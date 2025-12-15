@@ -341,7 +341,8 @@ public class ImportHandler {
         UpdateField.setAutomaticFields(
                 entries,
                 preferences.getOwnerPreferences(),
-                preferences.getTimestampPreferences());
+                preferences.getTimestampPreferences()
+        );
     }
 
     public void downloadLinkedFiles(BibEntry entry) {

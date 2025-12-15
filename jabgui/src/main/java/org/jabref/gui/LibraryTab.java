@@ -114,7 +114,6 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
 public class LibraryTab extends Tab implements CommandSelectionTab {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
@@ -153,7 +152,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private SuggestionProviders suggestionProviders;
 
-    @SuppressWarnings({"FieldCanBeLocal"}) private Subscription dividerPositionSubscription;
+    @SuppressWarnings({"FieldCanBeLocal"})
+    private Subscription dividerPositionSubscription;
 
     private ListProperty<GroupTreeNode> selectedGroupsProperty;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
@@ -265,7 +265,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabTitle(changedProperty.getValue()));
+            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
+                    updateTabTitle(changedProperty.getValue()));
         });
     }
 
@@ -880,7 +881,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
                 dialogService,
                 importHandler,
-                stateManager);
+                stateManager
+        );
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -903,14 +905,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
         addEntriesWithFeedback(
-                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file(and entry(s)) should be copied or moved
+                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
                 entriesToAdd,
                 bibDatabaseContext,
                 Localization.lang("Moved %0 entry(s) to %1"),
                 Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
                 dialogService,
                 importHandler,
-                stateManager);
+                stateManager
+        );
     }
 
     public void cutEntry() {
@@ -1154,7 +1157,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public static class DatabaseNotification extends NotificationPane {
-
         public DatabaseNotification(Node content) {
             super(content);
         }
