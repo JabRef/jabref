@@ -147,7 +147,7 @@ public class SideEffectExecutor {
     private void notifyUser(@NonNull String title, @NonNull String message) {
         try {
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.notify(title + message);
+            dialogService.notifyAll(title + message);
         } catch (Exception e) {
             LOGGER.error("Failed to notify user about side effect issue", e);
         }

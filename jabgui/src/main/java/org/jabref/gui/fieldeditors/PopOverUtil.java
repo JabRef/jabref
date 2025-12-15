@@ -42,7 +42,7 @@ public class PopOverUtil {
                         popOver.hide();
                         String message = Localization.lang("Error while fetching journal information: %0",
                                 exception.getMessage());
-                        dialogService.notify(message);
+                        dialogService.notifyAll(message);
                     })
                     .executeWith(taskExecutor);
         } else {
