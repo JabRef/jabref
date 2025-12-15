@@ -506,7 +506,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void removeCustomStyle(PreviewLayout layout) {
-        if (layout instanceof BstPreviewLayout) {
+        if (layout instanceof BstPreviewLayout bstLayout) {
             availableListProperty.remove(layout);
             chosenListProperty.remove(layout);
             // Remove the path so it doesn't come back on restart
