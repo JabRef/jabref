@@ -3,6 +3,8 @@ package org.jabref.logic.citation.contextextractor;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.AuthorListParser;
@@ -350,10 +352,10 @@ public class LibraryEntryResolver {
                 .replaceAll("[\\[\\](){}]", "")
                 .trim();
 
-        java.util.regex.Pattern authorYearPattern = java.util.regex.Pattern.compile(
+        Pattern authorYearPattern = Pattern.compile(
                 "([A-Za-z'\\-]+)(?:\\s+(?:et\\s+al\\.?|and|&)\\s+[A-Za-z'\\-]+)*\\s*(\\d{4})[a-z]?"
         );
-        java.util.regex.Matcher matcher = authorYearPattern.matcher(normalizedMarker);
+        Matcher matcher = authorYearPattern.matcher(normalizedMarker);
 
         if (matcher.find()) {
             String markerAuthor = matcher.group(1).toLowerCase(Locale.ROOT);
