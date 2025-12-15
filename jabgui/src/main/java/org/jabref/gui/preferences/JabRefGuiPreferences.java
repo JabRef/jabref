@@ -754,21 +754,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         externalApplicationsPreferences = getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences.getDefault());
 
         EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
-                (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
+                (_, _, newValue) -> put(EMAIL_SUBJECT, newValue));
         EasyBind.listen(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(),
-                (obs, oldValue, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
+                (_, _, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
         EasyBind.listen(externalApplicationsPreferences.useCustomTerminalProperty(),
-                (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
+                (_, _, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
         externalApplicationsPreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
                 put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(externalApplicationsPreferences.getExternalFileTypes())));
         EasyBind.listen(externalApplicationsPreferences.customTerminalCommandProperty(),
-                (obs, oldValue, newValue) -> put(CONSOLE_COMMAND, newValue));
+                (_, _, newValue) -> put(CONSOLE_COMMAND, newValue));
         EasyBind.listen(externalApplicationsPreferences.useCustomFileBrowserProperty(),
-                (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue)); // mind the !
+                (_, _, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue)); // mind the !
         EasyBind.listen(externalApplicationsPreferences.customFileBrowserCommandProperty(),
-                (obs, oldValue, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
+                (_, _, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
         EasyBind.listen(externalApplicationsPreferences.kindleEmailProperty(),
-                (obs, oldValue, newValue) -> put(KINDLE_EMAIL, newValue));
+                (_, _, newValue) -> put(KINDLE_EMAIL, newValue));
 
         return externalApplicationsPreferences;
     }
