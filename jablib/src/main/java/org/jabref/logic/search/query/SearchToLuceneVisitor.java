@@ -67,10 +67,17 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
         // unfielded expression
         if (ctx.FIELD() == null) {
+            boolean hasWildcard = term.contains("*") || term.contains("?");
+
             if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
                 return "/" + term + "/";
+            }else if(isQuoted){
+                return "\"" + escapeQuotes(term) + "\"";
+            } else if (hasWildcard) {
+                return QueryParser.escape(term).replace("\\*", "*").replace("\\?", "?");
+            } else{
+                return QueryParser.escape(term);
             }
-            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
         }
 
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
@@ -79,16 +86,6 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         }
 
         int operator = ctx.operator().getStart().getType();
-
-        if ("content".equals(field)
-                && !isQuoted
-                && !searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)
-                && !isRegexOperator(operator)
-                && !isExactMatchOperator(operator)) {
-            field = field + ":";
-            return buildContentWildcardQuery(field, term, operator);
-        }
-
         field = "any".equals(field) || "anyfield".equals(field) ? "" : field + ":";
         return buildFieldExpression(field, term, operator, isQuoted);
     }
@@ -105,22 +102,19 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             String expression = field + "/" + term + "/";
             return isNegationOp ? "NOT " + expression : expression;
         } else {
-            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            boolean hasWildcard = term.contains("*") || term.contains("?");
+
+            if(isQuoted){
+                term = "\"" + escapeQuotes(term) + "\"";
+            } else if (hasWildcard) {
+                term = QueryParser.escape(term).replace("\\*", "*").replace("\\?", "?");
+            } else{
+                term = QueryParser.escape(term);
+            }
+
             String expression = field + term;
             return isNegationOp ? "NOT " + expression : expression;
         }
-    }
-
-    private String buildContentWildcardQuery(String field, String term, int operator) {
-        boolean isNegationOp = isNegationOperator(operator);
-        String escapedTerm = QueryParser.escape(term);
-
-        if (!escapedTerm.contains("*") && !escapedTerm.contains("?")) {
-            escapedTerm = "*" + escapedTerm + "*";
-        }
-
-        String expression = field + escapedTerm;
-        return isNegationOp ? "NOT " + expression : expression;
     }
 
     private static String escapeQuotes(String term) {
@@ -153,16 +147,4 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         };
     }
 
-    private static boolean isExactMatchOperator(int operator) {
-        return switch (operator) {
-            case SearchParser.EEQUAL,
-                 SearchParser.CEEQUAL,
-                 SearchParser.NEEQUAL,
-                 SearchParser.NCEEQUAL,
-                 SearchParser.MATCHES ->
-                    true;
-            default ->
-                    false;
-        };
-    }
 }

@@ -18,6 +18,14 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("the", "the"),
                 Arguments.of("term", "term"),
                 Arguments.of("term", "any = term"),
+
+                Arguments.of("neighbou?r", "neighbou?r"),
+
+                Arguments.of("*term*", "*term*"),
+                Arguments.of("te*rm", "te*rm"),
+                Arguments.of("term*", "term*"),
+                Arguments.of("content:*image*", "content = *image*"),
+
                 Arguments.of("term", "any CONTAINS term"),
                 Arguments.of("term", "any MATCHES term"),
                 Arguments.of("term", "any =! term"),
@@ -28,25 +36,18 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("\"two terms\"", "any = \"two terms\""),
                 Arguments.of("NOT (term)", "NOT term"),
 
-                Arguments.of("content:*image*", "content = image"),
-                Arguments.of("content:image", "content == image"),
+                Arguments.of("content:image", "content = image"),
                 Arguments.of("annotations:image", "annotations = image"),
                 Arguments.of("content:\"image processing\"", "content = \"image processing\""),
-
-                Arguments.of("content:*image* AND annotations:processing", "content = image AND annotations = processing"),
-                Arguments.of("(content:*image* OR annotations:processing) AND term", "(content = image OR annotations = processing) AND term"),
+                Arguments.of("content:image AND annotations:processing", "content = image AND annotations = processing"),
+                Arguments.of("(content:image OR annotations:processing) AND term", "(content = image OR annotations = processing) AND term"),
                 Arguments.of("one OR (two AND three)", "one OR (two AND three)"),
-
-                Arguments.of("content:image", "content ==! image"),
-                Arguments.of("content:image", "content MATCHES image"),
-                Arguments.of("NOT content:image", "content !== image"),
-                Arguments.of("NOT content:image", "content !==! image"),
 
                 Arguments.of("NOT term", "any != term"),
                 Arguments.of("NOT term", "any !== term"),
                 Arguments.of("NOT term", "any !=! term"),
                 Arguments.of("NOT \"two terms\"", "any != \"two terms\""),
-                Arguments.of("content:*image* AND NOT annotations:processing", "content = image AND annotations != processing"),
+                Arguments.of("content:image AND NOT annotations:processing", "content = image AND annotations != processing"),
 
                 // ignore non pdf fields
                 Arguments.of("", "title = image"),
@@ -55,8 +56,6 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("image OR (processing)", "image OR (title = term OR processing)"),
                 Arguments.of("", "title = \"image processing\" AND author = smith"),
 
-                Arguments.of("neighbou\\?r", "neighbou?r"),
-                Arguments.of("neighbo\\*", "neighbo*"),
                 Arguments.of("", "title = neighbou?r"),
                 Arguments.of("", "(title == chocolate) OR (author == smith)"),
 
