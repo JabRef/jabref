@@ -18,14 +18,6 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("the", "the"),
                 Arguments.of("term", "term"),
                 Arguments.of("term", "any = term"),
-
-                Arguments.of("neighbou?r", "neighbou?r"),
-
-                Arguments.of("*term*", "*term*"),
-                Arguments.of("te*rm", "te*rm"),
-                Arguments.of("term*", "term*"),
-                Arguments.of("content:*image*", "content = *image*"),
-
                 Arguments.of("term", "any CONTAINS term"),
                 Arguments.of("term", "any MATCHES term"),
                 Arguments.of("term", "any =! term"),
@@ -35,6 +27,11 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("\"two terms\"", "\"two terms\""),
                 Arguments.of("\"two terms\"", "any = \"two terms\""),
                 Arguments.of("NOT (term)", "NOT term"),
+
+                Arguments.of("neighbou?r", "neighbou?r"),
+                Arguments.of("neighbo*", "neighbo*"),
+                Arguments.of("*term*", "*term*"),
+                Arguments.of("content:*image*", "content = *image*"),
 
                 Arguments.of("content:image", "content = image"),
                 Arguments.of("annotations:image", "annotations = image"),

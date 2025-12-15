@@ -71,11 +71,11 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
             if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
                 return "/" + term + "/";
-            }else if(isQuoted){
+            } else if (isQuoted) {
                 return "\"" + escapeQuotes(term) + "\"";
             } else if (hasWildcard) {
                 return QueryParser.escape(term).replace("\\*", "*").replace("\\?", "?");
-            } else{
+            } else {
                 return QueryParser.escape(term);
             }
         }
@@ -104,11 +104,11 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         } else {
             boolean hasWildcard = term.contains("*") || term.contains("?");
 
-            if(isQuoted){
+            if (isQuoted) {
                 term = "\"" + escapeQuotes(term) + "\"";
             } else if (hasWildcard) {
                 term = QueryParser.escape(term).replace("\\*", "*").replace("\\?", "?");
-            } else{
+            } else {
                 term = QueryParser.escape(term);
             }
 
@@ -146,5 +146,4 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
                     false;
         };
     }
-
 }

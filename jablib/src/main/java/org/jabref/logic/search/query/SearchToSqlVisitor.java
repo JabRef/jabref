@@ -223,15 +223,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
 
         if (!searchFlags.contains(REGULAR_EXPRESSION)) {
-            boolean hasWildcard = term.contains("*") || term.contains("?");
-            if (hasWildcard) {
-                term = escapeTermForSql(term);
-                term = term.replace("*", "%");
-                term = term.replace("?", "_");
-                prefixSuffix = "";
-            }else {
-                term = escapeTermForSql(term);
-            }
+            term = escapeTermForSql(term);
         }
 
         // Pseudo-fields
