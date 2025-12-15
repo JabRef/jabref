@@ -743,22 +743,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         putStringList(SIDE_PANE_COMPONENT_NAMES, names);
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
-
     // endregion
-
-    private ExternalApplicationsPreferences getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences defaults) {
-
-        return new ExternalApplicationsPreferences(
-                get(EMAIL_SUBJECT, defaults.getEmailSubject()),
-                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES,defaults.shouldAutoOpenEmailAttachmentsFolder()),
-                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaults.getExternalFileTypes()))),
-                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaults.useCustomTerminal()),
-                get(CONSOLE_COMMAND, defaults.getCustomTerminalCommand()),
-                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaults.useCustomFileBrowser()),
-                get(FILE_BROWSER_COMMAND, defaults.getCustomFileBrowserCommand()),
-                get(KINDLE_EMAIL, defaults.getKindleEmail())
-        );
-    }
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
@@ -766,10 +751,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return externalApplicationsPreferences;
         }
 
-        externalApplicationsPreferences =
-                getExternalApplicationsPreferencesFromBackingStore(
-                        ExternalApplicationsPreferences.getDefault()
-                );
+        externalApplicationsPreferences = getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences.getDefault());
 
         EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
                 (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
@@ -789,6 +771,19 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 (obs, oldValue, newValue) -> put(KINDLE_EMAIL, newValue));
 
         return externalApplicationsPreferences;
+    }
+
+    private ExternalApplicationsPreferences getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences defaults) {
+        return new ExternalApplicationsPreferences(
+                get(EMAIL_SUBJECT, defaults.getEmailSubject()),
+                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaults.shouldAutoOpenEmailAttachmentsFolder()),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaults.getExternalFileTypes()))),
+                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaults.useCustomTerminal()), // mind the !
+                get(CONSOLE_COMMAND, defaults.getCustomTerminalCommand()),
+                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaults.useCustomFileBrowser()), // mind the !
+                get(FILE_BROWSER_COMMAND, defaults.getCustomFileBrowserCommand()),
+                get(KINDLE_EMAIL, defaults.getKindleEmail())
+        );
     }
 
     public GroupsPreferences getGroupsPreferences() {

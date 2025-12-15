@@ -48,18 +48,16 @@ public class ExternalApplicationsPreferences {
 
     private ExternalApplicationsPreferences() {
         this(
-                Localization.lang("References"),     // eMailSubject
-                OS.WINDOWS,                          // shouldAutoOpenEmailAttachmentsFolder
-                Set.of(),                            // externalFileTypes
-                false,                               // useCustomTerminal
-                OS.WINDOWS
-                ? "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\""
-                : "",                            // customTerminalCommand
-                false,                               // useCustomFileBrowser
-                OS.WINDOWS
-                ? "explorer.exe /select, \"%DIR\""
-                : "",                            // customFileBrowserCommand
-                ""                                   // kindleEmail
+                Localization.lang("References"),                                         // eMailSubject
+                OS.WINDOWS,                                                                  // shouldAutoOpenEmailAttachmentsFolder
+                Set.of(),                                                                    // externalFileTypes
+                false,                                                                       // useCustomTerminal
+                OS.WINDOWS ? "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\""
+                           : "",                                                             // customTerminalCommand
+                false,                                                                       // useCustomFileBrowser
+                OS.WINDOWS ? "explorer.exe /select, \"%DIR\""
+                           : "",                                                             // customFileBrowserCommand
+                ""                                                                           // kindleEmail
         );
     }
 
@@ -69,9 +67,7 @@ public class ExternalApplicationsPreferences {
 
     public void setAll(ExternalApplicationsPreferences preferences) {
         this.eMailSubject.set(preferences.getEmailSubject());
-        this.shouldAutoOpenEmailAttachmentsFolder.set(
-                preferences.shouldAutoOpenEmailAttachmentsFolder()
-        );
+        this.shouldAutoOpenEmailAttachmentsFolder.set(preferences.shouldAutoOpenEmailAttachmentsFolder());
 
         this.useCustomTerminal.set(preferences.useCustomTerminal());
         this.customTerminalCommand.set(preferences.getCustomTerminalCommand());
@@ -84,7 +80,7 @@ public class ExternalApplicationsPreferences {
         this.externalFileTypes.clear();
         this.externalFileTypes.addAll(preferences.getExternalFileTypes());
     }
-    
+
     public String getEmailSubject() {
         return eMailSubject.get();
     }
