@@ -5,6 +5,10 @@ import java.util.regex.Pattern;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.util.strings.StringUtil;
 
+/**
+ * Compares two month values based on their format.
+ * Prefers normalized months (e.g. #jun#) and integers over unnormalized strings.
+ */
 public class MonthPlausibilityComparator implements FieldValuePlausibilityComparator {
     private static final Pattern MONTH_NORMALIZED = Pattern.compile("#(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)#");
 
