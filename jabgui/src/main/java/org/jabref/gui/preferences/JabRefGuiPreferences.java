@@ -257,14 +257,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
         // endregion
 
-        // region autoCompletePreferences
-        defaults.put(AUTO_COMPLETE, Boolean.FALSE);
-        defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
-        defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
-        defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
-        // endregion
-
         // region ExternalApplicationsPreferences
         defaults.put(EXTERNAL_FILE_TYPES, "");
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
@@ -386,6 +378,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
+        getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
     }
 
     @Override
@@ -403,6 +396,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getUnlinkedFilesDialogPreferences().setAll(getUnlinkedFilesDialogPreferences());
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
+        getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
     }
 
     // region EntryEditorPreferences
@@ -547,19 +541,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return autoCompletePreferences;
         }
 
-        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
-        if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
-            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
-        } else if (getBoolean(AUTOCOMPLETER_FIRST_LAST)) {
-            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
-        }
-
-        autoCompletePreferences = new AutoCompletePreferences(
-                getBoolean(AUTO_COMPLETE),
-                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
-                nameFormat,
-                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet())
-        );
+        autoCompletePreferences = getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences.getDefault());
 
         EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
         EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (obs, oldValue, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
@@ -1251,6 +1233,27 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaults.getLastShownEpochDay()));
     }
     // endregion
+
+    private AutoCompletePreferences getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences defaults) {
+        final String firstNameModeName = get(AUTOCOMPLETER_FIRSTNAME_MODE, defaults.getFirstNameMode().name());
+        AutoCompleteFirstNameMode firstNameMode = AutoCompleteFirstNameMode.parse(firstNameModeName);
+
+        AutoCompletePreferences.NameFormat nameFormat;
+        final boolean firstLast = getBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+        final boolean lastFirst = getBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+        if (firstLast && !lastFirst) {
+            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
+        } else if (!firstLast && lastFirst) {
+            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
+        } else {
+            nameFormat = defaults.getNameFormat();
+        }
+
+        return new AutoCompletePreferences(getBoolean(AUTO_COMPLETE, defaults.shouldAutoComplete()),
+                firstNameMode,
+                nameFormat,
+                getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaults.getCompleteFields()));
+    }
 
     /**
      * In GUI mode, we can lookup the directory better
