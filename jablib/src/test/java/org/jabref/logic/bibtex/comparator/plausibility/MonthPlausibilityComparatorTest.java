@@ -1,7 +1,9 @@
 package org.jabref.logic.bibtex.comparator.plausibility;
 
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MonthPlausibilityComparatorTest {
