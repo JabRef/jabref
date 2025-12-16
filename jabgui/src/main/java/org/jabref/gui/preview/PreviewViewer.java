@@ -2,6 +2,7 @@ package org.jabref.gui.preview;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
@@ -222,13 +223,30 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
+        String baseUrl = "";
+        if (databaseContext != null && databaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).isPresent()) {
+            Path baseDirPath = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).get();
+            try {
+                baseUrl = baseDirPath.toUri().toURL().toExternalForm();
+                // Ensure the base URL ends with a slash for correct relative path resolution
+                if (!baseUrl.endsWith("/")) {
+                    baseUrl += "/";
+                }
+            } catch (MalformedURLException e) {
+                LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
+            }
+        }
+
         layoutText = """
                 <html>
+                    <head>
+                        <base href="%s">
+                    </head>
                     <body id="previewBody">
                         <div id="content"> %s </div>
                     </body>
                 </html>
-                """.formatted(text);
+                """.formatted(baseUrl, text);
         highlightLayoutText();
         setHvalue(0);
     }

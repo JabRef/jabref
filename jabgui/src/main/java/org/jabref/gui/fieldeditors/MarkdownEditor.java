@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -19,7 +20,9 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
@@ -66,7 +69,7 @@ public class MarkdownEditor extends SimpleEditor {
 
     private void enableDragOver(EditorTextArea textArea) {
         textArea.setOnDragOver(event -> {
-            if (event.getGestureSource() != textArea && event.getDragboard().hasFiles()) {
+            if (event.getGestureSource() != textArea && (event.getDragboard().hasImage() || event.getDragboard().hasFiles())) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
             event.consume();
@@ -81,16 +84,18 @@ public class MarkdownEditor extends SimpleEditor {
             if (dragboard.hasFiles()) {
                 for (File file : dragboard.getFiles()) {
                     if (FileUtil.isImage(file.toPath())) {
-                        success = insertToDbAndAppend(file, textArea);
+                        success |= insertFileToDbAndAppend(file, textArea);
                     }
                 }
+            } else if (dragboard.hasImage()) {
+                success |= insertImageToDbAndAppend(dragboard.getUrl(), textArea);
             }
             event.setDropCompleted(success);
             event.consume();
         });
     }
 
-    private boolean insertToDbAndAppend(File file, EditorTextArea textArea) {
+    private boolean insertFileToDbAndAppend(File file, EditorTextArea textArea) {
         Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (fileDir.isEmpty()) {
             return false;
@@ -99,10 +104,19 @@ public class MarkdownEditor extends SimpleEditor {
         try {
             Files.copy(file.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
             String relativePath = FileUtil.relativize(destination, databaseContext.getFileDirectories(filePreferences)).toString();
-            String markdownText = "![" + file.getName() + "](" + relativePath + ")\n";
+            String markdownText = "![](" + relativePath + ")\n";
             textArea.appendText(markdownText);
             return true;
         } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public boolean insertImageToDbAndAppend(String imageUrl, EditorTextArea textArea) {
+        try {
+            Path tempFile = new URLDownload(imageUrl).toTemporaryFile();
+            return insertFileToDbAndAppend(tempFile.toFile(), textArea);
+        } catch (MalformedURLException | FetcherException e) {
             return false;
         }
     }
