@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - Improved merge dialog decisions for fields containing person names (e.g., `author`, `editor`) by using a new plausibility comparator. JabRef now prefers the side with more detailed/complete author information. [#14454](https://github.com/JabRef/jabref/issues/14454)
+- We added 15 non-standard BibLaTeX entry types (Audio, Image, Legal, ...) to the group "Non-standard types" group in the New Entry dialog and in the context menu. [#12963](https://github.com/JabRef/jabref/issues/12963)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
 - We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
@@ -31,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to change the Git username and PAT in Network Preferences. [#14509](https://github.com/JabRef/jabref/pull/14509)
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
+- We added the option to pseudonymize a library using the GUI, via the tools tab in the Main Menu. [#14118](https://github.com/JabRef/jabref/issues/14118)
 
 ### Changed
 
@@ -55,6 +57,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
 - We readded the missing gui commands for importing and exporting preferences. [#14492](https://github.com/JabRef/jabref/pull/14492)
 - We fixed a crash when importing preferences from older JabRef versions. [#14497](https://github.com/JabRef/jabref/issues/14497)
+- We fixed an issue where reordering linked files via drag and drop was no longer possible [14627](https://github.com/JabRef/jabref/pull/14627)
 
 ### Removed
 
