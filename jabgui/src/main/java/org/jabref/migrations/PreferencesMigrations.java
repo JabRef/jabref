@@ -583,7 +583,6 @@ public class PreferencesMigrations {
      * @param preferences the user's current preferences
      * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      */
-
     static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs =
                 preferences.getEntryEditorPreferences().getEntryEditorTabs();
@@ -624,7 +623,6 @@ public class PreferencesMigrations {
                 Localization.lang("General"),
                 FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
         );
-
         preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
     }
 
@@ -632,7 +630,6 @@ public class PreferencesMigrations {
      * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
-
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
