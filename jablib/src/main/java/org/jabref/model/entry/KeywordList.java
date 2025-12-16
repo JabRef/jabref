@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,13 +59,36 @@ public class KeywordList implements Iterable<Keyword> {
         }
 
         KeywordList keywordList = new KeywordList();
+        List<String> hierarchy = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean isEscaping = false;
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.ofHierarchical(chain);
-            keywordList.add(chainRoot);
+        for (int i = 0; i < keywordString.length(); i++) {
+            char currentChar = keywordString.charAt(i);
+
+            if (isEscaping) {
+                currentToken.append(currentChar);
+                isEscaping = false;
+            } else if (currentChar == '\\') {
+                isEscaping = true;
+            } else if (currentChar == Keyword.DEFAULT_HIERARCHICAL_DELIMITER) {
+                hierarchy.add(currentToken.toString().trim());
+                currentToken.setLength(0);
+            } else if (currentChar == delimiter) {
+                hierarchy.add(currentToken.toString().trim());
+                keywordList.add(Keyword.of(hierarchy));
+                hierarchy.clear();
+                currentToken.setLength(0);
+            } else {
+                currentToken.append(currentChar);
+            }
         }
+
+        if (!currentToken.isEmpty() || !hierarchy.isEmpty()) {
+            hierarchy.add(currentToken.toString().trim());
+            keywordList.add(Keyword.of(hierarchy));
+        }
+
         return keywordList;
     }
 
