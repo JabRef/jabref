@@ -1,9 +1,13 @@
 package org.jabref.model.entry;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,6 +20,29 @@ class KeywordListTest {
         keywords = new KeywordList();
         keywords.add("keywordOne");
         keywords.add("keywordTwo");
+    }
+
+    private static Stream<Arguments> provideWithEscapedDelimiterCases() {
+        return Stream.of(
+                Arguments.of("keyword\\,one, keywordTwo", new KeywordList("keyword,one", "keywordTwo")),
+                Arguments.of("keywordOne\\,, keywordTwo", new KeywordList("keywordOne,", "keywordTwo")),
+                Arguments.of("keyword\\\\, keywordTwo", new KeywordList("keyword\\", "keywordTwo")),
+                Arguments.of("keyword\\,one > sub", new KeywordList(Keyword.of(List.of("keyword,one", "sub")))),
+                Arguments.of("one\\,two\\,three, four", new KeywordList("one,two,three", "four")),
+                Arguments.of("keywordOne\\\\", new KeywordList("keywordOne\\"))
+        );
+    }
+
+    private static Stream<Arguments> provideSerializeWithNonEscapedDelimiterCases() {
+        return Stream.of(
+                Arguments.of(List.of(new Keyword("keyword,one"), new Keyword("keywordTwo")), "keyword\\,one, keywordTwo"),
+                Arguments.of(List.of(new Keyword("keywordOne,"), new Keyword("keywordTwo")), "keywordOne\\,, keywordTwo"),
+                Arguments.of(List.of(Keyword.of(List.of("keyword\\")), Keyword.of(List.of("keywordTwo"))), "keyword\\\\, keywordTwo"),
+                //                Not sure about this case
+                //                Arguments.of(List.of(new Keyword("keyword,one"), new Keyword("sub")), "keyword\\,one > sub"),
+                Arguments.of(List.of(new Keyword("one,two,three"), new Keyword("four")), "one\\,two\\,three, four"),
+                Arguments.of(List.of(new Keyword("keywordOne\\")), "keywordOne\\\\")
+        );
     }
 
     @Test
@@ -116,5 +143,17 @@ class KeywordListTest {
     @Test
     void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
         assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideWithEscapedDelimiterCases")
+    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword(String input, KeywordList expected) {
+        assertEquals(expected, KeywordList.parse(input, ','));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideSerializeWithNonEscapedDelimiterCases")
+    void serializeKeywordWithNonEscapedDelimiterJoinsKeywordsCorrectly(List<Keyword> input, String expected) {
+        assertEquals(expected, KeywordList.serialize(input, ','));
     }
 }
