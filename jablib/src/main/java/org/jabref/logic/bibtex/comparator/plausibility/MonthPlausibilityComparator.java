@@ -46,6 +46,10 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
         return ComparisonResult.UNDETERMINED;
     }
 
+    /**
+     * Checks if the value is in a strict BibTeX format.
+     * We prefer integers (e.g. "6") or BibTeX strings (e.g. "#jun#") over plain text (e.g. "June").
+     */
     private boolean isStrictFormat(String value) {
         String trimmed = value.trim();
 
