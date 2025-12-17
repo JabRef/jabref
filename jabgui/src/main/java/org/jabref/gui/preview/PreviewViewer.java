@@ -22,7 +22,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.preview.assets.PreviewText;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -238,9 +237,22 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
         }
 
-        layoutText = PreviewText.getPreviewText(baseUrl, text);
+        layoutText = formatPreviewText(baseUrl, text);
         highlightLayoutText();
         setHvalue(0);
+    }
+
+    private static String formatPreviewText(String baseUrl, String text) {
+        return """
+                <html>
+                    <head>
+                        <base href="%s">
+                    </head>
+                    <body id="previewBody">
+                        <div id="content"> %s </div>
+                    </body>
+                </html>
+                """.formatted(baseUrl, text);
     }
 
     private void highlightLayoutText() {

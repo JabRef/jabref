@@ -511,8 +511,7 @@ public class FileUtil {
      * @return True if file extension is an image, false otherwise
      */
     public static boolean isImage(Path file) {
-        Optional<String> extension = getFileExtension(file);
-        return extension.isPresent() && StandardFileType.IMAGE.getExtensions().contains(extension.get());
+        return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
     }
 
     /**
