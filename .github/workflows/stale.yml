@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   stale:
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v10

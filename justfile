@@ -6,7 +6,7 @@ ensure-gg-cmd:
 
 [unix]
 checkout-pr pr-id: ensure-gg-cmd
-    sh ./gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}}
+    if command -v gh >/dev/null 2>&1; then gh pr checkout {{pr-id}}; else sh ./gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}}; fi
 
 [unix]
 run-brach branch: ensure-gg-cmd
@@ -33,7 +33,7 @@ ensure-gg-cmd:
 
 [windows]
 checkout-pr pr-id: ensure-gg-cmd
-    .\gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}}
+    if (Get-Command gh -ErrorAction SilentlyContinue) { gh pr checkout {{pr-id}} } else { .\gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}} }
 
 [windows]
 run-branch branch: ensure-gg-cmd
