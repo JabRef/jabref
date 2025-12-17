@@ -34,6 +34,7 @@ import org.jabref.logic.layout.format.AuthorNatBib;
 import org.jabref.logic.layout.format.AuthorOrgSci;
 import org.jabref.logic.layout.format.Authors;
 import org.jabref.logic.layout.format.CSLType;
+import org.jabref.logic.layout.format.CategoryMappingForAcademicPages;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
 import org.jabref.logic.layout.format.CreateDocBook4Authors;
@@ -61,6 +62,7 @@ import org.jabref.logic.layout.format.JournalAbbreviator;
 import org.jabref.logic.layout.format.LastPage;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.MarkdownFormatter;
+import org.jabref.logic.layout.format.MonthNumberFormatter;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
@@ -77,6 +79,7 @@ import org.jabref.logic.layout.format.ReplaceWithEscapedDoubleQuotes;
 import org.jabref.logic.layout.format.RisAuthors;
 import org.jabref.logic.layout.format.RisKeywords;
 import org.jabref.logic.layout.format.RisMonth;
+import org.jabref.logic.layout.format.SafeFileName;
 import org.jabref.logic.layout.format.ShortMonthFormatter;
 import org.jabref.logic.layout.format.ToLowerCase;
 import org.jabref.logic.layout.format.ToUpperCase;
@@ -565,6 +568,12 @@ class LayoutEntry {
                     new ReplaceWithEscapedDoubleQuotes();
             case "HayagrivaType" ->
                     new HayagrivaType();
+            case "NumberMonth" ->
+                    new MonthNumberFormatter();
+            case "SafeFileName" ->
+                    new SafeFileName();
+            case "CategoryMappingForAcademicPages" ->
+                    new CategoryMappingForAcademicPages();
             default ->
                     null;
         };
