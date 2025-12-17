@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabls - start a bibtex languageserver
 
-//JAVA 25
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // raw is for https://github.com/unicode-org/icu/pull/2127

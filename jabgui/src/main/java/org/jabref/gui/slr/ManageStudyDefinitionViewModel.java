@@ -20,6 +20,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -64,6 +65,7 @@ public class ManageStudyDefinitionViewModel {
     private final DialogService dialogService;
 
     private final WorkspacePreferences workspacePreferences;
+    private final GitPreferences gitPreferences;
 
     private final StringProperty titleValidationMessage = new SimpleStringProperty();
     private final StringProperty authorsValidationMessage = new SimpleStringProperty();
@@ -78,6 +80,7 @@ public class ManageStudyDefinitionViewModel {
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
                                           @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull GitPreferences gitPreferences,
                                           @NonNull DialogService dialogService) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
@@ -92,6 +95,7 @@ public class ManageStudyDefinitionViewModel {
                                     .toList());
         this.dialogService = dialogService;
         this.workspacePreferences = workspacePreferences;
+        this.gitPreferences = gitPreferences;
 
         initializeValidationBindings();
     }
@@ -107,7 +111,9 @@ public class ManageStudyDefinitionViewModel {
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
                                           @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull GitPreferences gitPreferences,
                                           @NonNull DialogService dialogService) {
+        this.gitPreferences = gitPreferences;
         // copy the content of the study object into the UI fields
         authors.addAll(study.getAuthors());
         title.setValue(study.getTitle());
@@ -246,7 +252,7 @@ public class ManageStudyDefinitionViewModel {
         }
 
         try {
-            new GitHandler(studyDirectory).createCommitOnCurrentBranch("Update study definition", false);
+            new GitHandler(studyDirectory, gitPreferences).createCommitOnCurrentBranch("Update study definition", false);
         } catch (IOException | GitAPIException e) {
             LOGGER.error("Could not commit study definition file in directory {}", studyDirectory, e);
             dialogService.notify(Localization.lang("Please enter a valid file path.") +
