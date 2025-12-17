@@ -107,12 +107,12 @@ public class KeywordList implements Iterable<Keyword> {
                            .map(nodeKeyword -> nodeKeyword.replace("\\", "\\\\"))
                            .map(nodeKeyword -> nodeKeyword.replace(delimiterStr, escapedDelimiter))
                            .map(nodeKeyword -> nodeKeyword.replace(hierarchicalDelimiterStr, escapedHierarchicalDelimiter))
-                           .collect(Collectors.joining(String.format(" %s ", hierarchicalDelimiterStr))));
-
-            result.append(String.format("%s ", delimiterStr));
+                           .collect(Collectors.joining(String.format(" %s ", hierarchicalDelimiterStr)))
+            ).append(delimiterStr);
         }
+        
         if (!result.isEmpty()) {
-            result.setLength(result.length() - 2);
+            result.setLength(result.length() - 1);
         }
 
         return result.toString().trim();

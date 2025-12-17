@@ -35,11 +35,11 @@ class KeywordListTest {
 
     private static Stream<Arguments> provideSerializeWithNonEscapedDelimiterCases() {
         return Stream.of(
-                Arguments.of(List.of(new Keyword("keyword,one"), new Keyword("keywordTwo")), "keyword\\,one, keywordTwo"),
-                Arguments.of(List.of(new Keyword("keywordOne,"), new Keyword("keywordTwo")), "keywordOne\\,, keywordTwo"),
-                Arguments.of(List.of(Keyword.of(List.of("keyword\\")), Keyword.of(List.of("keywordTwo"))), "keyword\\\\, keywordTwo"),
+                Arguments.of(List.of(new Keyword("keyword,one"), new Keyword("keywordTwo")), "keyword\\,one,keywordTwo"),
+                Arguments.of(List.of(new Keyword("keywordOne,"), new Keyword("keywordTwo")), "keywordOne\\,,keywordTwo"),
+                Arguments.of(List.of(Keyword.of(List.of("keyword\\")), Keyword.of(List.of("keywordTwo"))), "keyword\\\\,keywordTwo"),
                 Arguments.of(List.of(Keyword.of(List.of("keyword,one", "sub"))), "keyword\\,one > sub"),
-                Arguments.of(List.of(new Keyword("one,two,three"), new Keyword("four")), "one\\,two\\,three, four"),
+                Arguments.of(List.of(new Keyword("one,two,three"), new Keyword("four")), "one\\,two\\,three,four"),
                 Arguments.of(List.of(new Keyword("keywordOne\\")), "keywordOne\\\\")
         );
     }
