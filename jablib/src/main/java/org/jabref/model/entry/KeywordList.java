@@ -93,7 +93,29 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
-        return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));
+        String delimiterStr = delimiter.toString();
+        String escapedDelimiter = "\\" + delimiterStr;
+        String hierarchicalDelimiterStr = Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString();
+        String escapedHierarchicalDelimiter = "\\" + hierarchicalDelimiterStr;
+
+        StringBuilder result = new StringBuilder();
+
+        for (Keyword keyword : keywords) {
+            result.append(
+                    keyword.flatten().stream()
+                           .map(Keyword::get)
+                           .map(nodeKeyword -> nodeKeyword.replace("\\", "\\\\"))
+                           .map(nodeKeyword -> nodeKeyword.replace(delimiterStr, escapedDelimiter))
+                           .map(nodeKeyword -> nodeKeyword.replace(hierarchicalDelimiterStr, escapedHierarchicalDelimiter))
+                           .collect(Collectors.joining(String.format(" %s ", hierarchicalDelimiterStr))));
+
+            result.append(String.format("%s ", delimiterStr));
+        }
+        if (!result.isEmpty()) {
+            result.setLength(result.length() - 2);
+        }
+
+        return result.toString().trim();
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
