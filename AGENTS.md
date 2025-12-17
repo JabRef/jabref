@@ -56,6 +56,7 @@ Agents **must not**:
 - Match naming conventions exactly
 - Keep methods small and focused
 - Avoid premature abstractions
+- Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
 
 ---
 
