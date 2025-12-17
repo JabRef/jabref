@@ -312,7 +312,7 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(
                         StandardActions.MULTI_MERGE_ENTRY_VIEW,
-                        new UpdateEntryFromWebSourcesAction(stateManager, undoManager, preferences, dialogService, taskExecutor)
+                        new UpdateEntryFromWebSourcesAction(stateManager, undoManager, preferences, dialogService, taskExecutor, dialogService)
                 ),
                 new SeparatorMenuItem(),
 
