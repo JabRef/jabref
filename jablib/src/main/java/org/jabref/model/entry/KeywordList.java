@@ -97,25 +97,16 @@ public class KeywordList implements Iterable<Keyword> {
         String escapedDelimiter = "\\" + delimiterStr;
         String hierarchicalDelimiterStr = Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString();
         String escapedHierarchicalDelimiter = "\\" + hierarchicalDelimiterStr;
+        String hierarchicalSeparator = " " + hierarchicalDelimiterStr + " ";
 
-        StringBuilder result = new StringBuilder();
-
-        for (Keyword keyword : keywords) {
-            result.append(
-                    keyword.flatten().stream()
-                           .map(Keyword::get)
-                           .map(nodeKeyword -> nodeKeyword.replace("\\", "\\\\"))
-                           .map(nodeKeyword -> nodeKeyword.replace(delimiterStr, escapedDelimiter))
-                           .map(nodeKeyword -> nodeKeyword.replace(hierarchicalDelimiterStr, escapedHierarchicalDelimiter))
-                           .collect(Collectors.joining(String.format(" %s ", hierarchicalDelimiterStr)))
-            ).append(delimiterStr);
-        }
-        
-        if (!result.isEmpty()) {
-            result.setLength(result.length() - 1);
-        }
-
-        return result.toString().trim();
+        return keywords.stream()
+                       .map(keyword -> keyword.flatten().stream()
+                                              .map(Keyword::get)
+                                              .map(nodeKeyword -> nodeKeyword.replace("\\", "\\\\"))
+                                              .map(nodeKeyword -> nodeKeyword.replace(delimiterStr, escapedDelimiter))
+                                              .map(nodeKeyword -> nodeKeyword.replace(hierarchicalDelimiterStr, escapedHierarchicalDelimiter))
+                                              .collect(Collectors.joining(hierarchicalSeparator)))
+                       .collect(Collectors.joining(delimiterStr));
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
