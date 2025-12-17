@@ -38,8 +38,7 @@ class KeywordListTest {
                 Arguments.of(List.of(new Keyword("keyword,one"), new Keyword("keywordTwo")), "keyword\\,one, keywordTwo"),
                 Arguments.of(List.of(new Keyword("keywordOne,"), new Keyword("keywordTwo")), "keywordOne\\,, keywordTwo"),
                 Arguments.of(List.of(Keyword.of(List.of("keyword\\")), Keyword.of(List.of("keywordTwo"))), "keyword\\\\, keywordTwo"),
-                //                Not sure about this case
-                //                Arguments.of(List.of(new Keyword("keyword,one"), new Keyword("sub")), "keyword\\,one > sub"),
+                Arguments.of(List.of(Keyword.of(List.of("keyword,one", "sub"))), "keyword\\,one > sub"),
                 Arguments.of(List.of(new Keyword("one,two,three"), new Keyword("four")), "one\\,two\\,three, four"),
                 Arguments.of(List.of(new Keyword("keywordOne\\")), "keywordOne\\\\")
         );
@@ -155,5 +154,17 @@ class KeywordListTest {
     @MethodSource("provideSerializeWithNonEscapedDelimiterCases")
     void serializeKeywordWithNonEscapedDelimiterJoinsKeywordsCorrectly(List<Keyword> input, String expected) {
         assertEquals(expected, KeywordList.serialize(input, ','));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideWithEscapedDelimiterCases")
+    void afterFirstParsingNoChangesShouldBeDoneToKeywords(String input, KeywordList expected) {
+        char delimiter = ',';
+        KeywordList firstParse = KeywordList.parse(input, delimiter);
+        String firstSerialize = KeywordList.serialize(firstParse.stream().toList(), delimiter);
+        KeywordList secondParse = KeywordList.parse(firstSerialize, delimiter);
+        String secondSerialize = KeywordList.serialize(secondParse.stream().toList(), delimiter);
+        assertEquals(firstSerialize, secondSerialize);
+        assertEquals(expected, secondParse);
     }
 }
