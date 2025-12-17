@@ -1,19 +1,17 @@
 package org.jabref.logic.bibtex.comparator.plausibility;
 
-import java.util.regex.Pattern;
+import java.util.Optional;
 
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.Month;
 
 /**
  * Compares two month values based on their format.
  * Prefers normalized months (e.g. #jun#) and integers over unnormalized strings.
  */
 public class MonthPlausibilityComparator implements FieldValuePlausibilityComparator {
-    private static final Pattern MONTH_NORMALIZED = Pattern.compile("#(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)#");
-
-    private static final Pattern MONTH_INTEGER = Pattern.compile("([1-9]|10|11|12)");
-
     @Override
     public ComparisonResult compare(String leftValue, String rightValue) {
         boolean isLeftBlank = StringUtil.isBlank(leftValue);
@@ -27,8 +25,17 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             return ComparisonResult.UNDETERMINED;
         }
 
-        boolean isLeftStrict = isStrictlyValid(leftValue);
-        boolean isRightStrict = isStrictlyValid(rightValue);
+        Optional<Month> leftMonth = Month.parse(leftValue);
+        Optional<Month> rightMonth = Month.parse(rightValue);
+
+        if (leftMonth.isPresent() && rightMonth.isEmpty()) {
+            return ComparisonResult.LEFT_BETTER;
+        } else if (leftMonth.isEmpty() && rightMonth.isPresent()) {
+            return ComparisonResult.RIGHT_BETTER;
+        }
+
+        boolean isLeftStrict = isStrictFormat(leftValue);
+        boolean isRightStrict = isStrictFormat(rightValue);
 
         if (isLeftStrict && !isRightStrict) {
             return ComparisonResult.LEFT_BETTER;
@@ -39,12 +46,16 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
         return ComparisonResult.UNDETERMINED;
     }
 
-    private boolean isStrictlyValid(String value) {
-        if (value == null) {
-            return false;
-        }
+    private boolean isStrictFormat(String value) {
         String trimmed = value.trim();
 
-        return MONTH_NORMALIZED.matcher(trimmed).matches() || MONTH_INTEGER.matcher(trimmed).matches();
+        if (trimmed.matches("\\d+")) {
+            return true;
+        }
+
+        char delimiter = FieldWriter.BIBTEX_STRING_START_END_SYMBOL;
+        return trimmed.length() >= 2
+                && trimmed.charAt(0) == delimiter
+                && trimmed.charAt(trimmed.length() - 1) == delimiter;
     }
 }

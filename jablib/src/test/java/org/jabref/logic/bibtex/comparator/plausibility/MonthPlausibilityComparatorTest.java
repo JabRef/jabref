@@ -2,30 +2,35 @@ package org.jabref.logic.bibtex.comparator.plausibility;
 
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MonthPlausibilityComparatorTest {
     private final MonthPlausibilityComparator comparator = new MonthPlausibilityComparator();
 
-    @Test
-    void preferNormalizedOverUnnormalized() {
-        assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare("Jun", "#jun#"));
-    }
+    @ParameterizedTest
+    @CsvSource(value = {
+            "Jun, #jun#, RIGHT_BETTER",
+            "June, #jun#, RIGHT_BETTER",
 
-    @Test
-    void preferIntegerOverUnnormalized() {
-        assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare("June", "6"));
-    }
+            "June, 6, RIGHT_BETTER",
 
-    @Test
-    void equalIfBothNormalized() {
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare("#jun#", "#jul#"));
-    }
+            "June, July, UNDETERMINED",
 
-    @Test
-    void equalIfBothInvalid() {
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare("June", "July"));
+            "#jun#, #jul#, UNDETERMINED",
+            "6, #jun#, UNDETERMINED",
+
+            "June, #Apr#, RIGHT_BETTER",
+
+            "NotAMonth, #jun#, RIGHT_BETTER",
+            "NotAMonth, June, RIGHT_BETTER",
+
+            ", #jun#, RIGHT_BETTER",
+            "#jun#, , LEFT_BETTER"
+    }, nullValues = {"null", ""})
+    void compare(String left, String right, ComparisonResult expected) {
+        assertEquals(expected, comparator.compare(left, right));
     }
 }
