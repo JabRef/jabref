@@ -64,6 +64,7 @@ import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.PreviewControls;
+import org.jabref.gui.pseudonymize.PseudonymizeAction;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
@@ -186,19 +187,16 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 // region: Sharing of the library
-                // TODO: Should be only enabled if not yet shared.
                 factory.createSubMenu(StandardActions.GIT,
-                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager)),
+                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager, preferences.getGitPreferences())),
                         factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
-
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
                         factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
-
                 // endregion
 
                 new SeparatorMenuItem(),
@@ -327,6 +325,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_ONLINE, new NewLibraryFromPdfActionOnline(frame, stateManager, dialogService, preferences, taskExecutor)),
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_OFFLINE, new NewLibraryFromPdfActionOffline(frame, stateManager, dialogService, preferences, taskExecutor)),
+                factory.createMenuItem(StandardActions.PSEUDONYMIZE_LIBRARY, new PseudonymizeAction(stateManager, dialogService, preferences)),
 
                 new SeparatorMenuItem(),
 

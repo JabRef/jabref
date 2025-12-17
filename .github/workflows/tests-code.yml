@@ -69,7 +69,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -92,6 +92,12 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
+          java-version: 24
+          distribution: 'corretto'
+          check-latest: true
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
           java-version: 25
           distribution: 'corretto'
           check-latest: true
@@ -103,7 +109,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -114,6 +120,10 @@ jobs:
       - name: Run OpenRewrite
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
+      - name: Output diff
+        if: failure()
+        run: |
+          cat /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch
 
   format:
     runs-on: ubuntu-latest
@@ -152,7 +162,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -176,7 +186,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v21
+        uses: DavidAnson/markdownlint-cli2-action@v22
         with:
           globs: |
             *.md
@@ -197,7 +207,7 @@ jobs:
         run: |
           echo "cache_key=jbang-heylogs-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -215,14 +225,14 @@ jobs:
 
           # exit 1 in case of an error
           remaining=$(
-              grep -E " error " heylogx.txt \
+              grep -E " error " heylogs.txt \
               | wc -l
             )
 
           echo "Remaining errors: $remaining"
 
-          # We have on acceptable error
-          if [ "$remaining" -gt 1 ]; then
+          # We have two acceptable errors
+          if [ "$remaining" -gt 2 ]; then
             echo "Failing because of $remaining remaining error(s)."
             exit 1
           fi
@@ -240,7 +250,7 @@ jobs:
           fetch-depth: 0
       - name: Cache clparse jar
         id: cache-clparse
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: /tmp/clparse
           key: clparse-0.9.1
@@ -278,7 +288,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -314,7 +324,7 @@ jobs:
       # the only place in all workflows where the JBang cache is updated
       # placed here as this updates the cache for all operating systems - these are different according to https://github.com/actions/cache/tree/main?tab=readme-ov-file#cache-version
       - name: Update cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -363,7 +373,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -413,7 +423,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -473,7 +483,7 @@ jobs:
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -543,7 +553,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -691,7 +701,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}

@@ -48,12 +48,28 @@ jobs:
             echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
             gh issue edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
 
-            # "workflow dispatch" does not trigger subsequent "on completion" runs
+            # "workflow dispatch" does not trigger subsequent "on completion" runs.
             # Therefore, we emulate ghprcomment here
             if [ "$EVENT" = "workflow_dispatch" ]; then
-              HAS_CONFLICT_COMMENT=$(gh api repos/jabref/JabRef/issues/$PR_NUMBER/comments | jq '.[].body | contains("Conflicts with target branch")' | grep true || true)
+              HAS_CONFLICT_COMMENT=$(
+                gh api graphql -f query="
+                  query {
+                    repository(owner: \"JabRef\", name: \"JabRef\") {
+                      pullRequest(number: $PR_NUMBER) {
+                        comments(last: 20) {
+                          nodes { body }
+                        }
+                      }
+                    }
+                  }
+                " \
+                | jq -r '.data.repository.pullRequest.comments.nodes[].body' \
+                | grep -q "Conflicts with target branch" \
+                  && echo "true" \
+                  || echo "false"
+              )
 
-              if [ -n "$HAS_CONFLICT_COMMENT" ]; then
+              if [ "$HAS_CONFLICT_COMMENT" = "true" ]; then
                 echo "Already commented about conflicts."
                 # When triggered by another workflow, success is also if there is a merge conflict
                 exit 0;
@@ -70,8 +86,7 @@ jobs:
           Conflicts with target branch
           -->
           EOF
-              # Commenting disabled, as we cannot reliably detect the old comments yet
-              # gh issue comment "$PR_NUMBER" --body-file body.txt
+              gh issue comment "$PR_NUMBER" --body-file body.txt
               echo "Commented on PR" >> $GITHUB_STEP_SUMMARY
 
               # When triggered by another workflow, success is also if there is a merge conflict
