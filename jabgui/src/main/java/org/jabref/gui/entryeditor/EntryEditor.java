@@ -378,7 +378,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 preferences,
                 taskExecutor,
                 bibEntryTypesManager,
-                searchCitationsRelationsService
+                searchCitationsRelationsService,
+                preferences.getEntryEditorPreferences()
         ));
         tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
         sourceTab = new SourceTab(

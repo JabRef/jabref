@@ -25,6 +25,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -41,12 +42,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.collab.entrychange.PreviewWithSourceTab;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
@@ -66,6 +68,7 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -113,6 +116,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
+    private final EntryEditorPreferences entryEditorPreferences;
 
     public CitationRelationsTab(DialogService dialogService,
                                 UndoManager undoManager,
@@ -121,7 +125,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 BibEntryTypesManager bibEntryTypesManager,
-                                SearchCitationsRelationsService searchCitationsRelationsService) {
+                                SearchCitationsRelationsService searchCitationsRelationsService,
+                                EntryEditorPreferences entryEditorPreferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
@@ -147,6 +152,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.progressIndicator = new ProgressIndicator();
         this.sciteResultsPane = new GridPane();
         setSciteResultsPane();
+
+        this.entryEditorPreferences = entryEditorPreferences;
     }
 
     private void setSciteResultsPane() {
@@ -383,6 +390,37 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitedByButton, 15.0);
 
+        // Dropdown for citationFetcher
+        ComboBox<CitationFetcherType> fetcherCombo = new ComboBox<>(
+                FXCollections.observableArrayList(
+                        CitationFetcherType.SEMANTICSCHOLAR,
+                        CitationFetcherType.CROSSREF
+                )
+        );
+        fetcherCombo.setTooltip(new Tooltip(Localization.lang("Select Citation Fetcher")));
+        fetcherCombo.setPrefWidth(160);
+        styleTopBarNode(fetcherCombo, 75.0);
+        fetcherCombo.setConverter(new StringConverter<CitationFetcherType>() {
+            @Override
+            public String toString(CitationFetcherType citationFetcherType) {
+                return citationFetcherType.getName();
+            }
+
+            @Override
+            public CitationFetcherType fromString(String s) {
+                if (s == null) {
+                    return CitationFetcherType.SEMANTICSCHOLAR;
+                }
+                for (CitationFetcherType provider : CitationFetcherType.values()) {
+                    if (provider.getName().equalsIgnoreCase(s)) {
+                        return provider;
+                    }
+                }
+                return CitationFetcherType.SEMANTICSCHOLAR;
+            }
+        });
+        fetcherCombo.setValue(entryEditorPreferences.getCitationFetcherType());
+
         // Create abort buttons for both sides
         Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitingButton.getGraphic().resize(30, 30);
@@ -409,7 +447,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleTopBarNode(importCitedByButton, 50.0);
         hideNodes(importCitingButton, importCitedByButton);
 
-        citingHBox.getChildren().addAll(citingLabel, refreshCitingButton, importCitingButton, citingProgress, abortCitingButton);
+        citingHBox.getChildren().addAll(citingLabel, fetcherCombo, refreshCitingButton, importCitingButton, citingProgress, abortCitingButton);
         citedByHBox.getChildren().addAll(citedByLabel, refreshCitedByButton, importCitedByButton, citedByProgress, abortCitedButton);
 
         VBox.setVgrow(citingListView, Priority.ALWAYS);
@@ -437,6 +475,24 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingComponents, citedByComponents));
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
+
+        fetcherCombo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                // Cancel any running searches so they don't continue with the old fetcher
+                if (citingTask != null && !citingTask.isCancelled()) {
+                    citingTask.cancel();
+                }
+                if (citedByTask != null && !citedByTask.isCancelled()) {
+                    citedByTask.cancel();
+                }
+
+                entryEditorPreferences.setCitationFetcherType(newValue);
+                // Ensure the search service uses the chosen fetcher
+                searchCitationsRelationsService.setCitationFetcherName(newValue.getFetcherName());
+                searchForRelations(citingComponents, citedByComponents);
+                searchForRelations(citedByComponents, citingComponents);
+            }
+        });
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
@@ -546,9 +602,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry.localEntry()));
     }
 
-    /**
-     * @implNote This code is similar to {@link PreviewWithSourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences, BibEntryTypesManager)}.
-     */
+    // Similar to PreviewWithSourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences, BibEntryTypesManager)
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);

@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherFactory;
 import org.jabref.logic.importer.fetcher.citation.crossref.CrossRefCitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -44,27 +45,27 @@ class GetCitedWorks implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        CitationFetcher citationFetcher = switch (provider) {
-            case CROSSREF -> {
-                CliPreferences preferences = argumentProcessor.cliPreferences;
-                AiService aiService = new AiService(
-                        preferences.getAiPreferences(),
-                        preferences.getFilePreferences(),
-                        preferences.getCitationKeyPatternPreferences(),
-                        LOGGER::info,
-                        new CurrentThreadTaskExecutor());
-                yield new CrossRefCitationFetcher(
+        CliPreferences preferences = argumentProcessor.cliPreferences;
+        AiService aiService = new AiService(
+                preferences.getAiPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                LOGGER::info,
+                new CurrentThreadTaskExecutor());
+
+        String fetcherName = (provider == Provider.CROSSREF)
+                             ? CrossRefCitationFetcher.FETCHER_NAME
+                             : SemanticScholarCitationFetcher.FETCHER_NAME;
+
+        CitationFetcher citationFetcher = CitationFetcherFactory.INSTANCE
+                .getCitationFetcher(
+                        fetcherName,
                         preferences.getImporterPreferences(),
                         preferences.getImportFormatPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
                         preferences.getGrobidPreferences(),
-                        aiService);
-            }
-            case SEMANTICSCHOLAR ->
-                    new SemanticScholarCitationFetcher(
-                            argumentProcessor.cliPreferences.getImporterPreferences()
-                    );
-        };
+                        aiService
+                );
 
         List<BibEntry> entries;
 
