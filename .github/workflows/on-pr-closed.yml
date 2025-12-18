@@ -170,7 +170,7 @@ jobs:
         if: steps.check_assignee.outputs.assigned == 'no'
         run: |
           echo "Commenting on PR..."
-          gh issue comment "${{ needs.collect_parameters.outputs.pr_number }}" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #${{ needs.determine_issue_number.outputs.issue_number }}."
+          gh issue comment "${{ needs.collect_parameters.outputs.pr_number }}" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #${{ needs.determine_issue_number.outputs.issue_number }}. In case you closed the PR for yourself, you can re-open it. Please also check [After submission of a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#after-submission-of-a-pull-request) in the CONTRIBUTING.md"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
