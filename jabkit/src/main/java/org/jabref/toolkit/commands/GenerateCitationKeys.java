@@ -26,7 +26,7 @@ class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
 
     @ParentCommand
-    private CitationKeyCommands parentMid;
+    private CitationKeyCommands parentCommand;
 
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
@@ -94,7 +94,7 @@ class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
-        JabKit parentTop = parentMid.getParent();
+        JabKit parentTop = parentCommand.getParent();
 
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
@@ -118,29 +118,31 @@ class GenerateCitationKeys implements Runnable {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
-        CitationKeyPatternPreferences preferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
+        CitationKeyPatternPreferences existingPreferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
+
+        CitationKeyPatternPreferences preferencesToUse = existingPreferences;
 
         if (transliterate != null || pattern != null || avoidOverwrite != null ||
                 warnBeforeOverwrite != null || generateBeforeSaving != null || suffix != null ||
                 keyPatternRegex != null || keyPatternReplacement != null ||
                 unwantedCharacters != null || keywordDelimiter != null) {
 
-            preferences = new CitationKeyPatternPreferences(
-                    transliterate != null ? transliterate : preferences.shouldTransliterateFieldsForCitationKey(),
-                    avoidOverwrite != null ? avoidOverwrite : preferences.shouldAvoidOverwriteCiteKey(),
-                    warnBeforeOverwrite != null ? warnBeforeOverwrite : preferences.shouldWarnBeforeOverwriteCiteKey(),
-                    generateBeforeSaving != null ? generateBeforeSaving : preferences.shouldGenerateCiteKeysBeforeSaving(),
-                    suffix != null ? suffix : preferences.getKeySuffix(),
-                    keyPatternRegex != null ? keyPatternRegex : preferences.getKeyPatternRegex(),
-                    keyPatternReplacement != null ? keyPatternReplacement : preferences.getKeyPatternReplacement(),
-                    unwantedCharacters != null ? unwantedCharacters : preferences.getUnwantedCharacters(),
-                    preferences.getKeyPatterns(),
-                    pattern != null ? pattern : preferences.getDefaultPattern(),
-                    keywordDelimiter != null ? keywordDelimiter : preferences.getKeywordDelimiter()
+            preferencesToUse = new CitationKeyPatternPreferences(
+                    transliterate != null ? transliterate : existingPreferences.shouldTransliterateFieldsForCitationKey(),
+                    avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
+                    warnBeforeOverwrite != null ? warnBeforeOverwrite : existingPreferences.shouldWarnBeforeOverwriteCiteKey(),
+                    generateBeforeSaving != null ? generateBeforeSaving : existingPreferences.shouldGenerateCiteKeysBeforeSaving(),
+                    suffix != null ? suffix : existingPreferences.getKeySuffix(),
+                    keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
+                    keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
+                    unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
+                    existingPreferences.getKeyPatterns(),
+                    pattern != null ? pattern : existingPreferences.getDefaultPattern(),
+                    keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
             );
         }
 
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences);
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferencesToUse);
         for (BibEntry entry : databaseContext.getEntries()) {
             keyGenerator.generateAndSetKey(entry);
         }

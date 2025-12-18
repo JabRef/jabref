@@ -12,13 +12,13 @@ import picocli.CommandLine.ParentCommand;
 public class CitationKeyCommands implements Runnable {
 
     @ParentCommand
-    private JabKit parentTop;
+    private JabKit parentCommand;
 
     @Override
     public void run() {
     }
 
     public JabKit getParent() {
-        return parentTop;
+        return parentCommand;
     }
 }

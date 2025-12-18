@@ -58,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We readded the missing gui commands for importing and exporting preferences. [#14492](https://github.com/JabRef/jabref/pull/14492)
 
 ### Removed
+- We removed `generate-citation-keys` as a standalone command in JabKit. Use `citationkeys generate` instead. [#14361](https://github.com/JabRef/jabref/issues/14361)
 
 ## [6.0-alpha.3] – 2025-10-30
 
