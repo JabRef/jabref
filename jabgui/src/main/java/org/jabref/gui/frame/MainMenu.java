@@ -59,6 +59,7 @@ import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.maintable.RightClickMenu;
 import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+import org.jabref.gui.mergeentries.UpdateEntryFromWebSourcesAction;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
 import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -309,6 +310,10 @@ public class MainMenu extends MenuBar {
                         new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor)),
                 // endregion
 
+                factory.createMenuItem(
+                        StandardActions.MULTI_MERGE_ENTRY_VIEW,
+                        new UpdateEntryFromWebSourcesAction(stateManager, undoManager, preferences, dialogService, taskExecutor, dialogService)
+                ),
                 new SeparatorMenuItem(),
 
                 // region file-related
