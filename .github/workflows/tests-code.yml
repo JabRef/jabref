@@ -120,6 +120,10 @@ jobs:
       - name: Run OpenRewrite
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
+      - name: Output diff
+        if: failure()
+        run: |
+          cat /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch
 
   format:
     runs-on: ubuntu-latest

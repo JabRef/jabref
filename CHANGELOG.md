@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
 - We added the option to pseudonymize a library using the GUI, via the tools tab in the Main Menu. [#14118](https://github.com/JabRef/jabref/issues/14118)
+- We added export options (Markdown and JSON) for AI Summary and AI Chat. [#13868](https://github.com/JabRef/jabref/issues/13868)
 
 ### Changed
 
@@ -57,7 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed localization of the "New Entries" dialog. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
 - We readded the missing gui commands for importing and exporting preferences. [#14492](https://github.com/JabRef/jabref/pull/14492)
-- We fixed an issue where reordering linked files via drag and drop was no longer possible [14627](https://github.com/JabRef/jabref/pull/14627)
+- We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 
 ### Removed
 
