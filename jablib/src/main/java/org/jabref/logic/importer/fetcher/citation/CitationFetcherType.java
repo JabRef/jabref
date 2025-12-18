@@ -5,7 +5,7 @@ import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticSchola
 
 public enum CitationFetcherType {
     CROSSREF("CrossRef"),
-    SEMANTICSCHOLAR("Semantic Scholar");;
+    SEMANTICSCHOLAR("Semantic Scholar");
 
     private final String name;
 
@@ -18,14 +18,14 @@ public enum CitationFetcherType {
     }
 
     public String getFetcherName() {
-        switch (this) {
-            case CROSSREF:
-                return CrossRefCitationFetcher.FETCHER_NAME;
-            case SEMANTICSCHOLAR:
-                return SemanticScholarCitationFetcher.FETCHER_NAME;
-            default:
-                throw new IllegalArgumentException("Unknown CitationFetcherType: " + this);
-        }
+        return switch (this) {
+            case CROSSREF ->
+                    CrossRefCitationFetcher.FETCHER_NAME;
+            case SEMANTICSCHOLAR ->
+                    SemanticScholarCitationFetcher.FETCHER_NAME;
+            default ->
+                    throw new IllegalArgumentException("Unknown CitationFetcherType: " + this);
+        };
     }
 
     @Override
