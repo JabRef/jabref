@@ -43,6 +43,7 @@ class ManageStudyDefinitionViewModelTest {
                 importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
+                new StudyCatalogItem("arXiv", false),
                 new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyCatalogItem("Biodiversity Heritage", false),
                 new StudyCatalogItem("CiteSeerX", false),
@@ -65,7 +66,6 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", true),
                 new StudyCatalogItem("Unpaywall", false),
-                new StudyCatalogItem("arXiv", false),
                 new StudyCatalogItem("zbMATH", false)
         ), manageStudyDefinitionViewModel.getCatalogs());
     }

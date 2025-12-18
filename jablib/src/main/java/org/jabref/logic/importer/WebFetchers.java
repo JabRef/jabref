@@ -147,7 +147,7 @@ public class WebFetchers {
      */
     public static SortedSet<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences,
                                                                ImporterPreferences importerPreferences) {
-        SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
