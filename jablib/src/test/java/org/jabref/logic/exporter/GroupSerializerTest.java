@@ -31,12 +31,17 @@ import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Loading of groups is tested in the GroupsParserTest class.
  */
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class GroupSerializerTest {
 
     private GroupSerializer groupSerializer;
