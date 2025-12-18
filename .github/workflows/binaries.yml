@@ -278,6 +278,8 @@ jobs:
         with:
           website: jdk.java.net
           release: EA
+          # use the next JDK, not the next-next
+          version: stable
       - name: Tell gradle to use JDK 26 (macOS)
         if: ${{ needs.conditions.outputs.eaJdk == 'true' && (startsWith(matrix.os, 'macos')) }}
         run: |
