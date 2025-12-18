@@ -266,6 +266,5 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires org.libreoffice.uno;
     requires transitive org.jspecify;
-    requires org.tinylog.api;
     // endregion
 }

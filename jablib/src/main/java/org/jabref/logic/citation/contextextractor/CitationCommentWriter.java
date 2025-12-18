@@ -2,7 +2,6 @@ package org.jabref.logic.citation.contextextractor;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -10,9 +9,9 @@ import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.citation.CitationContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +26,7 @@ public class CitationCommentWriter {
     private final Field commentField;
     private final String username;
 
-    public CitationCommentWriter() {
-        this.commentField = StandardField.COMMENT;
-        this.username = null;
-    }
-
-    public CitationCommentWriter(String username) {
-        Objects.requireNonNull(username, "Username cannot be null");
+    public CitationCommentWriter(@NonNull String username) {
         if (username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be blank");
         }
@@ -45,17 +38,16 @@ public class CitationCommentWriter {
         return commentField;
     }
 
-    public Optional<String> getUsername() {
-        return Optional.ofNullable(username);
+    public String getUsername() {
+        return username;
     }
 
-    public String formatContext(CitationContext context) {
-        Objects.requireNonNull(context, "Context cannot be null");
+    public String formatContext(@NonNull CitationContext context) {
         return CONTEXT_FORMAT.formatted(context.sourceCitationKey(), context.contextText());
     }
 
-    public String formatContexts(List<CitationContext> contexts) {
-        if (contexts == null || contexts.isEmpty()) {
+    public String formatContexts(@NonNull List<CitationContext> contexts) {
+        if (contexts.isEmpty()) {
             return "";
         }
         return contexts.stream()
@@ -63,10 +55,7 @@ public class CitationCommentWriter {
                        .collect(Collectors.joining(CONTEXT_SEPARATOR));
     }
 
-    public boolean addContextToEntry(BibEntry entry, CitationContext context) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        Objects.requireNonNull(context, "Context cannot be null");
-
+    public boolean addContextToEntry(@NonNull BibEntry entry, @NonNull CitationContext context) {
         String formattedContext = formatContext(context);
         Optional<String> existingComment = entry.getField(commentField);
 
@@ -84,9 +73,8 @@ public class CitationCommentWriter {
         return true;
     }
 
-    public int addContextsToEntry(BibEntry entry, List<CitationContext> contexts) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        if (contexts == null || contexts.isEmpty()) {
+    public int addContextsToEntry(@NonNull BibEntry entry, @NonNull List<CitationContext> contexts) {
+        if (contexts.isEmpty()) {
             return 0;
         }
 
@@ -141,10 +129,7 @@ public class CitationCommentWriter {
         return trimmedExisting + CONTEXT_SEPARATOR + newContent;
     }
 
-    public boolean removeContextsFromSource(BibEntry entry, String sourceCitationKey) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        Objects.requireNonNull(sourceCitationKey, "Source citation key cannot be null");
-
+    public boolean removeContextsFromSource(@NonNull BibEntry entry, @NonNull String sourceCitationKey) {
         Optional<String> existingComment = entry.getField(commentField);
         if (existingComment.isEmpty() || existingComment.get().isBlank()) {
             return false;
@@ -180,15 +165,11 @@ public class CitationCommentWriter {
         return removedAny;
     }
 
-    public void clearComment(BibEntry entry) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
+    public void clearComment(@NonNull BibEntry entry) {
         entry.clearField(commentField);
     }
 
-    public List<String> getContextsFromSource(BibEntry entry, String sourceCitationKey) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        Objects.requireNonNull(sourceCitationKey, "Source citation key cannot be null");
-
+    public List<String> getContextsFromSource(@NonNull BibEntry entry, @NonNull String sourceCitationKey) {
         Optional<String> existingComment = entry.getField(commentField);
         if (existingComment.isEmpty() || existingComment.get().isBlank()) {
             return List.of();
@@ -207,9 +188,7 @@ public class CitationCommentWriter {
         return !getContextsFromSource(entry, sourceCitationKey).isEmpty();
     }
 
-    public int countContexts(BibEntry entry) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-
+    public int countContexts(@NonNull BibEntry entry) {
         Optional<String> existingComment = entry.getField(commentField);
         if (existingComment.isEmpty() || existingComment.get().isBlank()) {
             return 0;
