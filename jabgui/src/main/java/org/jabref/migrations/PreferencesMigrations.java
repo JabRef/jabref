@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,7 +70,7 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
-        addICORERankingFieldToGeneralTab(preferences);
+        migrateGeneralTabDefaultFields(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
     }
 
@@ -583,7 +584,8 @@ public class PreferencesMigrations {
      * @param preferences the user's current preferences
      * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      */
-    static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
+
+    static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs =
                 preferences.getEntryEditorPreferences().getEntryEditorTabs();
 
@@ -594,8 +596,8 @@ public class PreferencesMigrations {
             return;
         }
 
-        // old defaults BEFORE ICORE and EPRINTTYPE
-        Set<Field> oldDefaultGeneralFields = Set.of(
+        // Defaults ICORE (before alpha.3)
+        Set<Field> preICoreDefaults = Set.of(
                 StandardField.DOI,
                 StandardField.CROSSREF,
                 StandardField.KEYWORDS,
@@ -605,7 +607,6 @@ public class PreferencesMigrations {
                 StandardField.GROUPS,
                 StandardField.OWNER,
                 StandardField.TIMESTAMP,
-
                 SpecialField.PRINTED,
                 SpecialField.PRIORITY,
                 SpecialField.QUALITY,
@@ -614,15 +615,20 @@ public class PreferencesMigrations {
                 SpecialField.RELEVANCE
         );
 
-        // reset only if user still has old defaults
-        if (!currentGeneralPrefs.equals(oldDefaultGeneralFields)) {
+        // Defaults ICORE (after alpha.3)
+        Set<Field> postICoreDefaults = new HashSet<>(preICoreDefaults);
+        postICoreDefaults.add(StandardField.ICORERANKING);
+
+        if (!currentGeneralPrefs.equals(preICoreDefaults)
+                && !currentGeneralPrefs.equals(postICoreDefaults)) {
             return;
         }
 
         entryEditorPrefs.put(
                 Localization.lang("General"),
-                FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
+                new HashSet<>(FieldFactory.getDefaultGeneralFields())
         );
+
         preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
     }
 
@@ -630,6 +636,7 @@ public class PreferencesMigrations {
      * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
+
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
