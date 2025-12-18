@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,16 +62,15 @@ public class KeywordList implements Iterable<Keyword> {
         KeywordList keywordList = new KeywordList();
         List<String> hierarchy = new ArrayList<>();
         StringBuilder currentToken = new StringBuilder();
-        boolean isEscaping = false;
+        AtomicBoolean isEscaping = new AtomicBoolean(false);
 
-        for (int i = 0; i < keywordString.length(); i++) {
-            char currentChar = keywordString.charAt(i);
-
-            if (isEscaping) {
+        keywordString.chars().forEachOrdered(symbol -> {
+            char currentChar = (char) symbol;
+            if (isEscaping.get()) {
                 currentToken.append(currentChar);
-                isEscaping = false;
+                isEscaping.set(false);
             } else if (currentChar == '\\') {
-                isEscaping = true;
+                isEscaping.set(true);
             } else if (currentChar == Keyword.DEFAULT_HIERARCHICAL_DELIMITER) {
                 hierarchy.add(currentToken.toString().trim());
                 currentToken.setLength(0);
@@ -82,7 +82,7 @@ public class KeywordList implements Iterable<Keyword> {
             } else {
                 currentToken.append(currentChar);
             }
-        }
+        });
 
         if (!currentToken.isEmpty() || !hierarchy.isEmpty()) {
             hierarchy.add(currentToken.toString().trim());
