@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -193,9 +194,16 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragDropped != null) {
                         setOnDragDropped(event -> {
-                            // The parent is the box for dropping; that should be used as target (and not this cell)
+                            // For reordering we need to accept the event so that the local handlers get it
+                            toOnDragDropped.accept(viewModel, event);
+                            Node parent = getParent();
+                            if (parent != null) {
+                                // The parent is the box for dropping from external files; that should be used as target (and not this cell)
+                                // We need to send a copy of the event before consuming the original one
+                                DragEvent forwarded = event.copyFor(parent, parent);
+                                Event.fireEvent(parent, forwarded);
+                            }
                             event.consume();
-                            getParent().fireEvent(event);
                         });
                     }
                     if (toOnDragEntered != null) {
@@ -206,8 +214,14 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragOver != null) {
                         setOnDragOver(event -> {
-                            event.consume(); // Prevent cells from acting as drop targets
-                            getParent().fireEvent(event); // The action performed was not look at the parent, the drop box
+                            // For reordering we need to accept the event so that the local handlers get it
+                            toOnDragOver.accept(viewModel, event);
+                            Node parent = getParent();
+                            if (parent != null) {
+                                DragEvent forwarded = event.copyFor(parent, parent);
+                                Event.fireEvent(parent, forwarded);
+                            }
+                            event.consume();
                         });
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
