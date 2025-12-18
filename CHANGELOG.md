@@ -37,7 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We changed notification logging to debug level. Notifications are now logged only in [debug mode](https://docs.jabref.org/advanced/commandline#debug-mode-debug). [#14645](https://github.com/JabRef/jabref/issues/14645)
+- We changed AI export logging to debug level (notifications and follow-up question generation). Logs are now emitted only in [debug mode](https://docs.jabref.org/advanced/commandline#debug-mode-debug). [#14645](https://github.com/JabRef/jabref/issues/14645)
 - We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types. [#14082](https://github.com/JabRef/jabref/issues/14082)
 - In case of invalid BibTeX in the source tab, a notification is displayed (instead of an exception). [#14504](https://github.com/JabRef/jabref/pull/14504)
 - We separated the "Clean up entries" dialog into three tabs for clarity. [#13819](https://github.com/JabRef/jabref/issues/13819)
