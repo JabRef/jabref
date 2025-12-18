@@ -69,7 +69,7 @@ jobs:
                   || echo "false"
               )
 
-              if [ -n "$HAS_CONFLICT_COMMENT" ]; then
+              if [ "$HAS_CONFLICT_COMMENT" = "true" ]; then
                 echo "Already commented about conflicts."
                 # When triggered by another workflow, success is also if there is a merge conflict
                 exit 0;
