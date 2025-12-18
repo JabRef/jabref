@@ -108,8 +108,8 @@ public class AiChatComponent extends VBox {
     ) {
         this.aiService = aiService;
         this.entries = (entries != null && !entries.isEmpty())
-                ? entries
-                : stateManager.getSelectedEntries();
+                       ? entries
+                       : stateManager.getSelectedEntries();
         this.bibDatabaseContext = bibDatabaseContext;
         this.aiPreferences = aiPreferences;
         this.entryTypesManager = entryTypesManager;
