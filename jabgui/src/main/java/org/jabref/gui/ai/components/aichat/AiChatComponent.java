@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -107,9 +108,6 @@ public class AiChatComponent extends VBox {
                            TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
-        this.entries = (entries != null && !entries.isEmpty())
-                       ? entries
-                       : stateManager.getSelectedEntries();
         this.bibDatabaseContext = bibDatabaseContext;
         this.aiPreferences = aiPreferences;
         this.entryTypesManager = entryTypesManager;
@@ -118,6 +116,19 @@ public class AiChatComponent extends VBox {
         this.taskExecutor = taskExecutor;
 
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, chatHistory, entries, bibDatabaseContext);
+
+        ObservableList<BibEntry> currentSelection = stateManager.getSelectedEntries();
+
+        if (entries != null && !entries.isEmpty()) {
+            boolean isSubsetOfSelection = new HashSet<>(currentSelection).containsAll(entries);
+            if (isSubsetOfSelection) {
+                this.entries = currentSelection;
+            } else {
+                this.entries = entries;
+            }
+        } else {
+            this.entries = currentSelection;
+        }
 
         aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
 
