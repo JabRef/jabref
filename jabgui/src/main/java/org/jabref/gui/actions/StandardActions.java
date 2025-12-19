@@ -82,17 +82,29 @@ public enum StandardActions implements Action {
     SAVE_LIBRARY_AS(Localization.lang("Save library as..."), KeyBinding.SAVE_DATABASE_AS),
     SAVE_SELECTED_AS_PLAIN_BIBTEX(Localization.lang("Save selected as plain BibTeX...")),
     SAVE_ALL(Localization.lang("Save all"), Localization.lang("Save all open libraries"), IconTheme.JabRefIcons.SAVE_ALL, KeyBinding.SAVE_ALL),
+
     IMPORT_INTO_NEW_LIBRARY(Localization.lang("Import into new library"), KeyBinding.IMPORT_INTO_NEW_DATABASE),
     IMPORT_INTO_CURRENT_LIBRARY(Localization.lang("Import into current library"), KeyBinding.IMPORT_INTO_CURRENT_DATABASE),
     EXPORT_ALL(Localization.lang("Export all entries")),
-    REMOTE_DB(Localization.lang("Shared database"), IconTheme.JabRefIcons.REMOTE_DATABASE),
     EXPORT_SELECTED(Localization.lang("Export selected entries"), KeyBinding.EXPORT_SELECTED),
+
+    GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
+    GIT_PULL(Localization.lang("Pull")),
+    GIT_PUSH(Localization.lang("Push")),
+    GIT_COMMIT(Localization.lang("Commit")),
+    GIT_SHARE(Localization.lang("Share this library to GitHub")),
+
+    CITE_DRIVE_PUSH(Localization.lang("Push to CiteDrive")),
+
+    REMOTE_DB(Localization.lang("Shared database"), IconTheme.JabRefIcons.REMOTE_DATABASE),
     CONNECT_TO_SHARED_DB(Localization.lang("Connect to shared database"), IconTheme.JabRefIcons.CONNECT_DB),
     PULL_CHANGES_FROM_SHARED_DB(Localization.lang("Pull changes from shared database"), KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
+
     CLOSE_LIBRARY(Localization.lang("Close library"), Localization.lang("Close the current library"), IconTheme.JabRefIcons.CLOSE),
     CLOSE_OTHER_LIBRARIES(Localization.lang("Close others"), Localization.lang("Close other libraries"), IconTheme.JabRefIcons.CLOSE),
     CLOSE_ALL_LIBRARIES(Localization.lang("Close all"), Localization.lang("Close all libraries"), IconTheme.JabRefIcons.CLOSE),
     QUIT(Localization.lang("Quit"), Localization.lang("Quit JabRef"), IconTheme.JabRefIcons.CLOSE_JABREF, KeyBinding.QUIT_JABREF),
+
     UNDO(Localization.lang("Undo"), IconTheme.JabRefIcons.UNDO, KeyBinding.UNDO),
     REDO(Localization.lang("Redo"), IconTheme.JabRefIcons.REDO, KeyBinding.REDO),
     REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
@@ -230,13 +242,7 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
-    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache")),
-
-    GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
-    GIT_PULL(Localization.lang("Pull")),
-    GIT_PUSH(Localization.lang("Push")),
-    GIT_COMMIT(Localization.lang("Commit")),
-    GIT_SHARE(Localization.lang("Share this library to GitHub"));
+    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
 
     private String text;
     private final String description;

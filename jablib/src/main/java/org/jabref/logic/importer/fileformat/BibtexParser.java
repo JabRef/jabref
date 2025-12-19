@@ -87,7 +87,7 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
 /// [`OpenDatabase.loadDatabase`](org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor))
 ///
 /// **Opposite class:**
-/// [`BibDatabaseWriter`](org.jabref.logic.exporter.BibDatabaseWriter)
+/// [org.jabref.logic.exporter.BibDatabaseWriter]
 ///
 /// FIXME: This class relies on `char`, but should use [java.lang.Character] to be fully Unicode compliant.
 public class BibtexParser implements Parser {

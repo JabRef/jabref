@@ -129,7 +129,7 @@ class CiteDriveOAuthTest {
 
         CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
 
-        Optional<AccessToken> actual = citeDriveOAuthService.currentOrFreshTokens().get();
+        Optional<AccessToken> actual = citeDriveOAuthService.getAccessToken().get();
         assertTrue(actual.isPresent());
 
         String bibtex = """

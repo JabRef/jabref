@@ -93,6 +93,8 @@ public class CiteDriveOAuthService {
         this.TOKEN_ENDPOINT = tokenEndpoint;
     }
 
+    /// Do not use if not in testing!
+    /// Continue at [CiteDriveOAuthService#getAccessToken()]
     @VisibleForTesting
     public CompletableFuture<Optional<AccessToken>> authorizeInteractive() {
         String state = UUID.randomUUID().toString();
@@ -161,7 +163,7 @@ public class CiteDriveOAuthService {
     /// If current tokens are present and include a refresh token, attempts to refresh them first.
     ///
     /// Also stores the refresh token
-    public CompletableFuture<Optional<AccessToken>> currentOrFreshTokens() {
+    public CompletableFuture<Optional<AccessToken>> getAccessToken() {
         RefreshToken cachedRefreshToken = citeDrivePreferences.getRefreshToken();
         if (cachedRefreshToken == null) {
             // No tokens yet: go interactive
