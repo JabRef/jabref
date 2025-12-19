@@ -320,7 +320,24 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             Platform.runLater(() -> idLookupGuess.setSelected(true));
         }
 
-        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
+            preferences.setIdLookupGuessing(newValue);
+            // When switching to auto-detect mode, detect identifier type from current text
+            if (newValue && idText.getText() != null && !idText.getText().trim().isEmpty()) {
+                Optional<Identifier> identifier = Identifier.from(idText.getText().trim());
+                if (identifier.isPresent()) {
+                    Identifier id = identifier.get();
+                    boolean isValid = switch (id) {
+                        case DOI doi -> DOI.isValid(doi.asString());
+                        case ISBN isbn -> isbn.isValid();
+                        default -> true;
+                    };
+                    if (isValid) {
+                        fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
+                    }
+                }
+            }
+        });
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
@@ -333,6 +350,26 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
+
+        // Auto-detect identifier type when typing in the identifier field
+        // Only works when "Automatically determine identifier type" is selected
+        idText.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (idLookupGuess.isSelected() && newValue != null && !newValue.trim().isEmpty()) {
+                Optional<Identifier> identifier = Identifier.from(newValue.trim());
+                if (identifier.isPresent()) {
+                    Identifier id = identifier.get();
+                    // Validate identifier (similar to extractValidIdentifierFromClipboard)
+                    boolean isValid = switch (id) {
+                        case DOI doi -> DOI.isValid(doi.asString());
+                        case ISBN isbn -> isbn.isValid();
+                        default -> true;
+                    };
+                    if (isValid) {
+                        fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
+                    }
+                }
+            }
+        });
 
         idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
