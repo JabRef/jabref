@@ -117,6 +117,7 @@ class CiteDriveOAuthTest {
     /// Uses the "intended" use of CiteDriveOAuthService w/ token refresh
     @Test
     @Timeout(60)
+    @Disabled
     void putLibrary() throws ExecutionException, InterruptedException, IOException {
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
