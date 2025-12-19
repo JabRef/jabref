@@ -43,7 +43,7 @@ public class CiteDrivePush {
                                                    .body(pis)
                                                    .asString();
         httpResponse.ifFailure(response -> {
-            LOGGER.error("CiteDrive push failed: {}", response);
+            LOGGER.error("CiteDrive push failed: {} - {}", response.getStatus(), response.getBody());
             notificationService.notify(Localization.lang("CiteDrive push failed: %0", response.getStatus() + " " + response.getBody()));
         });
         httpResponse.ifSuccess(_ -> notificationService.notify(Localization.lang("CiteDrive push succeeded.")));
