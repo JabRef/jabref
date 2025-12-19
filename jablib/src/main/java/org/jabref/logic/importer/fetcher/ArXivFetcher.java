@@ -591,7 +591,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
         @Override
         public String getName() {
-            return "ArXiv";
+            return "arXiv";
         }
 
         @Override
