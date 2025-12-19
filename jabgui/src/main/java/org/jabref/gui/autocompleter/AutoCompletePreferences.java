@@ -38,7 +38,7 @@ public class AutoCompletePreferences {
 
     ///  Creates object with default values
     private AutoCompletePreferences() {
-        this(false,                        // Auto complete default value false
+        this(false,                                         // Auto complete default value false
                 AutoCompleteFirstNameMode.BOTH,             // Auto completer of first name uses both: full and abbreviated
                 NameFormat.BOTH,                            // Name format uses both: last_first and first_last
                 new LinkedHashSet<>(List.of(StandardField.AUTHOR, // Auto completer complete fields
