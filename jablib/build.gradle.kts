@@ -210,7 +210,7 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core")
     // TODO: Use versions of versions/build.gradle.kts
-    mockitoAgent("org.mockito:mockito-core:5.20.0") { isTransitive = false }
+    mockitoAgent("org.mockito:mockito-core:5.21.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")
