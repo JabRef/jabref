@@ -435,7 +435,7 @@ jobs:
     if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      issues: write
       pull-requests: read
     steps:
       - name: echo PR data
