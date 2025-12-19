@@ -107,6 +107,16 @@ public class Launcher {
      * is not possible to alter the log configuration programmatically anymore.
      */
     public static void initLogging(String[] args) {
+        // Install a JUL filter to suppress extremely noisy JavaFX CSS warnings (see JDK-8268657)
+        // We add the filter before installing the SLF4J bridge so that filtered JUL records never
+        // reach SLF4J/tinylog in the first place.
+        java.util.logging.Logger rootJulLogger = java.util.logging.Logger.getLogger("");
+        try {
+            rootJulLogger.setFilter(new org.jabref.gui.logging.JavaFxCssLogFilter());
+        } catch (Throwable ignored) {
+            // If anything goes wrong, do not fail startup because of logging
+        }
+
         // routeLoggingToSlf4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
