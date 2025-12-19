@@ -27,7 +27,7 @@ jobs:
 
 
             Hi @{{ handle }}, you've already reached the limit of **{{ max_overall_assignment_count }}** active assignments for good first issues.
-            A good first issue is a great way to get started with contributing to JabRef, and we want to ensure that everyone has the opportunity to work on these issues.
+            Good first issues are a great way to get started with contributing to JabRef, and we want to ensure that all newcomers have the opportunity to work on them.
 
 
             While waiting for feedback on your current assignments, you are invited to move on to more advanced issues.
