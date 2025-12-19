@@ -577,25 +577,19 @@ public class PreferencesMigrations {
      * Migrates default fields of the "General" entry editor tab.
      *
      * <p>
-     * This migration handles all types of user that are coming before v6 alpha.3 and after v6.0-alpha.3
+     * This migration handles default configuration before v6 alpha.3 and after v6.0-alpha.3.
      * If the user current configuration matched with one of with known default field sets it gets updated to
      * current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
      * </p>
      *
      * @param preferences the user's current GUI preferences
      */
-
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
-        Map<String, Set<Field>> entryEditorPrefs =
-                preferences.getEntryEditorPreferences().getEntryEditorTabs();
-
-        Set<Field> currentGeneralPrefs =
-                entryEditorPrefs.get(Localization.lang("General"));
-
+        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+        Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
         if (currentGeneralPrefs == null) {
             return;
         }
-
         Set<Field> preV60alpha3Fields = Set.of(
                 StandardField.DOI,
                 StandardField.CROSSREF,
@@ -606,7 +600,6 @@ public class PreferencesMigrations {
                 StandardField.GROUPS,
                 StandardField.OWNER,
                 StandardField.TIMESTAMP,
-
                 SpecialField.PRINTED,
                 SpecialField.PRIORITY,
                 SpecialField.QUALITY,
@@ -614,15 +607,12 @@ public class PreferencesMigrations {
                 SpecialField.READ_STATUS,
                 SpecialField.RELEVANCE
         );
-
         Set<Field> v60alpha3Fields = new HashSet<>(preV60alpha3Fields);
         v60alpha3Fields.add(StandardField.ICORERANKING);
-
         if (!currentGeneralPrefs.equals(preV60alpha3Fields)
                 && !currentGeneralPrefs.equals(v60alpha3Fields)) {
             return;
         }
-
         entryEditorPrefs.put(
                 Localization.lang("General"),
                 new HashSet<>(FieldFactory.getDefaultGeneralFields())
@@ -635,7 +625,6 @@ public class PreferencesMigrations {
      * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
-
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
