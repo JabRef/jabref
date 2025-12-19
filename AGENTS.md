@@ -39,6 +39,7 @@ Agents **must not**:
 - Introduce new dependencies without justification
 - Rewrite large sections “for cleanliness”
 - Bypass tests or CI checks
+- Reformat code
 
 ---
 
@@ -57,6 +58,9 @@ Agents **must not**:
 - Keep methods small and focused
 - Avoid premature abstractions
 - Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
+- Ensure that tests are green before committing
+- Fix localization before committing. See `docs/code-howtos/localization.md`
+- Use JSpecify annotations instead of `null` checks
 
 ---
 
@@ -68,7 +72,7 @@ Agents must:
 - Keep tests deterministic and fast
 - Respect existing JUnit parallelization and resource locks
 - Never disable or weaken assertions
-- Follow the rules at [docs/code-howtos/testing.md](docs/code-howtos/testing.md)
+- Follow the rules at `docs/code-howtos/testing.md`
 
 If a change cannot be reasonably tested, explain **why**.
 
