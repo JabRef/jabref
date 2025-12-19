@@ -1540,15 +1540,11 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
             if (citeDrivePreferences.shouldPersistRefreshToken()) {
-                put(CITE_DRIVE_TOKEN, serializeCiteDriveToken(newValue));
+                put(CITE_DRIVE_TOKEN, newValue.toJSONObject().toJSONString());
             }
         });
 
         return citeDrivePreferences;
-    }
-
-    private String serializeCiteDriveToken(RefreshToken newValue) {
-
     }
 
     private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
@@ -1558,7 +1554,7 @@ public class JabRefCliPreferences implements CliPreferences {
         );
     }
 
-    private RefreshToken getCiteDriveToken() {
+    private @Nullable RefreshToken getCiteDriveToken() {
         try (final Keyring keyring = Keyring.create()) {
             return parseCiteDriveToken(keyring.getPassword("org.jabref", "citedrive"));
         } catch (Exception ex) {
@@ -1567,7 +1563,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private RefreshToken parseCiteDriveToken(@Nullable String json) {
+    private @Nullable RefreshToken parseCiteDriveToken(@Nullable String json) {
         if (json == null || json.isBlank()) {
             return null;
         }
