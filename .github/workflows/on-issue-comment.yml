@@ -20,17 +20,18 @@ jobs:
           # If this is updated, also update the number at unassign-issues.yml
           days_until_unassign: 14
           # 2: One person could have one PR opened and while waiting for feedback working on another one.
-          # For quick-win good-first-issues, 2 is too low.
-          max_assignments: 5
-          maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
-          allow_self_assign_author: false
-          assigned_comment: >
-            Thank you for your continued work in JabRef.
-            At this point, you probably already know the basics and the important links.
-            If not, our [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) is the place you should go to.
+          max_assignments: 2
+          max_overall_assignment_labels: "good first issue"
+          max_overall_assignment_message: >
+            ### ⚠️ Assignment Limit Reached for Good First Issues
 
 
-            Happy coding! 🚀
+            Hi @{{ handle }}, you've already reached the limit of **{{ max_overall_assignment_count }}** active assignments for good first issues.
+            Good first issues are a great way to get started with contributing to JabRef, and we want to ensure that all newcomers have the opportunity to work on them.
+
+
+            While waiting for feedback on your current assignments, you are invited to move on to more advanced issues.
+            Start at checking the [good second issues](https://github.com/JabRef/jabref/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen%20label%3A%22good%20second%20issue%22%20no%3Aassignee).
           assigned_comment_newcomer: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
