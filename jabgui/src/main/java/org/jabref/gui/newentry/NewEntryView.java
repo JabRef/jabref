@@ -89,73 +89,44 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private final NewEntryPreferences preferences;
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    @Inject
-    private StateManager stateManager;
-    @Inject
-    private TaskExecutor taskExecutor;
-    @Inject
-    private AiService aiService;
-    @Inject
-    private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private StateManager stateManager;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private AiService aiService;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private final ControlsFxVisualizer visualizer;
 
-    @FXML
-    private ButtonType generateButtonType;
+    @FXML private ButtonType generateButtonType;
     private Button generateButton;
 
-    @FXML
-    private TabPane tabs;
-    @FXML
-    private Tab tabAddEntry;
-    @FXML
-    private Tab tabLookupIdentifier;
-    @FXML
-    private Tab tabInterpretCitations;
-    @FXML
-    private Tab tabSpecifyBibtex;
+    @FXML private TabPane tabs;
+    @FXML private Tab tabAddEntry;
+    @FXML private Tab tabLookupIdentifier;
+    @FXML private Tab tabInterpretCitations;
+    @FXML private Tab tabSpecifyBibtex;
 
-    @FXML
-    private TitledPane entryRecommendedTitle;
-    @FXML
-    private TilePane entryRecommended;
-    @FXML
-    private TitledPane entryOtherTitle;
-    @FXML
-    private TilePane entryOther;
-    @FXML
-    private TitledPane entryCustomTitle;
-    @FXML
-    private TilePane entryCustom;
-    @FXML
-    private TitledPane entryNonStandardTitle;
-    @FXML
-    private TilePane entryNonStandard;
+    @FXML private TitledPane entryRecommendedTitle;
+    @FXML private TilePane entryRecommended;
+    @FXML private TitledPane entryOtherTitle;
+    @FXML private TilePane entryOther;
+    @FXML private TitledPane entryCustomTitle;
+    @FXML private TilePane entryCustom;
+    @FXML private TitledPane entryNonStandardTitle;
+    @FXML private TilePane entryNonStandard;
 
-    @FXML
-    private TextField idText;
-    @FXML
-    private Tooltip idTextTooltip;
-    @FXML
-    private Hyperlink idJumpLink;
-    @FXML
-    private RadioButton idLookupGuess;
-    @FXML
-    private RadioButton idLookupSpecify;
-    @FXML
-    private ComboBox<IdBasedFetcher> idFetcher;
-    @FXML
-    private Label idErrorInvalidText;
-    @FXML
-    private Label idErrorInvalidFetcher;
+    @FXML private TextField idText;
+    @FXML private Tooltip idTextTooltip;
+    @FXML private Hyperlink idJumpLink;
+    @FXML private RadioButton idLookupGuess;
+    @FXML private RadioButton idLookupSpecify;
+    @FXML private ComboBox<IdBasedFetcher> idFetcher;
+    @FXML private Label idErrorInvalidText;
+    @FXML private Label idErrorInvalidFetcher;
 
-    @FXML
-    private TextArea interpretText;
-    @FXML
-    private ComboBox<PlainCitationParserChoice> interpretParser;
+    @FXML private TextArea interpretText;
+    @FXML private ComboBox<PlainCitationParserChoice> interpretParser;
 
-    @FXML
-    private TextArea bibtexText;
+    @FXML private TextArea bibtexText;
 
     private BibEntry result;
 
@@ -584,18 +555,24 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
             case Book ->
                     Localization.lang("A single-volume book with one or more authors where the authors share credit for the work as a whole.");
-            case Booklet -> Localization.lang("A book-like work without a formal publisher or sponsoring institution.");
+            case Booklet ->
+                    Localization.lang("A book-like work without a formal publisher or sponsoring institution.");
             case Collection ->
                     Localization.lang("A single-volume collection with multiple, self-contained contributions by distinct authors which have their own title. The work as a whole has no overall author but it will usually have an editor.");
-            case Conference -> Localization.lang("A legacy alias for \"InProceedings\".");
-            case InBook -> Localization.lang("A part of a book which forms a self-contained unit with its own title.");
+            case Conference ->
+                    Localization.lang("A legacy alias for \"InProceedings\".");
+            case InBook ->
+                    Localization.lang("A part of a book which forms a self-contained unit with its own title.");
             case InCollection ->
                     Localization.lang("A contribution to a collection which forms a self-contained unit with a distinct author and title.");
-            case InProceedings -> Localization.lang("An article in a conference proceedings.");
-            case Manual -> Localization.lang("Technical or other documentation, not necessarily in printed form.");
+            case InProceedings ->
+                    Localization.lang("An article in a conference proceedings.");
+            case Manual ->
+                    Localization.lang("Technical or other documentation, not necessarily in printed form.");
             case MastersThesis ->
                     Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term  Master's thesis.");
-            case Misc -> Localization.lang("A fallback type for entries which do not fit into any other category.");
+            case Misc ->
+                    Localization.lang("A fallback type for entries which do not fit into any other category.");
             case PhdThesis ->
                     Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term PhD thesis.");
             case Proceedings ->
@@ -608,9 +585,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("This type is similar to \"InBook\" but intended for works originally published as a stand-alone book.");
             case InReference ->
                     Localization.lang("An article in a work of reference. This is a more specific variant of the generic \"InCollection\" entry type.");
-            case MvBook -> Localization.lang("A multi-volume \"Book\".");
-            case MvCollection -> Localization.lang("A multi-volume \"Collection\".");
-            case MvProceedings -> Localization.lang("A multi-volume \"Proceedings\" entry.");
+            case MvBook ->
+                    Localization.lang("A multi-volume \"Book\".");
+            case MvCollection ->
+                    Localization.lang("A multi-volume \"Collection\".");
+            case MvProceedings ->
+                    Localization.lang("A multi-volume \"Proceedings\" entry.");
             case MvReference ->
                     Localization.lang("A multi-volume \"Reference\" entry. The standard styles will treat this entry type as an alias for \"MvCollection\".");
             case Online ->
@@ -623,15 +603,18 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("An entry set is a group of entries which are cited as a single reference and listed as a single item in the bibliography.");
             case SuppBook ->
                     Localization.lang("Supplemental material in a \"Book\". This type is provided for elements such as prefaces, introductions, forewords, afterwords, etc. which often have a generic title only.");
-            case SuppCollection -> Localization.lang("Supplemental material in a \"Collection\".");
+            case SuppCollection ->
+                    Localization.lang("Supplemental material in a \"Collection\".");
             case SuppPeriodical ->
                     Localization.lang("Supplemental material in a \"Periodical\". This type may be useful when referring to items such as regular columns, obituaries, letters to the editor, etc. which only have a generic title.");
             case Thesis ->
                     Localization.lang("A thesis written for an educational institution to satisfy the requirements for a degree.");
-            case WWW -> Localization.lang("An alias for \"Online\", provided for jurabib compatibility.");
+            case WWW ->
+                    Localization.lang("An alias for \"Online\", provided for jurabib compatibility.");
             case Software ->
                     Localization.lang("Computer software. The standard styles will treat this entry type as an alias for \"Misc\".");
-            case Dataset -> Localization.lang("A data set or a similar collection of (mostly) raw data.");
+            case Dataset ->
+                    Localization.lang("A data set or a similar collection of (mostly) raw data.");
         };
     }
 
@@ -648,13 +631,20 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("This special entry type is not meant to be used in the bib file like other types. It is provided for third-party packages which merge notes into the bibliography.");
             case Commentary ->
                     Localization.lang("Commentaries which have a status different from regular books, such as legal commentaries.");
-            case Image -> Localization.lang("Images, pictures, photographs, and similar media.");
-            case Jurisdiction -> Localization.lang("Court decisions, court recordings, and similar things.");
-            case Legislation -> Localization.lang("Laws, bills, legislative proposals, and similar things.");
-            case Legal -> Localization.lang("Legal documents such as treaties.");
-            case Letter -> Localization.lang("Personal correspondence such as letters, emails, memoranda, etc.");
-            case Movie -> Localization.lang("Motion pictures.");
-            case Music -> Localization.lang("Musical recordings. This is a more specific variant of \"Audio\".");
+            case Image ->
+                    Localization.lang("Images, pictures, photographs, and similar media.");
+            case Jurisdiction ->
+                    Localization.lang("Court decisions, court recordings, and similar things.");
+            case Legislation ->
+                    Localization.lang("Laws, bills, legislative proposals, and similar things.");
+            case Legal ->
+                    Localization.lang("Legal documents such as treaties.");
+            case Letter ->
+                    Localization.lang("Personal correspondence such as letters, emails, memoranda, etc.");
+            case Movie ->
+                    Localization.lang("Motion pictures.");
+            case Music ->
+                    Localization.lang("Musical recordings. This is a more specific variant of \"Audio\".");
             case Performance ->
                     Localization.lang("Musical and theatrical performances as well as other works of the performing arts. This type refers to the event as opposed to a recording, a score, or a printed play.");
             case Review ->
