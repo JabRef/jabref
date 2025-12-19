@@ -119,7 +119,7 @@ public class AiChatComponent extends VBox {
 
         ObservableList<BibEntry> currentSelection = stateManager.getSelectedEntries();
 
-        if (entries != null && !entries.isEmpty()) {
+        if (!entries.isEmpty()) {
             boolean isSubsetOfSelection = new HashSet<>(currentSelection).containsAll(entries);
             if (isSubsetOfSelection) {
                 this.entries = currentSelection;
