@@ -42,6 +42,7 @@ public final class BuildInfo {
     public final String ieeeAPIKey;
     public final String medlineApiKey;
     public final String scienceDirectApiKey;
+    public final String scopusApiKey;
     public final String semanticScholarApiKey;
     public final String springerNatureAPIKey;
     public final String unpaywallEmail;
@@ -72,6 +73,7 @@ public final class BuildInfo {
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
         medlineApiKey = BuildInfo.getValue(properties, "medlineApiKey", "");
         scienceDirectApiKey = BuildInfo.getValue(properties, "scienceDirectApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
+        scopusApiKey = BuildInfo.getValue(properties, "scopusApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
         unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
