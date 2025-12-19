@@ -19,8 +19,9 @@ jobs:
           github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
           # If this is updated, also update the number at unassign-issues.yml
           days_until_unassign: 14
-          # One person could have one PR opened and while waiting for feedback working on another one
-          max_assignments: 2
+          # 2: One person could have one PR opened and while waiting for feedback working on another one.
+          # For quick-win good-first-issues, 2 is too low.
+          max_assignments: 5
           maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
           allow_self_assign_author: false
           assigned_comment: >
