@@ -17,8 +17,13 @@ jobs:
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
-          # If this is updated, also update the number at unassign-issues.yml
-          days_until_unassign: 14
+          maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
+          allow_self_assign_author: false
+          assignment_suggestion_comment: >
+            👋 Hey @{{ handle }}, looks like you’re eager to work on this issue — great! 🎉
+            It also looks like you don't know how to assign issues to yourself.
+            Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
+            It will also guide you in other aspects of contributing to JabRef.
           # 2: One person could have one PR opened and while waiting for feedback working on another one.
           max_assignments: 2
           max_overall_assignment_labels: "good first issue"
@@ -53,15 +58,16 @@ jobs:
 
 
             Happy coding! 🚀
-          assignment_suggestion_comment: >
-            👋 Hey @{{ handle }}, looks like you’re eager to work on this issue — great! 🎉
-            It also looks like you don't know how to assign issues to yourself.
-            Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
-            It will also guide you in other aspects of contributing to JabRef.
+          assigned_comment: >
+            Thank you for your continued work in JabRef.
+            At this point, you probably already know the basics and the important links.
+            If not, our [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) is the place you should go to.
+          # If this is updated, also update the number at unassign-issues.yml
+          days_until_unassign: 14
           unassigned_comment: |
             ### 📋 Assignment Update
 
-            Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
+            Hi @{{ handle }} you have been unassigned from this issue.
 
             <details>
             <summary>Next steps</summary>
