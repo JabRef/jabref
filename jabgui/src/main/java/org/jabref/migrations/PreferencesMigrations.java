@@ -574,15 +574,15 @@ public class PreferencesMigrations {
     }
 
     /**
-     * Updates the default preferences for the editor fields under the "General" tab to include the ICORE Ranking Field
-     * if it is missing.
+     * Migrates default fields of the "General" entry editor tab.
+     *
      * <p>
-     * The function first ensures that the current preferences match the previous default (before the ICORE field was added)
-     * and only then does the update.
+     * This migration handles all types of user that are coming before v6 alpha.3 and after v6.0-alpha.3
+     * If the user current configuration matched with one of with known default field sets it gets updated to
+     * current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
      * </p>
      *
-     * @param preferences the user's current preferences
-     * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
+     * @param preferences the user's current GUI preferences
      */
 
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
@@ -596,8 +596,7 @@ public class PreferencesMigrations {
             return;
         }
 
-        // Defaults ICORE (before alpha.3)
-        Set<Field> preICoreDefaults = Set.of(
+        Set<Field> preV60alpha3Fields = Set.of(
                 StandardField.DOI,
                 StandardField.CROSSREF,
                 StandardField.KEYWORDS,
@@ -607,6 +606,7 @@ public class PreferencesMigrations {
                 StandardField.GROUPS,
                 StandardField.OWNER,
                 StandardField.TIMESTAMP,
+
                 SpecialField.PRINTED,
                 SpecialField.PRIORITY,
                 SpecialField.QUALITY,
@@ -615,12 +615,11 @@ public class PreferencesMigrations {
                 SpecialField.RELEVANCE
         );
 
-        // Defaults ICORE (after alpha.3)
-        Set<Field> postICoreDefaults = new HashSet<>(preICoreDefaults);
-        postICoreDefaults.add(StandardField.ICORERANKING);
+        Set<Field> v60alpha3Fields = new HashSet<>(preV60alpha3Fields);
+        v60alpha3Fields.add(StandardField.ICORERANKING);
 
-        if (!currentGeneralPrefs.equals(preICoreDefaults)
-                && !currentGeneralPrefs.equals(postICoreDefaults)) {
+        if (!currentGeneralPrefs.equals(preV60alpha3Fields)
+                && !currentGeneralPrefs.equals(v60alpha3Fields)) {
             return;
         }
 
