@@ -525,7 +525,7 @@ public class JabRefGUI extends Application {
             executor.submit(() -> {
                 LOGGER.trace("Shutting down postgreServer");
                 PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-                postgreServer.shutdown();
+                postgreServer.close();
                 LOGGER.trace("PostgreServer shut down");
             });
 
