@@ -2400,7 +2400,6 @@ public class JabRefCliPreferences implements CliPreferences {
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
                     names.get(i),
-                    // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
                     (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
                     i < keys.size() ? keys.get(i) : ""));
         }
