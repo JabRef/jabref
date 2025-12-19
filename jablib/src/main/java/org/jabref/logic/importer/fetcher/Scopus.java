@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
  * which is available to all registered developers.
  */
 public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Scopus.class);
-
     public static final String FETCHER_NAME = "Scopus";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Scopus.class);
 
     private static final String API_URL = "https://api.elsevier.com/content/search/scopus";
 
