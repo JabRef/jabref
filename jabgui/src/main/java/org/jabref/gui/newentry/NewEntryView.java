@@ -325,16 +325,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             // When switching to auto-detect mode, detect identifier type from current text
             if (newValue && idText.getText() != null && !idText.getText().trim().isEmpty()) {
                 Optional<Identifier> identifier = Identifier.from(idText.getText().trim());
-                if (identifier.isPresent()) {
-                    Identifier id = identifier.get();
-                    boolean isValid = switch (id) {
-                        case DOI doi -> DOI.isValid(doi.asString());
-                        case ISBN isbn -> isbn.isValid();
-                        default -> true;
-                    };
-                    if (isValid) {
-                        fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
-                    }
+                if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
+                    fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
                 }
             }
         });
@@ -356,17 +348,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (idLookupGuess.isSelected() && newValue != null && !newValue.trim().isEmpty()) {
                 Optional<Identifier> identifier = Identifier.from(newValue.trim());
-                if (identifier.isPresent()) {
-                    Identifier id = identifier.get();
-                    // Validate identifier (similar to extractValidIdentifierFromClipboard)
-                    boolean isValid = switch (id) {
-                        case DOI doi -> DOI.isValid(doi.asString());
-                        case ISBN isbn -> isbn.isValid();
-                        default -> true;
-                    };
-                    if (isValid) {
-                        fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
-                    }
+                if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
+                    fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
                 }
             }
         });
@@ -692,6 +675,21 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return PlainCitationParserChoice.RULE_BASED_GENERAL;
     }
 
+    /**
+     * Validates an identifier. DOI and ISBN identifiers are validated,
+     * other identifier types are considered valid by default.
+     *
+     * @param id the identifier to validate
+     * @return true if the identifier is valid, false otherwise
+     */
+    private boolean isValidIdentifier(Identifier id) {
+        return switch (id) {
+            case DOI doi -> DOI.isValid(doi.asString());
+            case ISBN isbn -> isbn.isValid();
+            default -> true;
+        };
+    }
+
     private Optional<Identifier> extractValidIdentifierFromClipboard() {
         String clipboardText = ClipBoardManager.getContents().trim();
 
@@ -699,15 +697,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             Optional<Identifier> identifier = Identifier.from(clipboardText);
             if (identifier.isPresent()) {
                 Identifier id = identifier.get();
-                boolean isValid = switch (id) {
-                    case DOI doi ->
-                            DOI.isValid(doi.asString());
-                    case ISBN isbn ->
-                            isbn.isValid();
-                    default ->
-                            true;
-                };
-                if (isValid) {
+                if (isValidIdentifier(id)) {
                     return Optional.of(id);
                 }
             }
