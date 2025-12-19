@@ -577,7 +577,7 @@ public class PreferencesMigrations {
      * Migrates default fields of the "General" entry editor tab.
      *
      * <p>
-     * This migration handles default configuration before v6 alpha.3 and after v6.0-alpha.3.
+     * This migration handles default configuration before and after v6.0-alpha.3.
      * If the user current configuration matched with one of with known default field sets it gets updated to
      * current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
      * </p>
