@@ -83,7 +83,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
     private void configure() {
         showToUser(true);
-        titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
+        titleProperty().set(Localization.lang("Summarizing   %0...", citationKey));
 
         progressCounter.listenToAllProperties(this::updateProgress);
     }
