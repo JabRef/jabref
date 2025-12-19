@@ -65,7 +65,7 @@ class CiteDriveOAuthTest {
         CiteDrivePreferences citeDrivePreferences = mock(CiteDrivePreferences.class);
 
         CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class));
-        // When testing with https://github.com/navikt/mock-oauth2-server
+        // When testing with https://github.com/navikt/mock-oauth2-server - docker run -p 8080:8080 -h localhost -it --rm ghcr.io/navikt/mock-oauth2-server
         // CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(externalApplicationsPreferences, remotePreferences, OAUTH_SESSION_REGISTRY, mock(DialogService.class), URI.create("http://localhost:8080/default/authorize"), URI.create("http://localhost:8080/default/token"));
 
         Optional<AccessToken> actual = citeDriveOAuthService.authorizeInteractive().get();
