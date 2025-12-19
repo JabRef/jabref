@@ -28,17 +28,14 @@ public class CiteDrivePushAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
-        citeDriveOAuthService = new CiteDriveOAuthService(preferences.getExternalApplicationsPreferences(), preferences.getRemotePreferences(), preferences.getCiteDrivePreferences(), new OAuthSessionRegistry(), dialogService);
+        this.citeDriveOAuthService = new CiteDriveOAuthService(preferences.getExternalApplicationsPreferences(), preferences.getRemotePreferences(), preferences.getCiteDrivePreferences(), new OAuthSessionRegistry(), dialogService);
 
-        this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
+        this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
     @Override
     public void execute() {
-        if (this.stateManager.getActiveDatabase().isEmpty()) {
-            dialogService.notify(Localization.lang("CiteDrive push failed: no active database."));
-            return;
-        }
+        assert this.stateManager.getActiveDatabase().isPresent();
 
         BibDatabaseContext database = this.stateManager.getActiveDatabase().get();
 
