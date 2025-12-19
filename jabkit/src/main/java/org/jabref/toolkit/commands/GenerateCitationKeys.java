@@ -94,12 +94,10 @@ class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
-        JabKit parentTop = parentCommand.getParent();
-
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                parentTop.cliPreferences,
+                parentCommand.getParent().cliPreferences,
                 sharedOptions.porcelain);
 
         if (parserResult.isEmpty()) {
@@ -118,7 +116,7 @@ class GenerateCitationKeys implements Runnable {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
-        CitationKeyPatternPreferences existingPreferences = parentTop.cliPreferences.getCitationKeyPatternPreferences();
+        CitationKeyPatternPreferences existingPreferences = parentCommand.getParent().cliPreferences.getCitationKeyPatternPreferences();
 
         CitationKeyPatternPreferences preferencesToUse = existingPreferences;
 
@@ -149,12 +147,12 @@ class GenerateCitationKeys implements Runnable {
 
         if (outputFile != null) {
             JabKit.saveDatabase(
-                    parentTop.cliPreferences,
-                    parentTop.entryTypesManager,
+                    parentCommand.getParent().cliPreferences,
+                    parentCommand.getParent().entryTypesManager,
                     parserResult.get().getDatabase(),
                     outputFile);
         } else {
-            JabKit.outputDatabaseContext(parentTop.cliPreferences, parserResult.get().getDatabaseContext());
+            JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
         }
     }
 }
