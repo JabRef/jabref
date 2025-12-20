@@ -254,7 +254,7 @@ public class WelcomeTab extends Tab {
 
         VBox container = new VBox();
         container.getStyleClass().add("welcome-links-content");
-        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink,importIntoNewLibraryLink);
+        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importIntoNewLibraryLink);
 
         return createVBoxContainer(header, container);
     }
