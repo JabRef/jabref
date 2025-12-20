@@ -21,6 +21,8 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * Note: ScienceDirect Search API requires institutional access, so we use Scopus API instead
  * which is available to all registered developers.
  */
+@NullMarked
 public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Scopus";
 
@@ -44,6 +47,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
 
     private final ImporterPreferences importerPreferences;
 
+    @Nullable
     private ScopusQueryTransformer transformer;
 
     public Scopus(ImporterPreferences importerPreferences) {
@@ -178,6 +182,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
      * @param jsonEntry the JSON object representing a Scopus search result
      * @return BibEntry or null if parsing fails
      */
+    @Nullable
     private BibEntry parseScopusEntry(JSONObject jsonEntry) {
         try {
             BibEntry entry = new BibEntry();

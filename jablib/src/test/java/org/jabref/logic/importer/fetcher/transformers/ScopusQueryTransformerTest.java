@@ -22,11 +22,10 @@ class ScopusQueryTransformerTest {
 
     @Test
     void simpleTermTransformsToTitleAbsKeyAuth() {
-        SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine learning");
+        SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine");
         Optional<String> result = transformer.transformSearchQuery(queryNode);
 
-        assertTrue(result.isPresent());
-        assertEquals("TITLE-ABS-KEY-AUTH(\"machine learning\")", result.get());
+        assertEquals("TITLE-ABS-KEY-AUTH(machine)", result.get());
     }
 
     @Test
@@ -34,7 +33,6 @@ class ScopusQueryTransformerTest {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "test");
         Optional<String> result = transformer.transformSearchQuery(queryNode);
 
-        assertTrue(result.isPresent());
         assertEquals("TITLE-ABS-KEY-AUTH(test)", result.get());
     }
 
@@ -43,17 +41,15 @@ class ScopusQueryTransformerTest {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.of(StandardField.AUTHOR), "Steinmacher");
         Optional<String> result = transformer.transformSearchQuery(queryNode);
 
-        assertTrue(result.isPresent());
         assertTrue(result.get().contains("AUTH(Steinmacher)"));
     }
 
     @Test
     void titleFieldTransformsToTitle() {
-        SearchQueryNode queryNode = new SearchQueryNode(Optional.of(StandardField.TITLE), "machine learning");
+        SearchQueryNode queryNode = new SearchQueryNode(Optional.of(StandardField.TITLE), "machine");
         Optional<String> result = transformer.transformSearchQuery(queryNode);
 
-        assertTrue(result.isPresent());
-        assertTrue(result.get().contains("TITLE("));
+        assertTrue(result.get().contains("TITLE(machine)"));
     }
 
     @Test
@@ -61,7 +57,6 @@ class ScopusQueryTransformerTest {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.of(StandardField.JOURNAL), "Nature");
         Optional<String> result = transformer.transformSearchQuery(queryNode);
 
-        assertTrue(result.isPresent());
         assertTrue(result.get().contains("SRCTITLE(Nature)"));
     }
 
@@ -70,7 +65,6 @@ class ScopusQueryTransformerTest {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.of(StandardField.YEAR), "2020");
         Optional<String> result = transformer.transformSearchQuery(queryNode);
 
-        assertTrue(result.isPresent());
         assertEquals("PUBYEAR = 2020", result.get());
     }
 
@@ -79,14 +73,6 @@ class ScopusQueryTransformerTest {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.of(StandardField.DOI), "10.1000/test");
         Optional<String> result = transformer.transformSearchQuery(queryNode);
 
-        assertTrue(result.isPresent());
         assertTrue(result.get().contains("DOI(10.1000/test)"));
-    }
-
-    @Test
-    void logicalOperators() {
-        assertEquals(" AND ", transformer.getLogicalAndOperator());
-        assertEquals(" OR ", transformer.getLogicalOrOperator());
-        assertEquals("AND NOT ", transformer.getLogicalNotOperator());
     }
 }

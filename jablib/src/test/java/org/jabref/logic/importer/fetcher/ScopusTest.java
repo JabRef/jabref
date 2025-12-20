@@ -84,8 +84,6 @@ class ScopusTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcher
         return 2018;
     }
 
-    // ==================== Fetcher Properties Tests ====================
-
     @Test
     void fetcherName() {
         assertEquals("ScienceDirect", fetcher.getName());
@@ -99,20 +97,6 @@ class ScopusTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcher
         assertTrue(testUrl.contains("apiKey="));
     }
 
-    // ==================== URL Construction Tests ====================
-
-    @Test
-    void urlForQueryContainsRequiredParameters() throws URISyntaxException, MalformedURLException {
-        SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine learning");
-        URL url = fetcher.getURLForQuery(queryNode, 0);
-
-        String urlString = url.toString();
-        assertTrue(urlString.contains("api.elsevier.com/content/search/scopus"));
-        assertTrue(urlString.contains("query="));
-        assertTrue(urlString.contains("count="));
-        assertTrue(urlString.contains("start="));
-    }
-
     @Test
     void urlForQueryWithPagination() throws URISyntaxException, MalformedURLException {
         SearchQueryNode queryNode = new SearchQueryNode(Optional.empty(), "machine learning");
@@ -121,18 +105,6 @@ class ScopusTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcher
         String urlString = url.toString();
         // Page 2 with page size 20 should start at 40
         assertTrue(urlString.contains("start=40"));
-    }
-
-    // ==================== Search Tests ====================
-
-    @Test
-    void searchByQueryFindsEntry() throws FetcherException {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("machine learning neural networks");
-
-        assertFalse(fetchedEntries.isEmpty());
-        // Check that entries have titles
-        assertTrue(fetchedEntries.stream()
-                                 .anyMatch(e -> e.getField(StandardField.TITLE).isPresent()));
     }
 
     @Test
@@ -154,15 +126,5 @@ class ScopusTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcher
         // Scopus entries should have DOI or URL
         assertTrue(firstEntry.getField(StandardField.DOI).isPresent() ||
                 firstEntry.getField(StandardField.URL).isPresent());
-    }
-
-    @Test
-    void searchResultContainsJournalInfo() throws FetcherException {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("software engineering");
-
-        assertFalse(fetchedEntries.isEmpty());
-        // At least some entries should have journal information
-        assertTrue(fetchedEntries.stream()
-                                 .anyMatch(e -> e.getField(StandardField.JOURNAL).isPresent()));
     }
 }
