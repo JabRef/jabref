@@ -26,6 +26,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Pseudonymization {
 
+    private static final String GROUP_PSEUDONYM_PREFIX = "group";
+
     public record Result(BibDatabaseContext bibDatabaseContext, Map<String, String> valueMapping) {
     }
 
@@ -40,7 +42,7 @@ public class Pseudonymization {
 
         Map<String, String> valueMapping = new HashMap<>();
         fieldToValueToIdMap.forEach((field, stringToIntMap) ->
-                stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
+                stringToIntMap.forEach((value, id) -> valueMapping.put(getPseudonymPrefix(field) + "-" + id, value)));
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
@@ -66,7 +68,7 @@ public class Pseudonymization {
                 //       See {@link org.jabref.model.entry.field.StandardField} for usages.
                 String fieldContent = entry.getField(field).get();
                 Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
-                newEntry.setField(field, field.getName() + "-" + id);
+                newEntry.setField(field, getPseudonymPrefix(field) + "-" + id);
             }
         }
         return newEntries;
@@ -101,7 +103,7 @@ public class Pseudonymization {
 
         String originalName = node.getName();
         int id = valueToIdMap.computeIfAbsent(originalName, _ -> valueToIdMap.size() + 1);
-        groupCopy.nameProperty().setValue(StandardField.GROUPS.getName() + "-" + id);
+        groupCopy.nameProperty().setValue(GROUP_PSEUDONYM_PREFIX + "-" + id);
 
         GroupTreeNode newNode = new GroupTreeNode(groupCopy);
         for (GroupTreeNode child : node.getChildren()) {
@@ -110,5 +112,13 @@ public class Pseudonymization {
         }
 
         return newNode;
+    }
+
+    private static String getPseudonymPrefix(Field field) {
+        if (field == StandardField.GROUPS) {
+            return GROUP_PSEUDONYM_PREFIX;
+        }
+
+        return field.getName().toLowerCase(Locale.ROOT);
     }
 }

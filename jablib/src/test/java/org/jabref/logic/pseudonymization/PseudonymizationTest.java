@@ -152,20 +152,20 @@ class PseudonymizationTest {
         GroupTreeNode newRoot = result.bibDatabaseContext().getMetaData().getGroups().orElseThrow();
 
         // then
-        assertEquals("groups-1", newRoot.getName());
+        assertEquals("group-1", newRoot.getName());
         assertTrue(newRoot.getFirstChild().isPresent());
 
         GroupTreeNode newUsed = newRoot.getFirstChild().orElseThrow();
-        assertEquals("groups-2", newUsed.getName());
+        assertEquals("group-2", newUsed.getName());
         assertTrue(newUsed.getFirstChild().isPresent());
 
         GroupTreeNode newSub = newUsed.getFirstChild().orElseThrow();
-        assertEquals("groups-3", newSub.getName());
+        assertEquals("group-3", newSub.getName());
 
         Map<String, String> mapping = result.valueMapping();
-        assertEquals("Root", mapping.get("groups-1"));
-        assertEquals("Used", mapping.get("groups-2"));
-        assertEquals("Sub", mapping.get("groups-3"));
+        assertEquals("Root", mapping.get("group-1"));
+        assertEquals("Used", mapping.get("group-2"));
+        assertEquals("Sub", mapping.get("group-3"));
     }
 
     @Test
@@ -191,8 +191,8 @@ class PseudonymizationTest {
         String otherGroup = entries.get(2).getField(StandardField.GROUPS).orElseThrow();
 
         assertEquals(myGroup1, myGroup2);
-        assertTrue(myGroup1.startsWith("groups-"));
-        assertTrue(otherGroup.startsWith("groups-"));
+        assertTrue(myGroup1.startsWith("group-"));
+        assertTrue(otherGroup.startsWith("group-"));
         assertNotEquals(myGroup1, otherGroup);
 
         Map<String, String> mapping = result.valueMapping();
