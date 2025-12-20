@@ -32,6 +32,7 @@ import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.NewDatabaseAction;
+import org.jabref.gui.importer.actions.ImportCitaviAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -248,9 +249,12 @@ public class WelcomeTab extends Tab {
         Hyperlink openExampleLibraryLink = createActionLink(Localization.lang("New example library"),
                 this::openExampleLibrary);
 
+        Hyperlink importCitaviLink = createActionLink(Localization.lang("Import from Citavi..."),
+                () -> new ImportCitaviAction(tabContainer, preferences, fileUpdateMonitor, taskExecutor, dialogService).execute());
+
         VBox container = new VBox();
         container.getStyleClass().add("welcome-links-content");
-        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink);
+        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importCitaviLink);
 
         return createVBoxContainer(header, container);
     }
