@@ -26,7 +26,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Pseudonymization {
 
-    private static final String GROUP_PSEUDONYM_PREFIX = "group";
+    private static final String GROUPS_PSEUDONYM_PREFIX = "group";
 
     public record Result(BibDatabaseContext bibDatabaseContext, Map<String, String> valueMapping) {
     }
@@ -42,7 +42,7 @@ public class Pseudonymization {
 
         Map<String, String> valueMapping = new HashMap<>();
         fieldToValueToIdMap.forEach((field, stringToIntMap) ->
-                stringToIntMap.forEach((value, id) -> valueMapping.put(getPseudonymPrefix(field) + "-" + id, value)));
+                stringToIntMap.forEach((value, id) -> valueMapping.put(getFieldContent(field, id), value)));
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
@@ -69,8 +69,15 @@ public class Pseudonymization {
                 // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
                 //       See {@link org.jabref.model.entry.field.StandardField} for usages.
                 String fieldContent = entry.getField(field).get();
-                Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
-                newEntry.setField(field, getPseudonymPrefix(field) + "-" + id);
+
+                if (field == StandardField.GROUPS) {
+                    List<String> groups = splitGroups(fieldContent);
+                    String pseudonymizedGroups = pseudonymizeGroupValue(groups, valueToIdMap);
+                    newEntry.setField(field, pseudonymizedGroups);
+                } else {
+                    Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
+                    newEntry.setField(field, getFieldContent(field, id));
+                }
             }
         }
         return newEntries;
@@ -105,7 +112,7 @@ public class Pseudonymization {
 
         String originalName = node.getName();
         int id = valueToIdMap.computeIfAbsent(originalName, _ -> valueToIdMap.size() + 1);
-        groupCopy.nameProperty().setValue(GROUP_PSEUDONYM_PREFIX + "-" + id);
+        groupCopy.nameProperty().setValue(getFieldContent(StandardField.GROUPS, id));
 
         GroupTreeNode newNode = new GroupTreeNode(groupCopy);
         for (GroupTreeNode child : node.getChildren()) {
@@ -116,11 +123,26 @@ public class Pseudonymization {
         return newNode;
     }
 
-    private static String getPseudonymPrefix(Field field) {
-        if (field == StandardField.GROUPS) {
-            return GROUP_PSEUDONYM_PREFIX;
+    private static List<String> splitGroups(String content) {
+        return List.of(content.split("\\s*,\\s*"));
+    }
+
+    private static String pseudonymizeGroupValue(List<String> values, Map<String, Integer> valueToIdMap) {
+        List<String> pseudonymized = new ArrayList<>(values.size());
+
+        for (String value : values) {
+            Integer id = valueToIdMap.computeIfAbsent(value, k -> valueToIdMap.size() + 1);
+            pseudonymized.add(GROUPS_PSEUDONYM_PREFIX + "-" + id);
         }
 
-        return field.getName().toLowerCase(Locale.ROOT);
+        return String.join(", ", pseudonymized);
+    }
+
+    private static String getFieldContent(Field field, int id) {
+        String prefix = field == StandardField.GROUPS
+                        ? GROUPS_PSEUDONYM_PREFIX
+                        : field.getName().toLowerCase(Locale.ROOT);
+
+        return prefix + "-" + id;
     }
 }

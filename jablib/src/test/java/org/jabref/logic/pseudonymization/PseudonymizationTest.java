@@ -199,4 +199,33 @@ class PseudonymizationTest {
         assertEquals("MyGroup", mapping.get(myGroup1));
         assertEquals("OtherGroup", mapping.get(otherGroup));
     }
+
+    @Test
+    void pseudonymizeEntryWithMultipleGroups() {
+        // given
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(
+                new BibEntry("first").withField(StandardField.GROUPS, "one, two, three")
+        )));
+
+        Pseudonymization pseudonymization = new Pseudonymization();
+
+        // when
+        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
+
+        // then
+        BibEntry pseudonymizedEntry = result.bibDatabaseContext().getEntries().getFirst();
+        String pseudonymizedGroups = pseudonymizedEntry.getField(StandardField.GROUPS).orElseThrow();
+
+        String[] groups = pseudonymizedGroups.split(", ");
+        assertEquals(3, groups.length);
+
+        assertEquals("group-1", groups[0]);
+        assertEquals("group-2", groups[1]);
+        assertEquals("group-3", groups[2]);
+
+        Map<String, String> mapping = result.valueMapping();
+        assertEquals("one", mapping.get(groups[0]));
+        assertEquals("two", mapping.get(groups[1]));
+        assertEquals("three", mapping.get(groups[2]));
+    }
 }
