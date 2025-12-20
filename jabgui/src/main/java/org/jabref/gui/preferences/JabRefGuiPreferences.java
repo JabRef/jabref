@@ -242,9 +242,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private JabRefGuiPreferences() {
         super();
 
-        defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
-
-        defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
+        defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
+        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
+        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         // endregion
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
@@ -340,6 +340,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMergeDialogPreferences().setAll(MergeDialogPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
+        getEntryEditorPreferences().setAll(EntryEditorPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
@@ -362,11 +363,34 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMergeDialogPreferences().setAll(getMergeDialogPreferencesFromBackingStore(getMergeDialogPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
+        getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
         getUnlinkedFilesDialogPreferences().setAll(getUnlinkedFilesDialogPreferences());
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
+    }
+
+    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
+        return new EntryEditorPreferences(
+                getEntryEditorTabs(),
+                getDefaultEntryEditorTabs(),
+                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
+                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
+                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
+                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
+                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
+                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
+                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
+                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(
+                        get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().toString())),
+                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
+        );
     }
 
     // region EntryEditorPreferences
@@ -375,23 +399,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return entryEditorPreferences;
         }
 
-        entryEditorPreferences = new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(SHOW_AI_SUMMARY),
-                getBoolean(SHOW_AI_CHAT),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(SMART_FILE_ANNOTATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                getBoolean(SHOW_SCITE_TAB),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
+        entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
