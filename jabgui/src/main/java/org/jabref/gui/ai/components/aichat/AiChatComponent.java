@@ -18,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -86,6 +87,7 @@ public class AiChatComponent extends VBox {
     @FXML private Button notificationsButton;
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
+    @FXML private MenuButton exportButton;
     @FXML private Hyperlink exQuestion1;
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
@@ -127,6 +129,7 @@ public class AiChatComponent extends VBox {
     @FXML
     public void initialize() {
         uiChatHistory.setItems(aiChatLogic.getChatHistory());
+        exportButton.disableProperty().bind(Bindings.isEmpty(aiChatLogic.getChatHistory()));
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
@@ -429,11 +432,6 @@ public class AiChatComponent extends VBox {
 
     @FXML
     private void exportMarkdown() {
-        if (aiChatLogic.getChatHistory().isEmpty()) {
-            dialogService.notify(Localization.lang("No chat history to export"));
-            return;
-        }
-
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.MARKDOWN)
                 .withDefaultExtension(StandardFileType.MARKDOWN)
@@ -456,11 +454,6 @@ public class AiChatComponent extends VBox {
 
     @FXML
     private void exportJson() {
-        if (aiChatLogic.getChatHistory().isEmpty()) {
-            dialogService.notify(Localization.lang("No chat history to export"));
-            return;
-        }
-
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.JSON)
                 .withDefaultExtension(StandardFileType.JSON)
