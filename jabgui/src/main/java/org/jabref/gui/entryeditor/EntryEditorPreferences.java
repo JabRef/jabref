@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +16,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 
 public class EntryEditorPreferences {
 
@@ -52,6 +57,58 @@ public class EntryEditorPreferences {
     private final BooleanProperty shouldShowSciteTab;
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
+
+    public static Map<String, Set<Field>> createDefaultTabs() {
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
+        tabs.put(Localization.lang("General"), new LinkedHashSet<>(FieldFactory.getDefaultGeneralFields()));
+        tabs.put(Localization.lang("Abstract"), Set.of(StandardField.ABSTRACT));
+        return tabs;
+    }
+
+    // Creates Object with default values
+    private EntryEditorPreferences() {
+        this(
+                createDefaultTabs(),
+                createDefaultTabs(),
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                JournalPopupEnabled.FIRST_START,
+                true,
+                true,
+                0.5
+        );
+    }
+
+    public static EntryEditorPreferences getDefault() {
+        return new EntryEditorPreferences();
+    }
+
+    public void setAll(EntryEditorPreferences preferences) {
+        setEntryEditorTabList(preferences.getEntryEditorTabs());
+        this.defaultEntryEditorTabList.set(preferences.getDefaultEntryEditorTabs());
+        this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
+        this.shouldShowRecommendationsTab.set(preferences.shouldShowRecommendationsTab());
+        this.shouldShowAiSummaryTab.set(preferences.shouldShowAiSummaryTab());
+        this.shouldShowAiChatTab.set(preferences.shouldShowAiChatTab());
+        this.shouldShowLatexCitationsTab.set(preferences.shouldShowLatexCitationsTab());
+        this.shouldShowFileAnnotationsTab.set(preferences.shouldShowFileAnnotationsTab());
+        this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
+        this.enableValidation.set(preferences.shouldEnableValidation());
+        this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
+        this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
+        this.enablementStatus.set(preferences.shouldEnableJournalPopup());
+        this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
+        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
+        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
+    }
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   Map<String, Set<Field>> defaultEntryEditorTabList,

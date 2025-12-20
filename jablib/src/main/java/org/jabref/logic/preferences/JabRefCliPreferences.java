@@ -508,6 +508,12 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
+        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+        // the initialization of the preferences in main
+        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+        // will never be translated.
+        Localization.setLanguage(getLanguage());
+
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
@@ -586,22 +592,12 @@ public class JabRefCliPreferences implements CliPreferences {
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
-        defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
-        defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
-
-        defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
-        defaults.put(SHOW_AI_CHAT, Boolean.TRUE);
-        defaults.put(SHOW_AI_SUMMARY, Boolean.TRUE);
-        defaults.put(SMART_FILE_ANNOTATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
-        defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
-        defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
         defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
         defaults.put(SEND_OS_DATA, Boolean.FALSE);
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
-        defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
@@ -681,9 +677,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
-        defaults.put(AUTOLINK_FILES_ENABLED, Boolean.TRUE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
-        defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
@@ -712,11 +706,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(VERSION_IGNORED_UPDATE, "");
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
-        // Since some of the preference settings themselves use localized strings, we cannot set the language after
-        // the initialization of the preferences in main
-        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // will never be translated.
-        Localization.setLanguage(getLanguage());
         setLanguageDependentDefaultValues();
 
         // region last files opened
@@ -1656,7 +1645,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                getUserHostInfo().getUserHostString(),
+                userAndHost.getUserHostString(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
