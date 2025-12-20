@@ -1,8 +1,10 @@
 package org.jabref.gui.fieldeditors;
 
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -11,12 +13,8 @@ import javafx.util.StringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
-
-import org.jabref.model.entry.DateRangeUtil;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +40,11 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void setText(String newValue) {
-        String sanitized = DateRangeUtil.sanitizeIncompleteRange(newValue);
+        String sanitized = Date.sanitizeIncompleteRange(newValue);
         text.set(sanitized);
     }
 
-    public StringConverter<TemporalAccessor> getToStringConverter() {
+    public StringConverter<TemporalAccessor> getDateToStringConverter() {
         return new StringConverter<>() {
             @Override
             public String toString(TemporalAccessor value) {
