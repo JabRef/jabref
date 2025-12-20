@@ -39,7 +39,6 @@ class ScopusTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcher
     private static final Optional<String> API_KEY = Optional.of(new BuildInfo().scopusApiKey);
 
     private Scopus fetcher;
-    private BibEntry entry;
 
     @BeforeAll
     static void ensureScopusIsAvailable() throws FetcherException {
