@@ -47,6 +47,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.collab.entrychange.PreviewWithSourceTab;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
@@ -125,8 +126,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 BibEntryTypesManager bibEntryTypesManager,
-                                SearchCitationsRelationsService searchCitationsRelationsService,
-                                EntryEditorPreferences entryEditorPreferences) {
+                                SearchCitationsRelationsService searchCitationsRelationsService) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
@@ -153,7 +153,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.sciteResultsPane = new GridPane();
         setSciteResultsPane();
 
-        this.entryEditorPreferences = entryEditorPreferences;
+        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
     }
 
     private void setSciteResultsPane() {
@@ -602,7 +602,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry.localEntry()));
     }
 
-    // Similar to PreviewWithSourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences, BibEntryTypesManager)
+    /**
+     * @implNote This code is similar to {@link PreviewWithSourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences, BibEntryTypesManager)}.
+     */
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
