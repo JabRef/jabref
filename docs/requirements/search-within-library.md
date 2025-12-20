@@ -1,15 +1,20 @@
 ---
 parent: Requirements
 ---
-# Search
+# Search within a library
 
-This page collects requirements on the search.
+This page collects requirements on the search within a library.
+Typically, a user uses the search bar to trigger a search in the current library.
+They can also open up a popup to search across all libraries.
+
+> Requirements on search regarding a fetcher are not covered here.
+> Requirements on the syntax itself are not covered here, oo.
+{: .prompt-note}
+
+## Requirements sources
 
 Indirectly, the requirements are listed at <https://docs.jabref.org/finding-sorting-and-cleaning-entries/search>.
 This page tries to collect issues from users as requirements to enable better tracing in the code.
-
-> ![NOTE]
-> Currently, no implementation is linked
 
 ## Search for the name of the first authors
 `req~jabgui.search.syntax.author-first-name~1`
@@ -40,5 +45,8 @@ It is possible by regular expressions, but the user asked for "quickly".
 Issue: [#10490](https://github.com/JabRef/jabref/issues/10490)
 
 Enable to quickly search for a citation key.
+
+> Currently, no implementation is linked
+{: .prompt-note}
 
 <!-- markdownlint-disable-file MD022 -->
