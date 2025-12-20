@@ -1,5 +1,7 @@
 package org.jabref.gui.frame;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,9 +28,9 @@ public class SidePanePreferences {
 
     private SidePanePreferences() {
         this(
-                Set.of(),  // Default visible pane
-                Map.of(),  // Default preferred positions
-                0          // Default web search fetcher index
+                EnumSet.of(SidePaneType.WEB_SEARCH, SidePaneType.GROUPS), // Default visible panes (OPEN_OFFICE omitted)
+                Collections.emptyMap(),                                   // Default preferred positions
+                0                                                         // Default web search fetcher index
         );
     }
 
