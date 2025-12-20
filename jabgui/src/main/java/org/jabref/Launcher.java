@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.logging.JavaFxCssLogFilter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.logic.UiCommand;
@@ -107,19 +108,24 @@ public class Launcher {
      * is not possible to alter the log configuration programmatically anymore.
      */
     public static void initLogging(String[] args) {
-        // Install a JUL filter to suppress extremely noisy JavaFX CSS warnings (see JDK-8268657)
-        // We add the filter before installing the SLF4J bridge so that filtered JUL records never
-        // reach SLF4J/tinylog in the first place.
-        java.util.logging.Logger rootJulLogger = java.util.logging.Logger.getLogger("");
-        try {
-            rootJulLogger.setFilter(new org.jabref.gui.logging.JavaFxCssLogFilter());
-        } catch (Throwable ignored) {
-            // If anything goes wrong, do not fail startup because of logging
-        }
-
         // routeLoggingToSlf4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+
+        // Install a JUL filter to suppress extremely noisy JavaFX CSS warnings (see JDK-8268657)
+        // We must apply the filter to the loggers/handlers because filters on the root logger
+        // are not inherited by child loggers for their own log() calls.
+        try {
+            JavaFxCssLogFilter cssFilter = new org.jabref.gui.logging.JavaFxCssLogFilter();
+            java.util.logging.Logger rootJulLogger = java.util.logging.Logger.getLogger("");
+            rootJulLogger.setFilter(cssFilter);
+            for (java.util.logging.Handler handler : rootJulLogger.getHandlers()) {
+                handler.setFilter(cssFilter);
+            }
+            java.util.logging.Logger.getLogger("javafx.css").setFilter(cssFilter);
+        } catch (Throwable ex) {
+            // If anything goes wrong, do not fail startup because of logging
+        }
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug
