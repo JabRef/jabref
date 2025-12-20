@@ -28,6 +28,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
@@ -48,6 +49,7 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGranularity;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -102,6 +104,10 @@ public class GroupDialogViewModel {
 
     private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
 
+    // Directory Group Properties
+    private final BooleanProperty typeDirectoryProperty = new SimpleBooleanProperty();
+    private final StringProperty directoryGroupPathProperty = new SimpleStringProperty("");
+
     // Date Group Properties
     private final BooleanProperty dateRadioButtonSelectedProperty = new SimpleBooleanProperty();
     private final ObjectProperty<Field> dateGroupFieldProperty = new SimpleObjectProperty<>();
@@ -116,6 +122,7 @@ public class GroupDialogViewModel {
     private Validator keywordSearchTermEmptyValidator;
     private Validator searchSearchTermEmptyValidator;
     private Validator texGroupFilePathValidator;
+    private Validator directoryGroupPathValidator;
     private CompositeValidator validator;
 
     private final DialogService dialogService;
@@ -247,6 +254,17 @@ public class GroupDialogViewModel {
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
+        directoryGroupPathValidator = new FunctionBasedValidator<>(
+                directoryGroupPathProperty,
+                input -> {
+                    if (StringUtil.isBlank(input)) {
+                        return false;
+                    }
+                    Path inputPath = Path.of(input);
+                    return Files.isDirectory(inputPath);
+                },
+                ValidationMessage.error(Localization.lang("Please provide a valid directory path.")));
+
         typeSearchProperty.addListener((_, _, isSelected) -> {
             if (Boolean.TRUE.equals(isSelected)) {
                 validator.addValidators(searchSearchTermEmptyValidator);
@@ -268,6 +286,14 @@ public class GroupDialogViewModel {
                 validator.addValidators(texGroupFilePathValidator);
             } else {
                 validator.removeValidators(texGroupFilePathValidator);
+            }
+        });
+
+        typeDirectoryProperty.addListener((_, _, isSelected) -> {
+            if (Boolean.TRUE.equals(isSelected)) {
+                validator.addValidators(directoryGroupPathValidator);
+            } else {
+                validator.removeValidators(directoryGroupPathValidator);
             }
         });
 
@@ -393,6 +419,12 @@ public class GroupDialogViewModel {
                         dateGroupFieldProperty.getValue(),
                         dateGroupOptionProperty.getValue()
                 );
+            } else if (Boolean.TRUE.equals(typeDirectoryProperty.getValue())) {
+                resultingGroup = new DirectoryGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        Path.of(directoryGroupPathProperty.getValue().trim())
+                );
             }
 
             if (resultingGroup != null) {
@@ -492,6 +524,11 @@ public class GroupDialogViewModel {
 
                 TexGroup group = (TexGroup) editedGroup;
                 texGroupFilePathProperty.setValue(group.getFilePath().toString());
+            } else if (editedGroup.getClass() == DirectoryGroup.class) {
+                typeDirectoryProperty.setValue(true);
+
+                DirectoryGroup group = (DirectoryGroup) editedGroup;
+                directoryGroupPathProperty.setValue(group.getDirectoryPath().toString());
             }
         }
     }
@@ -677,6 +714,29 @@ public class GroupDialogViewModel {
 
     public StringProperty texGroupFilePathProperty() {
         return texGroupFilePathProperty;
+    }
+
+    // Directory Group Property Getters
+    public BooleanProperty typeDirectoryProperty() {
+        return typeDirectoryProperty;
+    }
+
+    public StringProperty directoryGroupPathProperty() {
+        return directoryGroupPathProperty;
+    }
+
+    public ValidationStatus directoryGroupPathValidationStatus() {
+        return directoryGroupPathValidator.getValidationStatus();
+    }
+
+    public void directoryGroupBrowse() {
+        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank() ?
+                        FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
+                        Path.of(directoryGroupPathProperty.get()))
+                .build();
+        dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
+                .ifPresent(dir -> directoryGroupPathProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     // Date Group Property Getters
