@@ -67,10 +67,17 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
         // unfielded expression
         if (ctx.FIELD() == null) {
+            boolean hasWildcard = term.contains("*") || term.contains("?");
+
             if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
                 return "/" + term + "/";
+            } else if (isQuoted) {
+                return "\"" + escapeQuotes(term) + "\"";
+            } else if (hasWildcard) {
+                return QueryParser.escape(term).replace("\\*", "*").replace("\\?", "?");
+            } else {
+                return QueryParser.escape(term);
             }
-            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
         }
 
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
@@ -78,8 +85,8 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             return "";
         }
 
-        field = "any".equals(field) || "anyfield".equals(field) ? "" : field + ":";
         int operator = ctx.operator().getStart().getType();
+        field = "any".equals(field) || "anyfield".equals(field) ? "" : field + ":";
         return buildFieldExpression(field, term, operator, isQuoted);
     }
 
@@ -95,7 +102,16 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             String expression = field + "/" + term + "/";
             return isNegationOp ? "NOT " + expression : expression;
         } else {
-            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            boolean hasWildcard = term.contains("*") || term.contains("?");
+
+            if (isQuoted) {
+                term = "\"" + escapeQuotes(term) + "\"";
+            } else if (hasWildcard) {
+                term = QueryParser.escape(term).replace("\\*", "*").replace("\\?", "?");
+            } else {
+                term = QueryParser.escape(term);
+            }
+
             String expression = field + term;
             return isNegationOp ? "NOT " + expression : expression;
         }
