@@ -49,6 +49,8 @@ public class Pseudonymization {
         result.setMode(bibDatabaseContext.getMode());
         newGroups.ifPresent(result.getMetaData()::setGroups);
 
+        bibDatabaseContext.getMetaData().getGroupSearchSyntaxVersion().ifPresent(result.getMetaData()::setGroupSearchSyntaxVersion);
+
         return new Result(result, valueMapping);
     }
 
