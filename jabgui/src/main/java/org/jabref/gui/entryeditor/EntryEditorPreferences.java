@@ -58,11 +58,39 @@ public class EntryEditorPreferences {
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
 
-    public static Map<String, Set<Field>> createDefaultTabs() {
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
-        tabs.put(Localization.lang("General"), new LinkedHashSet<>(FieldFactory.getDefaultGeneralFields()));
-        tabs.put(Localization.lang("Abstract"), Set.of(StandardField.ABSTRACT));
-        return tabs;
+    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
+                                  Map<String, Set<Field>> defaultEntryEditorTabList,
+                                  boolean shouldOpenOnNewEntry,
+                                  boolean shouldShowRecommendationsTab,
+                                  boolean shouldShowAiSummaryTab,
+                                  boolean shouldShowAiChatTab,
+                                  boolean shouldShowLatexCitationsTab,
+                                  boolean shouldShowFileAnnotationsTab,
+                                  boolean showSourceTabByDefault,
+                                  boolean enableValidation,
+                                  boolean allowIntegerEditionBibtex,
+                                  boolean autolinkFilesEnabled,
+                                  JournalPopupEnabled journalPopupEnabled,
+                                  boolean showSciteTab,
+                                  boolean showUserCommentsFields,
+                                  double previewWidthDividerPosition) {
+
+        this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
+        this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
+        this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
+        this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
+        this.shouldShowAiSummaryTab = new SimpleBooleanProperty(shouldShowAiSummaryTab);
+        this.shouldShowAiChatTab = new SimpleBooleanProperty(shouldShowAiChatTab);
+        this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);
+        this.shouldShowFileAnnotationsTab = new SimpleBooleanProperty(shouldShowFileAnnotationsTab);
+        this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
+        this.enableValidation = new SimpleBooleanProperty(enableValidation);
+        this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
+        this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
+        this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
+        this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
+        this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
+        this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
     // Creates Object with default values
@@ -110,39 +138,11 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
 
-    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
-                                  Map<String, Set<Field>> defaultEntryEditorTabList,
-                                  boolean shouldOpenOnNewEntry,
-                                  boolean shouldShowRecommendationsTab,
-                                  boolean shouldShowAiSummaryTab,
-                                  boolean shouldShowAiChatTab,
-                                  boolean shouldShowLatexCitationsTab,
-                                  boolean shouldShowFileAnnotationsTab,
-                                  boolean showSourceTabByDefault,
-                                  boolean enableValidation,
-                                  boolean allowIntegerEditionBibtex,
-                                  boolean autolinkFilesEnabled,
-                                  JournalPopupEnabled journalPopupEnabled,
-                                  boolean showSciteTab,
-                                  boolean showUserCommentsFields,
-                                  double previewWidthDividerPosition) {
-
-        this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
-        this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
-        this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
-        this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
-        this.shouldShowAiSummaryTab = new SimpleBooleanProperty(shouldShowAiSummaryTab);
-        this.shouldShowAiChatTab = new SimpleBooleanProperty(shouldShowAiChatTab);
-        this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);
-        this.shouldShowFileAnnotationsTab = new SimpleBooleanProperty(shouldShowFileAnnotationsTab);
-        this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
-        this.enableValidation = new SimpleBooleanProperty(enableValidation);
-        this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
-        this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
-        this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
-        this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
-        this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
-        this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
+    public static Map<String, Set<Field>> createDefaultTabs() {
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
+        tabs.put(Localization.lang("General"), new LinkedHashSet<>(FieldFactory.getDefaultGeneralFields()));
+        tabs.put(Localization.lang("Abstract"), Set.of(StandardField.ABSTRACT));
+        return tabs;
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
