@@ -18,6 +18,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_COVERAGE;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_RIGHTS;
@@ -29,6 +31,7 @@ import static org.mockito.Mockito.when;
 /**
  * This tests the writing to a PDF. If the creation of the RDF content should be checked, please head to {@link org.jabref.logic.exporter.XmpExporterTest}
  */
+@Execution(ExecutionMode.SAME_THREAD)
 class XmpUtilWriterTest {
 
     @TempDir

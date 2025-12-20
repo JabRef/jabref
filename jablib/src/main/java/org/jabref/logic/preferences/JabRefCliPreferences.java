@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
 import org.jabref.logic.FilePreferences;
@@ -761,8 +763,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
         // endregion
 
-        // endregion
-
         // region PushToApplicationPreferences
         defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -1021,6 +1021,13 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     public List<String> getStringList(String key) {
         return convertStringToList(get(key));
+    }
+
+    /**
+     * Returns a Sequenced Set of Fields.
+     */
+    public SequencedSet<Field> getFieldSequencedSet(String key, ObservableSet<Field> def) {
+        return FieldFactory.parseFieldList(get(key, FieldFactory.serializeFieldsList(def)));
     }
 
     /**
