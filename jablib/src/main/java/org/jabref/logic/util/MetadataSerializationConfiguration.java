@@ -3,6 +3,7 @@ package org.jabref.logic.util;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
@@ -72,6 +73,11 @@ public class MetadataSerializationConfiguration {
      * Identifier for AutomaticDateGroup.
      */
     public static final String AUTOMATIC_DATE_GROUP_ID = "AutomaticDateGroup:";
+
+    /**
+     * Identifier for {@link DirectoryGroup}.
+     */
+    public static final String DIRECTORY_GROUP_ID = "DirectoryGroup:";
 
     private MetadataSerializationConfiguration() {
     }
