@@ -30,6 +30,7 @@ public class CiteDrivePushAction extends SimpleCommand {
         this.preferences = preferences;
 
         this.citeDriveOAuthService = new CiteDriveOAuthService(preferences.getExternalApplicationsPreferences(), preferences.getRemotePreferences(), preferences.getCiteDrivePreferences(), new OAuthSessionRegistry(), dialogService);
+        // Alternative - for testing with a local OAuth server
         // this.citeDriveOAuthService = new CiteDriveOAuthService(preferences.getExternalApplicationsPreferences(), preferences.getRemotePreferences(), preferences.getCiteDrivePreferences(), new OAuthSessionRegistry(), dialogService, URI.create("http://localhost:8080/default/authorize"), URI.create("http://localhost:8080/default/token"));
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager));

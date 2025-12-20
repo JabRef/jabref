@@ -2,6 +2,7 @@ package org.jabref.gui.citedrive;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
@@ -40,10 +41,10 @@ class CiteDriveOAuthTest {
     private static final OAuthSessionRegistry OAUTH_SESSION_REGISTRY = new OAuthSessionRegistry();
 
     @BeforeAll
-    static void startServer() {
+    static void startServer() throws URISyntaxException {
         CliPreferences cliPreferences = mock(CliPreferences.class);
         SrvStateManager srvStateManager = mock(SrvStateManager.class);
-        URI uri = URI.create("http://localhost:23119");
+        URI uri = new URI("http://localhost:23119");
         HTTP_SERVER_MANAGER.start(cliPreferences, srvStateManager, OAUTH_SESSION_REGISTRY, uri);
     }
 
