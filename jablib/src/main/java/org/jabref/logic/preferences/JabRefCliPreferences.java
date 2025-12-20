@@ -710,7 +710,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // version check defaults
         defaults.put(VERSION_IGNORED_UPDATE, "");
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
-        
+
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
