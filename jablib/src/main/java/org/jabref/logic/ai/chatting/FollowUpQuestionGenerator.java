@@ -42,7 +42,7 @@ public class FollowUpQuestionGenerator {
 
             List<String> questions = parseQuestions(responseText);
 
-            LOGGER.info("Generated {} follow-up questions", questions.size());
+            LOGGER.debug("Generated {} follow-up questions", questions.size());
 
             return questions;
         } catch (Exception e) {

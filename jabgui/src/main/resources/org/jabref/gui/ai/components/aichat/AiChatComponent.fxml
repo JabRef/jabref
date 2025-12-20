@@ -12,6 +12,8 @@
 <?import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent?>
 <?import org.jabref.gui.ai.components.util.Loadable?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <fx:root type="javafx.scene.layout.VBox"
          spacing="10"
          xmlns="http://javafx.com/javafx/17.0.2-ea"
@@ -45,6 +47,18 @@
             </tooltip>
         </Button>
         <ChatPromptComponent fx:id="chatPrompt" HBox.hgrow="ALWAYS"/>
+        <MenuButton text="%Export" styleClass="icon-button,narrow">
+            <graphic>
+                <JabRefIconView glyph="SAVE"/>
+            </graphic>
+            <items>
+                <MenuItem text="%Export to Markdown" onAction="#exportMarkdown"/>
+                <MenuItem text="%Export to JSON" onAction="#exportJson"/>
+            </items>
+            <tooltip>
+                <Tooltip text="%Export chat history"/>
+            </tooltip>
+        </MenuButton>
     </HBox>
     <HBox alignment="CENTER" spacing="50">
         <Label fx:id="noticeText"

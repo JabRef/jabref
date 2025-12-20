@@ -6,6 +6,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="-Infinity" spacing="8.0" type="VBox" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.summary.SummaryShowingComponent">
     <children>
         <BorderPane minHeight="30.0">
@@ -15,6 +18,17 @@
             <center>
                 <Button mnemonicParsing="false" onAction="#onRegenerateButtonClick" text="%Regenerate" translateX="-40" />
             </center>
+            <right>
+                <MenuButton text="%Export" >
+                    <graphic>
+                        <JabRefIconView glyph="SAVE"/>
+                    </graphic>
+                    <items>
+                        <MenuItem text="%Export to Markdown" onAction="#exportMarkdown"/>
+                        <MenuItem text="%Export to JSON" onAction="#exportJson"/>
+                    </items>
+                </MenuButton>
+            </right>
         </BorderPane>
         <Text fx:id="summaryInfoText" strokeType="OUTSIDE" strokeWidth="0.0" text="%Generated at %0 by %1" />
     </children>

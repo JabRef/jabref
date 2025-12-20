@@ -12,6 +12,22 @@ public class CopyToPreferences {
         this.shouldAskForIncludingCrossReferences.set(shouldAskForIncludingCrossReferences);
     }
 
+    private CopyToPreferences() {
+        this(
+                true, // shouldAskForIncludingCrossReferences
+                false // shouldIncludeCrossReferences
+        );
+    }
+
+    public static CopyToPreferences getDefault() {
+        return new CopyToPreferences();
+    }
+
+    public void setAll(CopyToPreferences other) {
+        this.shouldIncludeCrossReferences.set(other.getShouldIncludeCrossReferences());
+        this.shouldAskForIncludingCrossReferences.set(other.getShouldAskForIncludingCrossReferences());
+    }
+
     public boolean getShouldIncludeCrossReferences() {
         return shouldIncludeCrossReferences.get();
     }
