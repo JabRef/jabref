@@ -393,8 +393,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, this));
-        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, this, preferences));
-        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, this, taskExecutor));
+        tabs.add(new AiSummaryTab(stateManager, bibEntryTypesManager, preferences, aiService, dialogService, this));
+        tabs.add(new AiChatTab(stateManager, bibEntryTypesManager, preferences, aiService, dialogService, this, taskExecutor));
 
         return tabs;
     }
