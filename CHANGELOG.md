@@ -67,7 +67,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
-- We removed `generate-citation-keys` as a standalone command in JabKit. Use `citationkeys generate` instead. [#14361](https://github.com/JabRef/jabref/issues/14361)
+- We removed `generate-citation-keys` as a standalone command in JabKit. Use `citationkeys generate` instead. ([#14361](https://github.com/JabRef/jabref/issues/14361), [#14500](https://github.com/JabRef/jabref/pull/14500))
 
 ## [6.0-alpha.3] – 2025-10-30
 

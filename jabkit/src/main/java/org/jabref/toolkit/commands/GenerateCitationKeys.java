@@ -60,7 +60,7 @@ class GenerateCitationKeys implements Runnable {
             names = "--suffix",
             description = "Key suffix strategy: ALWAYS, SECOND_WITH_A, SECOND_WITH_B"
     )
-    private CitationKeyPatternPreferences.KeySuffix suffix;
+    private CitationKeyPatternPreferences.KeySuffix keySuffix;
 
     @Option(
             names = "--regex",
@@ -121,7 +121,7 @@ class GenerateCitationKeys implements Runnable {
         CitationKeyPatternPreferences preferencesToUse = existingPreferences;
 
         if (transliterate != null || pattern != null || avoidOverwrite != null ||
-                warnBeforeOverwrite != null || generateBeforeSaving != null || suffix != null ||
+                warnBeforeOverwrite != null || generateBeforeSaving != null || keySuffix != null ||
                 keyPatternRegex != null || keyPatternReplacement != null ||
                 unwantedCharacters != null || keywordDelimiter != null) {
 
@@ -130,7 +130,7 @@ class GenerateCitationKeys implements Runnable {
                     avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
                     warnBeforeOverwrite != null ? warnBeforeOverwrite : existingPreferences.shouldWarnBeforeOverwriteCiteKey(),
                     generateBeforeSaving != null ? generateBeforeSaving : existingPreferences.shouldGenerateCiteKeysBeforeSaving(),
-                    suffix != null ? suffix : existingPreferences.getKeySuffix(),
+                    keySuffix != null ? keySuffix : existingPreferences.getKeySuffix(),
                     keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
                     keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                     unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
