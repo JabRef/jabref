@@ -708,11 +708,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
-        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes();
-        Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions();
         return new SidePanePreferences(
-                backingStoreVisiblePanes.isEmpty() ? defaults.visiblePanes() : backingStoreVisiblePanes,
-                backingStorePreferredPositions.isEmpty() ? defaults.getPreferredPositions() : backingStorePreferredPositions,
+                defaults.visiblePanes(),
+                defaults.getPreferredPositions(),
                 getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
         );
     }
