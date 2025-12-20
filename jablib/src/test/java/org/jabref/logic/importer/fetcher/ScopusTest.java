@@ -55,7 +55,6 @@ class ScopusTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcher
         when(IMPORTER_PREFERENCES.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(IMPORTER_PREFERENCES.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(API_KEY);
         fetcher = new Scopus(IMPORTER_PREFERENCES);
-        entry = new BibEntry();
     }
 
     @Override
