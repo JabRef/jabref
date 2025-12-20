@@ -85,7 +85,7 @@ class DirectoryGroupTest {
         AbstractGroup copy = group.deepCopy();
 
         assertNotNull(copy);
-        assertTrue(copy instanceof DirectoryGroup);
+        assertEquals(DirectoryGroup.class, copy.getClass());
         assertEquals(group.getName(), copy.getName());
         assertEquals(group.getHierarchicalContext(), copy.getHierarchicalContext());
         assertEquals(group.getColor(), copy.getColor());
