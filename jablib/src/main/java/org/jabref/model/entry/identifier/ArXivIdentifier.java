@@ -1,15 +1,16 @@
 package org.jabref.model.entry.identifier;
 
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,5 +138,32 @@ public class ArXivIdentifier extends EprintIdentifier {
         } catch (URISyntaxException e) {
             return Optional.empty();
         }
+    }
+    public static Optional<ArXivIdentifier> findInText(String text) {
+        if (text == null) {
+            return Optional.empty();
+        }
+
+        // Remove strange characters
+        text = text.replaceAll("[�]", "");
+
+        // Match arXiv URLs like:
+        // https://arxiv.org/abs/2503.08641v1
+        // https://arxiv.org/html/2503.08641v1#bib.bib5
+        Pattern arxivPattern = Pattern.compile(
+                "arxiv\\.org/(abs|html)/([0-9]{4}\\.[0-9]{5}(v[0-9]+)?)",
+                Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher matcher = arxivPattern.matcher(text);
+        if (matcher.find()) {
+            String arxivId = matcher.group(2);
+            String identifier = matcher.group(2);
+            String version = matcher.group(3) != null ? matcher.group(3).substring(1) : "";
+
+            return Optional.of(new ArXivIdentifier(identifier, version, ""));
+        }
+
+        return Optional.empty();
     }
 }

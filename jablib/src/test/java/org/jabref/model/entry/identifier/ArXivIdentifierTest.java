@@ -192,4 +192,16 @@ class ArXivIdentifierTest {
 
         assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "1", "")), parsed);
     }
+
+    @Test
+    void findsArXivIdentifierInUrl() {
+        String text = "https://arxiv.org/html/2503.08641v1#bib.bib5";
+
+        Optional<ArXivIdentifier> identifier = ArXivIdentifier.findInText(text);
+
+        assertTrue(identifier.isPresent());
+        assertEquals("2503.08641", identifier.get().getIdentifier());
+        assertEquals("1", identifier.get().getVersion());
+    }
+
 }
