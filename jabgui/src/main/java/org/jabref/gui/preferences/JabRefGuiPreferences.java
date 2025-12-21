@@ -400,7 +400,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
         Map<String, Set<Field>> storedTabs = getEntryEditorTabs();
-        if(storedTabs.isEmpty()) {
+        if (storedTabs.isEmpty()) {
             storedTabs = defaults.getEntryEditorTabs();
         }
         return new EntryEditorPreferences(
