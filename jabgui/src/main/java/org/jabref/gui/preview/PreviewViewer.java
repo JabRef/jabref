@@ -170,11 +170,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             javafx.application.Platform.runLater(() -> {
                 optHeight.ifPresent(measuredHeight -> {
                     contentHeight.set(measuredHeight);
-                    this.setPrefHeight(measuredHeight + PADDING);
+                    this.setPrefHeight(measuredHeight + PADDING * 2); // top and bottom
                 });
                 optWidth.ifPresent(measuredWidth -> {
                     contentWidth.set(measuredWidth);
-                    this.setPrefWidth(measuredWidth + PADDING);
+                    this.setPrefWidth(measuredWidth + PADDING * 2); // left and right
                 });
             });
 
