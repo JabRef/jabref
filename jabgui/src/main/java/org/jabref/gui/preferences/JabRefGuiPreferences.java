@@ -371,28 +371,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
     }
 
-    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
-        return new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
-                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
-                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
-                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
-                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
-                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
-                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
-                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(
-                        get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().toString())),
-                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
-        );
-    }
-
     // region EntryEditorPreferences
     public EntryEditorPreferences getEntryEditorPreferences() {
         if (entryEditorPreferences != null) {
@@ -420,6 +398,32 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return entryEditorPreferences;
     }
 
+    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
+        Map<String, Set<Field>> storedTabs = getEntryEditorTabs();
+        if(storedTabs.isEmpty()) {
+            storedTabs = defaults.getEntryEditorTabs();
+        }
+        return new EntryEditorPreferences(
+                storedTabs,
+                defaults.getDefaultEntryEditorTabs(),
+                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
+                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
+                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
+                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
+                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
+                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
+                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
+                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(
+                        get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().toString())),
+                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
+        );
+    }
+
     /**
      * Get a Map of defined tab names to default tab fields.
      *
@@ -430,10 +434,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
 
+        // If data is missing or mismatched, return an empty map so the caller uses defaults
         if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            // Nothing set (or wrong configuration), then we use default values
-            tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
-            tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
+            return tabs;
         }
 
         for (int i = 0; i < tabNames.size(); i++) {
@@ -464,25 +467,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
 
         getEntryEditorTabs();
-    }
-
-    private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
-
-        int defNumber = 0;
-        while (true) {
-            // Saved as 'CUSTOMTABNAME_def{number}' and seperated by ';'
-            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-
-            customTabsMap.put(name, FieldFactory.parseFieldList((String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber)));
-            defNumber++;
-        }
-        return customTabsMap;
     }
     // endregion
 

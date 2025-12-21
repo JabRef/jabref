@@ -507,12 +507,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        // Since some of the preference settings themselves use localized strings, we cannot set the language after
-        // the initialization of the preferences in main
-        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // will never be translated.
-        Localization.setLanguage(getLanguage());
-
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
@@ -705,6 +699,11 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(VERSION_IGNORED_UPDATE, "");
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
+        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+        // the initialization of the preferences in main
+        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+        // will never be translated.
+        Localization.setLanguage(getLanguage());
         setLanguageDependentDefaultValues();
 
         // region last files opened
@@ -1644,7 +1643,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                userAndHost.getUserHostString(),
+                getUserHostInfo().getUserHostString(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),

@@ -96,22 +96,22 @@ public class EntryEditorPreferences {
     // Creates Object with default values
     private EntryEditorPreferences() {
         this(
-                createDefaultTabs(),
-                createDefaultTabs(),
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                false,
-                true,
-                false,
-                true,
-                JournalPopupEnabled.FIRST_START,
-                true,
-                true,
-                0.5
+                createDefaultTabs(),                      // 1.  entryEditorTabList
+                createDefaultTabs(),                      // 2.  defaultEntryEditorTabList
+                true,                                     // 3.  shouldOpenOnNewEntry
+                true,                                     // 4.  shouldShowRecommendationsTab
+                true,                                     // 5.  shouldShowAiSummaryTab
+                true,                                     // 6.  shouldShowAiChatTab
+                true,                                     // 7.  shouldShowLatexCitationsTab
+                true,                                     // 8.  shouldShowFileAnnotationsTab
+                false,                                    // 9.  showSourceTabByDefault
+                true,                                     // 10. enableValidation
+                false,                                    // 11. allowIntegerEditionBibtex
+                true,                                     // 12. autoLinkFiles
+                JournalPopupEnabled.FIRST_START,          // 13. enablementStatus
+                true,                                     // 14. shouldShowSciteTab
+                true,                                     // 15. showUserCommentsFields
+                0.5                                       // 16. previewWidthDividerPosition
         );
     }
 
