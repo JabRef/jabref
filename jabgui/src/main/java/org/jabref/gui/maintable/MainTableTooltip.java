@@ -36,7 +36,7 @@ public class MainTableTooltip extends Tooltip {
         this.setWrapText(true);
 
         final double PREVIEW_WIDTH_PADDING = 16.0;
-        final double PREVIEW_HEIGHT_PADDING = 8.0;  // Padding to avoid bottom clipping of the preview
+        final double PREVIEW_HEIGHT_PADDING = 8.0; // Padding to avoid bottom clipping of the preview
         final double MIN_TOOLTIP_WIDTH = 200.0; // Minimum width of the tooltip to keep layout stable even with small content
 
         preview.contentHeightProperty().addListener((_, _, val) -> {
