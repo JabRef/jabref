@@ -37,8 +37,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We reworded "Waiting for ..." to "Summarizing ..." within in-progress AI summarization task [#14642](https://github.com/JabRef/jabref/issues/14642)
-- We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types [#14082](https://github.com/JabRef/jabref/issues/14082)
 - We changed AI export logging to debug level (notifications and follow-up question generation). Logs are now emitted only in [debug mode](https://docs.jabref.org/advanced/commandline#debug-mode-debug). [#14645](https://github.com/JabRef/jabref/issues/14645)
 - We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types. [#14082](https://github.com/JabRef/jabref/issues/14082)
 - In case of invalid BibTeX in the source tab, a notification is displayed (instead of an exception). [#14504](https://github.com/JabRef/jabref/pull/14504)
