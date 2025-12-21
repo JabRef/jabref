@@ -34,7 +34,7 @@ public interface Identifier {
             return Optional.empty();
         }
 
-        return Stream.<Supplier<Optional<? extends Identifier>>>of(
+        return Stream.<Supplier<Optional<? extends Identifier>>> of(
                                                                     () -> DOI.findInText(identifier),
                                                                     () -> ArXivIdentifier.findInText(identifier),
                                                                     () -> ISBN.parse(identifier),
