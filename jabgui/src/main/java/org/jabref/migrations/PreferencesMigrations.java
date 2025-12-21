@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,7 +70,7 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
-        addICORERankingFieldToGeneralTab(preferences);
+        migrateGeneralTabDefaultFields(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
     }
 
@@ -573,38 +574,52 @@ public class PreferencesMigrations {
     }
 
     /**
-     * Updates the default preferences for the editor fields under the "General" tab to include the ICORE Ranking Field
-     * if it is missing.
+     * Migrates default fields of the "General" entry editor tab.
+     *
      * <p>
-     * The function first ensures that the current preferences match the previous default (before the ICORE field was added)
-     * and only then does the update.
+     * This migration handles default configuration before and after v6.0-alpha.3.
+     * If the user current configuration matched with one of with known default field sets it gets updated to
+     * current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
      * </p>
      *
-     * @param preferences the user's current preferences
+     * @param preferences the user's current GUI preferences
      * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      */
-    static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
+    static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
-
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
-        if (currentGeneralPrefs != null) {
-            Set<Field> expectedGeneralPrefs = Set.of(
-                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
-                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
-                    StandardField.TIMESTAMP,
-
-                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
-                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
-            );
-            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
-                return;
-            }
+        if (currentGeneralPrefs == null) {
+            return;
+        }
+        Set<Field> preV60alpha3Fields = Set.of(
+                StandardField.DOI,
+                StandardField.CROSSREF,
+                StandardField.KEYWORDS,
+                StandardField.EPRINT,
+                StandardField.URL,
+                StandardField.FILE,
+                StandardField.GROUPS,
+                StandardField.OWNER,
+                StandardField.TIMESTAMP,
+                SpecialField.PRINTED,
+                SpecialField.PRIORITY,
+                SpecialField.QUALITY,
+                SpecialField.RANKING,
+                SpecialField.READ_STATUS,
+                SpecialField.RELEVANCE
+        );
+        Set<Field> v60alpha3Fields = new HashSet<>(preV60alpha3Fields);
+        v60alpha3Fields.add(StandardField.ICORERANKING);
+        if (!currentGeneralPrefs.equals(preV60alpha3Fields)
+                && !currentGeneralPrefs.equals(v60alpha3Fields)) {
+            return;
         }
 
         entryEditorPrefs.put(
                 Localization.lang("General"),
-                FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
+                new HashSet<>(FieldFactory.getDefaultGeneralFields())
         );
+
         preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
     }
 

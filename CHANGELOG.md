@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added functionality to use `,` and `>` symbols inside keywords by putting `\` symbol before them [#12810](https://github.com/JabRef/jabref/issues/12810)
+- We added the `eprinttype` field to the General entry editor tab. [#14555](https://github.com/JabRef/jabref/issues/14555)
 - We added a right-click option to delete custom BST styles in the entry preview. [#14352](https://github.com/JabRef/jabref/issues/14352)
 - Improved merge dialog decisions for fields containing person names (e.g., `author`, `editor`) by using a new plausibility comparator. JabRef now prefers the side with more detailed/complete author information. [#14454](https://github.com/JabRef/jabref/issues/14454)
 - We added 15 non-standard BibLaTeX entry types (Audio, Image, Legal, ...) to the group "Non-standard types" group in the New Entry dialog and in the context menu. [#12963](https://github.com/JabRef/jabref/issues/12963)
@@ -61,6 +62,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed localization of the "New Entries" dialog. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
 - We readded the missing gui commands for importing and exporting preferences. [#14492](https://github.com/JabRef/jabref/pull/14492)
+- We fixed a crash when importing preferences from older JabRef versions. [#14497](https://github.com/JabRef/jabref/issues/14497)
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
 
