@@ -432,6 +432,8 @@ public class AiChatComponent extends VBox {
 
     @FXML
     private void exportMarkdown() {
+        assert !entries.isEmpty();
+
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.MARKDOWN)
                 .withDefaultExtension(StandardFileType.MARKDOWN)
@@ -454,6 +456,8 @@ public class AiChatComponent extends VBox {
 
     @FXML
     private void exportJson() {
+        assert !entries.isEmpty();
+
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.JSON)
                 .withDefaultExtension(StandardFileType.JSON)
