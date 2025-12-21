@@ -81,7 +81,7 @@ public class ImportCitaviAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("Error importing. See the error log for details."));
             })
             .executeWith(taskExecutor);
-        }
+    }
 
     private ParserResult doImport(List<Path> files) throws IOException {
         CitaviXmlImporter importer = new CitaviXmlImporter();
