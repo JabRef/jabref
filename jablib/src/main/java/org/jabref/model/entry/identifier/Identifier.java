@@ -35,11 +35,11 @@ public interface Identifier {
         }
 
         return Stream.<Supplier<Optional<? extends Identifier>>>of(
-                                                                    () -> DOI.findInText(identifier),
-                                                                    () -> ArXivIdentifier.findInText(identifier),
-                                                                    () -> ISBN.parse(identifier),
-                                                                    () -> SSRN.parse(identifier),
-                                                                    () -> RFC.parse(identifier))
+                             () -> DOI.findInText(identifier),
+                             () -> ArXivIdentifier.findInText(identifier),
+                             () -> ISBN.parse(identifier),
+                             () -> SSRN.parse(identifier),
+                             () -> RFC.parse(identifier))
                      .map(Supplier::get)
                      .filter(Optional::isPresent)
                      .map(Optional::get)

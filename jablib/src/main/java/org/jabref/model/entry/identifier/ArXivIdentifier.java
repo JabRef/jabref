@@ -72,30 +72,25 @@ public class ArXivIdentifier extends EprintIdentifier {
 
         String cleanedText = text.replaceAll("#[^\\s]*", "");
 
-        Pattern newStylePattern = Pattern.compile(
-                                                  "(?:https?://)?(?:www\\.)?arxiv\\.org/(?:abs|html|pdf)/(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?");
+        Pattern newStylePattern = Pattern.compile("(?:https?://)?(?:www\\.)?arxiv\\.org/(?:abs|html|pdf)/(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?");
         Matcher newStyleMatcher = newStylePattern.matcher(cleanedText);
         if (newStyleMatcher.find()) {
             return getArXivIdentifier(newStyleMatcher);
         }
 
-        Pattern oldStylePattern = Pattern.compile(
-                                                  "(?:https?://)?(?:www\\.)?arxiv\\.org/(?:abs|html|pdf)/(?<id>(?<classification>[a-z\\-]+(?:\\.[A-Z]{2})?)/\\d{7})(?:v(?<version>\\d+))?");
+        Pattern oldStylePattern = Pattern.compile("(?:https?://)?(?:www\\.)?arxiv\\.org/(?:abs|html|pdf)/(?<id>(?<classification>[a-z\\-]+(?:\\.[A-Z]{2})?)/\\d{7})(?:v(?<version>\\d+))?");
         Matcher oldStyleMatcher = oldStylePattern.matcher(cleanedText);
         if (oldStyleMatcher.find()) {
             return getArXivIdentifier(oldStyleMatcher);
         }
 
-        Pattern arXivPrefixPattern = Pattern.compile(
-                                                     "arxiv:\\s?(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?",
-                                                     Pattern.CASE_INSENSITIVE);
+        Pattern arXivPrefixPattern = Pattern.compile("arxiv:\\s?(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?", Pattern.CASE_INSENSITIVE);
         Matcher arXivPrefixMatcher = arXivPrefixPattern.matcher(cleanedText);
         if (arXivPrefixMatcher.find()) {
             return getArXivIdentifier(arXivPrefixMatcher);
         }
 
-        Pattern plainPattern = Pattern.compile(
-                                               "(?:^|\\s)(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?(?:\\s|$)");
+        Pattern plainPattern = Pattern.compile("(?:^|\\s)(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?(?:\\s|$)");
         Matcher plainMatcher = plainPattern.matcher(cleanedText);
         if (plainMatcher.find()) {
             return getArXivIdentifier(plainMatcher);
@@ -140,10 +135,7 @@ public class ArXivIdentifier extends EprintIdentifier {
 
     @Override
     public String toString() {
-        return "ArXivIdentifier{" +
-            "identifier='" + identifier + '\'' +
-            ", classification='" + classification + '\'' +
-            '}';
+        return "ArXivIdentifier{" + "identifier='" + identifier + '\'' + ", classification='" + classification + '\'' + '}';
     }
 
     @Override
@@ -156,8 +148,7 @@ public class ArXivIdentifier extends EprintIdentifier {
         }
 
         ArXivIdentifier that = (ArXivIdentifier) o;
-        return Objects.equals(identifier, that.identifier) &&
-            Objects.equals(classification, that.classification);
+        return Objects.equals(identifier, that.identifier) && Objects.equals(classification, that.classification);
     }
 
     @Override

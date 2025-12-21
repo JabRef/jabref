@@ -205,15 +205,15 @@ class ArXivIdentifierTest {
 
     static Stream<Arguments> provideFindInTextTestCases() {
         return Stream.of(
-                         Arguments.of("https://arxiv.org/abs/1502.05795", Optional.of(new ArXivIdentifier("1502.05795", ""))),
-                         Arguments.of("https://arxiv.org/html/2503.08641v1#bib.bib5", Optional.of(new ArXivIdentifier("2503.08641", "1", ""))),
-                         Arguments.of("https://arxiv.org/abs/1502.05795v2", Optional.of(new ArXivIdentifier("1502.05795", "2", ""))),
-                         Arguments.of("https://arxiv.org/pdf/1502.05795.pdf", Optional.of(new ArXivIdentifier("1502.05795", ""))),
-                         Arguments.of("http://arxiv.org/abs/hep-ex/0307015v1", Optional.of(new ArXivIdentifier("hep-ex/0307015", "1", "hep-ex"))),
-                         Arguments.of("arXiv:2503.08641v1", Optional.of(new ArXivIdentifier("2503.08641", "1", ""))),
-                         Arguments.of("see 2503.08641 for details", Optional.of(new ArXivIdentifier("2503.08641", ""))),
-                         Arguments.of("no identifier here", Optional.empty()),
-                         Arguments.of("", Optional.empty()),
-                         Arguments.of(null, Optional.empty()));
+                Arguments.of("https://arxiv.org/abs/1502.05795", Optional.of(new ArXivIdentifier("1502.05795", ""))),
+                Arguments.of("https://arxiv.org/html/2503.08641v1#bib.bib5", Optional.of(new ArXivIdentifier("2503.08641", "1", ""))),
+                Arguments.of("https://arxiv.org/abs/1502.05795v2", Optional.of(new ArXivIdentifier("1502.05795", "2", ""))),
+                Arguments.of("https://arxiv.org/pdf/1502.05795.pdf", Optional.of(new ArXivIdentifier("1502.05795", ""))),
+                Arguments.of("http://arxiv.org/abs/hep-ex/0307015v1", Optional.of(new ArXivIdentifier("hep-ex/0307015", "1", "hep-ex"))),
+                Arguments.of("arXiv:2503.08641v1", Optional.of(new ArXivIdentifier("2503.08641", "1", ""))),
+                Arguments.of("see 2503.08641 for details", Optional.of(new ArXivIdentifier("2503.08641", ""))),
+                Arguments.of("no identifier here", Optional.empty()),
+                Arguments.of("", Optional.empty()),
+                Arguments.of(null, Optional.empty()));
     }
 }
