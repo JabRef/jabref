@@ -13,5 +13,6 @@ ignorePatterns:
   - pattern: '^http(s)?://127.0.0.1'
   - pattern: "^ftp://[^\\s/$?#]*\\.[^\\s]*$"
   - pattern: "^https://github.com/JabRef/jabref-issue-melting-pot"
+  - pattern: "dl\\.acm\\.org"
   # works locally, but not in the checker
   - pattern: "^https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator"

@@ -18,6 +18,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class EndnoteXmlExporterTest {
 
     private Exporter exporter;

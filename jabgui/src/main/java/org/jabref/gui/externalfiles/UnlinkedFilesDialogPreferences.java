@@ -16,9 +16,9 @@ public class UnlinkedFilesDialogPreferences {
 
     private UnlinkedFilesDialogPreferences() {
         this(
-                StandardFileType.ANY_FILE.getName(),
-                DateRange.ALL_TIME,
-                ExternalFileSorter.DEFAULT
+                StandardFileType.ANY_FILE.getName(), // Default selected files extensions
+                DateRange.ALL_TIME,                  // Default selected date range
+                ExternalFileSorter.DEFAULT           // Default sort order
         );
     }
 

@@ -1,5 +1,7 @@
 package org.jabref.gui.frame;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,8 +26,25 @@ public class SidePanePreferences {
         this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
+    private SidePanePreferences() {
+        this(
+                EnumSet.of(SidePaneType.WEB_SEARCH, SidePaneType.GROUPS), // Default visible panes (OPEN_OFFICE omitted)
+                Collections.emptyMap(),                                   // Default preferred positions
+                0                                                         // Default web search fetcher index
+        );
+    }
+
+    public static SidePanePreferences getDefault() {
+        return new SidePanePreferences();
+    }
+
     public ObservableSet<SidePaneType> visiblePanes() {
         return visiblePanes;
+    }
+
+    public void setVisiblePanes(Set<SidePaneType> panes) {
+        visiblePanes.clear();
+        visiblePanes.addAll(panes);
     }
 
     public ObservableMap<SidePaneType, Integer> getPreferredPositions() {
@@ -47,5 +66,11 @@ public class SidePanePreferences {
 
     public void setWebSearchFetcherSelected(int webSearchFetcherSelected) {
         this.webSearchFetcherSelected.set(webSearchFetcherSelected);
+    }
+
+    public void setAll(SidePanePreferences preferences) {
+        this.setVisiblePanes(preferences.visiblePanes());
+        this.setPreferredPositions(preferences.getPreferredPositions());
+        this.webSearchFetcherSelected.set(preferences.getWebSearchFetcherSelected());
     }
 }
