@@ -732,11 +732,11 @@ public class GroupDialogViewModel {
     public void directoryGroupBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank() ?
-                        FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
-                        Path.of(directoryGroupPathProperty.get()))
+                                      FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
+                                      Path.of(directoryGroupPathProperty.get()))
                 .build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                .ifPresent(dir -> directoryGroupPathProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> directoryGroupPathProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     // Date Group Property Getters

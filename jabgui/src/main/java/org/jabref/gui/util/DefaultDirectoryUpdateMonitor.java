@@ -70,8 +70,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                         continue;
                     }
 
-                    @SuppressWarnings("unchecked")
-                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                    @SuppressWarnings("unchecked") WatchEvent<Path> ev = (WatchEvent<Path>) event;
                     Path filename = ev.context();
                     Path fullPath = directory.resolve(filename);
 
@@ -95,8 +94,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
                 Thread.yield();
             }
         } catch (IOException e) {
-            JabRefException exception = new WatchServiceUnavailableException(
-                    e.getMessage(), e.getLocalizedMessage(), e.getCause());
+            JabRefException exception = new WatchServiceUnavailableException(e.getMessage(), e.getLocalizedMessage(), e.getCause());
             monitorFailure.set(Optional.of(exception));
             LOGGER.warn("Error during directory watching", e);
         }
@@ -176,10 +174,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     }
 
     private void registerSingleDirectory(Path directory) throws IOException {
-        WatchKey key = directory.register(watcher,
-                StandardWatchEventKinds.ENTRY_CREATE,
-                StandardWatchEventKinds.ENTRY_DELETE,
-                StandardWatchEventKinds.ENTRY_MODIFY);
+        WatchKey key = directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
         watchKeyToPath.put(key, directory);
     }
 
