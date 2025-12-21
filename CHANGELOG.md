@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to change the Git username and PAT in Network Preferences. [#14509](https://github.com/JabRef/jabref/pull/14509)
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
+- We enabled CLI parameters for customizing citation key generation in JabKit, allowing users to override citation key patterns without modifying GUI settings. [#14361](https://github.com/JabRef/jabref/issues/14361)
 - We added the option to pseudonymize a library using the GUI, via the tools tab in the Main Menu. [#14118](https://github.com/JabRef/jabref/issues/14118)
 - We added export options (Markdown and JSON) for AI Summary and AI Chat. [#13868](https://github.com/JabRef/jabref/issues/13868)
 - We added automatic recognition of arXiv identifiers when pasting URLs (including those with fragments like `#bib.bib5`) into the "New Entry" dialog.
@@ -70,6 +71,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
 
 ### Removed
+
+- We removed `generate-citation-keys` as a standalone command in JabKit. Use `citationkeys generate` instead. ([#14361](https://github.com/JabRef/jabref/issues/14361), [#14500](https://github.com/JabRef/jabref/pull/14500))
 
 ## [6.0-alpha.3] – 2025-10-30
 
