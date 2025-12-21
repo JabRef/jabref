@@ -17,15 +17,12 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.UpdateField;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Action to import Citavi XML files into a new library tab.
- * This action preserves citation keys from Citavi by temporarily disabling
- * the "Generate a new key for imported entries" preference.
  */
 public class ImportCitaviAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportCitaviAction.class);
@@ -33,17 +30,14 @@ public class ImportCitaviAction extends SimpleCommand {
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final CliPreferences preferences;
-    private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
     public ImportCitaviAction(LibraryTabContainer tabContainer,
                               CliPreferences preferences,
-                              FileUpdateMonitor fileUpdateMonitor,
                               TaskExecutor taskExecutor,
                               DialogService dialogService) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
-        this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
     }
@@ -52,19 +46,22 @@ public class ImportCitaviAction extends SimpleCommand {
     public void execute() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CITAVI)
+                .withDefaultExtension(StandardFileType.CITAVI)
                 .withInitialDirectory(preferences.getImporterPreferences().getImportWorkingDirectory())
                 .build();
 
-        List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
+        List<Path> files = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
 
-        if (selectedFiles.isEmpty()) {
+        if (files.isEmpty()) {
             return;
         }
 
-        importCitaviFiles(selectedFiles);
+        importFiles(files);
+
+        preferences.getImporterPreferences().setImportWorkingDirectory(files.getLast().getParent());
     }
 
-    private void importCitaviFiles(List<Path> files) {
+    private void importFiles(List<Path> files) {
         for (Path file : files) {
             if (!Files.exists(file)) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Import from Citavi"),
@@ -76,18 +73,14 @@ public class ImportCitaviAction extends SimpleCommand {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> doImport(files));
 
         task.onSuccess(parserResult -> {
-                tabContainer.addTab(parserResult.getDatabaseContext(), true);
-                dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
-            })
-            .onFailure(ex -> {
-                LOGGER.error("Error importing from Citavi", ex);
-                dialogService.notify(Localization.lang("Error importing. See the error log for details."));
-            })
-            .executeWith(taskExecutor);
-
-        if (!files.isEmpty()) {
-            preferences.getImporterPreferences().setImportWorkingDirectory(files.getLast().getParent());
-        }
+                    tabContainer.addTab(parserResult.getDatabaseContext(), true);
+                    dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
+                })
+                .onFailure(ex -> {
+                    LOGGER.error("Error importing from Citavi", ex);
+                    dialogService.notify(Localization.lang("Error importing. See the error log for details."));
+                })
+                .executeWith(taskExecutor);
     }
 
     private ParserResult doImport(List<Path> files) throws IOException {

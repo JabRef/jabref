@@ -249,8 +249,8 @@ public class WelcomeTab extends Tab {
         Hyperlink openExampleLibraryLink = createActionLink(Localization.lang("New example library"),
                 this::openExampleLibrary);
 
-        Hyperlink importCitaviLink = createActionLink(Localization.lang("Import from Citavi..."),
-                () -> new ImportCitaviAction(tabContainer, preferences, fileUpdateMonitor, taskExecutor, dialogService).execute());
+        Hyperlink importCitaviLink = createActionLink(Localization.lang("Import from Citavi") + "...",
+                () -> new ImportCitaviAction(tabContainer, preferences, taskExecutor, dialogService).execute());
 
         VBox container = new VBox();
         container.getStyleClass().add("welcome-links-content");
