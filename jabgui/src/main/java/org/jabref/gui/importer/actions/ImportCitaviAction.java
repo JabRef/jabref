@@ -73,14 +73,14 @@ public class ImportCitaviAction extends SimpleCommand {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> doImport(files));
 
         task.onSuccess(parserResult -> {
-                    tabContainer.addTab(parserResult.getDatabaseContext(), true);
-                    dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
-                })
-                .onFailure(ex -> {
-                    LOGGER.error("Error importing from Citavi", ex);
-                    dialogService.notify(Localization.lang("Error importing. See the error log for details."));
-                })
-                .executeWith(taskExecutor);
+            tabContainer.addTab(parserResult.getDatabaseContext(), true);
+            dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
+        })
+        .onFailure(ex -> {
+            LOGGER.error("Error importing from Citavi", ex);
+            dialogService.notify(Localization.lang("Error importing. See the error log for details."));
+        })
+        .executeWith(taskExecutor);
     }
 
     private ParserResult doImport(List<Path> files) throws IOException {
