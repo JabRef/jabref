@@ -33,7 +33,7 @@ import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,7 +171,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     }
 
     @Override
-    public boolean isValidKey(@NotNull String apiKey) {
+    public boolean isValidKey(@NonNull String apiKey) {
         try {
             URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
             int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
