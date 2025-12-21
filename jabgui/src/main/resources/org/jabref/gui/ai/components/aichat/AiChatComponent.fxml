@@ -47,7 +47,7 @@
             </tooltip>
         </Button>
         <ChatPromptComponent fx:id="chatPrompt" HBox.hgrow="ALWAYS"/>
-        <MenuButton text="%Export" styleClass="icon-button,narrow">
+        <MenuButton fx:id="exportButton" text="%Export" styleClass="icon-button,narrow">
             <graphic>
                 <JabRefIconView glyph="SAVE"/>
             </graphic>
