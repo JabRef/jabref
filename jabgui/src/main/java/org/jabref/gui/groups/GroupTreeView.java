@@ -193,6 +193,26 @@ public class GroupTreeView extends BorderPane {
         this.setBottom(groupBar);
     }
 
+    /**
+     * Refreshes the group tree display
+     */
+    public void refreshGroups() {
+        stateManager.getActiveDatabase().ifPresent(database -> {
+            database.getMetaData().getGroups().ifPresent(rootNode -> {
+                Platform.runLater(() -> {
+                    // Clear and rebuild tree
+                    getRoot().getChildren().clear();
+                    updateTree(rootNode);
+
+                    // Expand root node
+                    if (!getRoot().getChildren().isEmpty()) {
+                        getRoot().setExpanded(true);
+                    }
+                });
+            });
+        });
+    }
+
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
         viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, preferences.getFieldPreferences(), dialogService, aiService, adaptVisibleTabs, localDragboard, taskExecutor);
