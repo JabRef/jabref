@@ -15,6 +15,10 @@ jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
     }
+    conflictResolution {
+        select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
+        select("org.gradlex:jna-platform", "net.java.dev.jna:jna-platform-jpms")
+    }
 }
 
 // Tell gradle which jar to use for which platform
@@ -69,7 +73,6 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
-
 }
 
 extraJavaModuleInfo {
@@ -235,6 +238,12 @@ extraJavaModuleInfo {
     module("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8", "embedded.postgres.binaries.linux.arm64v8")
     module("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64", "embedded.postgres.binaries.windows.amd64")
     module("net.harawata:appdirs", "net.harawata.appdirs")
+    module("net.java.dev.jna:jna", "com.sun.jna") {
+        patchRealModule()
+        exportAllPackages()
+        requires("java.logging")
+    }
+    module("net.java.dev.jna:jna-platform", "com.sun.jna.platform")
     module("net.jcip:jcip-annotations", "jcip.annotations")
     module("net.jodah:typetools", "typetools")
     module("org.abego.treelayout:org.abego.treelayout.core", "org.abego.treelayout.core")
