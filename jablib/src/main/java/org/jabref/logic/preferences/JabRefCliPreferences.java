@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
 import org.jabref.logic.FilePreferences;
@@ -505,12 +507,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        // Since some of the preference settings themselves use localized strings, we cannot set the language after
-        // the initialization of the preferences in main
-        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // will never be translated.
-        Localization.setLanguage(getLanguage());
-
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
@@ -553,15 +549,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(KEY_PATTERN_REGEX, "");
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
-
-        // Proxy
-        defaults.put(PROXY_USE, Boolean.FALSE);
-        defaults.put(PROXY_HOSTNAME, "");
-        defaults.put(PROXY_PORT, "80");
-        defaults.put(PROXY_USE_AUTHENTICATION, Boolean.FALSE);
-        defaults.put(PROXY_USERNAME, "");
-        defaults.put(PROXY_PASSWORD, "");
-        defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);
 
         // SSL
         defaults.put(TRUSTSTORE_PATH, Directories
@@ -724,6 +711,11 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(VERSION_IGNORED_UPDATE, "");
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
+        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+        // the initialization of the preferences in main
+        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+        // will never be translated.
+        Localization.setLanguage(getLanguage());
         setLanguageDependentDefaultValues();
 
         // region last files opened
@@ -769,8 +761,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE));
         defaults.put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
         defaults.put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
-        // endregion
-
         // endregion
 
         // region PushToApplicationPreferences
@@ -1034,6 +1024,13 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
+     * Returns a Sequenced Set of Fields.
+     */
+    public SequencedSet<Field> getFieldSequencedSet(String key, ObservableSet<Field> def) {
+        return FieldFactory.parseFieldList(get(key, FieldFactory.serializeFieldsList(def)));
+    }
+
+    /**
      * Returns a Path
      */
     private Path getPath(String key, Path defaultValue) {
@@ -1055,6 +1052,8 @@ public class JabRefCliPreferences implements CliPreferences {
         clearCustomFetcherKeys();
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
+
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
     }
 
     private void clearTruststoreFromCustomCertificates() {
@@ -1206,8 +1205,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // TODO: We need to load all CLI-preferences from the backing store
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
-    }
 
+        // in case of incomplete or corrupt xml fall back to current preferences
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+    }
     //*************************************************************************************************************
     // ToDo: Cleanup
     //*************************************************************************************************************
@@ -1423,20 +1424,14 @@ public class JabRefCliPreferences implements CliPreferences {
         return remotePreferences;
     }
 
+    // region: Proxy Preferences
     @Override
     public ProxyPreferences getProxyPreferences() {
         if (proxyPreferences != null) {
             return proxyPreferences;
         }
 
-        proxyPreferences = new ProxyPreferences(
-                getBoolean(PROXY_USE),
-                get(PROXY_HOSTNAME),
-                get(PROXY_PORT),
-                getBoolean(PROXY_USE_AUTHENTICATION),
-                get(PROXY_USERNAME),
-                getProxyPassword(),
-                getBoolean(PROXY_PERSIST_PASSWORD));
+        proxyPreferences = getProxyPreferencesFromBackingStore(ProxyPreferences.getDefault());
 
         EasyBind.listen(proxyPreferences.useProxyProperty(), (_, _, newValue) -> putBoolean(PROXY_USE, newValue));
         EasyBind.listen(proxyPreferences.hostnameProperty(), (_, _, newValue) -> put(PROXY_HOSTNAME, newValue));
@@ -1457,6 +1452,19 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return proxyPreferences;
     }
+
+    private ProxyPreferences getProxyPreferencesFromBackingStore(ProxyPreferences defaults) {
+        return new ProxyPreferences(
+                getBoolean(PROXY_USE, defaults.shouldUseProxy()),
+                get(PROXY_HOSTNAME, defaults.getHostname()),
+                get(PROXY_PORT, defaults.getPort()),
+                getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
+                get(PROXY_USERNAME, defaults.getUsername()),
+                get(PROXY_PASSWORD, defaults.getPassword()),
+                getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
+        );
+    }
+    // endRegion: Proxy Preferences
 
     private String getProxyPassword() {
         if (getBoolean(PROXY_PERSIST_PASSWORD)) {
@@ -1647,7 +1655,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                userAndHost.getUserHostString(),
+                getUserHostInfo().getUserHostString(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
