@@ -36,6 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
 - We added the option to pseudonymize a library using the GUI, via the tools tab in the Main Menu. [#14118](https://github.com/JabRef/jabref/issues/14118)
 - We added export options (Markdown and JSON) for AI Summary and AI Chat. [#13868](https://github.com/JabRef/jabref/issues/13868)
+- We added automatic recognition of arXiv identifiers when pasting URLs (including those with fragments like `#bib.bib5`) into the "New Entry" dialog.
 
 ### Changed
 

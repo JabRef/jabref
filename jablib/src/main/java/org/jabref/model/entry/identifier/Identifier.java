@@ -34,13 +34,12 @@ public interface Identifier {
             return Optional.empty();
         }
 
-        return Stream.<Supplier<Optional<? extends Identifier>>>of(
-                             () -> DOI.findInText(identifier),
-                             () -> ArXivIdentifier.parse(identifier),
-                             () -> ISBN.parse(identifier),
-                             () -> SSRN.parse(identifier),
-                             () -> RFC.parse(identifier)
-                     )
+        return Stream.<Supplier<Optional<? extends Identifier>>> of(
+                                                                    () -> DOI.findInText(identifier),
+                                                                    () -> ArXivIdentifier.findInText(identifier),
+                                                                    () -> ISBN.parse(identifier),
+                                                                    () -> SSRN.parse(identifier),
+                                                                    () -> RFC.parse(identifier))
                      .map(Supplier::get)
                      .filter(Optional::isPresent)
                      .map(Optional::get)
