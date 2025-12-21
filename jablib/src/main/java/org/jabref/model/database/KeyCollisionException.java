@@ -2,7 +2,8 @@ package org.jabref.model.database;
 
 public class KeyCollisionException extends RuntimeException {
 
-    private String id;
+    // Fix: Initialize with empty string to satisfy NullAway requirements for all constructors
+    private String id = "";
 
     public KeyCollisionException() {
         super();
