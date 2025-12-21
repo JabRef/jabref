@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
 import org.jabref.logic.FilePreferences;
@@ -505,12 +507,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        // Since some of the preference settings themselves use localized strings, we cannot set the language after
-        // the initialization of the preferences in main
-        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // will never be translated.
-        Localization.setLanguage(getLanguage());
-
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
@@ -715,6 +711,11 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(VERSION_IGNORED_UPDATE, "");
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
+        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+        // the initialization of the preferences in main
+        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+        // will never be translated.
+        Localization.setLanguage(getLanguage());
         setLanguageDependentDefaultValues();
 
         // region last files opened
@@ -760,8 +761,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE));
         defaults.put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
         defaults.put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
-        // endregion
-
         // endregion
 
         // region PushToApplicationPreferences
@@ -1022,6 +1021,13 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     public List<String> getStringList(String key) {
         return convertStringToList(get(key));
+    }
+
+    /**
+     * Returns a Sequenced Set of Fields.
+     */
+    public SequencedSet<Field> getFieldSequencedSet(String key, ObservableSet<Field> def) {
+        return FieldFactory.parseFieldList(get(key, FieldFactory.serializeFieldsList(def)));
     }
 
     /**
@@ -1649,7 +1655,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                userAndHost.getUserHostString(),
+                getUserHostInfo().getUserHostString(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
