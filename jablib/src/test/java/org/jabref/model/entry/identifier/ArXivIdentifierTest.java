@@ -3,8 +3,12 @@ package org.jabref.model.entry.identifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -193,73 +197,23 @@ class ArXivIdentifierTest {
         assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "1", "")), parsed);
     }
 
-    @Test
-    void findInTextFromUrl() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("https://arxiv.org/abs/1502.05795");
-
-        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "")), found);
+    @ParameterizedTest
+    @MethodSource("provideFindInTextTestCases")
+    void findInText(String input, Optional<ArXivIdentifier> expected) {
+        assertEquals(expected, ArXivIdentifier.findInText(input));
     }
 
-    @Test
-    void findInTextFromUrlWithFragment() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("https://arxiv.org/html/2503.08641v1#bib.bib5");
-
-        assertEquals(Optional.of(new ArXivIdentifier("2503.08641", "1", "")), found);
-    }
-
-    @Test
-    void findInTextFromUrlWithVersion() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("https://arxiv.org/abs/1502.05795v2");
-
-        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "2", "")), found);
-    }
-
-    @Test
-    void findInTextFromPdfUrl() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("https://arxiv.org/pdf/1502.05795.pdf");
-
-        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "")), found);
-    }
-
-    @Test
-    void findInTextFromOldStyleUrl() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("http://arxiv.org/abs/hep-ex/0307015v1");
-
-        assertEquals(Optional.of(new ArXivIdentifier("hep-ex/0307015", "1", "hep-ex")), found);
-    }
-
-    @Test
-    void findInTextWithArXivPrefix() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("arXiv:2503.08641v1");
-
-        assertEquals(Optional.of(new ArXivIdentifier("2503.08641", "1", "")), found);
-    }
-
-    @Test
-    void findInTextPlainIdentifier() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("see 2503.08641 for details");
-
-        assertEquals(Optional.of(new ArXivIdentifier("2503.08641", "")), found);
-    }
-
-    @Test
-    void findInTextNoIdentifier() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("no identifier here");
-
-        assertEquals(Optional.empty(), found);
-    }
-
-    @Test
-    void findInTextEmptyString() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText("");
-
-        assertEquals(Optional.empty(), found);
-    }
-
-    @Test
-    void findInTextNull() {
-        Optional<ArXivIdentifier> found = ArXivIdentifier.findInText(null);
-
-        assertEquals(Optional.empty(), found);
+    static Stream<Arguments> provideFindInTextTestCases() {
+        return Stream.of(
+                         Arguments.of("https://arxiv.org/abs/1502.05795", Optional.of(new ArXivIdentifier("1502.05795", ""))),
+                         Arguments.of("https://arxiv.org/html/2503.08641v1#bib.bib5", Optional.of(new ArXivIdentifier("2503.08641", "1", ""))),
+                         Arguments.of("https://arxiv.org/abs/1502.05795v2", Optional.of(new ArXivIdentifier("1502.05795", "2", ""))),
+                         Arguments.of("https://arxiv.org/pdf/1502.05795.pdf", Optional.of(new ArXivIdentifier("1502.05795", ""))),
+                         Arguments.of("http://arxiv.org/abs/hep-ex/0307015v1", Optional.of(new ArXivIdentifier("hep-ex/0307015", "1", "hep-ex"))),
+                         Arguments.of("arXiv:2503.08641v1", Optional.of(new ArXivIdentifier("2503.08641", "1", ""))),
+                         Arguments.of("see 2503.08641 for details", Optional.of(new ArXivIdentifier("2503.08641", ""))),
+                         Arguments.of("no identifier here", Optional.empty()),
+                         Arguments.of("", Optional.empty()),
+                         Arguments.of(null, Optional.empty()));
     }
 }

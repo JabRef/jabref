@@ -70,11 +70,8 @@ public class ArXivIdentifier extends EprintIdentifier {
             return Optional.empty();
         }
 
-        // Remove URL fragments (e.g., #bib.bib5) as they interfere with parsing
         String cleanedText = text.replaceAll("#[^\\s]*", "");
 
-        // Pattern to find new-style arXiv identifiers (YYMM.NNNNN) in text
-        // Matches URLs like https://arxiv.org/abs/1234.56789v1 or https://arxiv.org/html/1234.56789
         Pattern newStylePattern = Pattern.compile(
                                                   "(?:https?://)?(?:www\\.)?arxiv\\.org/(?:abs|html|pdf)/(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?");
         Matcher newStyleMatcher = newStylePattern.matcher(cleanedText);
@@ -82,8 +79,6 @@ public class ArXivIdentifier extends EprintIdentifier {
             return getArXivIdentifier(newStyleMatcher);
         }
 
-        // Pattern to find old-style arXiv identifiers (archive/YYYYMMM) in text
-        // Matches URLs like https://arxiv.org/abs/hep-ex/0307015v1
         Pattern oldStylePattern = Pattern.compile(
                                                   "(?:https?://)?(?:www\\.)?arxiv\\.org/(?:abs|html|pdf)/(?<id>(?<classification>[a-z\\-]+(?:\\.[A-Z]{2})?)/\\d{7})(?:v(?<version>\\d+))?");
         Matcher oldStyleMatcher = oldStylePattern.matcher(cleanedText);
@@ -91,7 +86,6 @@ public class ArXivIdentifier extends EprintIdentifier {
             return getArXivIdentifier(oldStyleMatcher);
         }
 
-        // Pattern to find arXiv identifiers with arXiv: prefix in text
         Pattern arXivPrefixPattern = Pattern.compile(
                                                      "arxiv:\\s?(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?",
                                                      Pattern.CASE_INSENSITIVE);
@@ -100,7 +94,6 @@ public class ArXivIdentifier extends EprintIdentifier {
             return getArXivIdentifier(arXivPrefixMatcher);
         }
 
-        // Pattern to find plain arXiv identifiers in text (e.g., "see 1234.56789 for details")
         Pattern plainPattern = Pattern.compile(
                                                "(?:^|\\s)(?<id>\\d{4}\\.\\d{4,5})(?:v(?<version>\\d+))?(?:\\s?\\[(?<classification>\\S+)\\])?(?:\\s|$)");
         Matcher plainMatcher = plainPattern.matcher(cleanedText);
