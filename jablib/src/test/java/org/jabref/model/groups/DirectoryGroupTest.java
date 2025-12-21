@@ -18,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DirectoryGroupTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     private DirectoryGroup group;
 
