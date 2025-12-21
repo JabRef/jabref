@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +20,12 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
-@Command(
-        name = "generate", description = "Generate citation keys for entries in a .bib file."
-)
+@Command(name = "generate", description = "Generate citation keys for entries in a .bib file.")
 class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
 
     @ParentCommand
-    private CitationKeyCommands parentCommand;
+    private CitationKeys parentCommand;
 
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
@@ -38,52 +37,28 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--output", description = "Output .bib file")
     private Path outputFile;
 
-    @Option(
-            names = "--pattern",
-            description = "Override the citation key pattern from the preferences"
-    )
+    @Option(names = "--pattern", description = "Override the citation key pattern from the preferences")
     private String pattern;
 
-    @Option(
-            names = "--transliterate",
-            description = "Transliterate fields for citation key generation"
-    )
+    @Option(names = "--transliterate", description = "Transliterate fields for citation key generation")
     private Boolean transliterate;
 
-    @Option(
-            names = "--warn-before-overwrite",
-            description = "Warn before overwriting existing citation keys"
-    )
+    @Option(names = "--warn-before-overwrite", description = "Warn before overwriting existing citation keys")
     private Boolean warnBeforeOverwrite;
 
-    @Option(
-            names = "--suffix",
-            description = "Key suffix strategy: ALWAYS, SECOND_WITH_A, SECOND_WITH_B"
-    )
+    @Option(names = "--suffix", description = "Key suffix strategy: ALWAYS, SECOND_WITH_A, SECOND_WITH_B")
     private CitationKeyPatternPreferences.KeySuffix keySuffix;
 
-    @Option(
-            names = "--regex",
-            description = "Regular expression for key pattern matching"
-    )
+    @Option(names = "--regex", description = "Regular expression for key pattern matching")
     private String keyPatternRegex;
 
-    @Option(
-            names = "--regex-replacement",
-            description = "Replacement string for regex matches"
-    )
+    @Option(names = "--regex-replacement", description = "Replacement string for regex matches")
     private String keyPatternReplacement;
 
-    @Option(
-            names = "--unwanted",
-            description = "Unwanted characters to remove from generated keys"
-    )
+    @Option(names = "--unwanted", description = "Unwanted characters to remove from generated keys")
     private String unwantedCharacters;
 
-    @Option(
-            names = "--keyword-delimiter",
-            description = "Delimiter to use between keywords in citation key"
-    )
+    @Option(names = "--keyword-delimiter", description = "Delimiter to use between keywords in citation key")
     private Character keywordDelimiter;
 
     @Option(names = "--avoid-overwrite", description = "Avoid overwriting existing citation keys")
@@ -116,31 +91,7 @@ class GenerateCitationKeys implements Runnable {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
-        CitationKeyPatternPreferences existingPreferences = parentCommand.getParent().cliPreferences.getCitationKeyPatternPreferences();
-
-        CitationKeyPatternPreferences preferencesToUse = existingPreferences;
-
-        if (transliterate != null || pattern != null || avoidOverwrite != null ||
-                warnBeforeOverwrite != null || generateBeforeSaving != null || keySuffix != null ||
-                keyPatternRegex != null || keyPatternReplacement != null ||
-                unwantedCharacters != null || keywordDelimiter != null) {
-
-            preferencesToUse = new CitationKeyPatternPreferences(
-                    transliterate != null ? transliterate : existingPreferences.shouldTransliterateFieldsForCitationKey(),
-                    avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
-                    warnBeforeOverwrite != null ? warnBeforeOverwrite : existingPreferences.shouldWarnBeforeOverwriteCiteKey(),
-                    generateBeforeSaving != null ? generateBeforeSaving : existingPreferences.shouldGenerateCiteKeysBeforeSaving(),
-                    keySuffix != null ? keySuffix : existingPreferences.getKeySuffix(),
-                    keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
-                    keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
-                    unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
-                    existingPreferences.getKeyPatterns(),
-                    pattern != null ? pattern : existingPreferences.getDefaultPattern(),
-                    keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
-            );
-        }
-
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferencesToUse);
+        CitationKeyGenerator keyGenerator = getCitationKeyGenerator(databaseContext);
         for (BibEntry entry : databaseContext.getEntries()) {
             keyGenerator.generateAndSetKey(entry);
         }
@@ -154,5 +105,24 @@ class GenerateCitationKeys implements Runnable {
         } else {
             JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
         }
+    }
+
+    private @NonNull CitationKeyGenerator getCitationKeyGenerator(BibDatabaseContext databaseContext) {
+        CitationKeyPatternPreferences existingPreferences = parentCommand.getParent().cliPreferences.getCitationKeyPatternPreferences();
+
+        CitationKeyPatternPreferences preferencesToUse = new CitationKeyPatternPreferences(
+                transliterate != null ? transliterate : existingPreferences.shouldTransliterateFieldsForCitationKey(),
+                avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
+                warnBeforeOverwrite != null ? warnBeforeOverwrite : existingPreferences.shouldWarnBeforeOverwriteCiteKey(),
+                generateBeforeSaving != null ? generateBeforeSaving : existingPreferences.shouldGenerateCiteKeysBeforeSaving(),
+                keySuffix != null ? keySuffix : existingPreferences.getKeySuffix(),
+                keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
+                keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
+                unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
+                existingPreferences.getKeyPatterns(),
+                pattern != null ? pattern : existingPreferences.getDefaultPattern(),
+                keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
+        );
+        return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }
 }

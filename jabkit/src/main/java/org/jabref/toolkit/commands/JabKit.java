@@ -40,13 +40,14 @@ import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 
-@Command(name = "jabkit",
+@Command(
+        name = "jabkit",
         mixinStandardHelpOptions = true,
         // sorted alphabetically
         subcommands = {
                 CheckConsistency.class,
                 CheckIntegrity.class,
-                CitationKeyCommands.class,
+                CitationKeys.class,
                 Convert.class,
                 DoiToBibtex.class,
                 Fetch.class,

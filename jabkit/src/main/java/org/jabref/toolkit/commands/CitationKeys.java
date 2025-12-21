@@ -7,16 +7,11 @@ import picocli.CommandLine.ParentCommand;
         name = "citationkeys",
         subcommands = {
                 GenerateCitationKeys.class
-        }
-)
-public class CitationKeyCommands implements Runnable {
+        })
+public class CitationKeys {
 
     @ParentCommand
     private JabKit parentCommand;
-
-    @Override
-    public void run() {
-    }
 
     public JabKit getParent() {
         return parentCommand;
