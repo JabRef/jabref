@@ -39,6 +39,16 @@ public class ArXivIdentifier extends EprintIdentifier {
         this.classification = classification.trim();
     }
 
+    // Pattern for finding arXiv identifiers in text (new format: YYMM.NNNNN)
+    private static final Pattern FIND_ARXIV_PATTERN = Pattern.compile(
+            "(?:" + ARXIV_PREFIX + ")?[:/]?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?",
+            Pattern.CASE_INSENSITIVE);
+
+    // Pattern for finding old-style arXiv identifiers in text (e.g., hep-th/9901001)
+    private static final Pattern FIND_OLD_ARXIV_PATTERN = Pattern.compile(
+            "(?:" + ARXIV_PREFIX + ")?[:/]?\\s?(?<id>(?<classification>[a-z\\-]+(?:\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?",
+            Pattern.CASE_INSENSITIVE);
+
     public static Optional<ArXivIdentifier> parse(String value) {
         String identifier = value.replace(" ", "");
         Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
@@ -51,6 +61,34 @@ public class ArXivIdentifier extends EprintIdentifier {
         Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);
         if (oldIdentifierMatcher.matches()) {
             return getArXivIdentifier(oldIdentifierMatcher);
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Tries to find an arXiv identifier inside the given text.
+     *
+     * @param text the text which might contain an arXiv identifier
+     * @return an Optional containing the ArXivIdentifier or an empty Optional
+     */
+    public static Optional<ArXivIdentifier> findInText(String text) {
+        if (text == null || text.isBlank()) {
+            return Optional.empty();
+        }
+
+        // Try to find new-style arXiv identifier (YYMM.NNNNN)
+        Matcher matcher = FIND_ARXIV_PATTERN.matcher(text);
+        if (matcher.find()) {
+            String id = matcher.group("id");
+            String version = matcher.group("version");
+            return Optional.of(new ArXivIdentifier(id, version != null ? version : "", ""));
+        }
+
+        // Try to find old-style arXiv identifier (e.g., hep-th/9901001)
+        Matcher oldMatcher = FIND_OLD_ARXIV_PATTERN.matcher(text);
+        if (oldMatcher.find()) {
+            return getArXivIdentifier(oldMatcher);
         }
 
         return Optional.empty();
