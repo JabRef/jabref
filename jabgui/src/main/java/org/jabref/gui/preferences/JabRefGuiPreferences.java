@@ -240,9 +240,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private JabRefGuiPreferences() {
         super();
 
-        defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
-        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
-        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         // endregion
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
@@ -675,7 +672,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
-        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes();
+        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes(defaults);
         Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions();
         return new SidePanePreferences(
                 backingStoreVisiblePanes.isEmpty() ? defaults.visiblePanes() : backingStoreVisiblePanes,
@@ -684,15 +681,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         );
     }
 
-    private Set<SidePaneType> getVisibleSidePanes() {
+    private Set<SidePaneType> getVisibleSidePanes(SidePanePreferences defaults) {
         Set<SidePaneType> visiblePanes = new HashSet<>();
-        if (getBoolean(WEB_SEARCH_VISIBLE)) {
+        if (getBoolean(WEB_SEARCH_VISIBLE, defaults.visiblePanes().contains(SidePaneType.WEB_SEARCH))) {
             visiblePanes.add(SidePaneType.WEB_SEARCH);
         }
-        if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
+        if (getBoolean(GROUP_SIDEPANE_VISIBLE, defaults.visiblePanes().contains(SidePaneType.GROUPS))) {
             visiblePanes.add(SidePaneType.GROUPS);
         }
-        if (getBoolean(OO_SHOW_PANEL)) {
+        if (getBoolean(OO_SHOW_PANEL, defaults.visiblePanes().contains(SidePaneType.OPEN_OFFICE))) {
             visiblePanes.add(SidePaneType.OPEN_OFFICE);
         }
         return visiblePanes;
