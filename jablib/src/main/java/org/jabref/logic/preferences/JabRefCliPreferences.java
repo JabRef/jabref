@@ -46,6 +46,7 @@ import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -1952,7 +1953,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                           .map(CleanupPreferences.CleanupStep::valueOf)
                                                           .collect(Collectors.toSet())),
                 new FieldFormatterCleanupActions(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupActions.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
+                        FieldFormatterCleanupMapper.parseActions(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
                 ));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
@@ -1972,7 +1973,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultCleanupJobs(),
                 new FieldFormatterCleanupActions(
                         (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupActions.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
+                        FieldFormatterCleanupMapper.parseActions((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
                 ));
     }
 

@@ -15,13 +15,22 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
-class FieldFormatterCleanupParser {
+public class FieldFormatterCleanupMapper {
     private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^]]+)]");
 
-    private FieldFormatterCleanupParser() {
+    private FieldFormatterCleanupMapper() {
     }
 
-    static List<FieldFormatterCleanup> parseAction(String formatterString) {
+    /// This parses the key/list map of fields and clean up actions for the field.
+    ///
+    /// General format for one key/list map: `...[...]` - `field[formatter1,formatter2,...]`
+    /// Multiple are written as `...[...]...[...]...[...]`
+    /// `field1[formatter1,formatter2,...]field2[formatter3,formatter4,...]`
+    ///
+    /// The idea is that characters are field names until `[` is reached and that formatter lists are terminated by `]`
+    ///
+    /// Example: `pages[normalize_page_numbers]title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]`
+    public static List<FieldFormatterCleanup> parseActions(String formatterString) {
         if ((formatterString == null) || formatterString.isEmpty()) {
             // no save actions defined in the metadata
             return List.of();
@@ -49,14 +58,14 @@ class FieldFormatterCleanupParser {
         return result;
     }
 
-    static String serializeActions(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
+    public static String serializeActions(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
         // First, group all formatters by the field for which they apply
         // Order of the list should be kept
         Map<Field, Set<String>> groupedByField = new LinkedHashMap<>();
         for (FieldFormatterCleanup cleanup : actionList) {
             // add the formatter to map if not already in there, order sensitive
             groupedByField.computeIfAbsent(cleanup.getField(), _ -> new LinkedHashSet<>())
-                    .add(cleanup.getFormatter().getKey());
+                          .add(cleanup.getFormatter().getKey());
         }
 
         // convert the contents of the hashmap into the correct serialization

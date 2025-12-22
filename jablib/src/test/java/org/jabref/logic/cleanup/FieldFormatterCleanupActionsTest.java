@@ -51,7 +51,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void checkSimpleUseCase() {
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupActions.parse("title[identity]"));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("title[identity]"));
 
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup(StandardField.TITLE, new IdentityFormatter());
         assertEquals(List.of(identityInTitle), actions.getConfiguredActions());
@@ -63,7 +63,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void invalidSaveActionSting() {
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupActions.parse("title"));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("title"));
 
         assertEquals(List.of(), actions.getConfiguredActions());
 
@@ -74,7 +74,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void checkLowerCaseSaveAction() {
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupActions.parse("title[lower_case]"));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("title[lower_case]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter());
         assertEquals(List.of(lowerCaseTitle), actions.getConfiguredActions());
@@ -86,7 +86,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void checkTwoSaveActionsForOneField() {
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupActions.parse("title[lower_case,identity]"));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("title[lower_case,identity]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter());
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup(StandardField.TITLE, new IdentityFormatter());
@@ -99,7 +99,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void checkThreeSaveActionsForOneField() {
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupActions.parse("title[lower_case,identity,normalize_date]"));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("title[lower_case,identity,normalize_date]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter());
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup(StandardField.TITLE, new IdentityFormatter());
@@ -113,7 +113,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void checkMultipleSaveActions() {
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupActions.parse("pages[normalize_page_numbers]title[lower_case]"));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("pages[normalize_page_numbers]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         FieldFormatterCleanup normalizePages = new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter());
@@ -129,7 +129,7 @@ public class FieldFormatterCleanupActionsTest {
     @Test
     void checkMultipleSaveActionsWithMultipleFormatters() {
         FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true,
-                FieldFormatterCleanupActions.parse("pages[normalize_page_numbers,normalize_date]title[lower_case]"));
+                FieldFormatterCleanupMapper.parseActions("pages[normalize_page_numbers,normalize_date]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         FieldFormatterCleanup normalizePages = new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter());
@@ -145,7 +145,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void clearFormatterRemovesField() {
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupActions.parse("month[clear]"));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("month[clear]"));
         actions.applySaveActions(entry);
 
         assertEquals(Optional.empty(), entry.getField(StandardField.MONTH));
@@ -153,7 +153,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserKeepsSaveActions() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 month[normalize_month]
                 pages[normalize_page_numbers]
                 title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
@@ -178,7 +178,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserParsesLatexCleanupFormatter() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 title[latex_cleanup]
                 """);
         assertEquals(
@@ -188,7 +188,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserParsesTwoFormatters() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 title[escapeUnderscores,latex_cleanup]
                 """);
         assertEquals(
@@ -201,7 +201,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserParsesFourFormatters() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
                 """);
         assertEquals(
@@ -216,7 +216,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserParsesTwoFormattersWithCommas() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 title[escapeUnderscores,latex_cleanup]
                 booktitle[escapeAmpersands,escapeDollarSign]
                 """);
@@ -232,7 +232,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserParsesTwoFormattersOneWithComma() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 pages[normalize_page_numbers]
                 booktitle[escapeAmpersands,escapeDollarSign]
                 """);
@@ -247,7 +247,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserParsesThreeFormattersTwoWithComma() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 pages[normalize_page_numbers]
                 title[escapeUnderscores,latex_cleanup]
                 booktitle[escapeAmpersands,escapeDollarSign]
@@ -265,7 +265,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserWithTwoAndThree() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 title[escapeAmpersands,escapeUnderscores,latex_cleanup]
                 booktitle[escapeAmpersands,escapeUnderscores,latex_cleanup]
                 """);
@@ -282,7 +282,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserWithFourEntries() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 title[escapeUnderscores,latex_cleanup]
                 booktitle[escapeAmpersands,escapeUnderscores,latex_cleanup]
                 """);
@@ -299,7 +299,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parserTest() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 title[escapeAmpersands,escapeUnderscores,latex_cleanup]
                 booktitle[escapeAmpersands,latex_cleanup]
                 """);
@@ -316,7 +316,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void identityCanBeParsed() {
-        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupActions.parse("""
+        List<FieldFormatterCleanup> fieldFormatterCleanups = FieldFormatterCleanupMapper.parseActions("""
                 all-text-fields[identity]
                 date[normalize_date]
                 month[normalize_month]
@@ -346,7 +346,7 @@ public class FieldFormatterCleanupActionsTest {
 
     @Test
     void parsingOfDefaultSaveActions() {
-        assertEquals(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS, FieldFormatterCleanupActions.parse("""
+        assertEquals(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS, FieldFormatterCleanupMapper.parseActions("""
                 pages[normalize_page_numbers]
                 date[normalize_date]
                 month[normalize_month]

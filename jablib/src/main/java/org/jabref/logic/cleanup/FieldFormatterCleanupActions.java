@@ -39,18 +39,6 @@ public class FieldFormatterCleanupActions {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldFormatterCleanupActions.class);
 
-    /**
-     * This parses the key/list map of fields and clean up actions for the field.
-     * <p>
-     * General format for one key/list map: <code>...[...]</code> - <code>field[formatter1,formatter2,...]</code>
-     * Multiple are written as <code>...[...]...[...]...[...]</code>
-     * <code>field1[formatter1,formatter2,...]field2[formatter3,formatter4,...]</code>
-     * <p>
-     * The idea is that characters are field names until <code>[</code> is reached and that formatter lists are terminated by <code>]</code>
-     * <p>
-     * Example: <code>pages[normalize_page_numbers]title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]</code>
-     */
-
     static {
         DEFAULT_SAVE_ACTIONS = List.of(
                 new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
@@ -83,11 +71,9 @@ public class FieldFormatterCleanupActions {
         this.actions = actions;
     }
 
-    /**
-     * Note: String parsing is done at {@link FieldFormatterCleanupActions#parse(String)}
-     */
+    /// Note: String parsing is done at [FieldFormatterCleanupMapper#parseActions(String)]
     public static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
-        return FieldFormatterCleanupParser.serializeActions(actionList, newLineSeparator);
+        return FieldFormatterCleanupMapper.serializeActions(actionList, newLineSeparator);
     }
 
     public boolean isEnabled() {
@@ -114,10 +100,6 @@ public class FieldFormatterCleanupActions {
         }
 
         return result;
-    }
-
-    public static List<FieldFormatterCleanup> parse(String formatterString) {
-        return FieldFormatterCleanupParser.parseAction(formatterString);
     }
 
     static Formatter getFormatterFromString(String formatterName) {

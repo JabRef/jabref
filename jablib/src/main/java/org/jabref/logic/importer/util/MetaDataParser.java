@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -260,7 +261,7 @@ public class MetaDataParser {
             boolean enablementStatus = FieldFormatterCleanupActions.ENABLED.equals(formatterMetaList.getFirst());
             String formatterString = formatterMetaList.get(1);
 
-            return new FieldFormatterCleanupActions(enablementStatus, FieldFormatterCleanupActions.parse(formatterString));
+            return new FieldFormatterCleanupActions(enablementStatus, FieldFormatterCleanupMapper.parseActions(formatterString));
         } else {
             // return default actions
             return new FieldFormatterCleanupActions(false, DEFAULT_SAVE_ACTIONS);
