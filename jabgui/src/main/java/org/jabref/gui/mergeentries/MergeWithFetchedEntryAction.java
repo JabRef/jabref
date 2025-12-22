@@ -50,6 +50,6 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         }
 
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
-        new FetchAndMergeEntry(stateManager.getActiveDatabase().get(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(originalEntry);
+        new FetchAndMergeEntry(stateManager.getActiveDatabase().get(), taskExecutor, preferences, dialogService, undoManager, stateManager).fetchAndMerge(originalEntry);
     }
 }

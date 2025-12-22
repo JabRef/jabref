@@ -51,6 +51,7 @@ concurrency:
 jobs:
   detect_changes:
     runs-on: ubuntu-latest
+    if: github.repository == 'JabRef/jabref'
     outputs:
       changed: ${{ steps.changed.outputs.any_changed }}
     steps:
@@ -110,7 +111,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
