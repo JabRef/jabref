@@ -2,9 +2,9 @@ package org.jabref.gui.keyboard;
 
 import org.jabref.logic.l10n.Localization;
 
-/**
- * @implNote Cannot be sorted alphabetically, as {@link KeyBindingRepository#getKeyCombination(KeyBinding)} iterates over the enum in order and returns the first match.
- */
+/// @implNote Cannot be sorted alphabetically, as [KeyBindingRepository#getKeyCombination(KeyBinding)] iterates over the enum in order and returns the first match.
+/// Use `shortcut` for OS independent mapping of `ctrl` on Windows and `cmd`(meta)` on macOS
+/// See also the description at [javafx.scene.input.KeyCombination]
 public enum KeyBinding {
     EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", KeyBindingCategory.EDITOR),
     // DELETE BACKWARDS = Rubout
