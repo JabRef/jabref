@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SequencedMap;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
@@ -61,7 +60,6 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -242,9 +240,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private JabRefGuiPreferences() {
         super();
 
-        defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
-
-        defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
         // endregion
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
@@ -340,6 +335,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMergeDialogPreferences().setAll(MergeDialogPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
+        getEntryEditorPreferences().setAll(EntryEditorPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
@@ -362,6 +358,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMergeDialogPreferences().setAll(getMergeDialogPreferencesFromBackingStore(getMergeDialogPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
+        getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
         getUnlinkedFilesDialogPreferences().setAll(getUnlinkedFilesDialogPreferences());
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
@@ -375,23 +372,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return entryEditorPreferences;
         }
 
-        entryEditorPreferences = new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(SHOW_AI_SUMMARY),
-                getBoolean(SHOW_AI_CHAT),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(SMART_FILE_ANNOTATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                getBoolean(SHOW_SCITE_TAB),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
+        entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
@@ -412,6 +393,32 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return entryEditorPreferences;
     }
 
+    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
+        Map<String, Set<Field>> storedTabs = getEntryEditorTabs();
+        if (storedTabs.isEmpty()) {
+            storedTabs = defaults.getEntryEditorTabs();
+        }
+        return new EntryEditorPreferences(
+                storedTabs,
+                defaults.getDefaultEntryEditorTabs(),
+                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
+                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
+                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
+                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
+                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
+                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
+                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
+                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(
+                        get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().toString())),
+                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
+        );
+    }
+
     /**
      * Get a Map of defined tab names to default tab fields.
      *
@@ -422,10 +429,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
 
+        // If data is missing or mismatched, return an empty map so the caller uses defaults
         if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            // Nothing set (or wrong configuration), then we use default values
-            tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
-            tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
+            return tabs;
         }
 
         for (int i = 0; i < tabNames.size(); i++) {
@@ -456,25 +462,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
 
         getEntryEditorTabs();
-    }
-
-    private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
-
-        int defNumber = 0;
-        while (true) {
-            // Saved as 'CUSTOMTABNAME_def{number}' and seperated by ';'
-            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-
-            customTabsMap.put(name, FieldFactory.parseFieldList((String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber)));
-            defNumber++;
-        }
-        return customTabsMap;
     }
     // endregion
 
@@ -685,7 +672,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
-        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes();
+        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes(defaults);
         Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions();
         return new SidePanePreferences(
                 backingStoreVisiblePanes.isEmpty() ? defaults.visiblePanes() : backingStoreVisiblePanes,
@@ -694,15 +681,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         );
     }
 
-    private Set<SidePaneType> getVisibleSidePanes() {
+    private Set<SidePaneType> getVisibleSidePanes(SidePanePreferences defaults) {
         Set<SidePaneType> visiblePanes = new HashSet<>();
-        if (getBoolean(WEB_SEARCH_VISIBLE)) {
+        if (getBoolean(WEB_SEARCH_VISIBLE, defaults.visiblePanes().contains(SidePaneType.WEB_SEARCH))) {
             visiblePanes.add(SidePaneType.WEB_SEARCH);
         }
-        if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
+        if (getBoolean(GROUP_SIDEPANE_VISIBLE, defaults.visiblePanes().contains(SidePaneType.GROUPS))) {
             visiblePanes.add(SidePaneType.GROUPS);
         }
-        if (getBoolean(OO_SHOW_PANEL)) {
+        if (getBoolean(OO_SHOW_PANEL, defaults.visiblePanes().contains(SidePaneType.OPEN_OFFICE))) {
             visiblePanes.add(SidePaneType.OPEN_OFFICE);
         }
         return visiblePanes;
