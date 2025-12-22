@@ -283,10 +283,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
         // endregion
 
-        // region: Main table, main table column, and search dialog column preferences
-        defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
-        // endregion
-
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
     }
@@ -714,6 +710,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private Map<SidePaneType, Integer> getSidePanePreferredPositions(SidePanePreferences defaults) {
         // If either one is missing the preferences are corrupt or empty, thus fall back to default
         if (!hasKey(SIDE_PANE_COMPONENT_NAMES) || !hasKey(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS)) {
+            LOGGER.debug("SidePane preferred positions corrupt, falling back to default");
             return defaults.getPreferredPositions();
         }
 
