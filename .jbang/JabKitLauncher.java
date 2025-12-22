@@ -19,6 +19,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/ProviderConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Convert.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/DoiToBibtex.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Fetch.java

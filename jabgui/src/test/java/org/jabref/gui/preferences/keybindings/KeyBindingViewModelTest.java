@@ -77,9 +77,9 @@ class KeyBindingViewModelTest {
                 "L",
                 KeyCode.L,
                 true,
-                true,
                 false,
-                false
+                false,
+                true
         );
 
         viewModel.setNewBindingForCurrent(event);
@@ -87,6 +87,6 @@ class KeyBindingViewModelTest {
         viewModel.storeSettings();
 
         Optional<String> saved = prefsRepo.get(binding);
-        assertEquals(Optional.of("ctrl+shift+L"), saved);
+        assertEquals(Optional.of("shortcut+shift+L"), saved);
     }
 }

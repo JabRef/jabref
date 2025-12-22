@@ -12,21 +12,21 @@ import javafx.collections.ObservableSet;
 public class CleanupPreferences {
 
     private final ObservableSet<CleanupStep> activeJobs;
-    private final ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanups;
+    private final ObjectProperty<FieldFormatterCleanupActions> fieldFormatterCleanups;
 
     public CleanupPreferences(EnumSet<CleanupStep> activeJobs) {
-        this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()));
+        this(activeJobs, new FieldFormatterCleanupActions(false, new ArrayList<>()));
     }
 
     public CleanupPreferences(CleanupStep activeJob) {
         this(EnumSet.of(activeJob));
     }
 
-    public CleanupPreferences(FieldFormatterCleanups formatterCleanups) {
+    public CleanupPreferences(FieldFormatterCleanupActions formatterCleanups) {
         this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);
     }
 
-    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
+    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanupActions formatterCleanups) {
         this.activeJobs = FXCollections.observableSet(activeJobs);
         this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
     }
@@ -60,15 +60,15 @@ public class CleanupPreferences {
         return activeJobs.contains(step);
     }
 
-    public FieldFormatterCleanups getFieldFormatterCleanups() {
+    public FieldFormatterCleanupActions getFieldFormatterCleanups() {
         return fieldFormatterCleanups.get();
     }
 
-    public ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanupsProperty() {
+    public ObjectProperty<FieldFormatterCleanupActions> fieldFormatterCleanupsProperty() {
         return fieldFormatterCleanups;
     }
 
-    public void setFieldFormatterCleanups(FieldFormatterCleanups fieldFormatters) {
+    public void setFieldFormatterCleanups(FieldFormatterCleanupActions fieldFormatters) {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
