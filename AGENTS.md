@@ -70,7 +70,7 @@ Agents **must not**:
 - Avoid premature abstractions
 - Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
 - Ensure that tests are green before committing
-- Code should not be reformatted only because of syntax. There need to be new statements added if reformatting. 
+- Code should not be reformatted only because of syntax. There need to be new statements added if reformatting.
 - Follow the principles of \"Effective Java\"
 - Follow the principles of \"Clean Code\"
 - Remove commented code. (To keep a history of changes git was made for.)
