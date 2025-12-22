@@ -50,7 +50,7 @@ Agents **must not**:
 - Target the configured **Gradle toolchain**
 - Use **Java 24+ features**
 - Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.\n\nUsing JavaFX Obersvable lists is considered best practice, too.
-- Use modern Java data structures\n\nBAD: new HashSet<>(Arrays.asList(...))\n\nGOOD: Sef.of(...)
+- Use modern Java data structures\n\nBAD: new HashSet<>(Arrays.asList(...))\n\nGOOD: Set.of(...)
 - Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
 - To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
 - Correctly spelled variable names (meaning: no typos in variable names).
