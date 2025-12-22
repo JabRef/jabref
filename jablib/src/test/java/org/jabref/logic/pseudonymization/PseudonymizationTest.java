@@ -192,7 +192,7 @@ class PseudonymizationTest {
         assertEquals(Optional.of("group-2"), entries.get(2).getField(StandardField.GROUPS));
 
         Map<String, String> mapping = result.valueMapping();
-        assertEquals("MyGroup", mapping.get("MyGroup1"));
+        assertEquals("MyGroup", mapping.get("MyGroup"));
         assertEquals("OtherGroup", mapping.get("OtherGroup"));
     }
 
