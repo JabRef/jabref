@@ -24,6 +24,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/DoiToBibtex.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Fetch.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateBibFromAux.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitedWorks.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitingWorks.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
