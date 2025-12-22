@@ -1,5 +1,6 @@
 package org.jabref.logic.push;
 
+import java.io.File;
 import java.util.Map;
 
 import javafx.beans.property.MapProperty;
@@ -9,6 +10,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
+import org.jabref.logic.os.OS;
+
+import static com.google.common.base.StandardSystemProperty.USER_HOME;
 
 public class PushToApplicationPreferences {
     private final StringProperty activeApplicationName;
@@ -18,6 +24,39 @@ public class PushToApplicationPreferences {
 
     private final ObjectProperty<CitationCommandString> citeCommand;
     private final ObjectProperty<CitationCommandString> defaultCiteCommand;
+
+    private PushToApplicationPreferences() {
+        this.activeApplicationName = new SimpleStringProperty("Texmaker");
+        ObservableMap<String, String> commands = FXCollections.observableHashMap();
+        commands.put("Texmaker", OS.detectProgramPath("texmaker", "Texmaker"));
+        commands.put("WinEdt", OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        commands.put("TeXstudio", OS.detectProgramPath("texstudio", "TeXstudio"));
+        commands.put("TeXworks", OS.detectProgramPath("texworks", "TeXworks"));
+        commands.put("Sublime Text", OS.detectProgramPath("subl", "Sublime"));
+        commands.put("LyX/Kile", System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
+        commands.put("VScode", OS.detectProgramPath("Code", "Microsoft VS Code"));
+        commands.put("Vim", "vim");
+        commands.put("Emacs", OS.WINDOWS ? "emacsclient.exe" : "emacsclient");
+        this.commandPaths = new SimpleMapProperty<>(commands);
+
+        this.emacsArguments = new SimpleStringProperty("-n -e");
+        this.vimServer = new SimpleStringProperty("vim");
+        this.citeCommand = new SimpleObjectProperty<>(CitationCommandString.from("\\cite{key1,key2}"));
+        this.defaultCiteCommand = new SimpleObjectProperty<>(CitationCommandString.from("\\cite{key1,key2}"));
+    }
+
+    public static PushToApplicationPreferences getDefault() {
+        return new PushToApplicationPreferences();
+    }
+
+    public void setAll(PushToApplicationPreferences preferences) {
+        this.activeApplicationName.set(preferences.activeApplicationName.get());
+        this.commandPaths.set(preferences.commandPaths);
+        this.vimServer.set(preferences.getVimServer());
+        this.emacsArguments.set(preferences.getEmacsArguments());
+        this.citeCommand.set(preferences.getCiteCommand());
+        this.defaultCiteCommand.set(preferences.getDefaultCiteCommand());
+    }
 
     public PushToApplicationPreferences(String activeApplicationName,
                                         Map<String, String> commandPaths,
