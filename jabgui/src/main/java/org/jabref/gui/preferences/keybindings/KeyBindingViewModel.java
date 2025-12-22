@@ -7,6 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
@@ -14,8 +15,6 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-
-import com.google.common.base.CaseFormat;
 
 /**
  * This class represents a view model for objects of the KeyBinding
@@ -66,12 +65,12 @@ public class KeyBindingViewModel {
 
     private void setBinding(String bind) {
         this.realBinding = bind;
-        String[] parts = bind.split(" ");
-        StringBuilder displayBind = new StringBuilder();
-        for (String part : parts) {
-            displayBind.append(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part)).append(" ");
+        if (bind.isEmpty()) {
+            this.shownBinding.set("");
+            return;
         }
-        this.shownBinding.set(displayBind.toString().trim().replace(" ", " + "));
+
+        this.shownBinding.set(KeyCombination.valueOf(bind).getDisplayText());
     }
 
     private void setDisplayName() {
@@ -104,8 +103,8 @@ public class KeyBindingViewModel {
 
         // gather the pressed modifier keys
         String modifiers = "";
-        if (evt.isControlDown()) {
-            modifiers = "ctrl+";
+        if (evt.isShortcutDown()) {
+            modifiers = "shortcut+";
         }
         if (evt.isShiftDown()) {
             modifiers += "shift+";

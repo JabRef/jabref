@@ -54,6 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We made the box for both entry types and fields types searchable in "Custom entry types". [#14547](https://github.com/JabRef/jabref/issues/14547)
 - We renamed "Search pre-configured" to "Search pre-selected" and "Web search fetchers" to "Pre-selected fetchers". [#14557](https://github.com/JabRef/jabref/issues/14557)
 - We renamed "ArXiv" to "arXiv" in New Entry dialog. [#14643](https://github.com/JabRef/jabref/issues/14643)
+- We improved the keyboard shortcut dialog, it is now possible to directly press <kbd>cmd</kbd>+<kbd>...</kbd> when changing keyboards on macOS. [#14237](https://github.com/JabRef/jabref/issues/14237)
 
 ### Fixed
 
