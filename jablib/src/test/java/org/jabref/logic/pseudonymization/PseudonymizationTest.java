@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -173,7 +174,7 @@ class PseudonymizationTest {
         // given
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(
                 new BibEntry("first").withField(StandardField.GROUPS, "MyGroup"),
-                new BibEntry("second").withField(StandardField.GROUPS, "MyGroup"),
+                new BibEntry("second").withField(StandardField.GROUPS, "MyGroup, OtherGroup"),
                 new BibEntry("third").withField(StandardField.GROUPS, "OtherGroup")
         )));
 
@@ -189,6 +190,8 @@ class PseudonymizationTest {
         String myGroup1 = entries.getFirst().getField(StandardField.GROUPS).orElseThrow();
         String myGroup2 = entries.get(1).getField(StandardField.GROUPS).orElseThrow();
         String otherGroup = entries.get(2).getField(StandardField.GROUPS).orElseThrow();
+
+        assertEquals(Optional.of("group-1, group-2"), entries.get(1).getField(StandardField.GROUPS));
 
         assertEquals(myGroup1, myGroup2);
         assertTrue(myGroup1.startsWith("group-"));
