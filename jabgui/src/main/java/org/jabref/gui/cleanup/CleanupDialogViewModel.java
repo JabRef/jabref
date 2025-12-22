@@ -70,6 +70,10 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     public void apply(CleanupTabSelection selectedTab) {
+        apply(selectedTab, true);
+    }
+
+    public void apply(CleanupTabSelection selectedTab, boolean showFeedback) {
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
@@ -113,11 +117,18 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         if (taskExecutor != null) {
             BackgroundTask.wrap(() -> cleanup(cleanupPreset, entriesToProcess))
-                          .onSuccess(result -> showResults())
+                          .onSuccess(result -> {
+                              if (showFeedback) {
+                                  showResults();
+                              }
+                          })
                           .onFailure(dialogService::showErrorDialogAndWait)
                           .executeWith(taskExecutor);
         } else {
             cleanup(cleanupPreset, entriesToProcess);
+            if (showFeedback) {
+                showResults();
+            }
         }
     }
 

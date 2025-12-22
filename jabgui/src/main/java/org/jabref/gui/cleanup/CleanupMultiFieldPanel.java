@@ -47,11 +47,8 @@ public class CleanupMultiFieldPanel extends VBox {
         cleanupTimestampToModificationDate.selectedProperty().bindBidirectional(viewModel.timestampToModificationSelected);
     }
 
-    @FXML
-    private void onApply() {
+    public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupMultiFieldViewModel.MULTI_FIELD_JOBS, selectedJobs);
-        dialogViewModel.apply(selectedTab);
-        getScene().getWindow().hide();
+        return CleanupTabSelection.ofJobs(CleanupMultiFieldViewModel.MULTI_FIELD_JOBS, selectedJobs);
     }
 }

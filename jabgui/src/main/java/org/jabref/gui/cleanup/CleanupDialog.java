@@ -5,7 +5,10 @@ import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
@@ -27,6 +30,7 @@ public class CleanupDialog extends BaseDialog<Void> {
 
     @FXML private TabPane tabPane;
 
+    private final ButtonType cleanUpButton = new ButtonType(Localization.lang("Clean up"), ButtonBar.ButtonData.APPLY);
     private final CleanupDialogViewModel viewModel;
 
     // Constructor for multiple-entry cleanup
@@ -83,5 +87,26 @@ public class CleanupDialog extends BaseDialog<Void> {
                 new Tab(Localization.lang("File-related"), fileRelatedPanel),
                 new Tab(Localization.lang("Multi-field"), multiFieldPanel)
         );
+
+        getDialogPane().getButtonTypes().addAll(cleanUpButton, ButtonType.CANCEL);
+
+        getDialogPane().lookupButton(cleanUpButton).addEventFilter(ActionEvent.ACTION, event -> {
+            Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+            if (selectedTab != null && selectedTab.getContent() instanceof CleanupSingleFieldPanel panel) {
+                viewModel.apply(panel.getSelectedTab());
+            } else if (selectedTab != null && selectedTab.getContent() instanceof CleanupFileRelatedPanel panel) {
+                viewModel.apply(panel.getSelectedTab());
+            } else if (selectedTab != null && selectedTab.getContent() instanceof CleanupMultiFieldPanel panel) {
+                viewModel.apply(panel.getSelectedTab());
+            }
+            event.consume();
+        });
+
+        setResultConverter(button -> {
+            if (button == ButtonType.CANCEL) {
+                return null;
+            }
+            return null;
+        });
     }
 }

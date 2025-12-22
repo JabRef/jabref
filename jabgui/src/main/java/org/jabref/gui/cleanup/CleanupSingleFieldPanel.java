@@ -35,11 +35,8 @@ public class CleanupSingleFieldPanel extends VBox {
         formatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanups);
     }
 
-    @FXML
-    private void onApply() {
+    public CleanupTabSelection getSelectedTab() {
         FieldFormatterCleanupActions selectedFormatters = viewModel.getSelectedFormatters();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofFormatters(selectedFormatters);
-        dialogViewModel.apply(selectedTab);
-        getScene().getWindow().hide();
+        return CleanupTabSelection.ofFormatters(selectedFormatters);
     }
 }
