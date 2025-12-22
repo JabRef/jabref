@@ -18,7 +18,6 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
-import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 
 /**
@@ -60,7 +59,9 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
         }
 
         switch (aiPreferences.getAiProvider()) {
-            case OPEN_AI ->
+            // Hugging Face uses OpenAI API.
+            case OPEN_AI,
+                 HUGGING_FACE ->
                     langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
 
             case GPT4ALL ->
@@ -85,16 +86,6 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
                             .modelName(aiPreferences.getSelectedChatModel())
                             .temperature(aiPreferences.getTemperature())
                             .logRequestsAndResponses(true)
-                            .build()
-                    );
-
-            case HUGGING_FACE -> // NOTE: {@link HuggingFaceChatModel} doesn't support API base url.
-                    langchainChatModel = Optional.of(HuggingFaceChatModel
-                            .builder()
-                            .accessToken(apiKey)
-                            .modelId(aiPreferences.getSelectedChatModel())
-                            .temperature(aiPreferences.getTemperature())
-                            .timeout(Duration.ofMinutes(2))
                             .build()
                     );
         }

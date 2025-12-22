@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -67,7 +67,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}

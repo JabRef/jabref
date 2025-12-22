@@ -15,6 +15,10 @@ jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
     }
+    conflictResolution {
+        select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
+        select("org.gradlex:jna-platform", "net.java.dev.jna:jna-platform-jpms")
+    }
 }
 
 // Tell gradle which jar to use for which platform
@@ -69,7 +73,6 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
-
 }
 
 extraJavaModuleInfo {
@@ -105,6 +108,12 @@ extraJavaModuleInfo {
         uses("ai.djl.repository.RepositoryFactory")
     }
     module("at.favre.lib:hkdf", "hkdf")
+
+    module("cc.jilt:jilt", "jilt")         {
+        exportAllPackages()
+        requires("java.compiler") // Reason: javax.annotation.processor
+    }
+
     module("com.github.javakeyring:java-keyring", "java.keyring")
 
     module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {

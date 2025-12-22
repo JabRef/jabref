@@ -70,6 +70,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -97,6 +98,7 @@ public class GroupTreeView extends BorderPane {
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
+    private final BibEntryTypesManager entryTypesManager;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -118,22 +120,24 @@ public class GroupTreeView extends BorderPane {
     /**
      * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
      */
-    public GroupTreeView(TaskExecutor taskExecutor,
-                         StateManager stateManager,
-                         AdaptVisibleTabs adaptVisibleTabs,
+    public GroupTreeView(StateManager stateManager,
+                         BibEntryTypesManager entryTypesManager,
                          GuiPreferences preferences,
                          DialogService dialogService,
                          AiService aiService,
                          UndoManager undoManager,
-                         FileUpdateMonitor fileUpdateMonitor) {
-        this.taskExecutor = taskExecutor;
+                         FileUpdateMonitor fileUpdateMonitor,
+                         AdaptVisibleTabs adaptVisibleTabs,
+                         TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
-        this.adaptVisibleTabs = adaptVisibleTabs;
+        this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.adaptVisibleTabs = adaptVisibleTabs;
+        this.taskExecutor = taskExecutor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
@@ -191,7 +195,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, preferences.getFieldPreferences(), dialogService, aiService, adaptVisibleTabs, localDragboard, taskExecutor);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -412,7 +416,7 @@ public class GroupTreeView extends BorderPane {
                     taskExecutor);
             List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
-            importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), event.getTransferMode())
+            importHandler.importFilesInBackground(files, event.getTransferMode())
                          .executeWith(taskExecutor);
             success = true;
         }

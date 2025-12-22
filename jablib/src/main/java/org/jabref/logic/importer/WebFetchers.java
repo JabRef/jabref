@@ -74,10 +74,10 @@ public class WebFetchers {
         switch (field) {
             case DOI ->
                     fetcher = new DoiFetcher(importFormatPreferences);
-            case ISBN ->
-                    fetcher = new IsbnFetcher(importFormatPreferences);
             case EPRINT ->
                     fetcher = new ArXivFetcher(importFormatPreferences);
+            case ISBN ->
+                    fetcher = new IsbnFetcher(importFormatPreferences);
             case ISSN ->
                     fetcher = new IssnFetcher();
             case null,
@@ -147,7 +147,7 @@ public class WebFetchers {
      */
     public static SortedSet<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences,
                                                                ImporterPreferences importerPreferences) {
-        SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
@@ -262,7 +262,7 @@ class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
         if (Objects.equals(s1.getName(), CompositeSearchBasedFetcher.FETCHER_NAME)) {
             return -1;
         } else {
-            return s1.getName().compareTo(s2.getName());
+            return String.CASE_INSENSITIVE_ORDER.compare(s1.getName(), s2.getName());
         }
     }
 }

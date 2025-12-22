@@ -58,6 +58,8 @@ public class AiDefaultPreferences {
     public static final boolean ENABLE_CHAT = false;
     public static final boolean AUTO_GENERATE_EMBEDDINGS = false;
     public static final boolean AUTO_GENERATE_SUMMARIES = false;
+    public static final boolean GENERATE_FOLLOW_UP_QUESTIONS = true;
+    public static final int FOLLOW_UP_QUESTIONS_COUNT = 3;
 
     public static final AiProvider PROVIDER = AiProvider.OPEN_AI;
 
@@ -115,7 +117,20 @@ public class AiDefaultPreferences {
             AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, "$chunks",
 
             AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, "You are a bot to convert a plain text citation to a BibTeX entry. The user you talk to understands only BibTeX code, so provide it plainly without any wrappings.",
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTeX code as your message."
+            AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTeX code as your message.",
+
+            AiTemplate.FOLLOW_UP_QUESTIONS, """
+                    Based on this conversation:
+                    User: $userMessage
+                    Assistant: $aiResponse
+
+                    Generate $count short follow-up questions (maximum 10 words each) that the user might want to ask next.
+                    Format your response as a numbered list:
+                    1. [question]
+                    2. [question]
+                    3. [question]
+
+                    Only provide the numbered list, nothing else."""
     );
 
     public static List<String> getAvailableModels(AiProvider aiProvider) {

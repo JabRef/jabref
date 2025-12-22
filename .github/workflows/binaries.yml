@@ -236,7 +236,7 @@ jobs:
     name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -268,7 +268,7 @@ jobs:
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -403,7 +403,7 @@ jobs:
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           # tbn = to-be-notarized
           name: JabRef-${{ matrix.os }}-tbn
@@ -434,6 +434,9 @@ jobs:
     needs: [conditions, build]
     if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
     steps:
       - name: echo PR data
         env:
@@ -489,7 +492,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: JabRef-${{ matrix.os }}-tbn
       - name: Notarize dmg

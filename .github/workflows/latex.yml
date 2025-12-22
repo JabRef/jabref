@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4
         with:
@@ -80,7 +80,7 @@ jobs:
             bibengine: biber
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4
@@ -99,7 +99,7 @@ jobs:
         working-directory: ${{ matrix.directory }}
 
       - name: Upload build result
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: PDF-${{ matrix.tex }}
           path: |

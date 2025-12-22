@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabkit - mange BibTeX files using JabRef
 
-//JAVA 24
+//JAVA 24+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // raw is for https://github.com/unicode-org/icu/pull/2127
@@ -19,6 +19,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/ProviderConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Convert.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/DoiToBibtex.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Fetch.java

@@ -56,10 +56,14 @@ dependencies {
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.jabref.testsupport")
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
-    requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
+}
+
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "4g"
 }
 
 application {
@@ -85,6 +89,7 @@ application {
 javaModulePackaging {
     applicationName = "jabkit"
     addModules.add("jdk.incubator.vector")
+    jlinkOptions.addAll("--generate-cds-archive")
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {

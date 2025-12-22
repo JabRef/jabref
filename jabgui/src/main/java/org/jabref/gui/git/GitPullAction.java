@@ -12,7 +12,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
@@ -51,7 +50,7 @@ public class GitPullAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsGitRemoteConfigured(stateManager)));
+        this.executable.bind(ActionHelper.needsGitRemoteConfigured(stateManager));
     }
 
     @Override
@@ -103,7 +102,7 @@ public class GitPullAction extends SimpleCommand {
                     int manualResolvedCount;
                     if (!conflicts.isEmpty()) {
                         // resolve via GUI (strategy jumps to FX thread internally; safe to call from background)
-                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(new GitConflictResolverDialog(dialogService, guiPreferences));
+                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(new GitConflictResolverDialog(dialogService, guiPreferences, stateManager));
                         List<BibEntry> resolved = resolver.resolveConflicts(conflicts);
                         if (resolved.isEmpty()) {
                             dialogService.notify(Localization.lang("Pull canceled."));
@@ -158,10 +157,6 @@ public class GitPullAction extends SimpleCommand {
     ///         or Optional.empty() if the local library is already up-to-date or ahead of the remote branch.
     private Optional<PullPlan> prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
-        GitHandler handler = registry.get(bibPath.getParent());
-        String user = guiPreferences.getGitPreferences().getUsername();
-        String pat = guiPreferences.getGitPreferences().getPat();
-        handler.setCredentials(user, pat);
         return gitSyncService.prepareMerge(databaseContext, bibPath);
     }
 

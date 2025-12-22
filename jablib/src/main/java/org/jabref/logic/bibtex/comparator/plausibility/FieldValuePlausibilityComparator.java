@@ -1,6 +1,8 @@
-package org.jabref.logic.bibtex.comparator;
+package org.jabref.logic.bibtex.comparator.plausibility;
 
-public abstract class FieldValuePlausibilityComparator {
+import org.jabref.logic.bibtex.comparator.ComparisonResult;
+
+public interface FieldValuePlausibilityComparator {
     /**
      * Compares the plausibility of two field values.
      *
@@ -8,5 +10,5 @@ public abstract class FieldValuePlausibilityComparator {
      * @param rightValue value from the fetcher (or existing record)
      * @return ComparisonResult indicating which field is more plausible: RIGHT_BETTER, LEFT_BETTER, or UNDETERMINED
      */
-    public abstract ComparisonResult compare(String leftValue, String rightValue);
+    ComparisonResult compare(String leftValue, String rightValue);
 }
