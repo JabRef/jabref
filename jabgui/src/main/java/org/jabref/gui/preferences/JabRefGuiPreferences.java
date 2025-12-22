@@ -241,10 +241,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private JabRefGuiPreferences() {
         super();
-
-        defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
-        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
-        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         // endregion
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
