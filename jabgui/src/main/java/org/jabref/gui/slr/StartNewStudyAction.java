@@ -10,7 +10,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.crawler.StudyRepository;
-import org.jabref.logic.crawler.StudyYamlService;
+import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -57,14 +57,14 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
 
     @Override
     protected void crawlPreparation(Path studyRepositoryRoot) throws IOException, GitAPIException {
-        StudyYamlService studyYamlService = new StudyYamlService();
-        studyYamlService.writeStudyYamlFile(newStudy, studyRepositoryRoot.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
+        StudyYamlParser studyYAMLParser = new StudyYamlParser();
+        studyYAMLParser.writeStudyYamlFile(newStudy, studyRepositoryRoot.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
 
         // When execution reaches this point, the user created a new study.
         // The GitHandler is already called to initialize the repository with one single commit "Initial commit".
         // The "Initial commit" should also contain the created YAML.
         // Thus, we append to that commit.
-        GitHandler gitHandler = new GitHandler(studyRepositoryRoot);
+        GitHandler gitHandler = new GitHandler(studyRepositoryRoot, preferences.getGitPreferences());
         gitHandler.initIfNeeded();
         gitHandler.createCommitOnCurrentBranch("Initial commit", true);
     }

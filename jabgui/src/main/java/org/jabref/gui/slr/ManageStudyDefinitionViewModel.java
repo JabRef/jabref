@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -17,8 +18,9 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.logic.crawler.StudyRepository;
-import org.jabref.logic.crawler.StudyYamlService;
+import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -30,7 +32,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyCatalog;
+import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -63,6 +65,14 @@ public class ManageStudyDefinitionViewModel {
     private final DialogService dialogService;
 
     private final WorkspacePreferences workspacePreferences;
+    private final GitPreferences gitPreferences;
+
+    private final StringProperty titleValidationMessage = new SimpleStringProperty();
+    private final StringProperty authorsValidationMessage = new SimpleStringProperty();
+    private final StringProperty questionsValidationMessage = new SimpleStringProperty();
+    private final StringProperty queriesValidationMessage = new SimpleStringProperty();
+    private final StringProperty catalogsValidationMessage = new SimpleStringProperty();
+    private final StringProperty validationHeaderMessage = new SimpleStringProperty();
 
     /**
      * Constructor for a new study
@@ -70,6 +80,7 @@ public class ManageStudyDefinitionViewModel {
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
                                           @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull GitPreferences gitPreferences,
                                           @NonNull DialogService dialogService) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
@@ -84,6 +95,9 @@ public class ManageStudyDefinitionViewModel {
                                     .toList());
         this.dialogService = dialogService;
         this.workspacePreferences = workspacePreferences;
+        this.gitPreferences = gitPreferences;
+
+        initializeValidationBindings();
     }
 
     /**
@@ -97,13 +111,15 @@ public class ManageStudyDefinitionViewModel {
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
                                           @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull GitPreferences gitPreferences,
                                           @NonNull DialogService dialogService) {
+        this.gitPreferences = gitPreferences;
         // copy the content of the study object into the UI fields
         authors.addAll(study.getAuthors());
         title.setValue(study.getTitle());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
-        List<StudyCatalog> studyCatalogs = study.getCatalogs();
+        List<StudyDatabase> studyDatabases = study.getDatabases();
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
@@ -111,7 +127,7 @@ public class ManageStudyDefinitionViewModel {
                                     // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
                                     .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
                                     .map(name -> {
-                                        boolean enabled = studyCatalogs.contains(new StudyCatalog(name, true));
+                                        boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
                                         return new StudyCatalogItem(name, enabled);
                                     })
                                     .toList());
@@ -119,6 +135,47 @@ public class ManageStudyDefinitionViewModel {
         this.directory.set(studyDirectory.toString());
         this.workspacePreferences = workspacePreferences;
         this.dialogService = dialogService;
+
+        initializeValidationBindings();
+    }
+
+    private void initializeValidationBindings() {
+        titleValidationMessage.bind(Bindings.when(title.isEmpty())
+                                            .then(Localization.lang("Study title is required"))
+                                            .otherwise(""));
+
+        authorsValidationMessage.bind(Bindings.when(Bindings.isEmpty(authors))
+                                              .then(Localization.lang("At least one author is required"))
+                                              .otherwise(""));
+
+        questionsValidationMessage.bind(Bindings.when(Bindings.isEmpty(researchQuestions))
+                                                .then(Localization.lang("At least one research question is required"))
+                                                .otherwise(""));
+
+        queriesValidationMessage.bind(Bindings.when(Bindings.isEmpty(queries))
+                                              .then(Localization.lang("At least one query is required"))
+                                              .otherwise(""));
+
+        catalogsValidationMessage.bind(Bindings.when(
+                                                       Bindings.createBooleanBinding(() ->
+                                                               databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases))
+                                               .then(Localization.lang("At least one catalog must be selected"))
+                                               .otherwise(""));
+
+        validationHeaderMessage.bind(Bindings.when(
+                                                     Bindings.or(
+                                                             Bindings.or(
+                                                                     Bindings.or(
+                                                                             Bindings.or(title.isEmpty(), Bindings.isEmpty(authors)),
+                                                                             Bindings.isEmpty(researchQuestions)
+                                                                     ),
+                                                                     Bindings.isEmpty(queries)
+                                                             ),
+                                                             Bindings.createBooleanBinding(() ->
+                                                                     databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases)
+                                                     ))
+                                             .then(Localization.lang("In order to proceed:"))
+                                             .otherwise(""));
     }
 
     public StringProperty getTitle() {
@@ -172,7 +229,7 @@ public class ManageStudyDefinitionViewModel {
                 title.getValueSafe(),
                 researchQuestions,
                 queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
-                databases.stream().map(studyDatabaseItem -> new StudyCatalog(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyCatalog::isEnabled).collect(Collectors.toList()));
+                databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
         Path studyDirectory;
         final String studyDirectoryAsString = directory.getValueSafe();
         try {
@@ -185,7 +242,7 @@ public class ManageStudyDefinitionViewModel {
         }
         Path studyDefinitionFile = studyDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         try {
-            new StudyYamlService().writeStudyYamlFile(study, studyDefinitionFile);
+            new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
         } catch (IOException e) {
             LOGGER.error("Could not write study file {}", studyDefinitionFile, e);
             dialogService.notify(Localization.lang("Please enter a valid file path.") +
@@ -195,7 +252,7 @@ public class ManageStudyDefinitionViewModel {
         }
 
         try {
-            new GitHandler(studyDirectory).createCommitOnCurrentBranch("Update study definition", false);
+            new GitHandler(studyDirectory, gitPreferences).createCommitOnCurrentBranch("Update study definition", false);
         } catch (IOException | GitAPIException e) {
             LOGGER.error("Could not commit study definition file in directory {}", studyDirectory, e);
             dialogService.notify(Localization.lang("Please enter a valid file path.") +
@@ -240,5 +297,29 @@ public class ManageStudyDefinitionViewModel {
                                                      .collect(Collectors.toList());
 
         workspacePreferences.setSelectedSlrCatalogs(selectedCatalogsList);
+    }
+
+    public StringProperty validationHeaderMessageProperty() {
+        return validationHeaderMessage;
+    }
+
+    public StringProperty titleValidationMessageProperty() {
+        return titleValidationMessage;
+    }
+
+    public StringProperty authorsValidationMessageProperty() {
+        return authorsValidationMessage;
+    }
+
+    public StringProperty questionsValidationMessageProperty() {
+        return questionsValidationMessage;
+    }
+
+    public StringProperty queriesValidationMessageProperty() {
+        return queriesValidationMessage;
+    }
+
+    public StringProperty catalogsValidationMessageProperty() {
+        return catalogsValidationMessage;
     }
 }

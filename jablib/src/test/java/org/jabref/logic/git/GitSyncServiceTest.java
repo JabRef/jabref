@@ -14,6 +14,7 @@ import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PushResult;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -37,6 +38,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
@@ -48,6 +52,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("git")
 class GitSyncServiceTest {
     private Path library;
 
@@ -128,7 +134,10 @@ class GitSyncServiceTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
-        gitHandlerRegistry = new GitHandlerRegistry();
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
+        gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
 
         // create fake remote repo
         remoteDir = tempDir.resolve("remote.git");

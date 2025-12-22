@@ -28,7 +28,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           show-progress: 'false'
       - name: Merge Conflict finder
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Check force push
@@ -113,7 +113,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: pr_number
           path: pr_number.txt

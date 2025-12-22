@@ -8,7 +8,7 @@ name: Comment on PR
 on:
   workflow_run:
     # note when updating via a PR and testing - `workflow_run` executes from the `main` branch and not the PR branch
-    workflows: ["Source Code Tests", "On PR opened/updated", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md"]
+    workflows: ["Source Code Tests", "On PR opened/updated (check)", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md"]
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
     types: [completed]
   workflow_dispatch:
@@ -30,9 +30,26 @@ jobs:
       pull-requests: write
     timeout-minutes: 10
     steps:
+      - name: Show GitHub context
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          WORKFLOW_RUN_ID: ${{ github.event.inputs.workflow_run_id }}
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "PR_NUMBER=${PR_NUMBER}"
+          echo "WORKFLOW_RUN_ID=${WORKFLOW_RUN_ID}"
+          echo "EVENT_NAME=${EVENT_NAME}"
+          echo "WORKFLOW=${WORKFLOW}"
+          echo "RUN_ID=${RUN_ID}"
+          echo "RUN_NUMBER=${RUN_NUMBER}"
+          echo "Workflow $WORKFLOW" >> $GITHUB_STEP_SUMMARY
+
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         continue-on-error: true
         with:
           name: pr_number
@@ -47,10 +64,11 @@ jobs:
           PR_NUMBER=$(cat pr_number.txt)
           echo "Read PR number $PR_NUMBER"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "PR #" >> $GITHUB_STEP_SUMMARY
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -90,12 +108,59 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # This step runs in both cases using the proper variables.
+      - name: Setup JDK
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        uses: actions/setup-java@v5
+        with:
+          # java version supported by ghprcomment.java - https://github.com/koppor/ghprcomment/blob/2b1060508ebb51d137698fe66f5c20d9012b2be9/ghprcomment.java#L3
+          java-version: '24'
+          distribution: 'corretto'
+          check-latest: true
+      - name: Generate JBang cache key
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        uses: jbangdev/setup-jbang@main
       - name: ghprcomment@main
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        uses: jbangdev/jbang-action@v0.132.1
-        with:
-          script: https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
-          scriptargs: "-r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}"
-          trust: https://github.com/koppor/ghprcomment/
+        run: |
+          jbang trust add https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
+          jbang https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java -r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+
+      - name: 'Adapt label "status: changes-required"'
+        if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.name == 'Source Code Tests') && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        run: |
+          echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
+
+          REPO="${{ github.repository }}"
+
+          COMMENTS=$(gh api \
+            repos/$REPO/issues/$PR_NUMBER/comments \
+            --jq '.[] | select(.user.login=="jabref-machine")')
+
+          if [[ -n "$COMMENTS" ]]; then
+            echo "Bot comments - adding label changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
+            echo "Added label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No bot comments - removing label changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required"
+            echo "Removed label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}

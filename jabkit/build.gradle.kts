@@ -21,6 +21,7 @@ dependencies {
     implementation("info.picocli:picocli")
     annotationProcessor("info.picocli:picocli-codegen")
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify")
 
@@ -55,17 +56,25 @@ dependencies {
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
-    requires.add("org.junit.jupiter.api")
     requires.add("org.jabref.testsupport")
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
 }
 
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "4g"
+}
+
 application {
-    mainClass.set("org.jabref.JabKit")
+    mainClass.set("org.jabref.toolkit.JabKitLauncher")
     mainModule.set("org.jabref.jabkit")
 
     // Also passed to launcher by java-module-packaging plugin
     applicationDefaultJvmArgs = listOf(
+        // JEP 158: Disable all java util logging
+        "-Xlog:disable",
+
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
@@ -80,6 +89,7 @@ application {
 javaModulePackaging {
     applicationName = "jabkit"
     addModules.add("jdk.incubator.vector")
+    jlinkOptions.addAll("--generate-cds-archive")
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {

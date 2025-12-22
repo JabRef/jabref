@@ -13,29 +13,39 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.http.manager.HttpServerManager;
+import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.controlsfx.control.SearchableComboBox;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
-    @FXML private ComboBox<Language> language;
+    @Inject private HttpServerManager httpServerManager;
+    @Inject private LanguageServerController languageServerController;
+    @Inject private UiMessageHandler uiMessageHandler;
+    @Inject private RemoteListenerServerManager remoteListenerServerManager;
+    @Inject private StateManager stateManager;
+
+    @FXML private SearchableComboBox<Language> language;
     @FXML private ComboBox<ThemeTypes> theme;
     @FXML private CheckBox themeSyncOs;
     @FXML private TextField customThemePath;
@@ -44,7 +54,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Spinner<Integer> fontSize;
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox showAdvancedHints;
-    @FXML private CheckBox inspectionWarningDuplicate;
 
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox shouldAskForIncludingCrossReferences;
@@ -63,8 +72,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox enableLanguageServer;
     @FXML private TextField languageServerPort;
     @FXML private Button remoteHelp;
-    @Inject private FileUpdateMonitor fileUpdateMonitor;
-    @Inject private BibEntryTypesManager entryTypesManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -90,7 +97,14 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferences, fileUpdateMonitor);
+        this.viewModel = new GeneralTabViewModel(
+                dialogService,
+                preferences,
+                httpServerManager,
+                languageServerController,
+                uiMessageHandler,
+                remoteListenerServerManager,
+                stateManager);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -124,7 +138,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
-        inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
         shouldAskForIncludingCrossReferences.selectedProperty().bindBidirectional(viewModel.shouldAskForIncludingCrossReferences());
         confirmHideTabBar.selectedProperty().bindBidirectional(viewModel.confirmHideTabBarProperty());

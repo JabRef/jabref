@@ -34,7 +34,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyCatalog;
+import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -116,9 +116,9 @@ public class StudyRepository {
 
             gitHandler.checkoutBranch(SEARCH_BRANCH);
             // If study definition does not exist on this branch or was changed on work branch, copy it from work
-            boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) && new StudyYamlService().parseStudyYamlFile(studyDefinitionFile).equals(study));
+            boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) && new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile).equals(study));
             if (studyDefinitionDoesNotExistOrChanged) {
-                new StudyYamlService().writeStudyYamlFile(study, studyDefinitionFile);
+                new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
             }
             setUpRepositoryStructureForQueriesAndFetchers();
             gitHandler.createCommitOnCurrentBranch(updateRepositoryStructureMessage, false);
@@ -175,7 +175,7 @@ public class StudyRepository {
      * @throws IOException Problem opening the input stream.
      */
     private Study parseStudyFile() throws IOException {
-        return new StudyYamlService().parseStudyYamlFile(studyDefinitionFile);
+        return new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);
     }
 
     /**
@@ -196,10 +196,10 @@ public class StudyRepository {
      * @return List of BibEntries of type Library
      * @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
      */
-    public List<StudyCatalog> getActiveLibraryEntries() throws IllegalArgumentException {
-        return study.getCatalogs()
+    public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
+        return study.getDatabases()
                     .parallelStream()
-                    .filter(StudyCatalog::isEnabled)
+                    .filter(StudyDatabase::isEnabled)
                     .collect(Collectors.toList());
     }
 
@@ -440,7 +440,7 @@ public class StudyRepository {
                     preferences.getFieldPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager);
-            databaseWriter.saveDatabase(context);
+            databaseWriter.writeDatabase(context);
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {

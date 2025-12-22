@@ -2,11 +2,13 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Represents a Season of the Year.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public enum Season {
 
     SPRING("spring", 21),

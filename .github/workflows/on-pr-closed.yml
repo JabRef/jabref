@@ -2,17 +2,25 @@ name: On PR closed
 
 on:
   pull_request_target:
-    types: [ closed ]
+    types: [closed]
+
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to process
+        required: true
+        type: number
 
 jobs:
-  determine_issue_number:
-    name: Determine issue number
+  collect_parameters:
+    name: Collect parameters
     runs-on: ubuntu-latest
     if: >
-      (github.repository == 'JabRef/jabref') &&
-      !(
-        (github.event.pull_request.user.login == 'dependabot[bot]') ||
-        (
+      github.repository == 'JabRef/jabref' &&
+      (
+        github.event_name == 'workflow_dispatch' ||
+        !(
+          github.event.pull_request.user.login == 'dependabot[bot]' ||
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
           startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
@@ -20,44 +28,91 @@ jobs:
         )
       )
     permissions:
+      pull-requests: read
+    outputs:
+      pr_number: ${{ steps.pick.outputs.pr_number }}
+      pr_url:    ${{ steps.pick.outputs.pr_url }}
+      pr_body:   ${{ steps.pick.outputs.pr_body }}
+    steps:
+      - id: from_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const prNumber = Number(process.env.PR_NUMBER);
+            const {data: pr} = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            core.setOutput("pr_number", String(pr.number));
+            core.setOutput("pr_url", pr.html_url ?? "");
+            core.setOutput("pr_body", pr.body ?? "");
+      - name: Pick outputs
+        id: pick
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ steps.from_dispatch.outputs.pr_number }}" >> "$GITHUB_OUTPUT"
+            echo "pr_url=${{ steps.from_dispatch.outputs.pr_url }}"       >> "$GITHUB_OUTPUT"
+            cat >> "$GITHUB_OUTPUT" <<'EOF'
+          pr_body<<BODY
+          ${{ steps.from_dispatch.outputs.pr_body }}
+          BODY
+          EOF
+          else
+            echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+            echo "pr_url=${{ github.event.pull_request.html_url }}"  >> "$GITHUB_OUTPUT"
+            cat >> "$GITHUB_OUTPUT" <<'EOF'
+          pr_body<<BODY
+          ${{ github.event.pull_request.body }}
+          BODY
+          EOF
+          fi
+
+  determine_issue_number:
+    name: Determine issue number
+    needs: collect_parameters
+    runs-on: ubuntu-latest
+    permissions:
       contents: read
     outputs:
       issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
     steps:
-      - name: echo PR data
-        run: |
-          echo "PR Number: ${{ github.event.pull_request.number }}"
-          echo "PR URL: ${{ github.event.pull_request.html_url }}"
-          cat <<EOF
-          PR Body:
-          ${{ github.event.pull_request.body }}
-          EOF
       - name: Determine issue number
         id: get_issue_number
-        uses: koppor/ticket-check-action@add-output
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
-          ticketPrefix: '#'
-          titleRegex: '^#(?<ticketNumber>\d+)'
-          branchRegex: '^(?<ticketNumber>\d+)'
-          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #13109` in PULL_REQUEST_TEMPLATE
-          bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!13109\b)\d+)'
-          bodyRegexFlags: 'i'
-          outputOnly: true
-      - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
+        env:
+          PR_NUMBER: ${{ needs.collect_parameters.outputs.pr_number }}
+          PR_URL:    ${{ needs.collect_parameters.outputs.pr_url }}
+          PR_BODY:   ${{ needs.collect_parameters.outputs.pr_body }}
+        run: |
+          echo "PR Number: $PR_NUMBER"
+          echo "PR URL: $PR_URL"
+          echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
+          cat <<EOF
+          PR Body:
+          $PR_BODY
+          EOF
+          ticketNumber=$(printf '%s\n' "$PR_BODY" \
+            | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
+            | grep -Eo '[0-9]+' \
+            | grep -Ev '^13109$' \
+            | head -n1 || true)
+
+          echo "ticketNumber=$ticketNumber" >> "$GITHUB_OUTPUT"
+          echo "Determined issue [#$ticketNumber](https://github.com/JabRef/jabref/issues/$ticketNumber)" >> $GITHUB_STEP_SUMMARY
+
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
-    needs: determine_issue_number
+    needs: [collect_parameters, determine_issue_number]
     if: >
-      (needs.determine_issue_number.outputs.issue_number != '-1') &&
-      (!github.event.pull_request.merged)
+      (needs.determine_issue_number.outputs.issue_number != '') &&
+      (github.event_name == 'workflow_dispatch' || !github.event.pull_request.merged)
     permissions:
       contents: read
       issues: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Remove assignee
         run: |
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
@@ -111,13 +166,21 @@ jobs:
           default-column: "Free to take"
           issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
+      - name: Comment on PR that unassigned
+        if: steps.check_assignee.outputs.assigned == 'no'
+        run: |
+          echo "Commenting on PR..."
+          gh issue comment "${{ needs.collect_parameters.outputs.pr_number }}" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #${{ needs.determine_issue_number.outputs.issue_number }}. In case you closed the PR for yourself, you can re-open it. Please also check [After submission of a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#after-submission-of-a-pull-request) in the CONTRIBUTING.md"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest
     needs: determine_issue_number
     if: >
-      (needs.determine_issue_number.outputs.issue_number != '-1') &&
-      (github.event.pull_request.merged)
+      (needs.determine_issue_number.outputs.issue_number != '') &&
+      (github.event_name != 'workflow_dispatch' && github.event.pull_request.merged)
     permissions:
       contents: read
       issues: write

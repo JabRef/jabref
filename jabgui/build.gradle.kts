@@ -116,16 +116,13 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock") {
-        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
-    }
-
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
     testImplementation("org.ow2.asm:asm")
 
     testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
+
 }
 
 application {
@@ -133,7 +130,7 @@ application {
     mainModule.set("org.jabref")
 
     application.applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
@@ -158,6 +155,8 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
+    // general jLinkOptions are set in "--generate-cds-archive"
+    jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
         options.addAll(
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
@@ -222,9 +221,6 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
-
-    requires.add("wiremock")
-    requires.add("wiremock.slf4j.spi.shim")
 
     requires.add("com.tngtech.archunit")
     requires.add("com.tngtech.archunit.junit5.api")

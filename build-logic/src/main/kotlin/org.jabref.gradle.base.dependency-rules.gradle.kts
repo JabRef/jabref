@@ -15,6 +15,10 @@ jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
     }
+    conflictResolution {
+        select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
+        select("org.gradlex:jna-platform", "net.java.dev.jna:jna-platform-jpms")
+    }
 }
 
 // Tell gradle which jar to use for which platform
@@ -47,10 +51,7 @@ jvmDependencyConflicts.patch {
         removeDependency("org.apache.xmlgraphics:batik-ext")
         removeDependency("org.apache.xmlgraphics:xmlgraphics-commons")
     }
-    module("org.wiremock:wiremock") {
-        // workaround for https://github.com/wiremock/wiremock/issues/2874
-        addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
-    }
+
     module("org.apache.logging.log4j:log4j-to-slf4j") {
         // remove non-module annotation libraries only used at compile time
         removeDependency("com.github.spotbugs:spotbugs-annotations")
@@ -65,15 +66,9 @@ jvmDependencyConflicts.patch {
         removeDependency("org.osgi:org.osgi.annotation.bundle")
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
-    module("org.wiremock:wiremock") {
-        removeDependency("net.sf.jopt-simple:jopt-simple")
-    }
+
     module("org.testfx:testfx-core") {
         removeDependency("org.osgi:org.osgi.core")
-    }
-    module("org.glassfish.jersey.containers:jersey-container-servlet") {
-    }
-    module("org.glassfish.jersey.containers:jersey-container-servlet-core") {
     }
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
@@ -95,6 +90,7 @@ extraJavaModuleInfo {
     }
     module("ai.djl.pytorch:pytorch-engine", "ai.djl.pytorch_engine") {
         exportAllPackages()
+        exportAllPackages()
         requires("ai.djl.api")
         requires("org.slf4j")
     }
@@ -112,6 +108,12 @@ extraJavaModuleInfo {
         uses("ai.djl.repository.RepositoryFactory")
     }
     module("at.favre.lib:hkdf", "hkdf")
+
+    module("cc.jilt:jilt", "jilt")         {
+        exportAllPackages()
+        requires("java.compiler") // Reason: javax.annotation.processor
+    }
+
     module("com.github.javakeyring:java-keyring", "java.keyring")
 
     module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {
@@ -215,12 +217,12 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
-    module("io.github.classgraph:classgraph", "io.github.classgraph") {
-        overrideModuleName()
+    module("io.github.darvil82:terminal-text-formatter", "io.github.darvil.terminal.textformatter") {
+        patchRealModule()
         exportAllPackages()
+        requires("io.github.darvil.utils")
     }
-
-    module("io.github.darvil82:utils", "utils"){
+    module("io.github.darvil82:utils", "io.github.darvil.utils") {
         patchRealModule()
         exportAllPackages()
     }
@@ -290,7 +292,6 @@ extraJavaModuleInfo {
         requiresTransitive("org.testfx")
     }
 
-    module("commons-fileupload:commons-fileupload", "commons.fileupload")
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
@@ -385,69 +386,7 @@ extraJavaModuleInfo {
     }
 
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
-    module("org.glassfish.jersey.core:jersey-server", "jersey.server") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-        requires("jakarta.xml.bind")
-        requires("jersey.hk2")
-    }
-    // module("org.glassfish.jersey.containers:jersey-container-servlet", "jersey.servlet")
-    module("org.glassfish.jersey.inject:jersey-hk2", "jersey.hk2") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-    }
-    module("org.glassfish.jersey.core:jersey-client", "jersey.client") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-    }
-    module("org.glassfish.jersey.core:jersey-common", "jersey.common") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-        requires("java.xml")
-    }
-    module("org.glassfish.jersey.containers:jersey-container-grizzly2-http", "jersey.container.grizzly2.http") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-        requires("org.glassfish.grizzly")
-        requires("org.glassfish.grizzly.http")
-    }
-    module("org.glassfish.jersey.test-framework:jersey-test-framework-core", "jersey.test.framework.core") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-    }
-    module("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet", "jersey.container.grizzly2.servlet") {
-        // requires("jersey.servlet")
-    }
-    module("org.glassfish.jersey.containers:jersey-container-servlet", "jersey.container.servlet") {
-        exportAllPackages()
-        // requireAllDefinedDependencies()
-        requires("jersey.container.servlet.core")
-        requires("jakarta.servlet.api")
-    }
-    module("jakarta.servlet:jakarta.servlet-api", "jakarta.servlet.api") {
-        patchRealModule()
-        exportAllPackages()
-    }
-    module("org.glassfish.jersey.containers:jersey-container-servlet-core", "jersey.container.servlet.core") {
-        exportAllPackages()
-        requires("jakarta.servlet.api")
-    }
-    module("org.glassfish.jersey.media:jersey-media-jaxb", "jersey.media.jaxb") {
-        requireAllDefinedDependencies()
-        requires("java.logging")
-        requires("java.xml")
-        requires("jakarta.xml.bind")
-    }
-    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "jersey.test.framework.provider.grizzly2") {
-        requireAllDefinedDependencies()
-        requires("java.logging")
-    }
+
     module("org.glassfish.hk2:hk2-locator", "org.glassfish.hk2.locator") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -469,13 +408,6 @@ extraJavaModuleInfo {
         requires("java.logging")
     }
 
-    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requiresTransitive("javafx.base")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.controlsfx.controls")
-    }
     module("de.saxsys:mvvmfx", "de.saxsys.mvvmfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -485,7 +417,18 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
     }
+    // JitPack-variant because we need the latest commit
+    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
+    }
+
     module("org.reactfx:reactfx", "reactfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -601,50 +544,6 @@ extraJavaModuleInfo {
         requires("java.prefs")
     }
 
-    // Workaround for https://github.com/wiremock/wiremock/issues/2149
-    module("org.wiremock:wiremock", "wiremock") {
-        exportAllPackages()
-
-        requires("org.apache.httpcomponents.client5.httpclient5")
-        requires("com.fasterxml.jackson.core")
-        requires("com.fasterxml.jackson.databind")
-        requires("com.fasterxml.jackson.datatype.jsr310")
-        requires("com.google.common")
-        requires("commons.fileupload")
-        requires("java.xml")
-        requires("json.path")
-        requires("org.custommonkey.xmlunit")
-        requires("org.eclipse.jetty.server")
-        requires("org.eclipse.jetty.servlet")
-        requires("org.eclipse.jetty.servlets")
-        requires("org.eclipse.jetty.webapp")
-        requires("org.eclipse.jetty.proxy")
-        requires("org.eclipse.jetty.http2.server")
-        requires("org.eclipse.jetty.alpn.server")
-        requires("org.eclipse.jetty.alpn.java.server")
-        requires("org.eclipse.jetty.alpn.java.client")
-        requires("org.eclipse.jetty.alpn.client")
-        requires("org.slf4j")
-        requires("org.xmlunit")
-        requires("wiremock.slf4j.spi.shim")
-
-        uses("com.github.tomakehurst.wiremock.extension.Extension")
-
-        // workaround for https://github.com/wiremock/wiremock/issues/2874
-        mergeJar("com.github.jknack:handlebars")
-        mergeJar("com.github.jknack:handlebars-helpers")
-
-        // Required to provide package "wiremock.org.slf4j.helpers"
-        mergeJar("com.github.koppor:wiremock-slf4j-shim")
-    }
-    module("com.github.koppor:wiremock-slf4j-shim", "wiremock.slf4j.shim") {
-        patchRealModule()
-        exportAllPackages()
-    }
-    module("com.github.koppor:wiremock-slf4j-spi-shim", "wiremock.slf4j.spi.shim") {
-        patchRealModule()
-        exportAllPackages()
-    }
     module("org.objenesis:objenesis", "org.objenesis") {
         exportAllPackages()
         requireAllDefinedDependencies()

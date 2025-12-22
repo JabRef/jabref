@@ -10,7 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
@@ -38,19 +39,23 @@ import org.slf4j.LoggerFactory;
  * This provides an easy-to-use interface to manage a git repository
  */
 public class GitHandler {
-    static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
+
     final Path repositoryPath;
+
     final File repositoryPathAsFile;
-    private CredentialsProvider credentialsProvider;
+
+    private final GitPreferences gitPreferences;
 
     /**
      * Initialize the handler for the given repository
      *
      * @param repositoryPath The root of the initialized git repository
      */
-    public GitHandler(Path repositoryPath) {
+    public GitHandler(Path repositoryPath, GitPreferences gitPreferences) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
+        this.gitPreferences = gitPreferences;
     }
 
     public void initIfNeeded() {
@@ -79,36 +84,6 @@ public class GitHandler {
         } catch (GitAPIException | IOException e) {
             LOGGER.error("Git repository initialization failed at {}", repositoryPath, e);
         }
-    }
-
-    private Optional<CredentialsProvider> resolveCredentials() {
-        if (credentialsProvider != null) {
-            return Optional.of(credentialsProvider);
-        }
-
-        // TODO: This should be removed - only GitPasswordPreferences should be used
-        //       Not implemented in August, 2025, because implications to SLR component not clear.
-        String user = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
-        String password = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-
-        if (user.isBlank() || password.isBlank()) {
-            return Optional.empty();
-        }
-
-        this.credentialsProvider = new UsernamePasswordCredentialsProvider(user, password);
-        return Optional.of(this.credentialsProvider);
-    }
-
-    // TODO: GitHandlerRegistry should get passed GitPasswordPreferences (or similar), pass this to GitHandler instance, which uses it here#
-    //       As a result, this method will be gone
-    public void setCredentials(String username, String pat) {
-        if (username == null) {
-            username = "";
-        }
-        if (pat == null) {
-            pat = "";
-        }
-        this.credentialsProvider = new UsernamePasswordCredentialsProvider(username, pat);
     }
 
     private static Optional<String> currentRemoteUrl(Repository repo) {
@@ -266,7 +241,7 @@ public class GitHandler {
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
-            Optional<CredentialsProvider> credsOpt = resolveCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentials();
 
             boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
             if (needCreds && credsOpt.isEmpty()) {
@@ -287,7 +262,7 @@ public class GitHandler {
             StoredConfig config = repo.getConfig();
             String remoteUrl = config.getString("remote", "origin", "url");
 
-            Optional<CredentialsProvider> credsOpt = resolveCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentials();
             boolean needCreds = (remoteUrl != null) && requiresCredentialsForUrl(remoteUrl);
             if (needCreds && credsOpt.isEmpty()) {
                 throw new IOException("Missing Git credentials (username and Personal Access Token).");
@@ -315,7 +290,7 @@ public class GitHandler {
     /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<CredentialsProvider> credsOpt = resolveCredentials();
+            Optional<CredentialsProvider> credsOpt = getCredentials();
             PullCommand pullCommand = git.pull();
             if (credsOpt.isPresent()) {
                 pullCommand.setCredentialsProvider(credsOpt.get());
@@ -332,32 +307,32 @@ public class GitHandler {
         }
     }
 
-    public void fetchOnCurrentBranch() throws IOException {
+    public void fetchOnCurrentBranch() throws JabRefException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
-            Optional<CredentialsProvider> credsOpt = resolveCredentials();
-
-            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
-            if (needCreds && credsOpt.isEmpty()) {
-                throw new IOException("Missing Git credentials (username and Personal Access Token).");
+            Optional<CredentialsProvider> credentials = getCredentials();
+            boolean needCredentials = currentRemoteUrl(git.getRepository())
+                    .map(GitHandler::requiresCredentialsForUrl)
+                    .orElse(false);
+            if (needCredentials && credentials.isEmpty()) {
+                throw new JabRefException("Missing Git credentials (username and Personal Access Token).");
             }
             FetchCommand fetchCommand = git.fetch();
-            if (credsOpt.isPresent()) {
-                fetchCommand.setCredentialsProvider(credsOpt.get());
-            }
+            credentials.ifPresent(fetchCommand::setCredentialsProvider);
             fetchCommand.call();
         } catch (TransportException e) {
+            LOGGER.error("Error during transport", e);
             Throwable throwable = e;
             while (throwable != null) {
                 if (throwable instanceof NoRemoteRepositoryException) {
-                    throw new IOException("No repository found at the configured remote. Please check the URL or your token settings.", e);
+                    throw new JabRefException("No repository found at the configured remote. Please check the URL or your token settings.", e);
                 }
                 throwable = throwable.getCause();
             }
             String message = e.getMessage();
-            throw new IOException("Failed to fetch from remote: " + (message == null ? "unknown transport error" : message), e);
-        } catch (GitAPIException e) {
-            throw new IOException("Failed to fetch from remote: " + e.getMessage(), e);
+            throw new JabRefException("Failed to fetch from remote: " + (message == null ? "unknown transport error" : message), e);
+        } catch (GitAPIException | IOException e) {
+            LOGGER.error("Failed to fetch", e);
+            throw new JabRefException("Failed to fetch from remote: " + e.getMessage(), e);
         }
     }
 
@@ -380,8 +355,8 @@ public class GitHandler {
         return Optional.empty();
     }
 
-    public static Optional<GitHandler> fromAnyPath(Path anyPathInsideRepo) {
-        return findRepositoryRoot(anyPathInsideRepo).map(GitHandler::new);
+    public static Optional<GitHandler> fromAnyPath(Path anyPathInsideRepo, GitPreferences gitPreferences) {
+        return findRepositoryRoot(anyPathInsideRepo).map(path -> new GitHandler(path, gitPreferences));
     }
 
     public File getRepositoryPathAsFile() {
@@ -413,5 +388,15 @@ public class GitHandler {
                .setCommit(true)
                .call();
         }
+    }
+
+    private Optional<CredentialsProvider> getCredentials() {
+        if (gitPreferences.getPat().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(
+                new UsernamePasswordCredentialsProvider(
+                        gitPreferences.getUsername(),
+                        gitPreferences.getPat()));
     }
 }

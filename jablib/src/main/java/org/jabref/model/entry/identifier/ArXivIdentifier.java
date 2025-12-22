@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +16,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class ArXivIdentifier extends EprintIdentifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);
 
-    private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
+    private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|html|pdf)/|arxiv|arXiv";
     private final String identifier;
     private final String classification;
     private final String version;

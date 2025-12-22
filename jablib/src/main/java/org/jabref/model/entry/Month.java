@@ -2,12 +2,14 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 /**
  * Represents a Month of the Year.
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public enum Month {
 
     JANUARY("January", "jan", 1),
@@ -69,7 +71,7 @@ public enum Month {
      * This method accepts three types of months:
      * - Single and Double Digit months from 1 to 12 (01 to 12)
      * - 3 Digit BibTeX strings (jan, feb, mar...) possibly with # prepended
-     * - Full English Month identifiers.
+     * - Full English month identifiers.
      *
      * @param value the given value
      * @return the corresponding Month instance
@@ -189,7 +191,7 @@ public enum Month {
     }
 
     /**
-     * Returns the name of the long in unabbreviated english.
+     * Returns the name of the long in unabbreviated English.
      *
      * @return Month
      */
