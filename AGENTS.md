@@ -52,8 +52,8 @@ Agents **must not**:
 - Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.\n\nUsing JavaFX Obersavable lists is considered best practice, too.
 - Use modern Java data structures\n\nBAD: new HashSet<>(Arrays.asList(...))\n\nGOOD: Sef.of(...)
 - Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
-- To create an empty list we use `List.of()` instead of `Collections.emptyList()`",
-  "Correctly spelled variable names (meaning: no typos in variable names)
+- To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
+- Correctly spelled variable names (meaning: no typos in variable names).
 - Use StringJoiner instead of StringBuilder (if possible)
 - Prefer immutability and explicit nullability (JSpecify)
 - New methods (and new classes) should follow the Single-responsibility principle (SRP).
