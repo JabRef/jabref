@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator.plausibility;
 
 import java.util.Optional;
+
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.model.entry.Month;
 
