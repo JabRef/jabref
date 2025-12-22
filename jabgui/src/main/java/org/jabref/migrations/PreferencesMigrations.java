@@ -22,7 +22,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -541,9 +541,9 @@ public class PreferencesMigrations {
         List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
                                                            .split("\n"));
         if (formatterCleanups.size() >= 2
-                && (FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
-                || FieldFormatterCleanups.DISABLED.equals(formatterCleanups.getFirst()))) {
-            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
+                && (FieldFormatterCleanupActions.ENABLED.equals(formatterCleanups.getFirst())
+                || FieldFormatterCleanupActions.DISABLED.equals(formatterCleanups.getFirst()))) {
+            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanupActions.ENABLED.equals(formatterCleanups.getFirst())
                                                                     ? Boolean.TRUE
                                                                     : Boolean.FALSE);
 
