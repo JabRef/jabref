@@ -706,6 +706,8 @@ public class JabRefCliPreferences implements CliPreferences {
         // will never be translated.
         Localization.setLanguage(getLanguage());
 
+
+
         // region last files opened
         defaults.put(RECENT_DATABASES, "");
         defaults.put(LAST_FOCUSED, "");
@@ -785,6 +787,11 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GITHUB_REMEMBER_PAT_KEY, false);
         // endregion
     }
+
+    public void setLanguageDependentDefaultValues() {
+
+    }
+
 
     // region PushToApplicationPreferences
 

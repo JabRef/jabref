@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SequencedMap;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
@@ -61,7 +60,6 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -583,7 +581,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(workspacePreferences.languageProperty(), (_, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
             if (oldValue != newValue) {
-                setLanguageDependentDefaultValues();
                 Localization.setLanguage(newValue);
             }
         });
