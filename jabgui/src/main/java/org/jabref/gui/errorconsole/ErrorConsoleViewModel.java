@@ -8,11 +8,13 @@ import java.util.stream.Collectors;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.ObservableList;
+import javafx.scene.input.KeyCombination;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.logging.LogMessages;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
@@ -118,7 +120,8 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             dialogService.showInformationDialogAndWait(Localization.lang("Issue report successful"),
                     Localization.lang("Your issue was reported in your browser.") + "\n" +
                             Localization.lang("The log and exception information was copied to your clipboard.") + " " +
-                            Localization.lang("Please paste this information (with Ctrl+V) in the issue description.") + "\n" +
+                            Localization.lang("Please paste this information (with %0) in the issue description.",
+                                    preferences.getKeyBindingRepository().getKeyCombination(KeyBinding.PASTE).map(KeyCombination::getDisplayText).orElse("")) + "\n" +
                             Localization.lang("Please also add all steps to reproduce this issue, if possible."));
 
             URIBuilder uriBuilder = new URIBuilder()
