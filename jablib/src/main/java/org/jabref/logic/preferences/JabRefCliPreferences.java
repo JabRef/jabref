@@ -143,6 +143,7 @@ import org.slf4j.LoggerFactory;
  * is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
+@SuppressWarnings("NullAway")
 public class JabRefCliPreferences implements CliPreferences {
     public static final String LANGUAGE = "language";
 
@@ -706,8 +707,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // will never be translated.
         Localization.setLanguage(getLanguage());
 
-
-
         // region last files opened
         defaults.put(RECENT_DATABASES, "");
         defaults.put(LAST_FOCUSED, "");
@@ -789,9 +788,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     public void setLanguageDependentDefaultValues() {
-
     }
-
 
     // region PushToApplicationPreferences
 
