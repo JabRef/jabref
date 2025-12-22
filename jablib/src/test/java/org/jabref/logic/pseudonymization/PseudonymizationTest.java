@@ -187,20 +187,13 @@ class PseudonymizationTest {
         List<BibEntry> entries = result.bibDatabaseContext().getEntries();
         assertEquals(3, entries.size());
 
-        String myGroup1 = entries.getFirst().getField(StandardField.GROUPS).orElseThrow();
-        String myGroup2 = entries.get(1).getField(StandardField.GROUPS).orElseThrow();
-        String otherGroup = entries.get(2).getField(StandardField.GROUPS).orElseThrow();
-
+        assertEquals(Optional.of("group-1"), entries.getFirst().getField(StandardField.GROUPS));
         assertEquals(Optional.of("group-1, group-2"), entries.get(1).getField(StandardField.GROUPS));
-
-        assertEquals(myGroup1, myGroup2);
-        assertTrue(myGroup1.startsWith("group-"));
-        assertTrue(otherGroup.startsWith("group-"));
-        assertNotEquals(myGroup1, otherGroup);
+        assertEquals(Optional.of("group-2"), entries.get(2).getField(StandardField.GROUPS));
 
         Map<String, String> mapping = result.valueMapping();
-        assertEquals("MyGroup", mapping.get(myGroup1));
-        assertEquals("OtherGroup", mapping.get(otherGroup));
+        assertEquals("MyGroup", mapping.get("MyGroup1"));
+        assertEquals("OtherGroup", mapping.get("OtherGroup"));
     }
 
     @Test
