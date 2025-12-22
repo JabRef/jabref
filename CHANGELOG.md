@@ -35,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to change the Git username and PAT in Network Preferences. [#14509](https://github.com/JabRef/jabref/pull/14509)
 - When parsing a plain text citation, we added support for recognizing and extracting arXiv identifiers. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We introduced a new "Search Engine URL Template" setting in Preferences to allow users to customize their search engine URL templates [#12268](https://github.com/JabRef/jabref/issues/12268)
+- We enabled CLI parameters for customizing citation key generation in JabKit, allowing users to override citation key patterns without modifying GUI settings. [#14361](https://github.com/JabRef/jabref/issues/14361)
 - We added the option to pseudonymize a library using the GUI, via the tools tab in the Main Menu. [#14118](https://github.com/JabRef/jabref/issues/14118)
 - We added export options (Markdown and JSON) for AI Summary and AI Chat. [#13868](https://github.com/JabRef/jabref/issues/13868)
 
@@ -51,22 +52,27 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - <kbd>Tab</kbd> in the last text field of a tab moves the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
 - When pasting invalid BibTeX data, the content is now pasted as `@Misc` with the raw data in the `comment` field. [#14520](https://github.com/JabRef/jabref/pull/14520)
 - We changed fixed-value ComboBoxes to SearchableComboBox for better usability. [#14083](https://github.com/JabRef/jabref/issues/14083)
+- We made the box for both entry types and fields types searchable in "Custom entry types". [#14547](https://github.com/JabRef/jabref/issues/14547)
 - We renamed "Search pre-configured" to "Search pre-selected" and "Web search fetchers" to "Pre-selected fetchers". [#14557](https://github.com/JabRef/jabref/issues/14557)
 - We renamed "ArXiv" to "arXiv" in New Entry dialog. [#14643](https://github.com/JabRef/jabref/issues/14643)
 
 ### Fixed
 
+- We fixed an issue where the AI export button was enabled even when the chat history was empty. [#14640](https://github.com/JabRef/jabref/issues/14640)
 - We fixed an issue where pressing <kbd>ESC</kbd> in the preferences dialog would not always close the dialog. [#8888](https://github.com/JabRef/jabref/issues/8888)
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
 - We fixed the fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
 - We fixed localization of the "New Entries" dialog. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
 - We readded the missing gui commands for importing and exporting preferences. [#14492](https://github.com/JabRef/jabref/pull/14492)
+- We fixed the keyboard navigation in the entry editor: pressing <kbd>Shift</kbd> + <kbd>Tab</kbd> on the first field now correctly focuses the last field of the previous tab. [#14513](https://github.com/JabRef/jabref/issues/14513)
 - We fixed a crash when importing preferences from older JabRef versions. [#14497](https://github.com/JabRef/jabref/issues/14497)
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
 
 ### Removed
+
+- We removed `generate-citation-keys` as a standalone command in JabKit. Use `citationkeys generate` instead. ([#14361](https://github.com/JabRef/jabref/issues/14361), [#14500](https://github.com/JabRef/jabref/pull/14500))
 
 ## [6.0-alpha.3] – 2025-10-30
 
