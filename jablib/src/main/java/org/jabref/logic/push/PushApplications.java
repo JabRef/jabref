@@ -4,23 +4,31 @@ import java.util.Optional;
 
 public enum PushApplications {
 
-    EMACS("emacs", "Emacs"),
-    LYX("lyx", "LyX/Kile"),
-    TEXMAKER("texmaker", "Texmaker"),
-    TEXSTUDIO("texstudio", "TeXstudio"),
-    TEXWORKS("texworks", "TeXworks"),
-    VIM("vim", "Vim"),
-    WIN_EDT("winedt", "WinEdt"),
-    SUBLIME_TEXT("sublime", "Sublime Text"),
+    EMACS("emacs", "Emacs", "emacsPath"),
+    LYX("lyx", "LyX/Kile", "lyxpipe"),
+    TEXMAKER("texmaker", "Texmaker", "texmakerPath"),
+    TEXSTUDIO("texstudio", "TeXstudio", "TeXstudioPath"),
+    TEXWORKS("texworks", "TeXworks", "TeXworksPath"),
+    VIM("vim", "Vim", "vim"),
+    WIN_EDT("winedt", "WinEdt", "winEdtPath"),
+    SUBLIME_TEXT("sublime", "Sublime Text", "sublimeTextPath"),
     TEXSHOP("texshop", "TeXShop"),
-    VSCODE("vscode", "VScode");
+    VSCODE("vscode", "VScode", "VScodePath");
 
     private final String id;
     private final String displayName;
+    private String key;
+
 
     PushApplications(String id, String displayName) {
         this.id = id;
         this.displayName = displayName;
+    }
+
+    PushApplications(String id, String displayName, String key) {
+        this.id = id;
+        this.displayName = displayName;
+        this.key = key;
     }
 
     public static Optional<PushApplications> getApplicationByDisplayName(String key) {
@@ -48,4 +56,9 @@ public enum PushApplications {
     public String getDisplayName() {
         return displayName;
     }
+
+    public String getKey(){
+        return key;
+    }
+
 }
