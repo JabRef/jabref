@@ -247,6 +247,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         event.consume();
                     }
                 }
+                if (event.getCode() == KeyCode.TAB && event.isShiftDown()) {
+                    if (isFirstFieldInCurrentTab(child)) {
+                        moveToPreviousTabAndFocus();
+                        event.consume();
+                    }
+                }
             });
 
             if (child instanceof Parent childParent) {
@@ -610,6 +616,45 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     /**
+     * Checks if the given TextField is the first field in the currently selected tab.
+     *
+     * @param node the Node to check
+     * @return true if this is the first field in the current tab, false otherwise
+     */
+    boolean isFirstFieldInCurrentTab(Node node) {
+        if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+            return false;
+        }
+
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (!(selectedTab instanceof FieldsEditorTab currentTab)) {
+            return false;
+        }
+
+        Collection<Field> shownFields = currentTab.getShownFields();
+        // Try field-based check first
+        if (!shownFields.isEmpty() && node.getId() != null) {
+            Optional<Field> firstField = shownFields.stream().findFirst();
+
+            boolean matchesFirstFieldId = firstField.map(Field::getName)
+                                                    .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                                                    .orElse(false);
+            if (matchesFirstFieldId) {
+                return true;
+            }
+        }
+
+        // Fallback: check visual tree
+        if (currentTab.getContent() instanceof Parent parent) {
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            Optional<Node> firstFocusable = findFirstFocusableNode(searchRoot);
+            return firstFocusable.map(n -> n == node).orElse(false);
+        }
+
+        return false;
+    }
+
+    /**
      * Checks if the given TextField is the last field in the currently selected tab.
      *
      * @param node the Node to check
@@ -663,6 +708,17 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
     }
 
+    void moveToPreviousTabAndFocus() {
+        tabbed.getSelectionModel().selectPrevious();
+
+        Platform.runLater(() -> {
+            Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+            if (selectedTab instanceof FieldsEditorTab currentTab) {
+                focusLastFieldInTab(currentTab);
+            }
+        });
+    }
+
     private void focusFirstFieldInTab(FieldsEditorTab tab) {
         Node tabContent = tab.getContent();
         if (tabContent instanceof Parent parent) {
@@ -687,6 +743,30 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             // Final fallback: focus first focusable node within the editor grid (e.g., a button-only tab)
             Parent searchRoot = findEditorGridParent(parent).orElse(parent);
             findFirstFocusableNode(searchRoot).ifPresent(Node::requestFocus);
+        }
+    }
+
+    private void focusLastFieldInTab(FieldsEditorTab tab) {
+        Node tabContent = tab.getContent();
+        if (tabContent instanceof Parent parent) {
+            // First try to find field by ID
+            Collection<Field> shownFields = tab.getShownFields();
+            if (!shownFields.isEmpty()) {
+                Optional<Field> lastField = shownFields.stream()
+                                                       .reduce((first, second) -> second);
+
+                Field field = lastField.get();
+                String lastFieldId = field.getName();
+                Optional<TextInputControl> lastTextInput = findTextInputById(parent, lastFieldId);
+                if (lastTextInput.isPresent()) {
+                    lastTextInput.get().requestFocus();
+                    return;
+                }
+            }
+
+            // Final fallback: focus last focusable node within the editor grid
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            findLastFocusableNode(searchRoot).ifPresent(Node::requestFocus);
         }
     }
 
