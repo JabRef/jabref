@@ -15,7 +15,7 @@ import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
@@ -92,7 +92,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         // FieldFormatterCleanupsPanel, included via <?import ...> in FXML
 
-        Optional<FieldFormatterCleanups> saveActions = initialMetaData.getSaveActions();
+        Optional<FieldFormatterCleanupActions> saveActions = initialMetaData.getSaveActions();
         saveActions.ifPresentOrElse(value -> {
             cleanupsDisableProperty.setValue(!value.isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
@@ -113,18 +113,18 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             newMetaData.markAsNotProtected();
         }
 
-        FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(
+        FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(
                 !cleanupsDisableProperty().getValue(),
                 cleanupsProperty());
 
-        if (FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanups.getConfiguredActions())) {
+        if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
             newMetaData.clearSaveActions();
         } else {
             // if all actions have been removed, remove the save actions from the MetaData
-            if (fieldFormatterCleanups.getConfiguredActions().isEmpty()) {
+            if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
                 newMetaData.clearSaveActions();
             } else {
-                newMetaData.setSaveActions(fieldFormatterCleanups);
+                newMetaData.setSaveActions(fieldFormatterCleanupActions);
             }
         }
 

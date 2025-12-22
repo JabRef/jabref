@@ -14,16 +14,30 @@ jobs:
     steps:
       - name: Assign the user or unassign stale assignments
         id: assign
-        # uses: takanome-dev/assign-issue-action@edge
-        uses: takanome-dev/assign-issue-action@feat/github-teams-support
+        uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
-          # If this is updated, also update the number at unassign-issues.yml
-          days_until_unassign: 21
-          # One person should work on one issue only
-          max_assignments: 1
           maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
-          assigned_comment: >
+          allow_self_assign_author: false
+          assignment_suggestion_comment: >
+            👋 Hey @{{ handle }}, looks like you’re eager to work on this issue — great! 🎉
+            It also looks like you don't know how to assign issues to yourself.
+            Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
+            It will also guide you in other aspects of contributing to JabRef.
+          # 2: One person could have one PR opened and while waiting for feedback working on another one.
+          max_assignments: 2
+          max_overall_assignment_labels: "good first issue"
+          max_overall_assignment_message: >
+            ### ⚠️ Assignment Limit Reached for Good First Issues
+
+
+            Hi @{{ handle }}, you've already reached the limit of **{{ max_overall_assignment_count }}** active assignments for good first issues.
+            Good first issues are a great way to get started with contributing to JabRef, and we want to ensure that all newcomers have the opportunity to work on them.
+
+
+            While waiting for feedback on your current assignments, you are invited to move on to more advanced issues.
+            Start at checking the [good second issues](https://github.com/JabRef/jabref/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen%20label%3A%22good%20second%20issue%22%20no%3Aassignee).
+          assigned_comment_newcomer: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
 
@@ -44,15 +58,16 @@ jobs:
 
 
             Happy coding! 🚀
-          assignment_suggestion_comment: >
-            👋 Hey @{{ handle }}, looks like you’re eager to work on this issue — great! 🎉
-            It also looks like you don't know how to assign issues to yourself.
-            Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
-            It will also guide you in other aspects of contributing to JabRef.
+          assigned_comment: >
+            Thank you for your continued work in JabRef.
+            At this point, you probably already know the basics and the important links.
+            If not, our [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) is the place you should go to.
+          # If this is updated, also update the number at unassign-issues.yml
+          days_until_unassign: 14
           unassigned_comment: |
             ### 📋 Assignment Update
 
-            Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
+            Hi @{{ handle }} you have been unassigned from this issue.
 
             <details>
             <summary>Next steps</summary>

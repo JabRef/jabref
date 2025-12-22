@@ -6,7 +6,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
@@ -32,13 +32,12 @@ public class CleanupSingleFieldPanel extends VBox {
     }
 
     private void bindProperties() {
-        formatterCleanupsPanel.cleanupsDisableProperty().bind(viewModel.cleanupsEnabled.not());
         formatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanups);
     }
 
     @FXML
     private void onApply() {
-        FieldFormatterCleanups selectedFormatters = viewModel.getSelectedFormatters();
+        FieldFormatterCleanupActions selectedFormatters = viewModel.getSelectedFormatters();
         CleanupTabSelection selectedTab = CleanupTabSelection.ofFormatters(selectedFormatters);
         dialogViewModel.apply(selectedTab);
         getScene().getWindow().hide();
