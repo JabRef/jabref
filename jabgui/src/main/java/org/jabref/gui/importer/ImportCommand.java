@@ -94,7 +94,7 @@ public class ImportCommand extends SimpleCommand {
         List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
 
         if (selectedFiles.isEmpty()) {
-            return; // User cancelled or no files selected
+            return; // User canceled or no files selected
         }
 
         importMultipleFiles(selectedFiles, importers, fileDialogConfiguration.getSelectedExtensionFilter());
@@ -103,8 +103,9 @@ public class ImportCommand extends SimpleCommand {
     private void importMultipleFiles(List<Path> files, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
         for (Path file : files) {
             if (!Files.exists(file)) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Import"),
-                        Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Import"),
+                        Localization.lang("File %0 not found", file.getFileName().toString()));
                 return;
             }
         }
