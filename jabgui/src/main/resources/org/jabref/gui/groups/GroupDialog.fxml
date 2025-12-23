@@ -105,6 +105,12 @@
                             <Tooltip text="%Automatically create groups by date"/>
                         </tooltip>
                     </RadioButton>
+                    <RadioButton fx:id="directoryRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Directory">
+                        <tooltip>
+                            <Tooltip text="%Dynamically group entries by linked files in a directory"/>
+                        </tooltip>
+                    </RadioButton>
                 </VBox>
                 <Separator orientation="VERTICAL"/>
                 <StackPane HBox.hgrow="ALWAYS">
@@ -200,6 +206,13 @@
                         </VBox>
                         <CheckBox fx:id="dateGroupIncludeEmpty"
                                   text="%Include entries without date"/>
+                    </VBox>
+                    <VBox visible="${directoryRadioButton.selected}">
+                        <Label text="%Directory"/>
+                        <HBox spacing="10.0">
+                            <TextField fx:id="directoryGroupPath" HBox.hgrow="ALWAYS" prefHeight="30.0"/>
+                            <Button onAction="#directoryGroupBrowse" text="%Browse" prefHeight="30.0"/>
+                        </HBox>
                     </VBox>
                 </StackPane>
             </HBox>

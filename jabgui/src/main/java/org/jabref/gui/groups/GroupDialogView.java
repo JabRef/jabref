@@ -109,6 +109,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private ComboBox<DateGranularity> dateGroupOptionCombo;
     @FXML private CheckBox dateGroupIncludeEmpty;
 
+    // Directory Group
+    @FXML private RadioButton directoryRadioButton;
+    @FXML private TextField directoryGroupPath;
+
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
@@ -236,6 +240,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         dateGroupOptionCombo.valueProperty().bindBidirectional(viewModel.dateGroupOptionProperty());
         dateGroupIncludeEmpty.selectedProperty().bindBidirectional(viewModel.dateGroupIncludeEmptyProperty());
 
+        // Directory Group bindings
+        directoryRadioButton.selectedProperty().bindBidirectional(viewModel.typeDirectoryProperty());
+        directoryGroupPath.textProperty().bindBidirectional(viewModel.directoryGroupPathProperty());
+
         // Initialize Date Group ComboBoxes
         dateGroupFieldCombo.setItems(FXCollections.observableArrayList(FieldFactory.getDateFields()));
         dateGroupOptionCombo.setItems(FXCollections.observableArrayList(DateGranularity.values()));
@@ -278,6 +286,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML
     private void texGroupBrowse() {
         viewModel.texGroupBrowse();
+    }
+
+    @FXML
+    private void directoryGroupBrowse() {
+        viewModel.directoryGroupBrowse();
     }
 
     @FXML
