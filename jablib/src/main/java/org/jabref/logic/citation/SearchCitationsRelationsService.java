@@ -40,7 +40,6 @@ public class SearchCitationsRelationsService {
                                            GrobidPreferences grobidPreferences,
                                            AiService aiService,
                                            BibEntryTypesManager entryTypesManager) {
-
         this.citationFetcher = CitationFetcherFactory.INSTANCE.getCitationFetcher(
                 citationFetcherTypeProperty.get().getFetcherName(),
                 importerPreferences,
