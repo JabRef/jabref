@@ -350,7 +350,7 @@ public class FilePreferences {
         return coversDownloadLocation;
     }
 
-    public void setOpenFileExplorerInLastUsedDirectory(String value) {
+    public void setCoversDownloadLocation(String value) {
         this.coversDownloadLocation.set(value);
     }
 }

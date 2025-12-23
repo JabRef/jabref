@@ -129,7 +129,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setOpenFileExplorerInFileDirectory(openFileExplorerInFilesDirectory.getValue());
         filePreferences.setOpenFileExplorerInLastUsedDirectory(openFileExplorerInLastDirectory.getValue());
         filePreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
-        filePreferences.setOpenFileExplorerInLastUsedDirectory(coversDownloadLocation.getValue());
+        filePreferences.setCoversDownloadLocation(coversDownloadLocation.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
