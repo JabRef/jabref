@@ -185,7 +185,7 @@ class CSLFormatUtilsTest {
 
                 // Semicolons
                 Arguments.of(
-                        "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 July;34(3):45–67. Available from: https://github.com/JabRef<p></p>",
+                        "1. Smith B, Jones B, Williams J, . Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 July;34(3):45–67. Available from: https://github.com/JabRef<p></p>",
                         STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -231,7 +231,7 @@ class CSLFormatUtilsTest {
 
                 // Naked numeric - "1"
                 Arguments.of(
-                        "1 Smith Bill, Jones Bob, Williams Jeff. Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.<p></p>",
+                        "1 Smith Bill, Jones Bob, Williams Jeff, . Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -531,7 +531,7 @@ class CSLFormatUtilsTest {
 
                 // Type: "1"
                 Arguments.of(
-                        "3 Smith Bill, Jones Bob, Williams Jeff. Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.<p></p>",
+                        "3 Smith Bill, Jones Bob, Williams Jeff, . Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
                 ),
 
