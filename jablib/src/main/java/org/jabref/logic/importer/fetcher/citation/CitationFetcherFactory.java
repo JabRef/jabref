@@ -11,7 +11,9 @@ import org.jabref.logic.importer.util.GrobidPreferences;
 public enum CitationFetcherFactory {
     INSTANCE;
 
-    public CitationFetcher getCitationFetcher(String citationFetcherName, ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences,
+    public CitationFetcher getCitationFetcher(String citationFetcherName,
+                                              ImporterPreferences importerPreferences,
+                                              ImportFormatPreferences importFormatPreferences,
                                               CitationKeyPatternPreferences citationKeyPatternPreferences,
                                               GrobidPreferences grobidPreferences,
                                               AiService aiService) {
