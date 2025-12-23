@@ -105,7 +105,7 @@ public class ImportCommand extends SimpleCommand {
             if (!Files.exists(file)) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Import"),
-                        Localization.lang("File %0 not found", file.getFileName().toString()));
+                        Localization.lang("File %0 not found.", file.getFileName().toString()));
                 return;
             }
         }
