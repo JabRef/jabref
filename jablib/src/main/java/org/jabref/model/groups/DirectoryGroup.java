@@ -129,7 +129,7 @@ public class DirectoryGroup extends AbstractGroup {
                 subgroups.add(subgroup);
             });
         } catch (IOException e) {
-            LOGGER.error("Error scanning subdirectories of {}: {}", directoryPath, e.getMessage());
+            LOGGER.error("Error scanning subdirectories of {}", directoryPath, e);
         }
 
         return subgroups;
