@@ -74,7 +74,7 @@ public class AutoSetFileLinksUtil {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
-            Collection<LinkedFile> associatedNotLinkedFiles = new ArrayList<>();
+            Collection<LinkedFile> associatedNotLinkedFiles = Set.of();
 
             try {
                 associatedNotLinkedFiles = findAssociatedNotLinkedFiles(entry);
