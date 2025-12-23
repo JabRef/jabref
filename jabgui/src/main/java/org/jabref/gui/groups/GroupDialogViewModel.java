@@ -331,7 +331,14 @@ public class GroupDialogViewModel {
         AbstractGroup resultingGroup = null;
         try {
             String groupName = nameProperty.getValue().trim();
-            if (Boolean.TRUE.equals(typeExplicitProperty.getValue())) {
+            // Check Directory structure checkbox first (has priority over radio buttons)
+            if (Boolean.TRUE.equals(typeDirectoryProperty.getValue())) {
+                resultingGroup = new DirectoryGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        Path.of(directoryGroupPathProperty.getValue().trim())
+                );
+            } else if (Boolean.TRUE.equals(typeExplicitProperty.getValue())) {
                 resultingGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
@@ -418,12 +425,6 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         dateGroupFieldProperty.getValue(),
                         dateGroupOptionProperty.getValue()
-                );
-            } else if (Boolean.TRUE.equals(typeDirectoryProperty.getValue())) {
-                resultingGroup = new DirectoryGroup(
-                        groupName,
-                        groupHierarchySelectedProperty.getValue(),
-                        Path.of(directoryGroupPathProperty.getValue().trim())
                 );
             }
 
@@ -740,16 +741,6 @@ public class GroupDialogViewModel {
 
     public ValidationStatus directoryGroupPathValidationStatus() {
         return directoryGroupPathValidator.getValidationStatus();
-    }
-
-    public void directoryGroupBrowse() {
-        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank() ?
-                                      FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
-                                      Path.of(directoryGroupPathProperty.get()))
-                .build();
-        dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                     .ifPresent(dir -> directoryGroupPathProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     // Date Group Property Getters

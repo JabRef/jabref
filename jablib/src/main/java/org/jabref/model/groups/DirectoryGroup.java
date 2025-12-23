@@ -1,12 +1,20 @@
 package org.jabref.model.groups;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A group that mirrors a directory structure from the file system.
@@ -14,6 +22,8 @@ import org.jabref.model.entry.field.StandardField;
  * Sub-groups are automatically created for subdirectories.
  */
 public class DirectoryGroup extends AbstractGroup {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryGroup.class);
 
     private final Path directoryPath;
     private final Set<String> matchedEntries = new HashSet<>();
@@ -98,6 +108,55 @@ public class DirectoryGroup extends AbstractGroup {
     @Override
     public boolean isDynamic() {
         return true;
+    }
+
+    /**
+     * Scans the directory and returns a list of DirectoryGroups for each subdirectory.
+     * This is used to automatically create the group tree structure mirroring the file system.
+     *
+     * @return List of DirectoryGroup objects for immediate subdirectories
+     */
+    public List<DirectoryGroup> scanSubdirectories() {
+        List<DirectoryGroup> subgroups = new ArrayList<>();
+
+        if (!Files.isDirectory(directoryPath)) {
+            LOGGER.warn("Cannot scan subdirectories: {} is not a directory", directoryPath);
+            return subgroups;
+        }
+
+        try (Stream<Path> paths = Files.list(directoryPath)) {
+            paths.filter(Files::isDirectory)
+                 .sorted()
+                 .forEach(subDir -> {
+                     String subDirName = subDir.getFileName().toString();
+                     DirectoryGroup subgroup = new DirectoryGroup(
+                             subDirName,
+                             GroupHierarchyType.INCLUDING,
+                             subDir
+                     );
+                     subgroups.add(subgroup);
+                 });
+        } catch (IOException e) {
+            LOGGER.error("Error scanning subdirectories of {}: {}", directoryPath, e.getMessage());
+        }
+
+        return subgroups;
+    }
+
+    /**
+     * Recursively builds the complete group tree structure from the directory.
+     * Each subdirectory becomes a subgroup, and this process continues recursively.
+     *
+     * @param parentNode The parent GroupTreeNode to add subgroups to
+     */
+    public void buildGroupTree(GroupTreeNode parentNode) {
+        List<DirectoryGroup> subgroups = scanSubdirectories();
+
+        for (DirectoryGroup subgroup : subgroups) {
+            GroupTreeNode childNode = parentNode.addSubgroup(subgroup);
+            // Recursively build tree for subdirectories
+            subgroup.buildGroupTree(childNode);
+        }
     }
 
     @Override

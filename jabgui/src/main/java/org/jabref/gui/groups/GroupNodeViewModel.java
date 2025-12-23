@@ -41,6 +41,7 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGroup;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
@@ -466,6 +467,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof DateGroup) {
             return false;
+        } else if (group instanceof DirectoryGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -481,7 +484,8 @@ public class GroupNodeViewModel {
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
-                 TexGroup _ ->
+                 TexGroup _,
+                 DirectoryGroup _ ->
                     true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -504,7 +508,8 @@ public class GroupNodeViewModel {
             case AllEntriesGroup _,
                  ExplicitGroup _,
                  SearchGroup _,
-                 TexGroup _ ->
+                 TexGroup _,
+                 DirectoryGroup _ ->
                     true;
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
@@ -535,7 +540,8 @@ public class GroupNodeViewModel {
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
                  DateGroup _,
-                 TexGroup _ ->
+                 TexGroup _,
+                 DirectoryGroup _ ->
                     true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -561,7 +567,8 @@ public class GroupNodeViewModel {
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
-                 TexGroup _ ->
+                 TexGroup _,
+                 DirectoryGroup _ ->
                     true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
