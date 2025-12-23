@@ -27,6 +27,8 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -790,14 +792,31 @@ public class JabRefCliPreferences implements CliPreferences {
     // region PushToApplicationPreferences
 
     private PushToApplicationPreferences getPushToApplicationPreferencesFromBackingStore(PushToApplicationPreferences defaults) {
+        Map<String, String> commandPaths = new HashMap<>(defaults.getCommandPaths());
+        Map<String, String> lookup = new HashMap<>();
+        lookup.put(PushApplications.EMACS.getDisplayName(), PUSH_EMACS_PATH);
+        lookup.put(PushApplications.LYX.getDisplayName(), PUSH_LYXPIPE);
+        lookup.put(PushApplications.TEXMAKER.getDisplayName(), PUSH_TEXMAKER_PATH);
+        lookup.put(PushApplications.TEXSTUDIO.getDisplayName(), PUSH_TEXSTUDIO_PATH);
+        lookup.put(PushApplications.TEXWORKS.getDisplayName(), PUSH_TEXWORKS_PATH);
+        lookup.put(PushApplications.VIM.getDisplayName(), PUSH_VIM);
+        lookup.put(PushApplications.WIN_EDT.getDisplayName(), PUSH_WINEDT_PATH);
+        lookup.put(PushApplications.SUBLIME_TEXT.getDisplayName(), PUSH_SUBLIME_TEXT_PATH);
+        lookup.put(PushApplications.VSCODE.getDisplayName(), PUSH_VSCODE_PATH);
+        for(Map.Entry<String, String> entry : commandPaths.entrySet()) {
+            String oldKey = lookup.get(entry.getKey());
+            String defaultValue =  entry.getValue();
+            entry.setValue(getEmptyIsDefault(oldKey, defaultValue));
+        }
         return new PushToApplicationPreferences(
                 get(PUSH_TO_APPLICATION, defaults.getActiveApplicationName()),
-                defaults.getCommandPaths(),
+                new SimpleMapProperty<>(FXCollections.observableMap(commandPaths)),
                 get(PUSH_EMACS_ADDITIONAL_PARAMETERS, defaults.getEmacsArguments()),
                 get(PUSH_VIM_SERVER, defaults.getVimServer()),
-                defaults.getCiteCommand(),
-                defaults.getDefaultCiteCommand()
+                CitationCommandString.from(get(PUSH_CITE_COMMAND, defaults.getCiteCommand().toString())),
+                CitationCommandString.from(get(PUSH_CITE_COMMAND, defaults.getDefaultCiteCommand().toString()))
         );
+
     }
 
     public PushToApplicationPreferences getPushToApplicationPreferences() {
@@ -894,8 +913,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return PREFS_NODE.get(key, (String) defaults.get(key));
     }
 
-    public String getEmptyIsDefault(String key) {
-        String defaultValue = (String) defaults.get(key);
+    public String getEmptyIsDefault(String key, String defaultValue) {
         String result = PREFS_NODE.get(key, defaultValue);
         if ("".equals(result)) {
             return defaultValue;
@@ -920,12 +938,6 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private boolean getBooleanDefault(String key) {
-
-        if (defaults.get(key) == null) {
-            // Couldn't run the application without this condition.
-            LOGGER.info("************************* THIS KEY IS NULL {}", key);
-            return false;
-        }
         return (Boolean) defaults.get(key);
     }
 

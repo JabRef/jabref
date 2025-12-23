@@ -3,7 +3,6 @@ package org.jabref.logic.push;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
@@ -26,21 +25,21 @@ public class PushToApplicationPreferences {
 
 
     private PushToApplicationPreferences(){
-        this.activeApplicationName = new SimpleStringProperty(PushApplications.TEXSTUDIO.getDisplayName());
+        this.activeApplicationName = new SimpleStringProperty("Texmaker");
         Map<String, String> commands = new HashMap<>();
-        commands.put(PushApplications.TEXMAKER.getDisplayName(), getEmptyIsDefault(PushApplications.TEXMAKER.getKey(), OS.detectProgramPath("texmaker", "Texmaker")));
-        commands.put(PushApplications.WIN_EDT.getDisplayName(),  getEmptyIsDefault(PushApplications.WIN_EDT.getKey(), OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt")));
-        commands.put(PushApplications.TEXSTUDIO.getDisplayName(),  getEmptyIsDefault(PushApplications.TEXSTUDIO.getKey(), OS.detectProgramPath("texstudio", "TeXstudio")));
-        commands.put(PushApplications.TEXWORKS.getDisplayName(), getEmptyIsDefault(PushApplications.TEXWORKS.getKey(), OS.detectProgramPath("texworks", "TeXworks")));
-        commands.put(PushApplications.SUBLIME_TEXT.getDisplayName(), getEmptyIsDefault(PushApplications.SUBLIME_TEXT.getKey(), OS.detectProgramPath("subl", "Sublime")));
-        commands.put(PushApplications.LYX.getDisplayName(), getEmptyIsDefault(PushApplications.LYX.getKey(), System.getProperty("user.home") + File.separator + ".lyx/lyxpipe"));
-        commands.put(PushApplications.VSCODE.getDisplayName(), getEmptyIsDefault(PushApplications.VSCODE.getKey(), OS.detectProgramPath("Code", "Microsoft VS Code")));
-        commands.put(PushApplications.VIM.getDisplayName(), getEmptyIsDefault(PushApplications.VIM.getKey(), "vim"));
+        commands.put("Texmaker", OS.detectProgramPath("texmaker", "Texmaker"));
+        commands.put("WinEdt",  OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        commands.put("TeXstudio",  OS.detectProgramPath("texstudio", "TeXstudio"));
+        commands.put("TeXworks", OS.detectProgramPath("texworks", "TeXworks"));
+        commands.put("Sublime Text", OS.detectProgramPath("subl", "Sublime"));
+        commands.put("LyX/Kile", System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
+        commands.put("VScode", OS.detectProgramPath("Code", "Microsoft VS Code"));
+        commands.put("Vim", "vim");
 
         if(OS.WINDOWS){
-            commands.put(PushApplications.EMACS.getDisplayName(), "emacsclient.exe");
+            commands.put("Emacs", "emacsclient.exe");
         }else if(OS.OS_X || OS.LINUX){
-            commands.put(PushApplications.EMACS.getDisplayName(), "emacsclient");
+            commands.put("Emacs", "emacsclient");
         }
         this.commandPaths = new SimpleMapProperty<>(FXCollections.observableMap(commands));
 
@@ -48,15 +47,6 @@ public class PushToApplicationPreferences {
         this.vimServer = new SimpleStringProperty("vim");
         this.citeCommand = new SimpleObjectProperty<>(CitationCommandString.from("\\cite{key1,key2}"));
         this.defaultCiteCommand = new SimpleObjectProperty<>(CitationCommandString.from("\\cite{key1,key2}"));
-    }
-
-    private String getEmptyIsDefault(String key, String defaultValue) {
-        final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
-        String result = PREFS_NODE.get(key, defaultValue);
-        if ("".equals(result)) {
-            return defaultValue;
-        }
-        return result;
     }
 
 
