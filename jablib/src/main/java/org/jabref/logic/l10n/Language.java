@@ -32,7 +32,7 @@ public enum Language {
     POLISH("Polish", "pl"),
     PORTUGUESE("Português", "pt"),
     RUSSIAN("Russian", "ru"),
-    SIMPLIFIED_CHINESE("Chinese (Simplified)", "zh_CN"),
+    SIMPLIFIED_CHINESE("简体中文 (Chinese Simplified)", "zh_CN"),
     SPANISH("Español", "es"),
     SWEDISH("Svenska", "sv"),
     TAGALOG("Tagalog/Filipino", "tl"),
