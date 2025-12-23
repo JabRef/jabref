@@ -40,6 +40,11 @@ Agents **must not**:
 - Rewrite large sections “for cleanliness”
 - Bypass tests or CI checks
 - Reformat code
+- Write entire PRs
+- Write replies to PR review comments
+- Submit code the contributor doesn't understand
+- Generate documentation or comments without contributor's review
+- Automate the submission of code changes
 
 ---
 
