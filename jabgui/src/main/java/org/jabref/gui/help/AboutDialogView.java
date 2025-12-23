@@ -1,7 +1,6 @@
 package org.jabref.gui.help;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
@@ -37,9 +36,7 @@ public class AboutDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        Button btn = (Button) this.getDialogPane().lookupButton(copyVersionButton);
         ControlHelper.setAction(copyVersionButton, getDialogPane(), ignored -> copyVersionToClipboard());
-
     }
 
     public AboutDialogViewModel getViewModel() {

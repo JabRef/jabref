@@ -46,8 +46,24 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
+    private Optional<Button> getDefaultButton() {
+        return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));
+    }
+
+    private ButtonType getDefaultButtonType() {
+        return getDialogPane().getButtonTypes().stream()
+                              .filter(buttonType -> buttonType.getButtonData().isDefaultButton())
+                              .findFirst()
+                              .orElse(ButtonType.OK);
+    }
+
+    private void setDialogIcon(Image image) {
+        Stage dialogWindow = (Stage) getDialogPane().getScene().getWindow();
+        dialogWindow.getIcons().add(image);
+    }
+
     ///  Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
-    private void applyButtonFix(DialogPane pane) {
+    public static void applyButtonFix(DialogPane pane) {
         // Force the window to fit the new font content bounds
         if (pane.getScene() != null && pane.getScene().getWindow() != null) {
             pane.getScene().getWindow().sizeToScene();
@@ -67,21 +83,5 @@ public class BaseDialog<T> extends Dialog<T> {
                 button.applyCss();
             }
         }
-    }
-
-    private Optional<Button> getDefaultButton() {
-        return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));
-    }
-
-    private ButtonType getDefaultButtonType() {
-        return getDialogPane().getButtonTypes().stream()
-                              .filter(buttonType -> buttonType.getButtonData().isDefaultButton())
-                              .findFirst()
-                              .orElse(ButtonType.OK);
-    }
-
-    private void setDialogIcon(Image image) {
-        Stage dialogWindow = (Stage) getDialogPane().getScene().getWindow();
-        dialogWindow.getIcons().add(image);
     }
 }
