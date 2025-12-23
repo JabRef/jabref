@@ -152,7 +152,8 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
-    jlinkOptions.addAll("--generate-cds-archive")
+    // general jLinkOptions are set in "--generate-cds-archive"
+    jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
         options.addAll(
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",

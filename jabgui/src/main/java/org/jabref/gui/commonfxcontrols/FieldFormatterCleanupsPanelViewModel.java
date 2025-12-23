@@ -13,7 +13,7 @@ import javafx.scene.control.SelectionModel;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.model.entry.field.Field;
@@ -38,9 +38,9 @@ public class FieldFormatterCleanupsPanelViewModel {
     public void resetToRecommended() {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             if (databaseContext.isBiblatexMode()) {
-                cleanupsListProperty.setAll(FieldFormatterCleanups.RECOMMEND_BIBLATEX_ACTIONS);
+                cleanupsListProperty.setAll(FieldFormatterCleanupActions.RECOMMEND_BIBLATEX_ACTIONS);
             } else {
-                cleanupsListProperty.setAll(FieldFormatterCleanups.RECOMMEND_BIBTEX_ACTIONS);
+                cleanupsListProperty.setAll(FieldFormatterCleanupActions.RECOMMEND_BIBTEX_ACTIONS);
             }
         });
     }

@@ -15,6 +15,10 @@ jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
     }
+    conflictResolution {
+        select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
+        select("org.gradlex:jna-platform", "net.java.dev.jna:jna-platform-jpms")
+    }
 }
 
 // Tell gradle which jar to use for which platform
@@ -71,7 +75,6 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
-
 }
 
 extraJavaModuleInfo {
