@@ -49,8 +49,7 @@ public class SearchCitationsRelationsService {
                 grobidPreferences,
                 aiService);
 
-        // Subscribing to changes in the citation fetcher type preference
-        citationFetcherTypeProperty.addListener((observable, oldValue, newValue) -> {
+        citationFetcherTypeProperty.addListener((_, _, newValue) -> {
             this.citationFetcher = CitationFetcherFactory.INSTANCE.getCitationFetcher(
                     newValue.getFetcherName(),
                     importerPreferences,
