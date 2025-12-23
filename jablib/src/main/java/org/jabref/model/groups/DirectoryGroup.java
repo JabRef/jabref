@@ -78,18 +78,16 @@ public class DirectoryGroup extends AbstractGroup {
      * @return true if the entry has a file in this directory
      */
     public boolean hasFileInDirectory(BibEntry entry) {
-        return entry.getField(StandardField.FILE)
-                    .map(fileField -> {
-                        // Parse the file field and check if any file is in this directory
-                        // File field format: description:path:type
-                        String[] parts = fileField.split(":");
-                        if (parts.length >= 2) {
-                            Path filePath = Path.of(parts[1]);
-                            return isFileInDirectory(filePath);
-                        }
-                        return false;
-                    })
-                    .orElse(false);
+        return entry.getField(StandardField.FILE).map(fileField -> {
+            // Parse the file field and check if any file is in this directory
+            // File field format: description:path:type
+            String[] parts = fileField.split(":");
+            if (parts.length >= 2) {
+                Path filePath = Path.of(parts[1]);
+                return isFileInDirectory(filePath);
+            }
+            return false;
+        }).orElse(false);
     }
 
     /**
@@ -125,17 +123,11 @@ public class DirectoryGroup extends AbstractGroup {
         }
 
         try (Stream<Path> paths = Files.list(directoryPath)) {
-            paths.filter(Files::isDirectory)
-                 .sorted()
-                 .forEach(subDir -> {
-                     String subDirName = subDir.getFileName().toString();
-                     DirectoryGroup subgroup = new DirectoryGroup(
-                             subDirName,
-                             GroupHierarchyType.INCLUDING,
-                             subDir
-                     );
-                     subgroups.add(subgroup);
-                 });
+            paths.filter(Files::isDirectory).sorted().forEach(subDir -> {
+                String subDirName = subDir.getFileName().toString();
+                DirectoryGroup subgroup = new DirectoryGroup(subDirName, GroupHierarchyType.INCLUDING, subDir);
+                subgroups.add(subgroup);
+            });
         } catch (IOException e) {
             LOGGER.error("Error scanning subdirectories of {}: {}", directoryPath, e.getMessage());
         }
@@ -177,9 +169,7 @@ public class DirectoryGroup extends AbstractGroup {
         if (!(o instanceof DirectoryGroup other)) {
             return false;
         }
-        return Objects.equals(getName(), other.getName())
-                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
-                && Objects.equals(directoryPath, other.directoryPath);
+        return Objects.equals(getName(), other.getName()) && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext()) && Objects.equals(directoryPath, other.directoryPath);
     }
 
     @Override
@@ -189,14 +179,6 @@ public class DirectoryGroup extends AbstractGroup {
 
     @Override
     public String toString() {
-        return "DirectoryGroup{" +
-                "name='" + getName() + '\'' +
-                ", directoryPath=" + directoryPath +
-                ", context=" + context +
-                ", color=" + color +
-                ", isExpanded=" + isExpanded +
-                ", description=" + description +
-                ", iconName=" + iconName +
-                '}';
+        return "DirectoryGroup{" + "name='" + getName() + '\'' + ", directoryPath=" + directoryPath + ", context=" + context + ", color=" + color + ", isExpanded=" + isExpanded + ", description=" + description + ", iconName=" + iconName + '}';
     }
 }

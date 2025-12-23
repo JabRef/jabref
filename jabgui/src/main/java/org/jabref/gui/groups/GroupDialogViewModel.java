@@ -571,8 +571,8 @@ public class GroupDialogViewModel {
     public void directoryGroupBrowse() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank() ?
-                        FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
-                        Path.of(directoryGroupPathProperty.getValue()))
+                                      FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
+                                      Path.of(directoryGroupPathProperty.getValue()))
                 .build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                      .ifPresent(directory -> directoryGroupPathProperty.setValue(directory.toAbsolutePath().toString()));
