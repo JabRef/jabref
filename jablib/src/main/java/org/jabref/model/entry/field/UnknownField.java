@@ -6,6 +6,7 @@ import java.util.Objects;
 
 /// This class models a field that is not natively known to JabRef.
 /// It might be a custom field added by the user.
+/// Or it may originate from an importer if it cannot be mapped to one of the existing fields by its name and/or properties.
 /// It is not called "CustomField", because there was the idea that StandardFields could be customized.
 public class UnknownField implements Field {
     private String name;
