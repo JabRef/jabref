@@ -4,6 +4,9 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Objects;
 
+/// This class models a field that is not known to JabRef during compile-time.
+/// It might be a custom field added by the user.
+/// It is not called "CustomField", because there was the idea that StandardFields could be customized.
 public class UnknownField implements Field {
     private String name;
     private final EnumSet<FieldProperty> properties;
