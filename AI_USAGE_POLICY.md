@@ -55,8 +55,9 @@ We recommend AI tools trained on JabRef data, such as [DeepWiki](https://deepwik
 ❌ **Not allowed (generative use):**
 
 - Write entire PRs
-- Submit code you don't understand
-- Generate documentation or comments without your review
+- Write replies to PR review comments
+- Submit code the contributor doesn't understand
+- Generate documentation or comments without contributor's review
 - Automate the submission of code changes
 
 ## Why do we have this policy?
