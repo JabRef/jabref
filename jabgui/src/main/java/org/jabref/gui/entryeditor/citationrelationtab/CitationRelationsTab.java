@@ -811,20 +811,19 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void onSearchForRelationsSucceed(CitationComponents citationComponents,
                                              List<BibEntry> fetchedList,
                                              ObservableList<CitationRelationItem> observableList) {
-
         hideNodes(citationComponents.abortButton(), citationComponents.progress());
 
         // TODO: This could be a wrong database, because the user might have switched to another library
         //       If we were on fixing this, we would need to a) associate a BibEntry with a database or b) pass the database at "bindToEntry"
         BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElse(new BibDatabase());
         observableList.setAll(
-                fetchedList.stream().map(entr ->
+                fetchedList.stream().map(entry ->
                                    duplicateCheck.containsDuplicate(
                                                          database,
-                                                         entr,
+                                                         entry,
                                                          BibDatabaseModeDetection.inferMode(database))
-                                                 .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
-                                                 .orElseGet(() -> new CitationRelationItem(entr, false)))
+                                                 .map(localEntry -> new CitationRelationItem(entry, localEntry, true))
+                                                 .orElseGet(() -> new CitationRelationItem(entry, false)))
                            .toList()
         );
 
@@ -844,7 +843,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         showNodes(citationComponents.abortButton(), citationComponents.progress());
         hideNodes(citationComponents.refreshButton(), citationComponents.importButton());
 
-        citationComponents.abortButton().setOnAction(event -> {
+        citationComponents.abortButton().setOnAction(_ -> {
             hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
             showNodes(citationComponents.refreshButton());
             task.cancel();
