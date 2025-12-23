@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -104,18 +103,14 @@ class AutoSetFileLinksUtilTest {
     void findAllAssociatedNotLinkedFilesInsteadOfTheFirstOne(@TempDir Path tempDir) throws IOException {
         Path directory = tempDir.resolve("files");
         Path oldPath = directory.resolve("old/minimal.pdf");
-        Files.createDirectories(oldPath.getParent());
-        Files.createFile(oldPath);
-
-        LinkedFile stale = new LinkedFile("", oldPath.toString(), "PDF");
-        BibEntry entry = new BibEntry(StandardEntryType.Misc);
-        entry.addFile(stale);
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withFiles(List.of(new LinkedFile("", oldPath.toString(), "PDF")));
 
         // Simulate a file move
         String newPath1String = "new1/minimal.pdf";
         Path newPath1 = directory.resolve(newPath1String);
         Files.createDirectories(newPath1.getParent());
-        Files.move(oldPath, newPath1);
+        Files.createFile(newPath1);
 
         // Create a second copy of the file
         String newPath2String = "new2/minimal.pdf";
@@ -132,11 +127,10 @@ class AutoSetFileLinksUtilTest {
                 filePreferences,
                 autoLinkPrefs);
 
-        Collection<String> matchedFiles = util.findAssociatedNotLinkedFiles(entry)
-                                              .stream().map(LinkedFile::getLink).toList();
-        Set<String> expected = Set.of(newPath1String, newPath2String);
-        // findAssociatedNotLinkedFiles does not guarantee how the returned files are ordered
-        // so here we compare equality without considering order
-        assertEquals(new HashSet<>(matchedFiles), expected);
+        Collection<LinkedFile> matchedFiles = util.findAssociatedNotLinkedFiles(entry);
+        Set<LinkedFile> expected = Set.of(
+                new LinkedFile("", newPath1String, "PDF"),
+                new LinkedFile("", newPath2String, "PDF"));
+        assertEquals(expected, Set.copyOf(matchedFiles));
     }
 }
