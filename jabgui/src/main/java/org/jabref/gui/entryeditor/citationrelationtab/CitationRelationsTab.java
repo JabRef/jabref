@@ -400,7 +400,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         fetcherCombo.setTooltip(new Tooltip(Localization.lang("Select Citation Fetcher")));
         fetcherCombo.setPrefWidth(160);
         styleTopBarNode(fetcherCombo, 75.0);
-        fetcherCombo.setConverter(new StringConverter<CitationFetcherType>() {
+        fetcherCombo.setConverter(new StringConverter<>() {
             @Override
             public String toString(CitationFetcherType citationFetcherType) {
                 return citationFetcherType.getName();
@@ -408,9 +408,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             @Override
             public CitationFetcherType fromString(String s) {
-                if (s == null) {
-                    return CitationFetcherType.SEMANTICSCHOLAR;
-                }
                 for (CitationFetcherType provider : CitationFetcherType.values()) {
                     if (provider.getName().equalsIgnoreCase(s)) {
                         return provider;
@@ -477,21 +474,17 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
 
         fetcherCombo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                // Cancel any running searches so they don't continue with the old fetcher
-                if (citingTask != null && !citingTask.isCancelled()) {
-                    citingTask.cancel();
-                }
-                if (citedByTask != null && !citedByTask.isCancelled()) {
-                    citedByTask.cancel();
-                }
-
-                entryEditorPreferences.setCitationFetcherType(newValue);
-                // Ensure the search service uses the chosen fetcher
-                searchCitationsRelationsService.setCitationFetcherName(newValue.getFetcherName());
-                searchForRelations(citingComponents, citedByComponents);
-                searchForRelations(citedByComponents, citingComponents);
+            // Cancel any running searches so they don't continue with the old fetcher
+            if (citingTask != null && !citingTask.isCancelled()) {
+                citingTask.cancel();
             }
+            if (citedByTask != null && !citedByTask.isCancelled()) {
+                citedByTask.cancel();
+            }
+
+            entryEditorPreferences.setCitationFetcherType(newValue);
+            searchForRelations(citingComponents, citedByComponents);
+            searchForRelations(citedByComponents, citingComponents);
         });
 
         // Create SplitPane to hold all nodes above

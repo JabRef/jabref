@@ -23,8 +23,6 @@ public enum CitationFetcherType {
                     CrossRefCitationFetcher.FETCHER_NAME;
             case SEMANTICSCHOLAR ->
                     SemanticScholarCitationFetcher.FETCHER_NAME;
-            default ->
-                    throw new IllegalArgumentException("Unknown CitationFetcherType: " + this);
         };
     }
 

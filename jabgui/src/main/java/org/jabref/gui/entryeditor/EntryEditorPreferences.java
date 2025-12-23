@@ -248,6 +248,10 @@ public class EntryEditorPreferences {
         this.citationFetcherType.set(citationFetcherType);
     }
 
+    public ObjectProperty<CitationFetcherType> citationFetcherTypeProperty() {
+        return citationFetcherType;
+    }
+
     public boolean shouldShowSciteTab() {
         return this.shouldShowSciteTab.get();
     }
