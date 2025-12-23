@@ -2,11 +2,15 @@ package org.jabref.gui.util;
 
 import java.util.Optional;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import org.jabref.gui.icon.IconTheme;
@@ -18,6 +22,7 @@ import com.airhacks.afterburner.injection.Injector;
 public class BaseDialog<T> extends Dialog<T> {
 
     protected BaseDialog() {
+
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
@@ -35,8 +40,33 @@ public class BaseDialog<T> extends Dialog<T> {
             }
         });
 
+        this.setOnShowing(_ -> applyButtonFix(this.getDialogPane()));
+
         setDialogIcon(IconTheme.getJabRefImage());
         setResizable(true);
+    }
+
+    ///  Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
+    private void applyButtonFix(DialogPane pane) {
+        // Force the window to fit the new font content bounds
+        if (pane.getScene() != null && pane.getScene().getWindow() != null) {
+            pane.getScene().getWindow().sizeToScene();
+        }
+
+        for (ButtonType type : pane.getButtonTypes()) {
+            Node node = pane.lookupButton(type);
+            if (node instanceof Button button) {
+                // Disabling uniform size prevents the ButtonBar from squeezing
+                // buttons into a width that is slightly too small for 10pt or larger text.
+
+                ButtonBar.setButtonUniformSize(button, false);
+                button.setMinWidth(Region.USE_PREF_SIZE);
+                button.setMaxWidth(Double.MAX_VALUE);
+
+                // Re-trigger CSS to ensure prefWidth is calculated using the new font metrics
+                button.applyCss();
+            }
+        }
     }
 
     private Optional<Button> getDefaultButton() {

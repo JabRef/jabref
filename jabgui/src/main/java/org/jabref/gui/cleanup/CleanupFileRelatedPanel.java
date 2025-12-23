@@ -19,7 +19,7 @@ import org.jabref.model.entry.field.StandardField;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
-public class CleanupFileRelatedPanel extends VBox {
+public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
 
     @FXML private Label cleanupRenamePdfLabel;
 

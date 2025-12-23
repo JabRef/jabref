@@ -12,7 +12,7 @@ import org.jabref.logic.cleanup.CleanupTabSelection;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
-public class CleanupMultiFieldPanel extends VBox {
+public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanupDoi;
     @FXML private CheckBox cleanupEprint;
     @FXML private CheckBox cleanupUrl;

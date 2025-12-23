@@ -7,7 +7,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -29,8 +29,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class CleanupDialog extends BaseDialog<Void> {
 
     @FXML private TabPane tabPane;
+    @FXML private ButtonType cleanUpButton;
 
-    private final ButtonType cleanUpButton = new ButtonType(Localization.lang("Clean up"), ButtonBar.ButtonData.APPLY);
     private final CleanupDialogViewModel viewModel;
 
     // Constructor for multiple-entry cleanup
@@ -42,10 +42,13 @@ public class CleanupDialog extends BaseDialog<Void> {
                          Supplier<LibraryTab> tabSupplier,
                          TaskExecutor taskExecutor) {
 
+
+        super();
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
                 stateManager, undoManager, tabSupplier, taskExecutor
         );
+
 
         init(databaseContext, preferences);
     }
@@ -75,6 +78,7 @@ public class CleanupDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
+
         CleanupPreferences initialPreset = preferences.getCleanupPreferences();
         FilePreferences filePreferences = preferences.getFilePreferences();
 
@@ -88,15 +92,11 @@ public class CleanupDialog extends BaseDialog<Void> {
                 new Tab(Localization.lang("Multi-field"), multiFieldPanel)
         );
 
-        getDialogPane().getButtonTypes().addAll(cleanUpButton, ButtonType.CANCEL);
+        Button btn = (Button) getDialogPane().lookupButton(cleanUpButton);
 
-        getDialogPane().lookupButton(cleanUpButton).addEventFilter(ActionEvent.ACTION, event -> {
+        btn.addEventFilter(ActionEvent.ACTION, event -> {
             Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
-            if (selectedTab != null && selectedTab.getContent() instanceof CleanupSingleFieldPanel panel) {
-                viewModel.apply(panel.getSelectedTab());
-            } else if (selectedTab != null && selectedTab.getContent() instanceof CleanupFileRelatedPanel panel) {
-                viewModel.apply(panel.getSelectedTab());
-            } else if (selectedTab != null && selectedTab.getContent() instanceof CleanupMultiFieldPanel panel) {
+            if (selectedTab != null && selectedTab.getContent() instanceof CleanupPanel panel) {
                 viewModel.apply(panel.getSelectedTab());
             }
             event.consume();
