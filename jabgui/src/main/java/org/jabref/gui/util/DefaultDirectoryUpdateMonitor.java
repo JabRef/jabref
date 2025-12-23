@@ -14,9 +14,9 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
+
+import org.jspecify.annotations.Nullable;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
@@ -31,6 +31,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Monitors directories for file system changes using Java's WatchService.
  * Notifies registered listeners when files or directories are created, modified, or deleted.
+ * <p>
+ * This is separate from {@link DefaultFileUpdateMonitor} because directory monitoring requires
+ * different semantics: it monitors directory contents (files and subdirectories) rather than
+ * individual file changes, and supports recursive monitoring of directory trees.
+ * </p>
  */
 public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateMonitor {
 
@@ -40,13 +45,13 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     private final Map<WatchKey, Path> watchKeyToPath = new HashMap<>();
     private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
-    private final AtomicReference<Optional<JabRefException>> monitorFailure = new AtomicReference<>(Optional.empty());
+    private @Nullable JabRefException monitorFailure;
 
     @Override
     public void run() {
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
             this.watcher = watchService;
-            monitorFailure.set(Optional.empty());
+            monitorFailure = null;
 
             while (notShutdown.get()) {
                 WatchKey key;
@@ -95,7 +100,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
             }
         } catch (IOException e) {
             JabRefException exception = new WatchServiceUnavailableException(e.getMessage(), e.getLocalizedMessage(), e.getCause());
-            monitorFailure.set(Optional.of(exception));
+            monitorFailure = exception;
             LOGGER.warn("Error during directory watching", e);
         }
     }
@@ -142,6 +147,14 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         return null;
     }
 
+    /**
+     * Adds a listener for directory changes.
+     *
+     * @param directory the directory to monitor
+     * @param listener the listener to notify when changes occur
+     * @param recursive if true, also monitors all subdirectories
+     * @throws IOException if the directory cannot be registered for monitoring
+     */
     @Override
     public void addListenerForDirectory(Path directory, DirectoryUpdateListener listener, boolean recursive) throws IOException {
         if (!isActive()) {

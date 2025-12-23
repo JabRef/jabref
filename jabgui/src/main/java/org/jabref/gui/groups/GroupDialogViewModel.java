@@ -104,7 +104,6 @@ public class GroupDialogViewModel {
 
     private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
 
-    // Directory Group Properties
     private final BooleanProperty typeDirectoryProperty = new SimpleBooleanProperty();
     private final StringProperty directoryGroupPathProperty = new SimpleStringProperty("");
 
@@ -263,7 +262,7 @@ public class GroupDialogViewModel {
                     Path inputPath = Path.of(input);
                     return Files.isDirectory(inputPath);
                 },
-                ValidationMessage.error(Localization.lang("Please provide a valid directory path.")));
+                ValidationMessage.error(Localization.lang("Please provide a valid directory.")));
 
         typeSearchProperty.addListener((_, _, isSelected) -> {
             if (Boolean.TRUE.equals(isSelected)) {
@@ -290,7 +289,7 @@ public class GroupDialogViewModel {
         });
 
         typeDirectoryProperty.addListener((_, _, isSelected) -> {
-            if (Boolean.TRUE.equals(isSelected)) {
+            if (isSelected) {
                 validator.addValidators(directoryGroupPathValidator);
             } else {
                 validator.removeValidators(directoryGroupPathValidator);
@@ -332,7 +331,7 @@ public class GroupDialogViewModel {
         try {
             String groupName = nameProperty.getValue().trim();
             // Check Directory structure checkbox first (has priority over radio buttons)
-            if (Boolean.TRUE.equals(typeDirectoryProperty.getValue())) {
+            if (typeDirectoryProperty.get()) {
                 resultingGroup = new DirectoryGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
@@ -525,10 +524,8 @@ public class GroupDialogViewModel {
 
                 TexGroup group = (TexGroup) editedGroup;
                 texGroupFilePathProperty.setValue(group.getFilePath().toString());
-            } else if (editedGroup.getClass() == DirectoryGroup.class) {
+            } else if (editedGroup instanceof DirectoryGroup group) {
                 typeDirectoryProperty.setValue(true);
-
-                DirectoryGroup group = (DirectoryGroup) editedGroup;
                 directoryGroupPathProperty.setValue(group.getDirectoryPath().toString());
             }
         }
