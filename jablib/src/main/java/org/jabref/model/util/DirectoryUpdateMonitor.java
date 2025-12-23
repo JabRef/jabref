@@ -6,6 +6,11 @@ import java.nio.file.Path;
 /**
  * Interface for monitoring directory changes.
  * Implementations watch directories for file system changes and notify listeners.
+ * <p>
+ * This interface is part of the DirectoryGroup feature infrastructure.
+ * Currently used by {@link org.jabref.gui.util.DefaultDirectoryUpdateMonitor}.
+ * Future integration will enable real-time updates when files are added/removed from monitored directories.
+ * </p>
  */
 public interface DirectoryUpdateMonitor {
 
