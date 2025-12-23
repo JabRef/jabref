@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added the ability to drag and drop images to the comments field. [#14620](https://github.com/JabRef/jabref/issues/10559)
+- We added the ability to drag and drop images to the comments field. [#10559](https://github.com/JabRef/jabref/issues/10559)
 - We added functionality to use `,` and `>` symbols inside keywords by putting `\` symbol before them. [#12810](https://github.com/JabRef/jabref/issues/12810)
 - We added the `eprinttype` field to the General entry editor tab. [#14555](https://github.com/JabRef/jabref/issues/14555)
 - We added a right-click option to delete custom BST styles in the entry preview. [#14352](https://github.com/JabRef/jabref/issues/14352)

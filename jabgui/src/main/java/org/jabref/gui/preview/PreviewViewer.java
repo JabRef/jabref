@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -222,6 +223,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
+        AtomicReference<String> baseURL = new AtomicReference<>("");
         if (databaseContext != null) {
             databaseContext
                     .getFirstExistingFileDir(preferences.getFilePreferences())
@@ -232,12 +234,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                             if (!baseUrl.endsWith("/")) {
                                 baseUrl += "/";
                             }
-                            layoutText = formatPreviewText(baseUrl, text);
+                            baseURL.set(baseUrl);
                         } catch (MalformedURLException e) {
                             LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
                         }
                     });
         }
+        layoutText = formatPreviewText(baseURL.get(), text);
         highlightLayoutText();
         setHvalue(0);
     }

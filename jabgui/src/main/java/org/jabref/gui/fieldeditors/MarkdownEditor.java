@@ -114,7 +114,7 @@ public class MarkdownEditor extends SimpleEditor {
         List<Path> fileDirList = databaseContext.getFileDirectories(filePreferences);
         Path relativePath = FileUtil.relativize(file.toPath(), fileDirList);
 
-        // If the path is already relative, just insert the Markdown text
+        // If the path can be reached from the configured directories somehow, just insert the Markdown text
         if (!relativePath.isAbsolute()) {
             insertMarkdownText(relativePath.toString(), textArea);
             return true;
