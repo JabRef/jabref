@@ -19,7 +19,10 @@ tasks.withType<Test>().configureEach {
         maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
     }
     // See https://docs.gradle.org/current/userguide/performance.html#b_fork_tests_into_multiple_processes for details.
-    forkEvery = 100
+    if (!providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)) {
+        maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
+        forkEvery = 100
+    }
 }
 
 testlogger {
