@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jspecify.annotations.Nullable;
-
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
 import org.jabref.model.util.DirectoryUpdateListener;
@@ -25,6 +23,7 @@ import org.jabref.model.util.DirectoryUpdateMonitor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
