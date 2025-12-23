@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -97,20 +98,36 @@ public class MarkdownEditor extends SimpleEditor {
         });
     }
 
+    /**
+     * Inserts Markdown Link for a file dropped into the editor, copying file to the database file directory if necessary
+     *
+     * @param file is the file that is dropped into the editor
+     * @param textArea is the Editor text area
+     * @return true if the Markdown Text was inserted, false otherwise
+     */
     private boolean insertFileToLibraryAndAppend(File file, EditorTextArea textArea) {
         Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (fileDir.isEmpty()) {
+            LOGGER.warn("No file directory found, cannot drop file");
             return false;
         }
+        List<Path> fileDirList = databaseContext.getFileDirectories(filePreferences);
+        Path relativePath = FileUtil.relativize(file.toPath(), fileDirList);
+
+        // If the path is already relative, just insert the Markdown text
+        if (!relativePath.isAbsolute()) {
+            insertMarkdownText(relativePath.toString(), textArea);
+            return true;
+        }
         Path destination = fileDir.get().resolve(file.getName());
-        String relativePath = FileUtil.relativize(destination, databaseContext.getFileDirectories(filePreferences)).toString();
+        String relativePathString = FileUtil.relativize(destination, fileDirList).toString();
         try {
             Files.copy(file.toPath(), destination);
-            insertMarkdownText(relativePath, textArea);
+            insertMarkdownText(relativePathString, textArea);
             return true;
         } catch (FileAlreadyExistsException e) {
-            LOGGER.error("Dropped file already exists: {} ", destination, e);
-            insertMarkdownText(relativePath, textArea);
+            LOGGER.warn("Dropped file already exists: {} ", destination, e);
+            insertMarkdownText(relativePathString, textArea);
             return true;
         } catch (IOException e) {
             LOGGER.error("Could not copy file: {} ", destination, e);

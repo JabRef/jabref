@@ -505,10 +505,10 @@ public class FileUtil {
     }
 
     /**
-     * Test if the file is an Image file by simply checking if it's extension is an image extension
+     * Test if the file is an image file by simply checking if its extension is an image extension
      *
      * @param file The file to check
-     * @return True if file extension is an image, false otherwise
+     * @return true if file extension is an image, false otherwise
      */
     public static boolean isImage(Path file) {
         return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
