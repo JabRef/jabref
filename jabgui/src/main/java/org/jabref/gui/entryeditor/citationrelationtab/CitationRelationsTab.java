@@ -472,7 +472,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingComponents, citedByComponents));
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
 
-        fetcherCombo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
+            // Even though only the citing fetcher can be changed, the current UI code requires both sides to be refreshed
+
             // Cancel any running searches so they don't continue with the old fetcher
             if (citingTask != null && !citingTask.isCancelled()) {
                 citingTask.cancel();
@@ -482,6 +484,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             entryEditorPreferences.setCitationFetcherType(newValue);
+
             searchForRelations(citingComponents, citedByComponents);
             searchForRelations(citedByComponents, citingComponents);
         });
@@ -706,7 +709,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
 
-        link.setOnAction(e -> {
+        link.setOnAction(_ -> {
             CrossRef doiFetcher = new CrossRef();
 
             BackgroundTask.wrap(() -> doiFetcher.findIdentifier(citationComponents.entry()))
