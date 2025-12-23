@@ -1,6 +1,7 @@
 package org.jabref.toolkit.commands;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -24,11 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Answers;
 import picocli.CommandLine;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractJabKitTest {
     protected final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -142,11 +142,11 @@ public abstract class AbstractJabKitTest {
         }
     }
 
-    static void assertFileExists(Path path) {
+    static void assertFileExists(Path path) throws IOException {
         assertTrue(Files.exists(path), "though found " + Files.list(path.getParent()).map(f -> f.toString()).collect(Collectors.joining(", ")));
     }
 
-    static void assertFileDoesntExist(Path path) {
+    static void assertFileDoesntExist(Path path) throws IOException {
         assertFalse(Files.exists(path), "though found " + Files.list(path.getParent()).map(f -> f.toString()).collect(Collectors.joining(", ")));
     }
 }
