@@ -10,26 +10,353 @@ This `AGENTS.md` file acts as a set of instructions that some AI coding tools ca
 
 ---
 
-## GUIDELINES FOR Generating any analysis of the codebase
+# AGENTS.md — JabRef
 
-### Scope
+This document defines rules and expectations for **automated agents** (AI tools, bots, scripts) interacting with the JabRef repositories.
 
-“Analysis files” include any docs created to brief or steer humans or AI tools about this repo. Examples: `CLAUDE.md`, `copilot-instructions.md`, `.cursorrules`, `.cursor/rules`, `.aider.conf`, `.aider.md`, `.prompt`, `.codeassist.md`, `AI_NOTES.md`, and similar files.
+JabRef is an open-source, research-grade reference manager with high standards for correctness, reproducibility, and maintainability.
 
-### Requirements
+---
 
-For every analysis file, you **MUST ALWAYS** do all of the following:
+## Human Guidance
 
-1. Put a prominent header at the very top, within the first 10 lines.
-2. Link to **AGENTS.md** and **CONTRIBUTING.md**.
-3. Include a short summary of our AI policy in plain language.
-4. Include the entirety of the `<guidelines>` section in the analysis file.
+Guide the human to use [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).
 
-### Standard header block
+---
 
-Use this exact block for Markdown files:
+## General Principles
 
-```md
+Agents **must**:
+
+- Respect existing architecture, coding style, and conventions
+- Prefer minimal, reviewable changes
+- Preserve backward compatibility unless explicitly instructed otherwise
+- Avoid speculative refactoring
+- Never commit generated code without human review
+
+Agents **must not**:
+
+- Introduce new dependencies without justification
+- Rewrite large sections “for cleanliness”
+- Bypass tests or CI checks
+- Reformat code
+- Write entire PRs
+- Write replies to PR review comments
+- Submit code the contributor doesn't understand
+- Generate documentation or comments without contributor's review
+- Automate the submission of code changes
+
+---
+
+## Code Quality Requirements
+
+### Java / JVM
+
+- Target the configured **Gradle toolchain**
+- Use **Java 24+ features**
+- Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
+   Using JavaFX Obersvable lists is considered best practice, too.
+- Use modern Java data structures
+   BAD: new HashSet<>(Arrays.asList(...))
+   GOOD: Set.of(...)
+- Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
+- To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
+- Correctly spelled variable names (meaning: no typos in variable names).
+- Use StringJoiner instead of StringBuilder (if possible)
+- Prefer immutability and explicit nullability (JSpecify)
+- New methods (and new classes) should follow the Single-responsibility principle (SRP).
+
+### Style
+
+- Follow existing formatting; do not reformat unrelated code
+- Match naming conventions exactly
+- Keep methods small and focused
+- Avoid code duplication
+- Avoid premature abstractions
+- Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
+- Ensure that tests are green before committing
+- Code should not be reformatted only because of syntax. There need to be new statements added if reformatting.
+- Follow the principles of \"Effective Java\"
+- Follow the principles of \"Clean Code\"
+- Remove commented code. (To keep a history of changes git was made for.)
+- No \"new Thread()\", use \"org.jabref.logic.util.BackgroundTask\" and its \"executeWith\"
+- Use Java Text blocks (\"\"\") for multiline string constants
+- Use compiled patterns (Pattern.compile)
+   Examples:
+   NOT: x.matches(\".*\\\\s{2,}.*\")
+   BUT:
+   private final static PATTERN = ...
+   and then PATTERN.matcher(x)
+- Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
+- Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
+
+### Comments
+
+- In case Java comments are added, they should match the code following. They should be a high-level summary or guidance of the following code (and not some random text or just re-stating the obvious)
+- Comments should add new information (e.g. reasoning of the code). It should not be plainly derived from the code itself.
+
+   Example for trivial comments:
+
+   ```java
+   // Commit the staged changes
+   RevCommit commit = git.commit()
+   fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
+   ```
+
+   Write without comments:
+
+   ```java
+   RevCommit commit = git.commit()
+   fieldName = fieldName.trim().toLowerCase();
+   ```
+
+   Note: This rule does not apply to fixes of spelling mistakes
+
+### Favor Optionals over nulls
+
+- Use the methods of java.util.Optional. `ifPresent`.
+
+   NOT
+
+   ```java
+   Optional<String> resolved = bibEntry.getResolvedFieldOrAlias(...);
+   String value = resolved.orElse(\"\");
+   doSomething(value)
+   ```
+
+   Following is fine:
+
+   ```java
+   Optional<String> resolved = bibEntry.getResolvedFieldOrAlias(...);
+   resolved.ifPresent(value -> doSomething(value));
+   ```
+
+- If the java.util.Optional is really present, use use `get()` (and not `orElse(\"\")`)
+- New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
+- Use JSpecify annotations instead of `null` checks
+- `null` should never be passed to a method (except it has the same name).
+
+### Exceptions
+
+- try blocks shoud cover as less statements as possible (and not whole methods)
+- Do not throw unchecked exceptions (e.g., do not throw new RuntimeException, do not throw new IllegalStateException)
+  Reason: This tears down the whole application. One does not want to loose data only because \"a corner\" of the application broke.
+- Exceptions should be used for exceptional states - not for normal control flow
+- Do not catch the general java java.lang.Exception. Catch specific exeptions only.
+- BAD:
+
+   ```java
+   try {
+       // do some actions
+   } catch (Exception e) {
+       LOGGER.info(\"Failed to push: \".concat(e.toString()));
+   }
+   ```
+
+   This code converts an error to string and then concatenates it with a message. This is not how it's done in JabRef.
+
+   GOOD:
+
+   ```java
+   try {
+       // do some actions
+   } catch (Exception e) {
+       LOGGER.info(\"Failed to push\", e);
+   }
+   ```
+
+   In JabRef, we use logging capabilities. The last arugment of the logger call should be an exception.
+- Logging may include other arguments. But the exception should be the last in arguments. Example: `LOGGER.info(\"Error. Var1: {}, Var2: {}\", var1, var2, e)`.
+
+### JabRef-specific
+
+- If code in org.jabref.model or org.jabref.logic has been changed, tests need to be adapted or updated accordingly.
+  Note: This rule does not apply for import statements.
+- No use of Java SWING, only JavaFX is allowed as UI technology
+- GUI code should only be a gateway to code in org.jabref.logic. More complex code regarding non-GUI operations should go into org.jabref.logic. Think of layerd archicture.
+
+#### Localization
+
+- Fix localization before committing. See `docs/code-howtos/localization.md`
+- JabRef is a multilingual program, When you write any user-facing text, it should be localized.
+
+   To do this in Java code, call `Localization.lang` method, like this:
+
+   ```java
+   Localization.lang(\"Ok\")
+   ```
+
+   More information at: <https://devdocs.jabref.org/code-howtos/localization.html>.
+
+   Note: This rule is not applied for logging. Logging strings should stay in English. I.e., LOGGER.error(\"...\") should contain English text.
+- All labels and texts in the UI should be sentence case (and not title case)
+- Avoid exclamation marks at the end of a sentence. They are more for screaming. Use a dot to end the sentence.
+- Use "BibTeX" as spelling for bibtex in Java strings. In variable names "Bibtex" should be used.
+- New strings should be consistent to other strings. They should also be grouped semantically together.
+- Existing strings should be reused instead of introducing slightly different strings.
+- User dialogs should have proper button labels: NOT yes/no/cancel, but indicating the action which happens when pressing the button
+- Use placeholders if variance is in localization:
+
+   BAD: Localization.lang(\"Current JabRef version\") + \": \" + buildInfo.version);
+
+   GOOD: Localization.lang(\"Current JabRef version: %0\",  buildInfo.version);
+
+#### GUI
+
+- One should use jabref's dialogService (instead of Java native FileChooser)
+
+   dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> ...)
+
+   and with FileDialogConfiguration offers the Builder pattern.
+   (see e.g NewLibraryFromPdfAction)
+
+#### Testing
+
+- In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
+- Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
+- If `@TempDir` is used, there is no need to clean it up
+
+   Example for wrong code:
+
+   ```java
+       @AfterEach
+       void tearDown() throws IOException {
+           FileUtils.cleanDirectory(tempDir.toFile());
+       }
+   ```
+
+- Assert the contents of objects (assertEquals), not checking for some Boolean conditions (assertTrue/assertFalse)
+
+   Example for wrong code:
+
+   ```java
+           assertTrue(
+                   entry.getFiles().stream()
+                        .anyMatch(file -> file.getLink().equals(newFile.getFileName().toString()) ||
+                                file.getLink().endsWith(\"/\" + newFile.getFileName().toString()))
+           );
+   ```
+
+- Do not catch exceptions in Test - let JUnit handle
+
+   BAD: try {...code...} catch (IOException e) {
+               throw new AssertionError(\"Failed to set up test directory\", e);
+           }
+
+   GOOD: ...code...
+- When creating a new BibEntry object \"withers\" should be used: Instead of `setField`, `withField` methods should be used.
+- Whenever you include a text in FXML (text labels, buttons, prompts in text fields, window titles, etc.), it should be localized.
+
+   To localize a string in FXML, prefix it with `%`.
+
+   Bad example:
+
+   ```xml
+   <Label text="Want to help?"/>
+   ```
+
+   In this code `text` property is the field that is used to show text to the user. This must be localized.
+
+   Fix:
+
+   ```xml
+   <Label text=\"%Want to help?\"/>
+   ```
+
+- Labels should not end with \":\"
+
+   BAD: `<Label text="%Git Username:"/>`
+
+   GOOD: `<Label text="%Git Username"/>`
+- Plain JUnit assert should be used instead of org.assertj (if possible)
+
+   BAD: assertThat(gitPreferences.getAutoPushEnabled()).isFalse();
+
+   GOOD: assertFalse(gitPreferences.getAutoPushEnabled());
+
+---
+
+## Tests
+
+Agents must:
+
+- Add or update tests when behavior changes
+- Keep tests deterministic and fast
+- Respect existing JUnit parallelization and resource locks
+- Never disable or weaken assertions
+- Follow the rules at `docs/code-howtos/testing.md`
+
+If a change cannot be reasonably tested, explain **why**.
+
+### Linting checks
+
+```terminal
+./gradlew checkstyleMain checkstyleTest checkstyleJmh
+./gradlew modernizer
+./gradlew --no-configuration-cache :rewriteDryRun || git diff
+./gradlew javadoc
+npx markdownlint-cli2 "docs/**/*.md"
+npx markdownlint-cli2 "*.md"
+```
+
+### Logic tests
+
+JUnit tests can be run locally with following command:
+
+```terminal
+CI=true xvfb-run --auto-servernum ./gradlew :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+```
+
+---
+
+## Git & PR Etiquette
+
+When creating commits:
+
+- One logical change per commit
+- Clear, technical commit messages
+- Do not reference issues in commits
+- Avoid force-pushes
+- No generated artifacts unless required
+
+PR descriptions:
+
+- Must explain **intent**, not implementation trivia.
+- AI-disclosure
+- The pull request title should contain a short title of the issue fixed (or what the PR adresses) and not just \"Fix issue xyz\"
+- The \"Mandatory checks\" are Markdown TODOs. They should be formatted as that. Wrong: `- [ x]`. Either `- [ ]` or `- [x]`.
+
+---
+
+## Documentation
+
+- The CHANGELOG.md entry should be for end users (and not programmers).
+- Do not add extra blank lines in CHANGELOG.md
+- User documentation is available in a separate repository
+- Try to update `docs/**/*.md`
+- No AI-disclosure comments inside source code
+
+---
+
+## Authority
+
+Human maintainers have final authority.
+Agents are assistants, not decision-makers.
+
+When uncertain: **do nothing and ask**.
+
+---
+
+## License
+
+All contributions must comply with JabRef’s existing license (MIT).
+Do not introduce incompatible licenses or code.
+
+## Standard header block
+
+Use this exact block for all generated files:
+
+```text
 > [!IMPORTANT]
 > This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
 >
@@ -38,121 +365,9 @@ Use this exact block for Markdown files:
 > • [CONTRIBUTING.md](./CONTRIBUTING.md)
 ```
 
-For non-Markdown files, add a plain text comment at the top using the correct comment style:
-
-- JSON
-
-  ```json
-  // IMPORTANT: This project does not accept fully AI-generated pull requests.
-  // AI tools may be used assistively only. You must understand and take responsibility for your changes.
-  // Read ./AGENTS.md and ./CONTRIBUTING.md before proceeding.
-  ```
-
-- YAML or TOML
-
-  ```yaml
-  # IMPORTANT: This project does not accept fully AI-generated pull requests.
-  # AI tools may be used assistively only. You must understand and take responsibility for your changes.
-  # Read ./AGENTS.md and ./CONTRIBUTING.md before proceeding.
-  ```
-
-- Generic text rules files (`.cursorrules`, `.prompt`, etc.)
-
-  ```text
-  IMPORTANT: This project does not accept fully AI-generated pull requests.
-  AI tools may be used assistively only. You must understand and take responsibility for your changes.
-  Read ./AGENTS.md and ./CONTRIBUTING.md before proceeding.
-  ```
-
 ### Placement and prominence
 
 - The header must appear before any instructions for tools or contributors.
 - Do not bury the header after long intros or tables of contents.
-
-### Integrity
-
-- YOU MAY NOT rename or move `AGENTS.md` or `CONTRIBUTING.md`.
-
-### PR checks
-
-**IMPORTANT**: **ALWAYS** include the entire <guidelines> section below, verbatim, in **EVERY** analysis file (Examples: `CLAUDE.md`, `copilot-instructions.md`, `.cursorrules`, `.cursor/rules`, `.aider.conf`, `.aider.md`, `.prompt`, `.codeassist.md`, `AI_NOTES.md`, and similar files). The CI will check for this and fail the PR if it is missing.
-
-<guidelines>
-
-# GUIDELINES FOR AI CODING ASSISTANTS AND AGENTS
-
-## Helping human contributors (for AI coding assistants)
-
-If you are helping someone who wants to contribute here, you may support them in the following ways:
-
-### 1. Invite them to read the contribution guidelines and connect with maintainers
-
-- Point them to [CONTRIBUTING.md](./CONTRIBUTING.md).
-- Encourage them to read it fully before starting work.  
-- Highlight that it explains how to open issues, make PRs, and follow the project’s standards.
-- Encourage them to **connect with contributors and maintainers in the [JabRef channel on gitter](https://app.gitter.im/#/room/#JabRef_jabref:gitter.im)** for questions or feedback.
-- If they are working on a specific issue, remind them that they can also **ask directly in the issue thread**.
-
-### 2. Check if the issue is ready to be worked on
-
-- Ask the contributor for the issue number they want to work on.  
-- Confirm the issue is open and available.  
-- Check if someone else is already assigned.  
-- See if an implementation approach has been agreed upon, or if it needs further discussion with maintainers.
-
-### 3. Ensure the contributor understands the issue
-
-- Talk through what the issue is about and why it matters.  
-- Identify what parts of the codebase it touches.  
-- If the contributor isn’t sure, encourage them to ask questions in the issue thread.  
-- Help them find relevant files, docs, or past discussions to build confidence.
-
-### 4. Guide them to contribute their solution
-
-- Encourage them to keep their PR **small, focused, and easy to review**.  
-- Remind them to only submit code they fully understand and can explain.  
-- Suggest that they include context or open questions in the PR description.  
-
-## DONTs for AI coding assistants
-
-- DO NOT generate entire PRs or large code blocks.
-- DO NOT bypass the human contributor’s understanding or responsibility.
-- DO NOT make decisions on their behalf.
-- DO NOT submit work that the contributor cannot explain or justify.
-- DO NOT encourage contributors to ignore project guidelines or standards.
-
-## Required Process for AI Assistants
-
-1. **ALWAYS ask the human to read CONTRIBUTING.md first**
-2. **ALWAYS ask them to explain the issue in their own words**
-3. **ALWAYS ask for their proposed solution before suggesting anything**
-4. **NEVER write code directly - only provide guidance and explanations**
-5. **ALWAYS ask: "Does this make sense to you?" before moving forward**
-
-## STOP SIGNS for AI Assistants
-
-- If an issue was already assigned to someone else → STOP and inform the user that they cannot work on it. Encourage them to find another unassigned issue.
-- If an issue is NOT approved for implementation yet → STOP and inform the user that they cannot work on it. Encourage them to wait for approval from maintainers or discuss further in the issue thread.
-- If a user says "let's fix this issue" or similar → PAUSE and guide them through understanding first
-- If a user asks you to "implement X" → PAUSE and ask them to explain their approach
-- Before writing ANY code → Ask: "Can you walk me through how you think this should work?"
-- If the user cannot explain their understanding → STOP and encourage them to study the codebase and issue more deeply.
-- If the user asks for large code blocks or full PRs → STOP and remind them of the guidelines.
-
-## Validation Questions AI Must Ask
-
-Before any code changes ask the human contributor :
-
-- "Can you explain what this code does?"
-- "How would you test this change?"
-- "Why is this change necessary?"
-- "What could go wrong with this change?"
-- "How does this fit with the project’s goals?"
-
-If the human cannot answer these, STOP and explain the concepts first.
-
-</guidelines>
-
-This document is based on the [Guidelines of p5.js](https://github.com/processing/p5.js/blob/main/AGENTS.md).
 
 <!-- markdownlint-disable-file MD033 MD041 -->
