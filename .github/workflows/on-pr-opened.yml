@@ -23,8 +23,8 @@ jobs:
 
 
             We have automated checks in place, based on which you will soon get feedback if any of them are failing.
-            We also use [Qodo](https://www.qodo.ai/) for review assitance.
-            It will upate your pull request description with a review help and offer suggestions to improve the pull request.
+            We also use [Qodo](https://www.qodo.ai/) for review assistance.
+            It will update your pull request description with a review help and offer suggestions to improve the pull request.
 
 
             After all automated checks pass, a maintainer will also review your contribution.
