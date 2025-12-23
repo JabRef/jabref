@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -141,24 +143,25 @@ public class AutoSetFileLinksUtil {
     }
 
     private List<Path> findAssociatedFilesByBrokenLinkedFile(BibEntry entry) throws IOException {
-        List<Path> matches = new ArrayList<>();
 
-        for (LinkedFile linkedFile : entry.getFiles()) {
-            boolean isLinkedFileBroken = linkedFile.findIn(directories).isEmpty();
-            if (isLinkedFileBroken) {
-                String linkedFileBaseName = FileUtil.getBaseName(linkedFile.getLink());
+        Set<String> brokenLinkBaseNames = entry.getFiles().stream()
+                                               .filter(linkedFile -> linkedFile.findIn(directories).isEmpty())
+                                               .map(linkedFile -> FileUtil.getBaseName(linkedFile.getLink()).toLowerCase())
+                                               .collect(Collectors.toSet());
 
-                for (Path directory : directories) {
-                    try (Stream<Path> walk = Files.walk(directory)) {
-                        List<Path> found = walk.filter(path -> !Files.isDirectory(path))
-                                               .filter(path -> FileUtil.getBaseName(path).equalsIgnoreCase(linkedFileBaseName))
-                                               .toList();
-                        matches.addAll(found);
-                    }
-                }
-            }
+        if (brokenLinkBaseNames.isEmpty()) {
+            return List.of();
         }
 
+        List<Path> matches = new ArrayList<>();
+        for (Path directory : directories) {
+            try (Stream<Path> walk = Files.walk(directory)) {
+                List<Path> found = walk.filter(path -> !Files.isDirectory(path))
+                                       .filter(path -> brokenLinkBaseNames.contains(FileUtil.getBaseName(path).toLowerCase()))
+                                       .toList();
+                matches.addAll(found);
+            }
+        }
         return matches;
     }
 }
