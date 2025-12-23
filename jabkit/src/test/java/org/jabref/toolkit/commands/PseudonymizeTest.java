@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Files;
 import java.util.stream.Collectors;
 
 import com.google.common.io.Files;
@@ -34,8 +33,8 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         commandLine.execute("pseudonymize", "--input=" + copy);
         Path output = tempDir.resolve("origin.pseudo.bib");
         Path key = tempDir.resolve("origin.pseudo.csv");
-        assertTrue(output.toFile().exists(), Files.list(tempDir).map(f -> f.toString()).collect(Collectors.joining(", ")));
-        assertTrue(key.toFile().exists(), Files.list(tempDir).map(f -> f.toString()).collect(Collectors.joining(", ")));
+        assertTrue(output.toFile().exists(), java.nio.file.Files.list(tempDir).map(f -> f.toString()).collect(Collectors.joining(", ")));
+        assertTrue(key.toFile().exists(), java.nio.file.Files.list(tempDir).map(f -> f.toString()).collect(Collectors.joining(", ")));
     }
 
     @Test
