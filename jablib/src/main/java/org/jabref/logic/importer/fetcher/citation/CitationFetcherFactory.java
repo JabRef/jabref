@@ -20,7 +20,7 @@ public enum CitationFetcherFactory {
         return switch (citationFetcherName) {
             case CROSSREF ->
                     new CrossRefCitationFetcher(importerPreferences, importFormatPreferences,
-                    citationKeyPatternPreferences, grobidPreferences, aiService);
+                            citationKeyPatternPreferences, grobidPreferences, aiService);
             case SEMANTIC_SCHOLAR ->
                     new SemanticScholarCitationFetcher(importerPreferences);
         };
