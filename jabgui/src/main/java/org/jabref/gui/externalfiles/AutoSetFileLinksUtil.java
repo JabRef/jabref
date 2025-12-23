@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class AutoSetFileLinksUtil {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
-            List<LinkedFile> associatedNotLinkedFiles = new ArrayList<>();
+            Collection<LinkedFile> associatedNotLinkedFiles = new ArrayList<>();
 
             try {
                 associatedNotLinkedFiles = findAssociatedNotLinkedFiles(entry);
@@ -96,8 +97,12 @@ public class AutoSetFileLinksUtil {
     ///
     /// Related: {@link org.jabref.gui.externalfiles.UnlinkedFilesCrawler} for scanning files missing at all entries
     ///
-    /// NOTE: This method does not check if the file is already linked to another entry.
-    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
+    /// NOTE:
+    /// 1. This method does not check if the file is already linked to another entry.
+    /// 2. This method does not guarantee how the returned files are ordered.
+    ///    Order by how they appear in BibEntry does not work since findAssociatedFilesByBrokenLinkedFile may return
+    ///      multiple files (with the same name) for one broken linked file in the entry.
+    public Collection<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> associatedNotLinkedFiles = new ArrayList<>();
 
         List<String> extensions = externalApplicationsPreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).toList();

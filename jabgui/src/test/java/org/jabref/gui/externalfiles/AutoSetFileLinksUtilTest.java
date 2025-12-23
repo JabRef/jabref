@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -13,7 +14,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -55,7 +55,7 @@ class AutoSetFileLinksUtilTest {
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
         List<LinkedFile> expected = List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
-        List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
+        Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
     }
 
@@ -63,7 +63,7 @@ class AutoSetFileLinksUtilTest {
     void findAssociatedNotLinkedFilesForEmptySearchDir() throws IOException {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
-        List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
+        Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(List.of(), actual);
     }
 
@@ -78,7 +78,8 @@ class AutoSetFileLinksUtilTest {
         BibEntry entry = new BibEntry(StandardEntryType.Misc);
         entry.addFile(stale);
 
-        Path newPath = directory.resolve("new/minimal.pdf");
+        String newFile = "new/minimal.pdf";
+        Path newPath = directory.resolve(newFile);
         Files.createDirectories(newPath.getParent());
         Files.move(oldPath, newPath);
 
@@ -91,13 +92,11 @@ class AutoSetFileLinksUtilTest {
                 filePreferences,
                 autoLinkPrefs);
 
-        List<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
+        Collection<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
 
         assertEquals(1, matches.size());
-        assertEquals(
-                FileUtil.relativize(newPath, List.of(directory)),
-                Path.of(matches.getFirst().getLink())
-        );
+        assertEquals(newFile,
+                matches.stream().findFirst().map(LinkedFile::getLink).orElse(""));
     }
 
     @Test
@@ -132,8 +131,8 @@ class AutoSetFileLinksUtilTest {
                 filePreferences,
                 autoLinkPrefs);
 
-        List<String> matchedFiles = util.findAssociatedNotLinkedFiles(entry)
-                                        .stream().map(LinkedFile::getLink).toList();
+        Collection<String> matchedFiles = util.findAssociatedNotLinkedFiles(entry)
+                                              .stream().map(LinkedFile::getLink).toList();
         List<String> expected = List.of(newPath1String, newPath2String);
         // findAssociatedNotLinkedFiles does not guarantee how the returned files are ordered
         // so here we compare equality without considering order
