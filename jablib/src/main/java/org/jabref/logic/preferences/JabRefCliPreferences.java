@@ -27,6 +27,8 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
