@@ -284,13 +284,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
         // endregion
 
-        // region: Main table, main table column, and search dialog column preferences
-        defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
-
-        defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
-        defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
-        // endregion
-
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
     }
@@ -677,18 +670,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         sidePanePreferences = getSidePanePreferencesFromBackingStore(SidePanePreferences.getDefault());
 
-        sidePanePreferences.visiblePanes().addListener((InvalidationListener) listener ->
+        sidePanePreferences.visiblePanes().addListener((InvalidationListener) _ ->
                 storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
-        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) listener ->
+        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) _ ->
                 storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
-        EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (obs, oldValue, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
+        EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (_, _, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
 
         return sidePanePreferences;
     }
 
     private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
-        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes();
-        Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions();
+        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes(defaults.visiblePanes());
+        Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions(defaults);
         return new SidePanePreferences(
                 backingStoreVisiblePanes.isEmpty() ? defaults.visiblePanes() : backingStoreVisiblePanes,
                 backingStorePreferredPositions.isEmpty() ? defaults.getPreferredPositions() : backingStorePreferredPositions,
@@ -696,15 +689,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         );
     }
 
-    private Set<SidePaneType> getVisibleSidePanes() {
+    private Set<SidePaneType> getVisibleSidePanes(Set<SidePaneType> defaults) {
         Set<SidePaneType> visiblePanes = new HashSet<>();
-        if (getBoolean(WEB_SEARCH_VISIBLE)) {
+        if (getBoolean(WEB_SEARCH_VISIBLE, defaults.contains(SidePaneType.WEB_SEARCH))) {
             visiblePanes.add(SidePaneType.WEB_SEARCH);
         }
-        if (getBoolean(GROUP_SIDEPANE_VISIBLE)) {
+        if (getBoolean(GROUP_SIDEPANE_VISIBLE, defaults.contains(SidePaneType.GROUPS))) {
             visiblePanes.add(SidePaneType.GROUPS);
         }
-        if (getBoolean(OO_SHOW_PANEL)) {
+        if (getBoolean(OO_SHOW_PANEL, defaults.contains(SidePaneType.OPEN_OFFICE))) {
             visiblePanes.add(SidePaneType.OPEN_OFFICE);
         }
         return visiblePanes;
@@ -716,7 +709,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         putBoolean(OO_SHOW_PANEL, visiblePanes.contains(SidePaneType.OPEN_OFFICE));
     }
 
-    private Map<SidePaneType, Integer> getSidePanePreferredPositions() {
+    private Map<SidePaneType, Integer> getSidePanePreferredPositions(SidePanePreferences defaults) {
+        // If either one is missing the preferences are corrupt or empty, thus fall back to default
+        if (!hasKey(SIDE_PANE_COMPONENT_NAMES) || !hasKey(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS)) {
+            LOGGER.debug("SidePane preferred positions corrupt, falling back to default");
+            return defaults.getPreferredPositions();
+        }
+
         Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
 
         List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);

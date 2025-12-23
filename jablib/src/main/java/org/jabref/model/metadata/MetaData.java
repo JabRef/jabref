@@ -18,7 +18,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -73,7 +73,7 @@ public class MetaData {
     private Charset encoding;
     private SaveOrder saveOrder;
     private String defaultCiteKeyPattern;
-    private FieldFormatterCleanups saveActions;
+    private FieldFormatterCleanupActions saveActions;
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String librarySpecificFileDirectory;
@@ -173,11 +173,11 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<FieldFormatterCleanups> getSaveActions() {
+    public Optional<FieldFormatterCleanupActions> getSaveActions() {
         return Optional.ofNullable(saveActions);
     }
 
-    public void setSaveActions(@NonNull FieldFormatterCleanups saveActions) {
+    public void setSaveActions(@NonNull FieldFormatterCleanupActions saveActions) {
         this.saveActions = saveActions;
         postChange();
     }

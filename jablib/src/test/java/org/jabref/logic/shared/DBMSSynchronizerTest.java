@@ -10,7 +10,7 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
@@ -233,7 +233,7 @@ class DBMSSynchronizerTest {
         bibDatabase.insertEntry(bibEntry);
 
         MetaData testMetaData = new MetaData();
-        testMetaData.setSaveActions(new FieldFormatterCleanups(true, List.of(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
+        testMetaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
         dbmsSynchronizer.setMetaData(testMetaData);
 
         dbmsSynchronizer.applyMetaData();
