@@ -15,16 +15,14 @@ import org.jabref.gui.util.BaseDialog;
 
 import com.airhacks.afterburner.injection.Injector;
 
-/**
- * This class provides a super class for all dialogs implemented in JavaFX.
- * <p>
- * To create a custom JavaFX dialog one should create an instance of this class and set a dialog
- * pane through the inherited {@link Dialog#setDialogPane(DialogPane)} method.
- * The dialog can be shown via {@link Dialog#show()} or {@link Dialog#showAndWait()}.
- * <p>
- * The layout of the pane should be defined in an external fxml file and loaded it via the
- * {@link FXMLLoader}.
- */
+/// This class provides a super class for all dialogs implemented in JavaFX.
+///
+/// To create a custom JavaFX dialog one should create an instance of this class and set a dialog
+/// pane through the inherited [Dialog#setDialogPane(DialogPane)] method.
+/// The dialog can be shown via [Dialog#show()] or [Dialog#showAndWait()].
+///
+/// The layout of the pane should be defined in an external fxml file and loaded it via the
+/// [FXMLLoader].
 public class FXDialog extends Alert {
 
     public FXDialog(AlertType type, String title, Image image, boolean isModal) {
