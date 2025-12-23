@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Worker;
@@ -74,6 +77,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             getSelectionHtml();
             """;
 
+    public static final int PADDING = 8; // small padding so the rendered content is not clipped at edges
+
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -85,6 +90,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
     private String layoutText;
+    private final ReadOnlyDoubleWrapper contentHeight = new ReadOnlyDoubleWrapper(0);
+    private final ReadOnlyDoubleWrapper contentWidth = new ReadOnlyDoubleWrapper(0);
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
@@ -105,8 +112,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
-        setFitToHeight(true);
-        setFitToWidth(true);
+        setFitToHeight(false);
+        setFitToWidth(false);
+
+        setHbarPolicy(ScrollBarPolicy.NEVER);
+        setVbarPolicy(ScrollBarPolicy.NEVER);
         previewView = WebViewStore.get();
         setContent(previewView);
 
@@ -123,28 +133,75 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 return;
             }
 
-            // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
-            NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
-            for (int i = 0; i < anchorList.getLength(); i++) {
-                Node node = anchorList.item(i);
-                EventTarget eventTarget = (EventTarget) node;
-                eventTarget.addEventListener("click", evt -> {
-                    EventTarget target = evt.getCurrentTarget();
-                    HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
-                    String href = anchorElement.getHref();
-                    if (href != null) {
-                        try {
-                            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
-                        } catch (MalformedURLException exception) {
-                            LOGGER.error("Invalid URL", exception);
-                        } catch (IOException e) {
-                            LOGGER.error("Could not open URL: {}", href, e);
-                        }
-                    }
-                    evt.preventDefault();
-                }, false);
-            }
+            targetLinksToNewBrowserWindow();
+            fitViewerToActualSize();
         });
+    }
+
+    private void targetLinksToNewBrowserWindow() {
+        // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
+        NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
+        for (int i = 0; i < anchorList.getLength(); i++) {
+            Node node = anchorList.item(i);
+            EventTarget eventTarget = (EventTarget) node;
+            eventTarget.addEventListener("click", evt -> {
+                EventTarget target = evt.getCurrentTarget();
+                HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
+                String href = anchorElement.getHref();
+                if (href != null) {
+                    try {
+                        NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
+                    } catch (MalformedURLException exception) {
+                        LOGGER.error("Invalid URL", exception);
+                    } catch (IOException e) {
+                        LOGGER.error("Could not open URL: {}", href, e);
+                    }
+                }
+                evt.preventDefault();
+            }, false);
+        }
+    }
+
+    private void fitViewerToActualSize() {
+        try {
+            Optional<Double> optHeight = getDimension("scrollHeight");
+            Optional<Double> optWidth = getDimension("scrollWidth");
+
+            javafx.application.Platform.runLater(() -> {
+                optHeight.ifPresent(measuredHeight -> {
+                    contentHeight.set(measuredHeight);
+                    this.setPrefHeight(measuredHeight + PADDING * 2); // top and bottom
+                });
+                optWidth.ifPresent(measuredWidth -> {
+                    contentWidth.set(measuredWidth);
+                    this.setPrefWidth(measuredWidth + PADDING * 2); // left and right
+                });
+            });
+
+            setHvalue(0);
+        } catch (NullPointerException e) {
+            LOGGER.debug("Null value encountered while computing preview content size", e);
+        } catch (ClassCastException e) {
+            LOGGER.debug("Unexpected type returned from JavaScript while computing preview content size", e);
+        } catch (IllegalStateException e) {
+            LOGGER.debug("JavaFX thread not ready while computing preview content size", e);
+        }
+    }
+
+    private Optional<Double> getDimension(String property) {
+        Object result = previewView.getEngine().executeScript("document.getElementById('content').%s || document.body.%s".formatted(property, property));
+        if (result instanceof java.lang.Number number) {
+            return Optional.of(number.doubleValue());
+        }
+        return Optional.empty();
+    }
+
+    public ReadOnlyDoubleProperty contentHeightProperty() {
+        return contentHeight.getReadOnlyProperty();
+    }
+
+    public ReadOnlyDoubleProperty contentWidthProperty() {
+        return contentWidth.getReadOnlyProperty();
     }
 
     public void setLayout(PreviewLayout newLayout) {
