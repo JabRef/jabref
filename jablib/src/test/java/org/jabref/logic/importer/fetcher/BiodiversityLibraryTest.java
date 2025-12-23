@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 @Disabled("https://github.com/JabRef/jabref-issue-melting-pot/issues/844")
 class BiodiversityLibraryTest {
     private final String RESPONSE_FORMAT = "&format=json";
+    private final String BASE_URL = "https://www.biodiversitylibrary.org/api3";
 
     private final String apiKey = new BuildInfo().biodiversityHeritageApiKey;
     private BiodiversityLibrary fetcher;
@@ -55,40 +56,28 @@ class BiodiversityLibraryTest {
         assertNotNull(apiKey);
     }
 
-    @Test
-    void baseURLConstruction() throws MalformedURLException, URISyntaxException {
-        String expected = fetcher
-                .getTestUrl()
-                .concat(apiKey)
-                .concat(RESPONSE_FORMAT);
-
-        assertEquals(expected, fetcher.getBaseURL().toString());
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {"1234", "331", "121"})
     void getPartMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
-        String expected = fetcher
-                .getTestUrl()
-                .concat(apiKey)
-                .concat(RESPONSE_FORMAT)
-                .concat("&op=GetPartMetadata&pages=f&names=f")
-                .concat("&id=");
+        String expected = BASE_URL
+                + "?apiKey=" + apiKey
+                + "&format=json"
+                + "&op=GetPartMetadata&pages=f&names=f"
+                + "&id=";
 
-        assertEquals(expected.concat(id), fetcher.getPartMetadataURL(id).toString());
+        assertEquals(expected + id, fetcher.getPartMetadataURL(id).toString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"1234", "4321", "331"})
     void getItemMetadaUrl(String id) throws MalformedURLException, URISyntaxException {
-        String expected = fetcher
-                .getTestUrl()
-                .concat(apiKey)
-                .concat(RESPONSE_FORMAT)
-                .concat("&op=GetItemMetadata&pages=f&ocr=f&ocr=f")
-                .concat("&id=");
+        String expected = BASE_URL
+                + "?apiKey=" + apiKey
+                + "&format=json"
+                + "&op=GetItemMetadata&pages=f&ocr=f&ocr=f"
+                + "&id=";
 
-        assertEquals(expected.concat(id), fetcher.getItemMetadataURL(id).toString());
+        assertEquals(expected + id, fetcher.getItemMetadataURL(id).toString());
     }
 
     @Test

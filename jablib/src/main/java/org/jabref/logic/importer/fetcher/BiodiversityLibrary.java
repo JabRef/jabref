@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,10 +27,12 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import com.google.common.annotations.VisibleForTesting;
+import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +48,6 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
 
     private static final String BASE_URL = "https://www.biodiversitylibrary.org/api3";
     private static final String RESPONSE_FORMAT = "json";
-    private static final String TEST_URL_WIH_OPTIONAL_KEY = "https://www.biodiversitylibrary.org/api3?apikey=";
 
     private final ImporterPreferences importerPreferences;
 
@@ -58,13 +61,23 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
     }
 
     @Override
-    public String getTestUrl() {
-        return TEST_URL_WIH_OPTIONAL_KEY;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_BIODIVERSITY_HERITAGE_LIBRARY);
+    }
+
+    private String getTestUrl(String apiKey) {
+        return "https://www.biodiversitylibrary.org/api3?apikey=" + apiKey;
     }
 
     @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.of(HelpFile.FETCHER_BIODIVERSITY_HERITAGE_LIBRARY);
+    public boolean isValidKey(@NonNull String apiKey) {
+        try {
+            URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
+            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException e) {
+            return false;
+        }
     }
 
     public URL getBaseURL() throws URISyntaxException, MalformedURLException {

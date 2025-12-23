@@ -39,6 +39,7 @@ Agents **must not**:
 - Introduce new dependencies without justification
 - Rewrite large sections “for cleanliness”
 - Bypass tests or CI checks
+- Reformat code
 
 ---
 
@@ -48,15 +49,225 @@ Agents **must not**:
 
 - Target the configured **Gradle toolchain**
 - Use **Java 24+ features**
+- Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
+   Using JavaFX Obersvable lists is considered best practice, too.
+- Use modern Java data structures
+   BAD: new HashSet<>(Arrays.asList(...))
+   GOOD: Set.of(...)
+- Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
+- To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
+- Correctly spelled variable names (meaning: no typos in variable names).
+- Use StringJoiner instead of StringBuilder (if possible)
 - Prefer immutability and explicit nullability (JSpecify)
+- New methods (and new classes) should follow the Single-responsibility principle (SRP).
 
 ### Style
 
 - Follow existing formatting; do not reformat unrelated code
 - Match naming conventions exactly
 - Keep methods small and focused
+- Avoid code duplication
 - Avoid premature abstractions
 - Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
+- Ensure that tests are green before committing
+- Code should not be reformatted only because of syntax. There need to be new statements added if reformatting.
+- Follow the principles of \"Effective Java\"
+- Follow the principles of \"Clean Code\"
+- Remove commented code. (To keep a history of changes git was made for.)
+- No \"new Thread()\", use \"org.jabref.logic.util.BackgroundTask\" and its \"executeWith\"
+- Use Java Text blocks (\"\"\") for multiline string constants
+- Use compiled patterns (Pattern.compile)
+   Examples:
+   NOT: x.matches(\".*\\\\s{2,}.*\")
+   BUT:
+   private final static PATTERN = ...
+   and then PATTERN.matcher(x)
+- Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
+- Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
+
+### Comments
+
+- In case Java comments are added, they should match the code following. They should be a high-level summary or guidance of the following code (and not some random text or just re-stating the obvious)
+- Comments should add new information (e.g. reasoning of the code). It should not be plainly derived from the code itself.
+
+   Example for trivial comments:
+
+   ```java
+   // Commit the staged changes
+   RevCommit commit = git.commit()
+   fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
+   ```
+
+   Write without comments:
+
+   ```java
+   RevCommit commit = git.commit()
+   fieldName = fieldName.trim().toLowerCase();
+   ```
+
+   Note: This rule does not apply to fixes of spelling mistakes
+
+### Favor Optionals over nulls
+
+- Use the methods of java.util.Optional. `ifPresent`.
+
+   NOT
+
+   ```java
+   Optional<String> resolved = bibEntry.getResolvedFieldOrAlias(...);
+   String value = resolved.orElse(\"\");
+   doSomething(value)
+   ```
+
+   Following is fine:
+
+   ```java
+   Optional<String> resolved = bibEntry.getResolvedFieldOrAlias(...);
+   resolved.ifPresent(value -> doSomething(value));
+   ```
+
+- If the java.util.Optional is really present, use use `get()` (and not `orElse(\"\")`)
+- New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
+- Use JSpecify annotations instead of `null` checks
+- `null` should never be passed to a method (except it has the same name).
+
+### Exceptions
+
+- try blocks shoud cover as less statements as possible (and not whole methods)
+- Do not throw unchecked exceptions (e.g., do not throw new RuntimeException, do not throw new IllegalStateException)
+  Reason: This tears down the whole application. One does not want to loose data only because \"a corner\" of the application broke.
+- Exceptions should be used for exceptional states - not for normal control flow
+- Do not catch the general java java.lang.Exception. Catch specific exeptions only.
+- BAD:
+
+   ```java
+   try {
+       // do some actions
+   } catch (Exception e) {
+       LOGGER.info(\"Failed to push: \".concat(e.toString()));
+   }
+   ```
+
+   This code converts an error to string and then concatenates it with a message. This is not how it's done in JabRef.
+
+   GOOD:
+
+   ```java
+   try {
+       // do some actions
+   } catch (Exception e) {
+       LOGGER.info(\"Failed to push\", e);
+   }
+   ```
+
+   In JabRef, we use logging capabilities. The last arugment of the logger call should be an exception.
+- Logging may include other arguments. But the exception should be the last in arguments. Example: `LOGGER.info(\"Error. Var1: {}, Var2: {}\", var1, var2, e)`.
+
+### JabRef-specific
+
+- If code in org.jabref.model or org.jabref.logic has been changed, tests need to be adapted or updated accordingly.
+  Note: This rule does not apply for import statements.
+- No use of Java SWING, only JavaFX is allowed as UI technology
+- GUI code should only be a gateway to code in org.jabref.logic. More complex code regarding non-GUI operations should go into org.jabref.logic. Think of layerd archicture.
+
+#### Localization
+
+- Fix localization before committing. See `docs/code-howtos/localization.md`
+- JabRef is a multilingual program, When you write any user-facing text, it should be localized.
+
+   To do this in Java code, call `Localization.lang` method, like this:
+
+   ```java
+   Localization.lang(\"Ok\")
+   ```
+
+   More information at: <https://devdocs.jabref.org/code-howtos/localization.html>.
+
+   Note: This rule is not applied for logging. Logging strings should stay in English. I.e., LOGGER.error(\"...\") should contain English text.
+- All labels and texts in the UI should be sentence case (and not title case)
+- Avoid exclamation marks at the end of a sentence. They are more for screaming. Use a dot to end the sentence.
+- Use "BibTeX" as spelling for bibtex in Java strings. In variable names "Bibtex" should be used.
+- New strings should be consistent to other strings. They should also be grouped semantically together.
+- Existing strings should be reused instead of introducing slightly different strings.
+- User dialogs should have proper button labels: NOT yes/no/cancel, but indicating the action which happens when pressing the button
+- Use placeholders if variance is in localization:
+
+   BAD: Localization.lang(\"Current JabRef version\") + \": \" + buildInfo.version);
+
+   GOOD: Localization.lang(\"Current JabRef version: %0\",  buildInfo.version);
+
+#### GUI
+
+- One should use jabref's dialogService (instead of Java native FileChooser)
+
+   dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> ...)
+
+   and with FileDialogConfiguration offers the Builder pattern.
+   (see e.g NewLibraryFromPdfAction)
+
+#### Testing
+
+- In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
+- Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
+- If `@TempDir` is used, there is no need to clean it up
+
+   Example for wrong code:
+
+   ```java
+       @AfterEach
+       void tearDown() throws IOException {
+           FileUtils.cleanDirectory(tempDir.toFile());
+       }
+   ```
+
+- Assert the contents of objects (assertEquals), not checking for some Boolean conditions (assertTrue/assertFalse)
+
+   Example for wrong code:
+
+   ```java
+           assertTrue(
+                   entry.getFiles().stream()
+                        .anyMatch(file -> file.getLink().equals(newFile.getFileName().toString()) ||
+                                file.getLink().endsWith(\"/\" + newFile.getFileName().toString()))
+           );
+   ```
+
+- Do not catch exceptions in Test - let JUnit handle
+
+   BAD: try {...code...} catch (IOException e) {
+               throw new AssertionError(\"Failed to set up test directory\", e);
+           }
+
+   GOOD: ...code...
+- When creating a new BibEntry object \"withers\" should be used: Instead of `setField`, `withField` methods should be used.
+- Whenever you include a text in FXML (text labels, buttons, prompts in text fields, window titles, etc.), it should be localized.
+
+   To localize a string in FXML, prefix it with `%`.
+
+   Bad example:
+
+   ```xml
+   <Label text="Want to help?"/>
+   ```
+
+   In this code `text` property is the field that is used to show text to the user. This must be localized.
+
+   Fix:
+
+   ```xml
+   <Label text=\"%Want to help?\"/>
+   ```
+
+- Labels should not end with \":\"
+
+   BAD: `<Label text="%Git Username:"/>`
+
+   GOOD: `<Label text="%Git Username"/>`
+- Plain JUnit assert should be used instead of org.assertj (if possible)
+
+   BAD: assertThat(gitPreferences.getAutoPushEnabled()).isFalse();
+
+   GOOD: assertFalse(gitPreferences.getAutoPushEnabled());
 
 ---
 
@@ -68,9 +279,28 @@ Agents must:
 - Keep tests deterministic and fast
 - Respect existing JUnit parallelization and resource locks
 - Never disable or weaken assertions
-- Follow the rules at [docs/code-howtos/testing.md](docs/code-howtos/testing.md)
+- Follow the rules at `docs/code-howtos/testing.md`
 
 If a change cannot be reasonably tested, explain **why**.
+
+### Linting checks
+
+```terminal
+./gradlew checkstyleMain checkstyleTest checkstyleJmh
+./gradlew modernizer
+./gradlew --no-configuration-cache :rewriteDryRun || git diff
+./gradlew javadoc
+npx markdownlint-cli2 "docs/**/*.md"
+npx markdownlint-cli2 "*.md"
+```
+
+### Logic tests
+
+JUnit tests can be run locally with following command:
+
+```terminal
+CI=true xvfb-run --auto-servernum ./gradlew :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+```
 
 ---
 
@@ -86,13 +316,17 @@ When creating commits:
 
 PR descriptions:
 
-- must explain **intent**, not implementation trivia.
+- Must explain **intent**, not implementation trivia.
 - AI-disclosure
+- The pull request title should contain a short title of the issue fixed (or what the PR adresses) and not just \"Fix issue xyz\"
+- The \"Mandatory checks\" are Markdown TODOs. They should be formatted as that. Wrong: `- [ x]`. Either `- [ ]` or `- [x]`.
 
 ---
 
 ## Documentation
 
+- The CHANGELOG.md entry should be for end users (and not programmers).
+- Do not add extra blank lines in CHANGELOG.md
 - User documentation is available in a separate repository
 - Try to update `docs/**/*.md`
 - No AI-disclosure comments inside source code

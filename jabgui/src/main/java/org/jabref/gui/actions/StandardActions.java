@@ -83,18 +83,18 @@ public enum StandardActions implements Action {
     SAVE_SELECTED_AS_PLAIN_BIBTEX(Localization.lang("Save selected as plain BibTeX...")),
     SAVE_ALL(Localization.lang("Save all"), Localization.lang("Save all open libraries"), IconTheme.JabRefIcons.SAVE_ALL, KeyBinding.SAVE_ALL),
 
-    IMPORT_INTO_NEW_LIBRARY(Localization.lang("Import into new library"), KeyBinding.IMPORT_INTO_NEW_DATABASE),
-    IMPORT_INTO_CURRENT_LIBRARY(Localization.lang("Import into current library"), KeyBinding.IMPORT_INTO_CURRENT_DATABASE),
-    EXPORT_ALL(Localization.lang("Export all entries")),
-    EXPORT_SELECTED(Localization.lang("Export selected entries"), KeyBinding.EXPORT_SELECTED),
+    IMPORT_INTO_NEW_LIBRARY(Localization.lang("Import into new library..."), KeyBinding.IMPORT_INTO_NEW_DATABASE),
+    IMPORT_INTO_CURRENT_LIBRARY(Localization.lang("Import into current library..."), KeyBinding.IMPORT_INTO_CURRENT_DATABASE),
+    EXPORT_ALL(Localization.lang("Export all entries...")),
+    EXPORT_SELECTED(Localization.lang("Export selected entries..."), KeyBinding.EXPORT_SELECTED),
 
     GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
     GIT_PULL(Localization.lang("Pull")),
     GIT_PUSH(Localization.lang("Push")),
-    GIT_COMMIT(Localization.lang("Commit")),
+    GIT_COMMIT(Localization.lang("Commit...")),
     GIT_SHARE(Localization.lang("Share this library to GitHub")),
 
-    CITE_DRIVE(Localization.lang("CiteDrive...")),
+    CITE_DRIVE(Localization.lang("CiteDrive")),
     CITE_DRIVE_LOGIN(Localization.lang("Login...")), // "Authorize" would be the more technical term here.
     CITE_DRIVE_PUSH(Localization.lang("Push to CiteDrive")),
 
