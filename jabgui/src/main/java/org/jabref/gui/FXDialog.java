@@ -3,7 +3,6 @@ package org.jabref.gui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -18,7 +17,7 @@ import com.airhacks.afterburner.injection.Injector;
 /// This class provides a super class for all dialogs implemented in JavaFX.
 ///
 /// To create a custom JavaFX dialog one should create an instance of this class and set a dialog
-/// pane through the inherited [Dialog#setDialogPane(DialogPane)] method.
+/// pane through the inherited [Dialog#setDialogPane(javafx.scene.control.DialogPane)] method.
 /// The dialog can be shown via [Dialog#show()] or [Dialog#showAndWait()].
 ///
 /// The layout of the pane should be defined in an external fxml file and loaded it via the
