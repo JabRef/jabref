@@ -75,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed a crash when importing preferences from older JabRef versions. [#14497](https://github.com/JabRef/jabref/issues/14497)
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
+- We fixed an issure where warning dialog is mixed Chinese/English after switching to zh_CN [#14654](https://github.com/JabRef/jabref/issues/14654)
 
 ### Removed
 
