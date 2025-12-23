@@ -74,13 +74,14 @@ public class AutoSetFileLinksUtil {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
-            Collection<LinkedFile> associatedNotLinkedFiles = Set.of();
+            Collection<LinkedFile> associatedNotLinkedFiles;
 
             try {
                 associatedNotLinkedFiles = findAssociatedNotLinkedFiles(entry);
             } catch (IOException e) {
                 result.addFileException(e);
                 LOGGER.error("Problem finding files", e);
+                associatedNotLinkedFiles = Set.of();
             }
 
             for (LinkedFile associateNotLinkedFile : associatedNotLinkedFiles) {
