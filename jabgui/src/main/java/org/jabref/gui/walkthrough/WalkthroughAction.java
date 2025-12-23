@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -14,6 +15,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferencesDialogView;
@@ -477,7 +479,8 @@ public class WalkthroughAction extends SimpleCommand {
                 // Step 3: Focus on GlobalSearchBar
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Click in the search field to begin"))
-                        .content(new InfoBlock(Localization.lang("You can also use `Ctrl+F` or `Cmd+F` to focus the search field.")))
+                        .content(new InfoBlock(Localization.lang("You can also use the shortcut for focusing the search field (%0).",
+                                preferences.getKeyBindingRepository().getKeyCombination(KeyBinding.SEARCH).map(KeyCombination::getDisplayText).orElse(""))))
                         .resolver(searchFieldResolver)
                         .trigger(Trigger.onClick())
                         .position(TooltipPosition.BOTTOM)
@@ -595,7 +598,8 @@ public class WalkthroughAction extends SimpleCommand {
                 // Step 17: Completion
                 .addStep(WalkthroughStep
                         .panel(Localization.lang("Search walkthrough completed"))
-                        .content(new TextBlock(Localization.lang("**Quick reference:**\n- Press **Ctrl+F** to jump to search\n- Use **field = value** for field searches\n- Combine with **AND**, **OR**, **NOT**\n- Enable **regex** for pattern matching")),
+                        .content(new TextBlock(Localization.lang("**Quick reference:**\n- Press %0 to jump to search\n- Use **field = value** for field searches\n- Combine with **AND**, **OR**, **NOT**\n- Enable **regex** for pattern matching",
+                                        preferences.getKeyBindingRepository().getKeyCombination(KeyBinding.SEARCH).map(KeyCombination::getDisplayText).orElse(""))),
                                 new InfoBlock(Localization.lang("For complete search documentation and more examples, visit [Search documentation](%0)", URLs.SEARCH_WITH_IN_LIBRARY_DOC)))
                         .continueButton(Localization.lang("Finish"))
                         .position(PanelPosition.RIGHT)
