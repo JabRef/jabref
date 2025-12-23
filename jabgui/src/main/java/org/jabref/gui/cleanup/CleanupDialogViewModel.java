@@ -162,17 +162,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         if (modifiedEntriesCount > 0 && tabSupplier != null) {
             tabSupplier.get().markBaseChanged();
         }
-
-        String message = switch (modifiedEntriesCount) {
-            case 0 ->
-                    Localization.lang("No entry needed a clean up");
-            case 1 ->
-                    Localization.lang("One entry needed a clean up");
-            default ->
-                    Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
-        };
-
-        dialogService.notify(message);
+        dialogService.notify(Localization.lang("%0 entry(s) needed a clean up", Integer.toString(modifiedEntriesCount)));
     }
 
     private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
