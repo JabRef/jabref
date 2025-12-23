@@ -393,7 +393,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Dropdown for citationFetcher
         ComboBox<CitationFetcherType> fetcherCombo = new ComboBox<>(
                 FXCollections.observableArrayList(
-                        CitationFetcherType.SEMANTICSCHOLAR,
+                        CitationFetcherType.SEMANTIC_SCHOLAR,
                         CitationFetcherType.CROSSREF
                 )
         );
@@ -413,7 +413,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         return provider;
                     }
                 }
-                return CitationFetcherType.SEMANTICSCHOLAR;
+                return CitationFetcherType.SEMANTIC_SCHOLAR;
             }
         });
         fetcherCombo.setValue(entryEditorPreferences.getCitationFetcherType());

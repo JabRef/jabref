@@ -11,17 +11,18 @@ import org.jabref.logic.importer.util.GrobidPreferences;
 public enum CitationFetcherFactory {
     INSTANCE;
 
-    public CitationFetcher getCitationFetcher(String citationFetcherName,
+    public CitationFetcher getCitationFetcher(CitationFetcherType citationFetcherName,
                                               ImporterPreferences importerPreferences,
                                               ImportFormatPreferences importFormatPreferences,
                                               CitationKeyPatternPreferences citationKeyPatternPreferences,
                                               GrobidPreferences grobidPreferences,
                                               AiService aiService) {
-        if (CrossRefCitationFetcher.FETCHER_NAME.equalsIgnoreCase(citationFetcherName)) {
-            return new CrossRefCitationFetcher(importerPreferences, importFormatPreferences,
+        return switch (citationFetcherName) {
+            case CROSSREF ->
+                    new CrossRefCitationFetcher(importerPreferences, importFormatPreferences,
                     citationKeyPatternPreferences, grobidPreferences, aiService);
-        } else {
-            return new SemanticScholarCitationFetcher(importerPreferences);
-        }
+            case SEMANTIC_SCHOLAR ->
+                    new SemanticScholarCitationFetcher(importerPreferences);
+        };
     }
 }

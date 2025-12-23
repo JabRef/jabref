@@ -41,7 +41,7 @@ public class SearchCitationsRelationsService {
                                            AiService aiService,
                                            BibEntryTypesManager entryTypesManager) {
         this.citationFetcher = CitationFetcherFactory.INSTANCE.getCitationFetcher(
-                citationFetcherTypeProperty.get().getFetcherName(),
+                citationFetcherTypeProperty.get(),
                 importerPreferences,
                 importFormatPreferences,
                 citationKeyPatternPreferences,
@@ -50,7 +50,7 @@ public class SearchCitationsRelationsService {
 
         citationFetcherTypeProperty.addListener((_, _, newValue) -> {
             this.citationFetcher = CitationFetcherFactory.INSTANCE.getCitationFetcher(
-                    newValue.getFetcherName(),
+                    newValue,
                     importerPreferences,
                     importFormatPreferences,
                     citationKeyPatternPreferences,

@@ -5,12 +5,12 @@ import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticSchola
 
 public enum CitationFetcherType {
     CROSSREF("CrossRef"),
-    SEMANTICSCHOLAR("Semantic Scholar");
+    SEMANTIC_SCHOLAR("Semantic Scholar");
 
     private final String name;
 
-    CitationFetcherType(String displayName) {
-        this.name = displayName;
+    CitationFetcherType(String name) {
+        this.name = name;
     }
 
     public String getName() {
@@ -21,7 +21,7 @@ public enum CitationFetcherType {
         return switch (this) {
             case CROSSREF ->
                     CrossRefCitationFetcher.FETCHER_NAME;
-            case SEMANTICSCHOLAR ->
+            case SEMANTIC_SCHOLAR ->
                     SemanticScholarCitationFetcher.FETCHER_NAME;
         };
     }

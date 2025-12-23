@@ -383,7 +383,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(AUTOLINK_FILES_ENABLED),
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                CitationFetcherType.SEMANTICSCHOLAR,
+                CitationFetcherType.SEMANTIC_SCHOLAR,
                 getBoolean(SHOW_SCITE_TAB),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
