@@ -185,7 +185,7 @@ class AutoRenameFileOnEntryChangeTest {
         assertEquals("newKey2081 (2).pdf", entry.getFiles().getFirst().getLink());
     }
 
-    static void assertFileExists(Path path) {
+    static void assertFileExists(Path path) throws IOException {
         assertTrue(Files.exists(path), "though found " + Files.list(path.getParent()).map(f -> f.toString()).collect(Collectors.joining(", ")));
     }
 }
