@@ -47,7 +47,6 @@ public class CleanupDialog extends BaseDialog<Void> {
                 stateManager, undoManager, tabSupplier, taskExecutor
         );
 
-
         init(databaseContext, preferences);
     }
 
