@@ -14,13 +14,10 @@ testing {
 
 tasks.withType<Test>().configureEach {
     // Enable parallel tests (on desktop).
-    // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-    if (!providers.environmentVariable("CI").isPresent) {
-        maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
-    }
-    // See https://docs.gradle.org/current/userguide/performance.html#b_fork_tests_into_multiple_processes for details.
     if (!providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)) {
+        // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
         maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
+        // See https://docs.gradle.org/current/userguide/performance.html#b_fork_tests_into_multiple_processes for details.
         forkEvery = 100
     }
 }
