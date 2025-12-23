@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
@@ -133,9 +134,9 @@ class AutoSetFileLinksUtilTest {
 
         Collection<String> matchedFiles = util.findAssociatedNotLinkedFiles(entry)
                                               .stream().map(LinkedFile::getLink).toList();
-        List<String> expected = List.of(newPath1String, newPath2String);
+        Set<String> expected = Set.of(newPath1String, newPath2String);
         // findAssociatedNotLinkedFiles does not guarantee how the returned files are ordered
         // so here we compare equality without considering order
-        assertEquals(new HashSet<>(matchedFiles), new HashSet<>(expected));
+        assertEquals(new HashSet<>(matchedFiles), expected);
     }
 }
