@@ -199,7 +199,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
 
     @Override
     public boolean isActive() {
-        return monitorFailure.get().isEmpty() && watcher != null;
+        return monitorFailure == null && watcher != null;
     }
 
     @Override
