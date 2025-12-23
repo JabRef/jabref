@@ -397,7 +397,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         CitationFetcherType.CROSSREF
                 )
         );
-        fetcherCombo.setTooltip(new Tooltip(Localization.lang("Select Citation Fetcher")));
+        fetcherCombo.setTooltip(new Tooltip(Localization.lang("Select citation fetcher")));
         fetcherCombo.setPrefWidth(160);
         styleTopBarNode(fetcherCombo, 75.0);
         fetcherCombo.setConverter(new StringConverter<>() {
