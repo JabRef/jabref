@@ -235,16 +235,15 @@ public class LinkedFile implements Serializable {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {
             return FileUtil.getFileNameFromUrl(linkedName);
+        } else if (linkedName.isEmpty()) {
+            return Optional.empty();
         } else if (PATH_DELIM != null) {
             int slash = linkedName.lastIndexOf(PATH_DELIM);
             if (slash >= 0) {
                 return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
-            } else {
-                return Optional.empty();
             }
-        } else {
-            return Optional.of(FileUtil.getValidFileName(linkedName));
         }
+        return Optional.of(FileUtil.getValidFileName(linkedName));
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {

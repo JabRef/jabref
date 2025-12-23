@@ -125,6 +125,9 @@ public class LinkedFileHandler {
             suggestedFileName = sourcePath.getFileName();
         }
 
+        String fileNameWithoutExtension = FileUtil.getBaseName(suggestedFileName);
+        String extensionSuffix = FileUtil.getFileExtension(suggestedFileName).map(ext -> "." + ext).orElse("");
+
         Path targetPath = targetDirectory.resolve(suggestedFileName);
         boolean renamed = false;
         if (Files.exists(targetPath)) {
@@ -138,7 +141,7 @@ public class LinkedFileHandler {
             // @formatter:off
             do {
                 // @formatter:on
-                targetPath = targetDirectory.resolve(sourcePath.getFileName() + " (" + count + ")");
+                targetPath = targetDirectory.resolve(fileNameWithoutExtension + " (" + count + ")" + extensionSuffix);
                 exists = Files.exists(targetPath);
                 if (exists && Files.mismatch(sourcePath, targetPath) == -1) {
                     // In case of source == target, we pretend, we have success

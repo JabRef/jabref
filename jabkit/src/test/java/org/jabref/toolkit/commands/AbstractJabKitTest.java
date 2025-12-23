@@ -143,10 +143,10 @@ public abstract class AbstractJabKitTest {
     }
 
     static void assertFileExists(Path path) throws IOException {
-        assertTrue(Files.exists(path), "searched for '" + path.getFileName().toString() + "' but found " + Files.list(path.getParent()).map(f -> "'" + f.getFileName().toString() + "'").collect(Collectors.joining(", ")));
+        assertTrue(Files.exists(path), "file  '" + path.getFileName().toString() + "' doesn't exist, but found " + Files.list(path.getParent()).map(f -> "'" + f.getFileName().toString() + "'").collect(Collectors.joining(", ")));
     }
 
     static void assertFileDoesntExist(Path path) throws IOException {
-        assertFalse(Files.exists(path), "found '" + path.getFileName().toString() + "'");
+        assertFalse(Files.exists(path), "file '" + path.getFileName().toString() + "' shouldn't exist, but does");
     }
 }
