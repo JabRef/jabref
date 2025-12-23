@@ -390,7 +390,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitedByButton, 15.0);
 
-        // Dropdown for citationFetcher
         ComboBox<CitationFetcherType> fetcherCombo = new ComboBox<>(
                 FXCollections.observableArrayList(
                         CitationFetcherType.SEMANTIC_SCHOLAR,
