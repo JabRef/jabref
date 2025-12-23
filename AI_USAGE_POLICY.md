@@ -54,10 +54,10 @@ We recommend AI tools trained on JabRef data, such as [DeepWiki](https://deepwik
 
 ❌ **Not allowed (generative use):**
 
-- Write entire PRs or large code blocks
-- Make implementation decisions for you
-- Submit code you don't understand
-- Generate documentation or comments without your review
+- Write entire PRs
+- Write replies to PR review comments
+- Submit code the contributor doesn't understand
+- Generate documentation or comments without contributor's review
 - Automate the submission of code changes
 
 ## Why do we have this policy?
@@ -72,16 +72,7 @@ We believe that learning to code and contributing to open source are deeply huma
 
 ## About AGENTS.md
 
-The [AGENTS.md](./AGENTS.md) file contains instructions for AI coding assistants to prompt them to act more like guides than code generators. When someone uses an assistant to contribute, the tool will be prompted to explain the code, point to our documentation, and suggest asking questions in the community channels, rather than writing code directly.
-
 Note that [AGENTS.md](./AGENTS.md) is intentionally structured so that large language models (LLMs) can better comply with the guidelines. This explains why certain sections may seem redundant, overly directive or repetitive.
-
-This is not a perfect solution. Agents may ignore it or be convinced to generate code anyway. However, this is our best effort to guide their behavior and encourage responsible use.
-
-We are continuously looking for ways to improve our approach and may have to change our policies as AI tools evolve. We welcome feedback and suggestions from the community.
-
-> [!NOTE]
-> Including this [AGENTS.md](./AGENTS.md) does not imply endorsement by JabRef e.V., JabRef'S contributors, p5.js, the p5.js contributors, or the Processing Foundation of any specific AI tool or service, or encourage their use.
 
 ## Questions?
 
