@@ -7,7 +7,7 @@ import java.util.Optional;
 public record CleanupTabSelection(
         EnumSet<CleanupPreferences.CleanupStep> allJobs,
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs,
-        Optional<FieldFormatterCleanups> formatters) {
+        Optional<FieldFormatterCleanupActions> formatters) {
 
     public CleanupTabSelection {
         allJobs = allJobs == null ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(allJobs);
@@ -19,7 +19,7 @@ public record CleanupTabSelection(
         return new CleanupTabSelection(allJobs, selectedJobs, Optional.empty());
     }
 
-    public static CleanupTabSelection ofFormatters(FieldFormatterCleanups cleanups) {
+    public static CleanupTabSelection ofFormatters(FieldFormatterCleanupActions cleanups) {
         return new CleanupTabSelection(EnumSet.noneOf(CleanupPreferences.CleanupStep.class), EnumSet.noneOf(CleanupPreferences.CleanupStep.class), Optional.of(cleanups));
     }
 

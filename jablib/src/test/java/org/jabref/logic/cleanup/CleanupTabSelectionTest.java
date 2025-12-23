@@ -57,7 +57,7 @@ class CleanupTabSelectionTest {
 
     @Test
     void updatePreferencesAppliesFormatterCleanups() {
-        FieldFormatterCleanups formatter = new FieldFormatterCleanups(true, FieldFormatterCleanups.parse("title[identity]"));
+        FieldFormatterCleanupActions formatter = new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("title[identity]"));
 
         CleanupTabSelection selection = CleanupTabSelection.ofFormatters(formatter);
         CleanupPreferences result = selection.updatePreferences(cleanupPreferences);
