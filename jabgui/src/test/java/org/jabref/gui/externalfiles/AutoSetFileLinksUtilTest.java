@@ -134,8 +134,6 @@ class AutoSetFileLinksUtilTest {
 
         List<String> matchedFiles = util.findAssociatedNotLinkedFiles(entry)
                                         .stream().map(LinkedFile::getLink).toList();
-        assertEquals(2, matchedFiles.size());
-
         List<String> expected = List.of(newPath1String, newPath2String);
         // findAssociatedNotLinkedFiles does not guarantee how the returned files are ordered
         // so here we compare equality without considering order
