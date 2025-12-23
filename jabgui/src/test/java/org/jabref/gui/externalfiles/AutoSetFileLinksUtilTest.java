@@ -112,12 +112,14 @@ class AutoSetFileLinksUtilTest {
         entry.addFile(stale);
 
         // Simulate a file move
-        Path newPath1 = directory.resolve("new1/minimal.pdf");
+        String newPath1String = "new1/minimal.pdf";
+        Path newPath1 = directory.resolve(newPath1String);
         Files.createDirectories(newPath1.getParent());
         Files.move(oldPath, newPath1);
 
         // Create a second copy of the file
-        Path newPath2 = directory.resolve("new2/minimal.pdf");
+        String newPath2String = "new2/minimal.pdf";
+        Path newPath2 = directory.resolve(newPath2String);
         Files.createDirectories(newPath2.getParent());
         Files.copy(newPath1, newPath2);
 
@@ -133,11 +135,9 @@ class AutoSetFileLinksUtilTest {
         List<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
 
         assertEquals(2, matches.size());
-        assertTrue(matches.stream().anyMatch(file -> {
-            return FileUtil.relativize(newPath1, List.of(directory)).equals(Path.of(file.getLink()));
-        }));
-        assertTrue(matches.stream().anyMatch(file -> {
-            return FileUtil.relativize(newPath2, List.of(directory)).equals(Path.of(file.getLink()));
-        }));
+        assertTrue(matches.stream().anyMatch(file ->
+                Path.of(newPath1String).equals(Path.of(file.getLink()))));
+        assertTrue(matches.stream().anyMatch(file ->
+                Path.of(newPath2String).equals(Path.of(file.getLink()))));
     }
 }
