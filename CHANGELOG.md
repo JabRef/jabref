@@ -56,6 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We renamed "Search pre-configured" to "Search pre-selected" and "Web search fetchers" to "Pre-selected fetchers". [#14557](https://github.com/JabRef/jabref/issues/14557)
 - We renamed "ArXiv" to "arXiv" in New Entry dialog. [#14643](https://github.com/JabRef/jabref/issues/14643)
 - We improved the keyboard shortcut dialog, it is now possible to directly press <kbd>cmd</kbd>+<kbd>...</kbd> when changing keyboards on macOS. [#14237](https://github.com/JabRef/jabref/issues/14237)
+- We improved the “search and show unlinked files” feature to contain all associated files instead of just the first one. [#14697](https://github.com/JabRef/jabref/issues/14697)
 
 ### Fixed
 
