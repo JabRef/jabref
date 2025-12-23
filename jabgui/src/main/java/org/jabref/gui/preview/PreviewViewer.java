@@ -222,20 +222,22 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        databaseContext
-                .getFirstExistingFileDir(preferences.getFilePreferences())
-                .ifPresent(baseDirPath -> {
-                    try {
-                        String baseUrl = baseDirPath.toUri().toURL().toExternalForm();
-                        // Ensure the base URL ends with a slash for correct relative path resolution
-                        if (!baseUrl.endsWith("/")) {
-                            baseUrl += "/";
+        if (databaseContext != null) {
+            databaseContext
+                    .getFirstExistingFileDir(preferences.getFilePreferences())
+                    .ifPresent(baseDirPath -> {
+                        try {
+                            String baseUrl = baseDirPath.toUri().toURL().toExternalForm();
+                            // Ensure the base URL ends with a slash for correct relative path resolution
+                            if (!baseUrl.endsWith("/")) {
+                                baseUrl += "/";
+                            }
+                            layoutText = formatPreviewText(baseUrl, text);
+                        } catch (MalformedURLException e) {
+                            LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
                         }
-                        layoutText = formatPreviewText(baseUrl, text);
-                    } catch (MalformedURLException e) {
-                        LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
-                    }
-                });
+                    });
+        }
         highlightLayoutText();
         setHvalue(0);
     }
