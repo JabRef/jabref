@@ -11,21 +11,27 @@ import org.jabref.model.entry.BibEntry;
  * Manages the navigation history of viewed entries using two stacks.
  * This class encapsulates the logic of moving back and forward by maintaining a "back" stack for past entries
  * and a "forward" stack for future entries.
+ * 
+ * <p>History updates can be suppressed during bulk operations (e.g., file imports, drag-and-drop)
+ * using the {@link #suppressUpdates()} method, which employs a nesting-aware boolean flag to handle
+ * multiple concurrent suppression contexts correctly.</p>
  */
 public class NavigationHistory {
     private final List<BibEntry> previousEntries = new ArrayList<>();
     private final List<BibEntry> nextEntries = new ArrayList<>();
     private BibEntry currentEntry;
-    private int suppressionDepth;
+    private boolean suppressNavigation = false;
 
     /**
      * Sets a new entry as the current one, clearing the forward history.
      * The previously current entry is moved to the back stack.
+     * 
+     * <p>This operation is skipped if navigation updates are currently suppressed.</p>
      *
      * @param entry The BibEntry to add to the history.
      */
     public void add(BibEntry entry) {
-        if (isSuppressed()) {
+        if (suppressNavigation) {
             return;
         }
 
@@ -82,7 +88,9 @@ public class NavigationHistory {
 
     /**
      * Suppresses navigation history updates while the returned guard is open.
-     * Intended for bulk operations that perform multiple selection changes.
+     * Handles nesting correctly: if already suppressed, the flag is only cleared when the outermost guard closes.
+     *
+     * @return A {@link Suppression} guard that restores navigation tracking when closed.
      */
     public Suppression suppressUpdates() {
         return new Suppression(this);
@@ -90,41 +98,39 @@ public class NavigationHistory {
 
     /**
      * Convenience helper to suppress updates conditionally.
+     *
+     * @param active If true, returns an active suppression; otherwise returns a no-op suppression.
+     * @return A {@link Suppression} guard.
      */
     public Suppression suppressUpdatesIf(boolean active) {
         return active ? suppressUpdates() : Suppression.noOp();
     }
 
-    private boolean isSuppressed() {
-        return suppressionDepth > 0;
-    }
-
-    private void beginSuppression() {
-        suppressionDepth++;
-    }
-
-    private void endSuppression() {
-        if (suppressionDepth > 0) {
-            suppressionDepth--;
-        }
-    }
-
+    /**
+     * AutoCloseable guard for suppressing navigation history updates.
+     * 
+     * <p>Uses a nesting-aware approach: captures the suppression state when created,
+     * and only restores it if this instance was the one that activated suppression.</p>
+     */
     public static final class Suppression implements AutoCloseable {
         private static final Suppression NO_OP = new Suppression();
 
         private final NavigationHistory owner;
         private boolean closed;
         private final boolean active;
+        private final boolean wasAlreadySuppressed;
 
         private Suppression() {
             this.owner = null;
             this.active = false;
+            this.wasAlreadySuppressed = false;
         }
 
         private Suppression(NavigationHistory owner) {
             this.owner = owner;
             this.active = true;
-            owner.beginSuppression();
+            this.wasAlreadySuppressed = owner.suppressNavigation;
+            owner.suppressNavigation = true;
         }
 
         @Override
@@ -133,7 +139,11 @@ public class NavigationHistory {
                 return;
             }
             closed = true;
-            owner.endSuppression();
+            
+            // Only turn off suppression if we were the ones who turned it on
+            if (!wasAlreadySuppressed) {
+                owner.suppressNavigation = false;
+            }
         }
 
         public static Suppression noOp() {
