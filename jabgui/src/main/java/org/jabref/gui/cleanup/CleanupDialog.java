@@ -41,8 +41,6 @@ public class CleanupDialog extends BaseDialog<Void> {
                          UndoManager undoManager,
                          Supplier<LibraryTab> tabSupplier,
                          TaskExecutor taskExecutor) {
-
-
         super();
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
@@ -77,7 +75,6 @@ public class CleanupDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-
 
         CleanupPreferences initialPreset = preferences.getCleanupPreferences();
         FilePreferences filePreferences = preferences.getFilePreferences();
