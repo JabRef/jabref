@@ -186,6 +186,6 @@ class AutoRenameFileOnEntryChangeTest {
     }
 
     static void assertFileExists(Path path) throws IOException {
-        assertTrue(Files.exists(path), "though found " + Files.list(path.getParent()).map(f -> f.toString()).collect(Collectors.joining(", ")));
+        assertTrue(Files.exists(path), "searched for " + path.getFileName().toString() + " but found " + Files.list(path.getParent()).map(f -> "'" + f.getFileName().toString() + "'").collect(Collectors.joining(", ")));
     }
 }
