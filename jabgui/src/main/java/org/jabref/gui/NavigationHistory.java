@@ -11,7 +11,7 @@ import org.jabref.model.entry.BibEntry;
  * Manages the navigation history of viewed entries using two stacks.
  * This class encapsulates the logic of moving back and forward by maintaining a "back" stack for past entries
  * and a "forward" stack for future entries.
- * 
+ *
  * <p>History updates can be suppressed during bulk operations (e.g., file imports, drag-and-drop)
  * using the {@link #suppressUpdates()} method, which employs a nesting-aware boolean flag to handle
  * multiple concurrent suppression contexts correctly.</p>
@@ -25,7 +25,7 @@ public class NavigationHistory {
     /**
      * Sets a new entry as the current one, clearing the forward history.
      * The previously current entry is moved to the back stack.
-     * 
+     *
      * <p>This operation is skipped if navigation updates are currently suppressed.</p>
      *
      * @param entry The BibEntry to add to the history.
@@ -108,7 +108,7 @@ public class NavigationHistory {
 
     /**
      * AutoCloseable guard for suppressing navigation history updates.
-     * 
+     *
      * <p>Uses a nesting-aware approach: captures the suppression state when created,
      * and only restores it if this instance was the one that activated suppression.</p>
      */
@@ -139,7 +139,7 @@ public class NavigationHistory {
                 return;
             }
             closed = true;
-            
+
             // Only turn off suppression if we were the ones who turned it on
             if (!wasAlreadySuppressed) {
                 owner.suppressNavigation = false;
