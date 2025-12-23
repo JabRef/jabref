@@ -1,6 +1,10 @@
 package org.jabref.gui.ai.components.summary;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 import javafx.scene.Node;
 
@@ -9,19 +13,26 @@ import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponen
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.ai.AiExporter;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.summarization.Summary;
 import org.jabref.logic.ai.util.CitationKeyCheck;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,23 +44,32 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
     private final AiPreferences aiPreferences;
+    private final DialogService dialogService;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     public SummaryComponent(BibDatabaseContext bibDatabaseContext,
                             BibEntry entry,
-                            AiService aiService,
+                            BibEntryTypesManager entryTypesManager,
                             AiPreferences aiPreferences,
+                            FieldPreferences fieldPreferences,
                             ExternalApplicationsPreferences externalApplicationsPreferences,
                             CitationKeyPatternPreferences citationKeyPatternPreferences,
+                            AiService aiService,
                             DialogService dialogService,
                             AdaptVisibleTabs adaptVisibleTabs
+
     ) {
         super(aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
         this.bibDatabaseContext = bibDatabaseContext;
         this.entry = entry;
+        this.entryTypesManager = entryTypesManager;
+        this.aiPreferences = aiPreferences;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
         this.aiService = aiService;
-        this.aiPreferences = aiPreferences;
+        this.dialogService = dialogService;
+        this.fieldPreferences = fieldPreferences;
 
         aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> rebuildUi());
 
@@ -154,6 +174,67 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
 
             aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext);
             // No need to rebuildUi(), because this class listens to the state of ProcessingInfo of the summary.
-        });
+        },
+                () -> exportMarkdown(summary),
+                () -> exportJson(summary));
+    }
+
+    private void exportJson(Summary summary) {
+        if (summary == null) {
+            dialogService.notify(Localization.lang("No summary available to export"));
+            return;
+        }
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.JSON)
+                .withDefaultExtension(StandardFileType.JSON)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                     .ifPresent(path -> {
+                         try {
+                             List<ChatMessage> dummyChat = List.of(new AiMessage(summary.content()));
+                             AiExporter exporter = new AiExporter(entry, entryTypesManager, fieldPreferences);
+                             String jsonString = exporter.buildJsonExport(
+                                     summary.aiProvider().getLabel(),
+                                     summary.model(),
+                                     summary.timestamp().toString(),
+                                     dummyChat
+                             );
+
+                             Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
+                         } catch (IOException e) {
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
+                         }
+                     });
+    }
+
+    private void exportMarkdown(Summary summary) {
+        if (summary == null) {
+            dialogService.notify(Localization.lang("No summary available to export"));
+            return;
+        }
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.MARKDOWN)
+                .withDefaultExtension(StandardFileType.MARKDOWN)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entry, entryTypesManager, fieldPreferences);
+                             String content = exporter.buildMarkdownExport("AI summary", "Summary", summary.content());
+                             Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
+                         } catch (IOException e) {
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
+                         }
+                     });
     }
 }

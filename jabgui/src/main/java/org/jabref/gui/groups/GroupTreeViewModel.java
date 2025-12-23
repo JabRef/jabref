@@ -28,11 +28,13 @@ import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
@@ -61,6 +63,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
@@ -82,20 +86,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
     public GroupTreeViewModel(@NonNull StateManager stateManager,
+                              @NonNull BibEntryTypesManager entryTypesManager,
+                              @NonNull GuiPreferences preferences,
+                              @NonNull FieldPreferences fieldPreferences,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
-                              @NonNull GuiPreferences preferences,
                               @NonNull AdaptVisibleTabs adaptVisibleTabs,
-                              @NonNull TaskExecutor taskExecutor,
-                              @NonNull CustomLocalDragboard localDragboard
+                              @NonNull CustomLocalDragboard localDragboard,
+                              @NonNull TaskExecutor taskExecutor
     ) {
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.preferences = preferences;
+        this.fieldPreferences = fieldPreferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.preferences = preferences;
         this.adaptVisibleTabs = adaptVisibleTabs;
-        this.taskExecutor = taskExecutor;
         this.localDragboard = localDragboard;
+        this.taskExecutor = taskExecutor;
 
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
@@ -479,12 +487,15 @@ public class GroupTreeViewModel extends AbstractViewModel {
             existingWindow.get().requestFocus();
         } else {
             AiChatWindow aiChatWindow = new AiChatWindow(
+                    entryTypesManager,
+                    preferences.getAiPreferences(),
+                    fieldPreferences,
+                    preferences.getExternalApplicationsPreferences(),
                     aiService,
                     dialogService,
-                    preferences.getAiPreferences(),
-                    preferences.getExternalApplicationsPreferences(),
                     adaptVisibleTabs,
-                    taskExecutor
+                    taskExecutor,
+                    stateManager
             );
 
             aiChatWindow.setOnCloseRequest(event ->
