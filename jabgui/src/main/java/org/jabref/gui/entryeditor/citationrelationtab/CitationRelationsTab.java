@@ -473,20 +473,20 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
 
         fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
-            // Even though only the citing fetcher can be changed, the current UI code requires both sides to be refreshed
+            if (citingComponents.entry().getDOI().isEmpty()) {
+                // TODO: The combo box should be disabled if there is no DOI
+                return;
+            }
+
+            // Fetcher can only be changed for the citing search.
+            // Therefore, we handle this part only.
 
             // Cancel any running searches so they don't continue with the old fetcher
             if (citingTask != null && !citingTask.isCancelled()) {
                 citingTask.cancel();
             }
-            if (citedByTask != null && !citedByTask.isCancelled()) {
-                citedByTask.cancel();
-            }
-
             entryEditorPreferences.setCitationFetcherType(newValue);
-
             searchForRelations(citingComponents, citedByComponents);
-            searchForRelations(citedByComponents, citingComponents);
         });
 
         // Create SplitPane to hold all nodes above
