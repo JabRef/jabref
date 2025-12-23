@@ -100,7 +100,7 @@ public class FileUtil {
      */
     public static String getBaseName(String fileNameWithExtension) {
         int slash = Math.max(0, 1 + fileNameWithExtension.lastIndexOf(File.pathSeparatorChar));
-        int dot = Math.max(0, 1 + fileNameWithExtension.lastIndexOf('.'));
+        int dot = Math.max(0, fileNameWithExtension.lastIndexOf('.'));
         return slash < dot ? fileNameWithExtension.substring(slash, dot) : fileNameWithExtension.substring(slash);
     }
 

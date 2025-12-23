@@ -80,9 +80,9 @@ class LinkedFileHandlerTest {
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
 
         if (extension.isEmpty()) {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
-        } else {
             assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
+        } else {
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
         }
     }
 
@@ -111,9 +111,9 @@ class LinkedFileHandlerTest {
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
 
         if (extension.isEmpty()) {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
-        } else {
             assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
+        } else {
+            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
         }
     }
 }

@@ -33,8 +33,8 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         commandLine.execute("pseudonymize", "--input=" + copy);
         Path output = tempDir.resolve("origin.pseudo.bib");
         Path key = tempDir.resolve("origin.pseudo.csv");
-        assertTrue(output.toFile().exists(), java.nio.file.Files.list(tempDir).map(f -> f.toString()).collect(Collectors.joining(", ")));
-        assertTrue(key.toFile().exists(), java.nio.file.Files.list(tempDir).map(f -> f.toString()).collect(Collectors.joining(", ")));
+        assertTrue(output.toFile().exists());
+        assertTrue(key.toFile().exists());
     }
 
     @Test
