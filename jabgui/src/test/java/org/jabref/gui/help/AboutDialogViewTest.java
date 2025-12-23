@@ -87,7 +87,6 @@ class AboutDialogViewTest extends ApplicationTest {
         clickOn("Close");
     }
 
-
     @Test
     void buttonsAreNotTruncatedAt10ptFont() throws InterruptedException {
         DialogPane pane = aboutDialogView.getDialogPane();
@@ -108,7 +107,7 @@ class AboutDialogViewTest extends ApplicationTest {
                                 button.getText(), actualWidth, prefWidth));
             });
             // for debugging purpises
-           // Thread.sleep(4000);
+            // Thread.sleep(4000);
         }
     }
 }
