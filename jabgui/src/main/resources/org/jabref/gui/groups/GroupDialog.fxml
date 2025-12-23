@@ -210,7 +210,7 @@
                         <Tooltip text="%Dynamically group entries by linked files in a directory"/>
                     </tooltip>
                 </CheckBox>
-                <Label text="%root path\:" disable="${!directoryStructureCheckbox.selected}"/>
+                <Label text="%root path:" disable="${!directoryStructureCheckbox.selected}"/>
                 <TextField fx:id="directoryGroupPath" HBox.hgrow="ALWAYS" prefHeight="25.0" 
                            disable="${!directoryStructureCheckbox.selected}"/>
                 <Button onAction="#directoryGroupBrowse" text="%Browse" prefHeight="25.0"
