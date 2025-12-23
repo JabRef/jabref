@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -97,5 +98,46 @@ class AutoSetFileLinksUtilTest {
                 FileUtil.relativize(newPath, List.of(directory)),
                 Path.of(matches.getFirst().getLink())
         );
+    }
+
+    @Test
+    void findAllAssociatedNotLinkedFilesInsteadOfTheFirstOne(@TempDir Path tempDir) throws IOException {
+        Path directory = tempDir.resolve("files");
+        Path oldPath = directory.resolve("old/minimal.pdf");
+        Files.createDirectories(oldPath.getParent());
+        Files.createFile(oldPath);
+
+        LinkedFile stale = new LinkedFile("", oldPath.toString(), "PDF");
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+        entry.addFile(stale);
+
+        // Simulate a file move
+        Path newPath1 = directory.resolve("new1/minimal.pdf");
+        Files.createDirectories(newPath1.getParent());
+        Files.move(oldPath, newPath1);
+
+        // Create a second copy of the file
+        Path newPath2 = directory.resolve("new2/minimal.pdf");
+        Files.createDirectories(newPath2.getParent());
+        Files.copy(newPath1, newPath2);
+
+        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        when(context.getFileDirectories(filePreferences)).thenReturn(List.of(directory));
+
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                context,
+                externalApplicationsPreferences,
+                filePreferences,
+                autoLinkPrefs);
+
+        List<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
+
+        assertEquals(2, matches.size());
+        assertTrue(matches.stream().anyMatch(file -> {
+            return FileUtil.relativize(newPath1, List.of(directory)).equals(Path.of(file.getLink()));
+        }));
+        assertTrue(matches.stream().anyMatch(file -> {
+            return FileUtil.relativize(newPath2, List.of(directory)).equals(Path.of(file.getLink()));
+        }));
     }
 }
