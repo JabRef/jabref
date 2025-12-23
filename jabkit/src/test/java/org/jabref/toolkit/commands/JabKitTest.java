@@ -26,7 +26,7 @@ class JabKitTest extends AbstractJabKitTest {
 
         commandLine.execute(args.toArray(String[]::new));
 
-        assertTrue(Files.exists(outputBib));
+        assertFileExists(outputBib);
     }
 
     @Test

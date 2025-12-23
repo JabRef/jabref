@@ -44,7 +44,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=" + format,
                 "--output=" + outputPath);
 
-        assertTrue(outputPath.toFile().exists());
+        assertFileExists(outputPath);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=bibtex",
                 "--output=" + outputPath);
 
-        assertTrue(outputPath.toFile().exists());
+        assertFileExists(outputPath);
         assertTrue(Files.readString(outputPath).contains("Darwin1888"));
     }
 
@@ -77,7 +77,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=ffasdfasd",
                 "--output=" + outputPath);
 
-        assertFalse(outputPath.toFile().exists());
+        assertFileDoesntExist(outputPath);
     }
 
     @Test
@@ -116,6 +116,6 @@ public class ConvertTest extends AbstractJabKitTest {
 
         commandLine.execute(args.toArray(String[]::new));
 
-        assertTrue(Files.exists(outputHtml));
+        assertFileExists(outputHtml);
     }
 }

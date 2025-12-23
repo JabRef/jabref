@@ -3,9 +3,11 @@ package org.jabref.toolkit.commands;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
@@ -24,6 +26,8 @@ import picocli.CommandLine;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class AbstractJabKitTest {
     protected final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -135,5 +139,13 @@ public abstract class AbstractJabKitTest {
                     "Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e
             );
         }
+    }
+
+    static void assertFileExists(Path path) {
+        assertTrue(Files.exists(path), "though found " + Files.list(path.getParent()).map(f -> f.toString()).collect(Collectors.joining(", ")));
+    }
+
+    static void assertFileDoesntExist(Path path) {
+        assertFalse(Files.exists(path), "though found " + Files.list(path.getParent()).map(f -> f.toString()).collect(Collectors.joining(", ")));
     }
 }

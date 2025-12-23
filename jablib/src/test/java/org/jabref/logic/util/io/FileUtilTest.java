@@ -242,9 +242,9 @@ class FileUtilTest {
                blank, https://www.example.com/path/to/blank
                blank, https://www.example.com/not\\a\\windows\\path/blank
                not\\a\\windows.file, https://www.example.com/path/to/not\\a\\windows.file
-               test.file, https://www.example.com/path/to/file.pdf?field=value
-               test.file, https://www.example.com/path/to/file.pdf?a=1&b=2
-               test.file, https://www.example.com/path/to/file.pdf?search=for+a+file
+               test.file, https://www.example.com/path/to/test.file?field=value
+               test.file, https://www.example.com/path/to/test.file?a=1&b=2
+               test.file, https://www.example.com/path/to/test.file?search=for+a+file
                blank, https://www.example.com/path/to/blank?search=for+a+file
         """)
     // @formatter:on
