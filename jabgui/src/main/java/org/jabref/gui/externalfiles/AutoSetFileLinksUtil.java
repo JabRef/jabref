@@ -99,9 +99,9 @@ public class AutoSetFileLinksUtil {
     ///
     /// NOTE:
     /// 1. This method does not check if the file is already linked to another entry.
-    /// 2. This method does not guarantee how the returned files are ordered.
-    ///    Order by how they appear in BibEntry does not work since findAssociatedFilesByBrokenLinkedFile may return
-    ///      multiple files (with the same name) for one broken linked file in the entry.
+    /// 2. This method does not guarantee how the returned files are ordered. Order by how they appear in BibEntry does
+    ///    not work since findAssociatedFilesByBrokenLinkedFile may return multiple files (with the same name) for one
+    ///    broken linked file in the entry.
     public Collection<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> associatedNotLinkedFiles = new ArrayList<>();
 
