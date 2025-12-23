@@ -110,7 +110,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private CheckBox dateGroupIncludeEmpty;
 
     // Directory Group
-    @FXML private RadioButton directoryRadioButton;
+    @FXML private CheckBox directoryStructureCheckbox;
     @FXML private TextField directoryGroupPath;
 
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
@@ -241,7 +241,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         dateGroupIncludeEmpty.selectedProperty().bindBidirectional(viewModel.dateGroupIncludeEmptyProperty());
 
         // Directory Group bindings
-        directoryRadioButton.selectedProperty().bindBidirectional(viewModel.typeDirectoryProperty());
+        directoryStructureCheckbox.selectedProperty().bindBidirectional(viewModel.typeDirectoryProperty());
         directoryGroupPath.textProperty().bindBidirectional(viewModel.directoryGroupPathProperty());
 
         // Initialize Date Group ComboBoxes
