@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -132,12 +132,13 @@ class AutoSetFileLinksUtilTest {
                 filePreferences,
                 autoLinkPrefs);
 
-        List<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
+        List<String> matchedFiles = util.findAssociatedNotLinkedFiles(entry)
+                                        .stream().map(LinkedFile::getLink).toList();
+        assertEquals(2, matchedFiles.size());
 
-        assertEquals(2, matches.size());
-        assertTrue(matches.stream().anyMatch(file ->
-                Path.of(newPath1String).equals(Path.of(file.getLink()))));
-        assertTrue(matches.stream().anyMatch(file ->
-                Path.of(newPath2String).equals(Path.of(file.getLink()))));
+        List<String> expected = List.of(newPath1String, newPath2String);
+        // findAssociatedNotLinkedFiles does not guarantee how the returned files are ordered
+        // so here we compare equality without considering order
+        assertEquals(new HashSet<>(matchedFiles), new HashSet<>(expected));
     }
 }
