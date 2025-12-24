@@ -59,4 +59,5 @@ module org.jabref.jabsrv {
     requires transitive org.jspecify;
     requires java.logging;
     requires tools.jackson.databind;
+    requires jdk.httpserver;
 }

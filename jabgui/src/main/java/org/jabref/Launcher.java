@@ -12,6 +12,7 @@ import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.http.server.CockpitServer;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -95,7 +96,7 @@ public class Launcher {
             CSLStyleLoader.loadInternalStyles();
 
             // Start Researcher Cockpit Server (Ticket #2)
-            new org.jabref.gui.remote.CockpitServer().start();
+            new CockpitServer().start();
 
             JabRefGUI.setup(uiCommands, preferences);
             JabRefGUI.launch(JabRefGUI.class, args);

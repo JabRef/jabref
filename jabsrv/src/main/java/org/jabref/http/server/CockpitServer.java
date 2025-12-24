@@ -1,4 +1,4 @@
-package org.jabref.gui.remote;
+package org.jabref.http.server;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
