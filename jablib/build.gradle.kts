@@ -9,6 +9,7 @@ import java.util.*
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.download")
     id("java-library")
 
     id("antlr")
@@ -17,7 +18,7 @@ plugins {
 
     id("com.vanniktech.maven.publish") version "0.35.0"
 
-    // id("dev.jbang") version "0.2.0"
+    // id("dev.jbang") version "0.3.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
     // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
     id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
@@ -275,34 +276,10 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     onlyIf {!cslCatalogJson.get().asFile.exists()}
 }
 
-var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
-
-tasks.register("downloadLtwaFile") {
-    group = "JabRef"
-    description = "Downloads the LTWA file for journal abbreviations"
-
-    val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
-    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
-
-    outputs.file(ltwaCsvFile)
-
-    // Ensure that the task really is not run if the file already exists (otherwise, the task could also run if gradle's cache is cleared, ...)
-    onlyIf {!ltwaCsvFile.get().asFile.exists()}
-
-    doLast {
-        val dir = ltwaDir.get().asFile
-        val file = ltwaCsvFile.get().asFile
-
-        dir.mkdirs()
-
-        URI(ltwaUrl).toURL().openStream().use { input ->
-            file.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-
-        logger.debug("Downloaded LTWA file to $file")
-    }
+tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadLtwaFile") {
+    src("https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv")
+    dest(layout.buildDirectory.file("tmp/ltwa_20210702.csv"))
+    onlyIfModified(true)
 }
 
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
@@ -322,7 +299,6 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
 sourceSets["main"].resources {
     srcDir(layout.buildDirectory.dir("generated/resources"))
 }
-
 
 // region processResources
 abstract class JoinNonCommentedLines : DefaultTask() {
