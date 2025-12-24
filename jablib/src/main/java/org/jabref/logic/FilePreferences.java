@@ -41,6 +41,8 @@ public class FilePreferences {
     private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
+    private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
+    private final StringProperty coversDownloadLocation = new SimpleStringProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -61,7 +63,9 @@ public class FilePreferences {
                            boolean shouldKeepDownloadUrl,
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
-                           boolean openFileExplorerInLastUsedDirectory) {
+                           boolean openFileExplorerInLastUsedDirectory,
+                           boolean shouldDownloadCovers,
+                           String coversDownloadLocation) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -82,6 +86,8 @@ public class FilePreferences {
         this.lastUsedDirectory.setValue(lastUsedDirectory);
         this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);
         this.openFileExplorerInLastUsedDirectory.set(openFileExplorerInLastUsedDirectory);
+        this.shouldDownloadCovers.set(shouldDownloadCovers);
+        this.coversDownloadLocation.set(coversDownloadLocation);
     }
 
     public String getUserAndHost() {
@@ -322,5 +328,29 @@ public class FilePreferences {
 
     public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
         this.openFileExplorerInLastUsedDirectory.set(value);
+    }
+
+    public boolean shouldDownloadCovers() {
+        return shouldDownloadCovers.get();
+    }
+
+    public BooleanProperty shouldDownloadCoversProperty() {
+        return shouldDownloadCovers;
+    }
+
+    public void setShouldDownloadCovers(boolean value) {
+        this.shouldDownloadCovers.set(value);
+    }
+
+    public String coversDownloadLocation() {
+        return coversDownloadLocation.get();
+    }
+
+    public StringProperty coversDownloadLocationProperty() {
+        return coversDownloadLocation;
+    }
+
+    public void setCoversDownloadLocation(String value) {
+        this.coversDownloadLocation.set(value);
     }
 }

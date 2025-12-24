@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -20,6 +21,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
@@ -81,6 +83,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
 
+    private final BookCoverFetcher bookCoverFetcher;
+
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
@@ -104,6 +108,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
+
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -222,15 +228,25 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
+        String coverIfAny = getCoverImageURL().map(url -> "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(url)).orElse("");
+
         layoutText = """
-                <html>
-                    <body id="previewBody">
-                        <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(text);
+                    <html>
+                        <body id="previewBody">
+                            %s <div id="content"> %s </div>
+                        </body>
+                    </html>
+                """.formatted(coverIfAny, text);
         highlightLayoutText();
         setHvalue(0);
+    }
+
+    private Optional<String> getCoverImageURL() {
+        if (entry != null) {
+            String location = preferences.getFilePreferences().coversDownloadLocation();
+            return bookCoverFetcher.getDownloadedCoverForEntry(entry, location).map(p -> p.toUri().toString());
+        }
+        return Optional.empty();
     }
 
     private void highlightLayoutText() {
@@ -285,7 +301,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        clipBoardManager.setContent((String) previewView.getEngine().executeScript("document.body.innerText"));
+        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
+        ClipboardContent content = new ClipboardContent();
+        content.putString(plainText);
+        clipBoardManager.setContent(content);
     }
 
     public void copySelectionToClipBoard() {

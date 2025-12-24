@@ -1,11 +1,14 @@
 package org.jabref.toolkit.commands;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
@@ -22,6 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Answers;
 import picocli.CommandLine;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -135,5 +140,13 @@ public abstract class AbstractJabKitTest {
                     "Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e
             );
         }
+    }
+
+    static void assertFileExists(Path path) throws IOException {
+        assertTrue(Files.exists(path), "file  '" + path.getFileName().toString() + "' doesn't exist, but found " + Files.list(path.getParent()).map(f -> "'" + f.getFileName().toString() + "'").collect(Collectors.joining(", ")));
+    }
+
+    static void assertFileDoesntExist(Path path) throws IOException {
+        assertFalse(Files.exists(path), "file '" + path.getFileName().toString() + "' shouldn't exist, but does");
     }
 }
