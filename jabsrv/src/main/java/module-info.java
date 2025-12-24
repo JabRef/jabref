@@ -15,6 +15,7 @@ module org.jabref.jabsrv {
     exports org.jabref.http;
     opens org.jabref.http.server.resources to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     exports org.jabref.http.server.resources;
+    opens org.jabref.http.server.services to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
 
     requires javafx.base;
 
