@@ -109,6 +109,7 @@
     <CheckBox fx:id="alwaysReformatBib" text="%Always reformat library on save and export"/>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
         <CheckBox fx:id="autosaveLocalLibraries" text="%Autosave local libraries"/>
+        <Button fx:id="autosaveLocalLibrariesHelp"/>
         <padding>
             <Insets top="-8.0"/>
         </padding>
