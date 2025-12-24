@@ -323,7 +323,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
             preferences.setIdLookupGuessing(newValue);
             // When switching to auto-detect mode, detect identifier type from current text
-            if (newValue && idText.getText() != null && !idText.getText().trim().isEmpty()) {
+            if (newValue && !idText.getText().trim().isEmpty()) {
                 Optional<Identifier> identifier = Identifier.from(idText.getText().trim());
                 if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
                     fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
@@ -345,8 +345,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         // Auto-detect identifier type when typing in the identifier field
         // Only works when "Automatically determine identifier type" is selected
-        idText.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (idLookupGuess.isSelected() && newValue != null && !newValue.trim().isEmpty()) {
+        idText.textProperty().addListener((_, _, newValue) -> {
+            if (idLookupGuess.isSelected() && !newValue.trim().isEmpty()) {
                 Optional<Identifier> identifier = Identifier.from(newValue.trim());
                 if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
                     fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
