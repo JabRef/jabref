@@ -88,9 +88,9 @@
         <TextField fx:id="httpServerPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
     </HBox>
 
-    <Label styleClass="sectionHeader" text="%Language Server" />
+    <Label styleClass="sectionHeader" text="%LSP Server" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <CheckBox fx:id="enableLanguageServer" text="%Enable Language Server on port" />
+        <CheckBox fx:id="enableLanguageServer" text="%Enable LSP Server on port" />
         <TextField fx:id="languageServerPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
     </HBox>
 
@@ -109,7 +109,7 @@
     <CheckBox fx:id="alwaysReformatBib" text="%Always reformat library on save and export"/>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
         <CheckBox fx:id="autosaveLocalLibraries" text="%Autosave local libraries"/>
-        <Button fx:id="autosaveLocalLibrariesHelp"/>
+        <!-- <Button fx:id="autosaveLocalLibrariesHelp"/> -->
         <padding>
             <Insets top="-8.0"/>
         </padding>
