@@ -225,7 +225,7 @@ public class FieldFactory {
      * a separate preferences object
      */
     public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(List.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
+        List<Field> defaultGeneralFields = new ArrayList<>(List.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.EPRINTTYPE, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
         defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
         return defaultGeneralFields;
     }
