@@ -708,10 +708,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
         for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
-                    (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
-                            (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
-                            (id instanceof RFC && fetcher instanceof RfcFetcher) ||
-                            (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
+                    (id instanceof ISBN && fetcher instanceof IsbnFetcher) ||
+                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
                 return Optional.of(fetcher);
             }
         }
