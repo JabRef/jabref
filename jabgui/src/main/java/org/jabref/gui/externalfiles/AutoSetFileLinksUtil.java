@@ -27,7 +27,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +94,8 @@ public class AutoSetFileLinksUtil {
      * Prolog: we only consider the file with a unique name
      *         if a file's name is found multiple times in Part A, we do not consider it in Step 1
      *         if a file's name is found multiple times in Part B, we do not consider it in Step 2
-     * Step 1. try to auto link each broken linked file with Part A at first. For unlinked files left in Part A, add them
+     * Step 1. try to auto link each broken linked file with Part A at first. For unlinked files left in Part A, if no
+     *         linked file with same name exists, add them
      *         why `add`: Part A are found mainly by CitationKey, which has strong connection to the entry, so we are
      *                    confident that we should add them automatically
      * Step 2. try to auto link each broken linked file with Part B.
@@ -109,9 +109,13 @@ public class AutoSetFileLinksUtil {
         Map<String, LinkedFile> files = getAssociatedFiles(entry, result, preConfiguredFileFinder);
         autoLinkBrokenLinkedFiles(entry, files);
         // Add left unlinked files as new linked files
+        Set<String> linkedFileNames = entry.getFiles().stream().map(LinkedFile::getLink)
+                                           .map(FileUtil::getBaseName).collect(Collectors.toSet());
         files.forEach((name, file) -> {
-            entry.addFile(file);
-            onAddLinkedFile.accept(file, entry);
+            if (!linkedFileNames.contains(name)) {
+                entry.addFile(file);
+                onAddLinkedFile.accept(file, entry);
+            }
         });
 
         // Step 2: try matched files based on broken linked file names
@@ -142,7 +146,7 @@ public class AutoSetFileLinksUtil {
         entry.setFiles(updated);
     }
 
-    private @NotNull Map<String, LinkedFile> getAssociatedFiles(BibEntry entry, LinkFilesResult result, FileFinder finder) {
+    private Map<String, LinkedFile> getAssociatedFiles(BibEntry entry, LinkFilesResult result, FileFinder finder) {
         Map<String, LinkedFile> files;
         try {
             files = findAssociatedNotLinkedFilesWithUniqueName(entry, finder);
@@ -217,19 +221,19 @@ public class AutoSetFileLinksUtil {
         return file.findIn(directories).isEmpty();
     }
 
-    private @NotNull LinkedFile buildLinkedFileFromPath(Path associatedFile) {
+    private LinkedFile buildLinkedFileFromPath(Path associatedFile) {
         String strType = checkAndGetFileType(associatedFile);
         Path relativeFilePath = FileUtil.relativize(associatedFile, directories);
         return new LinkedFile("", relativeFilePath, strType);
     }
 
-    private @NotNull List<String> getConfiguredExtensions() {
+    private List<String> getConfiguredExtensions() {
         return externalApplicationsPreferences
                 .getExternalFileTypes()
                 .stream().map(ExternalFileType::getExtension).toList();
     }
 
-    private @NotNull String checkAndGetFileType(Path associatedFile) {
+    private String checkAndGetFileType(Path associatedFile) {
         return FileUtil.getFileExtension(associatedFile)
                        .flatMap(extension ->
                                ExternalFileTypes.getExternalFileTypeByExt(
