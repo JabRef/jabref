@@ -683,9 +683,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
      */
     private boolean isValidIdentifier(Identifier id) {
         return switch (id) {
-            case DOI doi -> DOI.isValid(doi.asString());
-            case ISBN isbn -> isbn.isValid();
-            default -> true;
+            case DOI doi ->
+                    DOI.isValid(doi.asString());
+            case ISBN isbn ->
+                    isbn.isValid();
+            default ->
+                    true;
         };
     }
 
