@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a new "Directory structure" group type that automatically creates subgroups mirroring a directory structure from the file system. [#10930](https://github.com/JabRef/jabref/issues/10930)
+- We added the ability to drag and drop images to the comments field. [#10559](https://github.com/JabRef/jabref/issues/10559)
 - We added functionality to use `,` and `>` symbols inside keywords by putting `\` symbol before them. [#12810](https://github.com/JabRef/jabref/issues/12810)
 - We added the `eprinttype` field to the General entry editor tab. [#14555](https://github.com/JabRef/jabref/issues/14555)
 - We added a right-click option to delete custom BST styles in the entry preview. [#14352](https://github.com/JabRef/jabref/issues/14352)
@@ -57,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We renamed "Search pre-configured" to "Search pre-selected" and "Web search fetchers" to "Pre-selected fetchers". [#14557](https://github.com/JabRef/jabref/issues/14557)
 - We renamed "ArXiv" to "arXiv" in New Entry dialog. [#14643](https://github.com/JabRef/jabref/issues/14643)
 - We improved the keyboard shortcut dialog, it is now possible to directly press <kbd>cmd</kbd>+<kbd>...</kbd> when changing keyboards on macOS. [#14237](https://github.com/JabRef/jabref/issues/14237)
+- We improved the “search and show unlinked files” feature to contain all associated files instead of just the first one. [#14697](https://github.com/JabRef/jabref/issues/14697)
 
 ### Fixed
 
@@ -66,11 +68,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
 - We fixed localization of the "New Entries" dialog. [#14455](https://github.com/JabRef/jabref/pull/14455)
 - We fixed an issue where keybindings could not be edited and saved. [#14237](https://github.com/JabRef/jabref/issues/14237)
+- We fixed an issue of cleaning of wrongly encoded DOIs. [#14704](https://github.com/JabRef/jabref/pull/14704)
 - We readded the missing gui commands for importing and exporting preferences. [#14492](https://github.com/JabRef/jabref/pull/14492)
 - We fixed the keyboard navigation in the entry editor: pressing <kbd>Shift</kbd> + <kbd>Tab</kbd> on the first field now correctly focuses the last field of the previous tab. [#14513](https://github.com/JabRef/jabref/issues/14513)
 - We fixed a crash when importing preferences from older JabRef versions. [#14497](https://github.com/JabRef/jabref/issues/14497)
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
+- We fixed an issure where warning dialog is mixed Chinese/English after switching to zh_CN [#14654](https://github.com/JabRef/jabref/issues/14654)
 
 ### Removed
 

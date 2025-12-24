@@ -36,7 +36,7 @@ jobs:
           close-pr-message: >
             This PR is being closed due to continued inactivity.
       - name: Process closed issues/PRs
-        if: steps.stale.outputs.closed-issues-prs
+        if: ${{ steps.stale.outputs.closed-issues-prs != [] }}
         env:
           CLOSED: ${{ steps.stale.outputs.closed-issues-prs }}
         run: |

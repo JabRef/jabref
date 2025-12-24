@@ -92,6 +92,6 @@
             <TextArea fx:id="textAreaVersions" editable="false" prefHeight="100.0" prefWidth="200.0" styleClass="info-sections"/>
         </VBox>
     </content>
-    <ButtonType fx:id="copyVersionButton" text="%Copy Version" buttonData="LEFT"/>
+    <ButtonType fx:id="copyVersionButton" text="Copy Version" buttonData="LEFT"/>
     <ButtonType fx:constant="CLOSE"/>
 </DialogPane>
