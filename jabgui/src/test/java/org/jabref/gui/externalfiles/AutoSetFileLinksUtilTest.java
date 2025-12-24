@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 
 import javafx.collections.FXCollections;
 
@@ -32,14 +34,13 @@ class AutoSetFileLinksUtilTest {
 
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final AutoLinkPreferences autoLinkPrefs = new AutoLinkPreferences(
-            AutoLinkPreferences.CitationKeyDependency.START,
-            "",
-            false,
-            ';');
+    private final AutoLinkPreferences autoLinkPrefs = mock(AutoLinkPreferences.class);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
     private Path path = null;
+    private final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> {
+        // omit undo related logic
+    };
 
     @BeforeEach
     void setUp(@TempDir Path folder) throws IOException {
@@ -48,6 +49,10 @@ class AutoSetFileLinksUtilTest {
         entry.setCitationKey("CiteKey");
         when(externalApplicationsPreferences.getExternalFileTypes())
                 .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+
+        when(autoLinkPrefs.getRegularExpression()).thenReturn("");
+        when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
+        when(autoLinkPrefs.getKeywordSeparator()).thenReturn(';');
     }
 
     @Test
@@ -61,6 +66,7 @@ class AutoSetFileLinksUtilTest {
 
     @Test
     void findAssociatedNotLinkedFilesForEmptySearchDir() throws IOException {
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
@@ -68,7 +74,7 @@ class AutoSetFileLinksUtilTest {
     }
 
     @Test
-    void relinksMovedFile(@TempDir Path tempDir) throws IOException {
+    void findOneAssociatedNotLinkedFile(@TempDir Path tempDir) throws IOException {
         Path directory = tempDir.resolve("files");
         Path oldPath = directory.resolve("old/minimal.pdf");
         Files.createDirectories(oldPath.getParent());
@@ -133,4 +139,440 @@ class AutoSetFileLinksUtilTest {
                 new LinkedFile("", newPath2String, "PDF"));
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
+
+    //******************************************************************************************************
+    //*********************************** Test linkAssociatedFiles *****************************************
+    //******************************************************************************************************
+
+    //******************************************************************************************************
+    //************************* Part 1. test auto link only by citation key ********************************
+    //******************************************************************************************************
+
+    //******************************************************************************************************
+    //************* Part 1.1 test auto link only by citation key - CitationKeyDependency.START *************
+    //******************************************************************************************************
+
+    /**
+     * └── citationKeyxxx.pdf
+     */
+    @Test
+    void autoLinkByCitationKeyStartAtRootFolder(@TempDir Path root) throws Exception {
+        when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        String citationKey = "thisIsACitationKey";
+
+        // File and folder before moving
+        String fileName = String.format("%s_foobar.pdf", citationKey);
+        Path fileA = root.resolve(fileName);
+        Files.createFile(fileA);
+
+        // Setup BibEntry without file
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey(citationKey);
+        List<BibEntry> entries = List.of(entryA);
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(fileName), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * └── A
+     *     └── B
+     *         └── citationKeyxxx.pdf
+     */
+    @Test
+    void autoLinkByCitationKeyStartAtSubFolder(@TempDir Path root) throws Exception {
+        when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        String citationKey = "thisIsACitationKey";
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Files.createDirectory(folderA);
+        Path folderB = folderA.resolve("B");
+        Files.createDirectory(folderB);
+        String fileName = String.format("%s_foobar.pdf", citationKey);
+        Path fileA = folderB.resolve(fileName);
+        Files.createFile(fileA);
+
+        // Setup BibEntry without file
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey(citationKey);
+        List<BibEntry> entries = List.of(entryA);
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(String.format("A/B/%s", fileName)), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    //******************************************************************************************************
+    //************* Part 1.2 test auto link only by citation key - CitationKeyDependency.EXACT *************
+    //******************************************************************************************************
+
+    /**
+     * └── citationKeyxxx.pdf
+     */
+    @Test
+    void autoLinkByCitationKeyExactAtRootFolderDoesNotWorkWithNotExactName(@TempDir Path root) throws Exception {
+        when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        String citationKey = "thisIsACitationKey";
+
+        // File and folder before moving
+        String fileName = String.format("%s_foobar.pdf", citationKey);
+        Path fileA = root.resolve(fileName);
+        Files.createFile(fileA);
+
+        // Setup BibEntry without file
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey(citationKey);
+        List<BibEntry> entries = List.of(entryA);
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of();
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * └── citationKey.pdf
+     */
+    @Test
+    void autoLinkByCitationKeyExactAtRootFolder(@TempDir Path root) throws Exception {
+        when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        String citationKey = "thisIsACitationKey";
+
+        // File and folder before moving
+        String fileName = String.format("%s.pdf", citationKey);
+        Path fileA = root.resolve(fileName);
+        Files.createFile(fileA);
+
+        // Setup BibEntry without file
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey(citationKey);
+        List<BibEntry> entries = List.of(entryA);
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(fileName), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * └── A
+     *     └── B
+     *         └── citationKey.pdf
+     */
+    @Test
+    void autoLinkByCitationKeyExactAtSubFolder(@TempDir Path root) throws Exception {
+        when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        String citationKey = "thisIsACitationKey";
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Files.createDirectory(folderA);
+        Path folderB = folderA.resolve("B");
+        Files.createDirectory(folderB);
+        String fileName = String.format("%s.pdf", citationKey);
+        Path fileA = folderB.resolve(fileName);
+        Files.createFile(fileA);
+
+        // Setup BibEntry without file
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey(citationKey);
+        List<BibEntry> entries = List.of(entryA);
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(String.format("A/B/%s", fileName)), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    //******************************************************************************************************
+    //************* Part 1.3 test auto link only by citation key - CitationKeyDependency.REGEX *************
+    //******************************************************************************************************
+
+    // omitted
+
+    //******************************************************************************************************
+    //*************************** Part 2. test auto link only by file name *********************************
+    //******************************************************************************************************
+
+    /**
+     * From
+     * ├── A
+     * └── A.pdf
+     * to
+     * └── A
+     *     └── A.pdf
+     */
+    @Test
+    void autoLinkMoveFileFromRootFolderToSubfolder(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = root.resolve("A.pdf");
+        Files.createFile(fileA);
+
+        // Setup correct BibEntry
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("WeDoNotCare");
+        entryA.addFile(new LinkedFile("", "A.pdf", "PDF"));
+        List<BibEntry> entries = List.of(entryA);
+
+        // Simulate the move
+        Files.move(fileA, folderA.resolve("A.pdf"));
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * From
+     * └── A
+     *     └── A.pdf
+     * to
+     * ├── A
+     * └── A.pdf
+     */
+    @Test
+    void autoLinkMoveFileFromSubfolderToRootFolder(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+
+        // Setup correct BibEntry
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("WeDoNotCare");
+        entryA.addFile(new LinkedFile("", "A/A.pdf", "PDF"));
+        List<BibEntry> entries = List.of(entryA);
+
+        // Simulate the move
+        Files.move(fileA, root.resolve("A.pdf"));
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A.pdf"), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * From
+     * ├── A
+     * │   └── A.pdf
+     * └── B
+     * to
+     * ├── A
+     * └── B
+     *     └── A.pdf
+     */
+    @Test
+    void autoLinkMoveFileFromSubfolderToSubfolder(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Path folderB = root.resolve("B");
+        Files.createDirectory(folderA);
+        Files.createDirectory(folderB);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+
+        // Setup correct BibEntry
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("WeDoNotCare");
+        entryA.addFile(new LinkedFile("", "A/A.pdf", "PDF"));
+        List<BibEntry> entries = List.of(entryA);
+
+        // Simulate the move
+        Files.move(fileA, folderB.resolve("A.pdf"));
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("B/A.pdf"), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * From
+     * ├── A.pdf
+     * └── A
+     * to
+     * ├── A.pdf
+     * └── A
+     *     └── A.pdf
+     */
+    @Test
+    void noAutoLinkCopyFileFromRootFolderToSubfolder(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = root.resolve("A.pdf");
+        Files.createFile(fileA);
+
+        // Setup correct BibEntry
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("WeDoNotCare");
+        entryA.addFile(new LinkedFile("", "A.pdf", "PDF"));
+        List<BibEntry> entries = List.of(entryA);
+
+        // Simulate the copy
+        Files.copy(fileA, folderA.resolve("A.pdf"));
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A.pdf"), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * From
+     * └── A
+     *     └── A.pdf
+     * to
+     * ├── A.pdf
+     * └── A
+     *     └── A.pdf
+     */
+    @Test
+    void noAutoLinkCopyFileFromSubfolderToRootFolder(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Files.createDirectory(folderA);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+
+        // Setup correct BibEntry
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("WeDoNotCare");
+        entryA.addFile(new LinkedFile("", "A/A.pdf", "PDF"));
+        List<BibEntry> entries = List.of(entryA);
+
+        // Simulate the copy
+        Files.copy(fileA, root.resolve("A.pdf"));
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * From
+     * ├── A
+     * │   └── A.pdf
+     * └── B
+     * to
+     * ├── A
+     * │   └── A.pdf
+     * └── B
+     *     └── A.pdf
+     */
+    @Test
+    void noAutoLinkCopyFileFromSubfolderToSubfolder(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        // File and folder before moving
+        Path folderA = root.resolve("A");
+        Path folderB = root.resolve("B");
+        Files.createDirectory(folderA);
+        Files.createDirectory(folderB);
+        Path fileA = folderA.resolve("A.pdf");
+        Files.createFile(fileA);
+
+        // Setup correct BibEntry
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.setCitationKey("WeDoNotCare");
+        entryA.addFile(new LinkedFile("", "A/A.pdf", "PDF"));
+        List<BibEntry> entries = List.of(entryA);
+
+        // Simulate the move
+        Files.copy(fileA, folderB.resolve("A.pdf"));
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFile);
+
+        // Check auto-link result
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.pdf"), "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    //******************************************************************************************************
+    //********************* Part 3. test auto link by file name and citation key ***************************
+    //******************************************************************************************************
 }

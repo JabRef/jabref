@@ -92,7 +92,7 @@ public class AutoSetFileLinksUtil {
      * Part B. match file name with broken linked file names, currently silently happen
      *
      * The auto-link process:
-     * Prolog: we only consider the file a unique name
+     * Prolog: we only consider the file with a unique name
      *         if a file's name is found multiple times in Part A, we do not consider it in Step 1
      *         if a file's name is found multiple times in Part B, we do not consider it in Step 2
      * Step 1. try to auto link each broken linked file with Part A at first. For unlinked files left in Part A, add them
@@ -110,6 +110,7 @@ public class AutoSetFileLinksUtil {
         autoLinkBrokenLinkedFiles(entry, files);
         // Add left unlinked files as new linked files
         files.forEach((name, file) -> {
+            entry.addFile(file);
             onAddLinkedFile.accept(file, entry);
         });
 
@@ -126,15 +127,19 @@ public class AutoSetFileLinksUtil {
     }
 
     private void autoLinkBrokenLinkedFiles(BibEntry entry, Map<String, LinkedFile> files) {
+        List<LinkedFile> updated = new ArrayList<>();
         for (LinkedFile linkedFile : entry.getFiles()) {
-            if (isBrokenLinkedFile(linkedFile)) {
-                String fileName = FileUtil.getBaseName(linkedFile.getLink());
-                if (files.containsKey(fileName)) {
-                    linkedFile.setLink(files.get(fileName).getLink());
-                    files.remove(fileName);
-                }
+            String fileName = FileUtil.getBaseName(linkedFile.getLink());
+            if (isBrokenLinkedFile(linkedFile) && files.containsKey(fileName)) {
+                linkedFile.setLink(files.get(fileName).getLink());
+                updated.add(linkedFile);
+                files.remove(fileName);
+            } else {
+                updated.add(linkedFile);
             }
         }
+
+        entry.setFiles(updated);
     }
 
     private @NotNull Map<String, LinkedFile> getAssociatedFiles(BibEntry entry, LinkFilesResult result, FileFinder finder) {
