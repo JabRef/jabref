@@ -146,7 +146,9 @@ public class MarkdownEditor extends SimpleEditor {
     }
 
     private void insertMarkdownText(String relativePath, EditorTextArea textArea) {
-        String markdownText = "![](" + relativePath + ")\n";
+        // Backslash needs to be replaced with forward slash for correct rendering
+        String resolvedRelativePath = relativePath.replace('\\', '/');
+        String markdownText = "![](" + resolvedRelativePath + ")\n";
         int caretPosition = textArea.getCaretPosition();
         textArea.insertText(caretPosition, markdownText);
     }
