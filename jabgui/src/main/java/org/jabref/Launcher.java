@@ -94,6 +94,9 @@ public class Launcher {
 
             CSLStyleLoader.loadInternalStyles();
 
+            // Start Researcher Cockpit Server (Ticket #2)
+            new org.jabref.gui.remote.CockpitServer().start();
+
             JabRefGUI.setup(uiCommands, preferences);
             JabRefGUI.launch(JabRefGUI.class, args);
         } catch (Throwable throwable) {
