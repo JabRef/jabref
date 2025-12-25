@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
@@ -143,7 +144,7 @@ public class AutoSetFileLinksUtil {
             }
         }
 
-        entry.setFiles(updated);
+        UiTaskExecutor.runInJavaFXThread(() -> entry.setFiles(updated));
     }
 
     private Map<String, LinkedFile> getAssociatedFiles(BibEntry entry, LinkFilesResult result, FileFinder finder) {
