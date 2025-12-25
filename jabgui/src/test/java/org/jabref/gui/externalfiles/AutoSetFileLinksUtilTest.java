@@ -472,6 +472,39 @@ class AutoSetFileLinksUtilTest {
 
     /**
      * CK: WeDoNotCare
+     * └── broken_file_name.doc
+     */
+    @Test
+    void noAutoLinkByCitationKeyStartAtRootFolderWithSuffixMismatch(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
+
+        String citationKey = "WeDoNotCare";
+
+        // File and folder
+        String fileName = "broken_file_name.doc";
+        Path fileA = root.resolve(fileName);
+        Files.createFile(fileA);
+
+        // Setup BibEntry with broken_file_name.pdf
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        entryA.addFile(new LinkedFile("", "broken_file_name.pdf", "PDF"));
+        entryA.setCitationKey(citationKey);
+        List<BibEntry> entries = List.of(entryA);
+
+        // Run auto-link
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
+
+        // Check auto-link result
+        // it should not be updated
+        List<LinkedFile> expect = List.of(new LinkedFile("", "broken_file_name.pdf", "PDF"));
+        List<LinkedFile> actual = entryA.getFiles();
+        assertEquals(expect, actual);
+    }
+
+    /**
+     * CK: WeDoNotCare
      * From
      * ├── A
      * └── A.pdf
