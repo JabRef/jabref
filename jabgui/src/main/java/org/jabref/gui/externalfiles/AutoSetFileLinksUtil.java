@@ -216,6 +216,7 @@ public class AutoSetFileLinksUtil {
         return Stream.concat(
                              findAssociatedNotLinkedFilesWithFinder(entry, preConfiguredFileFinder, extensions).stream(),
                              findAssociatedNotLinkedFilesWithFinder(entry, brokenLinkedFileNameBasedFileFinder, extensions).stream())
+                     .distinct()
                      .toList();
     }
 
