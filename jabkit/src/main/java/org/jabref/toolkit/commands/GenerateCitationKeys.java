@@ -2,6 +2,9 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Map;
+import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -67,6 +70,9 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--generate-before-saving", description = "Generate citation keys before saving")
     private Boolean generateBeforeSaving;
 
+    @Option(names = "--entry-type-pattern", description = "Per-entry-type citation key pattern")
+    private Map<String, String> entryTypePatterns;
+
     @Override
     public void run() {
         Optional<ParserResult> parserResult = JabKit.importFile(
@@ -108,21 +114,41 @@ class GenerateCitationKeys implements Runnable {
     }
 
     private @NonNull CitationKeyGenerator getCitationKeyGenerator(BibDatabaseContext databaseContext) {
-        CitationKeyPatternPreferences existingPreferences = parentCommand.getParent().cliPreferences.getCitationKeyPatternPreferences();
+        CitationKeyPatternPreferences existingPreferences =
+                parentCommand.getParent().cliPreferences.getCitationKeyPatternPreferences();
 
-        CitationKeyPatternPreferences preferencesToUse = new CitationKeyPatternPreferences(
-                transliterate != null ? transliterate : existingPreferences.shouldTransliterateFieldsForCitationKey(),
-                avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
-                warnBeforeOverwrite != null ? warnBeforeOverwrite : existingPreferences.shouldWarnBeforeOverwriteCiteKey(),
-                generateBeforeSaving != null ? generateBeforeSaving : existingPreferences.shouldGenerateCiteKeysBeforeSaving(),
-                keySuffix != null ? keySuffix : existingPreferences.getKeySuffix(),
-                keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
-                keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
-                unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
-                existingPreferences.getKeyPatterns(),
-                pattern != null ? pattern : existingPreferences.getDefaultPattern(),
-                keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
-        );
+        String defaultPattern =
+                pattern != null
+                ? pattern
+                : existingPreferences.getDefaultPattern();
+
+        GlobalCitationKeyPatterns patterns =
+                GlobalCitationKeyPatterns.fromPattern(defaultPattern);
+
+        if (entryTypePatterns != null) {
+            entryTypePatterns.forEach((type, pattern) ->
+                    patterns.addCitationKeyPattern(
+                            EntryTypeFactory.parse(type),
+                            pattern
+                    )
+            );
+        }
+
+        CitationKeyPatternPreferences preferencesToUse =
+                new CitationKeyPatternPreferences(
+                        transliterate != null ? transliterate : existingPreferences.shouldTransliterateFieldsForCitationKey(),
+                        avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
+                        warnBeforeOverwrite != null ? warnBeforeOverwrite : existingPreferences.shouldWarnBeforeOverwriteCiteKey(),
+                        generateBeforeSaving != null ? generateBeforeSaving : existingPreferences.shouldGenerateCiteKeysBeforeSaving(),
+                        keySuffix != null ? keySuffix : existingPreferences.getKeySuffix(),
+                        keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
+                        keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
+                        unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
+                        patterns,
+                        pattern != null ? pattern : existingPreferences.getDefaultPattern(),
+                        keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
+                );
+
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }
 }
