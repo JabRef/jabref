@@ -152,6 +152,40 @@ class AutoSetFileLinksUtilTest {
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
 
+    @Test
+    void findAllAssociatedNotLinkedFilesAndNotRepeated(@TempDir Path tempDir) throws IOException {
+        when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
+
+        // File and folder
+        Path subdir = tempDir.resolve("subdir");
+        Files.createDirectory(subdir);
+        Path fileA = tempDir.resolve("CK_A.pdf");
+        Files.createFile(fileA);
+        Path fileB = tempDir.resolve("CK_B.pdf");
+        Files.createFile(fileB);
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withFiles(List.of(
+                        new LinkedFile("", "subdir/CK_B.pdf", "PDF")
+                ));
+        entry.setCitationKey("CK");
+
+        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        when(context.getFileDirectories(filePreferences)).thenReturn(List.of(tempDir));
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                context,
+                externalApplicationsPreferences,
+                filePreferences,
+                autoLinkPrefs);
+
+        // find by citation will return CK_A.pdf and CK_B.pdf
+        // find by broken linked file name will return CK_B.pdf
+        Collection<LinkedFile> matchedFiles = util.findAssociatedNotLinkedFiles(entry);
+        Set<LinkedFile> expected = Set.of(
+                new LinkedFile("", "CK_A.pdf", "PDF"),
+                new LinkedFile("", "CK_B.pdf", "PDF"));
+        assertEquals(expected, Set.copyOf(matchedFiles));
+    }
+
     //******************************************************************************************************
     //*********************************** Test linkAssociatedFiles *****************************************
     //******************************************************************************************************
