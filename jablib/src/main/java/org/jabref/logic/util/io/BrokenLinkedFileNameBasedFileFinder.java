@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,7 @@ class BrokenLinkedFileNameBasedFileFinder implements FileFinder {
         }
     }
 
-    private static @NotNull Set<String> getBrokenLinkedFileNames(@NotNull BibEntry entry, @NotNull List<Path> directories) {
+    private static @NonNull Set<String> getBrokenLinkedFileNames(@NonNull BibEntry entry, @NonNull List<Path> directories) {
         return entry.getFiles().stream()
                     .filter(linkedFile -> linkedFile.findIn(directories).isEmpty())
                     .map(linkedFile -> FileUtil.getBaseName(linkedFile.getLink()).toLowerCase())
