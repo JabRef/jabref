@@ -5,8 +5,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -14,18 +12,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.BibField;
-import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,29 +28,9 @@ import static org.mockito.Mockito.mock;
 
 class BibliographyConsistencyCheckResultCsvWriterTest {
 
-    private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("unknownType");
-    private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
-
     private final BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
-    private BibEntryType newCustomType;
-    private BibEntryType overwrittenStandardType;
-    private BibEntryTypesManager entryTypesManager;
-
-    @BeforeEach
-    void setUp() {
-        newCustomType = new BibEntryType(
-                CUSTOM_TYPE,
-                List.of(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
-                Set.of());
-
-        overwrittenStandardType = new BibEntryType(
-                StandardEntryType.Article,
-                List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
-                Set.of());
-
-        entryTypesManager = new BibEntryTypesManager();
-    }
+    private final BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
 
     @Test
     void checkSimpleLibrary(@TempDir Path tempDir) throws IOException {

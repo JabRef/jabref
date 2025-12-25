@@ -10,6 +10,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -30,11 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BibliographyConsistencyCheckTest {
 
-    private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("unknownType");
     private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
 
     private BibEntryType newCustomType;
-    private BibEntryType overwrittenStandardType;
+    private BibEntryType overwrittenStandardTypeWithCustomFields;
+    private UnknownField bibUrl;
+    private UnknownField bibSource;
     private BibEntryTypesManager entryTypesManager;
 
     @BeforeEach
@@ -44,12 +46,126 @@ class BibliographyConsistencyCheckTest {
                 List.of(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
                 Set.of());
 
-        overwrittenStandardType = new BibEntryType(
-                StandardEntryType.Article,
-                List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
-                Set.of());
+        bibUrl = new UnknownField("biburl");
+        bibSource = new UnknownField("bibsource");
+
+        overwrittenStandardTypeWithCustomFields = new BibEntryTypeBuilder()
+                .withType(StandardEntryType.Article)
+                .withRequiredFields(
+                        StandardField.AUTHOR, StandardField.TITLE)
+                .withImportantFields(
+                        StandardField.SUBTITLE, StandardField.EDITOR, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER,
+                        StandardField.EID, StandardField.ISSUE, StandardField.PAGES, StandardField.NOTE, StandardField.ISSN, StandardField.DOI,
+                        StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID,
+                        bibUrl, bibSource)
+                .withDetailFields(
+                        StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR,
+                        StandardField.TITLEADDON, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
+                        StandardField.JOURNALSUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.LANGUAGE,
+                        StandardField.ORIGLANGUAGE, StandardField.VERSION,
+                        StandardField.ADDENDUM, StandardField.PUBSTATE)
+                .build();
 
         entryTypesManager = new BibEntryTypesManager();
+    }
+
+    @Test
+    void checkEntryWithOverwrittenStandardTypeWithCustomFields() {
+        BibEntry one = new BibEntry(StandardEntryType.Article, "DBLP:journals/sqj/IftikharBAK25")
+                .withField(StandardField.AUTHOR,
+                        "Umar Iftikhar and J{\"u}rgen B{\"o}rstler and Nauman Bin Ali and Oliver Kopp")
+                .withField(StandardField.TITLE,
+                        "Supporting the identification of prevalent quality issues in code changes " +
+                                "by analyzing reviewers' feedback")
+                .withField(StandardField.JOURNAL, "Softw. Qual. J.")
+                .withField(StandardField.VOLUME, "33")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.PAGES, "22")
+                .withField(StandardField.YEAR, "2025")
+                .withField(StandardField.URL,
+                        "https://doi.org/10.1007/s11219-025-09720-9")
+                .withField(StandardField.DOI,
+                        "10.1007/S11219-025-09720-9")
+                .withField(StandardField.TIMESTAMP,
+                        "Mon, 12 May 2025 21:02:32 +0200")
+                .withField(bibUrl,
+                        "https://dblp.org/rec/journals/sqj/IftikharBAK25.bib")
+                .withField(bibSource,
+                        "dblp computer science bibliography, https://dblp.org");
+
+        BibEntry two = new BibEntry(StandardEntryType.Article, "DBLP:journals/sqj/Aldalur25")
+                .withField(StandardField.AUTHOR,
+                        "Iñigo Aldalur")
+                .withField(StandardField.TITLE,
+                        "Enhancing software development education through gamification and " +
+                                "experiential learning with genially")
+                .withField(StandardField.JOURNAL, "Softw. Qual. J.")
+                .withField(StandardField.VOLUME, "33")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.PAGES, "1")
+                .withField(StandardField.YEAR, "2025")
+                .withField(StandardField.URL,
+                        "https://doi.org/10.1007/s11219-024-09699-9")
+                .withField(StandardField.DOI,
+                        "10.1007/S11219-024-09699-9")
+                .withField(StandardField.TIMESTAMP,
+                        "Thu, 02 Jan 2025 12:39:52 +0100")
+                .withField(bibUrl,
+                        "https://dblp.org/rec/journals/sqj/Aldalur25.bib");
+
+        BibEntry three = new BibEntry(StandardEntryType.Article, "DBLP:journals/sqj/PhungOA25")
+                .withField(StandardField.AUTHOR,
+                        "Khoa Phung and Emmanuel Ogunshile and Mehmet Emin Aydin")
+                .withField(StandardField.TITLE,
+                        "Domain-specific implications of error-type metrics in risk-based software " +
+                                "fault prediction")
+                .withField(StandardField.JOURNAL, "Softw. Qual. J.")
+                .withField(StandardField.VOLUME, "33")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.PAGES, "7")
+                .withField(StandardField.YEAR, "2025")
+                .withField(StandardField.URL,
+                        "https://doi.org/10.1007/s11219-024-09704-1")
+                .withField(StandardField.DOI,
+                        "10.1007/S11219-024-09704-1")
+                .withField(StandardField.TIMESTAMP,
+                        "Mon, 03 Mar 2025 22:23:25 +0100")
+                .withField(bibUrl,
+                        "https://dblp.org/rec/journals/sqj/PhungOA25.bib");
+
+        BibEntry four = new BibEntry(StandardEntryType.Article, "DBLP:journals/sqj/WuWWCD25")
+                .withField(StandardField.AUTHOR,
+                        "Qikai Wu and Xingqi Wang and Dan Wei and Bin Chen and Qingguo Dang")
+                .withField(StandardField.TITLE,
+                        "Just-in-time software defect prediction method for non-stationary " +
+                                "and imbalanced data streams")
+                .withField(StandardField.JOURNAL, "Softw. Qual. J.")
+                .withField(StandardField.VOLUME, "33")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.PAGES, "14")
+                .withField(StandardField.YEAR, "2025")
+                .withField(StandardField.URL,
+                        "https://doi.org/10.1007/s11219-025-09711-w")
+                .withField(StandardField.DOI,
+                        "10.1007/S11219-025-09711-W")
+                .withField(StandardField.TIMESTAMP,
+                        "Fri, 25 Jul 2025 18:22:04 +0200");
+
+            BibDatabase bibDatabase = new BibDatabase(List.of(one, two, three, four));
+            BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+            bibContext.setMode(BibDatabaseMode.BIBTEX);
+
+            entryTypesManager.addCustomOrModifiedType(overwrittenStandardTypeWithCustomFields, BibDatabaseMode.BIBTEX);
+
+            BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
+            });
+
+            BibliographyConsistencyCheck.EntryTypeResult overwrittenStandardTypeWithCustomFieldsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(bibUrl, bibSource), List.of(two, one, three));
+
+            BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(
+                    StandardEntryType.Article, overwrittenStandardTypeWithCustomFieldsResult
+            ));
+            assertEquals(expected, result);
     }
 
     @Test
@@ -91,6 +207,9 @@ class BibliographyConsistencyCheckTest {
 
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second, third, fourth, fifth, sixth, seventh, eighth, ninth));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
+
+        entryTypesManager.addCustomOrModifiedType(newCustomType, BibDatabaseMode.BIBTEX);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
@@ -107,7 +226,7 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
-    void checkSimpleLibraryWithCustomTypes() {
+    void checkSimpleLibraryWithCustomEntryTypes() {
         BibEntry first = new BibEntry(newCustomType.getType(), "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
