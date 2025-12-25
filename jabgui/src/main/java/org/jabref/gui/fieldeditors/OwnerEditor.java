@@ -1,10 +1,8 @@
+//owner editor
+
 package org.jabref.gui.fieldeditors;
 
 import javax.swing.undo.UndoManager;
-
-import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
@@ -17,11 +15,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+
 import jakarta.inject.Inject;
+import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.layout.HBox;
 
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
-    @FXML private OwnerEditorViewModel viewModel;
+    private OwnerEditorViewModel viewModel;
     @FXML private EditorTextField textField;
 
     @Inject private GuiPreferences preferences;
