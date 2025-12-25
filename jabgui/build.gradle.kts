@@ -104,6 +104,11 @@ dependencies {
 
     implementation("de.undercouch:citeproc-java")
 
+    // OAuth2 for CiteDrive
+    implementation("com.nimbusds:oauth2-oidc-sdk")
+    implementation("net.minidev:json-smart")
+    implementation("com.nimbusds:nimbus-jose-jwt")
+
     testImplementation(project(":test-support"))
 
     testImplementation("io.github.classgraph:classgraph")
@@ -215,15 +220,15 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     // requires.add("javafx.graphics")
 
     requires.add("com.github.javaparser.core")
+    requires.add("com.tngtech.archunit")
+    requires.add("com.tngtech.archunit.junit5.api")
+
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
 
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
-
-    requires.add("com.tngtech.archunit")
-    requires.add("com.tngtech.archunit.junit5.api")
 }
 
 tasks.test {

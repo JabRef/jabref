@@ -182,7 +182,7 @@ public class CommonArchitectureTest {
         ArchRuleDefinition.noClasses()
                           .that()
                           .resideInAPackage("org.jabref..")
-                          .should().callMethod(URI.class, "create", String.class)
+                          .should().callMethod(URI.class, "create", String.class) // Method: "URI.create(String)"
                           .check(classes);
     }
 

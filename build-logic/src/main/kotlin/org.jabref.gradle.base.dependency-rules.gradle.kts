@@ -149,6 +149,31 @@ extraJavaModuleInfo {
         uses("kong.unirest.core.json.JsonEngine")
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
+
+    // region nimbusdl
+    // required by nimbusdl
+    module("com.github.stephenc.jcip:jcip-annotations", "jcip.annotations") {
+        exportAllPackages()
+    }
+    module("net.minidev:json-smart", "json.smart") {
+        exportAllPackages()
+    }
+    module("com.nimbusds:content-type", "nimbusds.contenttype") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    knownModule("com.nimbusds:nimbus-jose-jwt", "com.nimbusds.jose.jwt")
+    module("com.nimbusds:lang-tag", "nimbusds.langtag") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("com.nimbusds:oauth2-oidc-sdk", "nimbusds.oauth2.oidc.sdk") {
+        overrideModuleName()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    // endregion
+
     module("com.squareup.okhttp3:okhttp", "okhttp3")
     module("com.squareup.okhttp3:okhttp-jvm", "okhttp3")
     module("com.squareup.okhttp3:okhttp-jvm-sse", "okhttp3.sse")

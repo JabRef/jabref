@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -294,7 +295,19 @@ public abstract class NativeDesktop {
      */
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
-        openExternalFilePlatformIndependent(fileType, url, externalApplicationsPreferences);
+        if (!OS.WINDOWS || (fileType.isPresent() && !fileType.get().getOpenWithApplication().isEmpty())) {
+            openExternalFilePlatformIndependent(fileType, url, externalApplicationsPreferences);
+            return;
+        }
+        URI uri;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
+            LoggerFactory.getLogger(NativeDesktop.class).error("Invalid URL: {}", url, e);
+            throw new IOException(e);
+        }
+        // Works also if url is longer than 260 characters (Windows command line limit)
+        Desktop.getDesktop().browse(uri);
     }
 
     public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {

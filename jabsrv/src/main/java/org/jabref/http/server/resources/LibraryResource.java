@@ -14,6 +14,7 @@ import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
+import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -82,7 +83,7 @@ public class LibraryResource {
     }
 
     @GET
-    @Produces(JabrefMediaType.BIBTEX)
+    @Produces(MediaTypes.APPLICATION_BIBTEX)
     public Response getBibtex(@PathParam("id") String id) {
         if ("demo".equals(id)) {
             StreamingOutput stream = output -> {

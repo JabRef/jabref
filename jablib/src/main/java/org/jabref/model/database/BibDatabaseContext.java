@@ -37,16 +37,13 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Represents everything related to a BIB file.
- *
- * <p> The entries are stored in BibDatabase, the other data in MetaData
- * and the options relevant for this file in Defaults.
- * </p>
- * <p>
- * To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
- * </p>
- */
+/// Represents everything related to a BIB file.
+///
+/// The entries are stored in BibDatabase, the other data in MetaData
+/// and the options relevant for this file in Defaults.
+///
+/// - To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+/// - To save an instance to a .bib file, use {@link org.jabref.logic.exporter.BibDatabaseWriter}.
 @AllowedToUseLogic("because it needs access to shared database features")
 @NullMarked
 public class BibDatabaseContext {

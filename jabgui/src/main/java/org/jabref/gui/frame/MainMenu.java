@@ -17,6 +17,8 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
+import org.jabref.gui.citedrive.CiteDriveLoginAction;
+import org.jabref.gui.citedrive.CiteDrivePushAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.consistency.ConsistencyCheckAction;
@@ -194,6 +196,9 @@ public class MainMenu extends MenuBar {
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
+                factory.createSubMenu(StandardActions.CITE_DRIVE,
+                        factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, stateManager, preferences)),
+                        factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences))),
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
                         factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
