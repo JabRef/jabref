@@ -86,10 +86,16 @@ public class CrossRefCitationFetcher implements CitationFetcher {
             JsonNode references = node.at("/message/reference");
             return references.valueStream()
                              .map(Unchecked.function(reference -> {
-                                 String unstructured = reference.at("/unstructured").asText();
                                  JsonNode doiNode = reference.at("/DOI");
+                                 JsonNode unstructured = reference.at("/unstructured");
                                  if (doiNode.isMissingNode()) {
-                                     return getBibEntryFromText(parser, unstructured);
+                                     if (unstructured.isMissingNode()) {
+                                         LOGGER.error("Reference has neither DOI nor unstructured text: {}", reference);
+                                         return new BibEntry()
+                                                 .withField(StandardField.NOTE, "Could not retrieve reference information from CrossRef")
+                                                 .withChanged(true);
+                                     }
+                                     return getBibEntryFromText(parser, unstructured.asText());
                                  } else {
                                      return getBibEntryFromDoi(doiNode.asText(), unstructured);
                                  }
@@ -122,14 +128,19 @@ public class CrossRefCitationFetcher implements CitationFetcher {
         }
     }
 
-    private BibEntry getBibEntryFromDoi(String referenceDoi, String unstructured) throws FetcherException {
+    private BibEntry getBibEntryFromDoi(String referenceDoi, JsonNode unstructured) throws FetcherException {
         // Determine the doi using CrossRef
         // In case no BibEntry found for the doi, just return a BibEntry using the doi
         return crossRefForDoi.performSearchById(referenceDoi)
-                             .orElseGet(() -> new BibEntry()
-                                     .withField(StandardField.DOI, referenceDoi)
-                                     .withField(StandardField.NOTE, unstructured)
-                                     .withChanged(true));
+                             .orElseGet(() -> {
+                                 BibEntry bibEntry = new BibEntry()
+                                         .withField(StandardField.DOI, referenceDoi)
+                                         .withChanged(true);
+                                 if (!unstructured.isMissingNode()) {
+                                     bibEntry.setField(StandardField.NOTE, unstructured.asText());
+                                 }
+                                 return bibEntry;
+                             });
     }
 
     /// Crossref has no citation count feature

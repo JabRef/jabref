@@ -28,4 +28,6 @@ java {
 
 tasks.withType<JavaCompile>().configureEach {
     options.release = 24
+    // See https://docs.gradle.org/current/userguide/performance.html#a_run_the_compiler_as_a_separate_process
+    options.isFork = true
 }

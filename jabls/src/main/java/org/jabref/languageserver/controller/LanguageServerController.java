@@ -30,7 +30,7 @@ public class LanguageServerController implements AutoCloseable {
 
     public synchronized void start(RemoteMessageHandler messageHandler, int port) {
         if (lspLauncher != null) {
-            LOGGER.warn("Language server controller already started, cannot start again.");
+            LOGGER.warn("LSP server controller already started, cannot start again.");
             return;
         }
 
@@ -39,23 +39,23 @@ public class LanguageServerController implements AutoCloseable {
         // The JVM will take care of running it at some point in time in the future
         // Thus, we cannot check directly if it really runs
         lspLauncher.start();
-        LOGGER.debug("Triggered language server start up.");
+        LOGGER.debug("Triggered LSP server start up.");
     }
 
     public synchronized void stop() {
-        LOGGER.debug("Stopping language server controller...");
+        LOGGER.debug("Stopping LSP server controller...");
         if (lspLauncher != null) {
             lspLauncher.interrupt();
             lspLauncher = null;
-            LOGGER.debug("Language server stopped successfully.");
+            LOGGER.debug("LSP server stopped successfully.");
         } else {
-            LOGGER.debug("Language server is not started, nothing to stop.");
+            LOGGER.debug("LSP server is not started, nothing to stop.");
         }
     }
 
     @Override
     public void close() {
-        LOGGER.debug("Closing Language server controller...");
+        LOGGER.debug("Closing LSP server controller...");
         stop();
     }
 }
