@@ -111,7 +111,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                                                                         .map(BibEntry::getCitationKey)
                                                                         .filter(Optional::isPresent)
                                                                         .map(Optional::get)
-                                                                        .collect(Collectors.joining(",")))
+                                                                        .collect(Collectors.joining(", ")))
                 ));
             }
         };
