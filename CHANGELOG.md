@@ -74,6 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
 - We fixed an issue where the warning dialog is mixed Chinese/English after switching to zh_CN [#14654](https://github.com/JabRef/jabref/issues/14654)
+- Fixed chat history being shared between groups with same name in different libraries [#14641](https://github.com/JabRef/jabref/issues/14641)
 
 ### Removed
 
