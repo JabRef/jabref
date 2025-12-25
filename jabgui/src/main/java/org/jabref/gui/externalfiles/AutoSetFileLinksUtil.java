@@ -28,7 +28,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,7 +162,7 @@ public class AutoSetFileLinksUtil {
             if (isBrokenLinkedFile(linkedFile)
                     && files.containsKey(fileName)
                     && extension.isPresent()
-                    && Strings.CI.equals(extension.get(), files.get(fileName).getFileType())
+                    && extension.get().equals(files.get(fileName).getFileType())
             ) {
                 linkedFile.setLink(files.get(fileName).getLink());
                 updated.add(linkedFile);

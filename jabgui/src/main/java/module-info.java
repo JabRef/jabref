@@ -190,6 +190,5 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires org.apache.commons.lang3;
     // endregion
 }
