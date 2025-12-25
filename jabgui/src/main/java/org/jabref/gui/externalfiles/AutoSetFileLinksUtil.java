@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -150,8 +151,7 @@ public class AutoSetFileLinksUtil {
         String newValue = FileFieldWriter.getStringRepresentation(newLinkedFiles);
         String oldValue = FileFieldWriter.getStringRepresentation(files);
 
-        return !(newValue == null && oldValue == null) &&
-                !(oldValue != null && oldValue.equals(newValue));
+        return !Objects.equals(newValue, oldValue);
     }
 
     private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles, Map<String, LinkedFile> files) {
@@ -162,7 +162,7 @@ public class AutoSetFileLinksUtil {
             if (isBrokenLinkedFile(linkedFile)
                     && files.containsKey(fileName)
                     && extension.isPresent()
-                    && extension.get().equals(files.get(fileName).getFileType())
+                    && extension.get().equalsIgnoreCase(files.get(fileName).getFileType())
             ) {
                 linkedFile.setLink(files.get(fileName).getLink());
                 updated.add(linkedFile);

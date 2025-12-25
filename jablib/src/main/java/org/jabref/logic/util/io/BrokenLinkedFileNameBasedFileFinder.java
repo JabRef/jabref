@@ -46,7 +46,10 @@ class BrokenLinkedFileNameBasedFileFinder implements FileFinder {
             // 2. its file extension matches one specified in extensions
             return walk.filter(path -> !Files.isDirectory(path))
                        .filter(path -> brokenLinkedFileNames.contains(FileUtil.getBaseName(path).toLowerCase()))
-                       .filter(path -> extensions.contains(FileUtil.getFileExtension(path).orElse("")))
+                       .filter(path -> {
+                           String pathExtension = FileUtil.getFileExtension(path).orElse("");
+                           return extensions.stream().anyMatch(ext -> ext.equalsIgnoreCase(pathExtension));
+                       })
                        .toList();
         }
     }
