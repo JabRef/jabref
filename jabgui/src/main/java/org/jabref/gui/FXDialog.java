@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.util.BaseDialog;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -65,6 +66,7 @@ public class FXDialog extends Alert {
                 dialogWindow.close();
             }
         });
+        this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
     }
 
     public FXDialog(AlertType type) {

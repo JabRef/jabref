@@ -11,17 +11,15 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
-public class CleanupSingleFieldPanel extends VBox {
+public class CleanupSingleFieldPanel extends VBox implements CleanupPanel {
 
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     private final CleanupSingleFieldViewModel viewModel;
-    private final CleanupDialogViewModel dialogViewModel;
 
     public CleanupSingleFieldPanel(@NonNull CleanupPreferences cleanupPreferences,
                                    @NonNull CleanupDialogViewModel dialogViewModel) {
 
-        this.dialogViewModel = dialogViewModel;
         this.viewModel = new CleanupSingleFieldViewModel(cleanupPreferences.getFieldFormatterCleanups());
 
         ViewLoader.view(this)
@@ -35,11 +33,8 @@ public class CleanupSingleFieldPanel extends VBox {
         formatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanups);
     }
 
-    @FXML
-    private void onApply() {
+    public CleanupTabSelection getSelectedTab() {
         FieldFormatterCleanupActions selectedFormatters = viewModel.getSelectedFormatters();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofFormatters(selectedFormatters);
-        dialogViewModel.apply(selectedTab);
-        getScene().getWindow().hide();
+        return CleanupTabSelection.ofFormatters(selectedFormatters);
     }
 }

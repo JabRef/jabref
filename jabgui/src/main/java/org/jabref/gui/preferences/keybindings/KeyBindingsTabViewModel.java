@@ -120,8 +120,11 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         KeyBindingRepository prefsRepo = preferences.getKeyBindingRepository();
 
-        prefsRepo.getBindingsProperty().clear();
+        if (prefsRepo.equals(keyBindingRepository)) {
+            return;
+        }
 
+        prefsRepo.getBindingsProperty().clear();
         keyBindingRepository.getKeyBindings().forEach((key, value) -> {
             prefsRepo.getBindingsProperty().put(key, value);
         });

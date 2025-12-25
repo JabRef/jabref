@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -203,7 +204,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         try {
-            List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
+            Collection<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
             for (LinkedFile linkedFile : linkedFiles) {
                 LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(
                         linkedFile,

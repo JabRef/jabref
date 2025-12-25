@@ -22,6 +22,4 @@
         <CheckBox fx:id="cleanupTimestampToModificationDate" text="%Convert timestamp field to field 'modificationdate'" />
     </VBox>
 
-    <Button text="%Apply" onAction="#onApply" />
-
 </fx:root>
