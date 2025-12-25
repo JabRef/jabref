@@ -489,7 +489,10 @@ jobs:
         include:
           - os: macos-15
             displayName: macOS (ARM64)
-            suffix: -arm64
+            suffix: _arm64
+          - os: macos-15-intel
+            displayName: macOS (ARM64)
+            suffix: ""
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
