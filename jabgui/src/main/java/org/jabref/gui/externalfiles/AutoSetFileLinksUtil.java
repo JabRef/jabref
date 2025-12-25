@@ -18,8 +18,8 @@ import java.util.stream.Stream;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -77,7 +77,7 @@ public class AutoSetFileLinksUtil {
         this.brokenLinkedFileNameBasedFileFinder = FileFinders.constructBrokenLinkedFileNameBasedFileFinder();
     }
 
-    public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, BiConsumer<LinkedFile, BibEntry> onAddLinkedFile) {
+    public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile) {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
@@ -105,35 +105,58 @@ public class AutoSetFileLinksUtil {
      *         one trick: we accumulate Part B after Step 1, so Part A does not affect those broken linked files we use
      *                    to query Part B
      */
-    private void doLinkAssociateFiles(BibEntry entry, BiConsumer<LinkedFile, BibEntry> onAddLinkedFile, LinkFilesResult result) {
+    private void doLinkAssociateFiles(BibEntry entry, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile, LinkFilesResult result) {
+        boolean entryUpdated = false;
         // Step 1: try matched files based on CitationKey configured by user
         Map<String, LinkedFile> files = getAssociatedFiles(entry, result, preConfiguredFileFinder);
-        autoLinkBrokenLinkedFiles(entry, files);
+        List<LinkedFile> newLinkedFiles = autoLinkBrokenLinkedFiles(entry.getFiles(), files);
+        if (filesChanged(newLinkedFiles, entry.getFiles())) {
+            entryUpdated = true;
+            onAddLinkedFile.accept(newLinkedFiles, entry);
+        }
         // Add left unlinked files as new linked files
         Set<String> linkedFileNames = entry.getFiles().stream().map(LinkedFile::getLink)
                                            .map(FileUtil::getBaseName).collect(Collectors.toSet());
-        files.forEach((name, file) -> {
-            if (!linkedFileNames.contains(name)) {
-                entry.addFile(file);
-                onAddLinkedFile.accept(file, entry);
-            }
-        });
+        List<LinkedFile> addedFiles = files.keySet().stream()
+                                           .filter(name -> !linkedFileNames.contains(name))
+                                           .map(files::get)
+                                           .toList();
+        if (!addedFiles.isEmpty()) {
+            entryUpdated = true;
+            newLinkedFiles = Stream.concat(entry.getFiles().stream(), addedFiles.stream()).toList();
+            onAddLinkedFile.accept(newLinkedFiles, entry);
+        }
 
         // Step 2: try matched files based on broken linked file names
         files = getAssociatedFiles(entry, result, brokenLinkedFileNameBasedFileFinder);
-        autoLinkBrokenLinkedFiles(entry, files);
+        newLinkedFiles = autoLinkBrokenLinkedFiles(entry.getFiles(), files);
+        if (filesChanged(newLinkedFiles, entry.getFiles())) {
+            entryUpdated = true;
+            onAddLinkedFile.accept(newLinkedFiles, entry);
+        }
+
         // It is a bug if there are files left
         if (!files.isEmpty()) {
             LOGGER.error("Cannot auto-link all the files found based on broken linked file names. Files left: {} ",
                     files.keySet().stream().map(files::get).map(LinkedFile::getLink).collect(Collectors.joining("||")));
         }
 
-        result.addBibEntry(entry);
+        if (entryUpdated) {
+            result.addBibEntry(entry);
+        }
     }
 
-    private void autoLinkBrokenLinkedFiles(BibEntry entry, Map<String, LinkedFile> files) {
+    private boolean filesChanged(List<LinkedFile> newLinkedFiles, List<LinkedFile> files) {
+        String newValue = FileFieldWriter.getStringRepresentation(newLinkedFiles);
+        String oldValue = FileFieldWriter.getStringRepresentation(files);
+
+        return !(newValue == null && oldValue == null) &&
+                !(oldValue != null && oldValue.equals(newValue));
+    }
+
+    private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles, Map<String, LinkedFile> files) {
         List<LinkedFile> updated = new ArrayList<>();
-        for (LinkedFile linkedFile : entry.getFiles()) {
+        for (LinkedFile linkedFile : linkedFiles) {
             String fileName = FileUtil.getBaseName(linkedFile.getLink());
             if (isBrokenLinkedFile(linkedFile) && files.containsKey(fileName)) {
                 linkedFile.setLink(files.get(fileName).getLink());
@@ -143,8 +166,7 @@ public class AutoSetFileLinksUtil {
                 updated.add(linkedFile);
             }
         }
-
-        UiTaskExecutor.runInJavaFXThread(() -> entry.setFiles(updated));
+        return updated;
     }
 
     private Map<String, LinkedFile> getAssociatedFiles(BibEntry entry, LinkFilesResult result, FileFinder finder) {

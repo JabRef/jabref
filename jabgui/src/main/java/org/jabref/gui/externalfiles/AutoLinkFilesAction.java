@@ -1,7 +1,9 @@
 package org.jabref.gui.externalfiles;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -61,18 +63,21 @@ public class AutoLinkFilesAction extends SimpleCommand {
         final NamedCompoundEdit nc = new NamedCompoundEdit(Localization.lang("Automatically set file links"));
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
-            final BiConsumer<LinkedFile, BibEntry> onLinkedFile = (linkedFile, entry) -> {
+            final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
                 // lambda for gui actions that are relevant when setting the linked file entry when ui is opened
-                String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
+                String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
                 String oldVal = entry.getField(StandardField.FILE).orElse(null);
                 UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
                 nc.addEdit(fieldChange); // push to undo manager is in succeeded
-                UiTaskExecutor.runInJavaFXThread(() -> entry.addFile(linkedFile));
+
+                // Wait because there are several rounds in one auto-link operation
+                // The later round depends on the updated bibEntry of the previous round
+                UiTaskExecutor.runAndWaitInJavaFXThread(() -> entry.setFiles(newLinkedFiles));
             };
 
             @Override
             protected AutoSetFileLinksUtil.LinkFilesResult call() {
-                return util.linkAssociatedFiles(entries, onLinkedFile);
+                return util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
             }
 
             @Override
@@ -87,7 +92,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 }
 
                 if (result.getChangedEntries().isEmpty()) {
-                    dialogService.showWarningDialogAndWait("Automatically set file links",
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Automatically set file links"),
                             Localization.lang("Finished automatically setting external links.") + "\n"
                                     + Localization.lang("No files found."));
                     return;
@@ -98,8 +104,15 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     undoManager.addEdit(nc);
                 }
 
-                dialogService.notify(Localization.lang("Finished automatically setting external links.") + " "
-                        + Localization.lang("Changed %0 entries.", String.valueOf(result.getChangedEntries().size())));
+                dialogService.notify(String.format("%s %s\n%s",
+                        Localization.lang("Finished automatically setting external links."),
+                        Localization.lang("Changed %0 entries.", String.valueOf(result.getChangedEntries().size())),
+                        Localization.lang("Affected entries: %0", result.getChangedEntries().stream()
+                                                                        .map(BibEntry::getCitationKey)
+                                                                        .filter(Optional::isPresent)
+                                                                        .map(Optional::get)
+                                                                        .collect(Collectors.joining(",")))
+                ));
             }
         };
 
