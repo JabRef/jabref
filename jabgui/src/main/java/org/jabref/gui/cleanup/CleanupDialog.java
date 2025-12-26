@@ -5,7 +5,10 @@ import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
@@ -26,6 +29,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class CleanupDialog extends BaseDialog<Void> {
 
     @FXML private TabPane tabPane;
+    @FXML private ButtonType cleanUpButton;
 
     private final CleanupDialogViewModel viewModel;
 
@@ -37,7 +41,7 @@ public class CleanupDialog extends BaseDialog<Void> {
                          UndoManager undoManager,
                          Supplier<LibraryTab> tabSupplier,
                          TaskExecutor taskExecutor) {
-
+        super();
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
                 stateManager, undoManager, tabSupplier, taskExecutor
@@ -83,5 +87,22 @@ public class CleanupDialog extends BaseDialog<Void> {
                 new Tab(Localization.lang("File-related"), fileRelatedPanel),
                 new Tab(Localization.lang("Multi-field"), multiFieldPanel)
         );
+
+        Button btn = (Button) getDialogPane().lookupButton(cleanUpButton);
+
+        btn.addEventFilter(ActionEvent.ACTION, event -> {
+            Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+            if (selectedTab != null && selectedTab.getContent() instanceof CleanupPanel panel) {
+                viewModel.apply(panel.getSelectedTab());
+            }
+            event.consume();
+        });
+
+        setResultConverter(button -> {
+            if (button == ButtonType.CANCEL) {
+                return null;
+            }
+            return null;
+        });
     }
 }

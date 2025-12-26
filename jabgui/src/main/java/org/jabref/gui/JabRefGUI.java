@@ -487,7 +487,7 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Shutting down language server controller");
+                LOGGER.trace("Shutting down LSP server controller");
                 languageServerController.stop();
                 LOGGER.trace("LanguageServerController shut down");
             });
