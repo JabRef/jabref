@@ -21,7 +21,7 @@ plugins {
     // id("dev.jbang") version "0.3.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
     // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
-    id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
+    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
 
     id("net.ltgt.errorprone") version "4.3.0"
     id("net.ltgt.nullaway") version "2.3.0"
