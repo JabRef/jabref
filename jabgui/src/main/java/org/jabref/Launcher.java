@@ -13,6 +13,7 @@ import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.logging.JavaFxCssLogFilter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.http.server.services.CockpitServer;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -94,6 +95,9 @@ public class Launcher {
             Injector.setModelOrService(PostgreServer.class, postgreServer);
 
             CSLStyleLoader.loadInternalStyles();
+
+            // Start Researcher Cockpit Server (Ticket #2)
+            new CockpitServer().start();
 
             JabRefGUI.setup(uiCommands, preferences);
             JabRefGUI.launch(JabRefGUI.class, args);
