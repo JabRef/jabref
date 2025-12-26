@@ -63,7 +63,8 @@ public class SearchCitationsRelationsService {
                 importerPreferences.getCitationsRelationsStoreTTL(),
                 importFormatPreferences,
                 fieldPreferences,
-                entryTypesManager
+                entryTypesManager,
+                citationFetcherTypeProperty
         );
     }
 
