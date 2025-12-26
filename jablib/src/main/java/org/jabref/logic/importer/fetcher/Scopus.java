@@ -47,7 +47,6 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
         this.importerPreferences = importerPreferences;
     }
 
-    @Override
     public String getTestUrl() {
         return API_URL + "?query=test&count=1&apiKey=";
     }
