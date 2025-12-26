@@ -3,7 +3,8 @@ package org.jabref.toolkit.commands;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Map;
-import org.jabref.model.entry.types.EntryTypeFactory;
+
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -15,17 +16,17 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
+import org.jabref.toolkit.converter.EntryTypeConverter;
+import org.jabref.toolkit.converter.KeySuffixConverter;
+
 @Command(name = "generate", description = "Generate citation keys for entries in a .bib file.")
 class GenerateCitationKeys implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
 
     @ParentCommand
     private CitationKeys parentCommand;
@@ -49,7 +50,7 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--warn-before-overwrite", description = "Warn before overwriting existing citation keys")
     private Boolean warnBeforeOverwrite;
 
-    @Option(names = "--suffix", description = "Key suffix strategy: ALWAYS, SECOND_WITH_A, SECOND_WITH_B")
+    @Option(names = "--suffix", description = "Key suffix strategy: ${COMPLETION-CANDIDATES}", converter = KeySuffixConverter.class)
     private CitationKeyPatternPreferences.KeySuffix keySuffix;
 
     @Option(names = "--regex", description = "Regular expression for key pattern matching")
@@ -70,8 +71,8 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--generate-before-saving", description = "Generate citation keys before saving")
     private Boolean generateBeforeSaving;
 
-    @Option(names = "--entry-type-pattern", description = "Per-entry-type citation key pattern")
-    private Map<String, String> entryTypePatterns;
+    @Option(names = "--entry-type-pattern", description = "Per-entry-type citation key pattern (e.g., article=[auth][year])", converter = EntryTypeConverter.class)
+    private Map<EntryType, String> entryTypePatterns;
 
     @Override
     public void run() {
@@ -128,7 +129,7 @@ class GenerateCitationKeys implements Runnable {
         if (entryTypePatterns != null) {
             entryTypePatterns.forEach((type, pattern) ->
                     patterns.addCitationKeyPattern(
-                            EntryTypeFactory.parse(type),
+                            type,
                             pattern
                     )
             );
