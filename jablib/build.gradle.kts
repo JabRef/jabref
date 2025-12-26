@@ -20,8 +20,8 @@ plugins {
 
     // id("dev.jbang") version "0.3.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
-    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
+    // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/jitpack-SNAPSHOT
+    id("com.github.koppor.jbang-gradle-plugin") version "jitpack-SNAPSHOT"
 
     id("net.ltgt.errorprone") version "4.3.0"
     id("net.ltgt.nullaway") version "2.3.0"
@@ -276,9 +276,11 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     onlyIf {!cslCatalogJson.get().asFile.exists()}
 }
 
+val ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
+
 tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadLtwaFile") {
     src("https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv")
-    dest(layout.buildDirectory.file("tmp/ltwa_20210702.csv"))
+    dest(ltwaCsvFile)
     onlyIfModified(true)
 }
 

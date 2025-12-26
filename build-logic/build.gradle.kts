@@ -10,6 +10,7 @@ dependencies {
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
     implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.5.1")
     implementation("com.github.andygoossens:gradle-modernizer-plugin:1.12.0")
+    implementation("de.undercouch.download:de.undercouch.download.gradle.plugin:5.6.0")
     implementation("org.gradlex:extra-java-module-info:1.13.1")
     implementation("org.gradlex:java-module-dependencies:1.11")
     implementation("org.gradlex:java-module-packaging:1.2")
