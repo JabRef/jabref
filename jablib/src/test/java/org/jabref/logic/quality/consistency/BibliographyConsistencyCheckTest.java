@@ -34,7 +34,7 @@ class BibliographyConsistencyCheckTest {
     private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
 
     private BibEntryType newCustomType;
-    private BibEntryType overwrittenStandardTypeWithCustomFields;
+    private BibEntryType overwrittenStandardTypeWithCustomField;
     private UnknownField bibUrl;
     private UnknownField bibSource;
     private BibEntryTypesManager entryTypesManager;
