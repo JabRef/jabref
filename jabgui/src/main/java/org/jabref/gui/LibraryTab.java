@@ -827,14 +827,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        markBaseChanged();
-        stateManager.setSelectedEntries(entries);
-        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-            showAndEdit(entries.getFirst());
-        } else {
-            clearAndSelect(entries.getFirst());
+        // Suppress navigation history during bulk insert to prevent polluting back/forward navigation
+        try (NavigationHistory.Suppression ignored = navigationHistory.suppressUpdatesIf(entries.size() > 1)) {
+            importHandler.importCleanedEntries(null, entries);
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+            markBaseChanged();
+            stateManager.setSelectedEntries(entries);
+            if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+                showAndEdit(entries.getFirst());
+            } else {
+                clearAndSelect(entries.getFirst());
+            }
         }
     }
 
