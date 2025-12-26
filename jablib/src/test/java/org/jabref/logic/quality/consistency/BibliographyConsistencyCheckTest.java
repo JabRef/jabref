@@ -151,21 +151,21 @@ class BibliographyConsistencyCheckTest {
                 .withField(StandardField.TIMESTAMP,
                         "Fri, 25 Jul 2025 18:22:04 +0200");
 
-            BibDatabase bibDatabase = new BibDatabase(List.of(one, two, three, four));
-            BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
-            bibContext.setMode(BibDatabaseMode.BIBTEX);
+        BibDatabase bibDatabase = new BibDatabase(List.of(one, two, three, four));
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
 
-            entryTypesManager.addCustomOrModifiedType(overwrittenStandardTypeWithCustomFields, BibDatabaseMode.BIBTEX);
+        entryTypesManager.addCustomOrModifiedType(overwrittenStandardTypeWithCustomFields, BibDatabaseMode.BIBTEX);
 
-            BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
-            });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
+        });
 
-            BibliographyConsistencyCheck.EntryTypeResult overwrittenStandardTypeWithCustomFieldsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(bibUrl, bibSource), List.of(two, one, three));
+        BibliographyConsistencyCheck.EntryTypeResult overwrittenStandardTypeWithCustomFieldsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(bibUrl, bibSource), List.of(two, one, three));
 
-            BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(
-                    StandardEntryType.Article, overwrittenStandardTypeWithCustomFieldsResult
-            ));
-            assertEquals(expected, result);
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(
+                StandardEntryType.Article, overwrittenStandardTypeWithCustomFieldsResult
+        ));
+        assertEquals(expected, result);
     }
 
     @Test
