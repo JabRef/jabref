@@ -7,6 +7,13 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
 import java.util.*
 
+// Ensure JBang cache directory exists to avoid task validation error
+// Fixes: Property 'installDir' specifies directory '.../.gradle/caches/jbang' which doesn't exist.
+val jbangCacheDir = File(System.getProperty("user.home"), ".gradle/caches/jbang")
+if (!jbangCacheDir.exists()) {
+    jbangCacheDir.mkdirs()
+}
+
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.download")
