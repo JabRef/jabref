@@ -23,7 +23,7 @@ jobs:
         include:
           - title: 'JabRef v6.0 (since alpha.3) | more information at contribute.jabref.org'
             # Last alpha release 2025-10-30, but want to have some seconds before
-            start: '2025-10-29'
+            start: '2025-10-24'
             end: ''
             file: 'jabref-v6.0-dev.mp4'
 #          - title: 'JabRef v6.0-alpha2 | more information at contribute.jabref.org'

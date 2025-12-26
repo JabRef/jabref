@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
-In case, there is no issue present, the pull request implementing the feature is linked.
+In case there is no issue present, the pull request implementing the feature is linked.
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
@@ -12,6 +12,16 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a new "Directory structure" group type that automatically creates subgroups mirroring a directory structure from the file system. [#10930](https://github.com/JabRef/jabref/issues/10930)
+### Changed
+
+### Fixed
+
+### Removed
+
+## [6.0-alpha.4] – 2025-12-25
+
+### Added
+
 - We added the ability to drag and drop images to the comments field. [#10559](https://github.com/JabRef/jabref/issues/10559)
 - We added functionality to use `,` and `>` symbols inside keywords by putting `\` symbol before them. [#12810](https://github.com/JabRef/jabref/issues/12810)
 - We added the `eprinttype` field to the General entry editor tab. [#14555](https://github.com/JabRef/jabref/issues/14555)
@@ -74,7 +84,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed a crash when importing preferences from older JabRef versions. [#14497](https://github.com/JabRef/jabref/issues/14497)
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
-- We fixed an issure where warning dialog is mixed Chinese/English after switching to zh_CN [#14654](https://github.com/JabRef/jabref/issues/14654)
+- We fixed an issue where the warning dialog is mixed Chinese/English after switching to zh_CN [#14654](https://github.com/JabRef/jabref/issues/14654)
 
 ### Removed
 
@@ -1832,7 +1842,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...HEAD
+[6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...HEAD
 [6.0-alpha.3]: https://github.com/JabRef/jabref/compare/v6.0-alpha2...v6.0-alpha.3
 [6.0-alpha2]: https://github.com/JabRef/jabref/compare/v6.0-alpha...v6.0-alpha2
 [6.0-alpha]: https://github.com/JabRef/jabref/compare/v5.15...v6.0-alpha
