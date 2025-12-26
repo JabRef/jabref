@@ -40,7 +40,7 @@ public class LspLauncher extends Thread {
         this.abbreviationRepository = abbreviationRepository;
         this.threadPool = Executors.newCachedThreadPool();
         this.port = port;
-        this.setName("JabLs - JabRef Language Server on: " + port);
+        this.setName("JabLs - JabRef LSP Server on: " + port);
         this.messageHandler = messageHandler;
     }
 
