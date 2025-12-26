@@ -4,12 +4,11 @@ import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.net.URI
 import java.util.*
 
 // Ensure JBang cache directory exists to avoid task validation error
 // Fixes: Property 'installDir' specifies directory '.../.gradle/caches/jbang' which doesn't exist.
-val jbangCacheDir = File(System.getProperty("user.home"), ".gradle/caches/jbang")
+val jbangCacheDir = File(gradle.gradleUserHomeDir, "caches/jbang")
 if (!jbangCacheDir.exists()) {
     jbangCacheDir.mkdirs()
 }
