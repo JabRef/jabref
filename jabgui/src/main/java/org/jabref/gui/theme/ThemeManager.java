@@ -147,8 +147,10 @@ public class ThemeManager {
     /// @param scene is the scene, the font size should be applied to
     private void updateFontStyle(@NonNull Scene scene) {
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
+            LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
         } else {
+            LOGGER.debug("Using default font size of {}pt", workspacePreferences.getDefaultFontSize());
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getDefaultFontSize() + "pt;");
         }
     }
