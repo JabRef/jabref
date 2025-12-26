@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
+- We added a new "Directory structure" group type that automatically creates subgroups mirroring a directory structure from the file system. [#10930](https://github.com/JabRef/jabref/issues/10930)
 
 ### Changed
 
