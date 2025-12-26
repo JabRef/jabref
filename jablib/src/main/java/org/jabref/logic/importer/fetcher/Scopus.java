@@ -28,14 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * SearchBasedFetcher implementation using <a href="https://dev.elsevier.com/">Elsevier's Scopus Search API</a>.
- * <p>
- * The Scopus Search API provides access to the largest abstract and citation database of research literature.
- * It covers 50+ million abstracts from over 20,500 peer-reviewed titles from more than 5,000 publishers.
- * <p>
  * API Documentation: <a href="https://dev.elsevier.com/documentation/ScopusSearchAPI.wadl">Scopus Search API</a>
- * <p>
- * Note: ScienceDirect Search API requires institutional access, so we use Scopus API instead
- * which is available to all registered developers.
  */
 @NullMarked
 public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
