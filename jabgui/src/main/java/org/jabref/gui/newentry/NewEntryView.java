@@ -320,7 +320,16 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             Platform.runLater(() -> idLookupGuess.setSelected(true));
         }
 
-        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
+            preferences.setIdLookupGuessing(newValue);
+            // When switching to auto-detect mode, detect identifier type from current text
+            if (newValue && !idText.getText().trim().isEmpty()) {
+                Optional<Identifier> identifier = Identifier.from(idText.getText().trim());
+                if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
+                    fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
+                }
+            }
+        });
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
@@ -333,6 +342,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
+
+        // Auto-detect identifier type when typing in the identifier field
+        // Only works when "Automatically determine identifier type" is selected
+        idText.textProperty().addListener((_, _, newValue) -> {
+            if (idLookupGuess.isSelected() && !newValue.trim().isEmpty()) {
+                Optional<Identifier> identifier = Identifier.from(newValue.trim());
+                if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
+                    fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
+                }
+            }
+        });
 
         idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
@@ -654,6 +674,24 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return PlainCitationParserChoice.RULE_BASED_GENERAL;
     }
 
+    /**
+     * Validates an identifier. DOI and ISBN identifiers are validated,
+     * other identifier types are considered valid by default.
+     *
+     * @param id the identifier to validate
+     * @return true if the identifier is valid, false otherwise
+     */
+    private boolean isValidIdentifier(Identifier id) {
+        return switch (id) {
+            case DOI doi ->
+                    DOI.isValid(doi.asString());
+            case ISBN isbn ->
+                    isbn.isValid();
+            default ->
+                    true;
+        };
+    }
+
     private Optional<Identifier> extractValidIdentifierFromClipboard() {
         String clipboardText = ClipBoardManager.getContents().trim();
 
@@ -661,15 +699,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             Optional<Identifier> identifier = Identifier.from(clipboardText);
             if (identifier.isPresent()) {
                 Identifier id = identifier.get();
-                boolean isValid = switch (id) {
-                    case DOI doi ->
-                            DOI.isValid(doi.asString());
-                    case ISBN isbn ->
-                            isbn.isValid();
-                    default ->
-                            true;
-                };
-                if (isValid) {
+                if (isValidIdentifier(id)) {
                     return Optional.of(id);
                 }
             }
@@ -681,10 +711,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
         for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
-                    (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
-                            (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
-                            (id instanceof RFC && fetcher instanceof RfcFetcher) ||
-                            (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
+                    (id instanceof ISBN && fetcher instanceof IsbnFetcher) ||
+                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
                 return Optional.of(fetcher);
             }
         }
