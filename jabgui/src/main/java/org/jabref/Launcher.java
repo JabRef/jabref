@@ -54,7 +54,7 @@ public class Launcher {
     public static void main(String[] args) {
         try {
             initLogging(args);
-            LOGGER.debug("Starting JabRef v{}", BUILD_INFO.version);
+            LOGGER.info("Starting JabRef v{}", BUILD_INFO.version);
 
             Injector.setModelOrService(BuildInfo.class, BUILD_INFO);
 
