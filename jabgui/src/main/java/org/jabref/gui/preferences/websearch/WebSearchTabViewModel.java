@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.websearch;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -38,15 +36,12 @@ import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
-
-import kong.unirest.core.UnirestException;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
@@ -328,24 +323,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             if (!(webFetcher instanceof CustomizableKeyFetcher fetcher)) {
                 return false;
             }
-
-            String testUrlWithoutApiKey = fetcher.getTestUrl();
-            if (testUrlWithoutApiKey == null) {
-                return false;
-            }
-
-            if (apiKey.isEmpty()) {
-                return false;
-            }
-
-            try {
-                URLDownload urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
-                // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
-                int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
-                return (statusCode >= 200) && (statusCode < 300);
-            } catch (IOException | UnirestException e) {
-                return false;
-            }
+            return fetcher.isValidKey(apiKey);
         };
         BackgroundTask.wrap(tester)
                       .onSuccess(onFinished)
