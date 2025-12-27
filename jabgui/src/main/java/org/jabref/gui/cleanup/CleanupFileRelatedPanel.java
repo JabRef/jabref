@@ -19,7 +19,7 @@ import org.jabref.model.entry.field.StandardField;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
-public class CleanupFileRelatedPanel extends VBox {
+public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
 
     @FXML private Label cleanupRenamePdfLabel;
 
@@ -78,11 +78,8 @@ public class CleanupFileRelatedPanel extends VBox {
         cleanupUpgradeExternalLinks.selectedProperty().bindBidirectional(viewModel.upgradeLinksSelected);
     }
 
-    @FXML
-    private void onApply() {
+    public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupFileViewModel.FILE_RELATED_JOBS, selectedJobs);
-        dialogViewModel.apply(selectedTab);
-        getScene().getWindow().hide();
+        return CleanupTabSelection.ofJobs(CleanupFileViewModel.FILE_RELATED_JOBS, selectedJobs);
     }
 }

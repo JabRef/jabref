@@ -113,7 +113,7 @@ public class FieldEditors {
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
-            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction);
+            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction, databaseContext);
         } else if (field == StandardField.ICORERANKING) {
             return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);
         } else {

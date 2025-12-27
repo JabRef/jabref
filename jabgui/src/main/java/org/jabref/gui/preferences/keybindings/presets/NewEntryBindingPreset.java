@@ -22,18 +22,18 @@ public class NewEntryBindingPreset implements KeyBindingPreset {
         keyBindings.put(KeyBinding.COPY_PREVIEW, "");
 
         // Add new entry presets
-        keyBindings.put(KeyBinding.NEW_ARTICLE, "ctrl+shift+A");
-        keyBindings.put(KeyBinding.NEW_BOOK, "ctrl+shift+B");
-        keyBindings.put(KeyBinding.ADD_ENTRY, "ctrl+N");
-        keyBindings.put(KeyBinding.ADD_ENTRY_IDENTIFIER, "ctrl+alt+shift+N");
-        keyBindings.put(KeyBinding.ADD_ENTRY_PLAINTEXT, "ctrl+shift+N");
-        keyBindings.put(KeyBinding.NEW_INBOOK, "ctrl+shift+I");
-        keyBindings.put(KeyBinding.NEW_INPROCEEDINGS, "ctrl+shift+C");
-        keyBindings.put(KeyBinding.NEW_MASTERSTHESIS, "ctrl+shift+M");
-        keyBindings.put(KeyBinding.NEW_PHDTHESIS, "ctrl+shift+T");
-        keyBindings.put(KeyBinding.NEW_PROCEEDINGS, "ctrl+shift+P");
-        keyBindings.put(KeyBinding.NEW_TECHREPORT, "ctrl+shift+R");
-        keyBindings.put(KeyBinding.NEW_UNPUBLISHED, "ctrl+shift+U");
+        keyBindings.put(KeyBinding.NEW_ARTICLE, "shortcut+shift+A");
+        keyBindings.put(KeyBinding.NEW_BOOK, "shortcut+shift+B");
+        keyBindings.put(KeyBinding.ADD_ENTRY, "shortcut+N");
+        keyBindings.put(KeyBinding.ADD_ENTRY_IDENTIFIER, "shortcut+alt+shift+N");
+        keyBindings.put(KeyBinding.ADD_ENTRY_PLAINTEXT, "shortcut+shift+N");
+        keyBindings.put(KeyBinding.NEW_INBOOK, "shortcut+shift+I");
+        keyBindings.put(KeyBinding.NEW_INPROCEEDINGS, "shortcut+shift+C");
+        keyBindings.put(KeyBinding.NEW_MASTERSTHESIS, "shortcut+shift+M");
+        keyBindings.put(KeyBinding.NEW_PHDTHESIS, "shortcut+shift+T");
+        keyBindings.put(KeyBinding.NEW_PROCEEDINGS, "shortcut+shift+P");
+        keyBindings.put(KeyBinding.NEW_TECHREPORT, "shortcut+shift+R");
+        keyBindings.put(KeyBinding.NEW_UNPUBLISHED, "shortcut+shift+U");
 
         return keyBindings;
     }

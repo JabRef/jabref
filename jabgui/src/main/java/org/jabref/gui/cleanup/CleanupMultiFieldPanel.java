@@ -12,7 +12,7 @@ import org.jabref.logic.cleanup.CleanupTabSelection;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
-public class CleanupMultiFieldPanel extends VBox {
+public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanupDoi;
     @FXML private CheckBox cleanupEprint;
     @FXML private CheckBox cleanupUrl;
@@ -47,11 +47,8 @@ public class CleanupMultiFieldPanel extends VBox {
         cleanupTimestampToModificationDate.selectedProperty().bindBidirectional(viewModel.timestampToModificationSelected);
     }
 
-    @FXML
-    private void onApply() {
+    public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupMultiFieldViewModel.MULTI_FIELD_JOBS, selectedJobs);
-        dialogViewModel.apply(selectedTab);
-        getScene().getWindow().hide();
+        return CleanupTabSelection.ofJobs(CleanupMultiFieldViewModel.MULTI_FIELD_JOBS, selectedJobs);
     }
 }

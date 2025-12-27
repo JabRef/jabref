@@ -17,6 +17,4 @@
         <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
     </padding>
 
-    <Button text="%Apply" onAction="#onApply" />
-
 </fx:root>

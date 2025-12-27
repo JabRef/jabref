@@ -70,6 +70,10 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     public void apply(CleanupTabSelection selectedTab) {
+        apply(selectedTab, true);
+    }
+
+    public void apply(CleanupTabSelection selectedTab, boolean showFeedback) {
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
@@ -113,11 +117,18 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         if (taskExecutor != null) {
             BackgroundTask.wrap(() -> cleanup(cleanupPreset, entriesToProcess))
-                          .onSuccess(result -> showResults())
+                          .onSuccess(result -> {
+                              if (showFeedback) {
+                                  showResults();
+                              }
+                          })
                           .onFailure(dialogService::showErrorDialogAndWait)
                           .executeWith(taskExecutor);
         } else {
             cleanup(cleanupPreset, entriesToProcess);
+            if (showFeedback) {
+                showResults();
+            }
         }
     }
 
@@ -151,17 +162,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         if (modifiedEntriesCount > 0 && tabSupplier != null) {
             tabSupplier.get().markBaseChanged();
         }
-
-        String message = switch (modifiedEntriesCount) {
-            case 0 ->
-                    Localization.lang("No entry needed a clean up");
-            case 1 ->
-                    Localization.lang("One entry needed a clean up");
-            default ->
-                    Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
-        };
-
-        dialogService.notify(message);
+        dialogService.notify(Localization.lang("%0 entry(s) needed a clean up", Integer.toString(modifiedEntriesCount)));
     }
 
     private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
