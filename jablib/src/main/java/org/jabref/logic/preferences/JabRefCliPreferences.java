@@ -27,6 +27,8 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -764,29 +766,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
         // endregion
 
-        // region PushToApplicationPreferences
-        defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
-        defaults.put(PUSH_TEXSTUDIO_PATH, OS.detectProgramPath("texstudio", "TeXstudio"));
-        defaults.put(PUSH_TEXWORKS_PATH, OS.detectProgramPath("texworks", "TeXworks"));
-        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.detectProgramPath("subl", "Sublime"));
-        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
-        defaults.put(PUSH_VIM, "vim");
-        defaults.put(PUSH_VIM_SERVER, "vim");
-        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-        defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("Code", "Microsoft VS Code"));
-        defaults.put(PUSH_CITE_COMMAND, "\\cite{key1,key2}");
-
-        if (OS.OS_X) {
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        } else if (OS.WINDOWS) {
-            defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
-        } else {
-            // Linux
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        }
-        // endregion
 
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
@@ -812,32 +791,40 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region PushToApplicationPreferences
 
+    private PushToApplicationPreferences getPushToApplicationPreferencesFromBackingStore(PushToApplicationPreferences defaults) {
+        Map<String, String> commandPaths = new HashMap<>(defaults.getCommandPaths());
+        Map<String, String> lookup = new HashMap<>();
+        lookup.put(PushApplications.EMACS.getDisplayName(), PUSH_EMACS_PATH);
+        lookup.put(PushApplications.LYX.getDisplayName(), PUSH_LYXPIPE);
+        lookup.put(PushApplications.TEXMAKER.getDisplayName(), PUSH_TEXMAKER_PATH);
+        lookup.put(PushApplications.TEXSTUDIO.getDisplayName(), PUSH_TEXSTUDIO_PATH);
+        lookup.put(PushApplications.TEXWORKS.getDisplayName(), PUSH_TEXWORKS_PATH);
+        lookup.put(PushApplications.VIM.getDisplayName(), PUSH_VIM);
+        lookup.put(PushApplications.WIN_EDT.getDisplayName(), PUSH_WINEDT_PATH);
+        lookup.put(PushApplications.SUBLIME_TEXT.getDisplayName(), PUSH_SUBLIME_TEXT_PATH);
+        lookup.put(PushApplications.VSCODE.getDisplayName(), PUSH_VSCODE_PATH);
+        for(Map.Entry<String, String> entry : commandPaths.entrySet()) {
+            String oldKey = lookup.get(entry.getKey());
+            String defaultValue =  entry.getValue();
+            entry.setValue(getEmptyIsDefault(oldKey, defaultValue));
+        }
+        return new PushToApplicationPreferences(
+                get(PUSH_TO_APPLICATION, defaults.getActiveApplicationName()),
+                new SimpleMapProperty<>(FXCollections.observableMap(commandPaths)),
+                get(PUSH_EMACS_ADDITIONAL_PARAMETERS, defaults.getEmacsArguments()),
+                get(PUSH_VIM_SERVER, defaults.getVimServer()),
+                CitationCommandString.from(get(PUSH_CITE_COMMAND, defaults.getCiteCommand().toString())),
+                CitationCommandString.from(get(PUSH_CITE_COMMAND, defaults.getDefaultCiteCommand().toString()))
+        );
+
+    }
+
     public PushToApplicationPreferences getPushToApplicationPreferences() {
         if (pushToApplicationPreferences != null) {
             return pushToApplicationPreferences;
         }
 
-        Map<String, String> applicationCommands = new HashMap<>();
-        // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
-        // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
-        applicationCommands.put(PushApplications.EMACS.getDisplayName(), getEmptyIsDefault(PUSH_EMACS_PATH));
-        applicationCommands.put(PushApplications.LYX.getDisplayName(), getEmptyIsDefault(PUSH_LYXPIPE));
-        applicationCommands.put(PushApplications.TEXMAKER.getDisplayName(), getEmptyIsDefault(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushApplications.TEXSTUDIO.getDisplayName(), getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushApplications.TEXWORKS.getDisplayName(), getEmptyIsDefault(PUSH_TEXWORKS_PATH));
-        applicationCommands.put(PushApplications.VIM.getDisplayName(), getEmptyIsDefault(PUSH_VIM));
-        applicationCommands.put(PushApplications.WIN_EDT.getDisplayName(), getEmptyIsDefault(PUSH_WINEDT_PATH));
-        applicationCommands.put(PushApplications.SUBLIME_TEXT.getDisplayName(), getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
-        applicationCommands.put(PushApplications.VSCODE.getDisplayName(), getEmptyIsDefault(PUSH_VSCODE_PATH));
-
-        pushToApplicationPreferences = new PushToApplicationPreferences(
-                get(PUSH_TO_APPLICATION),
-                applicationCommands,
-                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
-                get(PUSH_VIM_SERVER),
-                CitationCommandString.from(get(PUSH_CITE_COMMAND)),
-                CitationCommandString.from((String) defaults.get(PUSH_CITE_COMMAND))
-        );
+        pushToApplicationPreferences = getPushToApplicationPreferencesFromBackingStore(PushToApplicationPreferences.getDefault());
 
         EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
         pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
@@ -926,8 +913,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return PREFS_NODE.get(key, (String) defaults.get(key));
     }
 
-    public String getEmptyIsDefault(String key) {
-        String defaultValue = (String) defaults.get(key);
+    public String getEmptyIsDefault(String key, String defaultValue) {
         String result = PREFS_NODE.get(key, defaultValue);
         if ("".equals(result)) {
             return defaultValue;
@@ -1055,6 +1041,7 @@ public class JabRefCliPreferences implements CliPreferences {
         new SharedDatabasePreferences().clear();
 
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
     }
 
     private void clearTruststoreFromCustomCertificates() {
@@ -1209,6 +1196,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
     }
     //*************************************************************************************************************
     // ToDo: Cleanup

@@ -18,10 +18,12 @@ public enum PushApplications {
     private final String id;
     private final String displayName;
 
+
     PushApplications(String id, String displayName) {
         this.id = id;
         this.displayName = displayName;
     }
+
 
     public static Optional<PushApplications> getApplicationByDisplayName(String key) {
         for (PushApplications application : PushApplications.values()) {
@@ -48,4 +50,6 @@ public enum PushApplications {
     public String getDisplayName() {
         return displayName;
     }
+
+
 }
