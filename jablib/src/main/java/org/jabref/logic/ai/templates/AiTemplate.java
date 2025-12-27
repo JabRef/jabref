@@ -20,7 +20,11 @@ public enum AiTemplate {
     CITATION_PARSING_USER_MESSAGE,
 
     // Template that is used to generate follow-up questions in chat.
-    FOLLOW_UP_QUESTIONS;
+    FOLLOW_UP_QUESTIONS,
+
+    // Templates that are used for citation context extraction.
+    CITATION_CONTEXT_EXTRACTION_SYSTEM_MESSAGE,
+    CITATION_CONTEXT_EXTRACTION_USER_MESSAGE;
 
     public String getLocalizedName() {
         return switch (this) {
@@ -42,6 +46,10 @@ public enum AiTemplate {
                     Localization.lang("User message for citation parsing");
             case FOLLOW_UP_QUESTIONS ->
                     Localization.lang("Prompt for generating follow-up questions");
+            case CITATION_CONTEXT_EXTRACTION_SYSTEM_MESSAGE ->
+                    Localization.lang("System message for citation context extraction");
+            case CITATION_CONTEXT_EXTRACTION_USER_MESSAGE ->
+                    Localization.lang("User message for citation context extraction");
         };
     }
 }
