@@ -106,7 +106,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
                 dialogService.notify(String.format("%s %s\n%s",
                         Localization.lang("Finished automatically setting external links."),
-                        Localization.lang("Changed %0 entries.", String.valueOf(result.getChangedEntries().size())),
+                        Localization.lang("Changed %0 entries.", result.getChangedEntries().size()),
                         Localization.lang("Affected entries: %0", result.getChangedEntries().stream()
                                                                         .map(BibEntry::getCitationKey)
                                                                         .filter(Optional::isPresent)
