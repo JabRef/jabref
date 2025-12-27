@@ -82,7 +82,7 @@ public class AutoSetFileLinksUtil {
         LinkFilesResult result = new LinkFilesResult();
 
         for (BibEntry entry : entries) {
-            doLinkAssociateFiles(entry, onAddLinkedFile, result);
+            doLinkAssociatedFiles(entry, onAddLinkedFile, result);
         }
         return result;
     }
@@ -106,7 +106,7 @@ public class AutoSetFileLinksUtil {
      *         one trick: we accumulate Part B after Step 1, so Part A does not affect those broken linked files we use
      *                    to query Part B
      */
-    private void doLinkAssociateFiles(BibEntry entry, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile, LinkFilesResult result) {
+    private void doLinkAssociatedFiles(BibEntry entry, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile, LinkFilesResult result) {
         boolean entryUpdated = false;
         // Step 1: try matched files based on CitationKey configured by user
         Map<String, LinkedFile> files = getAssociatedFiles(entry, result, preConfiguredFileFinder);
