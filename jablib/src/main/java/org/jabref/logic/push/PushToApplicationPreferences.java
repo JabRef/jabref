@@ -33,7 +33,7 @@ public class PushToApplicationPreferences {
         commands.put("TeXstudio", OS.detectProgramPath("texstudio", "TeXstudio"));
         commands.put("TeXworks", OS.detectProgramPath("texworks", "TeXworks"));
         commands.put("Sublime Text", OS.detectProgramPath("subl", "Sublime"));
-        commands.put("LyX/Kile", System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
+        commands.put("LyX/Kile", USER_HOME + File.separator + ".lyx/lyxpipe");
         commands.put("VScode", OS.detectProgramPath("Code", "Microsoft VS Code"));
         commands.put("Vim", "vim");
         commands.put("Emacs", OS.WINDOWS ? "emacsclient.exe" : "emacsclient");
