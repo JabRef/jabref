@@ -2,9 +2,11 @@ package org.jabref.logic.formatter.casechanger;
 
 import java.util.stream.Collectors;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class SentenceCaseFormatter extends Formatter {
 
@@ -22,15 +24,12 @@ public class SentenceCaseFormatter extends Formatter {
      * Converts the first character of the first word of the given string to upper case (and the remaining characters of the first word to lower case) and changes other words to lower case, but does not change anything if word starts with "{"
      */
     @Override
-    public String format(String input) {
+    public String format(@NonNull String input) {
         return StringUtil.getStringAsSentences(input)
                          .stream()
                          .map(new LowerCaseFormatter()::format)
                          .map(Title::new)
-                         .map(title -> {
-                             title.getFirstWord().ifPresent(Word::toUpperFirst);
-                             return title;
-                         })
+                         .peek(title -> title.getFirstWord().ifPresent(Word::toUpperFirst))
                          .map(Object::toString)
                          .collect(Collectors.joining(" "));
     }

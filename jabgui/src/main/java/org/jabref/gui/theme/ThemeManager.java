@@ -3,13 +3,13 @@ package org.jabref.gui.theme;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.stream.Stream;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
@@ -67,10 +67,10 @@ public class ThemeManager {
     private boolean isDarkMode;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public ThemeManager(WorkspacePreferences workspacePreferences,
-                        FileUpdateMonitor fileUpdateMonitor) {
-        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
-        this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
+    public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
+                        @NonNull FileUpdateMonitor fileUpdateMonitor) {
+        this.workspacePreferences = workspacePreferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         // Always returns something even if the native library is not available - see https://github.com/dukke/FXThemes/issues/15
         this.themeWindowManager = ThemeWindowManagerFactory.create();
 
@@ -85,27 +85,48 @@ public class ThemeManager {
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
         baseCssLiveUpdate();
 
-        BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -> updateThemeSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
-        BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
-        updateThemeSettings();
+        if (Platform.isFxApplicationThread()) {
+            BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
+            BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -> updateThemeSettings());
+            BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
+            BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
+            BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
+            updateThemeSettings();
+        } else {
+            // Normally ThemeManager is only instantiated by JabGui and therefore already on the FX Thread, but when it's called from a test (e.g. ThemeManagerTest) then it's not on the fx thread
+            UiTaskExecutor.runInJavaFXThread(() -> {
+                BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
+                BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -> updateThemeSettings());
+                BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
+                BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
+                BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
+                updateThemeSettings();
+            });
+        }
     }
 
-    /// Installs the base and additional css files as stylesheets in the given scene.
+    /// Installs the base and additional CSS files as stylesheets in the given scene.
+    ///
+    /// This method is primarily intended to be called by `JabRefGUI` during startup.
+    /// Using `installCss` directly would cause a delay in theme application, resulting
+    /// in a brief flash of the default JavaFX theme (Modena CSS) before the intended theme appears.
+    public void installCssImmediately(Scene scene) {
+        List<String> toAdd = new ArrayList<>(2);
+        toAdd.add(baseStyleSheet.getSceneStylesheet().toExternalForm());
+        theme.getAdditionalStylesheet()
+             .map(StyleSheet::getSceneStylesheet)
+             .map(URL::toExternalForm)
+             .ifPresent(toAdd::add);
+
+        scene.getStylesheets().clear();
+        scene.getStylesheets().addAll(toAdd);
+    }
+
+    /// Registers a runnable on JavaFX thread to install the base and additional css files as stylesheets in the given scene.
     public void installCss(@NonNull Scene scene) {
         // Because of race condition in JavaFX, IndexOutOfBounds will be thrown, despite
         // all the invocation to this method come directly from the UI thread
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            List<String> stylesheets = Stream
-                    .of(baseStyleSheet.getSceneStylesheet(),
-                            theme.getAdditionalStylesheet().map(StyleSheet::getSceneStylesheet).orElse(null)
-                    ).filter(Objects::nonNull)
-                    .map(URL::toExternalForm)
-                    .toList();
-            scene.getStylesheets().setAll(stylesheets);
-        });
+        UiTaskExecutor.runInJavaFXThread(() -> installCssImmediately(scene));
     }
 
     /// Installs the css file as a stylesheet in the given web engine. Changes in the
@@ -126,8 +147,10 @@ public class ThemeManager {
     /// @param scene is the scene, the font size should be applied to
     private void updateFontStyle(@NonNull Scene scene) {
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
+            LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
         } else {
+            LOGGER.debug("Using default font size of {}pt", workspacePreferences.getDefaultFontSize());
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getDefaultFontSize() + "pt;");
         }
     }
@@ -187,7 +210,7 @@ public class ThemeManager {
     }
 
     private void updateThemeSettings() {
-        Theme theme = Objects.requireNonNull(workspacePreferences.getTheme());
+        Theme theme = workspacePreferences.getTheme();
 
         if (workspacePreferences.themeSyncOsProperty().getValue()) {
             if (Platform.getPreferences().getColorScheme() == ColorScheme.DARK) {

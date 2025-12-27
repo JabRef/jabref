@@ -25,8 +25,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -39,21 +39,23 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
 
-    // The preferences stored in JabRef
-    private final GitPreferences gitPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
+
+    // The preferences stored in JabRef
+    private final GitPreferences gitPreferences;
 
     // The preferences of this dialog
     private final StringProperty usernameProperty = new SimpleStringProperty("");
     private final StringProperty patProperty = new SimpleStringProperty("");
 
     // TODO: This should be a library preference -> the library is connected to repository; not all JabRef libraries to the same one
-    //       Reason: One could have https://github.com/JabRef/JabRef-exmple-libraries as one repo and https://github.com/myexampleuser/demolibs as onther repository
+    //       Reason: One could have https://github.com/JabRef/JabRef-exmple-libraries as one repo and https://github.com/myexampleuser/demolibs as another repository
     //               Both share the same secrets, but are different URLs.
     //       Also think of having two .bib files in the same folder - they will have the same repository URL -- should make no issues, but let's see...
     private final StringProperty repositoryUrlProperty = new SimpleStringProperty("");
+
     private final BooleanProperty rememberPatProperty = new SimpleBooleanProperty();
 
     private final Validator repositoryUrlValidator;
@@ -130,23 +132,15 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
         // TODO: Read remove from the git configuration - and only prompt for a repository if there is none
         String url = gitPreferences.getRepositoryUrl();
-        String user = gitPreferences.getUsername();
-        String pat = gitPreferences.getPat();
 
         Path bibPath = bibFilePathOpt.get();
-
         GitInitService.initRepoAndSetRemote(bibPath, url, gitHandlerRegistry);
         GitHandler handler = gitHandlerRegistry.get(bibPath.getParent());
-        handler.setCredentials(user, pat);
-
         GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);
-
         if (status.syncStatus() == SyncStatus.BEHIND) {
             throw new JabRefException(Localization.lang("Remote repository is not empty. Please pull changes before pushing."));
         }
-
         handler.createCommitOnCurrentBranch(Localization.lang("Share library to GitHub"), false);
-
         if (status.syncStatus() == SyncStatus.REMOTE_EMPTY) {
             handler.pushCurrentBranchCreatingUpstream();
         } else {
@@ -158,13 +152,13 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         repositoryUrlProperty.set(gitPreferences.getRepositoryUrl());
         usernameProperty.set(gitPreferences.getUsername());
         patProperty.set(gitPreferences.getPat());
-        rememberPatProperty.set(gitPreferences.getRememberPat());
+        rememberPatProperty.set(gitPreferences.getPersistPat());
     }
 
     public void storeSettings() {
         gitPreferences.setRepositoryUrl(repositoryUrlProperty.get().trim());
         gitPreferences.setUsername(usernameProperty.get().trim());
-        gitPreferences.setRememberPat(rememberPatProperty.get());
+        gitPreferences.setPersistPat(rememberPatProperty.get());
         gitPreferences.setPat(patProperty.get().trim());
     }
 

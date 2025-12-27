@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,16 +116,19 @@ public class ProtectedTermsLoader {
         mainList.add(readProtectedTermsListFromFile(path, enabled));
     }
 
-    public static ProtectedTermsList readProtectedTermsListFromResource(String resource, String description, boolean enabled) {
+    public static ProtectedTermsList readProtectedTermsListFromResource(@NonNull String resource,
+                                                                        @NonNull String description,
+                                                                        boolean enabled) {
         ProtectedTermsParser parser = new ProtectedTermsParser();
-        parser.readTermsFromResource(Objects.requireNonNull(resource), Objects.requireNonNull(description));
+        parser.readTermsFromResource(resource, description);
         return parser.getProtectTermsList(enabled, true);
     }
 
-    public static ProtectedTermsList readProtectedTermsListFromFile(Path path, boolean enabled) {
+    public static ProtectedTermsList readProtectedTermsListFromFile(@NonNull Path path,
+                                                                    boolean enabled) {
         LOGGER.debug("Reading term list from file {}", path);
         ProtectedTermsParser parser = new ProtectedTermsParser();
-        parser.readTermsFromFile(Objects.requireNonNull(path));
+        parser.readTermsFromFile(path);
         return parser.getProtectTermsList(enabled, false);
     }
 
@@ -134,9 +137,9 @@ public class ProtectedTermsLoader {
         return mainList.remove(termList);
     }
 
-    public ProtectedTermsList addNewProtectedTermsList(String newDescription, String newLocation, boolean enabled) {
-        Objects.requireNonNull(newDescription);
-        Objects.requireNonNull(newLocation);
+    public ProtectedTermsList addNewProtectedTermsList(@NonNull String newDescription,
+                                                       @NonNull String newLocation,
+                                                       boolean enabled) {
         ProtectedTermsList resultingList = new ProtectedTermsList(newDescription, new ArrayList<>(), newLocation);
         resultingList.setEnabled(enabled);
         resultingList.createAndWriteHeading(newDescription);

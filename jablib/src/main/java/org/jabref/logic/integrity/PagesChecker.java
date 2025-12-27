@@ -6,29 +6,33 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
 
 public class PagesChecker implements ValueChecker {
 
+    private static final String SINGLE_PAGE_PATTERN = "[A-Za-z]?\\d*";             // optional prefix and number
+    private static final String BIBTEX_RANGE_SEPARATOR = "(\\+|-{2}|\u2013)";      // separator, must contain exactly two dashes
+    private static final String BIBLATEX_RANGE_SEPARATOR = "(\\+|-{1,2}|\u2013)";  // separator
+
     private static final String PAGES_EXP_BIBTEX =
-            "\\A"                 // begin String
-                    + "[A-Za-z]?\\d*"       // optional prefix and number
+            "\\A"                       // begin String
+                    + SINGLE_PAGE_PATTERN
                     + "("
-                    + "(\\+|-{2}|\u2013)"   // separator, must contain exactly two dashes
-                    + "[A-Za-z]?\\d*"       // optional prefix and number
+                    + BIBTEX_RANGE_SEPARATOR
+                    + SINGLE_PAGE_PATTERN
                     + ")?"
-                    + "\\z";                // end String
+                    + "\\z";            // end String
 
     // See https://packages.oth-regensburg.de/ctan/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsubsection.3.15.3 for valid content
     private static final String PAGES_EXP_BIBLATEX =
-            "\\A"               // begin String
-                    + "[A-Za-z]?\\d*"     // optional prefix and number
+            "\\A"                       // begin String
+                    + SINGLE_PAGE_PATTERN
                     + "("
-                    + "(\\+|-{1,2}|\u2013)" // separator
-                    + "[A-Za-z]?\\d*"     // optional prefix and number
+                    + BIBLATEX_RANGE_SEPARATOR
+                    + SINGLE_PAGE_PATTERN
                     + ")?"
-                    + "\\z";              // end String
+                    + "\\z";            // end String
 
     private final Predicate<String> isValidPageNumber;
 

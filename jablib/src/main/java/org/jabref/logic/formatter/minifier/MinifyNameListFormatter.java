@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.minifier;
 
-import java.util.Objects;
-
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Replaces three or more authors with and others
@@ -30,9 +30,7 @@ public class MinifyNameListFormatter extends Formatter {
      * }</pre>
      */
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
-
+    public String format(@NonNull String value) {
         if (value.isEmpty()) {
             // nothing to do
             return value;

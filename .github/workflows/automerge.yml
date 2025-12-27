@@ -9,31 +9,41 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     if: github.repository == 'JabRef/jabref'
+    env:
+      HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      USER:      ${{ github.event.pull_request.user.login }}
+      TITLE:     ${{ github.event.pull_request.title }}
     steps:
       - name: Determine if job should run
         id: shouldrun
         shell: bash
         run: |
-          head_repo="${{ github.event.pull_request.head.repo.full_name }}"
-          if [[ "$head_repo" != "JabRef/jabref" ]]; then
-            echo "🚫 not from JabRef/jabref"
-            echo "shouldrun=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          echo USER: $USER
 
-          actor="${{ github.actor }}"
-          if [[ "$actor" == "renovate-bot" ]]; then
+          if [[ "$USER" == "renovate-bot" ]]; then
             echo "✅ from renote-bot"
             echo "shouldrun=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          title="${{ github.event.pull_request.title }}"
-          if [[ "$actor" == "dependabot[bot]" ]] || \
-            [[ "$title" == "[Bot] "* ]] || \
-            [[ "$title" == "Bump "* ]] || \
-            [[ "$title" == "New Crowdin updates"* ]] || \
-            [[ "$title" == "Update Gradle Wrapper from"* ]]; then
+          if [[ "$USER" == "dependabot[bot]" ]]; then
+            echo "✅ from dependabot"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$HEAD_REPO" != "JabRef/jabref" ]]; then
+            echo "🚫 not from JabRef/jabref"
+            echo "shouldrun=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$USER" == "dependabot[bot]" ]] || \
+            [[ "$TITLE" == "Chore(deps): "* ]] || \
+            [[ "$TITLE" == "[Bot] "* ]] || \
+            [[ "$TITLE" == "Bump "* ]] || \
+            [[ "$TITLE" == "New Crowdin updates"* ]] || \
+            [[ "$TITLE" == "Update Gradle Wrapper from"* ]]; then
             echo "✅ title OK"
             echo "shouldrun=true" >> "$GITHUB_OUTPUT"
             exit 0

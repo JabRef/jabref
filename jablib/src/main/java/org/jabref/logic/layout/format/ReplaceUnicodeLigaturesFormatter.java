@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.UnicodeLigaturesMap;
+
+import org.jspecify.annotations.NonNull;
 
 public class ReplaceUnicodeLigaturesFormatter extends Formatter implements LayoutFormatter {
 
@@ -32,7 +34,7 @@ public class ReplaceUnicodeLigaturesFormatter extends Formatter implements Layou
     }
 
     @Override
-    public String format(String fieldText) {
+    public String format(@NonNull String fieldText) {
         String result = fieldText;
         for (Pattern key : ligaturesMap.keySet()) {
             result = key.matcher(result).replaceAll(ligaturesMap.get(key));

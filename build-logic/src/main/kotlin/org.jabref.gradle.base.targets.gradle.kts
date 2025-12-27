@@ -8,13 +8,14 @@ javaModulePackaging {
     // Configuration shared by all targets and applications
     vendor = "JabRef"
     jlinkOptions.addAll(
+        "--generate-cds-archive",
         "--ignore-signing-information",
         "--compress", "zip-6",
         "--no-header-files",
         "--no-man-pages",
-        "--bind-services",
+        "--bind-services"
+        // "--strip-debug" // We need to keep this removed to get line numbers at stack traces
     )
-
     target("ubuntu-22.04") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.X86_64
@@ -25,13 +26,13 @@ javaModulePackaging {
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "deb", "rpm")
     }
-    target("macos-13") {
+    target("macos-15-intel") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
     }
-    target("macos-14") {
+    target("macos-15") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "dmg", "pkg")

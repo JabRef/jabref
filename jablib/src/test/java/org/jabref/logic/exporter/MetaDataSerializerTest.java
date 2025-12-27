@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.os.OS;
@@ -28,12 +28,17 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 public class MetaDataSerializerTest {
 
     private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
@@ -59,7 +64,7 @@ public class MetaDataSerializerTest {
 
     @Test
     void serializeSingleSaveAction() {
-        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
+        FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
+<fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.cleanup.CleanupSingleFieldPanel"
+         spacing="10.0" type="VBox">
+
+    <padding>
+        <Insets top="10.0" left="20.0"/>
+    </padding>
+
+    <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel" />
+    <padding>
+        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
+    </padding>
+
+</fx:root>

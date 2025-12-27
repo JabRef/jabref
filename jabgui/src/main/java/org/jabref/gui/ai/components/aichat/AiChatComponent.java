@@ -1,10 +1,16 @@
 package org.jabref.gui.ai.components.aichat;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,34 +18,44 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent;
 import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent;
 import org.jabref.gui.ai.components.util.Loadable;
 import org.jabref.gui.ai.components.util.notifications.Notification;
 import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiExporter;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.google.common.annotations.VisibleForTesting;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -59,6 +75,8 @@ public class AiChatComponent extends VBox {
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
 
     private final AiChatLogic aiChatLogic;
 
@@ -69,24 +87,33 @@ public class AiChatComponent extends VBox {
     @FXML private Button notificationsButton;
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
+    @FXML private MenuButton exportButton;
     @FXML private Hyperlink exQuestion1;
     @FXML private Hyperlink exQuestion2;
     @FXML private Hyperlink exQuestion3;
     @FXML private HBox exQuestionBox;
+    @FXML private HBox followUpQuestionsBox;
+
+    private String noticeTemplate;
 
     public AiChatComponent(AiService aiService,
                            StringProperty name,
                            ObservableList<ChatMessage> chatHistory,
+                           StateManager stateManager,
                            ObservableList<BibEntry> entries,
                            BibDatabaseContext bibDatabaseContext,
+                           BibEntryTypesManager entryTypesManager,
                            AiPreferences aiPreferences,
+                           FieldPreferences fieldPreferences,
                            DialogService dialogService,
                            TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
-        this.entries = entries;
+        this.entries = stateManager.getSelectedEntries();
         this.bibDatabaseContext = bibDatabaseContext;
         this.aiPreferences = aiPreferences;
+        this.entryTypesManager = entryTypesManager;
+        this.fieldPreferences = fieldPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -102,11 +129,13 @@ public class AiChatComponent extends VBox {
     @FXML
     public void initialize() {
         uiChatHistory.setItems(aiChatLogic.getChatHistory());
+        exportButton.disableProperty().bind(Bindings.isEmpty(aiChatLogic.getChatHistory()));
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
         sendExampleQuestions();
         initializeExampleQuestions();
+        initializeFollowUpQuestions();
     }
 
     private void initializeNotifications() {
@@ -117,11 +146,27 @@ public class AiChatComponent extends VBox {
     }
 
     private void initializeNotice() {
-        String newNotice = noticeText
-                .getText()
-                .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
+        this.noticeTemplate = noticeText.getText();
 
-        noticeText.setText(newNotice);
+        noticeText.textProperty().bind(Bindings.createStringBinding(this::computeNoticeText, noticeDependencies()));
+    }
+
+    @VisibleForTesting
+    String computeNoticeText() {
+        String provider = aiPreferences.getAiProvider().getLabel();
+        String model = aiPreferences.getSelectedChatModel();
+        return noticeTemplate.replace("%0", provider + " " + model);
+    }
+
+    private Observable[] noticeDependencies() {
+        return new Observable[] {
+                aiPreferences.aiProviderProperty(),
+                aiPreferences.openAiChatModelProperty(),
+                aiPreferences.mistralAiChatModelProperty(),
+                aiPreferences.geminiChatModelProperty(),
+                aiPreferences.huggingFaceChatModelProperty(),
+                aiPreferences.gpt4AllChatModelProperty()
+        };
     }
 
     private void initializeExampleQuestions() {
@@ -170,9 +215,61 @@ public class AiChatComponent extends VBox {
             onSendMessage(userMessage);
         });
 
+        chatPrompt.setRegenerateCallback(() -> {
+            setLoading(true);
+            Optional<UserMessage> lastUserPrompt = Optional.empty();
+            if (!aiChatLogic.getChatHistory().isEmpty()) {
+                lastUserPrompt = getLastUserMessage();
+            }
+            if (lastUserPrompt.isPresent()) {
+                while (aiChatLogic.getChatHistory().getLast().type() != ChatMessageType.USER) {
+                    deleteLastMessage();
+                }
+                deleteLastMessage();
+                chatPrompt.switchToNormalState();
+                onSendMessage(lastUserPrompt.get().singleText());
+            }
+        });
+
         chatPrompt.requestPromptFocus();
 
         updatePromptHistory();
+    }
+
+    private void initializeFollowUpQuestions() {
+        aiChatLogic.getFollowUpQuestions().addListener((javafx.collections.ListChangeListener<String>) change -> {
+            updateFollowUpQuestions();
+        });
+    }
+
+    private void updateFollowUpQuestions() {
+        List<String> questions = new ArrayList<>(aiChatLogic.getFollowUpQuestions());
+
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            followUpQuestionsBox.getChildren().removeIf(node -> node instanceof Hyperlink);
+
+            if (questions.isEmpty()) {
+                followUpQuestionsBox.setVisible(false);
+                followUpQuestionsBox.setManaged(false);
+                exQuestionBox.setVisible(true);
+                exQuestionBox.setManaged(true);
+            } else {
+                followUpQuestionsBox.setVisible(true);
+                followUpQuestionsBox.setManaged(true);
+                exQuestionBox.setVisible(false);
+                exQuestionBox.setManaged(false);
+
+                for (String question : questions) {
+                    Hyperlink link = new Hyperlink(question);
+                    link.getStyleClass().add("exampleQuestionStyle");
+                    link.setTooltip(new Tooltip(question));
+                    link.setOnAction(event -> {
+                        onSendMessage(question);
+                    });
+                    followUpQuestionsBox.getChildren().add(link);
+                }
+            }
+        });
     }
 
     private void updateNotifications() {
@@ -239,6 +336,13 @@ public class AiChatComponent extends VBox {
     }
 
     private void onSendMessage(String userPrompt) {
+        aiChatLogic.getFollowUpQuestions().clear();
+
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            exQuestionBox.setVisible(false);
+            exQuestionBox.setManaged(false);
+        });
+
         UserMessage userMessage = new UserMessage(userPrompt);
         updatePromptHistory();
         setLoading(true);
@@ -312,5 +416,70 @@ public class AiChatComponent extends VBox {
             int index = aiChatLogic.getChatHistory().size() - 1;
             aiChatLogic.getChatHistory().remove(index);
         }
+    }
+
+    private Optional<UserMessage> getLastUserMessage() {
+        int messageIndex = aiChatLogic.getChatHistory().size() - 1;
+        while (messageIndex >= 0) {
+            ChatMessage chat = aiChatLogic.getChatHistory().get(messageIndex);
+            if (chat.type() == ChatMessageType.USER) {
+                return Optional.of((UserMessage) chat);
+            }
+            messageIndex--;
+        }
+        return Optional.empty();
+    }
+
+    @FXML
+    private void exportMarkdown() {
+        assert !entries.isEmpty();
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.MARKDOWN)
+                .withDefaultExtension(StandardFileType.MARKDOWN)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entries, entryTypesManager, fieldPreferences);
+                             String content = exporter.buildMarkdownForChat(aiChatLogic.getChatHistory());
+                             Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
+                         } catch (IOException e) {
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
+                         }
+                     });
+    }
+
+    @FXML
+    private void exportJson() {
+        assert !entries.isEmpty();
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.JSON)
+                .withDefaultExtension(StandardFileType.JSON)
+                .withInitialDirectory(Path.of(System.getProperty("user.home")))
+                .build();
+
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                     .ifPresent(path -> {
+                         try {
+                             AiExporter exporter = new AiExporter(entries, entryTypesManager, fieldPreferences);
+                             String jsonString = exporter.buildJsonExport(
+                                     aiPreferences.getAiProvider().getLabel(),
+                                     aiPreferences.getSelectedChatModel(),
+                                     java.time.LocalDateTime.now().toString(),
+                                     aiChatLogic.getChatHistory()
+                             );
+                             Files.writeString(path, jsonString, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                             dialogService.notify(Localization.lang("Export operation finished successfully."));
+                         } catch (IOException e) {
+                             LOGGER.error("Problem occurred while writing the export file", e);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Problem occurred while writing the export file"), e);
+                         }
+                     });
     }
 }

@@ -1,14 +1,11 @@
 package org.jabref.languageserver.util;
 
-import java.util.Objects;
-
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -44,17 +41,17 @@ public final class LspDiagnosticBuilder {
     }
 
     public LspDiagnosticBuilder setMessage(String message) {
-        this.message = Objects.requireNonNull(message, "message must not be null");
+        this.message = message;
         return this;
     }
 
     public LspDiagnosticBuilder setSeverity(DiagnosticSeverity severity) {
-        this.severity = Objects.requireNonNull(severity, "severity must not be null");
+        this.severity = severity;
         return this;
     }
 
     public LspDiagnosticBuilder setSource(String source) {
-        this.source = Objects.requireNonNull(source, "source must not be null");
+        this.source = source;
         return this;
     }
 
@@ -74,7 +71,7 @@ public final class LspDiagnosticBuilder {
     }
 
     public LspDiagnosticBuilder setRange(ParserResult.Range range) {
-        this.explicitRange = convertToLspRange(range);
+        this.explicitRange = LspRangeUtil.convertToLspRange(range);
         return this;
     }
 
@@ -84,11 +81,9 @@ public final class LspDiagnosticBuilder {
     }
 
     public Diagnostic build() {
-        Objects.requireNonNull(message, "message must be set");
-
         Range range = explicitRange;
         if (explicitRange == null) {
-            range = convertToLspRange(computeRange());
+            range = LspRangeUtil.convertToLspRange(computeRange());
         }
         return new Diagnostic(range, message, severity, source);
     }
@@ -103,12 +98,5 @@ public final class LspDiagnosticBuilder {
         }
 
         return parserResult.getFieldRange(entry, field);
-    }
-
-    private Range convertToLspRange(ParserResult.Range range) {
-        return new Range(
-                new Position(Math.max(range.startLine() - 1, 0), Math.max(range.startColumn() - 1, 0)),
-                new Position(Math.max(range.endLine() - 1, 0), Math.max(range.endColumn() - 1, 0))
-        );
     }
 }

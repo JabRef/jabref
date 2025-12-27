@@ -5,17 +5,16 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Manages the loading of CitationStyles from both internal resources and external files.
@@ -130,9 +129,7 @@ public record CSLStyleLoader(
      *
      * @return Optional containing the added CitationStyle if valid, empty otherwise
      */
-    public Optional<CitationStyle> addStyleIfValid(String stylePath) {
-        Objects.requireNonNull(stylePath);
-
+    public Optional<CitationStyle> addStyleIfValid(@NonNull String stylePath) {
         Optional<CitationStyle> newStyleOptional = CSLStyleUtils.createCitationStyleFromFile(stylePath);
         if (newStyleOptional.isPresent()) {
             CitationStyle newStyle = newStyleOptional.get();
@@ -160,8 +157,7 @@ public record CSLStyleLoader(
      *
      * @return true if the style was removed, false otherwise
      */
-    public boolean removeStyle(CitationStyle style) {
-        Objects.requireNonNull(style);
+    public boolean removeStyle(@NonNull CitationStyle style) {
         if (!style.isInternalStyle()) {
             boolean result = EXTERNAL_STYLES.remove(style);
             storeExternalStyles();

@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Contains all supported languages.
@@ -30,7 +32,7 @@ public enum Language {
     POLISH("Polish", "pl"),
     PORTUGUESE("Português", "pt"),
     RUSSIAN("Russian", "ru"),
-    SIMPLIFIED_CHINESE("Chinese (Simplified)", "zh_CN"),
+    SIMPLIFIED_CHINESE("简体中文 (Chinese Simplified)", "zh_CN"),
     SPANISH("Español", "es"),
     SWEDISH("Svenska", "sv"),
     TAGALOG("Tagalog/Filipino", "tl"),
@@ -51,9 +53,7 @@ public enum Language {
         this.id = id;
     }
 
-    public static Optional<Locale> convertToSupportedLocale(Language language) {
-        Objects.requireNonNull(language);
-
+    public static Optional<Locale> convertToSupportedLocale(@NonNull Language language) {
         // Very important to split languages like pt_BR into two parts, because otherwise the country would be treated lowercase and create problems in loading
         String[] languageParts = language.getId().split("_");
         Locale locale;
@@ -66,6 +66,13 @@ public enum Language {
         }
 
         return Optional.of(locale);
+    }
+
+    public static Language getLanguageFor(String languageString) {
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(languageString))
+                     .findFirst()
+                     .orElse(Language.ENGLISH);
     }
 
     public String getDisplayName() {

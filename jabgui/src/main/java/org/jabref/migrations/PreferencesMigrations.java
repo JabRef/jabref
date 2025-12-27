@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,18 +22,18 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;
@@ -69,7 +70,7 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
-        addICORERankingFieldToGeneralTab(preferences);
+        migrateGeneralTabDefaultFields(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
     }
 
@@ -294,6 +295,7 @@ public class PreferencesMigrations {
     private static void upgradeKeyBindingsToJavaFX(JabRefCliPreferences prefs) {
         UnaryOperator<String> replaceKeys = str -> {
             String result = str.replace("ctrl ", "ctrl+");
+            result = result.replace("ctrl+", "shortcut+");
             result = result.replace("shift ", "shift+");
             result = result.replace("alt ", "alt+");
             result = result.replace("meta ", "meta+");
@@ -448,8 +450,13 @@ public class PreferencesMigrations {
      * they can deal with.
      */
     static void restoreVariablesForBackwardCompatibility(JabRefCliPreferences preferences) {
-        // 5.0 preference name "columnNames". The new one is {@link JabRefPreferences#COLUMN_NAMES}
-        List<String> oldColumnNames = preferences.getStringList("columnNames");
+        final String V5_0_COLUMN_NAMES = "columnNames";
+        final String V5_0_COLUMN_WIDTHS = "columnWidths";
+        final String V5_0_COLUMN_SORT_TYPES = "columnSortTypes";
+        final String V5_0_COLUMN_SORT_ORDER = "columnSortOrder";
+        final String V5_0_MAIN_FONT_SIZE = "mainFontSize";
+
+        List<String> oldColumnNames = preferences.getStringList(V5_0_COLUMN_NAMES);
         List<String> fieldColumnNames = oldColumnNames.stream()
                                                       .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
                                                       .map(columnName -> {
@@ -461,25 +468,29 @@ public class PreferencesMigrations {
                                                       }).collect(Collectors.toList());
 
         if (!fieldColumnNames.isEmpty()) {
-            preferences.putStringList("columnNames", fieldColumnNames);
+            preferences.putStringList(V5_0_COLUMN_NAMES, fieldColumnNames);
 
             List<String> fieldColumnWidths = new ArrayList<>(List.of());
             for (int i = 0; i < fieldColumnNames.size(); i++) {
                 fieldColumnWidths.add("100");
             }
-            preferences.putStringList("columnWidths", fieldColumnWidths);
+            preferences.putStringList(V5_0_COLUMN_WIDTHS, fieldColumnWidths);
 
-            preferences.put("columnSortTypes", "");
-            preferences.put("columnSortOrder", "");
+            preferences.put(V5_0_COLUMN_SORT_TYPES, "");
+            preferences.put(V5_0_COLUMN_SORT_ORDER, "");
         }
 
         // Ensure font size is a parsable int variable
         try {
             // some versions stored the font size as double to the **same** key
             // since the preference store is type-safe, we need to add this workaround
-            String fontSizeAsString = preferences.get(JabRefGuiPreferences.MAIN_FONT_SIZE);
+            String fontSizeAsString = preferences.get(V5_0_MAIN_FONT_SIZE);
+            if (fontSizeAsString == null) {
+                return;
+            }
+
             int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
-            preferences.putInt(JabRefGuiPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
+            preferences.putInt(V5_0_MAIN_FONT_SIZE, fontSizeAsInt);
         } catch (ClassCastException e) {
             // already an integer
         }
@@ -531,9 +542,9 @@ public class PreferencesMigrations {
         List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
                                                            .split("\n"));
         if (formatterCleanups.size() >= 2
-                && (FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
-                || FieldFormatterCleanups.DISABLED.equals(formatterCleanups.getFirst()))) {
-            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
+                && (FieldFormatterCleanupActions.ENABLED.equals(formatterCleanups.getFirst())
+                || FieldFormatterCleanupActions.DISABLED.equals(formatterCleanups.getFirst()))) {
+            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanupActions.ENABLED.equals(formatterCleanups.getFirst())
                                                                     ? Boolean.TRUE
                                                                     : Boolean.FALSE);
 
@@ -564,38 +575,52 @@ public class PreferencesMigrations {
     }
 
     /**
-     * Updates the default preferences for the editor fields under the "General" tab to include the ICORE Ranking Field
-     * if it is missing.
+     * Migrates default fields of the "General" entry editor tab.
+     *
      * <p>
-     * The function first ensures that the current preferences match the previous default (before the ICORE field was added)
-     * and only then does the update.
+     * This migration handles default configuration before and after v6.0-alpha.3.
+     * If the user current configuration matched with one of with known default field sets it gets updated to
+     * current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
      * </p>
      *
-     * @param preferences the user's current preferences
+     * @param preferences the user's current GUI preferences
      * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      */
-    static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
+    static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
-
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
-        if (currentGeneralPrefs != null) {
-            Set<Field> expectedGeneralPrefs = Set.of(
-                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
-                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
-                    StandardField.TIMESTAMP,
-
-                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
-                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
-            );
-            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
-                return;
-            }
+        if (currentGeneralPrefs == null) {
+            return;
+        }
+        Set<Field> preV60alpha3Fields = Set.of(
+                StandardField.DOI,
+                StandardField.CROSSREF,
+                StandardField.KEYWORDS,
+                StandardField.EPRINT,
+                StandardField.URL,
+                StandardField.FILE,
+                StandardField.GROUPS,
+                StandardField.OWNER,
+                StandardField.TIMESTAMP,
+                SpecialField.PRINTED,
+                SpecialField.PRIORITY,
+                SpecialField.QUALITY,
+                SpecialField.RANKING,
+                SpecialField.READ_STATUS,
+                SpecialField.RELEVANCE
+        );
+        Set<Field> v60alpha3Fields = new HashSet<>(preV60alpha3Fields);
+        v60alpha3Fields.add(StandardField.ICORERANKING);
+        if (!currentGeneralPrefs.equals(preV60alpha3Fields)
+                && !currentGeneralPrefs.equals(v60alpha3Fields)) {
+            return;
         }
 
         entryEditorPrefs.put(
                 Localization.lang("General"),
-                FieldFactory.getDefaultGeneralFields().stream().collect(Collectors.toSet())
+                new HashSet<>(FieldFactory.getDefaultGeneralFields())
         );
+
         preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
     }
 

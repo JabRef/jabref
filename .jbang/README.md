@@ -5,12 +5,77 @@ This directory contains JBang scripts for JabRef.
 
 Four use cases:
 
+- Runing `JabKit` - JabRef's CLI tool.
+- Runing `JabLs` - JabRef's LSP Server.
+- Runing `JabSrv` - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
-- Run JabKit - JabRef's CLI tool.
-- Run JabLs - JabRef's Language Server.
-- Run JabSrv - JabRef's HTTP server.
 
-## Running JabKit without installation
+## Running `JabKit`
+
+```bash
+$ jbang jabkit@jabref --help
+
+   &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
+   &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
+   &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
+   &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&
+   &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
+   &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
+&&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
+
+Version: 6.0-alpha.164--2025-11-20--2243e72
+Staying on top of your literature since 2003 - https://www.jabref.org/
+Please report issues at https://github.com/JabRef/jabref/issues
+
+JabKit - command line toolkit for JabRef
+Usage: jabkit [-dhpv] [COMMAND]
+  -d, --debug       Enable debug output
+  -h, --help        display this help message
+  -p, --porcelain   Enable script-friendly output
+  -v, --version     display version info
+Commands:
+  check-consistency       Check consistency of the library.
+  check-integrity         Check integrity of the database.
+  convert                 Convert between bibliography formats.
+  doi-to-bibtex           Converts a DOI to BibTeX
+  fetch                   Fetch entries from a provider.
+  generate-bib-from-aux   Generate small bib from aux file.
+  generate-citation-keys  Generate citation keys for entries in a .bib file.
+  get-cited-works         Outputs a list of works cited ("bibliography")
+  get-citing-works        Outputs a list of works citing the work at hand
+  pdf                     Manage PDF metadata.
+  preferences             Manage JabKit preferences.
+  pseudonymize            Perform pseudonymization of the library
+  search                  Search in a library.
+```
+
+> [!NOTE]
+> Due to the high development pace, you need to sometimes refresh the dependencies
+>
+> `jbang --fresh jabkit@jabref --help`
+
+### Installing and Running `JabKit` with JBang
+
+To have `jbang` working, you need to [install jbang](https://www.jbang.dev/download/).
+E.g., by `brew install jbangdev/tap/jbang` or `choco install jbang`
+
+`jbang` also enables to install `jabkit` permanently in your `PATH`:
+
+```console
+jbang app install --fresh --force jabkit@jabref
+```
+
+Then, you can run JabKit:
+
+```console
+jabkit --help
+```
+
+> [!NOTE]
+> You can use the command above to update JabKit, too.
+> Background: Although [JBang takes care about updating JabKit automatically](https://github.com/orgs/jbangdev/discussions/1636#discussioncomment-6150992), it does not update the `-SNAPSHOT` dependencies.
+
+### Running `JabKit` without installation
 
 By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit with minimal setup:
 
@@ -23,25 +88,9 @@ By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit 
 You can also put `gg.cmd` on your `PATH` and make it executable.
 Then you enable `alias jabkit='gg.cmd jbang jabkit@jabref`.
 
-## Running JabKit with JBang
+## Running `JabLs`
 
-If you have JBang installed, just run
-
-```terminal
-jbang jabkit@jabref
-```
-
-You can also install `jabkit` permanently in your `PATH`:
-
-1. [Install JBang](https://www.jbang.dev/download/). E.g., by `brew install jbangdev/tap/jbang` or `choco install jbang`
-2. Make `jabkit` available on the command line: `jbang app install jabkit@jabref`
-3. Run `jabkit`
-
-[JBang takes care about updating JabKit automatically](https://github.com/orgs/jbangdev/discussions/1636#discussioncomment-6150992).
-
-## Running JabLs
-
-If you have JBang installed, just run following command
+In case you have [JBang installed], just run following command:
 
 ```terminal
 jbang jabls@jabref
@@ -61,9 +110,9 @@ npx @jbangdev/jbang jabls@jabref
 
 One can add `--help` to see available options.
 
-## Running JabSrv
+## Running `JabSrv`
 
-If you have JBang installed, just run following command
+In case you have [JBang installed], just run following command:
 
 ```terminal
 jbang jabsrv@jabref
@@ -82,3 +131,9 @@ npx @jbangdev/jbang jabsrv@jabref
 ```
 
 One can add `--help` to see available options. E.g., how to set another port and how to specify served libraries.
+
+JBang installed: https://www.jbang.dev/download/
+
+## Try out any pull request
+
+See <https://blog.jabref.org/2025/05/31/run-pr/> for a howto.

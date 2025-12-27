@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,16 +19,21 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -60,7 +66,7 @@ import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -167,19 +173,21 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             EntryEditorTab activeTab = (EntryEditorTab) tab;
             if (activeTab != null) {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
+                if (activeTab instanceof FieldsEditorTab fieldsTab) {
+                    Platform.runLater(() -> setupNavigationForTab(fieldsTab));
+                }
             }
         });
 
         stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
-                    if (stateManager.getSelectedEntries().isEmpty()) {
-                        // [impl->req~entry-editor.keep-showing~1]
-                        // No change in the entry editor
-                        // We allow users to edit the "old" entry
-                    } else {
-                        setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
-                    }
-                }
-        );
+            if (stateManager.getSelectedEntries().isEmpty()) {
+                // [impl->req~entry-editor.keep-showing~1]
+                // No change in the entry editor
+                // We allow users to edit the "old" entry
+            } else {
+                setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
+            }
+        });
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (_, _, newValue) -> {
@@ -222,6 +230,37 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
     }
 
+    private void setupNavigationForTab(FieldsEditorTab tab) {
+        Node content = tab.getContent();
+        if (content instanceof Parent parent) {
+            findAndSetupTabNavigableNodes(parent);
+        }
+    }
+
+    private void findAndSetupTabNavigableNodes(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            // Generic handler for other focusable controls (e.g., Button, ComboBox, CheckBox, etc.)
+            child.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.TAB && !event.isShiftDown()) {
+                    if (isLastFieldInCurrentTab(child)) {
+                        moveToNextTabAndFocus();
+                        event.consume();
+                    }
+                }
+                if (event.getCode() == KeyCode.TAB && event.isShiftDown()) {
+                    if (isFirstFieldInCurrentTab(child)) {
+                        moveToPreviousTabAndFocus();
+                        event.consume();
+                    }
+                }
+            });
+
+            if (child instanceof Parent childParent) {
+                findAndSetupTabNavigableNodes(childParent);
+            }
+        }
+    }
+
     /**
      * Set up key bindings specific for the entry editor.
      */
@@ -248,6 +287,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                         break;
+                    case JUMP_TO_FIELD:
+                        selectFieldDialog();
+                        event.consume();
+                        break;
                     case HELP:
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
@@ -266,6 +309,15 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 }
             }
         });
+    }
+
+    public void selectFieldDialog() {
+        if (getCurrentlyEditedEntry() == null) {
+            return;
+        }
+        JumpToFieldDialog dialog = new JumpToFieldDialog(this);
+        dialog.initModality(Modality.NONE);
+        dialog.show();
     }
 
     @FXML
@@ -324,7 +376,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(stateManager, preferences));
-        tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
         tabs.add(new CitationRelationsTab(
                 dialogService,
                 undoManager,
@@ -348,8 +399,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, this));
-        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, this, preferences));
-        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, this, taskExecutor));
+        tabs.add(new AiSummaryTab(stateManager, bibEntryTypesManager, preferences, aiService, dialogService, this));
+        tabs.add(new AiChatTab(stateManager, bibEntryTypesManager, preferences, aiService, dialogService, this, taskExecutor));
 
         return tabs;
     }
@@ -376,7 +427,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         // Same order as in org.jabref.gui.entryeditor.EntryEditor.createTabs after the call of getAdditionalUserConfiguredTabs
         entryEditorTabList.remove(MathSciNetTab.NAME);
         entryEditorTabList.remove(FileAnnotationTab.NAME);
-        entryEditorTabList.remove(SciteTab.NAME);
         entryEditorTabList.remove(CitationRelationsTab.NAME);
         entryEditorTabList.remove(RelatedArticlesTab.NAME);
         // SourceTab is not listed, because it has different names for BibTeX and biblatex mode
@@ -422,6 +472,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return currentlyEditedEntry;
     }
 
+    public List<EntryEditorTab> getAllPossibleTabs() {
+        return allPossibleTabs;
+    }
+
     public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
         if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
             return;
@@ -436,14 +490,32 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
-            typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+            typeLabel.setText(new TypedBibEntry(this.currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
             adaptVisibleTabs();
             setupToolBar();
-            getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
+            getSelectedTab().notifyAboutFocus(this.currentlyEditedEntry);
         });
+
+        typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+
+        adaptVisibleTabs();
+
+        setupToolBar();
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
+        }
+        Platform.runLater(() -> {
+            for (Tab tab : tabbed.getTabs()) {
+                if (tab instanceof FieldsEditorTab fieldsTab) {
+                    setupNavigationForTab(fieldsTab);
+                }
+            }
+        });
+
+        EntryEditorTab selectedTab = getSelectedTab();
+        if (selectedTab != null) {
+            Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
         }
     }
 
@@ -491,32 +563,38 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(currentlyEditedEntry, fetcher);
+        new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager).fetchAndMerge(currentlyEditedEntry, fetcher);
+    }
+
+    public void selectField(String fieldName) {
+        setFocusToField(org.jabref.model.entry.field.FieldFactory.parseField(fieldName));
     }
 
     public void setFocusToField(Field field) {
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            Field actualField = field;
-            boolean fieldFound = false;
-            for (Tab tab : tabbed.getTabs()) {
-                tabbed.getSelectionModel().select(tab);
-                if ((tab instanceof FieldsEditorTab fieldsEditorTab)
-                        && fieldsEditorTab.getShownFields().contains(actualField)) {
-                    tabbed.getSelectionModel().select(tab);
-                    Platform.runLater(() -> fieldsEditorTab.requestFocus(actualField));
-                    // This line explicitly brings focus back to the main window containing the Entry Editor.
-                    getScene().getWindow().requestFocus();
-                    fieldFound = true;
-                    break;
+        UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
+                tab -> selectTabAndField(tab, field),
+                () -> {
+                    Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
+                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
                 }
-            }
-            if (!fieldFound) {
-                Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                if (aliasField != null) {
-                    setFocusToField(aliasField);
-                }
-            }
+        ));
+    }
+
+    private void selectTabAndField(FieldsEditorTab tab, Field field) {
+        Platform.runLater(() -> {
+            tabbed.getSelectionModel().select(tab);
+            tab.requestFocus(field);
         });
+        // This line explicitly brings focus back to the main window containing the Entry Editor.
+        getScene().getWindow().requestFocus();
+    }
+
+    private Optional<FieldsEditorTab> getTabContainingField(Field field) {
+        return tabbed.getTabs().stream()
+                     .filter(FieldsEditorTab.class::isInstance)
+                     .map(FieldsEditorTab.class::cast)
+                     .filter(tab -> tab.getShownFields().contains(field))
+                     .findFirst();
     }
 
     @Override
@@ -527,5 +605,242 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @Override
     public void previousPreviewStyle() {
         this.previewPanel.previousPreviewStyle();
+    }
+
+    /**
+     * Checks if the given TextField is the first field in the currently selected tab.
+     *
+     * @param node the Node to check
+     * @return true if this is the first field in the current tab, false otherwise
+     */
+    boolean isFirstFieldInCurrentTab(Node node) {
+        if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+            return false;
+        }
+
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (!(selectedTab instanceof FieldsEditorTab currentTab)) {
+            return false;
+        }
+
+        Collection<Field> shownFields = currentTab.getShownFields();
+        // Try field-based check first
+        if (!shownFields.isEmpty() && node.getId() != null) {
+            Optional<Field> firstField = shownFields.stream().findFirst();
+
+            boolean matchesFirstFieldId = firstField.map(Field::getName)
+                                                    .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                                                    .orElse(false);
+            if (matchesFirstFieldId) {
+                return true;
+            }
+        }
+
+        // Fallback: check visual tree
+        if (currentTab.getContent() instanceof Parent parent) {
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            Optional<Node> firstFocusable = findFirstFocusableNode(searchRoot);
+            return firstFocusable.map(n -> n == node).orElse(false);
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the given TextField is the last field in the currently selected tab.
+     *
+     * @param node the Node to check
+     * @return true if this is the last field in the current tab, false otherwise
+     */
+    boolean isLastFieldInCurrentTab(Node node) {
+        if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+            return false;
+        }
+
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (!(selectedTab instanceof FieldsEditorTab currentTab)) {
+            return false;
+        }
+
+        Collection<Field> shownFields = currentTab.getShownFields();
+        // Try field-based check first (preferred for standard field editors)
+        if (!shownFields.isEmpty() && node.getId() != null) {
+            Optional<Field> lastField = shownFields.stream()
+                                                   .reduce((first, second) -> second);
+
+            boolean matchesLastFieldId = lastField.map(Field::getName)
+                                                  .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                                                  .orElse(false);
+            if (matchesLastFieldId) {
+                return true;
+            }
+        }
+
+        // Fallback: determine if the node is the last focusable control within the editor grid of the current tab
+        if (currentTab.getContent() instanceof Parent parent) {
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            Optional<Node> lastFocusable = findLastFocusableNode(searchRoot);
+            return lastFocusable.map(n -> n == node).orElse(false);
+        }
+
+        return false;
+    }
+
+    /**
+     * Moves to the next tab and focuses on its first field.
+     */
+    void moveToNextTabAndFocus() {
+        tabbed.getSelectionModel().selectNext();
+
+        Platform.runLater(() -> {
+            Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+            if (selectedTab instanceof FieldsEditorTab currentTab) {
+                focusFirstFieldInTab(currentTab);
+            }
+        });
+    }
+
+    void moveToPreviousTabAndFocus() {
+        tabbed.getSelectionModel().selectPrevious();
+
+        Platform.runLater(() -> {
+            Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+            if (selectedTab instanceof FieldsEditorTab currentTab) {
+                focusLastFieldInTab(currentTab);
+            }
+        });
+    }
+
+    private void focusFirstFieldInTab(FieldsEditorTab tab) {
+        Node tabContent = tab.getContent();
+        if (tabContent instanceof Parent parent) {
+            // First try to find field by ID (preferred method)
+            Collection<Field> shownFields = tab.getShownFields();
+            if (!shownFields.isEmpty()) {
+                Field firstField = shownFields.iterator().next();
+                String firstFieldId = firstField.getName();
+                Optional<TextInputControl> firstTextInput = findTextInputById(parent, firstFieldId);
+                if (firstTextInput.isPresent()) {
+                    firstTextInput.get().requestFocus();
+                    return;
+                }
+            }
+
+            Optional<TextInputControl> anyTextInput = findAnyTextInput(parent);
+            if (anyTextInput.isPresent()) {
+                anyTextInput.get().requestFocus();
+                return;
+            }
+
+            // Final fallback: focus first focusable node within the editor grid (e.g., a button-only tab)
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            findFirstFocusableNode(searchRoot).ifPresent(Node::requestFocus);
+        }
+    }
+
+    private void focusLastFieldInTab(FieldsEditorTab tab) {
+        Node tabContent = tab.getContent();
+        if (tabContent instanceof Parent parent) {
+            // First try to find field by ID
+            Collection<Field> shownFields = tab.getShownFields();
+            if (!shownFields.isEmpty()) {
+                Optional<Field> lastField = shownFields.stream()
+                                                       .reduce((first, second) -> second);
+
+                Field field = lastField.get();
+                String lastFieldId = field.getName();
+                Optional<TextInputControl> lastTextInput = findTextInputById(parent, lastFieldId);
+                if (lastTextInput.isPresent()) {
+                    lastTextInput.get().requestFocus();
+                    return;
+                }
+            }
+
+            // Final fallback: focus last focusable node within the editor grid
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            findLastFocusableNode(searchRoot).ifPresent(Node::requestFocus);
+        }
+    }
+
+    /// Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
+    private Optional<TextInputControl> findTextInputById(Parent parent, String id) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {
+                return Optional.of(textInput);
+            } else if (child instanceof Parent childParent) {
+                Optional<TextInputControl> found = findTextInputById(childParent, id);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<TextInputControl> findAnyTextInput(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof TextInputControl textInput) {
+                return Optional.of(textInput);
+            } else if (child instanceof Parent childParent) {
+                Optional<TextInputControl> found = findAnyTextInput(childParent);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    /// Returns the first focusable, visible, managed, and enabled node in depth-first order
+    private Optional<Node> findFirstFocusableNode(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (isNodeFocusable(child)) {
+                return Optional.of(child);
+            } else if (child instanceof Parent childParent) {
+                Optional<Node> found = findFirstFocusableNode(childParent);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    /// Returns the last focusable, visible, managed, and enabled node in depth-first order
+    private Optional<Node> findLastFocusableNode(Parent parent) {
+        Optional<Node> last = Optional.empty();
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof Parent childParent) {
+                Optional<Node> sub = findLastFocusableNode(childParent);
+                if (sub.isPresent()) {
+                    last = sub;
+                }
+            }
+            if (isNodeFocusable(child)) {
+                last = Optional.of(child);
+            }
+        }
+        return last;
+    }
+
+    private boolean isNodeFocusable(Node node) {
+        return node.isFocusTraversable() && node.isVisible() && !node.isDisabled() && node.isManaged();
+    }
+
+    /// Tries to locate the editor grid (with style class "editorPane") inside the tab content to avoid
+    /// including preview or other sibling panels when determining focus order boundaries.
+    private Optional<Parent> findEditorGridParent(Parent root) {
+        if (root.getStyleClass().contains("editorPane")) {
+            return Optional.of(root);
+        }
+        for (Node child : root.getChildrenUnmodifiable()) {
+            if (child instanceof Parent p) {
+                Optional<Parent> found = findEditorGridParent(p);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
     }
 }

@@ -41,7 +41,7 @@ jobs:
       issues: write
     steps:
     - name: GreetingFirstTimeCodeContribution
-      uses: peter-evans/create-or-update-comment@v4
+      uses: peter-evans/create-or-update-comment@v5
       with:
         issue-number: ${{ github.event.issue.number || github.event.pull_request.number }}
         body: |
@@ -133,7 +133,7 @@ jobs:
           comment-tag:
             wisdom
           mode: recreate
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Remove label
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "dev: wisdom"

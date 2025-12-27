@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.layout.VBox?>
+<fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.cleanup.CleanupMultiFieldPanel"
+         spacing="10.0" type="VBox">
+
+    <padding>
+        <Insets top="10.0" left="20.0"/>
+    </padding>
+
+    <VBox>
+        <CheckBox fx:id="cleanupDoi" text="%Move DOIs from 'note' field and 'URL' field to 'DOI' field and remove http prefix" />
+        <CheckBox fx:id="cleanupEprint" text="%Move preprint information from 'URL' field and 'journal' field to the 'eprint' field" />
+        <CheckBox fx:id="cleanupUrl" text="%Move URL in 'note' field to 'URL' field" />
+        <CheckBox fx:id="cleanupBibLaTeX" text="%Convert to biblatex format (e.g., store publication date in date field)" />
+        <CheckBox fx:id="cleanupBibTeX" text="%Convert to BibTeX format (e.g., store publication date in year and month fields)" />
+        <CheckBox fx:id="cleanupTimestampToCreationDate" text="%Convert timestamp field to field 'creationdate'" />
+        <CheckBox fx:id="cleanupTimestampToModificationDate" text="%Convert timestamp field to field 'modificationdate'" />
+    </VBox>
+
+</fx:root>

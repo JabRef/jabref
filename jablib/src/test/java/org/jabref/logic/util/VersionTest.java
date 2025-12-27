@@ -286,6 +286,13 @@ class VersionTest {
     }
 
     @Test
+    void alphaTwoShouldBeUpdatedToAlpha3() {
+        Version alpha2 = Version.parse("6.0-alpha.2");
+        Version alpha3 = Version.parse("6.0-alpha.3");
+        assertTrue(alpha2.shouldBeUpdatedTo(alpha3));
+    }
+
+    @Test
     void betaShouldBeUpdatedToStable() {
         Version beta = Version.parse("2.8-beta");
         Version stable = Version.parse("2.8");

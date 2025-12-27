@@ -81,7 +81,7 @@ class BackupManagerDiscardedTest {
                     preferences.getFieldPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager)
-                    .saveDatabase(bibDatabaseContext);
+                    .writeDatabase(bibDatabaseContext);
         }
     }
 

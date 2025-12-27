@@ -1,11 +1,10 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -17,9 +16,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -32,10 +31,10 @@ import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
@@ -210,25 +209,53 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private String formatError(BibEntry entry, Throwable exception) {
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return "%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s".formatted(
+        LOGGER.error("Error generating preview for entry: {}", entry.getCitationKey(), exception);
+
+        return """
+                <div class="error">
+                    <h3>%s</h3>
+                    <p>%s</p>
+                    <p><small>Check the event logs for details.</small></p>
+                </div>
+                """.formatted(
                 Localization.lang("Error while generating citation style"),
-                exception.getLocalizedMessage(),
-                entry,
-                sw);
+                exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
     }
 
     private void setPreviewText(String text) {
-        layoutText = """
+        AtomicReference<String> baseURL = new AtomicReference<>("");
+        if (databaseContext != null) {
+            databaseContext
+                    .getFirstExistingFileDir(preferences.getFilePreferences())
+                    .ifPresent(baseDirPath -> {
+                        try {
+                            String baseUrl = baseDirPath.toUri().toURL().toExternalForm();
+                            // Ensure the base URL ends with a slash for correct relative path resolution
+                            if (!baseUrl.endsWith("/")) {
+                                baseUrl += "/";
+                            }
+                            baseURL.set(baseUrl);
+                        } catch (MalformedURLException e) {
+                            LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
+                        }
+                    });
+        }
+        layoutText = formatPreviewText(baseURL.get(), text);
+        highlightLayoutText();
+        setHvalue(0);
+    }
+
+    private static String formatPreviewText(String baseUrl, String text) {
+        return """
                 <html>
+                    <head>
+                        <base href="%s">
+                    </head>
                     <body id="previewBody">
                         <div id="content"> %s </div>
                     </body>
                 </html>
-                """.formatted(text);
-        highlightLayoutText();
-        setHvalue(0);
+                """.formatted(baseUrl, text);
     }
 
     private void highlightLayoutText() {
@@ -283,10 +310,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
-        ClipboardContent content = new ClipboardContent();
-        content.putString(plainText);
-        clipBoardManager.setContent(content);
+        clipBoardManager.setContent((String) previewView.getEngine().executeScript("document.body.innerText"));
     }
 
     public void copySelectionToClipBoard() {

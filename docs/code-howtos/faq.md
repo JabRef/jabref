@@ -9,6 +9,9 @@ Following is a list of common errors encountered by developers which lead to fai
 
 * Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
 * Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
+* <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
+* [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
+* Awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
 
 ## Failing GitHub workflow "Sync fork with upstream"
 
@@ -163,12 +166,59 @@ git push
 
 ### Prevention
 
-To avoid this, avoid staging using `git add .` from CLI. Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
+To avoid this, avoid staging using any of these commands:
+
+* `git add .`
+* `git add jablib/src/main` (or any path prefix)
+* `git commit -a`
+
+Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
 
 ## Q: I get `java: package org.jabref.logic.journals does not exist`
 
 A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
 Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
+
+## IDE import issues
+
+One might see following error:
+
+```text
+Could not apply requested plugin [id: 'org.jabref.gradle.module'] as it does not provide a plugin with id 'org.jabref.gradle.module'. This is caused by an incorrect plugin implementation. Please contact the plugin author(s).
+> Plugin with id 'org.jabref.gradle.module' not found.
+```
+
+This happened on Debian 12, with IntelliJ IDEA 2025.2.4 (Ultimate Edition).
+The workaround is to compile JabRef once from the command line.
+
+* Linux: Execute `./gradlew :jabgui:compileJava`
+* Windows (Powershell): Execute `.\gradlew :jabgui:compileJava`
+
+In case Gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg) as follows:
+
+1. Download <https://github.com/eirikb/gg/releases/latest/download/gg.cmd>
+2. Move the file to your JabRef project directory
+3. Compile JabRef
+
+   * Windows: `.\gg.cmd gradle:java@24 jabgui:compileJava`
+   * Linux: `sh -x ./gg.cmd gradle:java@24 jabgui:compileJava`
+
+4. Wait until the command execution completes.
+
+After about one minute, however, you can continue setting up IntelliJ, because the initial Gradle setup succeeded.
+
+## Gradle
+
+### Run `gradle` from command line
+
+Sometimes, one needs to double-check that there is an IDE setup issue - and not an issue with modified Gradle builds files.
+It is easily possible to run Gradle from the command line without installing a separate JDK manually.
+
+1. Download [gg.cmd](https://github.com/eirikb/gg/releases/latest/download/gg.cmd). [`gg.cmd`](https://github.com/eirikb/gg) is an easy-to-use toolchain downloading all requirements.
+2. Run `gradle`:
+
+   * Linux/macOS: `sh -x ./gg.cmd gradle :jabgui:run`
+   * Windows: `.\gg.cmd gradle :jabgui:run`
 
 <!-- markdownlint-disable-file MD033 -->

@@ -22,6 +22,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a qualifier, like the
  * field name to be displayed in the column.
  */
+@NullMarked
 public class MainTableColumnModel {
 
     public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
@@ -105,9 +107,6 @@ public class MainTableColumnModel {
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
      */
     public MainTableColumnModel(Type type, String qualifier) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(qualifier);
-
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
@@ -244,7 +243,6 @@ public class MainTableColumnModel {
      * @return A new {@code MainTableColumnModel}
      */
     public static MainTableColumnModel parse(String rawColumnName) {
-        Objects.requireNonNull(rawColumnName);
         String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
         Type type = Type.fromString(splittedName[0]);

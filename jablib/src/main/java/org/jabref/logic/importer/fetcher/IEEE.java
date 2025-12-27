@@ -1,13 +1,14 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,17 +25,19 @@ import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.URLUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.strings.StringUtil;
 
+import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +68,10 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
 
     private IEEEQueryTransformer transformer;
 
-    public IEEE(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        this.importerPreferences = Objects.requireNonNull(importerPreferences);
+    public IEEE(@NonNull ImportFormatPreferences importFormatPreferences,
+                @NonNull ImporterPreferences importerPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+        this.importerPreferences = importerPreferences;
     }
 
     /**
@@ -137,9 +141,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws FetcherException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws FetcherException {
         String stampString = "";
 
         // Try URL first -- will primarily work for entries from the old IEEE search
@@ -267,8 +269,23 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     @Override
-    public String getTestUrl() {
-        return TEST_URL_WITHOUT_API_KEY;
+    public boolean isValidKey(String apiKey) {
+        try {
+            URL testUrl = getURLForQuery("JabRef API key test", apiKey);
+            URLDownload urlDownload = new URLDownload(testUrl);
+            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException | URISyntaxException e) {
+            return false;
+        }
+    }
+
+    private URL getURLForQuery(String query, String apiKey) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", apiKey);
+        uriBuilder.addParameter("querytext", query);
+        uriBuilder.addParameter("max_records", "1");
+        return uriBuilder.build().toURL();
     }
 
     @Override

@@ -33,19 +33,18 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
-import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
-import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
-import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -336,7 +335,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -356,17 +355,9 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            final PlainCitationParser parser = switch (parserChoice) {
-                case PlainCitationParserChoice.RULE_BASED ->
-                        new RuleBasedPlainCitationParser();
-                case PlainCitationParserChoice.GROBID ->
-                        new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
-                case PlainCitationParserChoice.LLM ->
-                        new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
-            };
+            final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(parserChoice, preferences.getCitationKeyPatternPreferences(), preferences.getGrobidPreferences(), preferences.getImportFormatPreferences(), aiService);
 
-            final SeveralPlainCitationParser setParser = new SeveralPlainCitationParser(parser);
-            final List<BibEntry> entries = setParser.parseSeveralPlainCitations(text);
+            final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 
             if (entries.isEmpty()) {
                 return Optional.empty();
@@ -381,13 +372,13 @@ public class NewEntryViewModel {
         cancel();
         interpretWorker = new WorkerInterpretCitations();
 
-        interpretWorker.setOnFailed(event -> {
+        interpretWorker.setOnFailed(_ -> {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
             final String parserName = interpretParser.getValue().getLocalizedName();
+            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             final String dialogTitle = Localization.lang("Failed to interpret citations");
-
             if (exception instanceof FetcherException) {
                 dialogService.showInformationDialogAndWait(
                         dialogTitle,
@@ -404,8 +395,6 @@ public class NewEntryViewModel {
                                         "%0",
                                 exceptionMessage));
             }
-
-            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             executing.set(false);
         });
@@ -432,7 +421,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -471,7 +460,7 @@ public class NewEntryViewModel {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
 
-            final String dialogTitle = Localization.lang("Failed to parse Bib(La)Tex");
+            final String dialogTitle = Localization.lang("Failed to parse Bib(La)TeX");
 
             if (exception instanceof ParseException) {
                 dialogService.showInformationDialogAndWait(
@@ -490,7 +479,7 @@ public class NewEntryViewModel {
                                 exceptionMessage));
             }
 
-            LOGGER.error("An exception occurred when parsing Bib(La)Tex entries.", exception);
+            LOGGER.error("An exception occurred when parsing Bib(La)TeX entries.", exception);
 
             executing.set(false);
         });
@@ -504,7 +493,7 @@ public class NewEntryViewModel {
                         Localization.lang(
                                 "An unknown error has occurred.\n" +
                                         "Entries may need to be added manually."));
-                LOGGER.error("An invalid result was returned when parsing Bib(La)Tex entries.");
+                LOGGER.error("An invalid result was returned when parsing Bib(La)TeX entries.");
                 executing.set(false);
                 return;
             }
@@ -517,7 +506,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
+            handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);

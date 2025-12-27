@@ -47,7 +47,6 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
         saveOrderConfigPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         saveOrderConfigPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
 
-        fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.cleanupsDisableProperty());
         fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());
     }
 }

@@ -7,8 +7,10 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Cleanup URL link.
@@ -47,7 +49,7 @@ public class CleanupUrlFormatter extends Formatter {
      * @see URLDecoder#decode(String, Charset)
      */
     @Override
-    public String format(String url) {
+    public String format(@NonNull String url) {
         String toDecode = Objects
                 .requireNonNull(url, "Null url")
                 .replaceAll("\\+", "%2b");

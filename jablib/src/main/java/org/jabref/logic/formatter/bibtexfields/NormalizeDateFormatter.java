@@ -2,9 +2,11 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Optional;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.Date;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class transforms date to the format yyyy-mm-dd or yyyy-mm..
@@ -29,7 +31,7 @@ public class NormalizeDateFormatter extends Formatter {
      * "d.M.uuuu" (covers 15.1.2015)
      */
     @Override
-    public String format(String value) {
+    public String format(@NonNull String value) {
         Optional<Date> parsedDate = Date.parse(value);
         return parsedDate.map(Date::getNormalized).orElse(value);
     }

@@ -1,10 +1,10 @@
-//JAVA 24
+//JAVA 24+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//DEPS com.fasterxml.jackson.core:jackson-databind:2.17.1
 //DEPS org.jspecify:jspecify:1.0.0
-//DEPS org.slf4j:slf4j-api:2.0.13
-//DEPS org.slf4j:slf4j-simple:2.0.13
+//DEPS org.slf4j:slf4j-api:2.0.17
+//DEPS org.slf4j:slf4j-simple:2.0.17
+//DEPS tools.jackson.core:jackson-databind:3.0.3
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/architecture/AllowedToUseClassGetResource.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
@@ -28,9 +28,9 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.citationstyle.CitationStyle;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
 
 /// Generates a catalog of CSL styles internally supported by JabRef.
 /// The catalog contains the list of styles, along with some pre-computed metadata (e.g. numeric nature).

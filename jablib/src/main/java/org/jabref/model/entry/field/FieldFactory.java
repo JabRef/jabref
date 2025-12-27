@@ -17,11 +17,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class FieldFactory {
 
     /**
@@ -191,6 +193,14 @@ public class FieldFactory {
         return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.PERSON_NAMES));
     }
 
+    /// Gets all fields with [FieldProperty#DATE].
+    /// Also includes [StandardField#YEAR].
+    ///
+    /// @return Set of fields
+    public static Set<Field> getDateFields() {
+        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.DATE) || field == StandardField.YEAR);
+    }
+
     private static Set<Field> getFieldsFiltered(Predicate<Field> selector) {
         return getAllFields().stream()
                              .filter(selector)
@@ -215,7 +225,7 @@ public class FieldFactory {
      * a separate preferences object
      */
     public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(List.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
+        List<Field> defaultGeneralFields = new ArrayList<>(List.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.EPRINTTYPE, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
         defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
         return defaultGeneralFields;
     }

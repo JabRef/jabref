@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -40,6 +39,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -77,6 +77,8 @@ import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
+import org.jabref.model.TransferInformation;
+import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -90,6 +92,8 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -103,6 +107,8 @@ import org.controlsfx.control.action.Action;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 
 /**
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
@@ -175,10 +181,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      */
     private LibraryTab(@NonNull BibDatabaseContext bibDatabaseContext,
                        @NonNull LibraryTabContainer tabContainer,
-                       DialogService dialogService,
+                       @NonNull DialogService dialogService,
                        AiService aiService,
-                       GuiPreferences preferences,
-                       StateManager stateManager,
+                       @NonNull GuiPreferences preferences,
+                       @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager,
@@ -189,8 +195,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.tabContainer = tabContainer;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.preferences = Objects.requireNonNull(preferences);
-        this.stateManager = Objects.requireNonNull(stateManager);
+        this.preferences = preferences;
+        this.stateManager = stateManager;
         assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -821,7 +827,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        importHandler.importCleanedEntries(entries);
+        importHandler.importCleanedEntries(null, entries);
         getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
         markBaseChanged();
         stateManager.setSelectedEntries(entries);
@@ -833,7 +839,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void copyEntry() {
-        int entriesCopied = doCopyEntry(getSelectedEntries());
+        int entriesCopied = doCopyEntry(TransferMode.COPY, getSelectedEntries());
         if (entriesCopied >= 0) {
             dialogService.notify(Localization.lang("Copied %0 entry(s)", entriesCopied));
         } else {
@@ -841,18 +847,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    private int doCopyEntry(List<BibEntry> selectedEntries) {
+    private int doCopyEntry(TransferMode transferMode, List<BibEntry> selectedEntries) {
         if (selectedEntries.isEmpty()) {
             return 0;
         }
 
         List<BibtexString> stringConstants = bibDatabaseContext.getDatabase().getUsedStrings(selectedEntries);
         try {
-            if (stringConstants.isEmpty()) {
-                clipBoardManager.setContent(selectedEntries, entryTypesManager);
-            } else {
-                clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
-            }
+            clipBoardManager.setContent(transferMode, bibDatabaseContext, selectedEntries, entryTypesManager, stringConstants);
             return selectedEntries.size();
         } catch (IOException e) {
             LOGGER.error("Error while copying selected entries to clipboard.", e);
@@ -861,17 +863,26 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void pasteEntry() {
-        List<BibEntry> entriesToAdd;
         String content = ClipBoardManager.getContents();
-        entriesToAdd = importHandler.handleBibTeXData(content);
+        List<BibEntry> entriesToAdd = importHandler.handleBibTeXData(content);
         if (entriesToAdd.isEmpty()) {
             entriesToAdd = handleNonBibTeXStringData(content);
         }
         if (entriesToAdd.isEmpty()) {
             return;
         }
-
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+        // Now, the BibEntries to add are known
+        // The definitive insertion needs to happen now.
+        addEntriesWithFeedback(
+                clipBoardManager.getJabRefClipboardTransferData(),
+                entriesToAdd,
+                bibDatabaseContext,
+                Localization.lang("Pasted %0 entry(s) to %1"),
+                Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
+                dialogService,
+                importHandler,
+                stateManager
+        );
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -885,16 +896,28 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             } else {
                 dialogService.showErrorDialogAndWait(exception);
             }
-            return List.of();
+            BibEntry fallBack = new BibEntry(StandardEntryType.Misc)
+                    .withField(StandardField.COMMENT, data)
+                    .withChanged(true);
+            return List.of(fallBack);
         }
     }
 
-    public void dropEntry(List<BibEntry> entriesToAdd) {
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
+        addEntriesWithFeedback(
+                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
+                entriesToAdd,
+                bibDatabaseContext,
+                Localization.lang("Moved %0 entry(s) to %1"),
+                Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
+                dialogService,
+                importHandler,
+                stateManager
+        );
     }
 
     public void cutEntry() {
-        int entriesCopied = doCopyEntry(getSelectedEntries());
+        int entriesCopied = doCopyEntry(TransferMode.MOVE, getSelectedEntries());
         int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
 
         if (entriesCopied == entriesDeleted) {

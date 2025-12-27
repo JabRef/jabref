@@ -85,7 +85,8 @@ recipeList:
   #  - org.openrewrite.staticanalysis.UnnecessaryCloseInTryWithResources
   # Does not work
   #  - org.openrewrite.staticanalysis.UnnecessaryExplicitTypeArguments
-  - org.openrewrite.staticanalysis.UnnecessaryParentheses
+  # Removes too much
+  #  - org.openrewrite.staticanalysis.UnnecessaryParentheses
   # Does not work
   #  - org.openrewrite.staticanalysis.UnnecessaryPrimitiveAnnotations
   # Removes too much throws

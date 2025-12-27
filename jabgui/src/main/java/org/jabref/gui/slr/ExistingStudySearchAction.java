@@ -113,7 +113,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         try {
             crawler = new Crawler(
                     this.studyDirectory,
-                    new SlrGitHandler(this.studyDirectory),
+                    new SlrGitHandler(this.studyDirectory, preferences.getGitPreferences()),
                     preferences,
                     new BibEntryTypesManager(),
                     fileUpdateMonitor);

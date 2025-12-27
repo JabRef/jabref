@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -20,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FormatterTest {
 
@@ -72,12 +70,6 @@ class FormatterTest {
     @MethodSource("getFormatters")
     void getKeyReturnsNotEmpty(Formatter formatter) {
         assertNotEquals("", formatter.getKey());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    void formatOfNullThrowsException(Formatter formatter) {
-        assertThrows(NullPointerException.class, () -> formatter.format(null));
     }
 
     @ParameterizedTest

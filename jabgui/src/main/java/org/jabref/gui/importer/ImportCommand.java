@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
@@ -23,8 +24,8 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -94,19 +95,24 @@ public class ImportCommand extends SimpleCommand {
         List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
 
         if (selectedFiles.isEmpty()) {
-            return; // User cancelled or no files selected
+            return; // User canceled or no files selected
         }
 
         importMultipleFiles(selectedFiles, importers, fileDialogConfiguration.getSelectedExtensionFilter());
     }
 
     private void importMultipleFiles(List<Path> files, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
-        for (Path file : files) {
-            if (!Files.exists(file)) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Import"),
-                        Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
-                return;
-            }
+        List<Path> nonExistentFiles = files.stream()
+                                           .filter(file -> !Files.exists(file))
+                                           .toList();
+        if (!nonExistentFiles.isEmpty()) {
+            String fileNames = nonExistentFiles.stream()
+                                               .map(path -> path.getFileName().toString())
+                                               .collect(Collectors.joining(", "));
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Import"),
+                    Localization.lang("File(s) %0 not found.", fileNames));
+            return;
         }
 
         BackgroundTask<ParserResult> task;

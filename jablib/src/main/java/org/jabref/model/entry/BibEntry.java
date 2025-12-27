@@ -1,5 +1,7 @@
 package org.jabref.model.entry;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,10 +28,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -43,13 +51,13 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -380,9 +388,7 @@ public class BibEntry {
      * @param id The ID to be used
      */
     @VisibleForTesting
-    public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
+    public void setId(@NonNull String id) {
         String oldId = this.id;
 
         eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
@@ -444,9 +450,7 @@ public class BibEntry {
      * Sets this entry's type and sets the changed flag to true <br>
      * If the new entry type equals the old entry type no changed flag is set.
      */
-    public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
-        Objects.requireNonNull(newType);
-
+    public Optional<FieldChange> setType(@NonNull EntryType newType, EntriesEventSource eventSource) {
         EntryType oldType = type.get();
         if (newType.equals(oldType)) {
             return Optional.empty();
@@ -611,9 +615,7 @@ public class BibEntry {
      * Sets a number of fields simultaneously. The given HashMap contains field
      * names as keys, each mapped to the value to set.
      */
-    public void setField(Map<Field, String> fields) {
-        Objects.requireNonNull(fields, "fields must not be null");
-
+    public void setField(@NonNull Map<Field, String> fields) {
         fields.forEach(this::setField);
     }
 
@@ -624,11 +626,9 @@ public class BibEntry {
      * @param value       The value to set
      * @param eventSource Source the event is sent from
      */
-    public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
-        Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value for field " + field.getName() + " must not be null");
-        Objects.requireNonNull(eventSource, "field eventSource must not be null");
-
+    public Optional<FieldChange> setField(@NonNull Field field,
+                                          @NonNull String value,
+                                          @NonNull EntriesEventSource eventSource) {
         if (value.isEmpty()) {
             return clearField(field);
         }
@@ -709,6 +709,8 @@ public class BibEntry {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
+    // region String representations
+
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
     /// We do it this way to
@@ -727,6 +729,38 @@ public class BibEntry {
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
+
+    /// Uses `\n` as newline separator
+    ///
+    /// Method similar to [org.jabref.gui.entryeditor.SourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences)]
+    ///
+    /// @return String representation - empty string in case of an error (to ease calling)
+    public @NonNull String getStringRepresentation(
+            BibEntry entry,
+            BibDatabaseMode type,
+            BibEntryTypesManager entryTypesManager,
+            FieldPreferences fieldPreferences) {
+        try (StringWriter writer = new StringWriter()) {
+            BibWriter bibWriter = new BibWriter(writer, "\n");
+            FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+            BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
+            bibEntryWriter.write(entry, bibWriter, type, true);
+            return writer.toString();
+        } catch (IOException e) {
+            LOGGER.error("Could not write entry", e);
+            return "";
+        }
+    }
+
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
+    public void setParsedSerialization(String parsedSerialization) {
+        changed = false;
+        this.parsedSerialization = parsedSerialization;
+    }
+    // endregion
 
     public String getAuthorTitleYear() {
         return getAuthorTitleYear(0);
@@ -797,15 +831,6 @@ public class BibEntry {
         return getFieldOrAlias(StandardField.DATE).flatMap(Date::parse);
     }
 
-    public String getParsedSerialization() {
-        return parsedSerialization;
-    }
-
-    public void setParsedSerialization(String parsedSerialization) {
-        changed = false;
-        this.parsedSerialization = parsedSerialization;
-    }
-
     public void setCommentsBeforeEntry(String parsedComments) {
         this.commentsBeforeEntry = parsedComments;
     }
@@ -828,13 +853,11 @@ public class BibEntry {
         return this;
     }
 
-    public Optional<FieldChange> putKeywords(List<String> keywords, Character delimiter) {
-        Objects.requireNonNull(delimiter);
+    public Optional<FieldChange> putKeywords(List<String> keywords, @NonNull Character delimiter) {
         return putKeywords(new KeywordList(keywords), delimiter);
     }
 
-    public Optional<FieldChange> putKeywords(KeywordList keywords, Character delimiter) {
-        Objects.requireNonNull(keywords);
+    public Optional<FieldChange> putKeywords(@NonNull KeywordList keywords, Character delimiter) {
         Optional<String> oldValue = this.getField(StandardField.KEYWORDS);
 
         if (keywords.isEmpty()) {
@@ -856,9 +879,7 @@ public class BibEntry {
      *
      * @param keyword Keyword to add
      */
-    public void addKeyword(String keyword, Character delimiter) {
-        Objects.requireNonNull(keyword, "keyword must not be null");
-
+    public void addKeyword(@NonNull String keyword, Character delimiter) {
         if (keyword.isEmpty()) {
             return;
         }
@@ -877,8 +898,7 @@ public class BibEntry {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(Collection<String> keywords, Character delimiter) {
-        Objects.requireNonNull(keywords);
+    public void addKeywords(@NonNull Collection<String> keywords, Character delimiter) {
         keywords.forEach(keyword -> addKeyword(keyword, delimiter));
     }
 
@@ -928,17 +948,6 @@ public class BibEntry {
 
     public SharedBibEntryData getSharedBibEntryData() {
         return sharedBibEntryData;
-    }
-
-    public BibEntry withSharedBibEntryData(int sharedId, int version) {
-        sharedBibEntryData.setSharedID(sharedId);
-        sharedBibEntryData.setVersion(version);
-        return this;
-    }
-
-    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
-        sharedBibEntryData = sharedBibEntryData;
-        return this;
     }
 
     @Override
@@ -1290,5 +1299,11 @@ public class BibEntry {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    /// Trims whitespaces at the beginning of the BibEntry
+    public void trimLeft() {
+        this.parsedSerialization = parsedSerialization.trim(); // we should do "trimLeft", but currently, it is OK as is.
+        this.commentsBeforeEntry = commentsBeforeEntry.trim(); // we should do "trimLeft", but currently, it is OK as is.
     }
 }

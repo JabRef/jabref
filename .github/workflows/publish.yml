@@ -3,6 +3,8 @@ name: Publish to maven central
 on:
   # On releases
   push:
+    branches:
+      - main
     tags:
       - '**'
 
@@ -49,10 +51,11 @@ concurrency:
 jobs:
   detect_changes:
     runs-on: ubuntu-latest
+    if: github.repository == 'JabRef/jabref'
     outputs:
       changed: ${{ steps.changed.outputs.any_changed }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Detect changed jablib classes or workflow
@@ -62,6 +65,11 @@ jobs:
           files: |
             jablib/src/main/java/**/*.java
             .github/workflows/publish.yml
+      - name: List changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed.outputs.all_changed_files }}
+        run: |
+          echo $ALL_CHANGED_FILES
 
   publish:
     name: jablib
@@ -77,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -96,14 +104,14 @@ jobs:
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}

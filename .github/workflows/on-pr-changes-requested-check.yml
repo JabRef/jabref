@@ -1,0 +1,20 @@
+name: Adapt PR status labels (Check)
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  label-changes-required:
+    if: github.event.review.state == 'changes_requested'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v6
+        with:
+          name: pr_number
+          path: pr_number.txt

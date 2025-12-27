@@ -2,14 +2,14 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +52,7 @@ public class RegexFormatter extends Formatter {
      * @param input the regular expressions for matching and replacing given in the form {@code ("<regex>",
      *              "<replace>")}.
      */
-    public RegexFormatter(String input) {
-        Objects.requireNonNull(input);
+    public RegexFormatter(@NonNull String input) {
         input = input.trim().replace("\\\"", PLACEHOLDER_FOR_QUOTE_SIGN);
         Matcher constructorArgument = CONSTRUCTOR_ARGUMENT.matcher(input);
         if (constructorArgument.matches()) {
@@ -98,8 +97,7 @@ public class RegexFormatter extends Formatter {
     }
 
     @Override
-    public String format(final String input) {
-        Objects.requireNonNull(input);
+    public String format(@NonNull final String input) {
         if (regex == null || replacement == null) {
             return input;
         }

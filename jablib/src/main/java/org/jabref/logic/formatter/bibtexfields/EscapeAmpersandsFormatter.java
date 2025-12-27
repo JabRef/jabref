@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
-
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 public class EscapeAmpersandsFormatter extends Formatter {
 
@@ -18,9 +18,7 @@ public class EscapeAmpersandsFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
-
+    public String format(@NonNull String value) {
         StringBuilder result = new StringBuilder();
 
         boolean escape = false;

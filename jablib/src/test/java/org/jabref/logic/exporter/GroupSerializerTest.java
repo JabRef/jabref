@@ -12,9 +12,11 @@ import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -22,7 +24,6 @@ import org.jabref.model.groups.GroupTreeNodeTest;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
@@ -30,12 +31,17 @@ import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Loading of groups is tested in the GroupsParserTest class.
  */
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class GroupSerializerTest {
 
     private GroupSerializer groupSerializer;
@@ -53,13 +59,6 @@ class GroupSerializerTest {
     }
 
     @Test
-    void serializeSmartGroup() {
-        SmartGroup group = new SmartGroup("mySmartGroup", GroupHierarchyType.INDEPENDENT, ',');
-        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
-        assertEquals(List.of("0 SmartGroup:mySmartGroup;0;1;;;;"), serialization);
-    }
-
-    @Test
     void serializeSingleExplicitGroup() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
@@ -71,7 +70,7 @@ class GroupSerializerTest {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         group.setIconName("test icon");
         group.setExpanded(true);
-        group.setColor(Color.ALICEBLUE);
+        group.setColor(Color.ALICEBLUE.toString());
         group.setDescription("test description");
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(List.of("0 StaticGroup:myExplicitGroup;0;1;0xf0f8ffff;test icon;test description;"), serialization);
@@ -125,6 +124,30 @@ class GroupSerializerTest {
         AutomaticPersonsGroup group = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR);
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(List.of("0 AutomaticPersonsGroup:myAutomaticGroup;0;author;1;;;;"), serialization);
+    }
+
+    @Test
+    void serializeSingleAutomaticDateGroupWithYearGranularity() {
+        AutomaticDateGroup group = new AutomaticDateGroup("By Year", GroupHierarchyType.INDEPENDENT, StandardField.DATE, DateGranularity.YEAR);
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(List.of("0 AutomaticDateGroup:By Year;0;date;YEAR;1;;;;"), serialization);
+    }
+
+    @Test
+    void serializeSingleAutomaticDateGroupWithMonthGranularity() {
+        AutomaticDateGroup group = new AutomaticDateGroup("By Month", GroupHierarchyType.INCLUDING, StandardField.DATE, DateGranularity.MONTH);
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(List.of("0 AutomaticDateGroup:By Month;2;date;MONTH;1;;;;"), serialization);
+    }
+
+    @Test
+    void serializeSingleAutomaticDateGroupWithColorAndIcon() {
+        AutomaticDateGroup group = new AutomaticDateGroup("Publications", GroupHierarchyType.INDEPENDENT, StandardField.YEAR, DateGranularity.YEAR);
+        group.setColor(Color.BLUE.toString());
+        group.setIconName("calendar");
+        group.setDescription("Group by publication year");
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(List.of("0 AutomaticDateGroup:Publications;0;year;YEAR;1;0x0000ffff;calendar;Group by publication year;"), serialization);
     }
 
     @Test

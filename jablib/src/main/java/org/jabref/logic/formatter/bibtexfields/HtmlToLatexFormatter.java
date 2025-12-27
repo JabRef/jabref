@@ -1,15 +1,15 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +27,8 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
     private static final Pattern ESCAPED_PATTERN4 = Pattern.compile("&(\\w+);");
 
     @Override
-    public String format(String text) {
-        String result = Objects.requireNonNull(text);
+    public String format(@NonNull String text) {
+        String result = text;
 
         if (result.isEmpty()) {
             return result;

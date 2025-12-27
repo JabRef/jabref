@@ -80,9 +80,7 @@ open module org.jabref {
     // region: data mapping
     requires jdk.xml.dom;
     // requires com.google.gson;
-    // requires com.fasterxml.jackson.databind;
-    // requires com.fasterxml.jackson.dataformat.yaml;
-    // requires com.fasterxml.jackson.datatype.jsr310;
+    requires tools.jackson.databind;
     // endregion
 
     // dependency injection using HK2
@@ -163,7 +161,7 @@ open module org.jabref {
     /*
      * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene101.Lucene101Codec;
+    uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
@@ -179,6 +177,7 @@ open module org.jabref {
     // uses org.eclipse.jgit.lib.Signer;
 
     requires transitive org.jspecify;
+    requires io.github.adr;
 
     // region: other libraries (alphabetically)
     // requires cuid;
@@ -186,7 +185,6 @@ open module org.jabref {
     requires com.pixelduke.fxthemes;
     // requires com.sun.jna;
     // requires dd.plist;
-    requires io.github.adr;
     // required by okhttp and some AI library
     // requires kotlin.stdlib;
     // requires mslinks;

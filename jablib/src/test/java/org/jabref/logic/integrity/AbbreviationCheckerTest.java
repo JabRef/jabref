@@ -11,10 +11,12 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@ResourceLock("Localization.lang")
 class AbbreviationCheckerTest {
 
     private JournalAbbreviationRepository abbreviationRepository;

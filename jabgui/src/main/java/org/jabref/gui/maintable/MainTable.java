@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,13 +30,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
@@ -70,6 +69,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +102,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
-                     BibDatabaseContext database,
+                     @NonNull BibDatabaseContext database,
                      GuiPreferences preferences,
                      DialogService dialogService,
                      StateManager stateManager,
@@ -114,7 +114,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         super();
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
-        this.database = Objects.requireNonNull(database);
+        this.database = database;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.model = model;
@@ -314,11 +314,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // keep original entry selected and reset citation merge mode
             this.citationMergeMode = false;
         } else {
-            // select new entry
-            getSelectionModel().clearSelection();
             findEntry(bibEntry).ifPresent(entry -> {
-                getSelectionModel().select(entry);
-                scrollTo(entry);
+                int index = getItems().indexOf(entry);
+                if (index >= 0) {
+                    getSelectionModel().clearAndSelect(index);
+                    scrollTo(index);
+                }
             });
         }
     }
@@ -330,16 +331,24 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             this.citationMergeMode = false;
         } else {
             // select new entries
-            getSelectionModel().clearSelection();
-            List<BibEntryTableViewModel> entries = bibEntries.stream()
-                                                             .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                                             .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
-                                                             .filter(Optional::isPresent)
-                                                             .map(Optional::get)
-                                                             .toList();
-            entries.forEach(entry -> getSelectionModel().select(entry));
-            if (!entries.isEmpty()) {
-                scrollTo(entries.getFirst());
+            List<Integer> indices = bibEntries.stream()
+                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
+                                              .flatMap(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()).stream())
+                                              .map(entry -> getItems().indexOf(entry))
+                                              .filter(index -> index >= 0)
+                                              .toList();
+
+            if (!indices.isEmpty()) {
+                // For multiple selections, clear once then select all
+                getSelectionModel().clearSelection();
+                indices.forEach(index -> {
+                    if (index < getItems().size()) {
+                        getSelectionModel().select(index);
+                    } else {
+                        LOGGER.debug("Could not select entry at index {} since it is out of bounds", index);
+                    }
+                });
+                scrollTo(indices.getFirst());
             }
         }
     }
@@ -542,7 +551,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // - Bottom + top -> import entries
                 case TOP,
                      BOTTOM ->
-                        importHandler.importFilesInBackground(files, database, filePreferences, transferMode).executeWith(taskExecutor);
+                        importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
@@ -564,7 +573,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
             importHandler
-                    .importFilesInBackground(files, this.database, filePreferences, event.getTransferMode())
+                    .importFilesInBackground(files, event.getTransferMode())
                     .executeWith(taskExecutor);
             success = true;
         }

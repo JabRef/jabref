@@ -1,0 +1,120 @@
+name: Check PR Modifications
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+
+jobs:
+  # This ensures that no git merge conflict markers (<<<, ...) are contained
+  merge_conflict_job:
+    name: Find merge conflicts
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          show-progress: 'false'
+      - name: Merge Conflict finder
+        uses: olivernybroe/action-conflict-finder@v4.1
+
+  no-force-push:
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check force push
+        id: force_push_check
+        run: |
+          if [[ -z "${{ github.event.before }}" ]]; then
+            echo "✅ New PR created."
+            exit 0
+          fi
+          if git cat-file -e ${{ github.event.before }} 2>/dev/null; then
+            echo "✅ Regular push detected."
+            exit 0
+          else
+            echo "❌ Force push detected"
+            exit 1
+          fi
+
+  unmodified_submodules:
+    name: Submodules not modified
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
+      - name: Get all submodule changes
+        id: changes
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jablib/src/main/abbrv.jabref.org
+            jablib/src/main/resources/csl-styles
+            jablib/src/main/resources/csl-locales
+      - name: Submodules modified
+        if: steps.changes.outputs.any_changed == 'true'
+        run: |
+          echo "❌ Submodule modifications detected"
+          exit 1
+
+  other_than_main:
+    name: Source branch is other than "main"
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.head_ref == 'main'
+        uses: actions/github-script@v8
+        with:
+          script: |
+              core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v6
+        with:
+          name: pr_number
+          path: pr_number.txt
+

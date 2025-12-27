@@ -1,10 +1,11 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Removes all hyphenated line breaks in the string.
@@ -23,9 +24,7 @@ public class RemoveHyphenatedNewlinesFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
-
+    public String format(@NonNull String value) {
         value = HYPHENATED_WORDS.matcher(value).replaceAll("");
         return value.trim();
     }

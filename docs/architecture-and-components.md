@@ -1,4 +1,5 @@
 ---
+nav-order: 8
 ---
 # Architecture and Components
 

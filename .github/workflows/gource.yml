@@ -21,9 +21,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - title: 'JabRef v6.0 (in development) | more information at contribute.jabref.org'
-            # Last alpha release 2025-04-27, but want to have some seconds before
-            start: '2025-04-15'
+          - title: 'JabRef v6.0 (since alpha.3) | more information at contribute.jabref.org'
+            # Last alpha release 2025-10-30, but want to have some seconds before
+            start: '2025-10-24'
             end: ''
             file: 'jabref-v6.0-dev.mp4'
 #          - title: 'JabRef v6.0-alpha2 | more information at contribute.jabref.org'
@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           show-progress: 'false'
@@ -73,7 +73,7 @@ jobs:
           mv ./gource/gource.mp4 ${{ matrix.file }}
 
       - name: Upload gource video
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Gource-${{ matrix.file }}
           path: ${{ matrix.file }}

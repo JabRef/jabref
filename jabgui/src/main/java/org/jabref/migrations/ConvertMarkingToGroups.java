@@ -3,14 +3,13 @@ package org.jabref.migrations;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -21,6 +20,7 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Converts legacy explicit groups, where the group contained a list of assigned entries, to the new format,
@@ -31,9 +31,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
     private static final Pattern MARKING_PATTERN = Pattern.compile("\\[(.*):(\\d+)\\]");
 
     @Override
-    public void performMigration(ParserResult parserResult) {
-        Objects.requireNonNull(parserResult);
-
+    public void performMigration(@NonNull ParserResult parserResult) {
         ObservableList<BibEntry> entries = parserResult.getDatabase().getEntries();
         Multimap<String, BibEntry> markings = getMarkingWithEntries(entries);
         if (!markings.isEmpty()) {
@@ -50,7 +48,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             }
 
             if (parserResult.getMetaData().getGroups().isEmpty()) {
-                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
+                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
             }
             GroupTreeNode root = parserResult.getMetaData().getGroups().get();
             root.addChild(markingRoot, 0);

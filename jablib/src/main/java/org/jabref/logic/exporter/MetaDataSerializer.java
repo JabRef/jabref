@@ -10,8 +10,9 @@ import java.util.TreeMap;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
@@ -19,7 +20,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.strings.StringUtil;
 
 /**
  * Reading is done at {@link org.jabref.logic.importer.util.MetaDataParser}
@@ -113,8 +113,8 @@ public class MetaDataSerializer {
                 string += StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER);
                 // in case of save actions, add an additional newline after the enabled flag
                 lastWasSaveActionsEnablement = isSaveActions
-                        && (FieldFormatterCleanups.ENABLED.equals(dataItem)
-                        || FieldFormatterCleanups.DISABLED.equals(dataItem));
+                        && (FieldFormatterCleanupActions.ENABLED.equals(dataItem)
+                        || FieldFormatterCleanupActions.DISABLED.equals(dataItem));
                 joiner.add(string);
             }
             String serializedItem = joiner.toString();
@@ -171,17 +171,17 @@ public class MetaDataSerializer {
                 "]";
     }
 
-    public static List<String> getAsStringList(FieldFormatterCleanups fieldFormatterCleanups, String delimiter) {
+    public static List<String> getAsStringList(FieldFormatterCleanupActions fieldFormatterCleanupActions, String delimiter) {
         List<String> stringRepresentation = new ArrayList<>();
 
-        if (fieldFormatterCleanups.isEnabled()) {
-            stringRepresentation.add(FieldFormatterCleanups.ENABLED);
+        if (fieldFormatterCleanupActions.isEnabled()) {
+            stringRepresentation.add(FieldFormatterCleanupActions.ENABLED);
         } else {
-            stringRepresentation.add(FieldFormatterCleanups.DISABLED);
+            stringRepresentation.add(FieldFormatterCleanupActions.DISABLED);
         }
 
-        String formatterString = FieldFormatterCleanups.getMetaDataString(
-                fieldFormatterCleanups.getConfiguredActions(), delimiter);
+        String formatterString = FieldFormatterCleanupActions.getMetaDataString(
+                fieldFormatterCleanupActions.getConfiguredActions(), delimiter);
         stringRepresentation.add(formatterString);
         return stringRepresentation;
     }

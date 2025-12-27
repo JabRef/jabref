@@ -8,16 +8,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a list of keyword chains.
  * For example, "Type > A, Type > B, Something else".
  */
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public class KeywordList implements Iterable<Keyword> {
 
     private final List<Keyword> keywordChains;
@@ -43,38 +47,66 @@ public class KeywordList implements Iterable<Keyword> {
         this(Arrays.asList(keywordChains));
     }
 
-    public static KeywordList parse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
-        if (StringUtil.isBlank(keywordString)) {
-            return new KeywordList();
-        }
-
-        Objects.requireNonNull(delimiter);
-        Objects.requireNonNull(hierarchicalDelimiter);
-
-        KeywordList keywordList = new KeywordList();
-
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.ofHierarchical(chain);
-            keywordList.add(chainRoot);
-        }
-        return keywordList;
-    }
-
     /**
      * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
      *
      * @param keywordString a String of keywordChains
      * @param delimiter     The delimiter used for separating the keywords
-     * @return an parsed list containing the keywordChains
+     * @return a parsed list containing the keywordChains
      */
-    public static KeywordList parse(String keywordString, Character delimiter) {
-        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
+    public static KeywordList parse(@NonNull String keywordString, @NonNull Character delimiter) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        KeywordList keywordList = new KeywordList();
+        List<String> hierarchy = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        AtomicBoolean isEscaping = new AtomicBoolean(false);
+
+        keywordString.chars().forEachOrdered(symbol -> {
+            char currentChar = (char) symbol;
+            if (isEscaping.get()) {
+                currentToken.append(currentChar);
+                isEscaping.set(false);
+            } else if (currentChar == '\\') {
+                isEscaping.set(true);
+            } else if (currentChar == Keyword.DEFAULT_HIERARCHICAL_DELIMITER) {
+                hierarchy.add(currentToken.toString().trim());
+                currentToken.setLength(0);
+            } else if (currentChar == delimiter) {
+                hierarchy.add(currentToken.toString().trim());
+                keywordList.add(Keyword.of(hierarchy));
+                hierarchy.clear();
+                currentToken.setLength(0);
+            } else {
+                currentToken.append(currentChar);
+            }
+        });
+
+        if (!currentToken.isEmpty() || !hierarchy.isEmpty()) {
+            hierarchy.add(currentToken.toString().trim());
+            keywordList.add(Keyword.of(hierarchy));
+        }
+
+        return keywordList;
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
-        return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));
+        String delimiterStr = delimiter.toString();
+        String escapedDelimiter = "\\" + delimiterStr;
+        String hierarchicalDelimiterStr = Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString();
+        String escapedHierarchicalDelimiter = "\\" + hierarchicalDelimiterStr;
+        String hierarchicalSeparator = " " + hierarchicalDelimiterStr + " ";
+
+        return keywords.stream()
+                       .map(keyword -> keyword.flatten().stream()
+                                              .map(Keyword::get)
+                                              .map(nodeKeyword -> nodeKeyword.replace("\\", "\\\\"))
+                                              .map(nodeKeyword -> nodeKeyword.replace(delimiterStr, escapedDelimiter))
+                                              .map(nodeKeyword -> nodeKeyword.replace(hierarchicalDelimiterStr, escapedHierarchicalDelimiter))
+                                              .collect(Collectors.joining(hierarchicalSeparator)))
+                       .collect(Collectors.joining(delimiterStr));
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
@@ -88,9 +120,7 @@ public class KeywordList implements Iterable<Keyword> {
         return new KeywordList(this.keywordChains);
     }
 
-    public void replaceAll(KeywordList keywordsToReplace, Keyword newValue) {
-        Objects.requireNonNull(newValue);
-
+    public void replaceAll(KeywordList keywordsToReplace, @NonNull Keyword newValue) {
         // Remove keywordChains which should be replaced
         int foundPosition = -1; // remember position of the last found keyword
         for (Keyword specialFieldKeyword : keywordsToReplace) {

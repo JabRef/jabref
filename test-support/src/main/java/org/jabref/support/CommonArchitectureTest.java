@@ -18,6 +18,9 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import com.tngtech.archunit.library.GeneralCodingRules;
 
+import static com.tngtech.archunit.base.DescribedPredicate.not;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
+
 /**
  * This class checks JabRef's shipped classes for architecture quality.
  * Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
@@ -31,6 +34,7 @@ public class CommonArchitectureTest {
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic..";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model..";
     private static final String PACKAGE_ORG_JABREF_CLI = "org.jabref.cli..";
+    private static final String PACKAGE_ORG_JABREF_TOOLKIT_CLI = "org.jabref.toolkit.cli..";
 
     @ArchTest
     public void doNotUseApacheCommonsLang3(JavaClasses classes) {
@@ -57,6 +61,19 @@ public class CommonArchitectureTest {
     }
 
     @ArchTest
+    public void doNotUseJackson2(JavaClasses classes) {
+        // annotations still reside in com.fasterxml package:
+        ArchRuleDefinition.noClasses()
+                          .should()
+                          .dependOnClassesThat(
+                                  resideInAnyPackage("com.fasterxml..")
+                                          // https://github.com/FasterXML/jackson-databind/blob/37b593e4836af62a267f09d2193414078df36eb0/src/test/java/tools/jackson/databind/deser/AnySetterTest.java#L7C8-L7C42
+                                          .and(not(resideInAnyPackage("com.fasterxml.jackson.annotation..")))
+                          )
+                          .check(classes);
+    }
+
+    @ArchTest
     public void doNotUseAssertJ(JavaClasses classes) {
         ArchRuleDefinition.noClasses().should().accessClassesThat().resideInAPackage("org.assertj..")
                           .check(classes);
@@ -65,7 +82,7 @@ public class CommonArchitectureTest {
     @ArchTest
     public void doNotUseJavaAWT(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
-                          .should().accessClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
+                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
                           .check(classes);
     }
 
@@ -149,7 +166,9 @@ public class CommonArchitectureTest {
 
     @ArchTest
     public void restrictStandardStreams(JavaClasses classes) {
-        ArchRuleDefinition.noClasses().that().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)
+        ArchRuleDefinition.noClasses().that().resideOutsideOfPackages(
+                                  PACKAGE_ORG_JABREF_CLI,
+                                  PACKAGE_ORG_JABREF_TOOLKIT_CLI)
                           .and().resideOutsideOfPackages("org.jabref.gui.openoffice..") // Uses LibreOffice SDK
                           .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
                           .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
@@ -170,7 +189,13 @@ public class CommonArchitectureTest {
     @ArchTest
     public void shouldUseJSpecifyAnnotations(JavaClasses classes) {
         ArchRuleDefinition.noClasses()
-                          .should().dependOnClassesThat().resideInAPackage("org.jetbrains.annotations..")
+                          .should()
+                          .dependOnClassesThat()
+                          .resideInAnyPackage(
+                                  "jakarta.annotation..",
+                                  "javax.annotation..",
+                                  "org.eclipse.jgit.annotations",
+                                  "org.jetbrains.annotations..")
                           .because("JSpecify annotations should be used")
                           .check(classes);
     }
