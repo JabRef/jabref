@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
 import org.jabref.logic.FilePreferences;
@@ -43,7 +45,8 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -499,17 +502,12 @@ public class JabRefCliPreferences implements CliPreferences {
         try {
             Path preferencesPath = Path.of("jabref.xml");
             if (Files.exists(preferencesPath)) {
-                importPreferences(preferencesPath);
+                // This overwrites the configured values, which might be undesired by users
+                importPreferencesToBackingStore(preferencesPath);
             }
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
-
-        // Since some of the preference settings themselves use localized strings, we cannot set the language after
-        // the initialization of the preferences in main
-        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // will never be translated.
-        Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
@@ -695,7 +693,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
         defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
-        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
+        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
 
         defaults.put(AUTO_RENAME_FILES_ON_CHANGE, false);
         // use citation key appended with filename as default pattern
@@ -715,6 +713,11 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(VERSION_IGNORED_UPDATE, "");
         defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
+        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+        // the initialization of the preferences in main
+        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+        // will never be translated.
+        Localization.setLanguage(getLanguage());
         setLanguageDependentDefaultValues();
 
         // region last files opened
@@ -1023,6 +1026,13 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
+     * Returns a Sequenced Set of Fields.
+     */
+    public SequencedSet<Field> getFieldSequencedSet(String key, ObservableSet<Field> def) {
+        return FieldFactory.parseFieldList(get(key, FieldFactory.serializeFieldsList(def)));
+    }
+
+    /**
      * Returns a Path
      */
     private Path getPath(String key, Path defaultValue) {
@@ -1185,6 +1195,16 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     @Override
     public void importPreferences(Path path) throws JabRefException {
+        importPreferencesToBackingStore(path);
+
+        // TODO: We need to load all CLI-preferences from the backing store
+        //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
+
+        // in case of incomplete or corrupt xml fall back to current preferences
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+    }
+
+    private static void importPreferencesToBackingStore(Path path) throws JabRefException {
         LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
         try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
@@ -1194,12 +1214,6 @@ public class JabRefCliPreferences implements CliPreferences {
                     Localization.lang("Could not import preferences"),
                     ex);
         }
-
-        // TODO: We need to load all CLI-preferences from the backing store
-        //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
-
-        // in case of incomplete or corrupt xml fall back to current preferences
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
     }
     //*************************************************************************************************************
     // ToDo: Cleanup
@@ -1647,7 +1661,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                userAndHost.getUserHostString(),
+                getUserHostInfo().getUserHostString(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
@@ -1943,8 +1957,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
                                                           .map(CleanupPreferences.CleanupStep::valueOf)
                                                           .collect(Collectors.toSet())),
-                new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
+                new FieldFormatterCleanupActions(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
+                        FieldFormatterCleanupMapper.parseActions(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
                 ));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
@@ -1952,7 +1966,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
-            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
+            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
         });
 
         return cleanupPreferences;
@@ -1962,9 +1976,9 @@ public class JabRefCliPreferences implements CliPreferences {
     public CleanupPreferences getDefaultCleanupPreset() {
         return new CleanupPreferences(
                 getDefaultCleanupJobs(),
-                new FieldFormatterCleanups(
+                new FieldFormatterCleanupActions(
                         (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
+                        FieldFormatterCleanupMapper.parseActions((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
                 ));
     }
 

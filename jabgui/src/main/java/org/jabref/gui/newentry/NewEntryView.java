@@ -499,7 +499,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             final EntryType type = entry.getType();
 
             final Button button = new Button(type.getDisplayName());
-            button.setMinWidth(Button.USE_PREF_SIZE);
             button.setMaxWidth(Double.MAX_VALUE);
             button.setUserData(entry);
             button.setOnAction(_ -> onEntryTypeSelected(type));
