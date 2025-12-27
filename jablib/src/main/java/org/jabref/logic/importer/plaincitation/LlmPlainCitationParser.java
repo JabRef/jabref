@@ -19,7 +19,7 @@ import dev.langchain4j.model.chat.ChatModel;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser implements PlainCitationParser {
+public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser {
     private final AiTemplatesService aiTemplatesService;
     private final ImportFormatPreferences importFormatPreferences;
     private final ChatModel llm;
