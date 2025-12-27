@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
+- We fixed empty entries list when exporting AI chat from a group. [#14647](https://github.com/JabRef/jabref/issues/14647)
 
 ### Removed
 
@@ -84,7 +85,6 @@ We fixed an error on startup when using portable preferences. [#14729](https://g
 - We fixed the keyboard navigation in the entry editor: pressing <kbd>Shift</kbd> + <kbd>Tab</kbd> on the first field now correctly focuses the last field of the previous tab. [#14513](https://github.com/JabRef/jabref/issues/14513)
 - We fixed a crash when importing preferences from older JabRef versions. [#14497](https://github.com/JabRef/jabref/issues/14497)
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
-- We fixed empty entries list when exporting AI chat from a group. [#14647](https://github.com/JabRef/jabref/issues/14647)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
 - We fixed an issue where the warning dialog is mixed Chinese/English after switching to zh_CN [#14654](https://github.com/JabRef/jabref/issues/14654)
 
