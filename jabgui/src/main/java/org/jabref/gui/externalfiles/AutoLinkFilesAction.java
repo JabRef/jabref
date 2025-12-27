@@ -109,8 +109,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                         Localization.lang("Changed %0 entries.", result.getChangedEntries().size()),
                         Localization.lang("Affected entries: %0", result.getChangedEntries().stream()
                                                                         .map(BibEntry::getCitationKey)
-                                                                        .filter(Optional::isPresent)
-                                                                        .map(Optional::get)
+                                                                        .flatMap(Optional::stream)
                                                                         .collect(Collectors.joining(", ")))
                 ));
             }
