@@ -177,4 +177,24 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
     }
+
+    @Test
+    void getSeverity() {
+    }
+
+    @Test
+    void getMessage() {
+    }
+
+    @Test
+    void getFullTitle() {
+    }
+
+    @Test
+    void getAbbreviation() {
+    }
+
+    @Test
+    void testToString() {
+    }
 }
