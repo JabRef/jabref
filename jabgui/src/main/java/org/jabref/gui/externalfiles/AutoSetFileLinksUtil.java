@@ -118,13 +118,14 @@ public class AutoSetFileLinksUtil {
         // Add left unlinked files as new linked files
         Set<String> linkedFileNames = entry.getFiles().stream().map(LinkedFile::getLink)
                                            .map(FileUtil::getBaseName).collect(Collectors.toSet());
-        List<LinkedFile> addedFiles = files.entrySet().stream()
+        List<LinkedFile> filesToAdd = files.entrySet().stream()
                                            .filter(mapEntry -> !linkedFileNames.contains(mapEntry.getKey()))
                                            .map(Map.Entry::getValue)
                                            .toList();
-        if (!addedFiles.isEmpty()) {
+        if (!filesToAdd.isEmpty()) {
             entryUpdated = true;
-            newLinkedFiles = Stream.concat(entry.getFiles().stream(), addedFiles.stream()).toList();
+            newLinkedFiles = new ArrayList<>(entry.getFiles());
+            newLinkedFiles.addAll(filesToAdd);
             onAddLinkedFile.accept(newLinkedFiles, entry);
         }
 
