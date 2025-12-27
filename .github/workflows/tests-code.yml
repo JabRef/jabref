@@ -52,7 +52,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Run checkstyle reporter
@@ -140,6 +140,8 @@ jobs:
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
+    # Version 1.11.0 does not run on JDK25: "java.lang.reflect.InvocationTargetException"
+    if: false
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -149,7 +151,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -278,7 +280,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -314,7 +316,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Generate JBang cache key
@@ -363,7 +365,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -413,7 +415,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -615,7 +617,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           cache: maven
           check-latest: true
@@ -691,7 +693,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
@@ -737,7 +739,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
