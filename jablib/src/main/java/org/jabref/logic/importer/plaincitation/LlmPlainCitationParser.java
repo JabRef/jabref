@@ -16,7 +16,9 @@ import org.jabref.model.entry.BibEntry;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser implements PlainCitationParser {
     private final AiTemplatesService aiTemplatesService;
     private final ImportFormatPreferences importFormatPreferences;
