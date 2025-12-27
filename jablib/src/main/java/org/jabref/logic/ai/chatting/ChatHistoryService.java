@@ -142,9 +142,13 @@ public class ChatHistoryService implements AutoCloseable {
             if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                 chatHistory = FXCollections.observableArrayList();
             } else {
+                // Include library UID in the group key to ensure chat history is scoped per library
+                String libraryId = bibDatabaseContext.getUid().toString();
+                String groupKey = libraryId + ":" + group.getGroup().getName();
+                
                 List<ChatMessage> chatMessagesList = implementation.loadMessagesForGroup(
                         bibDatabaseContext.getDatabasePath().get(),
-                        group.getGroup().getName()
+                        groupKey
                 );
 
                 chatHistory = FXCollections.observableArrayList(chatMessagesList);
@@ -172,9 +176,13 @@ public class ChatHistoryService implements AutoCloseable {
         Optional<BibDatabaseContext> bibDatabaseContext = chatHistoryManagementRecord.bibDatabaseContext();
 
         if (bibDatabaseContext.isPresent() && bibDatabaseContext.get().getDatabasePath().isPresent()) {
+            // Include library UID in the group key to ensure chat history is scoped per library
+            String libraryId = bibDatabaseContext.get().getUid().toString();
+            String groupKey = libraryId + ":" + group.getGroup().getName();
+            
             implementation.storeMessagesForGroup(
                     bibDatabaseContext.get().getDatabasePath().get(),
-                    group.getGroup().getName(),
+                    groupKey,
                     chatHistoryManagementRecord.chatHistory()
             );
         }
@@ -213,10 +221,15 @@ public class ChatHistoryService implements AutoCloseable {
             return;
         }
 
+        // Include library UID in the group key to ensure chat history is scoped per library
+        String libraryId = bibDatabaseContext.getUid().toString();
+        String oldGroupKey = libraryId + ":" + oldName;
+        String newGroupKey = libraryId + ":" + newName;
+
         List<ChatMessage> chatMessages = groupsChatHistory.computeIfAbsent(groupTreeNode,
                 e -> new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;
-        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldName, List.of());
-        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), newName, chatMessages);
+        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldGroupKey, List.of());
+        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), newGroupKey, chatMessages);
     }
 
     private void transferEntryHistory(BibDatabaseContext bibDatabaseContext, BibEntry entry, String oldCitationKey, String newCitationKey) {
