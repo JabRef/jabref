@@ -727,7 +727,6 @@ public class GroupDialogViewModel {
         return texGroupFilePathProperty;
     }
 
-    // Directory Group Property Getters
     public BooleanProperty typeDirectoryProperty() {
         return typeDirectoryProperty;
     }
@@ -740,7 +739,6 @@ public class GroupDialogViewModel {
         return directoryGroupPathValidator.getValidationStatus();
     }
 
-    // Date Group Property Getters
     public BooleanProperty dateRadioButtonSelectedProperty() {
         return dateRadioButtonSelectedProperty;
     }
