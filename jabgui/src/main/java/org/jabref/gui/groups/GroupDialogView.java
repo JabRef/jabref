@@ -94,6 +94,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField searchGroupSearchTerm;
     @FXML private CheckBox searchGroupCaseSensitive;
     @FXML private CheckBox searchGroupRegex;
+    @FXML private CheckBox searchGroupDateRange;
 
     @FXML private RadioButton autoGroupKeywordsOption;
     @FXML private TextField autoGroupKeywordsField;
@@ -220,6 +221,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.CASE_SENSITIVE, newValue));
         searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
         searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newValue));
+        searchGroupDateRange.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.DATE_RANGE));
+        searchGroupDateRange.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.DATE_RANGE, newValue));
 
         autoGroupKeywordsOption.selectedProperty().bindBidirectional(viewModel.autoGroupKeywordsOptionProperty());
         autoGroupKeywordsField.textProperty().bindBidirectional(viewModel.autoGroupKeywordsFieldProperty());
