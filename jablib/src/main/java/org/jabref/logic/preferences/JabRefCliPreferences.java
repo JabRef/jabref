@@ -502,6 +502,7 @@ public class JabRefCliPreferences implements CliPreferences {
         try {
             Path preferencesPath = Path.of("jabref.xml");
             if (Files.exists(preferencesPath)) {
+                // This overwrites the configured values, which might be undesired by users
                 importPreferencesToBackingStore(preferencesPath);
             }
         } catch (JabRefException e) {
