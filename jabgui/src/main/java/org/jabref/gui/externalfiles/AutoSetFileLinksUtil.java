@@ -235,8 +235,7 @@ public class AutoSetFileLinksUtil {
         List<Path> linkedFiles =
                 entry.getFiles().stream()
                      .map(file -> file.findIn(directories))
-                     .filter(Optional::isPresent)
-                     .map(Optional::get)
+                     .flatMap(Optional::stream)
                      .toList();
 
         // Only keep associated files that are not linked
