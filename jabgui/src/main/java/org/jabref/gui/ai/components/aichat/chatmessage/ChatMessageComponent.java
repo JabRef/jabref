@@ -7,7 +7,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -23,6 +27,8 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 
 public class ChatMessageComponent extends HBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessageComponent.class);
@@ -53,12 +59,72 @@ public class ChatMessageComponent extends HBox {
         markdownContentPane.getChildren().add(markdownTextFlow);
         markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
         markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
+
+        setupContextMenu();
     }
 
     public ChatMessageComponent(ChatMessage chatMessage, Consumer<ChatMessageComponent> onDeleteCallback) {
         this();
         setChatMessage(chatMessage);
         setOnDelete(onDeleteCallback);
+    }
+
+    private void setupContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem copyItem = new MenuItem(Localization.lang("Copy"));
+
+        copyItem.setOnAction(_ -> {
+            int[] selection = (int[]) contextMenu.getProperties().getOrDefault("selection", new int[] {-1, -1});
+            int start = selection[0];
+            int end = selection[1];
+
+            String fullText = switch (chatMessage.get()) {
+                case UserMessage user ->
+                        user.singleText();
+                case AiMessage ai ->
+                        ai.text();
+                case ErrorMessage err ->
+                        err.getText();
+                case null,
+                     default ->
+                        "";
+            };
+
+            if (fullText.isEmpty()) {
+                return;
+            }
+
+            String textToCopy;
+            if (start >= 0 && end > start) {
+                int safeEnd = Math.min(end, fullText.length());
+                textToCopy = fullText.substring(start, safeEnd);
+            } else {
+                textToCopy = fullText;
+            }
+
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(textToCopy);
+            clipboard.setContent(content);
+        });
+
+        contextMenu.getItems().add(copyItem);
+
+        markdownContentPane.addEventFilter(MOUSE_PRESSED, event -> {
+            if (event.isSecondaryButtonDown()) {
+                try {
+                    int start = markdownTextFlow.getSelectionStartIndex();
+                    int end = markdownTextFlow.getSelectionEndIndex();
+                    contextMenu.getProperties().put("selection", new int[] {start, end});
+                } catch (AssertionError | Exception e) {
+                    contextMenu.getProperties().put("selection", new int[] {-1, -1});
+                }
+            }
+        });
+
+        markdownContentPane.setOnContextMenuRequested(event ->
+                contextMenu.show(markdownContentPane, event.getScreenX(), event.getScreenY())
+        );
     }
 
     public void setChatMessage(ChatMessage chatMessage) {
