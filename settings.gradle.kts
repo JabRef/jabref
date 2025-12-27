@@ -19,6 +19,7 @@ pluginManagement {
         maven("https://jitpack.io")
     }
 }
+
 plugins {
     id("org.jabref.gradle.build")
 }
