@@ -21,6 +21,7 @@ import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGranularity;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -137,6 +138,9 @@ public class GroupsParser {
         }
         if (input.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
             return texGroupFromString(input, fileMonitor, metaData, userAndHost);
+        }
+        if (input.startsWith(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID)) {
+            return directoryGroupFromString(input);
         }
 
         throw new ParseException("Unknown group: " + input);
@@ -341,6 +345,34 @@ public class GroupsParser {
             group.setColor(tokenizer.nextToken());
             group.setIconName(tokenizer.nextToken());
             group.setDescription(tokenizer.nextToken());
+        }
+    }
+
+    /**
+     * Parses a DirectoryGroup from its string representation.
+     *
+     * @param input The string representation of the DirectoryGroup
+     * @return The parsed DirectoryGroup
+     * @throws ParseException If the input cannot be parsed
+     */
+    private static DirectoryGroup directoryGroupFromString(String input) throws ParseException {
+        assert input.startsWith(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID);
+
+        QuotedStringTokenizer token = new QuotedStringTokenizer(
+                input.substring(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID.length()),
+                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
+                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = StringUtil.unquote(token.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(token.nextToken()));
+
+        try {
+            Path directoryPath = Path.of(StringUtil.unquote(token.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+            DirectoryGroup newGroup = new DirectoryGroup(name, context, directoryPath);
+            addGroupDetails(token, newGroup);
+            return newGroup;
+        } catch (InvalidPathException e) {
+            throw new ParseException("Invalid directory path in DirectoryGroup: " + input, e);
         }
     }
 }

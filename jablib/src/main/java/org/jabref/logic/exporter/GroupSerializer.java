@@ -12,6 +12,7 @@ import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DirectoryGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
@@ -130,6 +131,8 @@ public class GroupSerializer {
                     serializeAutomaticDateGroup(dateGroup);
             case TexGroup texGroup ->
                     serializeTexGroup(texGroup);
+            case DirectoryGroup directoryGroup ->
+                    serializeDirectoryGroup(directoryGroup);
             case null ->
                     throw new IllegalArgumentException("Group cannot be null");
             default ->
@@ -192,6 +195,21 @@ public class GroupSerializer {
         sb.append(StringUtil.quote(group.getKeywordHierarchicalDelimiter().toString(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         appendGroupDetails(sb, group);
+        return sb.toString();
+    }
+
+    private String serializeDirectoryGroup(DirectoryGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID);
+        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(group.getHierarchicalContext().ordinal());
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(StringUtil.quote(FileUtil.toPortableString(group.getDirectoryPath()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+
+        appendGroupDetails(sb, group);
+
         return sb.toString();
     }
 }
