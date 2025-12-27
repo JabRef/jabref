@@ -145,7 +145,7 @@ public class ChatHistoryService implements AutoCloseable {
                 // Include library UID in the group key to ensure chat history is scoped per library
                 String libraryId = bibDatabaseContext.getUid().toString();
                 String groupKey = libraryId + ":" + group.getGroup().getName();
-                
+
                 List<ChatMessage> chatMessagesList = implementation.loadMessagesForGroup(
                         bibDatabaseContext.getDatabasePath().get(),
                         groupKey
@@ -179,7 +179,7 @@ public class ChatHistoryService implements AutoCloseable {
             // Include library UID in the group key to ensure chat history is scoped per library
             String libraryId = bibDatabaseContext.get().getUid().toString();
             String groupKey = libraryId + ":" + group.getGroup().getName();
-            
+
             implementation.storeMessagesForGroup(
                     bibDatabaseContext.get().getDatabasePath().get(),
                     groupKey,
