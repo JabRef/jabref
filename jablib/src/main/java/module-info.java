@@ -122,8 +122,6 @@ open module org.jabref.jablib {
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
 
-    requires java.base;
-
     requires javafx.base;
     requires javafx.graphics; // because of javafx.scene.paint.Color
     requires afterburner.fx;
@@ -261,11 +259,11 @@ open module org.jabref.jablib {
     requires io.github.adr;
     requires io.github.darvil.terminal.textformatter;
     // required by okhttp and some AI library
-    requires kotlin.stdlib;
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.jooq.jool;
     requires org.libreoffice.uno;
-    requires transitive org.jspecify;
+    requires org.junit.jupiter.api;
+    requires kotlin.stdlib;
     // endregion
 }
