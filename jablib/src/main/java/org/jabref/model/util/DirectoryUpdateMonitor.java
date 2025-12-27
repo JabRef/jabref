@@ -16,11 +16,16 @@ public interface DirectoryUpdateMonitor {
 
     /**
      * Starts monitoring a directory for changes.
+     * <p>
+     * This method is called by DirectoryGroup when real-time monitoring is enabled.
+     * Currently, DirectoryGroup uses static scanning at creation time, but this infrastructure
+     * is prepared for future integration with WatchService for automatic group updates.
+     * </p>
      *
-     * @param directory The directory to monitor
-     * @param listener  The listener to notify of changes
-     * @param recursive Whether to monitor subdirectories recursively
-     * @throws IOException if the directory cannot be monitored
+     * @param directory The directory to monitor for file system changes
+     * @param listener  The listener to notify when files/directories are created, modified, or deleted
+     * @param recursive Whether to monitor subdirectories recursively (true for full tree monitoring)
+     * @throws IOException if the directory cannot be registered with the WatchService
      */
     void addListenerForDirectory(Path directory, DirectoryUpdateListener listener, boolean recursive) throws IOException;
 
