@@ -596,6 +596,12 @@ jobs:
       - run: jbang "${{ matrix.script }}" --help
         if: ${{ contains(matrix.script, 'Launcher.java') }}
         shell: bash
+      - run: |
+          cd jabkit/src/test/resources
+          # test wheter the imported preferences `jabref.xml` let JabKit still start
+          jbang ../../../../.jbang/JabKitLauncher.java check-integrity --debug --input empty.bib
+        if: ${{ matrix.script == '.jbang/JabKitLauncher.java' }}
+        shell: bash
 
   maven-examples:
     name: Maven examples (main)
