@@ -15,11 +15,11 @@ import org.jabref.logic.journals.quality.Severity;
 
 public class WrongEscapeChecker implements Checker {
 
-//    Regex: matches any backslash followed by a non-alphanumeric character
+    //    Regex: matches any backslash followed by a non-alphanumeric character
     private static final Pattern ESCAPE_PATTERN = Pattern.compile(".*\\\\.*");
 
     @Override
-    public List<Finding> check(List<AbbreviationEntry> entries){
+    public List<Finding> check(List<AbbreviationEntry> entries) {
         List<Finding> findings = new ArrayList<>();
         for (AbbreviationEntry entry : entries) {
             if (ESCAPE_PATTERN.matcher(entry.full()).matches() || ESCAPE_PATTERN.matcher(entry.abbr()).matches()) {
@@ -35,9 +35,8 @@ public class WrongEscapeChecker implements Checker {
         return findings;
     }
 
-        @Override
+    @Override
     public String code() {
         return "ERR_WRONG_ESCAPE";
-        }
-
+    }
 }
