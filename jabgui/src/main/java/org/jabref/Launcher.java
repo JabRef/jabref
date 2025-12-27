@@ -43,6 +43,7 @@ import org.tinylog.configuration.Configuration;
 /// - Start the JavaFX application
 public class Launcher {
     private static Logger LOGGER;
+    private static final BuildInfo BUILD_INFO = new BuildInfo();
 
     public enum MultipleInstanceAction {
         CONTINUE,
@@ -53,8 +54,9 @@ public class Launcher {
     public static void main(String[] args) {
         try {
             initLogging(args);
+            LOGGER.debug("Starting JabRef v{}", BUILD_INFO.version);
 
-            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
+            Injector.setModelOrService(BuildInfo.class, BUILD_INFO);
 
             final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
 
@@ -135,7 +137,7 @@ public class Launcher {
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
-        Path directory = Directories.getLogDirectory(new BuildInfo().version);
+        Path directory = Directories.getLogDirectory(BUILD_INFO.version);
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
