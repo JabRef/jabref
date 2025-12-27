@@ -39,9 +39,9 @@
                       text="%Warn before overwriting existing keys"
                       disable="${!overwriteAllow.selected}"/>
         </HBox>
-        <CheckBox fx:id="generateOnSave" text="%Generate keys before saving (only for entries without a key)"
+        <CheckBox fx:id="generateOnSave" text="%Generate keys before saving (for entries without a key)"
                 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="3"/>
-        <CheckBox fx:id="generateNewKeyOnImport" text="%Generate new keys for imported entries (overwriting their default)"
+        <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"
                 GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4"/>
 
         <Label text="%Letters after duplicate generated keys" GridPane.columnIndex="0"
