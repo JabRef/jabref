@@ -10,7 +10,7 @@ class AbbreviationsTest {
     private JournalAbbreviationRepository repository;
 
     @BeforeEach
-    void setUp() {
+     void setUp() {
         repository = JournalAbbreviationLoader.loadBuiltInRepository();
     }
 
@@ -22,5 +22,45 @@ class AbbreviationsTest {
     @Test
     void getNextAbbreviationConvertsAbbreviationToDotlessAbbreviation() {
         assertEquals("2D Mater", repository.getNextAbbreviation("2D Mater.").get());
+    }
+
+    @Test
+    void getName() {
+    }
+
+    @Test
+    void getAbbreviation() {
+    }
+
+    @Test
+    void getShortestUniqueAbbreviation() {
+    }
+
+    @Test
+    void isDefaultShortestUniqueAbbreviation() {
+    }
+
+    @Test
+    void getDotlessAbbreviation() {
+    }
+
+    @Test
+    void compareTo() {
+    }
+
+    @Test
+    void getNext() {
+    }
+
+    @Test
+    void testToString() {
+    }
+
+    @Test
+    void testEquals() {
+    }
+
+    @Test
+    void testHashCode() {
     }
 }
