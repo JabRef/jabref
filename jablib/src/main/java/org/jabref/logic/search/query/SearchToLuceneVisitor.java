@@ -73,6 +73,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             return isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
         }
 
+        // TODO: Here, there us no unescapeing of the term (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
         if (!isValidField(field)) {
             return "";
@@ -83,6 +84,9 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         return buildFieldExpression(field, term, operator, isQuoted);
     }
 
+    /// A valid field is a field which is supported by the Lucene index
+    /// Currently, Lucene is used for files only. Meta data of the files is stored in the BibEntry.
+    /// Thus, it does not make sense to search for "author" as field name as this is not stored in the Lucene index.
     private boolean isValidField(String field) {
         return "any".equals(field) || "anyfield".equals(field) || LinkedFilesConstants.PDF_FIELDS.contains(field);
     }
