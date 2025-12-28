@@ -324,7 +324,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             preferences.setIdLookupGuessing(newValue);
             // When switching to auto-detect mode, detect identifier type from current text
             if (newValue && !idText.getText().trim().isEmpty()) {
-                Optional<Identifier> identifier = Identifier.from(idText.getText().trim());
+                String cleanedText = cleanIdentifierText(idText.getText().trim());
+                Optional<Identifier> identifier = Identifier.from(cleanedText);
                 if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
                     fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
                 }
@@ -347,7 +348,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // Only works when "Automatically determine identifier type" is selected
         idText.textProperty().addListener((_, _, newValue) -> {
             if (idLookupGuess.isSelected() && !newValue.trim().isEmpty()) {
-                Optional<Identifier> identifier = Identifier.from(newValue.trim());
+                String cleanedText = cleanIdentifierText(newValue.trim());
+                Optional<Identifier> identifier = Identifier.from(cleanedText);
                 if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
                     fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
                 }
@@ -675,6 +677,28 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     /**
+     * Cleans identifier text by removing URL fragments and query parameters.
+     * This allows identifiers embedded in URLs (e.g., https://arxiv.org/html/2503.08641v1#bib.bib5)
+     * to be properly detected.
+     *
+     * @param text the text to clean
+     * @return the cleaned text with fragments and query parameters removed
+     */
+    private String cleanIdentifierText(String text) {
+        // Remove URL fragments (everything after #)
+        int fragmentIndex = text.indexOf('#');
+        if (fragmentIndex >= 0) {
+            text = text.substring(0, fragmentIndex);
+        }
+        // Remove query parameters (everything after ?)
+        int queryIndex = text.indexOf('?');
+        if (queryIndex >= 0) {
+            text = text.substring(0, queryIndex);
+        }
+        return text.trim();
+    }
+
+    /**
      * Validates an identifier. DOI and ISBN identifiers are validated,
      * other identifier types are considered valid by default.
      *
@@ -696,7 +720,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         String clipboardText = ClipBoardManager.getContents().trim();
 
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            Optional<Identifier> identifier = Identifier.from(clipboardText);
+            String cleanedText = cleanIdentifierText(clipboardText);
+            Optional<Identifier> identifier = Identifier.from(cleanedText);
             if (identifier.isPresent()) {
                 Identifier id = identifier.get();
                 if (isValidIdentifier(id)) {
