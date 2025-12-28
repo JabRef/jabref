@@ -9,7 +9,7 @@ ARG TAG_BUILD="false"
 
 WORKDIR /build
 
-COPY . .
+COPY --chown=gradle:gradle . .
 
 RUN gradle --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
 
