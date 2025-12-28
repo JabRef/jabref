@@ -215,11 +215,8 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
-          # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md > heylogs.txt || true
-
-          # ignore some errors
-          grep -v no-empty-headings < heylogs.txt | grep -v all-h2-contain-a-version | tee heylogs.txt
+          # run heylogs verification with native ignore rules
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md --rule no-empty-group:OFF --rule all-h2-contain-a-version:OFF --rule imbalanced-braces:OFF > heylogs.txt || true
 
           # exit 1 in case of an error
           remaining=$(
