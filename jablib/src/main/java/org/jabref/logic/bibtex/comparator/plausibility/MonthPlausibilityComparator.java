@@ -15,11 +15,9 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
         Optional<Month> leftM = Month.parse(left);
         Optional<Month> rightM = Month.parse(right);
 
-        // 1. Presence Checks
         if (leftM.isPresent() && rightM.isEmpty()) {
             return ComparisonResult.LEFT_BETTER;
         }
-
         if (rightM.isPresent() && leftM.isEmpty()) {
             return ComparisonResult.RIGHT_BETTER;
         }
@@ -27,17 +25,12 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             return ComparisonResult.UNDETERMINED;
         }
 
-        // 2. Conflict Check
         if (!leftM.equals(rightM)) {
             return ComparisonResult.UNDETERMINED;
         }
 
-        // 3. Format Prioritization
-
-        // Check for JabRef Format (#jan#)
         boolean leftIsJabRef = left.equals(leftM.get().getJabRefFormat());
         boolean rightIsJabRef = right.equals(rightM.get().getJabRefFormat());
-
         if (leftIsJabRef && !rightIsJabRef) {
             return ComparisonResult.LEFT_BETTER;
         }
@@ -45,10 +38,8 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             return ComparisonResult.RIGHT_BETTER;
         }
 
-        // Check for Standard Short Name (jan, feb...)
         boolean leftIsShort = left.equalsIgnoreCase(leftM.get().getShortName());
         boolean rightIsShort = right.equalsIgnoreCase(rightM.get().getShortName());
-
         if (leftIsShort && !rightIsShort) {
             return ComparisonResult.LEFT_BETTER;
         }
@@ -56,10 +47,8 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             return ComparisonResult.RIGHT_BETTER;
         }
 
-        // Check for Simple Number
         boolean leftIsSimpleNum = left.matches("\\d+") && Integer.parseInt(left) == leftM.get().getNumber();
         boolean rightIsSimpleNum = right.matches("\\d+") && Integer.parseInt(right) == rightM.get().getNumber();
-
         if (leftIsSimpleNum && !rightIsSimpleNum) {
             return ComparisonResult.LEFT_BETTER;
         }
@@ -67,7 +56,6 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             return ComparisonResult.RIGHT_BETTER;
         }
 
-        // Length Fallback
         if (left.length() < right.length()) {
             return ComparisonResult.LEFT_BETTER;
         }
