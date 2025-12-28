@@ -216,24 +216,10 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md | tee heylogs.txt || true
 
-          # ignore some errors
-          grep -v no-empty-headings < heylogs.txt | grep -v all-h2-contain-a-version | tee heylogs.txt
-
-          # exit 1 in case of an error
-          remaining=$(
-              grep -E " error " heylogs.txt \
-              | wc -l
-            )
-
-          echo "Remaining errors: $remaining"
-
-          # We have two acceptable errors
-          if [ "$remaining" -gt 2 ]; then
-            echo "Failing because of $remaining remaining error(s)."
-            echo "Failing because of $remaining remaining error(s)." >> $GITHUB_OUTPUT
-            echo "" >> $GITHUB_OUTPUT
+          # We have three acceptable errors
+          if ! grep -q "3 problems" heylogs.txt; then
             cat heylogs.txt >> $GITHUB_OUTPUT
             exit 1
           fi
