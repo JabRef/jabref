@@ -6,7 +6,6 @@ import java.util.concurrent.Callable;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
-import org.jabref.logic.importer.fetcher.citation.CitationFetcherFactory;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -51,7 +50,7 @@ class GetCitedWorks implements Callable<Integer> {
                 LOGGER::info,
                 new CurrentThreadTaskExecutor());
 
-        CitationFetcher citationFetcher = CitationFetcherFactory.INSTANCE
+        CitationFetcher citationFetcher = CitationFetcherType
                 .getCitationFetcher(
                         citationFetcherType,
                         preferences.getImporterPreferences(),

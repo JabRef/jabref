@@ -44,7 +44,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     // should only be read for closing - all other maps initialized at constructor
     private final MVStore store;
 
-    private ObjectProperty<CitationFetcherType> citationFetcherPropertyType;
+    private final ObjectProperty<CitationFetcherType> citationFetcherPropertyType;
 
     @VisibleForTesting
     MVStoreBibEntryRelationRepository(Path path,

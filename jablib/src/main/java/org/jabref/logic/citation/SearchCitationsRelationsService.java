@@ -14,7 +14,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
-import org.jabref.logic.importer.fetcher.citation.CitationFetcherFactory;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.util.Directories;
@@ -40,7 +39,7 @@ public class SearchCitationsRelationsService {
                                            GrobidPreferences grobidPreferences,
                                            AiService aiService,
                                            BibEntryTypesManager entryTypesManager) {
-        this.citationFetcher = CitationFetcherFactory.INSTANCE.getCitationFetcher(
+        this.citationFetcher = CitationFetcherType.getCitationFetcher(
                 citationFetcherTypeProperty.get(),
                 importerPreferences,
                 importFormatPreferences,
@@ -49,7 +48,7 @@ public class SearchCitationsRelationsService {
                 aiService);
 
         citationFetcherTypeProperty.addListener((_, _, newValue) -> {
-            this.citationFetcher = CitationFetcherFactory.INSTANCE.getCitationFetcher(
+            this.citationFetcher = CitationFetcherType.getCitationFetcher(
                     newValue,
                     importerPreferences,
                     importFormatPreferences,

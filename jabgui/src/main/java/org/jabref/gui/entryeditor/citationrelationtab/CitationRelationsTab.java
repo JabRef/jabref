@@ -42,7 +42,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -391,30 +390,14 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleTopBarNode(refreshCitedByButton, 15.0);
 
         ComboBox<CitationFetcherType> fetcherCombo = new ComboBox<>(
-                FXCollections.observableArrayList(
-                        CitationFetcherType.SEMANTIC_SCHOLAR,
-                        CitationFetcherType.CROSSREF
-                )
+                FXCollections.observableList(List.of(CitationFetcherType.values()))
         );
         fetcherCombo.setTooltip(new Tooltip(Localization.lang("Select citation fetcher")));
         fetcherCombo.setPrefWidth(160);
+        new ViewModelListCellFactory<CitationFetcherType>()
+                .withText(CitationFetcherType::getName)
+                .install(fetcherCombo);
         styleTopBarNode(fetcherCombo, 75.0);
-        fetcherCombo.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CitationFetcherType citationFetcherType) {
-                return citationFetcherType.getName();
-            }
-
-            @Override
-            public CitationFetcherType fromString(String s) {
-                for (CitationFetcherType provider : CitationFetcherType.values()) {
-                    if (provider.getName().equalsIgnoreCase(s)) {
-                        return provider;
-                    }
-                }
-                return CitationFetcherType.SEMANTIC_SCHOLAR;
-            }
-        });
         fetcherCombo.setValue(entryEditorPreferences.getCitationFetcherType());
 
         // Create abort buttons for both sides
