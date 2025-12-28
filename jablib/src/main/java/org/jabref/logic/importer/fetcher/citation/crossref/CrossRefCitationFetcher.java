@@ -35,6 +35,8 @@ import tools.jackson.databind.ObjectMapper;
 ///
 /// Example URL: <https://api.crossref.org/works/10.47397/tb/44-3/tb138kopp-jabref>
 public class CrossRefCitationFetcher implements CitationFetcher {
+    public static final String FETCHER_NAME = "CrossRef";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CrossRefCitationFetcher.class);
 
     private static final String API_URL = "https://api.crossref.org/works/";
@@ -64,7 +66,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
 
     @Override
     public String getName() {
-        return "Crossref";
+        return FETCHER_NAME;
     }
 
     @Override
