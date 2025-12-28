@@ -190,7 +190,7 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         options.addAll(
-            "--icon", "$projectDir/src/main/resources/icons/jabref.icns",
+            "--icon", "$projectDir/buildres/macos/JabRef.icns",
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
@@ -199,7 +199,7 @@ javaModulePackaging {
             options.addAll(
                 "--mac-sign",
                 "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
-                "--mac-package-signing-prefix", "org.jabref",
+                "--mac-package-signing-prefix", "org.jabref.",
             )
         }
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {

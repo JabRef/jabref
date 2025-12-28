@@ -51,7 +51,7 @@ public class Launcher {
         FOCUS
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         try {
             initLogging(args);
             LOGGER.info("Starting JabRef v{}", BUILD_INFO.version);
