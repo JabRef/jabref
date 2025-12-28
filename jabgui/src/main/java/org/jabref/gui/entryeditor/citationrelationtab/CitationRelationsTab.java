@@ -457,8 +457,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
 
         fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
-            fetcherCombo.setDisable(citingComponents.entry().getDOI().isEmpty());
-
             if (citingComponents.entry().getDOI().isEmpty()) {
                 return;
             }
