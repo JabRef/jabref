@@ -117,6 +117,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
     private final EntryEditorPreferences entryEditorPreferences;
+    private ComboBox<CitationFetcherType> fetcherCombo;
 
     public CitationRelationsTab(DialogService dialogService,
                                 UndoManager undoManager,
@@ -389,7 +390,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitedByButton, 15.0);
 
-        ComboBox<CitationFetcherType> fetcherCombo = new ComboBox<>(
+        fetcherCombo = new ComboBox<>(
                 FXCollections.observableList(List.of(CitationFetcherType.values()))
         );
         fetcherCombo.setTooltip(new Tooltip(Localization.lang("Select citation fetcher")));
@@ -456,8 +457,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
 
         fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
+            fetcherCombo.setDisable(citingComponents.entry().getDOI().isEmpty());
+
             if (citingComponents.entry().getDOI().isEmpty()) {
-                // TODO: The combo box should be disabled if there is no DOI
                 return;
             }
 
