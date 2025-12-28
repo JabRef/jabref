@@ -147,7 +147,7 @@ dependencies.constraints {
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2-1")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.21.2")
     api("org.jspecify:jspecify:1.0.0")
