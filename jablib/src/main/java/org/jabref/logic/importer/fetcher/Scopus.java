@@ -123,12 +123,12 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
                         continue;
                     }
 
-                    BibEntry entry = parseScopusEntry(jsonEntry);
-                    if (entry != null) {
+                    Optional<BibEntry> entryOpt = parseScopusEntry(jsonEntry);
+                    entryOpt.ifPresent(entry -> {
                         if (shouldIncludeEntry(entry)) {
                             entries.add(entry);
                         }
-                    }
+                    });
                 } catch (JSONException e) {
                     LOGGER.warn("Error parsing Scopus entry at index {}", i, e);
                 }
@@ -172,10 +172,9 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
      * Parses a single Scopus JSON entry into a BibEntry.
      *
      * @param jsonEntry the JSON object representing a Scopus search result
-     * @return BibEntry or null if parsing fails
+     * @return Optional containing the BibEntry, or empty if parsing fails
      */
-    @Nullable
-    private BibEntry parseScopusEntry(JSONObject jsonEntry) {
+    private Optional<BibEntry> parseScopusEntry(JSONObject jsonEntry) {
         try {
             BibEntry entry = new BibEntry();
 
@@ -308,10 +307,10 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
                 entry.setField(StandardField.EPRINT, eid);
             }
 
-            return entry;
+            return Optional.of(entry);
         } catch (JSONException e) {
             LOGGER.warn("Error parsing Scopus entry", e);
-            return null;
+            return Optional.empty();
         }
     }
 
