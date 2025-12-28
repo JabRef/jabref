@@ -36,7 +36,6 @@
       </option>
       <option name="RECORD_COMPONENTS_WRAP" value="0" />
       <option name="MULTI_CATCH_TYPES_WRAP" value="0" />
-      <option name="ENABLE_JAVADOC_FORMATTING" value="false" />
     </JavaCodeStyleSettings>
     <codeStyleSettings language="JAVA">
       <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
@@ -47,6 +46,7 @@
       <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
       <option name="ALIGN_MULTILINE_TERNARY_OPERATION" value="true" />
       <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />
+      <option name="WRAP_COMMENTS" value="true" />
       <option name="DOWHILE_BRACE_FORCE" value="3" />
       <arrangement>
         <rules>
