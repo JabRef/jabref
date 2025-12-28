@@ -18,6 +18,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.util.MarkdownTextFlow;
+import org.jabref.logic.ai.util.ChatMessageUtils;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -43,6 +44,7 @@ public class ChatMessageComponent extends HBox {
     @FXML private VBox buttonsVBox;
 
     private final MarkdownTextFlow markdownTextFlow;
+    private String selectedText;
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
@@ -74,32 +76,12 @@ public class ChatMessageComponent extends HBox {
         MenuItem copyItem = new MenuItem(Localization.lang("Copy"));
 
         copyItem.setOnAction(_ -> {
-            int[] selection = (int[]) contextMenu.getProperties().getOrDefault("selection", new int[] {-1, -1});
-            int start = selection[0];
-            int end = selection[1];
+            String textToCopy = !this.selectedText.isEmpty()
+                                ? this.selectedText
+                                : ChatMessageUtils.getContent(chatMessage.get()).orElse("");
 
-            String fullText = switch (chatMessage.get()) {
-                case UserMessage user ->
-                        user.singleText();
-                case AiMessage ai ->
-                        ai.text();
-                case ErrorMessage err ->
-                        err.getText();
-                case null,
-                     default ->
-                        "";
-            };
-
-            if (fullText.isEmpty()) {
+            if (textToCopy.isEmpty()) {
                 return;
-            }
-
-            String textToCopy;
-            if (start >= 0 && end > start) {
-                int safeEnd = Math.min(end, fullText.length());
-                textToCopy = fullText.substring(start, safeEnd);
-            } else {
-                textToCopy = fullText;
             }
 
             final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -115,9 +97,16 @@ public class ChatMessageComponent extends HBox {
                 try {
                     int start = markdownTextFlow.getSelectionStartIndex();
                     int end = markdownTextFlow.getSelectionEndIndex();
-                    contextMenu.getProperties().put("selection", new int[] {start, end});
+
+                    String fullText = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
+
+                    if (start >= 0 && end > start && !fullText.isEmpty()) {
+                        this.selectedText = fullText.substring(start, Math.min(end, fullText.length()));
+                    } else {
+                        this.selectedText = "";
+                    }
                 } catch (AssertionError | Exception e) {
-                    contextMenu.getProperties().put("selection", new int[] {-1, -1});
+                    this.selectedText = "";
                 }
             }
         });
