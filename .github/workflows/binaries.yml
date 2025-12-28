@@ -267,8 +267,8 @@ jobs:
         shell: bash
         run: |
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
+      - name: Cache JBang
+        uses: actions/cache@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
