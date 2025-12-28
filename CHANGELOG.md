@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added web search capability to ScienceDirect using the [Scopus](https://www.scopus.com/home.uri) Search API, enabling users to search for academic literature directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
+- We added web search capability to ScienceDirect using the [Scopus](https://www.scopus.com/) Search API, enabling users to search for academic literature directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
 
 ### Changed
 
