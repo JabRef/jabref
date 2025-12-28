@@ -23,10 +23,13 @@ jobs:
 
 
             We have automated checks in place, based on which you will soon get feedback if any of them are failing.
+            We also use [Qodo](https://www.qodo.ai/) for review assistance.
+            It will update your pull request description with a review help and offer suggestions to improve the pull request.
 
 
             After all automated checks pass, a maintainer will also review your contribution.
             Once that happens, you can go through their comments in the "Files changed" tab and act on them, or reply to the conversation if you have further inputs.
+            You can read about the whole pull request process in our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process).
 
 
-            Please re-check our [AI Usage Policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md) to ensure that your pull request is in line with it. It also contains links to our contribution guide in case of any other doubts related to our contribution workflow.
+            Please ensure that your pull request is in line with our [AI Usage Policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md) and make necessary disclosures.
