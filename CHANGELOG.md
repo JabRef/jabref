@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
+We fixed an issue where the identifier type dropdown in the "New Entry" dialog did not automatically update when typing an identifier. [#14660](https://github.com/JabRef/jabref/issues/14660)
 
 ### Removed
 
@@ -73,7 +74,6 @@ We fixed an error on startup when using portable preferences. [#14729](https://g
 
 ### Fixed
 
-We fixed an issue where the identifier type dropdown in the "New Entry" dialog did not automatically update when typing an identifier. [#14660](https://github.com/JabRef/jabref/issues/14660)
 - We fixed an issue where the AI export button was enabled even when the chat history was empty. [#14640](https://github.com/JabRef/jabref/issues/14640)
 - We fixed an issue where pressing <kbd>ESC</kbd> in the preferences dialog would not always close the dialog. [#8888](https://github.com/JabRef/jabref/issues/8888)
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
