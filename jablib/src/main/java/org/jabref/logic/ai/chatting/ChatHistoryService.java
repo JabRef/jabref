@@ -74,6 +74,7 @@ public class ChatHistoryService implements AutoCloseable {
             return groupName.compareTo(other.groupName);
         }
     }
+    
     // We use {@link TreeMap} for group chat history for the same reason as for {@link BibEntry}ies.
     private final TreeMap<GroupKey, ChatHistoryManagementRecord> groupsChatHistory = new TreeMap<>();
 
@@ -151,6 +152,7 @@ public class ChatHistoryService implements AutoCloseable {
         String libraryId = bibDatabaseContext.getUid().toString();
         String groupName = group.getGroup().getName();
         GroupKey key = new GroupKey(libraryId, groupName);
+    
         return groupsChatHistory.computeIfAbsent(key, k -> {
             ObservableList<ChatMessage> chatHistory;
 
@@ -183,11 +185,14 @@ public class ChatHistoryService implements AutoCloseable {
     
         // Finding all entries for this group
         List<GroupKey> keysToRemove = new ArrayList<>();
+    
         for (Map.Entry<GroupKey, ChatHistoryManagementRecord> entry : groupsChatHistory.entrySet()) {
             GroupKey key = entry.getKey();
             ChatHistoryManagementRecord record = entry.getValue();
+        
             if (key.groupName().equals(groupName)) {
                 Optional<BibDatabaseContext> bibDatabaseContext = record.bibDatabaseContext();
+            
                 if (bibDatabaseContext.isPresent() && bibDatabaseContext.get().getDatabasePath().isPresent()) {
                     implementation.storeMessagesForGroup(
                             bibDatabaseContext.get().getDatabasePath().get(),
@@ -195,6 +200,7 @@ public class ChatHistoryService implements AutoCloseable {
                             record.chatHistory()
                     );
                 }
+            
                 keysToRemove.add(key);
             }
         }
@@ -220,6 +226,7 @@ public class ChatHistoryService implements AutoCloseable {
     @Override
     public void close() {
         new HashSet<>(bibEntriesChatHistory.keySet()).forEach(this::closeChatHistoryForEntry);
+
         // Saving all group chat histories
         List<GroupKey> groupKeys = new ArrayList<>(groupsChatHistory.keySet());
         for (GroupKey key : groupKeys) {
@@ -233,6 +240,7 @@ public class ChatHistoryService implements AutoCloseable {
             }
             groupsChatHistory.remove(key);
         }
+
         implementation.commit();
         implementation.close();
     }
