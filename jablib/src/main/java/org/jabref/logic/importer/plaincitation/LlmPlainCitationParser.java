@@ -59,6 +59,18 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser {
         }
     }
 
+    private String getBibtexStringFromLlm(String searchQuery) {
+        String systemMessage = aiTemplatesService.makeCitationParsingSystemMessage();
+        String userMessage = aiTemplatesService.makeCitationParsingUserMessage(searchQuery);
+
+        return llm.chat(
+                List.of(
+                        new SystemMessage(systemMessage),
+                        new UserMessage(userMessage)
+                )
+        ).aiMessage().text();
+    }
+
     @Override
     public List<BibEntry> parseMultiplePlainCitations(String text) throws FetcherException {
         String systemMessage = aiTemplatesService.makeCitationParsingSystemMessage();
@@ -80,17 +92,5 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser {
         }
         entries.forEach(entry -> eprintCleanup.cleanup(entry));
         return entries;
-    }
-
-    private String getBibtexStringFromLlm(String searchQuery) {
-        String systemMessage = aiTemplatesService.makeCitationParsingSystemMessage();
-        String userMessage = aiTemplatesService.makeCitationParsingUserMessage(searchQuery);
-
-        return llm.chat(
-                List.of(
-                        new SystemMessage(systemMessage),
-                        new UserMessage(userMessage)
-                )
-        ).aiMessage().text();
     }
 }
