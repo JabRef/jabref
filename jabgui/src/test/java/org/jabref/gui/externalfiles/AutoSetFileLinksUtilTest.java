@@ -43,18 +43,13 @@ class AutoSetFileLinksUtilTest {
 
     /**
      * Modified version of AutoLinkFilesAction.linkFilesTask.onLinkedFilesUpdated.
-     * - Undo manager related code is commented out
-     * - Directly update BibEntry model instead of doing it in UI thread, which is not properly set up and is out of the
-     *   unit test scope
      */
     private final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
-        // String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
-        // String oldVal = entry.getField(StandardField.FILE).orElse(null);
-        // UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
-        // nc.addEdit(fieldChange); // omit undo related logic
+        // Undo manager related code is removed
 
-        // UiTaskExecutor.runAndWaitInJavaFXThread(() -> entry.setFiles(newLinkedFiles));
-        entry.setFiles(newLinkedFiles); // directly update model in unit test
+        // Directly update BibEntry model instead of doing it in UI thread by `UiTaskExecutor.runAndWaitInJavaFXThread`,
+        // which is not properly set up and is out of the unit test scope
+        entry.setFiles(newLinkedFiles);
     };
 
     @BeforeEach
