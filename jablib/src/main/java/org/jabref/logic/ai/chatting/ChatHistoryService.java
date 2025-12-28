@@ -183,7 +183,7 @@ public class ChatHistoryService implements AutoCloseable {
     public void closeChatHistoryForGroup(GroupTreeNode group) {
         String groupName = group.getGroup().getName();
     
-        // finding  all entries for this group....
+        // Finding all entries for this group
         List<GroupKey> keysToRemove = new ArrayList<>();
     
         for (Map.Entry<GroupKey, ChatHistoryManagementRecord> entry : groupsChatHistory.entrySet()) {
@@ -205,7 +205,7 @@ public class ChatHistoryService implements AutoCloseable {
             }
         }
     
-        //These is for Removing all matching entries.....
+        // Removing all matching entries
         for (GroupKey key : keysToRemove) {
             groupsChatHistory.remove(key);
         }
@@ -227,7 +227,7 @@ public class ChatHistoryService implements AutoCloseable {
     public void close() {
         new HashSet<>(bibEntriesChatHistory.keySet()).forEach(this::closeChatHistoryForEntry);
 
-        // Saving all groups chat history..
+        // Saving all group chat histories
         List<GroupKey> groupKeys = new ArrayList<>(groupsChatHistory.keySet());
         for (GroupKey key : groupKeys) {
             ChatHistoryManagementRecord record = groupsChatHistory.get(key);
