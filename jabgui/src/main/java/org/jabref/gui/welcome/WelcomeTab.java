@@ -31,6 +31,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.ImportCitaviAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -248,15 +249,22 @@ public class WelcomeTab extends Tab {
 
         Hyperlink openExampleLibraryLink = createActionLink(Localization.lang("New example library"),
                 this::openExampleLibrary);
+        Hyperlink importIntoNewLibraryLink = createActionLink(Localization.lang("Import into new library..."),
+                this::importIntoNewLibrary
+        );
 
         Hyperlink importCitaviLink = createActionLink(Localization.lang("Import from Citavi") + "...",
                 () -> new ImportCitaviAction(tabContainer, preferences, taskExecutor, dialogService).execute());
 
         VBox container = new VBox();
         container.getStyleClass().add("welcome-links-content");
-        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importCitaviLink);
+        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importIntoNewLibraryLink);
 
         return createVBoxContainer(header, container);
+    }
+
+    private void importIntoNewLibrary() {
+        new ImportCommand(tabContainer, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService).execute();
     }
 
     private VBox createWelcomeRecentBox() {

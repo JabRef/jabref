@@ -19,6 +19,13 @@ jobs:
           github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
           maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
           allow_self_assign_author: false
+          ignored_users: ${{ secrets.IGNORED_USERS }}
+          ignored_message: >
+              Hi @{{ handle }}, it seems that your past activity showed too much undirected AI usage.
+              Please re-iterate on [AI_USAGE_POLIY.md](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md) and [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md).
+
+
+              We might reconsider your request to work on an issue after March 31, 2026.
           assignment_suggestion_comment: >
             👋 Hey @{{ handle }}, looks like you’re eager to work on this issue — great! 🎉
             It also looks like you don't know how to assign issues to yourself.

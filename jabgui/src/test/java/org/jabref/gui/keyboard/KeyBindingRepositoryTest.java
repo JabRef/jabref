@@ -15,7 +15,7 @@ class KeyBindingRepositoryTest {
                 // Correctly mapped
                 Arguments.of(
                         List.of(KeyBinding.ABBREVIATE, KeyBinding.NEW_TECHREPORT, KeyBinding.PASTE),
-                        List.of("ctrl+1", "alt+2", "shift+3")
+                        List.of("shortcut+1", "alt+2", "shift+3")
                 ),
 
                 // Defaults on faulty data
