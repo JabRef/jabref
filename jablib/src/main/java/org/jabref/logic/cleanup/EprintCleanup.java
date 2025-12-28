@@ -22,8 +22,14 @@ public class EprintCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
+        entry.getField(StandardField.INSTITUTION)
+             .filter(institution -> "arxiv".equalsIgnoreCase(institution))
+             .ifPresent(_ -> {
+                 entry.clearField(StandardField.INSTITUTION).ifPresent(changes::add);
+                 entry.setField(StandardField.EPRINTTYPE, "arxiv").ifPresent(changes::add);
+             });
+
         Optional<String> version = entry.getField(StandardField.VERSION);
-        Optional<String> institution = entry.getField(StandardField.INSTITUTION);
 
         for (Field field : List.of(
                 StandardField.URL,
@@ -39,12 +45,9 @@ public class EprintCleanup implements CleanupJob {
                      String normalizedEprint = arXivIdentifier.asString();
 
                      if (version.isPresent() && !normalizedEprint.contains("v" + version.get())) {
+                         // Move from field "version" to normalizedEprint
+                         entry.clearField(StandardField.VERSION).ifPresent(changes::add);
                          normalizedEprint += "v" + version.get();
-                     }
-
-                     if (institution.isPresent() && "arxiv".equalsIgnoreCase(institution.get())) {
-                         entry.clearField(StandardField.INSTITUTION)
-                              .ifPresent(changes::add);
                      }
 
                      entry.setField(StandardField.EPRINT, normalizedEprint)
@@ -67,8 +70,6 @@ public class EprintCleanup implements CleanupJob {
                      }
                  });
         }
-
-        entry.clearField(StandardField.VERSION).ifPresent(changes::add);
 
         // Remove `journal = {arXiv}` if present
         entry.getField(StandardField.JOURNAL)
