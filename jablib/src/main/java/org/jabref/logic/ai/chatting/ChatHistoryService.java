@@ -2,9 +2,11 @@ package org.jabref.logic.ai.chatting;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -62,8 +64,19 @@ public class ChatHistoryService implements AutoCloseable {
     // See also ADR-38.
     private final TreeMap<BibEntry, ChatHistoryManagementRecord> bibEntriesChatHistory = new TreeMap<>(Comparator.comparing(BibEntry::getId));
 
+    private record GroupKey(String libraryId, String groupName) implements Comparable<GroupKey> {
+        @Override
+        public int compareTo(GroupKey other) {
+            int libraryCompare = libraryId.compareTo(other.libraryId);
+            if (libraryCompare != 0) {
+                return libraryCompare;
+            }
+            return groupName.compareTo(other.groupName);
+        }
+    }
+    
     // We use {@link TreeMap} for group chat history for the same reason as for {@link BibEntry}ies.
-    private final TreeMap<GroupTreeNode, ChatHistoryManagementRecord> groupsChatHistory = new TreeMap<>(Comparator.comparing(GroupTreeNode::getName));
+    private final TreeMap<GroupKey, ChatHistoryManagementRecord> groupsChatHistory = new TreeMap<>();
 
     public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, ChatHistoryStorage implementation) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
@@ -136,19 +149,19 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     public ObservableList<ChatMessage> getChatHistoryForGroup(BibDatabaseContext bibDatabaseContext, GroupTreeNode group) {
-        return groupsChatHistory.computeIfAbsent(group, groupArg -> {
+        String libraryId = bibDatabaseContext.getUid().toString();
+        String groupName = group.getGroup().getName();
+        GroupKey key = new GroupKey(libraryId, groupName);
+    
+        return groupsChatHistory.computeIfAbsent(key, k -> {
             ObservableList<ChatMessage> chatHistory;
 
             if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                 chatHistory = FXCollections.observableArrayList();
             } else {
-                // Include library UID in the group key to ensure chat history is scoped per library
-                String libraryId = bibDatabaseContext.getUid().toString();
-                String groupKey = libraryId + ":" + group.getGroup().getName();
-
                 List<ChatMessage> chatMessagesList = implementation.loadMessagesForGroup(
                         bibDatabaseContext.getDatabasePath().get(),
-                        groupKey
+                        groupName
                 );
 
                 chatHistory = FXCollections.observableArrayList(chatMessagesList);
@@ -168,27 +181,34 @@ public class ChatHistoryService implements AutoCloseable {
      * but it's best to call it when the chat history {@link GroupTreeNode} is no longer needed.
      */
     public void closeChatHistoryForGroup(GroupTreeNode group) {
-        ChatHistoryManagementRecord chatHistoryManagementRecord = groupsChatHistory.get(group);
-        if (chatHistoryManagementRecord == null) {
-            return;
+        String groupName = group.getGroup().getName();
+    
+        // finding  all entries for this group....
+        List<GroupKey> keysToRemove = new ArrayList<>();
+    
+        for (Map.Entry<GroupKey, ChatHistoryManagementRecord> entry : groupsChatHistory.entrySet()) {
+            GroupKey key = entry.getKey();
+            ChatHistoryManagementRecord record = entry.getValue();
+        
+            if (key.groupName().equals(groupName)) {
+                Optional<BibDatabaseContext> bibDatabaseContext = record.bibDatabaseContext();
+            
+                if (bibDatabaseContext.isPresent() && bibDatabaseContext.get().getDatabasePath().isPresent()) {
+                    implementation.storeMessagesForGroup(
+                            bibDatabaseContext.get().getDatabasePath().get(),
+                            groupName,
+                            record.chatHistory()
+                    );
+                }
+            
+                keysToRemove.add(key);
+            }
         }
-
-        Optional<BibDatabaseContext> bibDatabaseContext = chatHistoryManagementRecord.bibDatabaseContext();
-
-        if (bibDatabaseContext.isPresent() && bibDatabaseContext.get().getDatabasePath().isPresent()) {
-            // Include library UID in the group key to ensure chat history is scoped per library
-            String libraryId = bibDatabaseContext.get().getUid().toString();
-            String groupKey = libraryId + ":" + group.getGroup().getName();
-
-            implementation.storeMessagesForGroup(
-                    bibDatabaseContext.get().getDatabasePath().get(),
-                    groupKey,
-                    chatHistoryManagementRecord.chatHistory()
-            );
+    
+        //These is for Removing all matching entries.....
+        for (GroupKey key : keysToRemove) {
+            groupsChatHistory.remove(key);
         }
-
-        // TODO: What if there is two AI chats for the same entry? And one is closed and one is not?
-        groupsChatHistory.remove(group);
     }
 
     private boolean correctCitationKey(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
@@ -205,11 +225,21 @@ public class ChatHistoryService implements AutoCloseable {
 
     @Override
     public void close() {
-        // We need to clone `bibEntriesChatHistory.keySet()` because closeChatHistoryForEntry() modifies the `bibEntriesChatHistory` map.
         new HashSet<>(bibEntriesChatHistory.keySet()).forEach(this::closeChatHistoryForEntry);
 
-        // Clone is for the same reason, as written above.
-        new HashSet<>(groupsChatHistory.keySet()).forEach(this::closeChatHistoryForGroup);
+        // Saving all groups chat history..
+        List<GroupKey> groupKeys = new ArrayList<>(groupsChatHistory.keySet());
+        for (GroupKey key : groupKeys) {
+            ChatHistoryManagementRecord record = groupsChatHistory.get(key);
+            if (record != null && record.bibDatabaseContext().isPresent() && record.bibDatabaseContext().get().getDatabasePath().isPresent()) {
+                implementation.storeMessagesForGroup(
+                    record.bibDatabaseContext().get().getDatabasePath().get(),
+                    key.groupName(),
+                    record.chatHistory()
+                );
+            }
+            groupsChatHistory.remove(key);
+        }
 
         implementation.commit();
         implementation.close();
@@ -221,15 +251,14 @@ public class ChatHistoryService implements AutoCloseable {
             return;
         }
 
-        // Include library UID in the group key to ensure chat history is scoped per library
         String libraryId = bibDatabaseContext.getUid().toString();
-        String oldGroupKey = libraryId + ":" + oldName;
-        String newGroupKey = libraryId + ":" + newName;
+        GroupKey oldKey = new GroupKey(libraryId, oldName);
+        GroupKey newKey = new GroupKey(libraryId, newName);
 
-        List<ChatMessage> chatMessages = groupsChatHistory.computeIfAbsent(groupTreeNode,
-                e -> new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;
-        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldGroupKey, List.of());
-        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), newGroupKey, chatMessages);
+        List<ChatMessage> chatMessages = groupsChatHistory.computeIfAbsent(newKey,
+                k -> new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;
+        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldName, List.of());
+        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), newName, chatMessages);
     }
 
     private void transferEntryHistory(BibDatabaseContext bibDatabaseContext, BibEntry entry, String oldCitationKey, String newCitationKey) {
