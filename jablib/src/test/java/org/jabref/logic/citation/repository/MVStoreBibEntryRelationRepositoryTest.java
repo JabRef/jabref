@@ -14,8 +14,11 @@ import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -61,7 +64,8 @@ class MVStoreBibEntryRelationRepositoryTest {
                 7,
                 new BibEntryTypesManager(),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
     }
 
     @AfterEach
@@ -200,7 +204,8 @@ class MVStoreBibEntryRelationRepositoryTest {
                 30,
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
         assertTrue(daoUnderTest.shouldUpdate(entry, clock));
 
         // WHEN
@@ -232,13 +237,15 @@ class MVStoreBibEntryRelationRepositoryTest {
                 }
         );
         Path file = Files.createFile(temporaryFolder.resolve("serialization_error_" + MV_STORE_NAME));
-        MVStoreBibEntryRelationRepository daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
+        MVStoreBibEntryRelationRepository daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer,
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
         List<BibEntry> relations = createRelations(entry);
 
         // WHEN
         daoUnderTest.addRelations(entry, relations);
         daoUnderTest.close();
-        daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
+        daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer,
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
         List<BibEntry> deserializedRelations = daoUnderTest.getRelations(entry);
 
         // THEN
