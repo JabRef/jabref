@@ -175,6 +175,7 @@ public class ChatMessageComponent extends HBox {
             } else {
                 this.selectedText = "";
             }
+            // These errors can occur if the UI selection state and message content drift during rendering
         } catch (AssertionError | IndexOutOfBoundsException e) {
             LOGGER.debug("Failed to extract selection indices for copy action", e);
             this.selectedText = "";
