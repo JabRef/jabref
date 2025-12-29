@@ -41,6 +41,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.PopOver;
@@ -61,6 +62,7 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
     private final CountingUndoManager undoManager;
+    private final InfoCenterPane infoCenterPane;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -77,7 +79,8 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       CountingUndoManager undoManager) {
+                       CountingUndoManager undoManager,
+                       InfoCenterPane infoCenterPane) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -90,6 +93,7 @@ public class MainToolBar extends ToolBar {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
+        this.infoCenterPane = infoCenterPane;
 
         createToolBar();
     }
@@ -148,7 +152,14 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        createTaskIndicator()),
+                        createTaskIndicator(),
+                        factory.createIconButton(StandardActions.HELP, new SimpleCommand() {
+                            @Override
+                            public void execute() {
+                                infoCenterPane.setShowInfoCenter(true);
+                            }
+                        })
+                ),
 
                 new Separator(Orientation.VERTICAL),
 

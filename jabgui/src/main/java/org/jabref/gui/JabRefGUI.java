@@ -58,6 +58,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.dlsc.gemsfx.PowerPane;
+import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
@@ -299,7 +301,12 @@ public class JabRefGUI extends Application {
         mainStage.setMaximized(windowMaximised);
         debugLogWindowState(mainStage);
 
-        Scene scene = new Scene(JabRefGUI.mainFrame);
+        PowerPane powerpane = new PowerPane();
+        powerpane.getInfoCenterPane().getInfoCenterView().getGroups().addAll(dialogService.getNotifications());
+        Injector.setModelOrService(InfoCenterPane.class, powerpane.getInfoCenterPane());
+        powerpane.setContent(JabRefGUI.mainFrame);
+
+        Scene scene = new Scene(powerpane);
 
         LOGGER.debug("installing CSS");
         themeManager.installCssImmediately(scene);

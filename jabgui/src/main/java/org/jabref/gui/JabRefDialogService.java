@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -40,7 +39,6 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
@@ -55,8 +53,9 @@ import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.http.SimpleHttpResponse;
 
+import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.tobiasdiez.easybind.EasyBind;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ExceptionDialog;
@@ -79,6 +78,10 @@ public class JabRefDialogService implements DialogService {
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
+
+    private final NotificationGroup<Object, FileNotification> fileNotifications = new NotificationGroup<>("Files");
+    private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>("Preview");
+    private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>("Notifications");
 
     private final Window mainWindow;
 
@@ -444,25 +447,18 @@ public class JabRefDialogService implements DialogService {
         // TODO: Change to a notification overview instead of event log when that is available.
         //       The event log is not that user friendly (different purpose).
         LOGGER.debug(message);
+        UiTaskExecutor.runInJavaFXThread(() -> notify(new UndefinedNotification("Info", message)));
+    }
 
-        UiTaskExecutor.runInJavaFXThread(() ->
-                Notifications.create()
-                             .text(message)
-                             .position(Pos.BOTTOM_CENTER)
-                             .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-                             .owner(mainWindow)
-                             .threshold(5,
-                                     Notifications.create()
-                                                  .title(Localization.lang("Last notification"))
-                                                  .text(
-                                                          "(" + Localization.lang("Check the event log to see all notifications") + ")"
-                                                                  + "\n\n" + message)
-                                                  .onAction(e -> {
-                                                      ErrorConsoleAction ec = new ErrorConsoleAction();
-                                                      ec.execute();
-                                                  }))
-                             .hideCloseButton()
-                             .show());
+    @Override
+    public void notify(Notification<Object> notification) {
+        if (notification instanceof FileNotification) {
+            fileNotifications.getNotifications().add((FileNotification) notification);
+        } else if (notification instanceof PreviewNotification) {
+            previewNotifications.getNotifications().add((PreviewNotification) notification);
+        } else {
+            undefinedNotifications.getNotifications().add(notification);
+        }
     }
 
     @Override
@@ -553,5 +549,30 @@ public class JabRefDialogService implements DialogService {
             default ->
                     Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.");
         };
+    }
+
+    public static class FileNotification extends Notification<Object> {
+        public FileNotification(String title, String description) {
+            super(title, description);
+            setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+        }
+    }
+
+    public static class UndefinedNotification extends Notification<Object> {
+        public UndefinedNotification(String title, String description) {
+            super(title, description);
+            setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+        }
+    }
+
+    public static class PreviewNotification extends Notification<Object> {
+        public PreviewNotification(String title, String description) {
+            super(title, description);
+            setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+        }
+    }
+
+    public List<NotificationGroup<?, ? extends Notification<Object>>> getNotifications() {
+        return List.of(fileNotifications, undefinedNotifications, previewNotifications);
     }
 }

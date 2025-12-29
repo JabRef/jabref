@@ -24,15 +24,16 @@ import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.util.NotificationService;
 
+import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ProgressDialog;
 
 /**
  * This interface provides methods to create dialogs and show them to the user.
  */
-public interface DialogService extends NotificationService {
+public interface DialogService extends UiNotificationService {
 
     /**
      * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
@@ -328,4 +329,6 @@ public interface DialogService extends NotificationService {
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
+
+    List<NotificationGroup<?, ? extends Notification<Object>>> getNotifications();
 }
