@@ -15,6 +15,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Only the interface `FileFinder` is visible outside `jablib`.
+/// All the implementations of `FileFinder` are package-private, and are instantiated via `FileFinders`
 class BrokenLinkedFileNameBasedFileFinder implements FileFinder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrokenLinkedFileNameBasedFileFinder.class);
