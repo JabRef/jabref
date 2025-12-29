@@ -30,13 +30,6 @@ public class CompositeIdFetcher {
             return Optional.empty();
         }
 
-        Identifier identifier = identifierOpt.get();
-        switch (identifier.getClass())) {
-            // TODO - merge stuff below
-        }
-                                  .
-        getFetcher(identifier.get());
-
         Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
             return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().asString());
