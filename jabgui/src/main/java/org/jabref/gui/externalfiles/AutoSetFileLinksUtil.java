@@ -106,6 +106,7 @@ public class AutoSetFileLinksUtil {
     ///                    to query Part B
     private void doLinkAssociatedFiles(BibEntry entry, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile, LinkFilesResult result) {
         boolean entryUpdated = false;
+
         // Step 1: try matched files based on CitationKey configured by user
         Map<String, LinkedFile> files = getAssociatedFiles(entry, result, preConfiguredFileFinder);
         List<LinkedFile> newLinkedFiles = autoLinkBrokenLinkedFiles(entry.getFiles(), files);
