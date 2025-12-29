@@ -323,12 +323,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
             preferences.setIdLookupGuessing(newValue);
             // When switching to auto-detect mode, detect identifier type from current text
-            if (newValue && !idText.getText().trim().isEmpty()) {
-                String cleanedText = cleanIdentifierText(idText.getText().trim());
-                Optional<Identifier> identifier = Identifier.from(cleanedText);
-                if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
-                    fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
-                }
+            if (newValue) {
+                updateFetcherFromIdentifierText(idText.getText());
             }
         });
 
@@ -347,12 +343,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // Auto-detect identifier type when typing in the identifier field
         // Only works when "Automatically determine identifier type" is selected
         idText.textProperty().addListener((_, _, newValue) -> {
-            if (idLookupGuess.isSelected() && !newValue.trim().isEmpty()) {
-                String cleanedText = cleanIdentifierText(newValue.trim());
-                Optional<Identifier> identifier = Identifier.from(cleanedText);
-                if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
-                    fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
-                }
+            if (idLookupGuess.isSelected()) {
+                updateFetcherFromIdentifierText(newValue);
             }
         });
 
@@ -677,25 +669,19 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     /**
-     * Cleans identifier text by removing URL fragments and query parameters.
-     * This allows identifiers embedded in URLs (e.g., https://arxiv.org/html/2503.08641v1#bib.bib5)
-     * to be properly detected.
+     * Updates the fetcher based on the identifier text.
+     * Detects the identifier type and sets the appropriate fetcher if a valid identifier is found.
      *
-     * @param text the text to clean
-     * @return the cleaned text with fragments and query parameters removed
+     * @param text the identifier text to parse
      */
-    private String cleanIdentifierText(String text) {
-        // Remove URL fragments (everything after #)
-        int fragmentIndex = text.indexOf('#');
-        if (fragmentIndex >= 0) {
-            text = text.substring(0, fragmentIndex);
+    private void updateFetcherFromIdentifierText(String text) {
+        if (StringUtil.isBlank(text)) {
+            return;
         }
-        // Remove query parameters (everything after ?)
-        int queryIndex = text.indexOf('?');
-        if (queryIndex >= 0) {
-            text = text.substring(0, queryIndex);
+        Optional<Identifier> identifier = Identifier.from(text.trim());
+        if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
+            fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
         }
-        return text.trim();
     }
 
     /**
@@ -720,8 +706,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         String clipboardText = ClipBoardManager.getContents().trim();
 
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            String cleanedText = cleanIdentifierText(clipboardText);
-            Optional<Identifier> identifier = Identifier.from(cleanedText);
+            Optional<Identifier> identifier = Identifier.from(clipboardText);
             if (identifier.isPresent()) {
                 Identifier id = identifier.get();
                 if (isValidIdentifier(id)) {
