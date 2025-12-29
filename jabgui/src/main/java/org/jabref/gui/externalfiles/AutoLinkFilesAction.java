@@ -106,11 +106,11 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
                 dialogService.notify(String.format("%s %s\n%s",
                         Localization.lang("Finished automatically setting external links."),
-                        Localization.lang("Changed %0 entries.", result.getChangedEntries().size()),
-                        Localization.lang("Affected entries: %0", result.getChangedEntries().stream()
-                                                                        .map(BibEntry::getCitationKey)
-                                                                        .flatMap(Optional::stream)
-                                                                        .collect(Collectors.joining(", ")))
+                        Localization.lang("Changed %0 entry(s).", result.getChangedEntries().size()),
+                        Localization.lang("Affected entry(s): %0", result.getChangedEntries().stream()
+                                                                         .map(BibEntry::getCitationKey)
+                                                                         .flatMap(Optional::stream)
+                                                                         .collect(Collectors.joining(", ")))
                 ));
             }
         };
