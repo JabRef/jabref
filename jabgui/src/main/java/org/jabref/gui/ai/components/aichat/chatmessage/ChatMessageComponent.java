@@ -15,18 +15,17 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.util.MarkdownTextFlow;
 import org.jabref.logic.ai.util.ChatMessageUtils;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,8 @@ public class ChatMessageComponent extends HBox {
 
     private final MarkdownTextFlow markdownTextFlow;
     private String selectedText = "";
-    private final ClipBoardManager clipBoardManager = new ClipBoardManager(Injector.instantiateModelOrService(StateManager.class));
+    @Inject
+    private ClipBoardManager clipBoardManager;
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
@@ -78,10 +78,12 @@ public class ChatMessageComponent extends HBox {
         MenuItem copyItem = new MenuItem(Localization.lang("Copy"));
 
         copyItem.setOnAction(_ -> {
-            String textToCopy = !this.selectedText.isEmpty()
-                                ? this.selectedText
-                                : ChatMessageUtils.getContent(chatMessage.get()).orElse("");
-
+            String textToCopy;
+            if (!this.selectedText.isEmpty()) {
+                textToCopy = selectedText;
+            } else {
+                textToCopy = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
+            }
             if (!textToCopy.isEmpty()) {
                 clipBoardManager.setContent(textToCopy);
             }
@@ -90,22 +92,23 @@ public class ChatMessageComponent extends HBox {
         contextMenu.getItems().add(copyItem);
 
         markdownContentPane.addEventFilter(MOUSE_PRESSED, event -> {
-            if (event.isSecondaryButtonDown()) {
-                try {
-                    int start = markdownTextFlow.getSelectionStartIndex();
-                    int end = markdownTextFlow.getSelectionEndIndex();
+            if (!event.isSecondaryButtonDown()) {
+                return;
+            }
+            try {
+                int start = markdownTextFlow.getSelectionStartIndex();
+                int end = markdownTextFlow.getSelectionEndIndex();
 
-                    String fullText = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
+                String fullText = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
 
-                    if (start >= 0 && end > start && !fullText.isEmpty()) {
-                        this.selectedText = fullText.substring(start, Math.min(end, fullText.length()));
-                    } else {
-                        this.selectedText = "";
-                    }
-                } catch (AssertionError | IndexOutOfBoundsException e) {
-                    LOGGER.debug("Failed to extract selection indices for copy action", e);
+                if (start >= 0 && end > start && !fullText.isEmpty()) {
+                    this.selectedText = fullText.substring(start, Math.min(end, fullText.length()));
+                } else {
                     this.selectedText = "";
                 }
+            } catch (AssertionError | IndexOutOfBoundsException e) {
+                LOGGER.debug("Failed to extract selection indices for copy action", e);
+                this.selectedText = "";
             }
         });
 
