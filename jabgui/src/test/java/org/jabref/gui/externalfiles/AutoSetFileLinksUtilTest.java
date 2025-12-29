@@ -184,6 +184,7 @@ class AutoSetFileLinksUtilTest {
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
 
+    /// Tests req~logic.externalfiles.file-transfer.auto-link~1
     @Nested
     @DisplayName("linkAssociatedFiles")
     class linkAssociatedFiles {

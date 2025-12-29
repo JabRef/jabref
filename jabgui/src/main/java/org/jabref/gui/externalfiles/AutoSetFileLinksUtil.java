@@ -78,6 +78,7 @@ public class AutoSetFileLinksUtil {
         this.brokenLinkedFileNameBasedFileFinder = FileFinders.constructBrokenLinkedFileNameBasedFileFinder();
     }
 
+    /// [impl->req~logic.externalfiles.file-transfer.auto-link~1]
     public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile) {
         LinkFilesResult result = new LinkFilesResult();
 
