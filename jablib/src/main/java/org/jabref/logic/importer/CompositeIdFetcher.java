@@ -1,4 +1,4 @@
-package org.jabref.logic.importer;
+ package org.jabref.logic.importer;
 
 import java.util.Optional;
 
@@ -30,6 +30,7 @@ public class CompositeIdFetcher {
             return Optional.empty();
         }
 
+        // TODO - merge stuff below
         Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
             return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().asString());
