@@ -45,8 +45,7 @@ public class ChatMessageComponent extends HBox {
 
     private final MarkdownTextFlow markdownTextFlow;
     private String selectedText = "";
-    @Inject
-    private ClipBoardManager clipBoardManager;
+    @Inject private ClipBoardManager clipBoardManager;
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
@@ -78,12 +77,7 @@ public class ChatMessageComponent extends HBox {
         MenuItem copyItem = new MenuItem(Localization.lang("Copy"));
 
         copyItem.setOnAction(_ -> {
-            String textToCopy;
-            if (!this.selectedText.isEmpty()) {
-                textToCopy = selectedText;
-            } else {
-                textToCopy = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
-            }
+            String textToCopy = getTextToCopy();
             if (!textToCopy.isEmpty()) {
                 clipBoardManager.setContent(textToCopy);
             }
@@ -95,21 +89,7 @@ public class ChatMessageComponent extends HBox {
             if (!event.isSecondaryButtonDown()) {
                 return;
             }
-            try {
-                int start = markdownTextFlow.getSelectionStartIndex();
-                int end = markdownTextFlow.getSelectionEndIndex();
-
-                String fullText = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
-
-                if (start >= 0 && end > start && !fullText.isEmpty()) {
-                    this.selectedText = fullText.substring(start, Math.min(end, fullText.length()));
-                } else {
-                    this.selectedText = "";
-                }
-            } catch (AssertionError | IndexOutOfBoundsException e) {
-                LOGGER.debug("Failed to extract selection indices for copy action", e);
-                this.selectedText = "";
-            }
+            extractSelectedText();
         });
 
         markdownContentPane.setOnContextMenuRequested(event ->
@@ -174,5 +154,30 @@ public class ChatMessageComponent extends HBox {
 
     private void setColor(String fillColor, String borderColor) {
         vBox.setStyle("-fx-background-color: " + fillColor + "; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: " + borderColor + "; -fx-border-width: 3;");
+    }
+
+    private String getTextToCopy() {
+        if (!this.selectedText.isEmpty()) {
+            return this.selectedText;
+        }
+        return ChatMessageUtils.getContent(chatMessage.get()).orElse("");
+    }
+
+    private void extractSelectedText() {
+        try {
+            int start = markdownTextFlow.getSelectionStartIndex();
+            int end = markdownTextFlow.getSelectionEndIndex();
+
+            String fullText = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
+
+            if (start >= 0 && end > start && !fullText.isEmpty()) {
+                this.selectedText = fullText.substring(start, Math.min(end, fullText.length()));
+            } else {
+                this.selectedText = "";
+            }
+        } catch (AssertionError | IndexOutOfBoundsException e) {
+            LOGGER.debug("Failed to extract selection indices for copy action", e);
+            this.selectedText = "";
+        }
     }
 }
