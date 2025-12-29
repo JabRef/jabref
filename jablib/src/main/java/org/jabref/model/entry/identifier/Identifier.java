@@ -20,26 +20,25 @@ import org.jabref.model.entry.field.Field;
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public interface Identifier {
 
-    /**
-     * Returns the identifier as String
-     */
+    /// @returns the identifier as String
     String asString();
 
     Field getDefaultField();
 
     Optional<URI> getExternalURI();
 
-    public static Optional<Identifier> from(String identifier) {
+    static Optional<Identifier> from(String identifier) {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
-
+        String trimmedIdentifier = identifier.trim();
         return Stream.<Supplier<Optional<? extends Identifier>>>of(
-                             () -> DOI.findInText(identifier),
-                             () -> ArXivIdentifier.parse(identifier),
-                             () -> ISBN.parse(identifier),
-                             () -> SSRN.parse(identifier),
-                             () -> RFC.parse(identifier)
+                             () -> DOI.findInText(trimmedIdentifier),
+                             () -> ArXivIdentifier.parse(trimmedIdentifier),
+                             () -> ISBN.parse(trimmedIdentifier),
+                             () -> SSRN.parse(trimmedIdentifier),
+                             () -> RFC.parse(trimmedIdentifier),
+                             () -> IacrEprint.parse(trimmedIdentifier)
                      )
                      .map(Supplier::get)
                      .filter(Optional::isPresent)

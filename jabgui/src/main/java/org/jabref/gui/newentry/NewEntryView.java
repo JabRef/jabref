@@ -75,6 +75,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NewEntryView extends BaseDialog<BibEntry> {
     private static final String BIBTEX_REGEX = "^@([A-Za-z]+)\\{,";
@@ -473,9 +474,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void execute() {
-        // :TODO: These button text changes aren't actually visible, due to the UI thread not being able to perform the
-        // update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
-        // a `Platform.runLater(...)` which would probably fix this.
+        // TODO: These button text changes aren't actually visible, due to the UI thread not being able to perform the
+        //       update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
+        //       a `Platform.runLater(...)` which would probably fix this.
         switch (currentApproach) {
             case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
                 // We do nothing here.
@@ -670,8 +671,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
      *
      * @param text the identifier text to parse
      */
-    private void updateFetcherFromIdentifierText(String text) {
-        Identifier.from(text.trim())
+    private void updateFetcherFromIdentifierText(@Nullable String text) {
+        Identifier.from(text)
                   .flatMap(identifier -> fetcherForIdentifier(identifier))
                   .ifPresent(idFetcher::setValue);
     }

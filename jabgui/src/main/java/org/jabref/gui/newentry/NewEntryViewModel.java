@@ -115,9 +115,11 @@ public class NewEntryViewModel {
                 idText,
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("You must specify an identifier.")));
+
         duplicateDoiValidator = new FunctionBasedValidator<>(
                 idText,
                 input -> checkDOI(input).orElse(null));
+
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -234,13 +236,11 @@ public class NewEntryViewModel {
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
-            final String text = idText.getValue();
-            final CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
-
-            if (text == null || text.isEmpty()) {
+            String text = idText.getValue();
+            if (StringUtil.isBlank(text)) {
                 return Optional.empty();
             }
-
+            CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
             return fetcher.performSearchById(text);
         }
     }
@@ -248,11 +248,18 @@ public class NewEntryViewModel {
     private class WorkerLookupTypedId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
-            final String text = idText.getValue();
-            final boolean textValid = idTextValidator.getValidationStatus().isValid();
-            final IdBasedFetcher fetcher = idFetcher.getValue();
+            String text = idText.getValue();
+            if (StringUtil.isBlank(text)) {
+                return Optional.empty();
+            }
 
-            if (text == null || !textValid || fetcher == null) {
+            boolean textValid = idTextValidator.getValidationStatus().isValid();
+            if (!textValid) {
+                return Optional.empty();
+            }
+
+            IdBasedFetcher fetcher = idFetcher.getValue();
+            if (fetcher == null) {
                 return Optional.empty();
             }
 
@@ -311,7 +318,7 @@ public class NewEntryViewModel {
             executing.set(false);
         });
 
-        idLookupWorker.setOnSucceeded(event -> {
+        idLookupWorker.setOnSucceeded(_ -> {
             final Optional<BibEntry> result = idLookupWorker.getValue();
 
             if (result.isEmpty()) {
