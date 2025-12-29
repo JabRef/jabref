@@ -100,8 +100,8 @@ public class AutoSetFileLinksUtil {
     ///       - why `add`: Part A are found mainly by CitationKey, which has strong connection to the entry, so we are
     ///                    confident that we should add them automatically
     ///   - Step 2. try to auto link each broken linked file with Part B.
-    ///       - how about `unlinked files left in Part B`: there should be no files left as they are found based on broken
-    ///                                                    linked files and are used to fix them. `files left` hints a bug
+    ///       - how about `unlinked files left in Part B`: those files have the same name with one broken linked file
+    ///                    but different extension. We skip those files.
     ///       - one trick: we accumulate Part B after Step 1, so Part A does not affect those broken linked files we use
     ///                    to query Part B
     private void doLinkAssociatedFiles(BibEntry entry, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile, LinkFilesResult result) {
@@ -135,12 +135,7 @@ public class AutoSetFileLinksUtil {
             entryUpdated = true;
             onAddLinkedFile.accept(newLinkedFiles, entry);
         }
-
-        // It is a bug if there are files left
-        if (!files.isEmpty()) {
-            LOGGER.error("Cannot auto-link all the files found based on broken linked file names. Files left: {} ",
-                    files.keySet().stream().map(files::get).map(LinkedFile::getLink).collect(Collectors.joining("||")));
-        }
+        // We skip files left in`files`, they have same name with one broken linked file but different extension
 
         if (entryUpdated) {
             result.addBibEntry(entry);
