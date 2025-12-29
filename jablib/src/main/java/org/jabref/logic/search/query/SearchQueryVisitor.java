@@ -82,7 +82,7 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
             return new SearchQueryNode(Optional.empty(), term);
         }
 
-        // TODO: Here, there us no unescapeing of the term (e.g., field\=thing=value does not work as expected)
+        // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
 
         // Pseudo-fields

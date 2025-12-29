@@ -73,7 +73,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             return isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
         }
 
-        // TODO: Here, there us no unescapeing of the term (e.g., field\=thing=value does not work as expected)
+        // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
         if (!isValidField(field)) {
             return "";
