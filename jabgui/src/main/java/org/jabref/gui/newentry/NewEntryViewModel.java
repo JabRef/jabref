@@ -58,6 +58,8 @@ public class NewEntryViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryViewModel.class);
 
+    private static final LayoutFormatter DOI_STRIP = new DOIStrip();
+
     private final GuiPreferences preferences;
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -145,27 +147,22 @@ public class NewEntryViewModel {
 
     public void populateDOICache() {
         doiCache.clear();
-        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
-
-        activeDatabase.map(BibDatabaseContext::getEntries)
-                      .ifPresent(entries -> {
-                          entries.forEach(entry -> {
-                              entry.getField(StandardField.DOI)
-                                   .ifPresent(doi -> {
-                                       doiCache.put(doi, entry);
-                                   });
-                          });
-                      });
+        stateManager.getActiveDatabase()
+                    .map(BibDatabaseContext::getEntries)
+                    .stream().flatMap(List::stream)
+                    .forEach(entry -> {
+                        entry.getField(StandardField.DOI)
+                             .ifPresent(doi -> {
+                                 doiCache.put(doi, entry);
+                             });
+                    });
     }
 
     public Optional<ValidationMessage> checkDOI(String doiInput) {
-        if (doiInput == null || doiInput.isBlank()) {
+        if (StringUtil.isBlank(doiInput)) {
             return Optional.empty();
         }
-
-        LayoutFormatter doiStrip = new DOIStrip();
-        String normalized = doiStrip.format(doiInput.toLowerCase());
-
+        String normalized = DOI_STRIP.format(doiInput.toLowerCase());
         if (doiCache.containsKey(normalized)) {
             duplicateEntry = doiCache.get(normalized);
             return Optional.of(ValidationMessage.warning(Localization.lang("Entry already exists in a library")));

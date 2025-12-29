@@ -296,18 +296,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         viewModel.populateDOICache();
+        viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+            if (isValid) {
+                Tooltip.install(idText, idTextTooltip);
+            } else {
+                Tooltip.uninstall(idText, idTextTooltip);
+            }
+        });
 
         // [impl->req~newentry.clipboard.autofocus~1]
         Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
         if (validClipboardId.isPresent()) {
-            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
-                if (isValid) {
-                    Tooltip.install(idText, idTextTooltip);
-                } else {
-                    Tooltip.uninstall(idText, idTextTooltip);
-                }
-            });
-
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
@@ -675,46 +674,16 @@ public class NewEntryView extends BaseDialog<BibEntry> {
      * @param text the identifier text to parse
      */
     private void updateFetcherFromIdentifierText(String text) {
-        if (StringUtil.isBlank(text)) {
-            return;
-        }
-        Optional<Identifier> identifier = Identifier.from(text.trim());
-        if (identifier.isPresent() && isValidIdentifier(identifier.get())) {
-            fetcherForIdentifier(identifier.get()).ifPresent(idFetcher::setValue);
-        }
-    }
-
-    /**
-     * Validates an identifier. DOI and ISBN identifiers are validated,
-     * other identifier types are considered valid by default.
-     *
-     * @param id the identifier to validate
-     * @return true if the identifier is valid, false otherwise
-     */
-    private boolean isValidIdentifier(Identifier id) {
-        return switch (id) {
-            case DOI doi ->
-                    DOI.isValid(doi.asString());
-            case ISBN isbn ->
-                    isbn.isValid();
-            default ->
-                    true;
-        };
+        Identifier.from(text.trim())
+                  .flatMap(identifier -> fetcherForIdentifier(identifier))
+                  .ifPresent(idFetcher::setValue);
     }
 
     private Optional<Identifier> extractValidIdentifierFromClipboard() {
         String clipboardText = ClipBoardManager.getContents().trim();
-
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            Optional<Identifier> identifier = Identifier.from(clipboardText);
-            if (identifier.isPresent()) {
-                Identifier id = identifier.get();
-                if (isValidIdentifier(id)) {
-                    return Optional.of(id);
-                }
-            }
+            return Identifier.from(clipboardText);
         }
-
         return Optional.empty();
     }
 
