@@ -138,4 +138,30 @@ public class ArXivIdentifier extends EprintIdentifier {
             return Optional.empty();
         }
     }
+
+    public static Optional<ArXivIdentifier> findInText(String text) {
+        if (StringUtil.isBlank(text)) {
+            return Optional.empty();
+        }
+
+        String cleanedText = text.split("#")[0];
+
+        Optional<ArXivIdentifier> directParse = parse(cleanedText);
+        if (directParse.isPresent()) {
+            return directParse;
+        }
+
+        Pattern pattern = Pattern.compile(
+                "(?:http(s)?://arxiv.org/(?:abs|html|pdf)/|arxiv:|arXiv:)?"
+                        + "(\\d{4}\\.\\d{4,5})(v\\d+)?",
+                Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher matcher = pattern.matcher(cleanedText);
+        if (matcher.find()) {
+            return parse(matcher.group());
+        }
+
+        return Optional.empty();
+    }
 }

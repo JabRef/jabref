@@ -29,7 +29,7 @@ public class CompositeIdFetcher {
         if (doi.isPresent()) {
             return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().asString());
         }
-        Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
+        Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.findInText(identifier);
         if (arXivIdentifier.isPresent()) {
             return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().asString());
         }
