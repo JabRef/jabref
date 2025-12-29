@@ -2626,6 +2626,11 @@ journalInfo .grid-cell-b {
     -fx-fill: white;
 }
 
+.keybinding-table-icon-cell {
+    -fx-alignment: CENTER-RIGHT;
+    -fx-padding: 0 5 0 0;
+}
+
 /* ThreeWayMergeView */
 .three-way-merge .merged-field .styled-text-area {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
