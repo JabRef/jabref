@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
+- We added a new "Directory structure" group type that automatically creates subgroups mirroring a directory structure from the file system. [#10930](https://github.com/JabRef/jabref/issues/10930)
 
 ### Changed
 
@@ -26,9 +27,7 @@ We fixed an error on startup when using portable preferences. [#14729](https://g
 ### Added
 
 - We added the ability to drag and drop images to the comments field. [#10559](https://github.com/JabRef/jabref/issues/10559)
-- We added a new "Directory structure" group type that automatically creates subgroups mirroring a directory structure from the file system. [#10930](https://github.com/JabRef/jabref/issues/10930)
 - We added functionality to use `,` and `>` symbols inside keywords by putting `\` symbol before them. [#12810](https://github.com/JabRef/jabref/issues/12810)
-- We added a new "Directory" group type that mirrors a directory structure from the file system. Entries belong to this group if they have a linked file within the specified directory. [#10930](https://github.com/JabRef/jabref/issues/10930)
 - We added the `eprinttype` field to the General entry editor tab. [#14555](https://github.com/JabRef/jabref/issues/14555)
 - We added a right-click option to delete custom BST styles in the entry preview. [#14352](https://github.com/JabRef/jabref/issues/14352)
 - Improved merge dialog decisions for fields containing person names (e.g., `author`, `editor`) by using a new plausibility comparator. JabRef now prefers the side with more detailed/complete author information. [#14454](https://github.com/JabRef/jabref/issues/14454)
