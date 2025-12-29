@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabsrv - serve BibTeX files using JabRef
 
-//JAVA 24
+//JAVA 24+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // raw is for https://github.com/unicode-org/icu/pull/2127
@@ -18,11 +18,11 @@
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.8
 //DEPS org.bouncycastle:bcprov-jdk18on:1.83
-//DEPS com.konghq:unirest-modules-gson:4.6.0
+//DEPS com.konghq:unirest-modules-gson:4.7.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.0
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.0
@@ -34,12 +34,12 @@
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
-//DEPS com.konghq:unirest-modules-gson:4.6.0
+//DEPS com.konghq:unirest-modules-gson:4.7.0
 //DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS de.undercouch:citeproc-java:3.4.0
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3 
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 //DEPS tools.jackson.core:jackson-core:3.0.3
 //DEPS tools.jackson.core:jackson-databind:3.0.3
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.3
@@ -78,7 +78,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties

@@ -18,7 +18,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -73,11 +73,14 @@ public class MetaData {
     private Charset encoding;
     private SaveOrder saveOrder;
     private String defaultCiteKeyPattern;
-    private FieldFormatterCleanups saveActions;
+    private FieldFormatterCleanupActions saveActions;
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String librarySpecificFileDirectory;
+
+    @NonNull
     private final ContentSelectors contentSelectors = new ContentSelectors();
+
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
@@ -170,11 +173,11 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<FieldFormatterCleanups> getSaveActions() {
+    public Optional<FieldFormatterCleanupActions> getSaveActions() {
         return Optional.ofNullable(saveActions);
     }
 
-    public void setSaveActions(@NonNull FieldFormatterCleanups saveActions) {
+    public void setSaveActions(@NonNull FieldFormatterCleanupActions saveActions) {
         this.saveActions = saveActions;
         postChange();
     }
@@ -196,25 +199,25 @@ public class MetaData {
         return isProtected;
     }
 
-    public ContentSelectors getContentSelectors() {
+    public @NonNull ContentSelectors getContentSelectors() {
         return contentSelectors;
     }
 
-    public SortedSet<ContentSelector> getContentSelectorsSorted() {
+    public @NonNull SortedSet<@NonNull ContentSelector> getContentSelectorsSorted() {
         return contentSelectors.getContentSelectors();
     }
 
-    public void addContentSelector(ContentSelector contentSelector) {
+    public void addContentSelector(@NonNull ContentSelector contentSelector) {
         this.contentSelectors.addContentSelector(contentSelector);
         postChange();
     }
 
-    public void clearContentSelectors(Field field) {
+    public void clearContentSelectors(@NonNull Field field) {
         contentSelectors.removeSelector(field);
         postChange();
     }
 
-    public List<String> getContentSelectorValuesForField(Field field) {
+    public @NonNull List<@NonNull String> getContentSelectorValuesForField(Field field) {
         return contentSelectors.getSelectorValuesForField(field);
     }
 

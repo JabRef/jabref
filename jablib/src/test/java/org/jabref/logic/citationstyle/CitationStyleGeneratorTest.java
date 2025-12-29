@@ -15,12 +15,17 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("Localization.lang")
 class CitationStyleGeneratorTest {
 
     private static final List<CitationStyle> STYLE_LIST = CSLStyleLoader.getInternalStyles();

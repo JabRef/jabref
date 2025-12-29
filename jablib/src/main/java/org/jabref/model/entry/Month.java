@@ -71,7 +71,7 @@ public enum Month {
      * This method accepts three types of months:
      * - Single and Double Digit months from 1 to 12 (01 to 12)
      * - 3 Digit BibTeX strings (jan, feb, mar...) possibly with # prepended
-     * - Full English Month identifiers.
+     * - Full English month identifiers.
      *
      * @param value the given value
      * @return the corresponding Month instance
@@ -191,7 +191,7 @@ public enum Month {
     }
 
     /**
-     * Returns the name of the long in unabbreviated english.
+     * Returns the name of the long in unabbreviated English.
      *
      * @return Month
      */

@@ -1,11 +1,9 @@
 package org.jabref.gui.commonfxcontrols;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
+import javafx.geometry.Pos;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -14,7 +12,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -30,7 +27,6 @@ import org.controlsfx.control.SearchableComboBox;
 
 public class FieldFormatterCleanupsPanel extends VBox {
 
-    @FXML private CheckBox cleanupsEnabled;
     @FXML private TableView<FieldFormatterCleanup> cleanupsList;
     @FXML private TableColumn<FieldFormatterCleanup, Field> fieldColumn;
     @FXML private TableColumn<FieldFormatterCleanup, Formatter> formatterColumn;
@@ -77,6 +73,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
                 .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(field -> Localization.lang("Remove formatter for %0", FieldTextMapper.getDisplayName(field)))
                 .withOnMouseClickedEvent(_ -> _ -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem()))
+                .withContentAlignment(Pos.CENTER)
                 .install(actionsColumn);
 
         viewModel.selectedCleanupProperty().setValue(cleanupsList.getSelectionModel());
@@ -113,11 +110,6 @@ public class FieldFormatterCleanupsPanel extends VBox {
     }
 
     private void setupBindings() {
-        BindingsHelper.bindBidirectional((ObservableValue<Boolean>) cleanupsEnabled.selectedProperty(),
-                viewModel.cleanupsDisableProperty(),
-                disabled -> cleanupsEnabled.selectedProperty().setValue(!disabled),
-                selected -> viewModel.cleanupsDisableProperty().setValue(!selected));
-
         cleanupsList.itemsProperty().bind(viewModel.cleanupsListProperty());
         addableFields.itemsProperty().bind(viewModel.availableFieldsProperty());
         addableFields.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
@@ -138,10 +130,6 @@ public class FieldFormatterCleanupsPanel extends VBox {
     @FXML
     private void addCleanup() {
         viewModel.addCleanup();
-    }
-
-    public BooleanProperty cleanupsDisableProperty() {
-        return viewModel.cleanupsDisableProperty();
     }
 
     public ListProperty<FieldFormatterCleanup> cleanupsProperty() {

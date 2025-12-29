@@ -64,7 +64,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         }
 
         // Using Injector to avoid widespread refactoring for constructor injection.
-        // Class that calls formatters (FieldFormatterCleanups.java) has many usages that would need updates.
+        // Class that calls formatters (FieldFormatterCleanupActions.java) has many usages that would need updates.
         JabRefCliPreferences cliPreferences = Injector.instantiateModelOrService(JabRefCliPreferences.class);
 
         // get preferences for BibEntry

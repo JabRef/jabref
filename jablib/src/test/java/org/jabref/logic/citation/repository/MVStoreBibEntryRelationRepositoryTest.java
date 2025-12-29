@@ -14,8 +14,11 @@ import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -27,6 +30,8 @@ import org.jabref.support.DisabledOnCIServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
@@ -38,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @DisabledOnCIServer("Strange out of memory exceptions, works with manual testing")
+@Execution(ExecutionMode.SAME_THREAD)
 class MVStoreBibEntryRelationRepositoryTest {
 
     private final static String MV_STORE_NAME = "test-relations.mv";
@@ -58,7 +64,8 @@ class MVStoreBibEntryRelationRepositoryTest {
                 7,
                 new BibEntryTypesManager(),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
     }
 
     @AfterEach
@@ -92,7 +99,7 @@ class MVStoreBibEntryRelationRepositoryTest {
         return entry
                 .getCitationKey()
                 .map(key -> RandomGenerator.StreamableGenerator
-                        .of("L128X256MixRandom").ints(150)
+                        .of("L128X256MixRandom").ints(12) // 12 is arbitrary here. We just want some relations. We do not do any "load" testing.
                         .mapToObj(i -> new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.TITLE, "A title: " + i)
                                 .withField(StandardField.YEAR, String.valueOf(2024))
@@ -197,7 +204,8 @@ class MVStoreBibEntryRelationRepositoryTest {
                 30,
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
         assertTrue(daoUnderTest.shouldUpdate(entry, clock));
 
         // WHEN
@@ -229,13 +237,15 @@ class MVStoreBibEntryRelationRepositoryTest {
                 }
         );
         Path file = Files.createFile(temporaryFolder.resolve("serialization_error_" + MV_STORE_NAME));
-        MVStoreBibEntryRelationRepository daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
+        MVStoreBibEntryRelationRepository daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer,
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
         List<BibEntry> relations = createRelations(entry);
 
         // WHEN
         daoUnderTest.addRelations(entry, relations);
         daoUnderTest.close();
-        daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
+        daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer,
+                new SimpleObjectProperty<>(CitationFetcherType.SEMANTIC_SCHOLAR));
         List<BibEntry> deserializedRelations = daoUnderTest.getRelations(entry);
 
         // THEN

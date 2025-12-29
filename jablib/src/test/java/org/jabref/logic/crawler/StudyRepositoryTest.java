@@ -115,19 +115,19 @@ class StudyRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
     void quantumFilesCreated(String fileName) {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
     void cloudComputingFilesCreated(String fileName) {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
     void softwareEngineeringFilesCreated(String fileName) {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", fileName)));
     }

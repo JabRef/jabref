@@ -15,6 +15,10 @@ jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
     }
+    conflictResolution {
+        select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
+        select("org.gradlex:jna-platform", "net.java.dev.jna:jna-platform-jpms")
+    }
 }
 
 // Tell gradle which jar to use for which platform
@@ -69,7 +73,6 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
-
 }
 
 extraJavaModuleInfo {
@@ -147,7 +150,6 @@ extraJavaModuleInfo {
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
     module("com.squareup.okhttp3:okhttp", "okhttp3")
-    module("com.squareup.okhttp3:okhttp-jvm", "okhttp3")
     module("com.squareup.okhttp3:okhttp-jvm-sse", "okhttp3.sse")
     module("com.squareup.okio:okio", "okio")
     module("com.squareup.retrofit2:converter-jackson", "retrofit2.converter.jackson")

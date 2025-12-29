@@ -148,7 +148,7 @@
 
     In future, **please avoid that**. For now, you can continue working.
 - jobName: 'Conflicts with target branch'
-  workflowName: 'On PR opened/updated'
+  workflowName: 'On PR opened/updated (check)'
   message: >
     Your pull request conflicts with the target branch.
 
@@ -189,12 +189,14 @@
   workflowName: 'Check PR Format'
   always: true
   message: >
-    You have removed the "Mandatory Checks" section from your pull request description. Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L10).
+    You have removed the "Mandatory Checks" section from your pull request description.
+    Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
 - jobName: 'PR checklist OK'
   workflowName: 'Check PR Format'
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
+    Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
 - jobName: 'Determine issue number'
   workflowName: 'Link PR to Issue'
   always: true

@@ -17,7 +17,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
@@ -63,6 +63,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
@@ -80,6 +81,7 @@ import static org.mockito.Mockito.when;
  * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
  */
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
+@ResourceLock("Localization.lang")
 class BibtexParserTest {
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private ImportFormatPreferences importFormatPreferences;
@@ -1217,7 +1219,7 @@ class BibtexParserTest {
 
                         @comment{jabref-meta: saveActions:enabled;title[lower_case]}"""));
 
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
@@ -1250,7 +1252,7 @@ class BibtexParserTest {
                         ;}
                         """));
 
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
 
@@ -1307,7 +1309,7 @@ class BibtexParserTest {
         ParserResult parserResult = parser
                 .parse(Reader.of("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
 
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),

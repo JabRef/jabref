@@ -19,7 +19,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
@@ -54,6 +54,9 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,6 +67,8 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
  */
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class BibDatabaseWriterTest {
 
     private BibDatabaseWriter databaseWriter;
@@ -739,7 +744,7 @@ class BibDatabaseWriterTest {
 
     @Test
     void writeSaveActions() throws IOException {
-        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
+        FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
                 Arrays.asList(
                         new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()),
                         new FieldFormatterCleanup(StandardField.JOURNAL, new TitleCaseFormatter()),
