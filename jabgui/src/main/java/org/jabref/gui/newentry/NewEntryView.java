@@ -304,20 +304,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             }
         });
 
-        // [impl->req~newentry.clipboard.autofocus~1]
-        Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
-        if (validClipboardId.isPresent()) {
-            idText.setText(ClipBoardManager.getContents().trim());
-            idText.selectAll();
-
-            Identifier id = validClipboardId.get();
-            Platform.runLater(() -> {
-                idLookupSpecify.setSelected(true);
-                fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
-            });
-        } else {
-            Platform.runLater(() -> idLookupGuess.setSelected(true));
-        }
+        extractIdentifierFromClipboard()
+                .ifPresentOrElse(identifier -> {
+                            idText.setText(ClipBoardManager.getContents().trim());
+                            idText.selectAll();
+                            Platform.runLater(() -> {
+                                // [impl->req~newentry.clipboard.autofocus~1]
+                                idLookupSpecify.setSelected(true);
+                                fetcherForIdentifier(identifier).ifPresent(idFetcher::setValue);
+                            });
+                        },
+                        () -> Platform.runLater(() -> idLookupGuess.setSelected(true)));
 
         idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
             preferences.setIdLookupGuessing(newValue);
@@ -679,7 +676,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                   .ifPresent(idFetcher::setValue);
     }
 
-    private Optional<Identifier> extractValidIdentifierFromClipboard() {
+    private Optional<Identifier> extractIdentifierFromClipboard() {
         String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
             return Identifier.from(clipboardText);
