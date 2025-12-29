@@ -10,18 +10,19 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.util.MarkdownTextFlow;
 import org.jabref.logic.ai.util.ChatMessageUtils;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -44,7 +45,8 @@ public class ChatMessageComponent extends HBox {
     @FXML private VBox buttonsVBox;
 
     private final MarkdownTextFlow markdownTextFlow;
-    private String selectedText;
+    private String selectedText = "";
+    private final ClipBoardManager clipBoardManager = new ClipBoardManager(Injector.instantiateModelOrService(StateManager.class));
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
@@ -80,14 +82,9 @@ public class ChatMessageComponent extends HBox {
                                 ? this.selectedText
                                 : ChatMessageUtils.getContent(chatMessage.get()).orElse("");
 
-            if (textToCopy.isEmpty()) {
-                return;
+            if (!textToCopy.isEmpty()) {
+                clipBoardManager.setContent(textToCopy);
             }
-
-            final Clipboard clipboard = Clipboard.getSystemClipboard();
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(textToCopy);
-            clipboard.setContent(content);
         });
 
         contextMenu.getItems().add(copyItem);
@@ -105,7 +102,8 @@ public class ChatMessageComponent extends HBox {
                     } else {
                         this.selectedText = "";
                     }
-                } catch (AssertionError | Exception e) {
+                } catch (AssertionError | IndexOutOfBoundsException e) {
+                    LOGGER.debug("Failed to extract selection indices for copy action", e);
                     this.selectedText = "";
                 }
             }
