@@ -20,7 +20,11 @@ import org.jabref.model.entry.field.Field;
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public interface Identifier {
 
-    /// @returns the identifier as String
+    /**
+     * Returns the identifier as String
+     *
+     * @return the identifier as String
+     */
     String asString();
 
     Field getDefaultField();
