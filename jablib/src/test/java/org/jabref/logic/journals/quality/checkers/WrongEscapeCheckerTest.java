@@ -1,13 +1,14 @@
 package org.jabref.logic.journals.quality.checkers;
 
+import java.util.List;
+
 import org.jabref.logic.journals.quality.AbbreviationEntry;
 import org.jabref.logic.journals.quality.Finding;
 import org.jabref.logic.journals.quality.Severity;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WrongEscapeCheckerTest {
 
