@@ -87,25 +87,23 @@ public class AutoSetFileLinksUtil {
         return result;
     }
 
-    /**
-     * Source of associated not linked files:
-     * Part A. match file name with CitationKey, (START, EXACT, REGEX) configured by user
-     * Part B. match file name with broken linked file names, currently silently happen
-     *
-     * The auto-link process:
-     * Prolog: we only consider the file with a unique name
-     *         if a file's name is found multiple times in Part A, we do not consider it in Step 1
-     *         if a file's name is found multiple times in Part B, we do not consider it in Step 2
-     * Step 1. try to auto link each broken linked file with Part A at first. For unlinked files left in Part A, if no
-     *         linked file with same name exists, add them
-     *         why `add`: Part A are found mainly by CitationKey, which has strong connection to the entry, so we are
-     *                    confident that we should add them automatically
-     * Step 2. try to auto link each broken linked file with Part B.
-     *         how about `unlinked files left in Part B`: there should be no files left as they are found based on broken
-     *                                                    linked files and are used to fix them. `files left` hints a bug
-     *         one trick: we accumulate Part B after Step 1, so Part A does not affect those broken linked files we use
-     *                    to query Part B
-     */
+    /// Source of associated not linked files:
+    ///   - Part A. match file name with CitationKey, (START, EXACT, REGEX) configured by user
+    ///   - Part B. match file name with broken linked file names, currently silently happen
+    ///
+    /// The auto-link process:
+    ///   - Prolog: we only consider the file with a unique name
+    ///       - if a file's name is found multiple times in Part A, we do not consider it in Step 1
+    ///       - if a file's name is found multiple times in Part B, we do not consider it in Step 2
+    ///   - Step 1. try to auto link each broken linked file with Part A at first. For unlinked files left in Part A, if no
+    ///         linked file with same name exists, add them
+    ///       - why `add`: Part A are found mainly by CitationKey, which has strong connection to the entry, so we are
+    ///                    confident that we should add them automatically
+    ///   - Step 2. try to auto link each broken linked file with Part B.
+    ///       - how about `unlinked files left in Part B`: there should be no files left as they are found based on broken
+    ///                                                    linked files and are used to fix them. `files left` hints a bug
+    ///       - one trick: we accumulate Part B after Step 1, so Part A does not affect those broken linked files we use
+    ///                    to query Part B
     private void doLinkAssociatedFiles(BibEntry entry, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile, LinkFilesResult result) {
         boolean entryUpdated = false;
         // Step 1: try matched files based on CitationKey configured by user
