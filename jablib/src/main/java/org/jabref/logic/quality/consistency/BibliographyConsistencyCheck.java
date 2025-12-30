@@ -76,13 +76,13 @@ public class BibliographyConsistencyCheck {
                       .filter(entry ->
                               // This removes entries that have all differing fields set (could be confusing to the user)
                               !Collections.disjoint(entry.getFields(), differingFields)
-                              // This ensures that all entries with missing required fields are included
-                              // This checks if any required OrFields has at least one field that's not in the entry
-                              || (requiredFields.stream()
-                                      .map(OrFields::getFields)
-                                      .anyMatch(subfields ->
-                                              Collections.disjoint(subfields, entry.getFields())
-                                      )
+                                      // This ensures that all entries with missing required fields are included
+                                      // This checks if any required OrFields has at least one field that's not in the entry
+                                      || (requiredFields.stream()
+                                                        .map(OrFields::getFields)
+                                                        .anyMatch(subfields ->
+                                                                Collections.disjoint(subfields, entry.getFields())
+                                                        )
                               )
                       )
                       .sorted(new FieldComparatorStack<>(List.of(

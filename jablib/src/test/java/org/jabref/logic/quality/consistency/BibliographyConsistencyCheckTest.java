@@ -516,14 +516,14 @@ class BibliographyConsistencyCheckTest {
         );
 
         Set<OrFields> requiredFields = Set.of(StandardField.AUTHOR, StandardField.TITLE, StandardField.PAGES, StandardField.PDF).stream()
-                .map(OrFields::new)
-                .collect(Collectors.toSet());
+                                          .map(OrFields::new)
+                                          .collect(Collectors.toSet());
 
         List<BibEntry> result = new BibliographyConsistencyCheck().filterAndSortEntriesWithFieldDifferences(
                 Set.of(entry1, entry2, entry3, entry4, entry5),
                 differingFields,
                 requiredFields
-                );
+        );
 
         assertEquals(List.of(entry1, entry2, entry3, entry4, entry5), result);
     }
