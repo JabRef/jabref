@@ -10,7 +10,7 @@ class AbbreviationsTest {
     private JournalAbbreviationRepository repository;
 
     @BeforeEach
-     void setUp() {
+    void setUp() {
         repository = JournalAbbreviationLoader.loadBuiltInRepository();
     }
 

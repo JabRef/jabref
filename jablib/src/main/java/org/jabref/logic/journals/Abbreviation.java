@@ -25,7 +25,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
     public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
         this(name,
                 abbreviation,
-                // "L. N." becomes "L N ", we need to remove the double spaces in between
+                // "L. N." becomes "L  N ", we need to remove the double spaces inbetween
                 abbreviation.replace(".", " ").replace("  ", " ").trim(),
                 shortestUniqueAbbreviation.trim());
     }

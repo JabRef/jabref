@@ -13,8 +13,8 @@ class WrongEscapeCheckerTest {
 
     @Test
     void detectsEscapeInFullName() {
-        AbbreviationEntry entry = new AbbreviationEntry("Zeszyty Naukowe W\\y", "Problemy Mat.");
-        WrongEscapeChecker checker = new WrongEscapeChecker();
+        AbbreviationEntry entry =new AbbreviationEntry("Zeszyty Naukowe W\\y", "Problemy Mat.");
+                   WrongEscapeChecker checker = new WrongEscapeChecker();
         List<Finding> findings = checker.check(List.of(entry));
 
         assertEquals(1, findings.size());
