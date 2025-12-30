@@ -323,9 +323,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
         idFetcher.disableProperty().bind(idLookupSpecify.selectedProperty().not());
         idFetcher.valueProperty().bindBidirectional(viewModel.idFetcherProperty());
-        IdBasedFetcher initialFetcher = fetcherFromName(newEntryPreferences.getLatestIdFetcher(), idFetcher.getItems());
+        IdBasedFetcher initialFetcher = fetcherFromName(newEntryPreferences.getLatestIdFetcher());
         if (initialFetcher == null) {
-            initialFetcher = fetcherFromName(DoiFetcher.NAME, idFetcher.getItems());
+            initialFetcher = fetcherFromName(DoiFetcher.NAME);
         }
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> newEntryPreferences.setLatestIdFetcher(idFetcher.getValue().getName()));
@@ -528,7 +528,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return null;
     }
 
-    private static String descriptionOfStandardEntryType(StandardEntryType type) {
+    private static @NonNull String descriptionOfStandardEntryType(StandardEntryType type) {
         // These descriptions are taken from subsection 2.1 of the biblatex package documentation.
         // Biblatex is a superset of bibtex, with more elaborate descriptions, so its documentation is preferred.
         // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
@@ -600,7 +600,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         };
     }
 
-    private static String descriptionOfNonStandardEntryType(BiblatexNonStandardEntryType type) {
+    private static @NonNull String descriptionOfNonStandardEntryType(BiblatexNonStandardEntryType type) {
         // These descriptions are taken from subsection 2.1.3 of the biblatex package documentation.
         // Non-standard Types (BibLaTeX only) - these use the @misc driver in standard bibliography styles.
         // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
@@ -638,8 +638,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         };
     }
 
-    private static IdBasedFetcher fetcherFromName(String fetcherName, List<IdBasedFetcher> fetchers) {
-        for (IdBasedFetcher fetcher : fetchers) {
+    private @Nullable IdBasedFetcher fetcherFromName(String fetcherName) {
+        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if (fetcher.getName().equals(fetcherName)) {
                 return fetcher;
             }
@@ -666,6 +666,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private void updateFetcherFromIdentifierText(@Nullable String text) {
         Identifier.from(text)
                   .flatMap(identifier -> WebFetchers.getIdBasedFetcherFoIdentifier(identifier, preferences.getImportFormatPreferences()))
+                .map(fetcher -> fetcherFromName(fetcher.getName()))
                   .ifPresent(idFetcher::setValue);
     }
 

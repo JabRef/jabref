@@ -102,6 +102,8 @@ public class WebFetchers {
     public static Optional<IdBasedFetcher> getIdBasedFetcherFoIdentifier(Identifier identifier, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
+        // All identifiers listed here should also appear at {@link org.jabref.gui.mergeentries.FetchAndMergeEntry.SUPPORTED_FIELDS} and vice versa.
+
         return Optional.ofNullable(
                 switch (identifier) {
                     case ArXivIdentifier _ ->
