@@ -28,7 +28,7 @@ A singleton can be added by `com.airhacks.afterburner.injection.Injector#setMode
 
 We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themselves are independent of any logic and therefore easy to test.
 
-Example: [NormalizePagesFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/formatter/bibtexfields/NormalizePagesFormatter.java)
+Example: [NormalizePagesFormatter](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/formatter/bibtexfields/NormalizePagesFormatter.java)
 
 ## Drag and Drop
 
@@ -72,7 +72,7 @@ org.jabref.logic.util.io.FileUtil.relativize(java.nio.file.Path, org.jabref.mode
 
 `model` and `logic` must not know `JabRefPreferences`. See `ProxyPreferences` for encapsulated preferences and [https://github.com/JabRef/jabref/pull/658](https://github.com/JabRef/jabref/pull/658) for a detailed discussion.
 
-See [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java) (via [https://github.com/JabRef/jabref/pull/3092](https://github.com/JabRef/jabref/pull/3092)) for the current way how to deal with preferences.
+See [https://github.com/JabRef/jabref/blob/master/jablib/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java) (via [https://github.com/JabRef/jabref/pull/3092](https://github.com/JabRef/jabref/pull/3092)) for the current way how to deal with preferences.
 
 Defaults should go into the model package. See [Comments in this Commit](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484)
 
