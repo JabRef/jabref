@@ -21,6 +21,7 @@ public class ArXivIdentifier extends EprintIdentifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);
 
     private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|html|pdf)/|arxiv|arXiv";
+    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
     private final String identifier;
     private final String classification;
     private final String version;
@@ -41,8 +42,7 @@ public class ArXivIdentifier extends EprintIdentifier {
 
     public static Optional<ArXivIdentifier> parse(String value) {
         String identifier = value.replace(" ", "");
-        Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
-        Matcher identifierMatcher = identifierPattern.matcher(identifier);
+        Matcher identifierMatcher = IDENTIFIER_PATTERN.matcher(identifier);
         if (identifierMatcher.matches()) {
             return getArXivIdentifier(identifierMatcher);
         }
@@ -144,20 +144,12 @@ public class ArXivIdentifier extends EprintIdentifier {
             return Optional.empty();
         }
 
-        String cleanedText = text.split("#")[0];
-
-        Optional<ArXivIdentifier> directParse = parse(cleanedText);
+        Optional<ArXivIdentifier> directParse = parse(text);
         if (directParse.isPresent()) {
             return directParse;
         }
 
-        Pattern pattern = Pattern.compile(
-                "(?:http(s)?://arxiv.org/(?:abs|html|pdf)/|arxiv:|arXiv:)?"
-                        + "(\\d{4}\\.\\d{4,5})(v\\d+)?",
-                Pattern.CASE_INSENSITIVE
-        );
-
-        Matcher matcher = pattern.matcher(cleanedText);
+        Matcher matcher = IDENTIFIER_PATTERN.matcher(text);
         if (matcher.find()) {
             return parse(matcher.group());
         }
