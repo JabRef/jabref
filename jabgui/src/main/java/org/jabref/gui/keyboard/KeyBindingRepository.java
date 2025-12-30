@@ -17,8 +17,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.logic.os.OS;
-
 /**
  * Handles keyboard shortcuts. Including checking whether a keybinding matches.
  * See {@link #matches}.
@@ -155,9 +153,6 @@ public class KeyBindingRepository {
         String binding = get(bindName.getConstant());
         if (binding.isEmpty()) {
             return Optional.empty();
-        }
-        if (OS.OS_X) {
-            binding = binding.replace("ctrl", "meta");
         }
         return Optional.of(KeyCombination.valueOf(binding));
     }
