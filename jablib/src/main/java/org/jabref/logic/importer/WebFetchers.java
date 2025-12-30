@@ -47,6 +47,7 @@ import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
+import org.jabref.logic.importer.fetcher.SsrnFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
@@ -105,16 +106,18 @@ public class WebFetchers {
                 switch (identifier) {
                     case ArXivIdentifier _ ->
                             new ArXivFetcher(importFormatPreferences);
-                    case DOI _, SSRN _ ->
+                    case DOI _ ->
                             new DoiFetcher(importFormatPreferences);
                     case IacrEprint _ ->
-                        new IacrEprintFetcher(importFormatPreferences);
+                            new IacrEprintFetcher(importFormatPreferences);
                     case ISBN _ ->
                             new IsbnFetcher(importFormatPreferences);
                     case ISSN _ ->
                             new IssnFetcher();
                     case RFC _ ->
                             new RfcFetcher(importFormatPreferences);
+                    case SSRN _ ->
+                            new SsrnFetcher(importFormatPreferences);
                     // No fetcher for ARK and MathSciNet
                     default ->
                             null;
