@@ -74,10 +74,11 @@ public class BibliographyConsistencyCheck {
     List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<OrFields> requiredFields) {
         return entries.stream()
                       .filter(entry ->
-                              // This removes entries that have all differing fields set (could be confusing to the user)
-                              !Collections.disjoint(entry.getFields(), differingFields)
-                                      // This ensures that all entries with missing required fields are included
-                                      // This checks if any required OrFields has at least one field that's not in the entry
+                              // Handles violation: this entry is inconsistent because it sets a field
+                              // that not every other entry of its type sets (differing field)
+                              !Collections.disjoint(filterExcludedFields(entry.getFields()), differingFields)
+                                      // Handles violation: this entry is inconsistent because it does not set fields
+                                      // for its type that specify required fields
                                       || (requiredFields.stream()
                                                         .map(OrFields::getFields)
                                                         .anyMatch(subfields ->
@@ -146,10 +147,6 @@ public class BibliographyConsistencyCheck {
 
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
             assert entries != null;
-            if (entries == null || entries.size() <= 1 || differingFields.isEmpty()) {
-                // entries.size == 1 can happen if there is only one entry for one type. (E.g., only one `@Book` entry)
-                continue;
-            }
 
             List<BibEntry> sortedEntries = filterAndSortEntriesWithFieldDifferences(entries, differingFields, requiredFields);
             if (!sortedEntries.isEmpty()) {

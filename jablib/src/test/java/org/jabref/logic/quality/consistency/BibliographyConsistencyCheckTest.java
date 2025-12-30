@@ -384,9 +384,15 @@ class BibliographyConsistencyCheckTest {
     void checkLibraryWithoutIssues(@TempDir Path tempDir) {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNALTITLE, "some journal title")
+                .withField(StandardField.DATE, "some date")
                 .withField(StandardField.PAGES, "some pages");
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNALTITLE, "some other journal title")
+                .withField(StandardField.DATE, "some date")
                 .withField(StandardField.PAGES, "some pages");
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
@@ -411,6 +417,7 @@ class BibliographyConsistencyCheckTest {
 
         BibDatabase bibDatabase = new BibDatabase(List.of(a, b));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
                 .check(bibContext, entryTypesManager, (_, _) -> {
