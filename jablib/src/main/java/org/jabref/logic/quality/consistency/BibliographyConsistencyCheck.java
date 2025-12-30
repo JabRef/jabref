@@ -105,7 +105,7 @@ public class BibliographyConsistencyCheck {
      * Computation takes place grouped by each entryType.
      * Computes the fields set in all entries. In case entries of the same type has more fields defined, it is output.
      * <p>
-     * This class <em>does not</em> check whether all required fields are present or if the fields are valid for the entry type.
+     * This class <em>does</em> check if required fields are set for an entry type but <em>does not</em> check if the fields are valid for the entry type.
      * That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
      *
      * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
