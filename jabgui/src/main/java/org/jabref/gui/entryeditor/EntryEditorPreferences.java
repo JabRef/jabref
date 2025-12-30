@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.model.entry.field.Field;
 
 public class EntryEditorPreferences {
@@ -49,6 +50,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty allowIntegerEditionBibtex;
     private final BooleanProperty autoLinkFiles;
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
+    private final ObjectProperty<CitationFetcherType> citationFetcherType;
     private final BooleanProperty shouldShowSciteTab;
     private final BooleanProperty shouldShowCitationContextTab;
     private final BooleanProperty showUserCommentsFields;
@@ -67,6 +69,7 @@ public class EntryEditorPreferences {
                                   boolean allowIntegerEditionBibtex,
                                   boolean autolinkFilesEnabled,
                                   JournalPopupEnabled journalPopupEnabled,
+                                  CitationFetcherType citationFetcherType,
                                   boolean showSciteTab,
                                   boolean showCitationContextTab,
                                   boolean showUserCommentsFields,
@@ -85,6 +88,7 @@ public class EntryEditorPreferences {
         this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
+        this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
         this.shouldShowCitationContextTab = new SimpleBooleanProperty(showCitationContextTab);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
@@ -237,6 +241,18 @@ public class EntryEditorPreferences {
 
     public void setEnableJournalPopup(JournalPopupEnabled journalPopupEnabled) {
         this.enablementStatus.set(journalPopupEnabled);
+    }
+
+    public CitationFetcherType getCitationFetcherType() {
+        return citationFetcherType.get();
+    }
+
+    public void setCitationFetcherType(CitationFetcherType citationFetcherType) {
+        this.citationFetcherType.set(citationFetcherType);
+    }
+
+    public ObjectProperty<CitationFetcherType> citationFetcherTypeProperty() {
+        return citationFetcherType;
     }
 
     public boolean shouldShowSciteTab() {

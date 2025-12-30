@@ -443,7 +443,7 @@ public class JabRefDialogService implements DialogService {
     public void notify(String message) {
         // TODO: Change to a notification overview instead of event log when that is available.
         //       The event log is not that user friendly (different purpose).
-        LOGGER.info(message);
+        LOGGER.debug(message);
 
         UiTaskExecutor.runInJavaFXThread(() ->
                 Notifications.create()
