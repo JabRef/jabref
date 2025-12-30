@@ -470,7 +470,6 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
             entryEditorPreferences.setCitationFetcherType(newValue);
             searchForRelations(citingComponents, citedByComponents);
-            searchForRelations(citedByComponents, citingComponents);
         });
 
         // Create SplitPane to hold all nodes above
