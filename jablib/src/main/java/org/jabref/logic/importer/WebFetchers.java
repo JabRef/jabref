@@ -55,8 +55,14 @@ import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.identifier.ISSN;
+import org.jabref.model.entry.identifier.IacrEprint;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.model.entry.identifier.RFC;
+import org.jabref.model.entry.identifier.SSRN;
 
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
@@ -70,6 +76,7 @@ public class WebFetchers {
     private WebFetchers() {
     }
 
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences) ]
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(Field field, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
@@ -88,6 +95,30 @@ public class WebFetchers {
             }
         }
         return Optional.of(fetcher);
+    }
+
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field, ImportFormatPreferences) ]
+    public static Optional<IdBasedFetcher> getIdBasedFetcherFoIdentifier(Identifier identifier, ImportFormatPreferences importFormatPreferences) {
+        IdBasedFetcher fetcher;
+
+        return Optional.ofNullable(
+                switch (identifier) {
+                    case ArXivIdentifier _ ->
+                            new ArXivFetcher(importFormatPreferences);
+                    case DOI _, SSRN _ ->
+                            new DoiFetcher(importFormatPreferences);
+                    case IacrEprint _ ->
+                        new IacrEprintFetcher(importFormatPreferences);
+                    case ISBN _ ->
+                            new IsbnFetcher(importFormatPreferences);
+                    case ISSN _ ->
+                            new IssnFetcher();
+                    case RFC _ ->
+                            new RfcFetcher(importFormatPreferences);
+                    // No fetcher for ARK and MathSciNet
+                    default ->
+                            null;
+                });
     }
 
     @SuppressWarnings("unchecked")
