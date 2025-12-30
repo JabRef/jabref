@@ -276,14 +276,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         "</font>__NEWLINE__");
         // endregion
 
-        // region NameDisplayPreferences
-        defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
-        defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
-        defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
-        defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
-        defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
-        // endregion
-
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
     }
@@ -339,6 +331,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
+        getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
     }
 
     @Override
@@ -361,6 +354,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
+        getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -943,19 +937,59 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         nameDisplayPreferences = new NameDisplayPreferences(
                 getNameDisplayStyle(),
-                getNameAbbreviationStyle());
+                getNameAbbreviationStyle()
+        );
 
         EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
             putBoolean(NAMES_AS_IS, newValue == NameDisplayPreferences.DisplayStyle.AS_IS);
             putBoolean(NAMES_FIRST_LAST, newValue == NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME);
         });
+
         EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (obs, oldValue, newValue) -> {
-            putBoolean(ABBR_AUTHOR_NAMES, newValue == NameDisplayPreferences.AbbreviationStyle.FULL);
-            putBoolean(NAMES_LAST_ONLY, newValue == NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY);
+            putBoolean(ABBR_AUTHOR_NAMES,
+                    newValue != NameDisplayPreferences.AbbreviationStyle.NONE);
+            putBoolean(NAMES_LAST_ONLY,
+                    newValue == NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY);
         });
 
         return nameDisplayPreferences;
+    }
+
+    private NameDisplayPreferences getNameDisplayPreferencesFromBackingStore(
+            NameDisplayPreferences defaults) {
+
+        boolean namesAsIs = getBoolean(NAMES_AS_IS, false);
+        boolean namesFirstLast = getBoolean(NAMES_FIRST_LAST, false);
+        boolean namesNatbib = getBoolean(NAMES_NATBIB, true);
+
+        boolean abbreviateNames = getBoolean(ABBR_AUTHOR_NAMES, true);
+        boolean namesLastOnly = getBoolean(NAMES_LAST_ONLY, true);
+
+        // ---- DisplayStyle mapping ----
+        NameDisplayPreferences.DisplayStyle displayStyle;
+        if (namesAsIs) {
+            displayStyle = NameDisplayPreferences.DisplayStyle.AS_IS;
+        } else if (namesFirstLast) {
+            displayStyle = NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+        } else if (namesNatbib) {
+            displayStyle = NameDisplayPreferences.DisplayStyle.NATBIB;
+        } else {
+            // safe fallback
+            displayStyle = defaults.getDisplayStyle();
+        }
+
+        // ---- AbbreviationStyle mapping ----
+        NameDisplayPreferences.AbbreviationStyle abbreviationStyle;
+        if (!abbreviateNames) {
+            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.NONE;
+        } else if (namesLastOnly) {
+            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
+        } else {
+            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.FULL;
+        }
+
+        return new NameDisplayPreferences(displayStyle, abbreviationStyle);
     }
 
     private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyle() {
