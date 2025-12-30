@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
@@ -70,13 +71,20 @@ public class BibliographyConsistencyCheck {
     ///
     /// Additionally, the entries are sorted
     @VisibleForTesting
-    List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> requiredFields) {
+    List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<OrFields> requiredFields) {
         return entries.stream()
                       .filter(entry ->
                               // This removes entries that have all differing fields set (could be confusing to the user)
                               !Collections.disjoint(entry.getFields(), differingFields)
-                                      // This ensures that all entries with missing required fields are included
-                                      || !entry.getFields().containsAll(requiredFields))
+                              // This ensures that all entries with missing required fields are included
+                              // This checks if any required OrFields has at least one field that's not in the entry
+                              || (requiredFields.stream()
+                                      .map(OrFields::getFields)
+                                      .anyMatch(subfields ->
+                                              Collections.disjoint(subfields, entry.getFields())
+                                      )
+                              )
+                      )
                       .sorted(new FieldComparatorStack<>(List.of(
                               new BibEntryByCitationKeyComparator(),
                               new BibEntryByFieldsComparator()
@@ -132,11 +140,9 @@ public class BibliographyConsistencyCheck {
                                                                     .filter(def -> def.getType().equals(entryType))
                                                                     .findFirst();
 
-            Set<Field> requiredFields = typeDefOpt.map(typeDef ->
-                    typeDef.getRequiredFields().stream()
-                           .flatMap(orFields -> orFields.getFields().stream())
-                           .collect(Collectors.toSet())
-            ).orElse(Set.of());
+            Set<OrFields> requiredFields = typeDefOpt.map(typeDef ->
+                    new HashSet<>(typeDef.getRequiredFields())
+            ).orElse(new HashSet<>());
 
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
             assert entries != null;

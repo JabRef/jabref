@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -15,6 +16,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -463,10 +465,16 @@ class BibliographyConsistencyCheckTest {
                 new UnknownField("customField"),
                 StandardField.PUBLISHER
         );
+
+        Set<OrFields> requiredFields = Set.of(StandardField.AUTHOR, StandardField.TITLE, StandardField.PAGES, StandardField.PDF).stream()
+                .map(OrFields::new)
+                .collect(Collectors.toSet());
+
         List<BibEntry> result = new BibliographyConsistencyCheck().filterAndSortEntriesWithFieldDifferences(
                 Set.of(entry1, entry2, entry3, entry4, entry5),
                 differingFields,
-                Set.of(StandardField.AUTHOR, StandardField.TITLE, StandardField.PAGES, StandardField.PDF));
+                requiredFields
+                );
 
         assertEquals(List.of(entry1, entry2, entry3, entry4, entry5), result);
     }
