@@ -44,7 +44,7 @@ public class ChatMessageComponent extends HBox {
     @FXML private VBox buttonsVBox;
 
     private final MarkdownTextFlow markdownTextFlow;
-    private String selectedText = "";
+    //    private String selectedText = "";
     @Inject private ClipBoardManager clipBoardManager;
 
     public ChatMessageComponent() {
@@ -75,26 +75,31 @@ public class ChatMessageComponent extends HBox {
     private void setupContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem copyItem = new MenuItem(Localization.lang("Copy"));
-
-        copyItem.setOnAction(_ -> {
-            String textToCopy = getTextToCopy();
-            if (!textToCopy.isEmpty()) {
-                clipBoardManager.setContent(textToCopy);
-            }
-        });
-
         contextMenu.getItems().add(copyItem);
 
+        // 1. Capture and LOCK the selection state
         markdownContentPane.addEventFilter(MOUSE_PRESSED, event -> {
-            if (!event.isSecondaryButtonDown()) {
-                return;
+            if (event.isSecondaryButtonDown() && markdownTextFlow.isSelectionActive()) {
+                // Consume the event to prevent JavaFX from clearing the selection highlight
+                event.consume();
+                // Manually trigger the context menu since we consumed the event that usually triggers it
+                contextMenu.show(markdownContentPane, event.getScreenX(), event.getScreenY());
             }
-            extractSelectedText();
         });
 
-        markdownContentPane.setOnContextMenuRequested(event ->
-                contextMenu.show(markdownContentPane, event.getScreenX(), event.getScreenY())
-        );
+        copyItem.setOnAction(_ -> {
+            if (markdownTextFlow.isSelectionActive()) {
+                markdownTextFlow.copySelectedText();
+            } else {
+                copyFullMessage();
+            }
+        });
+
+        markdownContentPane.setOnContextMenuRequested(event -> {
+            if (!markdownTextFlow.isSelectionActive()) {
+                contextMenu.show(markdownContentPane, event.getScreenX(), event.getScreenY());
+            }
+        });
     }
 
     public void setChatMessage(ChatMessage chatMessage) {
@@ -156,29 +161,11 @@ public class ChatMessageComponent extends HBox {
         vBox.setStyle("-fx-background-color: " + fillColor + "; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: " + borderColor + "; -fx-border-width: 3;");
     }
 
-    private String getTextToCopy() {
-        if (!this.selectedText.isEmpty()) {
-            return this.selectedText;
-        }
-        return ChatMessageUtils.getContent(chatMessage.get()).orElse("");
-    }
-
-    private void extractSelectedText() {
-        try {
-            int start = markdownTextFlow.getSelectionStartIndex();
-            int end = markdownTextFlow.getSelectionEndIndex();
-
-            String fullText = ChatMessageUtils.getContent(chatMessage.get()).orElse("");
-
-            if (start >= 0 && end > start && !fullText.isEmpty()) {
-                this.selectedText = fullText.substring(start, Math.min(end, fullText.length()));
-            } else {
-                this.selectedText = "";
+    private void copyFullMessage() {
+        ChatMessageUtils.getContent(chatMessage.get()).ifPresent(content -> {
+            if (!content.isEmpty()) {
+                clipBoardManager.setContent(content);
             }
-            // These errors can occur if the UI selection state and message content drift during rendering
-        } catch (AssertionError | IndexOutOfBoundsException e) {
-            LOGGER.debug("Failed to extract selection indices for copy action", e);
-            this.selectedText = "";
-        }
+        });
     }
 }
