@@ -63,7 +63,7 @@ The tests in `org.jabref.logic.l10n.LocalizationConsistencyTest` check whether t
 
 ## Adding a new Language
 
-1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/master/jablib/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java)
+1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java)
 2. Create an empty \<locale code>.properties file
 3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
 
