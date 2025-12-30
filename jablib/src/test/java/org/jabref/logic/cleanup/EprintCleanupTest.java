@@ -80,6 +80,15 @@ class EprintCleanupTest {
                                 .withField(StandardField.EPRINTTYPE, "arxiv")
                 ),
 
+                // arXiv:1503.05173 in EPRINT field should be split-up
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "arXiv:1503.05173"),
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "1503.05173")
+                                .withField(StandardField.EPRINTTYPE, "arxiv")
+                ),
+
                 // LLM-generated BibEntry with journal "arxiv" and volume with arXiv ID
                 Arguments.of(
                         new BibEntry()
