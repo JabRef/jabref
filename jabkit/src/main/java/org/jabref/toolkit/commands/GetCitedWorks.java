@@ -6,15 +6,13 @@ import java.util.concurrent.Callable;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
-import org.jabref.logic.importer.fetcher.citation.crossref.CrossRefCitationFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.toolkit.arguments.Provider;
-import org.jabref.toolkit.converter.ProviderConverter;
+import org.jabref.toolkit.converter.CitationFetcherTypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,37 +32,33 @@ class GetCitedWorks implements Callable<Integer> {
 
     @CommandLine.Option(
             names = "--provider",
-            converter = ProviderConverter.class,
+            converter = CitationFetcherTypeConverter.class,
             description = "Metadata provider: ${COMPLETION-CANDIDATES}"
     )
-    private Provider provider = Provider.CROSSREF;
+    private CitationFetcherType citationFetcherType = CitationFetcherType.CROSSREF;
 
     @CommandLine.Parameters(description = "DOI to check")
     private String doi;
 
     @Override
     public Integer call() {
-        CitationFetcher citationFetcher = switch (provider) {
-            case CROSSREF -> {
-                CliPreferences preferences = argumentProcessor.cliPreferences;
-                AiService aiService = new AiService(
-                        preferences.getAiPreferences(),
-                        preferences.getFilePreferences(),
-                        preferences.getCitationKeyPatternPreferences(),
-                        LOGGER::info,
-                        new CurrentThreadTaskExecutor());
-                yield new CrossRefCitationFetcher(
+        CliPreferences preferences = argumentProcessor.cliPreferences;
+        AiService aiService = new AiService(
+                preferences.getAiPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                LOGGER::info,
+                new CurrentThreadTaskExecutor());
+
+        CitationFetcher citationFetcher = CitationFetcherType
+                .getCitationFetcher(
+                        citationFetcherType,
                         preferences.getImporterPreferences(),
                         preferences.getImportFormatPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
                         preferences.getGrobidPreferences(),
-                        aiService);
-            }
-            case SEMANTICSCHOLAR ->
-                    new SemanticScholarCitationFetcher(
-                            argumentProcessor.cliPreferences.getImporterPreferences()
-                    );
-        };
+                        aiService
+                );
 
         List<BibEntry> entries;
 
