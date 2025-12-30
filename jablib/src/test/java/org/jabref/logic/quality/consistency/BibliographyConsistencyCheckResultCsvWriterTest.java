@@ -144,10 +144,17 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
     void checkLibraryWithoutIssues(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNAL, "some journal")
+                .withField(StandardField.YEAR, "2025")
                 .withField(StandardField.PAGES, "some pages");
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNAL, "some journal")
+                .withField(StandardField.YEAR, "2026")
                 .withField(StandardField.PAGES, "some pages");
+
         BibDatabase database = new BibDatabase();
         database.insertEntry(first);
         database.insertEntry(second);

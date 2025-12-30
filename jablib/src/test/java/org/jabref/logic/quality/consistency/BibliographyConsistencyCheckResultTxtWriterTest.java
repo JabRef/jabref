@@ -263,9 +263,15 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     void checkLibraryWithoutIssuesWithOutPorcelain(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNALTITLE, "some journal title")
+                .withField(StandardField.DATE, "some date")
                 .withField(StandardField.PAGES, "some pages");
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNALTITLE, "some other journal title")
+                .withField(StandardField.DATE, "some date")
                 .withField(StandardField.PAGES, "some pages");
         List<BibEntry> bibEntriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
@@ -291,9 +297,15 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     void checkLibraryWithoutIssuesWithPorcelain(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNALTITLE, "some journal title")
+                .withField(StandardField.DATE, "some date")
                 .withField(StandardField.PAGES, "some pages");
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNALTITLE, "some other journal title")
+                .withField(StandardField.DATE, "some date")
                 .withField(StandardField.PAGES, "some pages");
         List<BibEntry> bibEntriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
