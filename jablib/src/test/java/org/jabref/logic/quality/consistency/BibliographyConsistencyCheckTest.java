@@ -72,6 +72,55 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
+    void checkEntriesWithNonTrivialRequiredOrFields() {
+        BibEntry one = new BibEntry(StandardEntryType.Booklet, "1")
+                .withField(StandardField.EDITOR, "editor one") // Booklet requires editor or author
+                .withField(StandardField.TITLE, "the first entry")
+                .withField(StandardField.DATE, "date");
+        BibEntry two = new BibEntry(StandardEntryType.Booklet, "2")
+                .withField(StandardField.EDITOR, "editor two")
+                .withField(StandardField.TITLE, "the second entry")
+                .withField(StandardField.DATE, "date")
+                .withField(StandardField.PAGES, "17");
+        BibEntry three = new BibEntry(StandardEntryType.Booklet, "3")
+                .withField(StandardField.EDITOR, "editor three")
+                .withField(StandardField.TITLE, "the third entry")
+                .withField(StandardField.DATE, "date");
+
+        BibEntry four = new BibEntry(StandardEntryType.Manual, "4")
+                .withField(StandardField.AUTHOR, "author four") // Manual also requires editor or author
+                .withField(StandardField.TITLE, "the fourth entry")
+                .withField(StandardField.DATE, "date");
+        BibEntry five = new BibEntry(StandardEntryType.Manual, "5")
+                .withField(StandardField.AUTHOR, "author five")
+                .withField(StandardField.TITLE, "the fifth entry")
+                .withField(StandardField.DATE, "date")
+                .withField(StandardField.SUBTITLE, "some subtitle");
+        BibEntry six = new BibEntry(StandardEntryType.Manual, "6")
+                .withField(StandardField.AUTHOR, "author six")
+                .withField(StandardField.TITLE, "the sixth entry")
+                .withField(StandardField.DATE, "date")
+                .withField(StandardField.PAGES, "59");
+
+        BibDatabase bibDatabase = new BibDatabase(List.of(one, two, three, four, five, six));
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBLATEX);
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
+        });
+
+        BibliographyConsistencyCheck.EntryTypeResult bookletResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES), List.of(two));
+
+        BibliographyConsistencyCheck.EntryTypeResult manualResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.SUBTITLE), List.of(five, six));
+
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(
+                StandardEntryType.Booklet, bookletResult,
+                StandardEntryType.Manual, manualResult
+        ));
+        assertEquals(expected, result);
+    }
+
+    @Test
     void checkEntryWithOverwrittenStandardTypeWithCustomFields() {
         BibEntry one = new BibEntry(StandardEntryType.Article, "DBLP:journals/sqj/IftikharBAK25")
                 .withField(StandardField.AUTHOR,
