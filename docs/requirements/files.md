@@ -26,4 +26,6 @@ After a file is linked to an entry, the user might move the file to another dire
 
 The function `Quality -> Automatically set file links` can help user to auto-link the moved files based on the broken file name, or the entry citation key.
 
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
