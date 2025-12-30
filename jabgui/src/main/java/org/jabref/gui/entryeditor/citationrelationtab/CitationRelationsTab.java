@@ -681,6 +681,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             return;
         }
         executeSearch(citationComponents);
+        executeSearch(otherCitationComponents);
     }
 
     private void setUpEmptyPanel(CitationComponents citationComponents,
