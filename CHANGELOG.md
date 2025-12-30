@@ -35,6 +35,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef would not start on Linux ARM due to missing binaries for postgres-embedded [#14783](https://github.com/JabRef/jabref/issues/14783)
 - We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
+We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
+- Only show restart search button in citation-relation panel when the fetch failed. [#14757](https://github.com/JabRef/jabref/issues/14757)
 
 ### Removed
 
