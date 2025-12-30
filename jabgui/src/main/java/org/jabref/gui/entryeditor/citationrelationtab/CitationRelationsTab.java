@@ -794,7 +794,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void onSearchForRelationsSucceed(CitationComponents citationComponents,
                                              List<BibEntry> fetchedList,
                                              ObservableList<CitationRelationItem> observableList) {
-        hideNodes(citationComponents.abortButton(), citationComponents.progress());
+        hideNodes(citationComponents.refreshButton(), citationComponents.abortButton(), citationComponents.progress());
 
         // TODO: This could be a wrong database, because the user might have switched to another library
         //       If we were on fixing this, we would need to a) associate a BibEntry with a database or b) pass the database at "bindToEntry"
@@ -819,7 +819,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         BooleanBinding booleanBind = Bindings.isEmpty(citationComponents.listView().getCheckModel().getCheckedItems());
         citationComponents.importButton().disableProperty().bind(booleanBind);
         citationComponents.importButton().setOnMouseClicked(event -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
-        showNodes(citationComponents.refreshButton(), citationComponents.importButton());
+        showNodes(citationComponents.importButton());
     }
 
     private void prepareToSearchForRelations(CitationComponents citationComponents, BackgroundTask<List<BibEntry>> task) {
