@@ -263,7 +263,7 @@ open module org.jabref.jablib {
     requires org.antlr.antlr4.runtime;
     requires org.jooq.jool;
     requires org.libreoffice.uno;
-    requires org.junit.jupiter.api;
+    requires transitive org.jspecify;
     requires kotlin.stdlib;
     // endregion
 }
