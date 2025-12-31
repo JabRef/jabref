@@ -9,7 +9,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
-- We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
 
 ### Added
 
@@ -17,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
 - We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
 
 ### Removed
