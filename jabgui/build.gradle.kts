@@ -43,7 +43,7 @@ dependencies {
     implementation("org.jabref:afterburner.fx")
     implementation("org.kordamp.ikonli:ikonli-javafx")
     implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack")
-    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
+    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation") //jitpack
     implementation("de.saxsys:mvvmfx")
     implementation("org.fxmisc.flowless:flowless")
     implementation("org.fxmisc.richtext:richtextfx")

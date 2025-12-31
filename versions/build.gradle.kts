@@ -17,7 +17,7 @@ val lucene = "10.3.2"
 val pdfbox = "3.0.6"
 
 dependencies {
-    api(platform("ai.djl:bom:0.35.1"))
+    api(platform("ai.djl:bom:0.36.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.7.1"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
@@ -43,7 +43,7 @@ dependencies {
     api("org.glassfish.jersey.test-framework:jersey-test-framework-core")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
 
-    api(platform("tools.jackson:jackson-bom:3.0.2"))
+    api(platform("tools.jackson:jackson-bom:3.0.3"))
     api("tools.jackson.core:jackson-core")
     api("tools.jackson.core:jackson-databind")
     api("tools.jackson.dataformat:jackson-dataformat-yaml")
@@ -80,13 +80,13 @@ dependencies.constraints {
     api("com.konghq:unirest-java-core:4.7.0")
     api("com.konghq:unirest-modules-gson:4.7.0")
     api("com.pixelduke:fxthemes:1.6.0")
-    api("com.squareup.okhttp3:okhttp:5.1.0")
+    api("com.squareup.okhttp3:okhttp:5.3.2")
     api("com.squareup.okio:okio-jvm:3.16.4")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    api("com.uber.nullaway:nullaway:0.12.10")
+    api("com.uber.nullaway:nullaway:0.12.15")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.21.0")
@@ -147,7 +147,7 @@ dependencies.constraints {
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2-1")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.21.2")
     api("org.jspecify:jspecify:1.0.0")
