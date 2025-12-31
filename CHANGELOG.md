@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
+- We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
 
 ### Changed
 
@@ -35,11 +36,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added 15 non-standard BibLaTeX entry types (Audio, Image, Legal, ...) to the group "Non-standard types" group in the New Entry dialog and in the context menu. [#12963](https://github.com/JabRef/jabref/issues/12963)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
-- We made the "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
-- We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
-- We added support for Cygwin-file paths on a Windows Operating System. [#13274](https://github.com/JabRef/jabref/issues/13274)
-- We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
-- We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
 - We added "IEEE" as another option for parsing plain text citations. [#14233](https://github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)

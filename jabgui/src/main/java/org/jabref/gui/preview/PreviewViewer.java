@@ -229,7 +229,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String coverIfAny = getCoverImageURL().map(url -> "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(url)).orElse("");
+        String coverIfAny = getCoverImageURL().map("<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>"::formatted).orElse("");
 
         AtomicReference<String> baseURL = new AtomicReference<>("");
         if (databaseContext != null) {
