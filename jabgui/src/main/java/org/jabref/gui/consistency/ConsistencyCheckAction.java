@@ -44,6 +44,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
+
         this.executable.bind(needsDatabase(stateManager));
     }
 
