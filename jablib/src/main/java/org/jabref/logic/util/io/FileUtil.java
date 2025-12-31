@@ -347,7 +347,7 @@ public class FileUtil {
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param entries      list of BibTeX entries
+     * @param entries  list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
      * @return list of files. May be empty
      */
@@ -521,6 +521,16 @@ public class FileUtil {
      */
     public static boolean isBibFile(Path file) {
         return getFileExtension(file).filter("bib"::equals).isPresent();
+    }
+
+    /**
+     * Test if the file is an image file by simply checking if its extension is an image extension
+     *
+     * @param file The file to check
+     * @return true if file extension is an image, false otherwise
+     */
+    public static boolean isImage(Path file) {
+        return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
     }
 
     /**

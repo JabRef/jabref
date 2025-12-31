@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -230,15 +231,40 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void setPreviewText(String text) {
         String coverIfAny = getCoverImageURL().map(url -> "<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>".formatted(url)).orElse("");
 
-        layoutText = """
-                    <html>
-                        <body id="previewBody">
-                            %s <div id="content"> %s </div>
-                        </body>
-                    </html>
-                """.formatted(coverIfAny, text);
+        AtomicReference<String> baseURL = new AtomicReference<>("");
+        if (databaseContext != null) {
+            databaseContext
+                    .getFirstExistingFileDir(preferences.getFilePreferences())
+                    .ifPresent(baseDirPath -> {
+                        try {
+                            String baseUrl = baseDirPath.toUri().toURL().toExternalForm();
+                            // Ensure the base URL ends with a slash for correct relative path resolution
+                            if (!baseUrl.endsWith("/")) {
+                                baseUrl += "/";
+                            }
+                            baseURL.set(baseUrl);
+                        } catch (MalformedURLException e) {
+                            LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
+                        }
+                    });
+        }
+
+        layoutText = formatPreviewText(baseURL.get(), coverIfAny, text);
         highlightLayoutText();
         setHvalue(0);
+    }
+
+    private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
+        return """
+                <html>
+                    <head>
+                        <base href="%s">
+                    </head>
+                    <body id="previewBody">
+                        %s <div id="content"> %s </div>
+                    </body>
+                </html>
+                """.formatted(baseUrl, coverIfAny, text);
     }
 
     private Optional<String> getCoverImageURL() {

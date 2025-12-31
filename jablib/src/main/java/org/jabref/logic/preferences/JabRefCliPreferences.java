@@ -505,7 +505,9 @@ public class JabRefCliPreferences implements CliPreferences {
         try {
             Path preferencesPath = Path.of("jabref.xml");
             if (Files.exists(preferencesPath)) {
-                importPreferences(preferencesPath);
+                // This overwrites the configured values, which might be undesired by users
+                importPreferencesToBackingStore(preferencesPath);
+                LOGGER.info("Preferences imported from jabref.xml");
             }
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
@@ -1200,6 +1202,16 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     @Override
     public void importPreferences(Path path) throws JabRefException {
+        importPreferencesToBackingStore(path);
+
+        // TODO: We need to load all CLI-preferences from the backing store
+        //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
+
+        // in case of incomplete or corrupt xml fall back to current preferences
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+    }
+
+    private static void importPreferencesToBackingStore(Path path) throws JabRefException {
         LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
         try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
@@ -1209,12 +1221,6 @@ public class JabRefCliPreferences implements CliPreferences {
                     Localization.lang("Could not import preferences"),
                     ex);
         }
-
-        // TODO: We need to load all CLI-preferences from the backing store
-        //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
-
-        // in case of incomplete or corrupt xml fall back to current preferences
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
     }
     //*************************************************************************************************************
     // ToDo: Cleanup

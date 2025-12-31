@@ -35,8 +35,10 @@ jobs:
           days-before-pr-close: 7
           close-pr-message: >
             This PR is being closed due to continued inactivity.
+      - name: Output result
+        run: echo "${{ steps.stale.outputs.closed-issues-prs }}" >> $GITHUB_STEP_SUMMARY
       - name: Process closed issues/PRs
-        if: ${{ steps.stale.outputs.closed-issues-prs != [] }}
+        if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
         env:
           CLOSED: ${{ steps.stale.outputs.closed-issues-prs }}
         run: |
