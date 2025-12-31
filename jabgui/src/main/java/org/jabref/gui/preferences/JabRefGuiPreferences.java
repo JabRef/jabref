@@ -993,25 +993,28 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyle() {
-        NameDisplayPreferences.AbbreviationStyle abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.NONE; // default
-        if (getBoolean(ABBR_AUTHOR_NAMES)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.FULL;
-        } else if (getBoolean(NAMES_LAST_ONLY)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
+
+        if (!getBoolean(ABBR_AUTHOR_NAMES)) {
+            return NameDisplayPreferences.AbbreviationStyle.NONE;
         }
-        return abbreviationStyle;
+        if (getBoolean(NAMES_LAST_ONLY)) {
+            return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
+        }
+        return NameDisplayPreferences.AbbreviationStyle.FULL;
     }
 
     private NameDisplayPreferences.DisplayStyle getNameDisplayStyle() {
-        NameDisplayPreferences.DisplayStyle displayStyle = NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME; // default
-        if (getBoolean(NAMES_NATBIB)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.NATBIB;
-        } else if (getBoolean(NAMES_AS_IS)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.AS_IS;
-        } else if (getBoolean(NAMES_FIRST_LAST)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+
+        if (getBoolean(NAMES_AS_IS)) {
+            return NameDisplayPreferences.DisplayStyle.AS_IS;
         }
-        return displayStyle;
+        if (getBoolean(NAMES_FIRST_LAST)) {
+            return NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+        }
+        if (getBoolean(NAMES_NATBIB)) {
+            return NameDisplayPreferences.DisplayStyle.NATBIB;
+        }
+        return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
     }
 
     // endregion
