@@ -24,8 +24,8 @@ public class NameDisplayPreferences {
 
     private NameDisplayPreferences() {
         this(
-                DisplayStyle.NATBIB,
-                AbbreviationStyle.LASTNAME_ONLY
+                DisplayStyle.NATBIB,               //displayStyle: use Natbib-style name formatting
+                AbbreviationStyle.LASTNAME_ONLY    //abbreviationStyle: abbreviate names to last names only
         );
     }
 
