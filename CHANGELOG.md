@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
 - We fixed an issue when warning for duplicate entries in the "New Entry" dialog. [#14662](https://github.com/JabRef/jabref/pull/14662)
+- We fixed the Quality > Automatically set file links button. Now if a file is moved, the button can relink the moved file to the broken linked file. [#9798](https://github.com/JabRef/jabref/issues/9798)
 
 ### Removed
 
