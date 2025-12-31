@@ -42,10 +42,17 @@ import org.slf4j.LoggerFactory;
  */
 public class FetchAndMergeEntry {
 
-    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.CompositeIdFetcher#performSearchById}
-    public static List<Field> SUPPORTED_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
+    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.WebFetchers#getIdBasedFetcherFoIdentifier}
+    public static List<Field> SUPPORTED_FIELDS =
+            List.of(
+                    StandardField.EPRINT, // arXiv
+                    StandardField.DOI,
+                    StandardField.ISBN,
+                    StandardField.ISSN
+            );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
+
     private final DialogService dialogService;
     private final UndoManager undoManager;
     private final StateManager stateManager;
