@@ -37,20 +37,12 @@ public interface Identifier {
         }
         String trimmedIdentifier = identifier.trim();
         return Stream.<Supplier<Optional<? extends Identifier>>>of(
-<<<<<<< HEAD
-                             () -> DOI.findInText(identifier),
-                             () -> ArXivIdentifier.findInText(identifier),
-                             () -> ISBN.parse(identifier),
-                             () -> SSRN.parse(identifier),
-                             () -> RFC.parse(identifier)
-=======
                              () -> DOI.findInText(trimmedIdentifier),
-                             () -> ArXivIdentifier.parse(trimmedIdentifier),
+                             () -> ArXivIdentifier.findInText(trimmedIdentifier),
                              () -> ISBN.parse(trimmedIdentifier),
                              () -> SSRN.parse(trimmedIdentifier),
                              () -> RFC.parse(trimmedIdentifier),
                              () -> IacrEprint.parse(trimmedIdentifier)
->>>>>>> upstream/main
                      )
                      .map(Supplier::get)
                      .filter(Optional::isPresent)
