@@ -16,7 +16,8 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
 @AllowedToUseLogic("because we want to have this class 'smart' an be able to parse obscure DOIs, too. For this, we need the LatexToUnicodeformatter.")
+@NullMarked
 public class DOI implements Identifier {
 
     public static final URI AGENCY_RESOLVER = URLUtil.createUri("https://doi.org/doiRA");
@@ -111,7 +113,7 @@ public class DOI implements Identifier {
      * @throws NullPointerException     if DOI/Short DOI is null
      * @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
      */
-    public DOI(@NonNull String doi) {
+    public DOI(String doi) {
         // Remove whitespace
         String trimmedDoi = doi.trim();
 
@@ -287,7 +289,7 @@ public class DOI implements Identifier {
      * DOIs are case-insensitive. Thus, 10.1109/cloud.2017.89 equals 10.1109/CLOUD.2017.89
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
