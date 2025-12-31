@@ -22,6 +22,8 @@ public interface Identifier {
 
     /**
      * Returns the identifier as String
+     *
+     * @return the identifier as String
      */
     String asString();
 
@@ -29,17 +31,26 @@ public interface Identifier {
 
     Optional<URI> getExternalURI();
 
-    public static Optional<Identifier> from(String identifier) {
+    static Optional<Identifier> from(String identifier) {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
-
+        String trimmedIdentifier = identifier.trim();
         return Stream.<Supplier<Optional<? extends Identifier>>>of(
+<<<<<<< HEAD
                              () -> DOI.findInText(identifier),
                              () -> ArXivIdentifier.findInText(identifier),
                              () -> ISBN.parse(identifier),
                              () -> SSRN.parse(identifier),
                              () -> RFC.parse(identifier)
+=======
+                             () -> DOI.findInText(trimmedIdentifier),
+                             () -> ArXivIdentifier.parse(trimmedIdentifier),
+                             () -> ISBN.parse(trimmedIdentifier),
+                             () -> SSRN.parse(trimmedIdentifier),
+                             () -> RFC.parse(trimmedIdentifier),
+                             () -> IacrEprint.parse(trimmedIdentifier)
+>>>>>>> upstream/main
                      )
                      .map(Supplier::get)
                      .filter(Optional::isPresent)

@@ -13,10 +13,9 @@
 // requirements needed by jabkit projecxt need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
 
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/arguments/Provider.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CaseInsensitiveEnumConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/ProviderConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java

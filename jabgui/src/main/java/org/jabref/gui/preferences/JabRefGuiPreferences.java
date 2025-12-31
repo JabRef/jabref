@@ -55,6 +55,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
@@ -382,6 +383,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(AUTOLINK_FILES_ENABLED),
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
+                CitationFetcherType.SEMANTIC_SCHOLAR,
                 getBoolean(SHOW_SCITE_TAB),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
