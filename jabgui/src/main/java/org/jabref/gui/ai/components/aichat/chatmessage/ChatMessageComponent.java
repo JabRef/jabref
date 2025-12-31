@@ -44,7 +44,6 @@ public class ChatMessageComponent extends HBox {
     @FXML private VBox buttonsVBox;
 
     private final MarkdownTextFlow markdownTextFlow;
-    //    private String selectedText = "";
     @Inject private ClipBoardManager clipBoardManager;
 
     public ChatMessageComponent() {
