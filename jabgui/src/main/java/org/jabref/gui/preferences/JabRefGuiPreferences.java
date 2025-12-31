@@ -935,10 +935,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return nameDisplayPreferences;
         }
 
-        nameDisplayPreferences = new NameDisplayPreferences(
-                getNameDisplayStyle(),
-                getNameAbbreviationStyle()
-        );
+        nameDisplayPreferences = getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences.getDefault());
 
         EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
