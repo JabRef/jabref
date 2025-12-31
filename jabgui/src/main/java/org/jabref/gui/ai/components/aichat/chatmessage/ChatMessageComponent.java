@@ -61,7 +61,6 @@ public class ChatMessageComponent extends HBox {
         markdownContentPane.getChildren().add(markdownTextFlow);
         markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
         markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
-
         setupContextMenu();
     }
 
