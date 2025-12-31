@@ -58,6 +58,8 @@ public class NewEntryViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryViewModel.class);
 
+    private static final LayoutFormatter DOI_STRIP = new DOIStrip();
+
     private final GuiPreferences preferences;
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -113,9 +115,11 @@ public class NewEntryViewModel {
                 idText,
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("You must specify an identifier.")));
+
         duplicateDoiValidator = new FunctionBasedValidator<>(
                 idText,
                 input -> checkDOI(input).orElse(null));
+
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -145,27 +149,22 @@ public class NewEntryViewModel {
 
     public void populateDOICache() {
         doiCache.clear();
-        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
-
-        activeDatabase.map(BibDatabaseContext::getEntries)
-                      .ifPresent(entries -> {
-                          entries.forEach(entry -> {
-                              entry.getField(StandardField.DOI)
-                                   .ifPresent(doi -> {
-                                       doiCache.put(doi, entry);
-                                   });
-                          });
-                      });
+        stateManager.getActiveDatabase()
+                    .map(BibDatabaseContext::getEntries)
+                    .stream().flatMap(List::stream)
+                    .forEach(entry -> {
+                        entry.getField(StandardField.DOI)
+                             .ifPresent(doi -> {
+                                 doiCache.put(doi, entry);
+                             });
+                    });
     }
 
     public Optional<ValidationMessage> checkDOI(String doiInput) {
-        if (doiInput == null || doiInput.isBlank()) {
+        if (StringUtil.isBlank(doiInput)) {
             return Optional.empty();
         }
-
-        LayoutFormatter doiStrip = new DOIStrip();
-        String normalized = doiStrip.format(doiInput.toLowerCase());
-
+        String normalized = DOI_STRIP.format(doiInput.toLowerCase());
         if (doiCache.containsKey(normalized)) {
             duplicateEntry = doiCache.get(normalized);
             return Optional.of(ValidationMessage.warning(Localization.lang("Entry already exists in a library")));
@@ -237,13 +236,11 @@ public class NewEntryViewModel {
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
-            final String text = idText.getValue();
-            final CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
-
-            if (text == null || text.isEmpty()) {
+            String text = idText.getValue();
+            if (StringUtil.isBlank(text)) {
                 return Optional.empty();
             }
-
+            CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
             return fetcher.performSearchById(text);
         }
     }
@@ -251,11 +248,18 @@ public class NewEntryViewModel {
     private class WorkerLookupTypedId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
-            final String text = idText.getValue();
-            final boolean textValid = idTextValidator.getValidationStatus().isValid();
-            final IdBasedFetcher fetcher = idFetcher.getValue();
+            String text = idText.getValue();
+            if (StringUtil.isBlank(text)) {
+                return Optional.empty();
+            }
 
-            if (text == null || !textValid || fetcher == null) {
+            boolean textValid = idTextValidator.getValidationStatus().isValid();
+            if (!textValid) {
+                return Optional.empty();
+            }
+
+            IdBasedFetcher fetcher = idFetcher.getValue();
+            if (fetcher == null) {
                 return Optional.empty();
             }
 
@@ -314,7 +318,7 @@ public class NewEntryViewModel {
             executing.set(false);
         });
 
-        idLookupWorker.setOnSucceeded(event -> {
+        idLookupWorker.setOnSucceeded(_ -> {
             final Optional<BibEntry> result = idLookupWorker.getValue();
 
             if (result.isEmpty()) {
