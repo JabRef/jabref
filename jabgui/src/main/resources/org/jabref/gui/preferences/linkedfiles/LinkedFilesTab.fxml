@@ -44,7 +44,6 @@
                     text="%When downloading files, or moving linked files to the file directory, use the bib file location."/>
         </tooltip>
     </RadioButton>
-
     <Label styleClass="sectionHeader" text="%Open file explorer"/>
     <RadioButton fx:id="openFileExplorerInFilesDirectory" text="%Open file explorer in files directory"
                  toggleGroup="$fileExplorerToggleGroup" selected="true"/>
