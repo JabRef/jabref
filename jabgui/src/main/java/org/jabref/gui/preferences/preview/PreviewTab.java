@@ -15,6 +15,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TextField;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
@@ -64,6 +65,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
     @FXML private CustomTextField searchBox;
+    @FXML private Label bookCoverLabel;
+    @FXML private TextField bookCoverLocation;
+    @FXML private CheckBox bookCoverDownload;
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
@@ -129,6 +133,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
         showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
+        
+        bookCoverLocation.textProperty().bindBidirectional(viewModel.coversDownloadLocationProperty());
+        bookCoverLocation.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
+        bookCoverLabel.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
+        bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
 
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());

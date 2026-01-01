@@ -26,6 +26,9 @@ public class PreviewPreferences {
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
     private final ObservableList<Path> bstPreviewLayoutPaths;
+    
+    private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
+    private final StringProperty coversDownloadLocation = new SimpleStringProperty();
 
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
@@ -33,7 +36,9 @@ public class PreviewPreferences {
                               String defaultCustomPreviewLayout,
                               boolean showPreviewAsExtraTab,
                               boolean showPreviewEntryTableTooltip,
-                              List<Path> bstPreviewLayoutPaths) {
+                              List<Path> bstPreviewLayoutPaths,
+                              boolean shouldDownloadCovers,
+                              String coversDownloadLocation) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
         this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
@@ -41,6 +46,8 @@ public class PreviewPreferences {
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
+        this.shouldDownloadCovers.set(shouldDownloadCovers);
+        this.coversDownloadLocation.set(coversDownloadLocation);
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
@@ -123,5 +130,29 @@ public class PreviewPreferences {
 
     public void setBstPreviewLayoutPaths(List<Path> bstPreviewLayoutPaths) {
         this.bstPreviewLayoutPaths.setAll(bstPreviewLayoutPaths);
+    }
+
+    public boolean shouldDownloadCovers() {
+        return shouldDownloadCovers.get();
+    }
+
+    public BooleanProperty shouldDownloadCoversProperty() {
+        return shouldDownloadCovers;
+    }
+
+    public void setShouldDownloadCovers(boolean value) {
+        this.shouldDownloadCovers.set(value);
+    }
+
+    public String coversDownloadLocation() {
+        return coversDownloadLocation.get();
+    }
+
+    public StringProperty coversDownloadLocationProperty() {
+        return coversDownloadLocation;
+    }
+
+    public void setCoversDownloadLocation(String value) {
+        this.coversDownloadLocation.set(value);
     }
 }

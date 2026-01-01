@@ -239,8 +239,8 @@ public class NewEntryViewModel {
     }
 
     private BibEntry withCoversDownloaded(BibEntry entry) {
-        if (preferences.getFilePreferences().shouldDownloadCovers()) {
-            String location = preferences.getFilePreferences().coversDownloadLocation();
+        if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
+            String location = preferences.getPreviewPreferences().coversDownloadLocation();
             bookCoverFetcher.downloadCoversForEntry(entry, location);
         }
         return entry;

@@ -28,10 +28,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private TextField mainFileDirectory;
     @FXML private RadioButton useMainFileDirectory;
 
-    @FXML private CheckBox bookCoverDownload;
-    @FXML private Label bookCoverLabel;
-    @FXML private TextField bookCoverLocation;
-
     @FXML private RadioButton useBibLocationAsPrimary;
     @FXML private Button browseDirectory;
     @FXML private Button autolinkRegexHelp;
@@ -73,11 +69,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
-
-        bookCoverLocation.textProperty().bindBidirectional(viewModel.coversDownloadLocationProperty());
-        bookCoverLocation.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
-        bookCoverLabel.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
-        bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
 
         moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
         moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());

@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -18,10 +19,16 @@
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.preview.PreviewTab">
-    <Label text="%Current Preview" styleClass="titleHeader"/>
+    <Label text="%Entry Preview" styleClass="titleHeader"/>
     <CheckBox fx:id="showAsTabCheckBox" text="%Show preview as a tab in entry editor"/>
     <CheckBox fx:id="showPreviewTooltipCheckBox" text="%Show preview in entry table tooltip"/>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label fx:id="bookCoverLabel" text="%Cover image download location"/>
+        <TextField fx:id="bookCoverLocation" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <CheckBox fx:id="bookCoverDownload" text="%Automatically download cover images"/>
     <Button fx:id="bstFileButton" text="%Add BST file" onAction="#selectBstFile" />
+
     <HBox spacing="4.0">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="%Available" styleClass="sectionHeader"/>

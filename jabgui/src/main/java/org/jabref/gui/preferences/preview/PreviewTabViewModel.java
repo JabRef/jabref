@@ -67,6 +67,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);
 
+    private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
+    private final StringProperty coversDownloadLocation = new SimpleStringProperty("");
+
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());
@@ -148,6 +151,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             BstPreviewLayout layout = new BstPreviewLayout(path);
             availableListProperty.add(layout);
         });
+
+        shouldDownloadCovers.setValue(previewPreferences.shouldDownloadCovers());
+        coversDownloadLocation.setValue(previewPreferences.coversDownloadLocation());
     }
 
     public void setPreviewLayout(PreviewLayout selectedLayout) {
@@ -213,6 +219,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             previewPreferences.setLayoutCyclePosition(chosenListProperty.getValue().indexOf(
                     chosenSelectionModelProperty.getValue().getSelectedItems().getFirst()));
         }
+
+        previewPreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
+        previewPreferences.setCoversDownloadLocation(coversDownloadLocation.getValue());
     }
 
     public ValidationStatus chosenListValidationStatus() {
@@ -496,6 +505,14 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty sourceTextProperty() {
         return sourceTextProperty;
+    }
+
+    public BooleanProperty shouldDownloadCoversProperty() {
+        return shouldDownloadCovers;
+    }
+
+    public StringProperty coversDownloadLocationProperty() {
+        return coversDownloadLocation;
     }
 
     public void addBstStyle(Path bstFile) {
