@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -28,8 +29,6 @@ import dev.langchain4j.data.message.UserMessage;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 
 public class ChatMessageComponent extends HBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessageComponent.class);
@@ -76,7 +75,7 @@ public class ChatMessageComponent extends HBox {
         contextMenu.getItems().add(copyItem);
 
         // 1. Capture and LOCK the selection state
-        markdownContentPane.addEventFilter(MOUSE_PRESSED, event -> {
+        markdownContentPane.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             if (event.isSecondaryButtonDown() && markdownTextFlow.isSelectionActive()) {
                 // Consume the event to prevent JavaFX from clearing the selection highlight
                 event.consume();
