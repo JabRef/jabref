@@ -99,7 +99,7 @@ public class FileUtil {
      * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(String fileNameWithExtension) {
-        int slash = Math.max(0, 1 + fileNameWithExtension.lastIndexOf(File.pathSeparatorChar));
+        int slash = Math.max(0, 1 + fileNameWithExtension.lastIndexOf(File.separatorChar));
         int dot = Math.max(0, fileNameWithExtension.lastIndexOf('.'));
         return slash < dot ? fileNameWithExtension.substring(slash, dot) : fileNameWithExtension.substring(slash);
     }

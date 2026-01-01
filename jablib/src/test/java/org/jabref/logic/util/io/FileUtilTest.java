@@ -1,5 +1,6 @@
 package org.jabref.logic.util.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -219,13 +220,23 @@ class FileUtilTest {
     }
 
     @Test
-    void getFileNameWithSimpleString() {
+    void getBaseNameWithSimpleString() {
         assertEquals("test", FileUtil.getBaseName("test.pdf"));
     }
 
     @Test
-    void getFileNameWithMultipleDotsString() {
+    void getBaseNameWithMultipleDotsString() {
         assertEquals("te.st", FileUtil.getBaseName("te.st.PdF  "));
+    }
+
+    @Test
+    void getBaseNameWithSimpleStringAndPath() {
+        assertEquals("test", FileUtil.getBaseName("path"+File.separatorChar+"test.pdf"));
+    }
+
+    @Test
+    void getBaseNameWithMultipleDotsStringAndPath() {
+        assertEquals("te.st", FileUtil.getBaseName("path"+File.separatorChar+"te.st.PdF  "));
     }
 
     @ParameterizedTest

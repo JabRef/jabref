@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -39,8 +40,6 @@ public class LinkedFile implements Serializable {
     private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
-
-    private static final String PATH_DELIM = System.getProperty("file.separator");
 
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
@@ -237,8 +236,8 @@ public class LinkedFile implements Serializable {
             return FileUtil.getFileNameFromUrl(linkedName);
         } else if (linkedName.isEmpty()) {
             return Optional.empty();
-        } else if (PATH_DELIM != null) {
-            int slash = linkedName.lastIndexOf(PATH_DELIM);
+        } else {
+            int slash = linkedName.lastIndexOf(File.separatorChar);
             if (slash >= 0) {
                 return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
             }
