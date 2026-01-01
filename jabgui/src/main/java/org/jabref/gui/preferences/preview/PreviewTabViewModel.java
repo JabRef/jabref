@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.preview;
 
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,6 +90,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final TaskExecutor taskExecutor;
 
     private final Validator chosenListValidator;
+    private final Validator coverDirValidator;
 
     private final CustomLocalDragboard localDragboard;
     private ListProperty<PreviewLayout> dragSourceList = null;
@@ -117,6 +120,25 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                 Localization.lang("Selected Layouts can not be empty")
                         )
                 )
+        );
+
+        coverDirValidator = new FunctionBasedValidator<>(
+                coversDownloadLocation,
+                coversDownloadPath -> {
+                    ValidationMessage error = ValidationMessage.error(
+                            Localization.lang("Cover image download directory '%0' not found.\nCheck the tab \"Entry Preview\".", coversDownloadPath)
+                    );
+                    try {
+                        Path path = Path.of(coversDownloadPath);
+                        if (!(Files.exists(path) && Files.isDirectory(path))) {
+                            return error;
+                        }
+                    } catch (InvalidPathException ex) {
+                        return error;
+                    }
+                    // is valid
+                    return null;
+                }
         );
     }
 
@@ -223,6 +245,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         previewPreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
         previewPreferences.setCoversDownloadLocation(coversDownloadLocation.getValue());
+    }
+
+    ValidationStatus coverDirValidationStatus() {
+        return coverDirValidator.getValidationStatus();
     }
 
     public ValidationStatus chosenListValidationStatus() {

@@ -230,6 +230,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.coverDirValidationStatus(), bookCoverLocation));
     }
 
     /**
