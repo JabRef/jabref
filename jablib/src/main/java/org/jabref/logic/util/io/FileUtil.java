@@ -80,7 +80,7 @@ public class FileUtil {
     public static Optional<String> getFileExtension(String fileName) {
         int slash = fileName.lastIndexOf(File.separatorChar);
         int dot = fileName.lastIndexOf('.');
-        if (dot > slash+1 && dot < fileName.length()-1) {
+        if (dot > slash + 1 && dot < fileName.length() - 1) {
             return Optional.of(fileName.substring(dot + 1).trim().toLowerCase(Locale.ROOT));
         } else {
             return Optional.empty();

@@ -175,6 +175,7 @@ class FileUtilTest {
     }
 
     @ParameterizedTest
+    // @formatter:off
     @CsvSource(textBlock = """
                pdf, test.pdf
                pdf, te.st.pdf
@@ -186,12 +187,14 @@ class FileUtilTest {
                pdf, path/test.pdf
                pdf, path/.to/FileInsideAHiddenFolder.pdf
         """)
+    // @formatter:on
     void getFileExtensionsFromString(String extension, String file) {
         file = file.replace('/', File.separatorChar);
         assertEquals(extension, FileUtil.getFileExtension(file).get());
     }
 
     @ParameterizedTest
+    // @formatter:off
     @CsvSource(textBlock = """
                JustTextNotASingleDot
                .StartsWithADotIsNotAnExtension
@@ -200,6 +203,7 @@ class FileUtilTest {
                path/.to/FileInsideAHiddenFolder
                path/.to/.StartsWithADotInsideAHiddenFolder
         """)
+    // @formatter:on
     void getAbsentFileExtensionsFromString(String file) {
         file = file.replace('/', File.separatorChar);
 
@@ -208,6 +212,7 @@ class FileUtilTest {
     }
 
     @ParameterizedTest
+    // @formatter:off
     @CsvSource(textBlock = """
                test, test.pdf
                te.st, 'te.st.PdF  '
@@ -221,12 +226,14 @@ class FileUtilTest {
                FileInsideAHiddenFolder, path/.to/FileInsideAHiddenFolder
                .StartsWithADotInsideAHiddenFolder, path/.to/.StartsWithADotInsideAHiddenFolder
         """)
+    // @formatter:on
     void getBaseNameFromString(String baseName, String file) {
         file = file.replace('/', File.separatorChar);
         assertEquals(baseName, FileUtil.getBaseName(file));
     }
 
     @ParameterizedTest
+    // @formatter:off
     @CsvSource(textBlock = """
                test.pdf
                'te.st.PdF  '
@@ -240,6 +247,7 @@ class FileUtilTest {
                path/.to/FileInsideAHiddenFolder
                path/.to/.StartsWithADotInsideAHiddenFolder
         """)
+    // @formatter:on
     void checkFileExtensionAreTheSameForStringsAndPaths(String file) {
         file = file.replace('/', File.separatorChar);
 
