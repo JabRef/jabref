@@ -185,11 +185,11 @@ class AutoRenameFileOnEntryChangeTest {
         assertEquals("newKey2081 (2).pdf", entry.getFiles().getFirst().getLink());
     }
 
-    static void assertFileExists(Path path) throws IOException {
-        String listedFiles = Files.list(path.getParent())
+    static void assertFileExists(Path file) throws IOException {
+        String listedFiles = Files.list(file.getParent())
                                   .map(path -> "'" + path.getFileName().toString() + "'")
                                   .collect(Collectors.joining(", "));
 
-        assertTrue(Files.exists(path), "file '" + path.getFileName().toString() + "' doesn't exist,  but found " + listedFiles);
+        assertTrue(Files.exists(file), "file '" + file.getFileName().toString() + "' doesn't exist,  but found " + listedFiles);
     }
 }
