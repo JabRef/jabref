@@ -140,15 +140,15 @@ public abstract class AbstractJabKitTest {
         }
     }
 
-    static void assertFileExists(Path path) throws IOException {
-        String listedFiles = Files.list(path.getParent())
+    static void assertFileExists(Path file) throws IOException {
+        String listedFiles = Files.list(file.getParent())
                                   .map(path -> "'" + path.getFileName().toString() + "'")
                                   .collect(Collectors.joining(", "));
 
-        assertTrue(Files.exists(path), "file  '" + path.getFileName().toString() + "' doesn't exist, but found " + listedFiles);
+        assertTrue(Files.exists(file), "file  '" + file.getFileName().toString() + "' doesn't exist, but found " + listedFiles);
     }
 
-    static void assertFileDoesntExist(Path path) throws IOException {
-        assertFalse(Files.exists(path), "file '" + path.getFileName().toString() + "' shouldn't exist, but does");
+    static void assertFileDoesntExist(Path file) throws IOException {
+        assertFalse(Files.exists(file), "file '" + file.getFileName().toString() + "' shouldn't exist, but does");
     }
 }

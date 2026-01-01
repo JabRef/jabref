@@ -133,7 +133,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
         showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
-        
+
         bookCoverLocation.textProperty().bindBidirectional(viewModel.coversDownloadLocationProperty());
         bookCoverLocation.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
         browseDirectory.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());

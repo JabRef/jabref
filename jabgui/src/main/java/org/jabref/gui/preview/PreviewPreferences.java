@@ -26,7 +26,7 @@ public class PreviewPreferences {
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
     private final ObservableList<Path> bstPreviewLayoutPaths;
-    
+
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
     private final StringProperty coversDownloadLocation = new SimpleStringProperty();
 

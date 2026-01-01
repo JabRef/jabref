@@ -241,7 +241,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
         return true;
     }
-    
+
     public void coverDirBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration =
                 new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(coversDownloadLocation.getValue())).build();
