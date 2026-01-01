@@ -17,7 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 ### Fixed
-
+- We Fixed an issue where last opened files were saved as absolute paths in Memory Stick Mode, hindering portability [#3590](https://github.com/JabRef/jabref/issues/3590)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
 - We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
 - We fixed an issue when warning for duplicate entries in the "New Entry" dialog. [#14662](https://github.com/JabRef/jabref/pull/14662)
