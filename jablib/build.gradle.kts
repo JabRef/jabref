@@ -17,9 +17,7 @@ plugins {
 
     id("com.vanniktech.maven.publish") version "0.35.0"
 
-    // id("dev.jbang") version "0.3.0"
-    // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    id("com.github.koppor.jbang-gradle-plugin")
+    id("dev.jbang") version "0.4.0"
 
     id("net.ltgt.errorprone") version "4.3.0"
     id("net.ltgt.nullaway") version "2.3.0"
@@ -296,7 +294,7 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
 
     inputs.file(ltwaCsvFile)
-    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv");
+    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv")
     outputs.file(ltwaListMv)
     val ltwaListMvProv = ltwaListMv
     onlyIf { !ltwaListMvProv.get().asFile.exists() }
