@@ -65,9 +65,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
     @FXML private CustomTextField searchBox;
-    @FXML private Label bookCoverLabel;
-    @FXML private TextField bookCoverLocation;
     @FXML private CheckBox bookCoverDownload;
+    @FXML private TextField bookCoverLocation;
+    @FXML private Button browseDirectory;
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
@@ -136,7 +136,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         
         bookCoverLocation.textProperty().bindBidirectional(viewModel.coversDownloadLocationProperty());
         bookCoverLocation.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
-        bookCoverLabel.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
+        browseDirectory.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
         bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
 
         searchBox.setPromptText(Localization.lang("Search..."));
@@ -334,5 +334,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             return menu;
         }
         return null;
+    }
+
+    public void coverDirBrowse() {
+        viewModel.coverDirBrowse();
     }
 }

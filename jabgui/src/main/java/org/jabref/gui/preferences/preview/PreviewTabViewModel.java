@@ -31,6 +31,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
@@ -239,6 +240,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
+    }
+    
+    public void coverDirBrowse() {
+        DirectoryDialogConfiguration dirDialogConfiguration =
+                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(coversDownloadLocation.getValue())).build();
+        dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
+                     .ifPresent(f -> coversDownloadLocation.setValue(f.toString()));
     }
 
     public void addToChosen() {
