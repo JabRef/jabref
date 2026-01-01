@@ -37,8 +37,7 @@ public class PreviewPreferences {
                               boolean showPreviewAsExtraTab,
                               boolean showPreviewEntryTableTooltip,
                               List<Path> bstPreviewLayoutPaths,
-                              boolean shouldDownloadCovers,
-                              String coversDownloadLocation) {
+                              boolean shouldDownloadCovers) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
         this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
@@ -47,7 +46,6 @@ public class PreviewPreferences {
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
         this.shouldDownloadCovers.set(shouldDownloadCovers);
-        this.coversDownloadLocation.set(coversDownloadLocation);
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
@@ -142,17 +140,5 @@ public class PreviewPreferences {
 
     public void setShouldDownloadCovers(boolean value) {
         this.shouldDownloadCovers.set(value);
-    }
-
-    public String coversDownloadLocation() {
-        return coversDownloadLocation.get();
-    }
-
-    public StringProperty coversDownloadLocationProperty() {
-        return coversDownloadLocation;
-    }
-
-    public void setCoversDownloadLocation(String value) {
-        this.coversDownloadLocation.set(value);
     }
 }

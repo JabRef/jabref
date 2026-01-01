@@ -15,7 +15,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextField;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
@@ -66,8 +65,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private CodeArea editArea;
     @FXML private CustomTextField searchBox;
     @FXML private CheckBox bookCoverDownload;
-    @FXML private TextField bookCoverLocation;
-    @FXML private Button browseDirectory;
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
@@ -134,9 +131,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
         showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
 
-        bookCoverLocation.textProperty().bindBidirectional(viewModel.coversDownloadLocationProperty());
-        bookCoverLocation.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
-        browseDirectory.disableProperty().bind(viewModel.shouldDownloadCoversProperty().not());
         bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
 
         searchBox.setPromptText(Localization.lang("Search..."));
@@ -230,7 +224,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.coverDirValidationStatus(), bookCoverLocation));
     }
 
     /**
@@ -335,9 +328,5 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             return menu;
         }
         return null;
-    }
-
-    public void coverDirBrowse() {
-        viewModel.coverDirBrowse();
     }
 }

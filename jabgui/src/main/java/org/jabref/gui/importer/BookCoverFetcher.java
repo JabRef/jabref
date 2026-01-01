@@ -15,6 +15,7 @@ import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ISBN;
@@ -41,12 +42,12 @@ public class BookCoverFetcher {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
     }
 
-    public Optional<Path> getDownloadedCoverForEntry(BibEntry entry, String location) {
-        return entry.getISBN().flatMap(isbn -> findExistingImage("isbn-" + isbn.asString(), Path.of(location)));
+    public Optional<Path> getDownloadedCoverForEntry(BibEntry entry) {
+        return entry.getISBN().flatMap(isbn -> findExistingImage("isbn-" + isbn.asString(), Directories.getCoverDirectory()));
     }
 
-    public void downloadCoversForEntry(BibEntry entry, String location) {
-        entry.getISBN().ifPresent(isbn -> downloadCoverForISBN(isbn, Path.of(location)));
+    public void downloadCoversForEntry(BibEntry entry) {
+        entry.getISBN().ifPresent(isbn -> downloadCoverForISBN(isbn, Directories.getCoverDirectory()));
     }
 
     private void downloadCoverForISBN(ISBN isbn, Path directory) {

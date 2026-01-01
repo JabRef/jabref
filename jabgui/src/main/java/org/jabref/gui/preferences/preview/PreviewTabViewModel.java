@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.preview;
 
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +31,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
@@ -71,7 +68,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);
 
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
-    private final StringProperty coversDownloadLocation = new SimpleStringProperty("");
 
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
@@ -90,7 +86,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final TaskExecutor taskExecutor;
 
     private final Validator chosenListValidator;
-    private final Validator coverDirValidator;
 
     private final CustomLocalDragboard localDragboard;
     private ListProperty<PreviewLayout> dragSourceList = null;
@@ -120,25 +115,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                 Localization.lang("Selected Layouts can not be empty")
                         )
                 )
-        );
-
-        coverDirValidator = new FunctionBasedValidator<>(
-                coversDownloadLocation,
-                coversDownloadPath -> {
-                    ValidationMessage error = ValidationMessage.error(
-                            Localization.lang("Cover image download directory '%0' not found.\nCheck the tab \"Entry Preview\".", coversDownloadPath)
-                    );
-                    try {
-                        Path path = Path.of(coversDownloadPath);
-                        if (!(Files.exists(path) && Files.isDirectory(path))) {
-                            return error;
-                        }
-                    } catch (InvalidPathException ex) {
-                        return error;
-                    }
-                    // is valid
-                    return null;
-                }
         );
     }
 
@@ -176,7 +152,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         });
 
         shouldDownloadCovers.setValue(previewPreferences.shouldDownloadCovers());
-        coversDownloadLocation.setValue(previewPreferences.coversDownloadLocation());
     }
 
     public void setPreviewLayout(PreviewLayout selectedLayout) {
@@ -244,11 +219,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         previewPreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
-        previewPreferences.setCoversDownloadLocation(coversDownloadLocation.getValue());
-    }
-
-    ValidationStatus coverDirValidationStatus() {
-        return coverDirValidator.getValidationStatus();
     }
 
     public ValidationStatus chosenListValidationStatus() {
@@ -266,13 +236,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
-    }
-
-    public void coverDirBrowse() {
-        DirectoryDialogConfiguration dirDialogConfiguration =
-                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(coversDownloadLocation.getValue())).build();
-        dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                     .ifPresent(f -> coversDownloadLocation.setValue(f.toString()));
     }
 
     public void addToChosen() {
@@ -543,10 +506,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty shouldDownloadCoversProperty() {
         return shouldDownloadCovers;
-    }
-
-    public StringProperty coversDownloadLocationProperty() {
-        return coversDownloadLocation;
     }
 
     public void addBstStyle(Path bstFile) {

@@ -22,19 +22,7 @@
     <Label text="%Current Preview" styleClass="titleHeader"/>
     <CheckBox fx:id="showAsTabCheckBox" text="%Show preview as a tab in entry editor"/>
     <CheckBox fx:id="showPreviewTooltipCheckBox" text="%Show preview in entry table tooltip"/>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <CheckBox fx:id="bookCoverDownload" text="%Download cover images"/>
-        <TextField fx:id="bookCoverLocation" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="browseDirectory" onAction="#coverDirBrowse" styleClass="icon-button,narrow" 
-                prefHeight="20.0" prefWidth="20.0">
-            <graphic>
-                <JabRefIconView glyph="OPEN"/>
-            </graphic>
-            <tooltip>
-                <Tooltip text="%Browse"/>
-            </tooltip>
-        </Button>
-    </HBox>
+    <CheckBox fx:id="bookCoverDownload" text="%Download cover images"/>
     <Button fx:id="bstFileButton" text="%Add BST file" onAction="#selectBstFile" />
 
     <HBox spacing="4.0">
