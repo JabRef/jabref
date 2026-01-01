@@ -33,7 +33,7 @@ Chosen option: "The PreviewPanel of the EntryEditor".
 
 ### Existing SidePane
 
-![Image: Placement in SidePane](assets/ass0040-placement-in-sidepane.png)
+![Image: Placement in SidePane](assets/0040-placement-in-sidepane.png)
 
 * Good, because it would be unobtrusive
 * Bad, because it would crowd other panels in the SidePane
