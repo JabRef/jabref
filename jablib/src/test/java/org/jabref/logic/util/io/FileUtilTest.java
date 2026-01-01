@@ -231,12 +231,12 @@ class FileUtilTest {
 
     @Test
     void getBaseNameWithSimpleStringAndPath() {
-        assertEquals("test", FileUtil.getBaseName("path"+File.separatorChar+"test.pdf"));
+        assertEquals("test", FileUtil.getBaseName("path" + File.separatorChar + "test.pdf"));
     }
 
     @Test
     void getBaseNameWithMultipleDotsStringAndPath() {
-        assertEquals("te.st", FileUtil.getBaseName("path"+File.separatorChar+"te.st.PdF  "));
+        assertEquals("te.st", FileUtil.getBaseName("path" + File.separatorChar + "te.st.PdF  "));
     }
 
     @ParameterizedTest
