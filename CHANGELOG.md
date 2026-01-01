@@ -13,12 +13,16 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - We added a new "Citation contexts" tab in the entry editor that extracts citation contexts from attached PDFs and adds them to cited entries' comment fields. [#14085](https://github.com/JabRef/jabref/issues/14085)
+- In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
 
 ### Changed
 
 ### Fixed
 
-We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
+- We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
+- We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
+- We fixed an issue when warning for duplicate entries in the "New Entry" dialog. [#14662](https://github.com/JabRef/jabref/pull/14662)
+- We fixed the Quality > Automatically set file links button. Now if a file is moved, the button can relink the moved file to the broken linked file. [#9798](https://github.com/JabRef/jabref/issues/9798)
 
 ### Removed
 

@@ -507,6 +507,7 @@ public class JabRefCliPreferences implements CliPreferences {
             if (Files.exists(preferencesPath)) {
                 // This overwrites the configured values, which might be undesired by users
                 importPreferencesToBackingStore(preferencesPath);
+                LOGGER.info("Preferences imported from jabref.xml");
             }
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
