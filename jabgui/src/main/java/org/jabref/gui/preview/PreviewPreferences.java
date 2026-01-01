@@ -28,7 +28,6 @@ public class PreviewPreferences {
     private final ObservableList<Path> bstPreviewLayoutPaths;
 
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
-    private final StringProperty coversDownloadLocation = new SimpleStringProperty();
 
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
