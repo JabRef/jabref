@@ -78,9 +78,10 @@ public class FileUtil {
      * @return the extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        int dotPosition = fileName.lastIndexOf('.');
-        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
+        int slash = fileName.lastIndexOf(File.separatorChar);
+        int dot = fileName.lastIndexOf('.');
+        if (dot > slash + 1 && dot < fileName.length() - 1) {
+            return Optional.of(fileName.substring(dot + 1).trim().toLowerCase(Locale.ROOT));
         } else {
             return Optional.empty();
         }
@@ -89,24 +90,47 @@ public class FileUtil {
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
-     * @return the extension (without leading dot), trimmed and in lowercase.
+     * @return the extension (without leading dot), trimmed and in lowercase
      */
     public static Optional<String> getFileExtension(Path file) {
         return getFileExtension(file.getFileName().toString());
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * @return the name part of a file name (i.e., everything before last ".")
      */
-    public static String getBaseName(String fileNameWithExtension) {
-        return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
+    public static String getBaseName(String fileName) {
+        int slash = Math.max(0, fileName.lastIndexOf(File.separatorChar) + 1);
+        int dot = Math.max(0, fileName.lastIndexOf('.'));
+        return slash < dot ? fileName.substring(slash, dot) : fileName.substring(slash);
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(Path fileNameWithExtension) {
         return getBaseName(fileNameWithExtension.getFileName().toString());
+    }
+
+    /**
+     * Extracts the filename from a URL, which is found between the last slash '/' and first query '?'.
+     * Does not check that the file is a vaild URL.
+     *
+     * @param link the URL string to extract the filename from
+     * @return the extracted filename, or Optional.empty if there is none.
+     */
+    public static Optional<String> getFileNameFromUrl(String link) {
+        int slash = link.lastIndexOf('/');
+        slash = (slash >= 0 ? slash + 1 : 0);
+
+        int query = link.indexOf('?', slash);
+        query = (query >= 0 ? query : link.length());
+
+        if (slash < query) {
+            return Optional.of(getValidFileName(link.substring(slash, query)));
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -347,11 +371,7 @@ public class FileUtil {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
         if (targetName.isEmpty() || "-".equals(targetName)) {
-            targetName = entry.getCitationKey().orElse("default");
-        }
-
-        if ("default".equals(targetName)) {
-            return Optional.empty();
+            return entry.getCitationKey().map(FileNameCleaner::cleanFileName);
         }
 
         // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename

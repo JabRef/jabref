@@ -1,5 +1,6 @@
 package org.jabref.logic.util.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -152,14 +153,6 @@ class FileUtilTest {
     }
 
     @Test
-    void getLinkedFileNameGetOptionalEmptyIfDefaultAsPattern() {
-        String fileNamePattern = "default";
-        BibEntry entry = new BibEntry();
-
-        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
-    }
-
-    @Test
     void getLinkedFileNameByYearAuthorFirstpage() {
         String fileNamePattern = "[year]_[auth]_[firstpage]";
         BibEntry entry = new BibEntry();
@@ -181,59 +174,120 @@ class FileUtilTest {
         assertEquals(expected, result.get());
     }
 
-    @Test
-    void getFileExtensionSimpleFile() {
-        assertEquals("pdf", FileUtil.getFileExtension(Path.of("test.pdf")).get());
+    @ParameterizedTest
+    // @formatter:off
+    @CsvSource(textBlock = """
+               pdf, test.pdf
+               pdf, te.st.pdf
+               pdf, te.st.PdF
+               pdf, 'test.pdf  '
+               pdf, 'test.PdF  '
+               pdf, 'te.st.PdF  '
+               txt, other.txt
+               pdf, path/test.pdf
+               pdf, path/.to/FileInsideAHiddenFolder.pdf
+        """)
+    // @formatter:on
+    void getFileExtensionsFromString(String extension, String file) {
+        file = file.replace('/', File.separatorChar);
+        assertEquals(extension, FileUtil.getFileExtension(file).get());
+    }
+
+    @ParameterizedTest
+    // @formatter:off
+    @CsvSource(textBlock = """
+               JustTextNotASingleDot
+               .StartsWithADotIsNotAnExtension
+               path/to/JustTextNotASingleDot
+               path/to/.StartsWithADotIsNotAnExtension
+               path/.to/FileInsideAHiddenFolder
+               path/.to/.StartsWithADotInsideAHiddenFolder
+        """)
+    // @formatter:on
+    void getAbsentFileExtensionsFromString(String file) {
+        file = file.replace('/', File.separatorChar);
+
+        Optional<String> result = FileUtil.getFileExtension(file);
+        assertFalse(result.isPresent(), "got extension '" + result.orElse("") + "'");
+    }
+
+    @ParameterizedTest
+    // @formatter:off
+    @CsvSource(textBlock = """
+               test, test.pdf
+               te.st, 'te.st.PdF  '
+               other, 'other.txt'
+               file, path/to/file.pdf
+               te.st, 'path/to/te.st.PdF  '
+               JustTextNotASingleDot, JustTextNotASingleDot
+               .StartsWithADotIsNotAnExtension, .StartsWithADotIsNotAnExtension
+               JustTextNotASingleDot, path/to/JustTextNotASingleDot
+               .StartsWithADotIsNotAnExtension, path/to/.StartsWithADotIsNotAnExtension
+               FileInsideAHiddenFolder, path/.to/FileInsideAHiddenFolder
+               .StartsWithADotInsideAHiddenFolder, path/.to/.StartsWithADotInsideAHiddenFolder
+        """)
+    // @formatter:on
+    void getBaseNameFromString(String baseName, String file) {
+        file = file.replace('/', File.separatorChar);
+        assertEquals(baseName, FileUtil.getBaseName(file));
+    }
+
+    @ParameterizedTest
+    // @formatter:off
+    @CsvSource(textBlock = """
+               test.pdf
+               'te.st.PdF  '
+               other.txt
+               path/test.pdf
+               path/to/file.pdf
+               JustTextNotASingleDot
+               .StartsWithADotIsNotAnExtension
+               path/to/JustTextNotASingleDot
+               path/to/.StartsWithADotIsNotAnExtension
+               path/.to/FileInsideAHiddenFolder
+               path/.to/.StartsWithADotInsideAHiddenFolder
+        """)
+    // @formatter:on
+    void checkFileExtensionAreTheSameForStringsAndPaths(String file) {
+        file = file.replace('/', File.separatorChar);
+
+        Optional<String> resultFromString = FileUtil.getFileExtension(file);
+        Optional<String> resultFromPath = FileUtil.getFileExtension(Path.of(file));
+        assertEquals(resultFromString.orElse("EMPTY"), resultFromPath.orElse("EMPTY"), "difference between Strings and Path from '" + file + "'");
+    }
+
+    @ParameterizedTest
+    // @formatter:off
+    @CsvSource(textBlock = """
+               test.file, www.example.com/test.file
+               test.file, http://www.example.com/test.file
+               test.file, https://www.example.com/test.file
+               test.file, www.example.com/path/to/test.file
+               test.file, http://www.example.com/path/to/test.file
+               test.file, https://www.example.com/path/to/test.file
+               test.file, https://www.example.com/not\\a\\windows\\path/test.file
+               test.file, https://www.example.com////test.file
+               blank, https://www.example.com/path/to/blank
+               blank, https://www.example.com/not\\a\\windows\\path/blank
+               not\\a\\windows.file, https://www.example.com/path/to/not\\a\\windows.file
+               test.file, https://www.example.com/path/to/test.file?field=value
+               test.file, https://www.example.com/path/to/test.file?a=1&b=2
+               test.file, https://www.example.com/path/to/test.file?search=for+a+file
+               blank, https://www.example.com/path/to/blank?search=for+a+file
+        """)
+    // @formatter:on
+    void getFileNameFromUrlsCorrectly(String file, String url) {
+        assertEquals(file, FileUtil.getFileNameFromUrl(url).orElse("file.pdf"), "from '" + url + "'");
     }
 
     @Test
-    void getFileExtensionMultipleDotsFile() {
-        assertEquals("pdf", FileUtil.getFileExtension(Path.of("te.st.PdF")).get());
+    void getEmptyFileNameFromUrlCorrectly() {
+        assertEquals(Optional.empty(), FileUtil.getFileNameFromUrl("https://www.example.com/path/to/?nothing=at+all"), "from 'https://www.example.com/path/to/?nothing=at+all'");
     }
 
     @Test
-    void getFileExtensionNoExtensionFile() {
-        assertFalse(FileUtil.getFileExtension(Path.of("JustTextNotASingleDot")).isPresent());
-    }
-
-    @Test
-    void getFileExtensionNoExtension2File() {
-        assertFalse(FileUtil.getFileExtension(Path.of(".StartsWithADotIsNotAnExtension")).isPresent());
-    }
-
-    @Test
-    void getFileExtensionWithSimpleString() {
-        assertEquals("pdf", FileUtil.getFileExtension("test.pdf").get());
-    }
-
-    @Test
-    void getFileExtensionTrimsAndReturnsInLowercase() {
-        assertEquals("pdf", FileUtil.getFileExtension("test.PdF  ").get());
-    }
-
-    @Test
-    void getFileExtensionWithMultipleDotsString() {
-        assertEquals("pdf", FileUtil.getFileExtension("te.st.PdF  ").get());
-    }
-
-    @Test
-    void getFileExtensionWithNoDotReturnsEmptyExtension() {
-        assertEquals(Optional.empty(), FileUtil.getFileExtension("JustTextNotASingleDot"));
-    }
-
-    @Test
-    void getFileExtensionWithDotAtStartReturnsEmptyExtension() {
-        assertEquals(Optional.empty(), FileUtil.getFileExtension(".StartsWithADotIsNotAnExtension"));
-    }
-
-    @Test
-    void getFileNameWithSimpleString() {
-        assertEquals("test", FileUtil.getBaseName("test.pdf"));
-    }
-
-    @Test
-    void getFileNameWithMultipleDotsString() {
-        assertEquals("te.st", FileUtil.getBaseName("te.st.PdF  "));
+    void getEmptyFileNameFromEmptyUrlCorrectly() {
+        assertEquals(Optional.empty(), FileUtil.getFileNameFromUrl(""), "from ''");
     }
 
     @Test
