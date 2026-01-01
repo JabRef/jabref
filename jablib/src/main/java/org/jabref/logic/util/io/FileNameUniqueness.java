@@ -44,7 +44,9 @@ public class FileNameUniqueness {
         int counter = 1;
         String newFileName = proposedName;
         while (Files.exists(targetDirectory.resolve(newFileName))) {
-            newFileName = fileNameWithoutExtension + " (" + counter + ")" + extensionSuffix;
+            newFileName = fileNameWithoutExtension +
+                    " (" + counter + ")" +
+                    extensionSuffix;
             counter++;
         }
 

@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -223,26 +222,6 @@ public class LinkedFile implements Serializable {
 
     public boolean isOnlineLink() {
         return isOnlineLink(link.get());
-    }
-
-    /**
-     * Extracts the file name, including basename and extension, from the link.
-     *
-     * @return extracted file name
-     */
-    public Optional<String> getFileName() {
-        String linkedName = link.get();
-        if (isOnlineLink(linkedName)) {
-            return FileUtil.getFileNameFromUrl(linkedName);
-        } else if (linkedName.isEmpty()) {
-            return Optional.empty();
-        } else {
-            int slash = linkedName.lastIndexOf(File.separatorChar);
-            if (slash >= 0) {
-                return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
-            }
-        }
-        return Optional.of(FileUtil.getValidFileName(linkedName));
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {

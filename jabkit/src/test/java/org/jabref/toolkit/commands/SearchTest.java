@@ -72,7 +72,7 @@ public class SearchTest extends AbstractJabKitTest {
                 "--output-format=bibtex",
                 "--output=" + output);
 
-        assertFileDoesntExist(output);
+        assertFalse(output.toFile().exists());
     }
 
     @Test
@@ -95,7 +95,7 @@ public class SearchTest extends AbstractJabKitTest {
 
         commandLine.execute(args.toArray(String[]::new));
 
-        assertFileExists(outputBib);
+        assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
     }
 }

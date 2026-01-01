@@ -64,7 +64,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
     @FXML private CustomTextField searchBox;
-    @FXML private CheckBox bookCoverDownload;
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
@@ -130,8 +129,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
         showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
-
-        bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
 
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());

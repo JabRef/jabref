@@ -75,9 +75,6 @@ import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.Duplicate
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
-
-    private static final String FILENAME_FALLBACK = "downloaded.pdf";
-
     private final BibDatabaseContext targetBibDatabaseContext;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -440,7 +437,7 @@ public class ImportHandler {
         LOGGER.trace("Checking if URL is a PDF: {}", data);
 
         if (URLUtil.isURL(data)) {
-            String fileName = FileUtil.getFileNameFromUrl(data).orElse(FILENAME_FALLBACK);
+            String fileName = data.substring(data.lastIndexOf('/') + 1);
             if (FileUtil.isPDFFile(Path.of(fileName))) {
                 try {
                     return handlePdfUrl(data);
@@ -507,7 +504,7 @@ public class ImportHandler {
             return List.of();
         }
         URLDownload urlDownload = new URLDownload(pdfUrl);
-        String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse(FILENAME_FALLBACK);
+        String filename = URLUtil.getFileNameFromUrl(pdfUrl);
         Path targetFile = targetDirectory.get().resolve(filename);
         try {
             urlDownload.toFile(targetFile);

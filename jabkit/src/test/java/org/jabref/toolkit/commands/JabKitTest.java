@@ -1,7 +1,7 @@
 package org.jabref.toolkit.commands;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JabKitTest extends AbstractJabKitTest {
 
     @Test
-    void auxImport(@TempDir Path tempDir) throws IOException, URISyntaxException {
+    void auxImport(@TempDir Path tempDir) throws URISyntaxException {
         String fullBib = getClassResourceAsFullyQualifiedString("origin.bib");
         String auxFile = getClassResourceAsFullyQualifiedString("paper.aux");
 
@@ -26,7 +26,7 @@ class JabKitTest extends AbstractJabKitTest {
 
         commandLine.execute(args.toArray(String[]::new));
 
-        assertFileExists(outputBib);
+        assertTrue(Files.exists(outputBib));
     }
 
     @Test

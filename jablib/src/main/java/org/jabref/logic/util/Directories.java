@@ -68,13 +68,4 @@ public class Directories {
                                       "relations",
                                       OS.APP_DIR_APP_AUTHOR));
     }
-
-    public static Path getCoverDirectory() {
-        return Path.of(
-                AppDirsFactory.getInstance()
-                              .getUserDataDir(
-                                      OS.APP_DIR_APP_NAME,
-                                      "covers",
-                                      OS.APP_DIR_APP_AUTHOR));
-    }
 }

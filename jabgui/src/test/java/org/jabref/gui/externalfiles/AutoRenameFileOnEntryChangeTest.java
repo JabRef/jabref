@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
@@ -94,7 +93,7 @@ class AutoRenameFileOnEntryChangeTest {
         entry.setField(StandardField.AUTHOR, "newKey");
 
         assertEquals("oldKey2081.pdf", entry.getFiles().getFirst().getLink());
-        assertFileExists(tempDir.resolve("oldKey2081.pdf"));
+        assertTrue(Files.exists(tempDir.resolve("oldKey2081.pdf")));
     }
 
     @Test
@@ -106,7 +105,7 @@ class AutoRenameFileOnEntryChangeTest {
         entry.setField(StandardField.AUTHOR, "newKey");
 
         assertEquals("oldKey2081.pdf", entry.getFiles().getFirst().getLink());
-        assertFileExists(tempDir.resolve("oldKey2081.pdf"));
+        assertTrue(Files.exists(tempDir.resolve("oldKey2081.pdf")));
     }
 
     @Test
@@ -118,12 +117,12 @@ class AutoRenameFileOnEntryChangeTest {
         // change author only
         entry.setField(StandardField.AUTHOR, "newKey");
         assertEquals("newKey2081.pdf", entry.getFiles().getFirst().getLink());
-        assertFileExists(tempDir.resolve("newKey2081.pdf"));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.pdf")));
 
         // change year only
         entry.setField(StandardField.YEAR, "2082");
         assertEquals("newKey2082.pdf", entry.getFiles().getFirst().getLink());
-        assertFileExists(tempDir.resolve("newKey2082.pdf"));
+        assertTrue(Files.exists(tempDir.resolve("newKey2082.pdf")));
     }
 
     @Test
@@ -153,19 +152,19 @@ class AutoRenameFileOnEntryChangeTest {
 
         // Change author only
         entry.setField(StandardField.AUTHOR, "newKey");
-        assertFileExists(tempDir.resolve("newKey2081.pdf"));
-        assertFileExists(tempDir.resolve("newKey2081.jpg"));
-        assertFileExists(tempDir.resolve("newKey2081.csv"));
-        assertFileExists(tempDir.resolve("newKey2081.doc"));
-        assertFileExists(tempDir.resolve("newKey2081.docx"));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.pdf")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.jpg")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.csv")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.doc")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.docx")));
 
         // change year only
         entry.setField(StandardField.YEAR, "2082");
-        assertFileExists(tempDir.resolve("newKey2082.pdf"));
-        assertFileExists(tempDir.resolve("newKey2082.jpg"));
-        assertFileExists(tempDir.resolve("newKey2082.csv"));
-        assertFileExists(tempDir.resolve("newKey2082.doc"));
-        assertFileExists(tempDir.resolve("newKey2082.docx"));
+        assertTrue(Files.exists(tempDir.resolve("newKey2082.pdf")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2082.jpg")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2082.csv")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2082.doc")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2082.docx")));
     }
 
     @Test
@@ -179,17 +178,9 @@ class AutoRenameFileOnEntryChangeTest {
         when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
 
         entry.setField(StandardField.AUTHOR, "newKey");
-        assertFileExists(tempDir.resolve("newKey2081.pdf"));
-        assertFileExists(tempDir.resolve("newKey2081 (1).pdf"));
-        assertFileExists(tempDir.resolve("newKey2081 (2).pdf"));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.pdf")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081 (1).pdf")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081 (2).pdf")));
         assertEquals("newKey2081 (2).pdf", entry.getFiles().getFirst().getLink());
-    }
-
-    static void assertFileExists(Path file) throws IOException {
-        String listedFiles = Files.list(file.getParent())
-                                  .map(path -> "'" + path.getFileName().toString() + "'")
-                                  .collect(Collectors.joining(", "));
-
-        assertTrue(Files.exists(file), "file '" + file.getFileName().toString() + "' doesn't exist,  but found " + listedFiles);
     }
 }
