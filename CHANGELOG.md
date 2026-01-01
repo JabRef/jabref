@@ -13,7 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
-
+- Consistency check is now aware of custom entry types, custom fields, and alerts on missing required fields
 ### Changed
 
 ### Fixed
