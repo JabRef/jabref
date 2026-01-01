@@ -1,5 +1,6 @@
 package org.jabref.logic.util;
 
+import java.io.IOError;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;

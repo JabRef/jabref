@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -76,6 +75,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
             getSelectionHtml();
             """;
+
+    private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -229,29 +230,32 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String coverIfAny = getCoverImageURL().map("<img style=\"border-width:1px; border-style:solid; border-color:black; display:block; height:12rem;\" src=\"%s\"> <br>"::formatted).orElse("");
-
-        AtomicReference<String> baseURL = new AtomicReference<>("");
-        if (databaseContext != null) {
-            databaseContext
-                    .getFirstExistingFileDir(preferences.getFilePreferences())
-                    .ifPresent(baseDirPath -> {
-                        try {
-                            String baseUrl = baseDirPath.toUri().toURL().toExternalForm();
-                            // Ensure the base URL ends with a slash for correct relative path resolution
-                            if (!baseUrl.endsWith("/")) {
-                                baseUrl += "/";
-                            }
-                            baseURL.set(baseUrl);
-                        } catch (MalformedURLException e) {
-                            LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
-                        }
-                    });
-        }
-
-        layoutText = formatPreviewText(baseURL.get(), coverIfAny, text);
+        String baseURL = getBaseURL().orElse("");
+        String coverIfAny = getCoverImageURL().map(COVER_IMAGE_FORMAT_HTML::formatted).orElse("");
+        layoutText = formatPreviewText(baseURL, coverIfAny, text);
         highlightLayoutText();
         setHvalue(0);
+    }
+
+    private Optional<String> getBaseURL() {
+        if (databaseContext != null) {
+            return databaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(path -> {
+                String url = path.toUri().toString();
+                if (!url.endsWith("/")) {
+                    url += "/";
+                }
+                return url;
+            });
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> getCoverImageURL() {
+        if (entry != null) {
+            String location = preferences.getPreviewPreferences().coversDownloadLocation();
+            return bookCoverFetcher.getDownloadedCoverForEntry(entry, location).map(path -> path.toUri().toString());
+        }
+        return Optional.empty();
     }
 
     private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
@@ -265,14 +269,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     </body>
                 </html>
                 """.formatted(baseUrl, coverIfAny, text);
-    }
-
-    private Optional<String> getCoverImageURL() {
-        if (entry != null) {
-            String location = preferences.getPreviewPreferences().coversDownloadLocation();
-            return bookCoverFetcher.getDownloadedCoverForEntry(entry, location).map(path -> path.toUri().toString());
-        }
-        return Optional.empty();
     }
 
     private void highlightLayoutText() {
