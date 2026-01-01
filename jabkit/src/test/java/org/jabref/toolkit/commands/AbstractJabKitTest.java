@@ -136,14 +136,16 @@ public abstract class AbstractJabKitTest {
             return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())
                        .toAbsolutePath();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(
-                    "Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e
-            );
+            throw new RuntimeException("Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e);
         }
     }
 
     static void assertFileExists(Path path) throws IOException {
-        assertTrue(Files.exists(path), "file  '" + path.getFileName().toString() + "' doesn't exist, but found " + Files.list(path.getParent()).map(f -> "'" + f.getFileName().toString() + "'").collect(Collectors.joining(", ")));
+        String listedFiles = Files.list(path.getParent())
+                                  .map(path -> "'" + path.getFileName().toString() + "'")
+                                  .collect(Collectors.joining(", "));
+
+        assertTrue(Files.exists(path), "file  '" + path.getFileName().toString() + "' doesn't exist, but found " + listedFiles);
     }
 
     static void assertFileDoesntExist(Path path) throws IOException {

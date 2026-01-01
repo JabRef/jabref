@@ -71,12 +71,15 @@ public class BookCoverFetcher {
             LOGGER.info("Downloading cover image file from {}", url);
 
             URLDownload download = new URLDownload(url);
-            Optional<String> mime = download.getMimeType();
+            Optional<String> mimeIfAvailable = download.getMimeType();
 
-            Optional<ExternalFileType> inferedFromMime = mime.flatMap(m -> ExternalFileTypes.getExternalFileTypeByMimeType(m, externalApplicationsPreferences)).filter(t -> t.getMimeType().startsWith("image/"));
-            Optional<ExternalFileType> inferedFromExtension = extension.flatMap(x -> ExternalFileTypes.getExternalFileTypeByExt(x, externalApplicationsPreferences)).filter(t -> t.getMimeType().startsWith("image/"));
+            Optional<ExternalFileType> inferedFromMime = mimeIfAvailable.flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
+                                                                        .filter(fileType -> fileType.getMimeType().startsWith("image/"));
+            Optional<ExternalFileType> inferedFromExtension = extension.flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
+                                                                       .filter(fileType -> fileType.getMimeType().startsWith("image/"));
+            final ExternalFileType inferedFileType = inferedFromMime.orElse(inferedFromExtension.orElse(StandardExternalFileType.JPG));
 
-            Optional<Path> destination = resolveNameWithType(directory, name, inferedFromMime.orElse(inferedFromExtension.orElse(StandardExternalFileType.JPG)));
+            Optional<Path> destination = resolveNameWithType(directory, name, inferedFileType);
             if (destination.isPresent()) {
                 download.toFile(destination.get());
             }
@@ -86,9 +89,9 @@ public class BookCoverFetcher {
         }
     }
 
-    private static Optional<Path> resolveNameWithType(Path directory, String name, ExternalFileType filetype) {
+    private static Optional<Path> resolveNameWithType(Path directory, String name, ExternalFileType fileType) {
         try {
-            return Optional.of(directory.resolve(FileUtil.getValidFileName(name + "." + filetype.getExtension())));
+            return Optional.of(directory.resolve(FileUtil.getValidFileName(name + "." + fileType.getExtension())));
         } catch (InvalidPathException e) {
             return Optional.empty();
         }
@@ -96,8 +99,8 @@ public class BookCoverFetcher {
 
     private Optional<Path> findExistingImage(final String name, final Path directory) {
         return externalApplicationsPreferences.getExternalFileTypes().stream()
-                                              .filter(filetype -> filetype.getMimeType().startsWith("image/"))
-                                              .flatMap(filetype -> resolveNameWithType(directory, name, filetype).stream())
+                                              .filter(fileType -> fileType.getMimeType().startsWith("image/"))
+                                              .flatMap(fileType -> resolveNameWithType(directory, name, fileType).stream())
                                               .filter(Files::exists).findFirst();
     }
 

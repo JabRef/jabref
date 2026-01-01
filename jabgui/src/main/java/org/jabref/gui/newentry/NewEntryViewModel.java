@@ -24,6 +24,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.CompositeIdFetcher;
@@ -239,8 +240,9 @@ public class NewEntryViewModel {
     }
 
     private BibEntry withCoversDownloaded(BibEntry entry) {
-        if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
-            String location = preferences.getPreviewPreferences().coversDownloadLocation();
+        final PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        if (previewPreferences.shouldDownloadCovers()) {
+            final String location = previewPreferences.coversDownloadLocation();
             bookCoverFetcher.downloadCoversForEntry(entry, location);
         }
         return entry;
@@ -255,7 +257,8 @@ public class NewEntryViewModel {
             }
 
             CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
-            return fetcher.performSearchById(text).map(e -> withCoversDownloaded(e));
+            return fetcher.performSearchById(text)
+                          .map(entry -> withCoversDownloaded(entry));
         }
     }
 
@@ -277,7 +280,8 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text).map(e -> withCoversDownloaded(e));
+            return fetcher.performSearchById(text)
+                          .map(entry -> withCoversDownloaded(entry));
         }
     }
 
