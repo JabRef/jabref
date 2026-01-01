@@ -330,7 +330,7 @@ public class CitationContextComponent extends BorderPane {
                                       matched.isMatched() ? getEntryDisplayName(matched.libraryEntry()) : Localization.lang("Not found"),
                                       matched.context().contextText(),
                                       matched.isMatched()
-                                      ? (matched.isNewEntry() ? Localization.lang("New entry") : Localization.lang("Existing"))
+                                      ? (matched.isNewEntry() ? Localization.lang("New Entry") : Localization.lang("Existing"))
                                       : Localization.lang("Unmatched"),
                                       matched.isMatched(),
                                       matched

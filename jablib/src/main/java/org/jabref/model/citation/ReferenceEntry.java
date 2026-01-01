@@ -1,6 +1,5 @@
 package org.jabref.model.citation;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,17 +8,19 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
+
 public record ReferenceEntry(
-        String rawText,
-        String marker,
-        Optional<String> authors,
-        Optional<String> title,
-        Optional<String> year,
-        Optional<String> journal,
-        Optional<String> volume,
-        Optional<String> pages,
-        Optional<String> doi,
-        Optional<String> url
+        @NonNull String rawText,
+        @NonNull String marker,
+        @NonNull Optional<String> authors,
+        @NonNull Optional<String> title,
+        @NonNull Optional<String> year,
+        @NonNull Optional<String> journal,
+        @NonNull Optional<String> volume,
+        @NonNull Optional<String> pages,
+        @NonNull Optional<String> doi,
+        @NonNull Optional<String> url
 ) {
     private static final Pattern YEAR_PATTERN = Pattern.compile("\\b(19|20)\\d{2}\\b");
     private static final Pattern AUTHOR_YEAR_KEY_PATTERN = Pattern.compile(
@@ -27,17 +28,6 @@ public record ReferenceEntry(
     );
 
     public ReferenceEntry {
-        Objects.requireNonNull(rawText, "Raw text cannot be null");
-        Objects.requireNonNull(marker, "Marker cannot be null");
-        Objects.requireNonNull(authors, "Authors optional cannot be null");
-        Objects.requireNonNull(title, "Title optional cannot be null");
-        Objects.requireNonNull(year, "Year optional cannot be null");
-        Objects.requireNonNull(journal, "Journal optional cannot be null");
-        Objects.requireNonNull(volume, "Volume optional cannot be null");
-        Objects.requireNonNull(pages, "Pages optional cannot be null");
-        Objects.requireNonNull(doi, "DOI optional cannot be null");
-        Objects.requireNonNull(url, "URL optional cannot be null");
-
         if (rawText.isBlank()) {
             throw new IllegalArgumentException("Raw text cannot be blank");
         }

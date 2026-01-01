@@ -15,6 +15,17 @@ public class PdfReferenceParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfReferenceParser.class);
 
+    private static final String NUMERIC_BRACKETED_REGEX = "\\[\\d{1,3}\\]";
+    private static final String NUMERIC_DOTTED_REGEX = "(?:^|\\n)\\d{1,3}\\.\\s";
+    private static final String AUTHOR_KEY_REGEX = "\\[[A-Z][a-zA-Z]+\\d{2,4}[a-z]?\\]";
+
+    private static final Pattern NUMERIC_BRACKETED_PATTERN = Pattern.compile(NUMERIC_BRACKETED_REGEX);
+    private static final Pattern NUMERIC_BRACKETED_SPLIT_PATTERN = Pattern.compile("(?=" + NUMERIC_BRACKETED_REGEX + ")");
+    private static final Pattern NUMERIC_DOTTED_PATTERN = Pattern.compile(NUMERIC_DOTTED_REGEX);
+    private static final Pattern NUMERIC_DOTTED_SPLIT_PATTERN = Pattern.compile("(?=" + NUMERIC_DOTTED_REGEX + ")");
+    private static final Pattern AUTHOR_KEY_PATTERN = Pattern.compile(AUTHOR_KEY_REGEX);
+    private static final Pattern AUTHOR_KEY_SPLIT_PATTERN = Pattern.compile("(?=" + AUTHOR_KEY_REGEX + ")");
+
     private static final Pattern NUMERIC_MARKER_PATTERN = Pattern.compile(
             "^\\s*\\[?(\\d{1,3})\\]?\\.?\\s+"
     );
@@ -101,13 +112,13 @@ public class PdfReferenceParser {
 
         switch (format) {
             case NUMERIC_BRACKETED ->
-                    references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=\\[\\d{1,3}\\])")));
+                    references.addAll(splitByPattern(normalizedText, NUMERIC_BRACKETED_SPLIT_PATTERN));
             case NUMERIC_DOTTED ->
-                    references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=(?:^|\\n)\\d{1,3}\\.\\s)")));
+                    references.addAll(splitByPattern(normalizedText, NUMERIC_DOTTED_SPLIT_PATTERN));
             case AUTHOR_YEAR ->
                     references.addAll(splitByBlankLinesOrIndentation(normalizedText));
             case AUTHOR_KEY ->
-                    references.addAll(splitByPattern(normalizedText, Pattern.compile("(?=\\[[A-Z][a-zA-Z]+\\d{2,4}[a-z]?\\])")));
+                    references.addAll(splitByPattern(normalizedText, AUTHOR_KEY_SPLIT_PATTERN));
             default ->
                     references.addAll(splitByBlankLinesOrIndentation(normalizedText));
         }
@@ -119,9 +130,9 @@ public class PdfReferenceParser {
     }
 
     private ReferenceFormat detectReferenceFormat(String text) {
-        int numericBracketed = countMatches(text, Pattern.compile("\\[\\d{1,3}\\]"));
-        int numericDotted = countMatches(text, Pattern.compile("(?:^|\\n)\\d{1,3}\\.\\s"));
-        int authorKey = countMatches(text, Pattern.compile("\\[[A-Z][a-zA-Z]+\\d{2,4}[a-z]?\\]"));
+        int numericBracketed = countMatches(text, NUMERIC_BRACKETED_PATTERN);
+        int numericDotted = countMatches(text, NUMERIC_DOTTED_PATTERN);
+        int authorKey = countMatches(text, AUTHOR_KEY_PATTERN);
 
         if (numericBracketed >= 3) {
             return ReferenceFormat.NUMERIC_BRACKETED;
