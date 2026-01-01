@@ -82,6 +82,17 @@ public class CitationContextComponent extends BorderPane {
         this.statusLabel = new Label();
 
         initializeComponent();
+
+        entry.getFieldBinding(org.jabref.model.entry.field.StandardField.FILE)
+             .addListener((obs, oldVal, newVal) -> Platform.runLater(this::refreshContent));
+    }
+
+    private void refreshContent() {
+        contentBox.getChildren().clear();
+        extractedResults.clear();
+        resultsTable.getItems().clear();
+        setCenter(null);
+        initializeComponent();
     }
 
     private void initializeComponent() {
