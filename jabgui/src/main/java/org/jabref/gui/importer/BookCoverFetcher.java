@@ -89,19 +89,19 @@ public class BookCoverFetcher {
         }
     }
 
+    private Optional<Path> findExistingImage(final String name, final Path directory) {
+        return externalApplicationsPreferences.getExternalFileTypes().stream()
+                                              .filter(fileType -> fileType.getMimeType().startsWith("image/"))
+                                              .flatMap(fileType -> resolveNameWithType(directory, name, fileType).stream())
+                                              .filter(Files::exists).findFirst();
+    }
+
     private static Optional<Path> resolveNameWithType(Path directory, String name, ExternalFileType fileType) {
         try {
             return Optional.of(directory.resolve(FileUtil.getValidFileName(name + "." + fileType.getExtension())));
         } catch (InvalidPathException e) {
             return Optional.empty();
         }
-    }
-
-    private Optional<Path> findExistingImage(final String name, final Path directory) {
-        return externalApplicationsPreferences.getExternalFileTypes().stream()
-                                              .filter(fileType -> fileType.getMimeType().startsWith("image/"))
-                                              .flatMap(fileType -> resolveNameWithType(directory, name, fileType).stream())
-                                              .filter(Files::exists).findFirst();
     }
 
     private static String getSourceForIsbn(ISBN isbn) {
