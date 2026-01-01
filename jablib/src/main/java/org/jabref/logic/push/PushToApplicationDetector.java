@@ -39,7 +39,7 @@ public class PushToApplicationDetector {
             return false;
         }
         Path p = Path.of(path);
-        return p.isAbsolute() && Files.exists(p);
+        return p.isAbsolute() && p.toFile().exists();
     }
 
     private static @Nullable String findApplicationPath(PushToApplication app) {
@@ -61,7 +61,7 @@ public class PushToApplicationDetector {
 
         for (Path base : paths) {
             try {
-                if (Files.exists(base)) {
+                if (base.toFile().exists()) {
                     String result = findExecutableInDirectory(base, names);
                     if (result != null) {
                         return result;
@@ -122,7 +122,7 @@ public class PushToApplicationDetector {
     }
 
     private static boolean isValidExecutable(Path path, String[] names) {
-        if (Files.notExists(path)) {
+        if (!path.toFile().exists()) {
             return false;
         }
 

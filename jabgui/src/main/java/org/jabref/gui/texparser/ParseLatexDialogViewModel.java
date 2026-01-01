@@ -78,8 +78,9 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
 
-        Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
-        latexDirectoryValidator = new FunctionBasedValidator<>(latexFileDirectory, isDirectory, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        Predicate<String> isDirectory = path -> Path.of(path).toFile().isDirectory();
+        latexDirectoryValidator = new FunctionBasedValidator<>(latexFileDirectory, isDirectory,
+                ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
 
     public StringProperty latexFileDirectoryProperty() {
@@ -151,7 +152,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     }
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {
-        if ((directory == null) || !Files.isDirectory(directory)) {
+        if ((directory == null) || !directory.toFile().isDirectory()) {
             throw new IOException("Invalid directory for searching: %s".formatted(directory));
         }
 
@@ -159,7 +160,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         Map<Boolean, List<Path>> fileListPartition;
 
         try (Stream<Path> filesStream = Files.list(directory)) {
-            fileListPartition = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
+            fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
             LOGGER.error("Error searching files", e);
             return parent;
@@ -194,7 +195,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     public void parseButtonClicked() {
         List<Path> fileList = checkedFileList.stream()
                                              .map(item -> item.getValue().getPath())
-                                             .filter(Files::isRegularFile)
+                                             .filter(path -> path.toFile().isFile())
                                              .toList();
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");

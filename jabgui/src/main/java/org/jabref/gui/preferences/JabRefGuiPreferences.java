@@ -89,7 +89,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String PREVIEW_AS_TAB = "previewAsTab";
     public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
     public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
-    public static final String COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
 
     // region column names
@@ -287,8 +286,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
-
-        defaults.put(COVER_IMAGE_DOWNLOAD, Boolean.TRUE);
     }
 
     /**
@@ -866,8 +863,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
                 getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
                                                        .map(Path::of)
-                                                       .collect(Collectors.toList()),
-                getBoolean(COVER_IMAGE_DOWNLOAD)
+                                                       .collect(Collectors.toList())
         );
 
         previewPreferences.getLayoutCycle().addListener((InvalidationListener) c -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
@@ -876,7 +872,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
         EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
         previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) c -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
-        EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(COVER_IMAGE_DOWNLOAD, newValue));
         return this.previewPreferences;
     }
 

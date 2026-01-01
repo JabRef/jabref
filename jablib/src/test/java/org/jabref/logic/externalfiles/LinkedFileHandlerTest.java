@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 class LinkedFileHandlerTest {
     private Path tempFolder;
     private BibEntry entry;
-    private BibEntry badEntry;
     private BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final CliPreferences preferences = mock(CliPreferences.class);
@@ -31,7 +30,6 @@ class LinkedFileHandlerTest {
     @BeforeEach
     void setUp(@TempDir Path tempFolder) {
         entry = new BibEntry().withCitationKey("asdf");
-        badEntry = new BibEntry();
         databaseContext = new BibDatabaseContext();
 
         when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
@@ -42,13 +40,13 @@ class LinkedFileHandlerTest {
     }
 
     @ParameterizedTest(name = "{1} to {2} should be {0}")
-    @CsvSource(textBlock = """
-                newName.pdf, test.pdf, newName
-                newName.txt, test.pdf, newName.txt
-                newNameWithoutExtension, test, newNameWithoutExtension
-                newName.pdf, testFile, newName.pdf
-                newName..pdf, test.pdf, newName.
-            """)
+    @CsvSource({
+            "newName.pdf, test.pdf, newName",
+            "newName.txt, test.pdf, newName.txt",
+            "newNameWithoutExtension, test, newNameWithoutExtension",
+            "newName.pdf, testFile, newName.pdf",
+            "newName..pdf, test.pdf, newName."
+    })
     void renameFile(String expectedFileName, String originalFileName, String newFileName) throws IOException {
         final Path tempFile = tempFolder.resolve(originalFileName);
         Files.createFile(tempFile);
@@ -61,59 +59,37 @@ class LinkedFileHandlerTest {
         assertEquals(expectedFileName, result);
     }
 
-    @ParameterizedTest(name = "{1} with {2} should be {0} with citation key 'asdf'")
-    @CsvSource(textBlock = """
-                asdf.pdf, '', pdf
-                asdf.pdf, https://example.com/file.pdf, pdf
-                asdf.pdf, https://example.com/file.pdf?query=test, pdf
-                asdf.pdf, https://example.com/file.doc, pdf
-                asdf.pdf, https://example.com/file, pdf
-                asdf.pdf, https://example.com/file.pdf, ''
-                asdf.pdf, https://example.com/, pdf
-                asdf.pdf, path/to/file.pdf, pdf
-                asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
-            """)
+    @ParameterizedTest(name = "{1} with {2} should be {0}")
+    @CsvSource({
+            "asdf.pdf, '', pdf",
+            "file.pdf, https://example.com/file.pdf, pdf",
+            "file.pdf, https://example.com/file.pdf?query=test, pdf",
+            "file.pdf, https://example.com/file.doc, pdf",
+            "file.pdf, https://example.com/file, pdf",
+            "file.pdf, https://example.com/file.pdf, ''",
+            "file.pdf, https://example.com/, pdf",
+            "file.pdf, path/to/file.pdf, pdf",
+            "OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf"
+    })
     void getSuggestedFileName(String expectedFileName, String link, String extension) {
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
-
-        final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
-
-        if (extension.isEmpty()) {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
+        if (link.isEmpty()) {
+            when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         } else {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
+            when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [title]");
         }
-    }
 
-    @ParameterizedTest(name = "{1} with {2} should be {0} with empty citation key")
-    @CsvSource(textBlock = """
-                file.pdf, '', pdf
-                file.pdf, https://example.com/file.pdf, pdf
-                file.pdf, https://example.com/file.pdf?query=test, pdf
-                file.pdf, https://example.com/file.doc, pdf
-                file.pdf, https://example.com/file, pdf
-                file.pdf, https://example.com/file.pdf, ''
-                file.pdf, https://example.com/, pdf
-                file.pdf, path/to/file.pdf, pdf
-                other.pdf, https://example.com/other.pdf, pdf
-                other.pdf, https://example.com/other.pdf?query=test, pdf
-                other.pdf, https://example.com/other.doc, pdf
-                other.pdf, https://example.com/other, pdf
-                other.pdf, https://example.com/other.pdf, ''
-                other.pdf, path/to/other.pdf, pdf
-                OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
-            """)
-    void getSuggestedFileNameWithMissingKey(String expectedFileName, String link, String extension) {
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
-
-        final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
-
-        if (extension.isEmpty()) {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
-        } else {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
+        BibEntry testEntry = new BibEntry();
+        if (link.isEmpty()) {
+            testEntry = entry;
         }
+
+        final LinkedFile linkedFile = mock(LinkedFile.class);
+        when(linkedFile.isOnlineLink()).thenReturn(link.startsWith("http"));
+        when(linkedFile.getLink()).thenReturn(link);
+
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, testEntry, databaseContext, filePreferences);
+
+        final String result = linkedFileHandler.getSuggestedFileName(extension);
+        assertEquals(expectedFileName, result);
     }
 }

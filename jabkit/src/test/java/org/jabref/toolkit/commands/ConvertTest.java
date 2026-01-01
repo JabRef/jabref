@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +44,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=" + format,
                 "--output=" + outputPath);
 
-        assertFileExists(outputPath);
+        assertTrue(outputPath.toFile().exists());
     }
 
     @Test
@@ -59,7 +60,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=bibtex",
                 "--output=" + outputPath);
 
-        assertFileExists(outputPath);
+        assertTrue(outputPath.toFile().exists());
         assertTrue(Files.readString(outputPath).contains("Darwin1888"));
     }
 
@@ -76,7 +77,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=ffasdfasd",
                 "--output=" + outputPath);
 
-        assertFileDoesntExist(outputPath);
+        assertFalse(outputPath.toFile().exists());
     }
 
     @Test
@@ -94,7 +95,7 @@ public class ConvertTest extends AbstractJabKitTest {
     }
 
     @Test
-    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws IOException, URISyntaxException {
+    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException {
         Path originBib = getClassResourceAsPath("origin.bib");
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -115,6 +116,6 @@ public class ConvertTest extends AbstractJabKitTest {
 
         commandLine.execute(args.toArray(String[]::new));
 
-        assertFileExists(outputHtml);
+        assertTrue(Files.exists(outputHtml));
     }
 }

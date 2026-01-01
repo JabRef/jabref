@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -22,9 +21,7 @@
     <Label text="%Current Preview" styleClass="titleHeader"/>
     <CheckBox fx:id="showAsTabCheckBox" text="%Show preview as a tab in entry editor"/>
     <CheckBox fx:id="showPreviewTooltipCheckBox" text="%Show preview in entry table tooltip"/>
-    <CheckBox fx:id="bookCoverDownload" text="%Download cover images"/>
     <Button fx:id="bstFileButton" text="%Add BST file" onAction="#selectBstFile" />
-
     <HBox spacing="4.0">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="%Available" styleClass="sectionHeader"/>
