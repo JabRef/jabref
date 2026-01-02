@@ -62,7 +62,6 @@ class LinkedFileHandlerTest {
         assertEquals(expectedFileName, result);
     }
 
-
     @ParameterizedTest(name = "{1} with {2} should be {0} for citation key 'asdf'")
     @CsvSource(textBlock = """
                 asdf.pdf, '', pdf
