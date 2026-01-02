@@ -23,7 +23,6 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
         }
 
         if (leftMonth.isPresent() && rightMonth.isPresent() && leftMonth.get() == rightMonth.get()) {
-
             boolean leftStrict = Month.isStrictFormat(left);
             boolean rightStrict = Month.isStrictFormat(right);
 
