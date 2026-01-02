@@ -1,5 +1,6 @@
 package org.jabref.logic.externalfiles;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,16 +62,18 @@ class LinkedFileHandlerTest {
         assertEquals(expectedFileName, result);
     }
 
-    @ParameterizedTest(name = "{1} with {2} should be {0} with citation key 'asdf'")
+
+    @ParameterizedTest(name = "{1} with {2} should be {0} for citation key 'asdf'")
     @CsvSource(textBlock = """
                 asdf.pdf, '', pdf
+                asdf.pdf, file.pdf, pdf
+                asdf.txt, file.pdf, txt
+                asdf.pdf, file.txt, pdf
                 asdf.pdf, https://example.com/file.pdf, pdf
                 asdf.pdf, https://example.com/file.pdf?query=test, pdf
                 asdf.pdf, https://example.com/file.doc, pdf
                 asdf.pdf, https://example.com/file, pdf
-                asdf.pdf, https://example.com/file.pdf, ''
                 asdf.pdf, https://example.com/, pdf
-                asdf.pdf, path/to/file.pdf, pdf
                 asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
             """)
     void getSuggestedFileName(String expectedFileName, String link, String extension) {
@@ -79,29 +82,30 @@ class LinkedFileHandlerTest {
         final LinkedFile linkedFile = new LinkedFile("", link, "");
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
 
-        if (extension.isEmpty()) {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
-        } else {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
-        }
+        assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
     }
 
-    @ParameterizedTest(name = "{1} with {2} should be {0} with empty citation key")
+    @ParameterizedTest(name = "{1} with {2} should be {0} for empty citation key")
     @CsvSource(textBlock = """
                 file.pdf, '', pdf
+                file.txt, '', txt
+                file.pdf, file.pdf, pdf
+                file.txt, file.pdf, txt
+                file.pdf, file.txt, pdf
+                other.pdf, other.pdf, pdf
+                other.txt, other.pdf, txt
+                other.pdf, other.txt, pdf
                 file.pdf, https://example.com/file.pdf, pdf
+                file.pdf, https://example.com/file.txt, pdf
+                file.txt, https://example.com/file.pdf, txt
                 file.pdf, https://example.com/file.pdf?query=test, pdf
                 file.pdf, https://example.com/file.doc, pdf
                 file.pdf, https://example.com/file, pdf
-                file.pdf, https://example.com/file.pdf, ''
                 file.pdf, https://example.com/, pdf
-                file.pdf, path/to/file.pdf, pdf
                 other.pdf, https://example.com/other.pdf, pdf
                 other.pdf, https://example.com/other.pdf?query=test, pdf
                 other.pdf, https://example.com/other.doc, pdf
                 other.pdf, https://example.com/other, pdf
-                other.pdf, https://example.com/other.pdf, ''
-                other.pdf, path/to/other.pdf, pdf
                 OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
             """)
     void getSuggestedFileNameWithMissingKey(String expectedFileName, String link, String extension) {
@@ -110,10 +114,55 @@ class LinkedFileHandlerTest {
         final LinkedFile linkedFile = new LinkedFile("", link, "");
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
 
-        if (extension.isEmpty()) {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
-        } else {
-            assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
-        }
+        assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
+    }
+
+    @ParameterizedTest(name = "{1} should be {0} for citation key 'asdf'")
+    @CsvSource(textBlock = """
+                asdf, ''
+                asdf.pdf, file.pdf
+                asdf.txt, file.txt
+                asdf.pdf, https://example.com/file.pdf
+                asdf.pdf, https://example.com/file.pdf?query=test
+                asdf.doc, https://example.com/file.doc
+                asdf, https://example.com/file
+                asdf, https://example.com/
+                asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf
+            """)
+    void getSuggestedFileNameWithoutExtension(String expectedFileName, String link) {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+
+        assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
+    }
+
+    @ParameterizedTest(name = "{1} should be {0} for empty citation key")
+    @CsvSource(textBlock = """
+                file, ''
+                file.pdf, file.pdf
+                file.txt, file.txt
+                other.pdf, other.pdf
+                other.txt, other.txt
+                file.pdf, https://example.com/file.pdf
+                file.txt, https://example.com/file.txt
+                file.pdf, https://example.com/file.pdf?query=test
+                file.doc, https://example.com/file.doc
+                file, https://example.com/file
+                file, https://example.com/
+                other.pdf, https://example.com/other.pdf
+                other.pdf, https://example.com/other.pdf?query=test
+                other.doc, https://example.com/other.doc
+                other, https://example.com/other
+                OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf
+            """)
+    void getSuggestedFileNameWithoutExtensionWithMissingKey(String expectedFileName, String link) {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
+
+        assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
     }
 }

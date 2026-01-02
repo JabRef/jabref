@@ -80,7 +80,7 @@ public class FileUtil {
     public static Optional<String> getFileExtension(String fileName) {
         int slash = fileName.lastIndexOf(File.separatorChar);
         int dot = fileName.lastIndexOf('.');
-        if (dot > slash + 1 && dot < fileName.length() - 1) {
+        if (slash + 1 < dot && dot < fileName.length() - 1) {
             return Optional.of(fileName.substring(dot + 1).trim().toLowerCase(Locale.ROOT));
         } else {
             return Optional.empty();
@@ -88,7 +88,7 @@ public class FileUtil {
     }
 
     /**
-     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
+     * Returns the extension of a file or Optional.empty() if the file does not have one (no "." in name).
      *
      * @return the extension (without leading dot), trimmed and in lowercase
      */
@@ -100,9 +100,15 @@ public class FileUtil {
      * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(String fileName) {
-        int slash = Math.max(0, fileName.lastIndexOf(File.separatorChar) + 1);
-        int dot = Math.max(0, fileName.lastIndexOf('.'));
-        return slash < dot ? fileName.substring(slash, dot) : fileName.substring(slash);
+        int slash = fileName.lastIndexOf(File.separatorChar);
+        int dot = fileName.lastIndexOf('.');
+        if (slash + 1 < dot && dot < fileName.length() - 1) {
+            return fileName.substring(slash + 1, dot).trim();
+        } else if (slash >= 0 && slash < fileName.length() - 1) {
+            return fileName.substring(slash + 1).trim();
+        } else {
+            return fileName.trim();
+        }
     }
 
     /**
