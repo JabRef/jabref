@@ -60,6 +60,8 @@ import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
@@ -73,6 +75,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NewEntryView extends BaseDialog<BibEntry> {
     private static final String BIBTEX_REGEX = "^@([A-Za-z]+)\\{,";
@@ -109,6 +112,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private TilePane entryOther;
     @FXML private TitledPane entryCustomTitle;
     @FXML private TilePane entryCustom;
+    @FXML private TitledPane entryNonStandardTitle;
+    @FXML private TilePane entryNonStandard;
 
     @FXML private TextField idText;
     @FXML private Tooltip idTextTooltip;
@@ -236,6 +241,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         entryCustomTitle.expandedProperty().bindBidirectional(preferences.typesCustomExpandedProperty());
         entryCustom.managedProperty().bind(entryCustom.visibleProperty());
 
+        entryNonStandardTitle.managedProperty().bind(entryNonStandardTitle.visibleProperty());
+        entryNonStandard.managedProperty().bind(entryNonStandard.visibleProperty());
+
         final boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
 
         List<BibEntryType> recommendedEntries;
@@ -263,6 +271,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         } else {
             addEntriesToPane(entryCustom, customEntries);
         }
+
+        if (isBiblatexMode) {
+            addEntriesToPane(entryNonStandard, BiblatexNonStandardEntryTypeDefinitions.ALL);
+        } else {
+            entryNonStandardTitle.setVisible(false);
+        }
     }
 
     private void initializeLookupIdentifier() {
@@ -283,31 +297,33 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         viewModel.populateDOICache();
+        viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+            if (isValid) {
+                Tooltip.install(idText, idTextTooltip);
+            } else {
+                Tooltip.uninstall(idText, idTextTooltip);
+            }
+        });
 
-        // [impl->req~newentry.clipboard.autofocus~1]
-        Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
-        if (validClipboardId.isPresent()) {
-            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
-                if (isValid) {
-                    Tooltip.install(idText, idTextTooltip);
-                } else {
-                    Tooltip.uninstall(idText, idTextTooltip);
-                }
-            });
+        extractIdentifierFromClipboard()
+                .ifPresentOrElse(identifier -> {
+                            idText.setText(ClipBoardManager.getContents().trim());
+                            idText.selectAll();
+                            Platform.runLater(() -> {
+                                // [impl->req~newentry.clipboard.autofocus~1]
+                                idLookupSpecify.setSelected(true);
+                                fetcherForIdentifier(identifier).ifPresent(idFetcher::setValue);
+                            });
+                        },
+                        () -> Platform.runLater(() -> idLookupGuess.setSelected(true)));
 
-            idText.setText(ClipBoardManager.getContents().trim());
-            idText.selectAll();
-
-            Identifier id = validClipboardId.get();
-            Platform.runLater(() -> {
-                idLookupSpecify.setSelected(true);
-                fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
-            });
-        } else {
-            Platform.runLater(() -> idLookupGuess.setSelected(true));
-        }
-
-        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
+            preferences.setIdLookupGuessing(newValue);
+            // When switching to auto-detect mode, detect identifier type from current text
+            if (newValue) {
+                updateFetcherFromIdentifierText(idText.getText());
+            }
+        });
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
@@ -320,6 +336,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
+
+        // Auto-detect identifier type when typing in the identifier field
+        // Only works when "Automatically determine identifier type" is selected
+        idText.textProperty().addListener((_, _, newValue) -> {
+            if (idLookupGuess.isSelected()) {
+                updateFetcherFromIdentifierText(newValue);
+            }
+        });
 
         idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
@@ -357,8 +381,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported Bib(La)Tex source format.
+            // TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+            // supported Bib(La)TeX source format.
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }
@@ -450,9 +474,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void execute() {
-        // :TODO: These button text changes aren't actually visible, due to the UI thread not being able to perform the
-        // update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
-        // a `Platform.runLater(...)` which would probably fix this.
+        // TODO: These button text changes aren't actually visible, due to the UI thread not being able to perform the
+        //       update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
+        //       a `Platform.runLater(...)` which would probably fix this.
         switch (currentApproach) {
             case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
                 // We do nothing here.
@@ -486,7 +510,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             final EntryType type = entry.getType();
 
             final Button button = new Button(type.getDisplayName());
-            button.setMinWidth(Button.USE_PREF_SIZE);
             button.setMaxWidth(Double.MAX_VALUE);
             button.setUserData(entry);
             button.setOnAction(_ -> onEntryTypeSelected(type));
@@ -506,6 +529,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private static String descriptionOfEntryType(EntryType type) {
         if (type instanceof StandardEntryType entryType) {
             return descriptionOfStandardEntryType(entryType);
+        }
+        if (type instanceof BiblatexNonStandardEntryType entryType) {
+            return descriptionOfNonStandardEntryType(entryType);
         }
         return null;
     }
@@ -582,6 +608,44 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         };
     }
 
+    private static String descriptionOfNonStandardEntryType(BiblatexNonStandardEntryType type) {
+        // These descriptions are taken from subsection 2.1.3 of the biblatex package documentation.
+        // Non-standard Types (BibLaTeX only) - these use the @misc driver in standard bibliography styles.
+        // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
+        return switch (type) {
+            case Artwork ->
+                    Localization.lang("Works of the visual arts such as paintings, sculpture, and installations.");
+            case Audio ->
+                    Localization.lang("Audio recordings, typically on audio cd, dvd, audio cassette, or similar media.");
+            case Bibnote ->
+                    Localization.lang("This special entry type is not meant to be used in the bib file like other types. It is provided for third-party packages which merge notes into the bibliography.");
+            case Commentary ->
+                    Localization.lang("Commentaries which have a status different from regular books, such as legal commentaries.");
+            case Image ->
+                    Localization.lang("Images, pictures, photographs, and similar media.");
+            case Jurisdiction ->
+                    Localization.lang("Court decisions, court recordings, and similar things.");
+            case Legislation ->
+                    Localization.lang("Laws, bills, legislative proposals, and similar things.");
+            case Legal ->
+                    Localization.lang("Legal documents such as treaties.");
+            case Letter ->
+                    Localization.lang("Personal correspondence such as letters, emails, memoranda, etc.");
+            case Movie ->
+                    Localization.lang("Motion pictures.");
+            case Music ->
+                    Localization.lang("Musical recordings. This is a more specific variant of \"Audio\".");
+            case Performance ->
+                    Localization.lang("Musical and theatrical performances as well as other works of the performing arts. This type refers to the event as opposed to a recording, a score, or a printed play.");
+            case Review ->
+                    Localization.lang("Reviews of some other work. This is a more specific variant of the \"Article\" type.");
+            case Standard ->
+                    Localization.lang("National and international standards issued by a standards body such as the International Organization for Standardization.");
+            case Video ->
+                    Localization.lang("Audiovisual recordings, typically on dvd, vhs cassette, or similar media.");
+        };
+    }
+
     private static IdBasedFetcher fetcherFromName(String fetcherName, List<IdBasedFetcher> fetchers) {
         for (IdBasedFetcher fetcher : fetchers) {
             if (fetcher.getName().equals(fetcherName)) {
@@ -601,37 +665,33 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return PlainCitationParserChoice.RULE_BASED_GENERAL;
     }
 
-    private Optional<Identifier> extractValidIdentifierFromClipboard() {
+    /**
+     * Updates the fetcher based on the identifier text.
+     * Detects the identifier type and sets the appropriate fetcher if a valid identifier is found.
+     *
+     * @param text the identifier text to parse
+     */
+    private void updateFetcherFromIdentifierText(@Nullable String text) {
+        Identifier.from(text)
+                  .flatMap(identifier -> fetcherForIdentifier(identifier))
+                  .ifPresent(idFetcher::setValue);
+    }
+
+    private Optional<Identifier> extractIdentifierFromClipboard() {
         String clipboardText = ClipBoardManager.getContents().trim();
-
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            Optional<Identifier> identifier = Identifier.from(clipboardText);
-            if (identifier.isPresent()) {
-                Identifier id = identifier.get();
-                boolean isValid = switch (id) {
-                    case DOI doi ->
-                            DOI.isValid(doi.asString());
-                    case ISBN isbn ->
-                            isbn.isValid();
-                    default ->
-                            true;
-                };
-                if (isValid) {
-                    return Optional.of(id);
-                }
-            }
+            return Identifier.from(clipboardText);
         }
-
         return Optional.empty();
     }
 
     private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
         for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
-                    (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
-                            (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
-                            (id instanceof RFC && fetcher instanceof RfcFetcher) ||
-                            (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
+                    (id instanceof ISBN && fetcher instanceof IsbnFetcher) ||
+                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
                 return Optional.of(fetcher);
             }
         }

@@ -6,4 +6,4 @@ branches:
   main:
     regex: ^main
     tag: 'alpha' # Update this to the tag prefix for the alpha/beta release (e.g., "alpha2") or leave empty
-    pre-release-weight: 31000 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release
+    pre-release-weight: 32000 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release

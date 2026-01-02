@@ -14,4 +14,11 @@ public class FileFinders {
                     new RegExpBasedFileFinder(autoLinkPreferences.getRegularExpression(), autoLinkPreferences.getKeywordSeparator());
         };
     }
+
+    /**
+     * The constructed file finder is based on broken linked file names.
+     */
+    public static FileFinder constructBrokenLinkedFileNameBasedFileFinder() {
+        return new BrokenLinkedFileNameBasedFileFinder();
+    }
 }

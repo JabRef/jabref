@@ -166,7 +166,7 @@ public class JabRefGUI extends Application {
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
-        gitHandlerRegistry = new GitHandlerRegistry();
+        gitHandlerRegistry = new GitHandlerRegistry(preferences.getGitPreferences());
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
@@ -223,6 +223,10 @@ public class JabRefGUI extends Application {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getFieldPreferences(),
+                preferences.getEntryEditorPreferences().citationFetcherTypeProperty(),
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getGrobidPreferences(),
+                JabRefGUI.aiService,
                 entryTypesManager
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
@@ -438,7 +442,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
@@ -487,7 +491,7 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Shutting down language server controller");
+                LOGGER.trace("Shutting down LSP server controller");
                 languageServerController.stop();
                 LOGGER.trace("LanguageServerController shut down");
             });
@@ -523,7 +527,7 @@ public class JabRefGUI extends Application {
             executor.submit(() -> {
                 LOGGER.trace("Shutting down postgreServer");
                 PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-                postgreServer.shutdown();
+                postgreServer.close();
                 LOGGER.trace("PostgreServer shut down");
             });
 
