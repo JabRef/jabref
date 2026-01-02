@@ -64,6 +64,10 @@ dependencies {
     implementation("org.apache.lucene:lucene-analysis-common")
     implementation("org.apache.lucene:lucene-highlighter")
 
+    implementation("io.zonky.test:embedded-postgres")
+    implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
+    implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
+
     implementation("org.jsoup:jsoup")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
