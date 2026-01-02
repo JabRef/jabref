@@ -75,10 +75,11 @@ public class SearchCitationsRelationsService {
         this.relationsRepository = repository;
     }
 
-    public List<BibEntry> searchCites(BibEntry referencing) throws FetcherException {
+    public List<BibEntry> searchCites(BibEntry referencing, boolean bypassCache) throws FetcherException {
         boolean isFetchingAllowed =
-                !relationsRepository.containsReferences(referencing) ||
-                        relationsRepository.isReferencesUpdatable(referencing);
+                bypassCache
+                        || !relationsRepository.containsReferences(referencing)
+                        || relationsRepository.isReferencesUpdatable(referencing);
         if (isFetchingAllowed) {
             List<BibEntry> referencedBy = citationFetcher.getReferences(referencing);
             relationsRepository.insertReferences(referencing, referencedBy);
@@ -91,10 +92,11 @@ public class SearchCitationsRelationsService {
      * If the store was not empty and nothing was fetched after a successful fetch => the store will be erased and the returned collection will be empty
      * If the store was not empty and an error occurs while fetching => will return the content of the store
      */
-    public List<BibEntry> searchCitedBy(BibEntry cited) throws FetcherException {
+    public List<BibEntry> searchCitedBy(BibEntry cited, boolean bypassCache) throws FetcherException {
         boolean isFetchingAllowed =
-                !relationsRepository.containsCitations(cited) ||
-                        relationsRepository.isCitationsUpdatable(cited);
+                bypassCache
+                        || !relationsRepository.containsCitations(cited)
+                        || relationsRepository.isCitationsUpdatable(cited);
         if (isFetchingAllowed) {
             List<BibEntry> citedBy = citationFetcher.getCitations(cited);
             relationsRepository.insertCitations(cited, citedBy);
