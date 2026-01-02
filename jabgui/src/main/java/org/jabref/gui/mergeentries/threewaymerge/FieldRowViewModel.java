@@ -122,6 +122,8 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(hasEqualLeftAndRightBinding(), this::setIsFieldsMerged);
+
+        autoSelectBetterValue();
     }
 
     public void autoSelectBetterValue() {

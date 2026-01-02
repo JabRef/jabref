@@ -207,4 +207,26 @@ public enum Month {
     public String getTwoDigitNumber() {
         return twoDigitNumber;
     }
+
+    /**
+     * Checks if the value is in a strict BibTeX format.
+     * <p>
+     * A strict format is either a BibTeX string (e.g. {@code #jun#}) or an integer (e.g. {@code 6}).
+     * Plain text months (e.g. {@code June}) are considered non-strict.
+     *
+     * @param value the string value to check
+     * @return true if the value matches the strict format criteria
+     */
+    public static boolean isStrictFormat(String value) {
+        String trimmed = value.trim();
+
+        if (trimmed.matches("\\d+")) {
+            return true;
+        }
+
+        char delimiter = '#';
+        return trimmed.length() >= 2
+                && trimmed.charAt(0) == delimiter
+                && trimmed.charAt(trimmed.length() - 1) == delimiter;
+    }
 }
