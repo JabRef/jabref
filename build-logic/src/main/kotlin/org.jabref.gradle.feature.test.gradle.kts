@@ -16,14 +16,8 @@ tasks.withType<Test>().configureEach {
     // Note: For now, parallel handling with gradle is enough
     //       How to enable parallel JUnit tests **in addition**: https://docs.junit.org/6.0.1/writing-tests/parallel-execution.html
 
-    if (providers.environmentVariable("GITHUB_ACTIONS").map { it.toBoolean() }.getOrElse(false)) {
-        // Disable parallelism on GITHUB_ACTIONS, other CIs might be fine.
-        maxParallelForks = 1
-    } else {
-       // Enable parallel tests (on desktop).
-        // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-        maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
-    }
+    // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
 
     // Even in sequential tests, to a "force" cleanup
     // See https://docs.gradle.org/current/userguide/performance.html#b_fork_tests_into_multiple_processes for details.
