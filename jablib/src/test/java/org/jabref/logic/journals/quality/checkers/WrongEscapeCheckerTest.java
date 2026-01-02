@@ -3,7 +3,6 @@ package org.jabref.logic.journals.quality.checkers;
 import org.jabref.logic.journals.quality.AbbreviationEntry;
 import org.jabref.logic.journals.quality.Finding;
 import org.jabref.logic.journals.quality.Severity;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
