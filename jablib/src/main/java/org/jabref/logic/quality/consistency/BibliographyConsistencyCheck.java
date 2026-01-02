@@ -73,19 +73,12 @@ public class BibliographyConsistencyCheck {
     @VisibleForTesting
     List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<OrFields> requiredFields) {
         return entries.stream()
-                      .filter(entry ->
-                              // Handles violation: this entry is inconsistent because it sets a field
-                              // that not every other entry of its type sets (differing field)
-                              !Collections.disjoint(filterExcludedFields(entry.getFields()), differingFields)
-                                      // Handles violation: this entry is inconsistent because it does not set fields
-                                      // for its type that specify required fields
-                                      || (requiredFields.stream()
-                                                        .map(OrFields::getFields)
-                                                        .anyMatch(subfields ->
-                                                                Collections.disjoint(subfields, entry.getFields())
-                                                        )
-                              )
-                      )
+                      .filter(entry -> {
+                          boolean hasDifferingFields = !Collections.disjoint(filterExcludedFields(entry.getFields()), differingFields);
+                          boolean hasMissingRequiredFields = requiredFields.stream()
+                                                                           .anyMatch(orFields -> Collections.disjoint(orFields.getFields(), entry.getFields()));
+                          return hasDifferingFields || hasMissingRequiredFields;
+                      })
                       .sorted(new FieldComparatorStack<>(List.of(
                               new BibEntryByCitationKeyComparator(),
                               new BibEntryByFieldsComparator()
