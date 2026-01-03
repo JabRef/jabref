@@ -85,7 +85,7 @@ public class FileUtil {
         if (StringUtil.isNullOrEmpty(extension)) {
             return Optional.empty();
         }
-        return Optional.of(fileName);
+        return Optional.of(extension);
     }
 
     /**
