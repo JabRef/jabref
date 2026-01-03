@@ -24,10 +24,9 @@ import org.slf4j.LoggerFactory;
 
 public class SideEffectExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SideEffectExecutor.class);
-
+    private final List<Observable> currentDependencies = new ArrayList<>();
     private @Nullable PauseTransition timeoutTransition;
     private @Nullable InvalidationListener dependencyListener;
-    private final List<Observable> currentDependencies = new ArrayList<>();
 
     /// Executes a side effect's forward action, waiting for the expected condition if
     /// necessary.
@@ -56,8 +55,7 @@ public class SideEffectExecutor {
                 boolean conditionMet = waitForCondition(sideEffect);
                 if (!conditionMet) {
                     LOGGER.warn("Expected condition not met for side effect: {}", sideEffect.description());
-                    notifyUser(Localization.lang("Side effect timeout"),
-                            Localization.lang("The condition for '%0' was not met within the timeout period.", sideEffect.description()));
+                    notifyUser(Localization.lang("Side effect timeout"), Localization.lang("The condition for '%0' was not met within the timeout period.", sideEffect.description()));
                     return false;
                 }
                 return sideEffect.forward(walkthrough);
@@ -66,8 +64,7 @@ public class SideEffectExecutor {
             }
         } catch (Exception e) {
             LOGGER.error("Error executing {} effect: {}", forward ? "forward" : "backward", sideEffect.description(), e);
-            notifyUser(Localization.lang("Walkthrough side effect error"),
-                    Localization.lang("An error occurred while executing '%0': %1", sideEffect.description(), e.getMessage()));
+            notifyUser(Localization.lang("Walkthrough side effect error"), Localization.lang("An error occurred while executing '%0': %1", sideEffect.description(), e.getMessage()));
             return false;
         } finally {
             cleanUp();
@@ -147,7 +144,7 @@ public class SideEffectExecutor {
     private void notifyUser(@NonNull String title, @NonNull String message) {
         try {
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.notify(title + message);
+            dialogService.showInformationDialogAndWait(title, message);
         } catch (Exception e) {
             LOGGER.error("Failed to notify user about side effect issue", e);
         }

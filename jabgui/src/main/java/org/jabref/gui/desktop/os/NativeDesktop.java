@@ -64,13 +64,7 @@ public abstract class NativeDesktop {
      * <p>
      * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
-    public static void openExternalViewer(BibDatabaseContext databaseContext,
-                                          GuiPreferences preferences,
-                                          String initialLink,
-                                          Field initialField,
-                                          DialogService dialogService,
-                                          BibEntry entry)
-            throws IOException {
+    public static void openExternalViewer(BibDatabaseContext databaseContext, GuiPreferences preferences, String initialLink, Field initialField, DialogService dialogService, BibEntry entry) throws IOException {
         String link = initialLink;
         Field field = initialField;
         if ((PS == field) || (PDF == field)) {
@@ -90,8 +84,7 @@ public abstract class NativeDesktop {
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     field = PDF;
-                } else if ("ps".equalsIgnoreCase(split[split.length - 1])
-                        || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
+                } else if ("ps".equalsIgnoreCase(split[split.length - 1]) || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
                     field = PS;
                 }
             }
@@ -104,10 +97,7 @@ public abstract class NativeDesktop {
         } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
 
-            link = identifierParser.parse(StandardField.EPRINT)
-                                   .flatMap(Identifier::getExternalURI)
-                                   .map(URI::toASCIIString)
-                                   .orElse(link);
+            link = identifierParser.parse(StandardField.EPRINT).flatMap(Identifier::getExternalURI).map(URI::toASCIIString).orElse(link);
 
             if (Objects.equals(link, initialLink)) {
                 Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
@@ -151,15 +141,13 @@ public abstract class NativeDesktop {
     }
 
     public static void openCustomDoi(String link, GuiPreferences preferences, DialogService dialogService) {
-        DOI.parse(link)
-           .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
-           .ifPresent(uri -> {
-               try {
-                   openBrowser(uri, preferences.getExternalApplicationsPreferences());
-               } catch (IOException e) {
-                   dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
-               }
-           });
+        DOI.parse(link).flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI())).ifPresent(uri -> {
+            try {
+                openBrowser(uri, preferences.getExternalApplicationsPreferences());
+            } catch (IOException e) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+            }
+        });
     }
 
     private static void openIsbn(String isbn, GuiPreferences preferences) throws IOException {
@@ -175,11 +163,7 @@ public abstract class NativeDesktop {
      * @param link            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
-    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
-                                                    ExternalApplicationsPreferences externalApplicationsPreferences,
-                                                    FilePreferences filePreferences,
-                                                    String link,
-                                                    final Optional<ExternalFileType> type) throws IOException {
+    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, String link, final Optional<ExternalFileType> type) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openBrowser(link, externalApplicationsPreferences);
             return true;
@@ -194,10 +178,7 @@ public abstract class NativeDesktop {
         return true;
     }
 
-    private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType,
-                                                            String filePath,
-                                                            ExternalApplicationsPreferences externalApplicationsPreferences)
-            throws IOException {
+    private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
@@ -219,9 +200,7 @@ public abstract class NativeDesktop {
      * @param fileLink the location of the file
      * @throws IOException if the default file browser cannot be opened
      */
-    public static void openFolderAndSelectFile(Path fileLink,
-                                               ExternalApplicationsPreferences externalApplicationsPreferences,
-                                               DialogService dialogService) throws IOException {
+    public static void openFolderAndSelectFile(Path fileLink, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) throws IOException {
         if (fileLink == null) {
             return;
         }
@@ -316,7 +295,6 @@ public abstract class NativeDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            dialogService.notify(couldNotOpenBrowser);
             dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
