@@ -21,24 +21,24 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class LinkedFileHandlerTest {
+    @TempDir
     private Path tempFolder;
-    private BibEntry entry;
-    private BibEntry badEntry;
+
+    private BibEntry entryWithCitationKeyAsdf;
+    private BibEntry entryWithoutCitationKey;
     private BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final CliPreferences preferences = mock(CliPreferences.class);
 
     @BeforeEach
-    void setUp(@TempDir Path tempFolder) {
-        entry = new BibEntry().withCitationKey("asdf");
-        badEntry = new BibEntry();
+    void setUp() {
+        entryWithCitationKeyAsdf = new BibEntry().withCitationKey("asdf");
+        entryWithoutCitationKey = new BibEntry();
         databaseContext = new BibDatabaseContext();
 
         when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
-
-        this.tempFolder = tempFolder;
     }
 
     @ParameterizedTest(name = "{1} to {2} should be {0}")
@@ -54,7 +54,7 @@ class LinkedFileHandlerTest {
         Files.createFile(tempFile);
 
         final LinkedFile linkedFile = new LinkedFile("", tempFile, "");
-        LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithCitationKeyAsdf, databaseContext, filePreferences);
 
         linkedFileHandler.renameToName(newFileName, false);
         final String result = Path.of(linkedFile.getLink()).getFileName().toString();
@@ -80,7 +80,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithCitationKeyAsdf, databaseContext, filePreferences);
 
         assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
     }
@@ -113,7 +113,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithoutCitationKey, databaseContext, filePreferences);
 
         assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
     }
@@ -134,7 +134,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithCitationKeyAsdf, databaseContext, filePreferences);
 
         assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
     }
@@ -162,7 +162,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithoutCitationKey, databaseContext, filePreferences);
 
         assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
     }
