@@ -34,6 +34,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,18 +118,12 @@ public class FileUtil {
      * @param link the URL string to extract the filename from
      * @return the extracted filename, or Optional.empty if there is none.
      */
-    public static Optional<String> getFileNameFromUrl(String link) {
-        int slash = link.lastIndexOf('/');
-        slash = (slash >= 0 ? slash + 1 : 0);
-
-        int query = link.indexOf('?', slash);
-        query = (query >= 0 ? query : link.length());
-
-        if (slash < query) {
-            return Optional.of(getValidFileName(link.substring(slash, query)));
-        } else {
+    public static Optional<String> getFileNameFromUrl(@Nullable String link) {
+        String name = FilenameUtils.getName(link);
+        if (StringUtil.isNullOrEmpty(name)) {
             return Optional.empty();
         }
+        return Optional.of(name);
     }
 
     /**
