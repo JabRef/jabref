@@ -42,6 +42,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -144,34 +145,63 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-        List<Path> fileList = checkedFileListProperty
-                .stream()
-                .map(TreeItem::getValue)
-                .map(FileNodeViewModel::getPath)
-                .filter(Files::isRegularFile)
-                .toList();
+        List<Path> selectedFiles = checkedFileListProperty.stream()
+                                                          .map(TreeItem::getValue)
+                                                          .map(FileNodeViewModel::getPath)
+                                                          .filter(Files::isRegularFile)
+                                                          .toList();
 
-        if (fileList.isEmpty()) {
+        if (selectedFiles.isEmpty()) {
             LOGGER.warn("There are no valid files checked for import");
             return;
         }
+
         resultList.clear();
 
-        importFilesBackgroundTask = importHandler
-                .importFilesInBackground(fileList, TransferMode.LINK)
-                .onRunning(() -> {
-                    progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
-                    progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
-                    taskActiveProperty.setValue(true);
-                })
-                .onFinished(() -> {
-                    progressValueProperty.unbind();
-                    progressTextProperty.unbind();
-                    taskActiveProperty.setValue(false);
-                })
-                .onSuccess(resultList::addAll);
-        importFilesBackgroundTask.executeWith(taskExecutor);
+        List<Path> filesToImportNormally = new java.util.ArrayList<>();
+
+        for (Path file : selectedFiles) {
+            String fileName = file.getFileName().toString();
+            int dotIndex = fileName.lastIndexOf('.');
+            String citationKeyCandidate =
+                    (dotIndex > 0) ? fileName.substring(0, dotIndex) : fileName;
+
+            Optional<BibEntry> existingEntry =
+                    bibDatabase.getDatabase().getEntryByCitationKey(citationKeyCandidate);
+
+            if (existingEntry.isPresent()) {
+                importHandler.getFileLinker()
+                             .linkFilesToEntry(existingEntry.get(), List.of(file));
+
+                resultList.add(new ImportFilesResultItemViewModel(
+                        file,
+                        true,
+                        Localization.lang("File attached to existing entry")
+                ));
+            } else {
+                filesToImportNormally.add(file);
+            }
+        }
+
+        if (!filesToImportNormally.isEmpty()) {
+            importFilesBackgroundTask = importHandler
+                    .importFilesInBackground(filesToImportNormally, TransferMode.LINK)
+                    .onRunning(() -> {
+                        progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
+                        progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
+                        taskActiveProperty.setValue(true);
+                    })
+                    .onFinished(() -> {
+                        progressValueProperty.unbind();
+                        progressTextProperty.unbind();
+                        taskActiveProperty.setValue(false);
+                    })
+                    .onSuccess(resultList::addAll);
+
+            importFilesBackgroundTask.executeWith(taskExecutor);
+        }
     }
+
 
     /**
      * This starts the export of all files of all selected nodes in the file tree view.
