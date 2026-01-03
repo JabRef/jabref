@@ -106,6 +106,7 @@ class LinkedFileHandlerTest {
                 other.pdf, https://example.com/other.pdf?query=test, pdf
                 other.pdf, https://example.com/other.doc, pdf
                 other.pdf, https://example.com/other, pdf
+                other.pdf, path/to/other.pdf, pdf
                 OAM-Webinar-V2.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
             """)
     void getSuggestedFileNameWithMissingKey(String expectedFileName, String link, String extension) {
