@@ -259,7 +259,7 @@ public class LinkedFileHandler {
      * @param extension The extension of the file.
      * @return the suggested filename, including extension
      */
-    public String getSuggestedFileName(String extension) {
+    public String getSuggestedFileName(@NonNull String extension) {
         String filename = linkedFile.getFileName().orElse("file");
         final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
                                               .orElse(FileUtil.getBaseName(filename));
