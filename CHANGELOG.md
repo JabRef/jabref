@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
 - We fixed an issue when warning for duplicate entries in the "New Entry" dialog. [#14662](https://github.com/JabRef/jabref/pull/14662)
 - We fixed the Quality > Automatically set file links button. Now if a file is moved, the button can relink the moved file to the broken linked file. [#9798](https://github.com/JabRef/jabref/issues/9798)
+- We fixed an issue where bulk import operations polluted the navigation history, making the Back/Forward buttons navigate through imported entries instead of only user-selected entries. [#13878](https://github.com/JabRef/jabref/issues/13878)
 
 ### Removed
 
@@ -80,7 +81,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where the AI export button was enabled even when the chat history was empty. [#14640](https://github.com/JabRef/jabref/issues/14640)
-- We fixed an issue where bulk import operations polluted the navigation history, making the Back/Forward buttons navigate through imported entries instead of only user-selected entries. [#13878](https://github.com/JabRef/jabref/issues/13878)
 - We fixed an issue where pressing <kbd>ESC</kbd> in the preferences dialog would not always close the dialog. [#8888](https://github.com/JabRef/jabref/issues/8888)
 - We fixed the checkbox in merge dialog "Treat duplicates the same way" to make it functional. [#14224](https://github.com/JabRef/jabref/pull/14224)
 - We fixed the fallback window height (786 → 768) in JabRefGUI. [#14295](https://github.com/JabRef/jabref/pull/14295)
