@@ -279,7 +279,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
 val ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
 
 tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadLtwaFile") {
-    src("https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv")
+    src("https://www.issn.org/wp-content/uploads/2024/02/ltwa_current.csv")
     dest(ltwaCsvFile)
     onlyIfModified(true)
 }
