@@ -3,7 +3,7 @@ package org.jabref.logic.util;
 @FunctionalInterface
 public interface NotificationService {
     /**
-     * Notify the user in a non-blocking way (i.e., in form of toast in a snackbar).
+     * Notify the user in a non-blocking way.
      *
      * @param message the message to show.
      */
