@@ -25,12 +25,14 @@ import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,13 +80,11 @@ public class FileUtil {
      * @return the extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        int slash = fileName.lastIndexOf(File.separatorChar);
-        int dot = fileName.lastIndexOf('.');
-        if (slash + 1 < dot && dot < fileName.length() - 1) {
-            return Optional.of(fileName.substring(dot + 1).trim().toLowerCase(Locale.ROOT));
-        } else {
+        String extension = FilenameUtils.getExtension(fileName);
+        if (StringUtil.isNullOrEmpty(extension)) {
             return Optional.empty();
         }
+        return Optional.of(fileName);
     }
 
     /**
@@ -100,15 +100,7 @@ public class FileUtil {
      * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(String fileName) {
-        int slash = fileName.lastIndexOf(File.separatorChar);
-        int dot = fileName.lastIndexOf('.');
-        if (slash + 1 < dot && dot < fileName.length() - 1) {
-            return fileName.substring(slash + 1, dot).trim();
-        } else if (slash >= 0 && slash < fileName.length() - 1) {
-            return fileName.substring(slash + 1).trim();
-        } else {
-            return fileName.trim();
-        }
+        return FilenameUtils.getBaseName(fileName);
     }
 
     /**
@@ -120,7 +112,7 @@ public class FileUtil {
 
     /**
      * Extracts the filename from a URL, which is found between the last slash '/' and first query '?'.
-     * Does not check that the file is a vaild URL.
+     * Does not check that the file is a valid URL.
      *
      * @param link the URL string to extract the filename from
      * @return the extracted filename, or Optional.empty if there is none.
