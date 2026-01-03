@@ -3,10 +3,13 @@ package org.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -118,12 +121,15 @@ public class FileUtil {
      * @param link the URL string to extract the filename from
      * @return the extracted filename, or Optional.empty if there is none.
      */
-    public static Optional<String> getFileNameFromUrl(@Nullable String link) {
-        String name = FilenameUtils.getName(link);
-        if (StringUtil.isNullOrEmpty(name)) {
+    public static Optional<String> getFileNameFromUrl(@NonNull String link) {
+        // Apache Commons IO has no good support; FilenameUtils.getName(link) doesn't strip query parameters
+        // Source: https://stackoverflow.com/a/33871029/873282
+        try {
+            return Optional.of(Paths.get(new URI(link).getPath()).getFileName().toString());
+        } catch (URISyntaxException e) {
+            LOGGER.warn("Was not a valid URL {}", link, e);
             return Optional.empty();
         }
-        return Optional.of(name);
     }
 
     /**
