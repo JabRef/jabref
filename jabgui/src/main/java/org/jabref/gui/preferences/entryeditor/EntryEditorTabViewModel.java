@@ -34,6 +34,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty journalPopupProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableCitationContextTabProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
 
@@ -69,6 +70,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
         enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
+        enableCitationContextTabProperty.setValue(entryEditorPreferences.shouldShowCitationContextTab());
         showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
@@ -110,6 +112,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
         entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
+        entryEditorPreferences.setShouldShowCitationContextTab(enableCitationContextTabProperty.getValue());
         entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
@@ -197,6 +200,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableSciteTabProperty() {
         return enableSciteTabProperty;
+    }
+
+    public BooleanProperty enableCitationContextTabProperty() {
+        return enableCitationContextTabProperty;
     }
 
     public BooleanProperty showUserCommentsProperty() {

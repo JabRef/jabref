@@ -302,6 +302,16 @@
              closable="false">
              <TextArea fx:id="followUpQuestionsTextArea"/>
         </Tab>
+        <Tab fx:id="citationContextExtractionSystemMessageTab"
+             text="%System message for citation context extraction"
+             closable="false">
+            <TextArea fx:id="citationContextExtractionSystemMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="citationContextExtractionUserMessageTab"
+             text="%User message for citation context extraction"
+             closable="false">
+            <TextArea fx:id="citationContextExtractionUserMessageTextArea"/>
+        </Tab>
     </TabPane>
 
     <HBox spacing="10" alignment="CENTER_LEFT">
