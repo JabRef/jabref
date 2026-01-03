@@ -109,6 +109,11 @@ public class FetchAndMergeEntry {
         }
     }
 
+    public void mergeFetchedEntry(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
+        showMergeDialog(originalEntry, fetchedEntry, fetcher);
+    }
+
+
     private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
         MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences, stateManager);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
