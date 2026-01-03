@@ -158,49 +158,23 @@ public class UnlinkedFilesDialogViewModel {
 
         resultList.clear();
 
-        List<Path> filesToImportNormally = new java.util.ArrayList<>();
+        importFilesBackgroundTask = importHandler
+                .importFilesInBackground(selectedFiles, TransferMode.LINK)
+                .onRunning(() -> {
+                    progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
+                    progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
+                    taskActiveProperty.setValue(true);
+                })
+                .onFinished(() -> {
+                    progressValueProperty.unbind();
+                    progressTextProperty.unbind();
+                    taskActiveProperty.setValue(false);
+                })
+                .onSuccess(resultList::addAll);
 
-        for (Path file : selectedFiles) {
-            String fileName = file.getFileName().toString();
-            int dotIndex = fileName.lastIndexOf('.');
-            String citationKeyCandidate =
-                    (dotIndex > 0) ? fileName.substring(0, dotIndex) : fileName;
-
-            Optional<BibEntry> existingEntry =
-                    bibDatabase.getDatabase().getEntryByCitationKey(citationKeyCandidate);
-
-            if (existingEntry.isPresent()) {
-                importHandler.getFileLinker()
-                             .linkFilesToEntry(existingEntry.get(), List.of(file));
-
-                resultList.add(new ImportFilesResultItemViewModel(
-                        file,
-                        true,
-                        Localization.lang("File attached to existing entry")
-                ));
-            } else {
-                filesToImportNormally.add(file);
-            }
-        }
-
-        if (!filesToImportNormally.isEmpty()) {
-            importFilesBackgroundTask = importHandler
-                    .importFilesInBackground(filesToImportNormally, TransferMode.LINK)
-                    .onRunning(() -> {
-                        progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
-                        progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
-                        taskActiveProperty.setValue(true);
-                    })
-                    .onFinished(() -> {
-                        progressValueProperty.unbind();
-                        progressTextProperty.unbind();
-                        taskActiveProperty.setValue(false);
-                    })
-                    .onSuccess(resultList::addAll);
-
-            importFilesBackgroundTask.executeWith(taskExecutor);
-        }
+        importFilesBackgroundTask.executeWith(taskExecutor);
     }
+
 
 
     /**
