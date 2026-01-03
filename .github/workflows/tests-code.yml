@@ -216,24 +216,10 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md | tee heylogs.txt || true
 
-          # ignore some errors
-          grep -v no-empty-headings < heylogs.txt | grep -v all-h2-contain-a-version | tee heylogs.txt
-
-          # exit 1 in case of an error
-          remaining=$(
-              grep -E " error " heylogs.txt \
-              | wc -l
-            )
-
-          echo "Remaining errors: $remaining"
-
-          # We have two acceptable errors
-          if [ "$remaining" -gt 2 ]; then
-            echo "Failing because of $remaining remaining error(s)."
-            echo "Failing because of $remaining remaining error(s)." >> $GITHUB_OUTPUT
-            echo "" >> $GITHUB_OUTPUT
+          # We have three acceptable errors
+          if ! grep -q "3 problems" heylogs.txt; then
             cat heylogs.txt >> $GITHUB_OUTPUT
             exit 1
           fi
@@ -386,6 +372,37 @@ jobs:
         run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
+
+  tests-jabkit-smoke:
+    name: "JabKit Smoke Test"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 24
+          distribution: 'corretto'
+          check-latest: true
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Update cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - run: ./gradlew :jabkit:runJabKitPortableSmokeTest
 
   databasetests:
     if: (github.repository_owner == 'JabRef')

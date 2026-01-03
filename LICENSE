@@ -1,6 +1,6 @@
 MIT License
 
-Copyright © 2003-2025 JabRef Authors
+Copyright © 2003-2026 JabRef Authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

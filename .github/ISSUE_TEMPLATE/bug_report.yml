@@ -14,7 +14,7 @@ body:
       label: JabRef version
       options:
         - "5.15 (latest release)"
-        - "6.0-alpha.3"
+        - "6.0-alpha.4"
         - Latest development branch build (please note build date below)
         - Other (please describe below)
       description: The version as shown in the about dialog.
