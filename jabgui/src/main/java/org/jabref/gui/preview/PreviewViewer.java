@@ -238,16 +238,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private Optional<String> getBaseURL() {
-        if (databaseContext != null) {
-            return databaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(path -> {
-                String url = path.toUri().toString();
-                if (!url.endsWith("/")) {
-                    url += "/";
-                }
-                return url;
-            });
+        if (databaseContext == null) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return databaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(path -> {
+            String url = path.toUri().toString();
+            if (!url.endsWith("/")) {
+                url += "/";
+            }
+            return url;
+        });
     }
 
     private Optional<String> getCoverImageURL() {
