@@ -62,6 +62,7 @@ class LinkedFileHandlerTest {
     }
 
     @ParameterizedTest(name = "{1} with {2} should be {0} for citation key 'asdf'")
+    // Empty extensions do not need to be tested - all calls provide a non-empty extension
     @CsvSource(textBlock = """
                 asdf.pdf, '', pdf
                 asdf.pdf, file.pdf, pdf
@@ -73,6 +74,7 @@ class LinkedFileHandlerTest {
                 asdf.pdf, https://example.com/file, pdf
                 asdf.pdf, https://example.com/, pdf
                 asdf.pdf, https://www.cncf.io/wp-content/uploads/2020/08/OAM-Webinar-V2.pdf, pdf
+                asdf.pdf, path/to/file.pdf, pdf
             """)
     void getSuggestedFileName(String expectedFileName, String link, String extension) {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");

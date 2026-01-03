@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -260,6 +261,7 @@ public class LinkedFileHandler {
      * @return the suggested filename, including extension
      */
     public String getSuggestedFileName(@NonNull String extension) {
+        assert !StringUtil.isBlank(extension);
         String filename = linkedFile.getFileName().orElse("file");
         final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
                                               .orElse(FileUtil.getBaseName(filename));
