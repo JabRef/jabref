@@ -39,8 +39,6 @@ class AutoSetFileLinksUtilTest {
     private final AutoLinkPreferences autoLinkPrefs = mock(AutoLinkPreferences.class);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
-    private Path path = null;
-
     /**
      * Modified version of AutoLinkFilesAction.linkFilesTask.onLinkedFilesUpdated.
      */
@@ -51,14 +49,14 @@ class AutoSetFileLinksUtilTest {
         // which is not properly set up and is out of the unit test scope
         entry.setFiles(newLinkedFiles);
     };
+    private Path path = null;
 
     @BeforeEach
     void setUp(@TempDir Path folder) throws IOException {
         path = folder.resolve("CiteKey.pdf");
         Files.createFile(path);
         entry.setCitationKey("CiteKey");
-        when(externalApplicationsPreferences.getExternalFileTypes())
-                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
 
         when(autoLinkPrefs.getRegularExpression()).thenReturn("");
         when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
@@ -102,25 +100,19 @@ class AutoSetFileLinksUtilTest {
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getFileDirectories(filePreferences)).thenReturn(List.of(directory));
 
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
-                context,
-                externalApplicationsPreferences,
-                filePreferences,
-                autoLinkPrefs);
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(context, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
 
         Collection<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
 
         assertEquals(1, matches.size());
-        assertEquals(newFile,
-                matches.stream().findFirst().map(LinkedFile::getLink).orElse(""));
+        assertEquals(newFile, matches.stream().findFirst().map(LinkedFile::getLink).orElse(""));
     }
 
     @Test
     void findAllAssociatedNotLinkedFilesInsteadOfTheFirstOne(@TempDir Path tempDir) throws IOException {
         Path directory = tempDir.resolve("files");
         Path oldPath = directory.resolve("old/minimal.pdf");
-        BibEntry entry = new BibEntry(StandardEntryType.Misc)
-                .withFiles(List.of(new LinkedFile("", oldPath.toString(), "PDF")));
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withFiles(List.of(new LinkedFile("", oldPath.toString(), "PDF")));
 
         // Simulate a file move
         String newPath1String = "new1/minimal.pdf";
@@ -137,16 +129,10 @@ class AutoSetFileLinksUtilTest {
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getFileDirectories(filePreferences)).thenReturn(List.of(directory));
 
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
-                context,
-                externalApplicationsPreferences,
-                filePreferences,
-                autoLinkPrefs);
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(context, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
 
         Collection<LinkedFile> matchedFiles = util.findAssociatedNotLinkedFiles(entry);
-        Set<LinkedFile> expected = Set.of(
-                new LinkedFile("", newPath1String, "PDF"),
-                new LinkedFile("", newPath2String, "PDF"));
+        Set<LinkedFile> expected = Set.of(new LinkedFile("", newPath1String, "PDF"), new LinkedFile("", newPath2String, "PDF"));
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
 
@@ -161,26 +147,17 @@ class AutoSetFileLinksUtilTest {
         Files.createFile(fileA);
         Path fileB = tempDir.resolve("CK_B.pdf");
         Files.createFile(fileB);
-        BibEntry entry = new BibEntry(StandardEntryType.Misc)
-                .withFiles(List.of(
-                        new LinkedFile("", "subdir/CK_B.pdf", "PDF")
-                ));
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withFiles(List.of(new LinkedFile("", "subdir/CK_B.pdf", "PDF")));
         entry.setCitationKey("CK");
 
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getFileDirectories(filePreferences)).thenReturn(List.of(tempDir));
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
-                context,
-                externalApplicationsPreferences,
-                filePreferences,
-                autoLinkPrefs);
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(context, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
 
         // find by citation will return CK_A.pdf and CK_B.pdf
         // find by broken linked file name will return CK_B.pdf
         Collection<LinkedFile> matchedFiles = util.findAssociatedNotLinkedFiles(entry);
-        Set<LinkedFile> expected = Set.of(
-                new LinkedFile("", "CK_A.pdf", "PDF"),
-                new LinkedFile("", "CK_B.pdf", "PDF"));
+        Set<LinkedFile> expected = Set.of(new LinkedFile("", "CK_A.pdf", "PDF"), new LinkedFile("", "CK_B.pdf", "PDF"));
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
 
@@ -208,7 +185,7 @@ class AutoSetFileLinksUtilTest {
                     String citationKey = "thisIsACitationKey";
 
                     // File and folder before moving
-                    String fileName = String.format("%s_foobar.pdf", citationKey);
+                    String fileName = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = root.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -218,8 +195,7 @@ class AutoSetFileLinksUtilTest {
                     List<BibEntry> entries = List.of(entryA);
 
                     // Run auto-link
-                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                            externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
@@ -245,7 +221,7 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileName = String.format("%s_foobar.pdf", citationKey);
+                    String fileName = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -255,12 +231,11 @@ class AutoSetFileLinksUtilTest {
                     List<BibEntry> entries = List.of(entryA);
 
                     // Run auto-link
-                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                            externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
-                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(String.format("A/B/%s", fileName)), "PDF"));
+                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/B/%s".formatted(fileName)), "PDF"));
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(expect, actual);
                 }
@@ -283,10 +258,10 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileNameA = String.format("%s_foobar.pdf", citationKey);
+                    String fileNameA = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileNameA);
                     Files.createFile(fileA);
-                    String fileNameB = String.format("%s.pdf", citationKey);
+                    String fileNameB = "%s.pdf".formatted(citationKey);
                     Path fileB = folderB.resolve(fileNameB);
                     Files.createFile(fileB);
 
@@ -296,16 +271,12 @@ class AutoSetFileLinksUtilTest {
                     List<BibEntry> entries = List.of(entryA);
 
                     // Run auto-link
-                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                            externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
 
-                    List<LinkedFile> expect = List.of(
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameA)), "PDF"),
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameB)), "PDF")
-                    );
+                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/B/%s".formatted(fileNameA)), "PDF"), new LinkedFile("", Path.of("A/B/%s".formatted(fileNameB)), "PDF"));
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(Set.copyOf(expect), Set.copyOf(actual));
                 }
@@ -328,10 +299,10 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileNameA = String.format("%s_foobar.pdf", citationKey);
+                    String fileNameA = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileNameA);
                     Files.createFile(fileA);
-                    String fileNameB = String.format("%s.pdf", citationKey);
+                    String fileNameB = "%s.pdf".formatted(citationKey);
                     Path fileB = folderB.resolve(fileNameB);
                     Files.createFile(fileB);
 
@@ -342,16 +313,12 @@ class AutoSetFileLinksUtilTest {
                     List<BibEntry> entries = List.of(entryA);
 
                     // Run auto-link
-                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                            externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
 
-                    List<LinkedFile> expect = List.of(
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameA)), "PDF"),
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameB)), "PDF")
-                    );
+                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/B/%s".formatted(fileNameA)), "PDF"), new LinkedFile("", Path.of("A/B/%s".formatted(fileNameB)), "PDF"));
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(Set.copyOf(expect), Set.copyOf(actual));
                 }
@@ -372,7 +339,7 @@ class AutoSetFileLinksUtilTest {
                     String citationKey = "thisIsACitationKey";
 
                     // File and folder before moving
-                    String fileName = String.format("%s_foobar.pdf", citationKey);
+                    String fileName = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = root.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -382,8 +349,7 @@ class AutoSetFileLinksUtilTest {
                     List<BibEntry> entries = List.of(entryA);
 
                     // Run auto-link
-                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                            externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
@@ -403,7 +369,7 @@ class AutoSetFileLinksUtilTest {
                     String citationKey = "thisIsACitationKey";
 
                     // File and folder before moving
-                    String fileName = String.format("%s.pdf", citationKey);
+                    String fileName = "%s.pdf".formatted(citationKey);
                     Path fileA = root.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -413,8 +379,7 @@ class AutoSetFileLinksUtilTest {
                     List<BibEntry> entries = List.of(entryA);
 
                     // Run auto-link
-                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                            externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
@@ -440,7 +405,7 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileName = String.format("%s.pdf", citationKey);
+                    String fileName = "%s.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -450,12 +415,11 @@ class AutoSetFileLinksUtilTest {
                     List<BibEntry> entries = List.of(entryA);
 
                     // Run auto-link
-                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                            externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                    AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
-                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(String.format("A/B/%s", fileName)), "PDF"));
+                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/B/%s".formatted(fileName)), "PDF"));
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(expect, actual);
                 }
@@ -489,8 +453,7 @@ class AutoSetFileLinksUtilTest {
                 List<BibEntry> entries = List.of(entryA);
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -529,8 +492,7 @@ class AutoSetFileLinksUtilTest {
                 Files.move(fileA, folderA.resolve("A.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -568,8 +530,7 @@ class AutoSetFileLinksUtilTest {
                 Files.move(fileA, root.resolve("A.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -611,8 +572,7 @@ class AutoSetFileLinksUtilTest {
                 Files.move(fileA, folderB.resolve("A.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -651,8 +611,7 @@ class AutoSetFileLinksUtilTest {
                 Files.copy(fileA, folderA.resolve("A.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -691,8 +650,7 @@ class AutoSetFileLinksUtilTest {
                 Files.copy(fileA, root.resolve("A.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -735,8 +693,7 @@ class AutoSetFileLinksUtilTest {
                 Files.copy(fileA, folderB.resolve("A.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -779,8 +736,7 @@ class AutoSetFileLinksUtilTest {
                 Files.move(fileA, folderA.resolve("AAA.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -818,8 +774,7 @@ class AutoSetFileLinksUtilTest {
                 Files.move(fileA, root.resolve("AAA.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
@@ -862,8 +817,7 @@ class AutoSetFileLinksUtilTest {
                 Files.copy(fileA, folderB.resolve("AAA.pdf"));
 
                 // Run auto-link
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
-                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
                 util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                 // Check auto-link result
