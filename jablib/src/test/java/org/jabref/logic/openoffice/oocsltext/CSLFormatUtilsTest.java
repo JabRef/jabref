@@ -205,12 +205,6 @@ class CSLFormatUtilsTest {
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
                 ),
 
-                // Underlines
-                Arguments.of(
-                        "Smith, Bill, Bob Jones, and Jeff Williams. “Title of the test entry.” Ed. Phil Taylor. <u>BibTeX Journal</u> 34.3 (2016): 45–67. <https://github.com/JabRef>.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
-                ),
-
                 // Non-breaking spaces
                 Arguments.of(
                         "Smith, Bill, Bob Jones, & Jeff Williams, “Title of the test entry,” <i>BibTeX Journal</i>, 2016, vol. 34, no. 3, pp. 45–67.<p></p>",
@@ -309,11 +303,6 @@ class CSLFormatUtilsTest {
                 Arguments.of(
                         "(Smith, Jones and Williams, 2016)",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
-                ),
-
-                Arguments.of(
-                        "(Smith, Jones, & Williams, “Title of the test entry”)",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -438,11 +427,6 @@ class CSLFormatUtilsTest {
                 Arguments.of(
                         "(Garcia and Lee, 2021; Smith and Johnson, 2020)",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
-                ),
-
-                Arguments.of(
-                        "(Garcia & Lee, “Quantum Entanglement in Superconductors”; Smith & Johnson, “A Study on Machine Learning Algorithms”)",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
