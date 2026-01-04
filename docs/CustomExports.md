@@ -78,6 +78,7 @@ You can download the latest version of JabRef from the official website:
     - **Main layout file:** select your copied `openoffice-csv.layout`
     - **File extension:** `csv`
 4. Save and **restart JabRef**
+5. If a custom export does not appear, restart JabRef and verify the selected layout file.
 
 > JabRef will now know to use your layout when exporting.
 
