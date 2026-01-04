@@ -327,7 +327,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Note: not sure if the right parenthesis outside the superscript is correct, but that's how citeproc-java generates it in raw form as well.
@@ -338,7 +338,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-bibliographic style (citation-format="note")
