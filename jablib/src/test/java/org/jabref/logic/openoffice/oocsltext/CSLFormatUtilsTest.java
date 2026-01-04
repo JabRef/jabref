@@ -169,7 +169,7 @@ class CSLFormatUtilsTest {
                 // Numeric type "[1]", brackets, newlines
                 Arguments.of(
                         "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric type "1."
@@ -278,7 +278,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -407,7 +407,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "[1], [2]",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -514,7 +514,7 @@ class CSLFormatUtilsTest {
                 // Type: "[1]"
                 Arguments.of(
                         "[3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "1."
