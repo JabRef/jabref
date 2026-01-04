@@ -196,7 +196,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, ed. <i>BibTeX Journal</i>. 2016;34(3):45-67. doi:10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 10th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Small-caps
@@ -303,7 +303,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 10th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -432,7 +432,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 10th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
