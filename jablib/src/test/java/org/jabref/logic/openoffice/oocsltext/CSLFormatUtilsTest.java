@@ -232,7 +232,7 @@ class CSLFormatUtilsTest {
                 // Numeric in parentheses - "(1)"
                 Arguments.of(
                         "(1) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric with right parenthesis - "1)"
@@ -244,7 +244,7 @@ class CSLFormatUtilsTest {
                 // Numeric in superscript - "<SUPERSCRIPT>1"
                 Arguments.of(
                         "<sup>1</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -451,7 +451,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -461,7 +461,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-bibliographic style (citation-format="note")
@@ -522,7 +522,7 @@ class CSLFormatUtilsTest {
                 // Type: "(1)"
                 Arguments.of(
                         "(3) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "1)"
@@ -534,7 +534,7 @@ class CSLFormatUtilsTest {
                 // Type: "<SUPERSCRIPT>1"
                 Arguments.of(
                         "<sup>3</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
