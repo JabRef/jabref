@@ -118,7 +118,7 @@ dependencies.constraints {
     api("net.ltgt.nullaway:nullaway:2.3.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
-    api("org.apache.commons:commons-csv:1.15.0")
+    api("org.apache.commons:commons-csv:1.14.")
     api("org.apache.commons:commons-lang3:3.19.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.client5:httpclient5:5.5")
