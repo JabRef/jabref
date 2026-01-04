@@ -222,6 +222,36 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         colMessage.setResizable(true);
         importResultTable.setItems(viewModel.resultTableItems());
         importResultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // Add context menu for "Jump to Entry"
+        importResultTable.setContextMenu(createResultTableContextMenu());
+    }
+
+    private ContextMenu createResultTableContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+
+        // Create "Jump to Entry" menu item
+        javafx.scene.control.MenuItem jumpToEntryItem = new javafx.scene.control.MenuItem(
+                Localization.lang("Jump to entry")
+        );
+
+        // Enable only when an item is selected
+        jumpToEntryItem.disableProperty().bind(
+                Bindings.isNull(importResultTable.getSelectionModel().selectedItemProperty())
+        );
+
+        // Action when clicked
+        jumpToEntryItem.setOnAction(event -> {
+            ImportFilesResultItemViewModel selected = importResultTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                viewModel.jumpToLinkedEntry(selected.file().get());
+                // Close the dialog after jumping
+                close();
+            }
+        });
+
+        contextMenu.getItems().add(jumpToEntryItem);
+        return contextMenu;
     }
 
     private void initButtons() {
