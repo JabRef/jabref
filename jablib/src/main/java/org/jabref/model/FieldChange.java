@@ -5,19 +5,21 @@ import java.util.Objects;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used in the instance of a field being modified, removed or added.
  */
+@NullMarked
 public class FieldChange {
 
     private final BibEntry entry;
     private final Field field;
-    private final String oldValue;
-    private final String newValue;
+    @Nullable private final String oldValue;
+    @Nullable private final String newValue;
 
-    public FieldChange(@NonNull BibEntry entry, @NonNull Field field, String oldValue, String newValue) {
+    public FieldChange(BibEntry entry, Field field, @Nullable String oldValue, @Nullable String newValue) {
         this.entry = entry;
         this.field = field;
         this.oldValue = oldValue;
@@ -32,11 +34,11 @@ public class FieldChange {
         return this.field;
     }
 
-    public String getOldValue() {
+    public @Nullable String getOldValue() {
         return this.oldValue;
     }
 
-    public String getNewValue() {
+    public @Nullable String getNewValue() {
         return this.newValue;
     }
 

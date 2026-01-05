@@ -281,7 +281,7 @@ val ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
 tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadLtwaFile") {
     src("https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv")
     dest(ltwaCsvFile)
-    onlyIfModified(true)
+    overwrite(false)
 }
 
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
