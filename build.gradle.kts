@@ -66,7 +66,6 @@ allprojects {
         includeConfigs =
             listOf(
                 "runtimeClasspath",
-                "compileClasspath"
             )
         skipConfigs =
             listOf(
