@@ -80,7 +80,13 @@ public class GroupNodeViewModel {
     @SuppressWarnings("FieldCanBeLocal") private final ObservableList<BibEntry> entriesList;
     @SuppressWarnings("FieldCanBeLocal") private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
 
-    public GroupNodeViewModel(@NonNull BibDatabaseContext databaseContext, @NonNull StateManager stateManager, @NonNull TaskExecutor taskExecutor, @NonNull GroupTreeNode groupNode, @NonNull CustomLocalDragboard localDragBoard, @NonNull GuiPreferences preferences) {
+    public GroupNodeViewModel(
+            @NonNull BibDatabaseContext databaseContext,
+            @NonNull StateManager stateManager,
+            @NonNull TaskExecutor taskExecutor,
+            @NonNull GroupTreeNode groupNode,
+            @NonNull CustomLocalDragboard localDragBoard,
+            @NonNull GuiPreferences preferences) {
         this.databaseContext = databaseContext;
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
@@ -91,7 +97,12 @@ public class GroupNodeViewModel {
         displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
-            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries()).stream().map(this::toViewModel).sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName())).collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
+                    .stream()
+                    .map(this::toViewModel)
+                    .sorted((group1, group2) -> group1.getDisplayName()
+                            .compareToIgnoreCase(group2.getDisplayName()))
+                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
@@ -112,28 +123,54 @@ public class GroupNodeViewModel {
         expandedProperty.addListener((_, _, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
-        // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
+        // The wrapper created by the FXCollections will set a weak listener on the wrapped list.
+        // This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
 
-        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
+        EasyObservableList<Boolean> selectedEntriesMatchStatus =
+                EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
-        allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
+        allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not()
+                .and(selectedEntriesMatchStatus.allMatch(matched -> matched));
 
         this.databaseContext.getDatabase().registerListener(new SearchIndexListener());
     }
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
+    public GroupNodeViewModel(
+            BibDatabaseContext databaseContext,
+            StateManager stateManager,
+            TaskExecutor taskExecutor,
+            AbstractGroup group,
+            CustomLocalDragboard localDragboard,
+            GuiPreferences preferences) {
         this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferences);
     }
 
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
-        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, GroupsFactory.createAllEntriesGroup(), localDragBoard, preferences);
+    static GroupNodeViewModel getAllEntriesGroup(
+            BibDatabaseContext newDatabase,
+            StateManager stateManager,
+            TaskExecutor taskExecutor,
+            CustomLocalDragboard localDragBoard,
+            GuiPreferences preferences) {
+        return new GroupNodeViewModel(
+                newDatabase,
+                stateManager,
+                taskExecutor,
+                GroupsFactory.createAllEntriesGroup(),
+                localDragBoard,
+                preferences);
     }
 
     private GroupNodeViewModel toViewModel(GroupTreeNode child) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferences);
+        return new GroupNodeViewModel(
+                databaseContext,
+                stateManager,
+                taskExecutor,
+                child,
+                localDragBoard,
+                preferences);
     }
 
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
@@ -207,7 +244,15 @@ public class GroupNodeViewModel {
 
     @Override
     public String toString() {
-        return "GroupNodeViewModel{" + "displayName='" + displayName + '\'' + ", isRoot=" + isRoot + ", icon='" + getIcon() + '\'' + ", children=" + children + ", databaseContext=" + databaseContext + ", groupNode=" + groupNode + ", matchedEntries=" + matchedEntries + '}';
+        return "GroupNodeViewModel{"
+                + "displayName='" + displayName + '\''
+                + ", isRoot=" + isRoot
+                + ", icon='" + getIcon() + '\''
+                + ", children=" + children
+                + ", databaseContext=" + databaseContext
+                + ", groupNode=" + groupNode
+                + ", matchedEntries=" + matchedEntries
+                + '}';
     }
 
     @Override
