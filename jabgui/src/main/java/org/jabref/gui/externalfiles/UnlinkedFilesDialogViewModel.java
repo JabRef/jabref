@@ -107,7 +107,6 @@ public class UnlinkedFilesDialogViewModel {
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
 
     public UnlinkedFilesDialogViewModel(DialogService dialogService, UndoManager undoManager, FileUpdateMonitor fileUpdateMonitor, GuiPreferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
-
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
@@ -259,6 +258,7 @@ public class UnlinkedFilesDialogViewModel {
 
     /**
      * Jump to (focus) a linked entry in the main table
+     *
      * @param filePath the file path whose linked entry should be focused
      */
     public void jumpToLinkedEntry(String filePath) {
@@ -289,7 +289,6 @@ public class UnlinkedFilesDialogViewModel {
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(exportPath.get(), StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
-
             for (Path file : fileList) {
                 writer.write(file.toString());
                 writer.newLine();
