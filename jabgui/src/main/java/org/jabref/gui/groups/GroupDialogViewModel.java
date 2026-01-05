@@ -552,15 +552,10 @@ public class GroupDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(texGroupFilePathProperty.getValue().isBlank()
-                        ? currentDatabase.getMetaData()
-                                .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                .orElse(FileUtil.getInitialDirectory(
-                                        currentDatabase,
-                                        preferences.getFilePreferences().getWorkingDirectory()))
-                                .toString()
-                        : texGroupFilePathProperty.get())
-                .build();
+                .withInitialDirectory(texGroupFilePathProperty.getValue().isBlank() ?
+                                      currentDatabase.getMetaData()
+                                                     .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
@@ -571,17 +566,13 @@ public class GroupDialogViewModel {
      * Opens a directory chooser dialog for selecting the directory path for DirectoryGroup.
      */
     public void directoryGroupBrowse() {
-        DirectoryDialogConfiguration directoryDialogConfiguration =
-                new DirectoryDialogConfiguration.Builder()
-                        .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank()
-                                ? FileUtil.getInitialDirectory(
-                                        currentDatabase,
-                                        preferences.getFilePreferences().getWorkingDirectory())
-                                : Path.of(directoryGroupPathProperty.getValue()))
-                        .build();
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank() ?
+                                      FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
+                                      Path.of(directoryGroupPathProperty.getValue()))
+                .build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                .ifPresent(directory -> directoryGroupPathProperty.setValue(
-                        directory.toAbsolutePath().toString()));
+                     .ifPresent(directory -> directoryGroupPathProperty.setValue(directory.toAbsolutePath().toString()));
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
