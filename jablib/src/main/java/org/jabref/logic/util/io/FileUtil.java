@@ -78,11 +78,22 @@ public class FileUtil {
     /**
      * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
+     * In case the filename starts with a "." and only has one ".", the part after the dot is NOT the extension
+     *
      * @return the extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        String extension = FilenameUtils.getExtension(fileName);
+        Path realFileName = Path.of(fileName).getFileName();
+        if (realFileName == null) {
+            return Optional.empty();
+        }
+        String realFileNameString = realFileName.toString();
+        String extension = FilenameUtils.getExtension(realFileNameString);
         if (StringUtil.isNullOrEmpty(extension)) {
+            return Optional.empty();
+        }
+        if (realFileNameString.startsWith(".") && (realFileNameString.length() == extension.length() + 1)) {
+            // In case ".tmp" is asked for the extension, the answer is empty (and not tmp)
             return Optional.empty();
         }
         return Optional.of(extension);
