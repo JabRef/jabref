@@ -174,7 +174,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         final String link = "path/to/other.txt".replace('/', File.separatorChar);
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithCitationKeyAsdf, databaseContext, filePreferences);
         assertEquals("asdf.pdf", linkedFileHandler.getSuggestedFileName("pdf"), "\"" + link + "\" with \"pdf\" should be \"asdf.pdf\" for citation key 'asdf'");
     }
 
@@ -183,7 +183,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         final String link = "path/to/other.txt".replace('/', File.separatorChar);
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithoutCitationKey, databaseContext, filePreferences);
         assertEquals("other.pdf", linkedFileHandler.getSuggestedFileName("pdf"), "\"" + link + "\" with \"pdf\" should be \"other.pdf\" for empty citation key");
     }
 
@@ -192,7 +192,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         final String link = "path/to/other.txt".replace('/', File.separatorChar);
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithCitationKeyAsdf, databaseContext, filePreferences);
         assertEquals("asdf.txt", linkedFileHandler.getSuggestedFileName(), "\"" + link + "\" should be \"asdf.txt\" for citation key 'asdf'");
     }
 
@@ -201,7 +201,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         final String link = "path/to/other.txt".replace('/', File.separatorChar);
         final LinkedFile linkedFile = new LinkedFile("", link, "");
-        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithoutCitationKey, databaseContext, filePreferences);
         assertEquals("other.txt", linkedFileHandler.getSuggestedFileName(), "\"" + link + "\" should be \"other.txt\" for empty citation key");
     }
 }
