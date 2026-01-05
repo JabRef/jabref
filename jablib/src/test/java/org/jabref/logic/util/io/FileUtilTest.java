@@ -203,7 +203,7 @@ class FileUtilTest {
     void getAbsentFileExtension(String file) {
         file = file.replace('/', File.separatorChar);
         Optional<String> result = FileUtil.getFileExtension(file);
-        assertFalse(result.isPresent(), "got extension '" + result.orElse("") + "'");
+        assertEquals(Optional.empty(), result);
     }
 
     @ParameterizedTest
