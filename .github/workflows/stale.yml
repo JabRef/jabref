@@ -51,3 +51,16 @@ jobs:
             echo "Handling #$n"
             gh workflow run "On PR closed" --ref main --field pr_number="$n"
           done
+      - name: Write closed PR URLs to summary
+        if: always()
+        env:
+          CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
+        run: |
+          {
+            echo "## Closed PRs"
+            echo
+            echo "$CLOSED_JSON" \
+              | jq -r '.[] | select(.pull_request != null) | "- [#\(.number)](\(.pull_request.html_url))"' \
+              || true
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
