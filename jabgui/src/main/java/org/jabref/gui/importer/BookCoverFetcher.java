@@ -53,14 +53,12 @@ public class BookCoverFetcher {
     private void downloadCoverForISBN(ISBN isbn, Path directory) {
         final String name = "isbn-" + isbn.asString();
         if (findExistingImage(name, directory).isEmpty()) {
-            final String url = getSourceForIsbn(isbn);
+            final String url = getImageUrl(isbn);
             downloadCoverImage(url, name, directory);
         }
     }
 
     private void downloadCoverImage(String url, final String name, final Path directory) {
-        Optional<String> extension = FileUtil.getFileNameFromUrl(url).flatMap(FileUtil::getFileExtension);
-
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -68,25 +66,32 @@ public class BookCoverFetcher {
             return;
         }
 
+        LOGGER.info("Downloading cover image file from {}", url);
+
+        URLDownload download;
         try {
-            LOGGER.info("Downloading cover image file from {}", url);
-
-            URLDownload download = new URLDownload(url);
-            Optional<String> mimeIfAvailable = download.getMimeType();
-
-            Optional<ExternalFileType> inferredFromMime = mimeIfAvailable.flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
-                                                                         .filter(fileType -> fileType.getMimeType().startsWith("image/"));
-            Optional<ExternalFileType> inferredFromExtension = extension.flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
-                                                                        .filter(fileType -> fileType.getMimeType().startsWith("image/"));
-            final ExternalFileType inferredFileType = inferredFromMime.orElse(inferredFromExtension.orElse(StandardExternalFileType.JPG));
-
-            Optional<Path> destination = resolveNameWithType(directory, name, inferredFileType);
-            if (destination.isPresent()) {
-                download.toFile(destination.get());
-            }
-        } catch (FetcherException | MalformedURLException e) {
+            download = new URLDownload(url);
+        } catch (MalformedURLException e) {
             LOGGER.error("Error while downloading cover image file", e);
             return;
+        }
+
+        ExternalFileType inferredFileType = download
+                .getMimeType().flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
+                .filter(fileType -> fileType.getMimeType().startsWith("image/"))
+                .or(() -> FileUtil.getFileNameFromUrl(url).flatMap(FileUtil::getFileExtension)
+                                  .flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
+                                  .filter(fileType -> fileType.getMimeType().startsWith("image/")))
+                .orElse(StandardExternalFileType.JPG);
+
+        Optional<Path> destination = resolveNameWithType(directory, name, inferredFileType);
+        if (destination.isEmpty()) {
+            return;
+        }
+        try {
+            download.toFile(destination.get());
+        } catch (FetcherException e) {
+            LOGGER.error("Error while downloading cover image file", e);
         }
     }
 
@@ -105,7 +110,7 @@ public class BookCoverFetcher {
         }
     }
 
-    private static String getSourceForIsbn(ISBN isbn) {
+    private static String getImageUrl(ISBN isbn) {
         if (isbn.isIsbn13()) {
             String url = URL_FETCHER_URL + isbn.asString();
             try {
