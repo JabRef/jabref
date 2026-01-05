@@ -10,11 +10,7 @@ plugins {
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
 dependencies {
-    rewrite(
-        platform(
-            "org.openrewrite.recipe:rewrite-recipe-bom:3.21.0"
-        )
-    )
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.21.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -22,9 +18,7 @@ dependencies {
 }
 
 rewrite {
-    activeRecipe(
-        "org.jabref.config.rewrite.cleanup"
-    )
+    activeRecipe("org.jabref.config.rewrite.cleanup")
     exclusion(
         "settings.gradle",
         "**/generated/sources/**",
@@ -64,13 +58,9 @@ requirementTracing {
 tasks.register(
     "run"
 ) {
-    group =
-        "application"
-    description =
-        "Runs the GUI"
-    dependsOn(
-        ":jabgui:run"
-    )
+    group = "application"
+    description = "Runs the GUI"
+    dependsOn(":jabgui:run")
 }
 
 allprojects {
