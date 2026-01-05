@@ -75,7 +75,9 @@ allprojects {
                 "testRuntimeClasspath",
                 "testCompileClasspath",
                 "testImplementation",
-                "rewrite"
+                "rewrite",
+                "mockitoAgent",
+                "antlr"
             )
     }
 }
