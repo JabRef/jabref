@@ -1,5 +1,6 @@
 package org.jabref.logic.externalfiles;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -165,5 +167,41 @@ class LinkedFileHandlerTest {
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithoutCitationKey, databaseContext, filePreferences);
 
         assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
+    }
+
+    @Test
+    void getSuggestedFileNameInDirectory() {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+        final String link = "path/to/other.txt".replace('/', File.separatorChar);
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        assertEquals("asdf.pdf", linkedFileHandler.getSuggestedFileName("pdf"), "\"" + link + "\" with \"pdf\" should be \"asdf.pdf\" for citation key 'asdf'");
+    }
+
+    @Test
+    void getSuggestedFileNameInDirectoryWithMissingKey() {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+        final String link = "path/to/other.txt".replace('/', File.separatorChar);
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
+        assertEquals("other.pdf", linkedFileHandler.getSuggestedFileName("pdf"), "\"" + link + "\" with \"pdf\" should be \"other.pdf\" for empty citation key");
+    }
+
+    @Test
+    void getSuggestedFileNameWithoutExtensionInDirectory() {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+        final String link = "path/to/other.txt".replace('/', File.separatorChar);
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
+        assertEquals("asdf.txt", linkedFileHandler.getSuggestedFileName(), "\"" + link + "\" should be \"asdf.txt\" for citation key 'asdf'");
+    }
+
+    @Test
+    void getSuggestedFileNameWithoutExtensionWithMissingKeyInDirectory() {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+        final String link = "path/to/other.txt".replace('/', File.separatorChar);
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, badEntry, databaseContext, filePreferences);
+        assertEquals("other.txt", linkedFileHandler.getSuggestedFileName(), "\"" + link + "\" should be \"other.txt\" for empty citation key");
     }
 }
