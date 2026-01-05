@@ -64,7 +64,7 @@ tasks.register("run") {
 allprojects {
     tasks.cyclonedxDirectBom {
         includeConfigs =
-            listOf("runtimeClasspath",)
+            listOf("runtimeClasspath")
         skipConfigs =
             listOf(
                 "testRuntimeClasspath",
