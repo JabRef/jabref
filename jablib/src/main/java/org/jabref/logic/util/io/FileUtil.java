@@ -124,12 +124,19 @@ public class FileUtil {
     public static Optional<String> getFileNameFromUrl(@NonNull String link) {
         // Apache Commons IO has no good support; FilenameUtils.getName(link) doesn't strip query parameters
         // Source: https://stackoverflow.com/a/33871029/873282
+        URI uri;
         try {
-            return Optional.of(Paths.get(new URI(link).getPath()).getFileName().toString());
+            uri = new URI(link);
         } catch (URISyntaxException e) {
             LOGGER.warn("Was not a valid URL {}", link, e);
             return Optional.empty();
         }
+        Path fileName = Paths.get(uri.getPath()).getFileName();
+        if (fileName == null) {
+            // Happens if there is no path, e.g., at https://example.com/
+            return Optional.empty();
+        }
+        return Optional.of(fileName.toString());
     }
 
     /**
