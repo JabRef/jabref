@@ -129,7 +129,7 @@ public class FileUtil {
             LOGGER.warn("Was not a valid URL {}", link, e);
             return Optional.empty();
         }
-        Path fileName = Paths.get(uri.getPath()).getFileName();
+        Path fileName = Path.of(uri.getPath()).getFileName();
         if (fileName == null) {
             // Happens if there is no path, e.g., at https://example.com/
             return Optional.empty();
