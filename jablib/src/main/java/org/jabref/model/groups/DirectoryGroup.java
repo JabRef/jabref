@@ -169,7 +169,9 @@ public class DirectoryGroup extends AbstractGroup {
         if (!(o instanceof DirectoryGroup other)) {
             return false;
         }
-        return Objects.equals(getName(), other.getName()) && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext()) && Objects.equals(directoryPath, other.directoryPath);
+        return Objects.equals(getName(), other.getName())
+                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
+                && Objects.equals(directoryPath, other.directoryPath);
     }
 
     @Override
@@ -179,6 +181,14 @@ public class DirectoryGroup extends AbstractGroup {
 
     @Override
     public String toString() {
-        return "DirectoryGroup{" + "name='" + getName() + '\'' + ", directoryPath=" + directoryPath + ", context=" + context + ", color=" + color + ", isExpanded=" + isExpanded + ", description=" + description + ", iconName=" + iconName + '}';
+        return "DirectoryGroup{"
+                + "name='" + getName() + '\''
+                + ", directoryPath=" + directoryPath
+                + ", context=" + context
+                + ", color=" + color
+                + ", isExpanded=" + isExpanded
+                + ", description=" + description
+                + ", iconName=" + iconName
+                + '}';
     }
 }
