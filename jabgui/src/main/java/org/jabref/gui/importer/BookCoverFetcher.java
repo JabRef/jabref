@@ -74,13 +74,13 @@ public class BookCoverFetcher {
             URLDownload download = new URLDownload(url);
             Optional<String> mimeIfAvailable = download.getMimeType();
 
-            Optional<ExternalFileType> inferedFromMime = mimeIfAvailable.flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
+            Optional<ExternalFileType> inferredFromMime = mimeIfAvailable.flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
+                                                                         .filter(fileType -> fileType.getMimeType().startsWith("image/"));
+            Optional<ExternalFileType> inferredFromExtension = extension.flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
                                                                         .filter(fileType -> fileType.getMimeType().startsWith("image/"));
-            Optional<ExternalFileType> inferedFromExtension = extension.flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
-                                                                       .filter(fileType -> fileType.getMimeType().startsWith("image/"));
-            final ExternalFileType inferedFileType = inferedFromMime.orElse(inferedFromExtension.orElse(StandardExternalFileType.JPG));
+            final ExternalFileType inferredFileType = inferredFromMime.orElse(inferredFromExtension.orElse(StandardExternalFileType.JPG));
 
-            Optional<Path> destination = resolveNameWithType(directory, name, inferedFileType);
+            Optional<Path> destination = resolveNameWithType(directory, name, inferredFileType);
             if (destination.isPresent()) {
                 download.toFile(destination.get());
             }
