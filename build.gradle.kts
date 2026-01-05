@@ -55,9 +55,7 @@ requirementTracing {
 }
 
 // TODO: "run" should run the GUI, not all modules
-tasks.register(
-    "run"
-) {
+tasks.register("run") {
     group = "application"
     description = "Runs the GUI"
     dependsOn(":jabgui:run")
