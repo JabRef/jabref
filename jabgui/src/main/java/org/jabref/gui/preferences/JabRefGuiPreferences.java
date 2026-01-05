@@ -288,7 +288,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
 
-        defaults.put(COVER_IMAGE_DOWNLOAD, Boolean.TRUE);
+        // Disabled per default - similar to Mr. DLib; see [org.jabref.logic.preferences.JabRefCliPreferences.ACCEPT_RECOMMENDATIONS].
+        defaults.put(COVER_IMAGE_DOWNLOAD, Boolean.FALSE);
     }
 
     /**
