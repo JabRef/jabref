@@ -90,9 +90,9 @@ record MultiSelectionMenuBuilder(
 
             @Override
             public void execute() {
-                var localLinkedFiles = selection.stream()
-                                                .filter(MultiSelectionMenuBuilder.this::isLocalAndExists)
-                                                .toList();
+                List<LinkedFileViewModel> localLinkedFiles = selection.stream()
+                                                       .filter(MultiSelectionMenuBuilder.this::isLocalAndExists)
+                                                       .toList();
 
                 if (localLinkedFiles.isEmpty()) {
                     return;
@@ -102,7 +102,7 @@ record MultiSelectionMenuBuilder(
                         .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                         .build();
 
-                var exportDirectory = dialogService.showDirectorySelectionDialog(directoryDialogConfiguration);
+                Optional<Path> exportDirectory = dialogService.showDirectorySelectionDialog(directoryDialogConfiguration);
                 if (exportDirectory.isEmpty()) {
                     return;
                 }
@@ -112,7 +112,7 @@ record MultiSelectionMenuBuilder(
                 int skippedCount = 0;
 
                 for (LinkedFileViewModel linkedFileViewModel : localLinkedFiles) {
-                    var sourcePath = linkedFileViewModel.getFile().findIn(databaseContext, preferences.getFilePreferences());
+                    Optional<Path> sourcePath = linkedFileViewModel.getFile().findIn(databaseContext, preferences.getFilePreferences());
                     if (sourcePath.isEmpty()) {
                         skippedCount++;
                         continue;
