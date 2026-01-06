@@ -57,7 +57,6 @@ import org.jabref.model.util.Range;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -219,18 +218,6 @@ public class SourceTab extends EntryEditorTab {
         codeArea.setContextMenu(contextMenu);
 
         sourceValidator.addRule(validationMessage);
-
-        sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
-            ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
-            if (!sourceValidationStatus.isValid()) {
-                sourceValidationStatus.getHighestMessage().ifPresent(message -> {
-                    String content = Localization.lang("User input via entry-editor in `{}bibtex source` tab led to failure.")
-                            + "\n" + Localization.lang("Please check your library file for wrong syntax.")
-                            + "\n\n" + message.getMessage();
-                    dialogService.showWarningDialogAndWait(Localization.lang("SourceTab error"), content);
-                });
-            }
-        });
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
             if (!onFocus && (currentEntry != null)) {
