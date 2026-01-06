@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
@@ -24,6 +25,9 @@ import org.jabref.logic.preferences.CliPreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.websockets.WebSocketAddOn;
+import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
@@ -41,8 +45,17 @@ public class Server {
         this.preferences = preferences;
     }
 
-    /// Entry point for the CLI
+    /// Entry point for the CLI (backwards-compatible)
     public HttpServer run(List<Path> files, URI uri) {
+        return run(files, uri, null);
+    }
+
+    /**
+     * CLI entry that allows supplying a RemoteMessageHandler to be registered in the ServiceLocator.
+     * If {@code remoteMessageHandler} is null, no handler is registered and WebSocket handlers will
+     * receive null when looking it up (they should handle that case).
+     */
+    public HttpServer run(List<Path> files, URI uri, RemoteMessageHandler remoteMessageHandler) {
         List<Path> filesToServeList;
         if (files == null || files.isEmpty()) {
             LOGGER.debug("No library available to serve, serving the demo library...");
@@ -65,6 +78,7 @@ public class Server {
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, remoteMessageHandler, "remoteMessageHandler", RemoteMessageHandler.class);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -82,13 +96,25 @@ public class Server {
         return httpServer;
     }
 
-    /// Entry point for the GUI
+    /// Entry point for the GUI (delegates to overload that can accept a handler)
     public HttpServer run(SrvStateManager srvStateManager, URI uri) {
+        return run(srvStateManager, uri, null);
+    }
+
+    /**
+     * GUI entry that allows supplying a RemoteMessageHandler to be registered in the ServiceLocator.
+     * This mirrors the CLI entrypoint which accepts a handler so WebSocket code can lookup and use it.
+     */
+    public HttpServer run(SrvStateManager srvStateManager, URI uri, RemoteMessageHandler remoteMessageHandler) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
+
+        if (remoteMessageHandler != null) {
+            ServiceLocatorUtilities.addOneConstant(serviceLocator, remoteMessageHandler, "remoteMessageHandler", RemoteMessageHandler.class);
+        }
 
         return startServer(serviceLocator, uri);
     }
@@ -97,6 +123,23 @@ public class Server {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
+
+        // Ensure a RemoteMessageHandler is always available; register a no-op logger handler if none provided
+        RemoteMessageHandler existingHandler = serviceLocator.getService(RemoteMessageHandler.class);
+        if (existingHandler == null) {
+            RemoteMessageHandler noopHandler = new RemoteMessageHandler() {
+                @Override
+                public void handleCommandLineArguments(String[] message) {
+                    LOGGER.info("Received remote command (no-op handler): {}", java.util.Arrays.toString(message));
+                }
+
+                @Override
+                public void handleFocus() {
+                    LOGGER.info("Received focus request (no-op handler)");
+                }
+            };
+            ServiceLocatorUtilities.addOneConstant(serviceLocator, noopHandler, "remoteMessageHandler", RemoteMessageHandler.class);
+        }
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
@@ -119,8 +162,25 @@ public class Server {
 
         LOGGER.debug("Starting HTTP server...");
 
-        return GrizzlyHttpServerFactory
-                .createHttpServer(uri, resourceConfig, serviceLocator);
+        // Create server without starting so we can attach add-ons before listeners bind
+        HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, resourceConfig, /* start */ false);
+
+        // Attach WebSocket add-on to each network listener and register WS application at /ws
+        for (NetworkListener listener : server.getListeners()) {
+            listener.registerAddOn(new WebSocketAddOn());
+        }
+
+        WebSocketEngine.getEngine().register("", "/ws", new org.jabref.http.server.ws.JabRefWebSocketApp(serviceLocator));
+
+        // Now start the server
+        try {
+            server.start();
+        } catch (Exception e) {
+            LOGGER.error("Failed to start HTTP server", e);
+            throw new RuntimeException(e);
+        }
+
+        return server;
     }
 
     private boolean sslCertExists() {
