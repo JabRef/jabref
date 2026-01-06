@@ -447,6 +447,9 @@ public class JabRefGUI extends Application {
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
+        if (remotePreferences.enableWebSocketServer()) {
+            remoteListenerServerManager.openAndStartWebSocket(cliMessageHandler, remotePreferences.getWebSocketPort());
+        }
     }
 
     @Override

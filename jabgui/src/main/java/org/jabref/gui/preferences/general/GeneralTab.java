@@ -67,6 +67,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private TextField backupDirectory;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
+    @FXML private CheckBox enableWebSocketServer;
+    @FXML private TextField webSocketPort;
     @FXML private CheckBox enableHttpServer;
     @FXML private TextField httpServerPort;
     @FXML private CheckBox enableLanguageServer;
@@ -161,6 +163,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
+            validationVisualizer.initVisualization(viewModel.webSocketPortValidationStatus(), webSocketPort);
             validationVisualizer.initVisualization(viewModel.httpPortValidationStatus(), httpServerPort);
             validationVisualizer.initVisualization(viewModel.languageServerPortValidationStatus(), languageServerPort);
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
@@ -170,6 +173,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
+
+        enableWebSocketServer.selectedProperty().bindBidirectional(viewModel.enableWebSocketServerProperty());
+        webSocketPort.textProperty().bindBidirectional(viewModel.webSocketPortProperty());
+        webSocketPort.disableProperty().bind(enableWebSocketServer.selectedProperty().not());
 
         enableHttpServer.selectedProperty().bindBidirectional(viewModel.enableHttpServerProperty());
         httpServerPort.textProperty().bindBidirectional(viewModel.httpPortProperty());

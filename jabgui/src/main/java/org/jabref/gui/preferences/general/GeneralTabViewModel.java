@@ -108,6 +108,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final Validator remotePortValidator;
+    private final BooleanProperty enableWebSocketServerProperty = new SimpleBooleanProperty();
+    private final StringProperty webSocketPortProperty = new SimpleStringProperty("");
+    private final Validator webSocketPortValidator;
     private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
     private final StringProperty httpPortProperty = new SimpleStringProperty("");
     private final Validator httpPortValidator;
@@ -165,6 +168,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
 
+        webSocketPortValidator = new FunctionBasedValidator<>(
+                webSocketPortProperty,
+                RemoteUtil::isStringUserPort,
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
+                        Localization.lang("Network"),
+                        Localization.lang("WebSocket Server"),
+                        Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
         httpPortValidator = new FunctionBasedValidator<>(
                 httpPortProperty,
                 RemoteUtil::isStringUserPort,
@@ -180,6 +191,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus remotePortValidationStatus() {
         return remotePortValidator.getValidationStatus();
+    }
+
+    public ValidationStatus webSocketPortValidationStatus() {
+        return webSocketPortValidator.getValidationStatus();
     }
 
     public ValidationStatus httpPortValidationStatus() {
@@ -230,6 +245,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         remoteServerProperty.setValue(remotePreferences.useRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
+
+        enableWebSocketServerProperty.setValue(remotePreferences.enableWebSocketServer());
+        webSocketPortProperty.setValue(String.valueOf(remotePreferences.getWebSocketPort()));
 
         enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());
         httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpPort()));
@@ -299,6 +317,22 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             remoteListenerServerManager.stop();
         }
 
+        getPortAsInt(webSocketPortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentWebSocketPort(newPort)) {
+                remotePreferences.setWebSocketPort(newPort);
+            }
+        });
+
+        // stop in all cases, because the port might have changed
+        remoteListenerServerManager.closeAndStopWebSocket();
+        if (enableWebSocketServerProperty.getValue()) {
+            remotePreferences.setEnableWebSocketServer(true);
+            remoteListenerServerManager.openAndStartWebSocket(messageHandler, remotePreferences.getWebSocketPort());
+        } else {
+            remotePreferences.setEnableWebSocketServer(false);
+            remoteListenerServerManager.closeAndStopWebSocket();
+        }
+
         getPortAsInt(httpPortProperty.getValue()).ifPresent(newPort -> {
             if (remotePreferences.isDifferentHttpPort(newPort)) {
                 remotePreferences.setHttpPort(newPort);
@@ -349,6 +383,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             validator.addValidators(remotePortValidator);
+        }
+
+        if (enableWebSocketServerProperty.getValue()) {
+            validator.addValidators(webSocketPortValidator);
         }
 
         if (enableHttpServerProperty.getValue()) {
@@ -487,6 +525,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty remotePortProperty() {
         return remotePortProperty;
+    }
+
+    public BooleanProperty enableWebSocketServerProperty() {
+        return enableWebSocketServerProperty;
+    }
+
+    public StringProperty webSocketPortProperty() {
+        return webSocketPortProperty;
     }
 
     public BooleanProperty enableHttpServerProperty() {

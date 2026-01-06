@@ -81,6 +81,10 @@
         <TextField fx:id="remotePort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
         <Button fx:id="remoteHelp" prefWidth="20.0" />
     </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="enableWebSocketServer" text="%Enable WebSocket Server (for browser extensions) on port" />
+        <TextField fx:id="webSocketPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
+    </HBox>
 
     <Label styleClass="sectionHeader" text="%HTTP Server" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
