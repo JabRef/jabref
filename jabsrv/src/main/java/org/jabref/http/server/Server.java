@@ -95,7 +95,7 @@ public class Server {
 
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
         // see https://stackoverflow.com/a/33794265/873282
