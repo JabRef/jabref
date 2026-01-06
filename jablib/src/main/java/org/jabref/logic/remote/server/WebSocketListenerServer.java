@@ -12,6 +12,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +106,8 @@ public class WebSocketListenerServer implements Runnable {
         return true;
     }
 
+    // Generates the Sec-WebSocket-Accept key from the Sec-WebSocket-Key
+    // according to RFC 6455 (https://www.rfc-editor.org/rfc/rfc6455)
     private String generateAcceptKey(String webSocketKey) {
         try {
             String concatenated = webSocketKey + WEBSOCKET_GUID;
@@ -218,71 +224,21 @@ public class WebSocketListenerServer implements Runnable {
         }
     }
 
-    private String extractJsonValue(String json, String key) {
-        String searchKey = "\"" + key + "\"";
-        int keyIndex = json.indexOf(searchKey);
-        if (keyIndex == -1) {
-            return null;
-        }
-
-        int colonIndex = json.indexOf(":", keyIndex);
-        if (colonIndex == -1) {
-            return null;
-        }
-
-        int startQuote = json.indexOf("\"", colonIndex);
-        if (startQuote == -1) {
-            return null;
-        }
-
-        int endQuote = json.indexOf("\"", startQuote + 1);
-        if (endQuote == -1) {
-            return null;
-        }
-
-        String value = json.substring(startQuote + 1, endQuote);
-        return unescapeJsonString(value);
-    }
-
-    private String unescapeJsonString(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (c == '\\' && i + 1 < str.length()) {
-                char next = str.charAt(i + 1);
-                switch (next) {
-                    case 'n' -> {
-                        result.append('\n');
-                        i++;
-                    }
-                    case 't' -> {
-                        result.append('\t');
-                        i++;
-                    }
-                    case 'r' -> {
-                        result.append('\r');
-                        i++;
-                    }
-                    case '\\' -> {
-                        result.append('\\');
-                        i++;
-                    }
-                    case '"' -> {
-                        result.append('"');
-                        i++;
-                    }
-                    default ->
-                        result.append(c);
-                }
-            } else {
-                result.append(c);
+    private @Nullable String extractJsonValue(String json, String key) {
+        try {
+            JsonElement parsed = JsonParser.parseString(json);
+            if (!parsed.isJsonObject()) {
+                return null;
             }
+            JsonObject obj = parsed.getAsJsonObject();
+            if (!obj.has(key) || obj.get(key).isJsonNull()) {
+                return null;
+            }
+            return obj.get(key).getAsString();
+        } catch (Exception e) {
+            LOGGER.debug("Failed to parse JSON in WebSocket message: {}", e.toString());
+            return null;
         }
-        return result.toString();
     }
 
     private void sendTextFrame(OutputStream output, String message) throws IOException {
