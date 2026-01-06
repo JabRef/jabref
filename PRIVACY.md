@@ -2,13 +2,13 @@
 
 Last updated: 2024-08-06
 
-Your privacy is a fundamental right JabRef e.V. respects and supports.
+Your privacy is a fundamental right that JabRef e.V. respects and supports.
 By using JabRef and its related online services, you choose to share some of your personal information.
 In this Privacy Policy we explain how we collect, use, and share information about you, along with the choices you have.
 
 The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' refers to the desktop application that is provided by JabRef e.V.
 
-Please remember that no method of transmission over the Internet, or method of electronic storage is absolute secure.
+Please remember that no method of transmission over the Internet, or method of electronic storage is absolutely secure.
 While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.
 Also, whenever you communicate through the internet, your IP-Address will always be transmitted and retained by third parties for technical and in some cases for legal reasons.
 

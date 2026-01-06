@@ -169,7 +169,7 @@ class CSLFormatUtilsTest {
                 // Numeric type "[1]", brackets, newlines
                 Arguments.of(
                         "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric type "1."
@@ -196,19 +196,13 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, ed. <i>BibTeX Journal</i>. 2016;34(3):45-67. doi:10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 11th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Small-caps
                 Arguments.of(
                         "<smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps> and <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.<p></p>",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
-                ),
-
-                // Underlines
-                Arguments.of(
-                        "Smith, Bill, Bob Jones, and Jeff Williams. “Title of the test entry.” Ed. Phil Taylor. <u>BibTeX Journal</u> 34.3 (2016): 45–67. <https://github.com/JabRef>.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-breaking spaces
@@ -238,7 +232,7 @@ class CSLFormatUtilsTest {
                 // Numeric in parentheses - "(1)"
                 Arguments.of(
                         "(1) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric with right parenthesis - "1)"
@@ -250,7 +244,7 @@ class CSLFormatUtilsTest {
                 // Numeric in superscript - "<SUPERSCRIPT>1"
                 Arguments.of(
                         "<sup>1</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -278,7 +272,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -303,17 +297,12 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 11th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
                         "(Smith, Jones and Williams, 2016)",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
-                ),
-
-                Arguments.of(
-                        "(Smith, Jones, & Williams, “Title of the test entry”)",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -338,7 +327,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Note: not sure if the right parenthesis outside the superscript is correct, but that's how citeproc-java generates it in raw form as well.
@@ -349,7 +338,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-bibliographic style (citation-format="note")
@@ -407,7 +396,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "[1], [2]",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -432,17 +421,12 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 11th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
                         "(Garcia and Lee, 2021; Smith and Johnson, 2020)",
                         STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
-                ),
-
-                Arguments.of(
-                        "(Garcia & Lee, “Quantum Entanglement in Superconductors”; Smith & Johnson, “A Study on Machine Learning Algorithms”)",
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -467,7 +451,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -477,7 +461,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "<sup>1,2</sup>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-bibliographic style (citation-format="note")
@@ -514,7 +498,7 @@ class CSLFormatUtilsTest {
                 // Type: "[1]"
                 Arguments.of(
                         "[3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "1."
@@ -538,7 +522,7 @@ class CSLFormatUtilsTest {
                 // Type: "(1)"
                 Arguments.of(
                         "(3) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "1)"
@@ -550,7 +534,7 @@ class CSLFormatUtilsTest {
                 // Type: "<SUPERSCRIPT>1"
                 Arguments.of(
                         "<sup>3</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
