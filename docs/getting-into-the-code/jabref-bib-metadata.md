@@ -20,6 +20,7 @@ by BibTeX and biblatex processors and therefore do not affect bibliography compi
 The metadata is typically stored in `@Comment` blocks with a `jabref-meta` prefix.
 
 Example:
+
 ```bibtex
 @Comment{jabref-meta: groupstree:
 0 AllEntriesGroup:;
