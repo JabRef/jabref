@@ -189,26 +189,28 @@ public class WebSocketListenerServer implements Runnable {
             LOGGER.debug("Processing command: {} with argument: {}", command, argument);
 
             return switch (command) {
-                case "ping" -> "{\"status\":\"success\",\"response\":\"pong\"}";
+                case "ping" ->
+                        "{\"status\":\"success\",\"response\":\"pong\"}";
                 case "focus" -> {
-                    messageHandler.handleCommandLineArguments(new String[]{"--focus"});
+                    messageHandler.handleCommandLineArguments(new String[] {"--focus"});
                     yield "{\"status\":\"success\",\"response\":\"focused\"}";
                 }
                 case "open" -> {
                     if (argument != null && !argument.isEmpty()) {
-                        messageHandler.handleCommandLineArguments(new String[]{"--import", argument});
+                        messageHandler.handleCommandLineArguments(new String[] {"--import", argument});
                         yield "{\"status\":\"success\",\"response\":\"opened\"}";
                     }
                     yield "{\"status\":\"error\",\"message\":\"No file specified\"}";
                 }
                 case "add" -> {
                     if (argument != null && !argument.isEmpty()) {
-                        messageHandler.handleCommandLineArguments(new String[]{"--importBibtex", argument});
+                        messageHandler.handleCommandLineArguments(new String[] {"--importBibtex", argument});
                         yield "{\"status\":\"success\",\"response\":\"added\"}";
                     }
                     yield "{\"status\":\"error\",\"message\":\"No BibTeX entry specified\"}";
                 }
-                default -> "{\"status\":\"error\",\"message\":\"Unknown command: " + command + "\"}";
+                default ->
+                        "{\"status\":\"error\",\"message\":\"Unknown command: " + command + "\"}";
             };
         } catch (Exception e) {
             LOGGER.error("Error processing WebSocket message", e);
@@ -273,7 +275,8 @@ public class WebSocketListenerServer implements Runnable {
                         result.append('"');
                         i++;
                     }
-                    default -> result.append(c);
+                    default ->
+                        result.append(c);
                 }
             } else {
                 result.append(c);
@@ -307,7 +310,7 @@ public class WebSocketListenerServer implements Runnable {
     }
 
     private void sendPongFrame(OutputStream output) throws IOException {
-        byte[] pongFrame = new byte[]{(byte) 0x8A, 0x00}; // FIN + pong frame, no payload
+        byte[] pongFrame = new byte[] {(byte) 0x8A, 0x00}; // FIN + pong frame, no payload
         output.write(pongFrame);
         output.flush();
     }

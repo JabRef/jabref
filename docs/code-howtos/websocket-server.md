@@ -40,35 +40,43 @@ The server implements RFC 6455 WebSocket protocol and accepts JSON-formatted tex
 ## Available Commands
 
 ### 1. ping
+
 Tests the connection.
 
 **Request:**
+
 ```json
 {"command": "ping"}
 ```
 
 **Response:**
+
 ```json
 {"status": "success", "response": "pong"}
 ```
 
 ### 2. focus
+
 Brings the JabRef window to the front.
 
 **Request:**
+
 ```json
 {"command": "focus"}
 ```
 
 **Response:**
+
 ```json
 {"status": "success", "response": "focused"}
 ```
 
 ### 3. open
+
 Opens a BibTeX file or imports references.
 
 **Request:**
+
 ```json
 {
   "command": "open",
@@ -77,14 +85,17 @@ Opens a BibTeX file or imports references.
 ```
 
 **Response:**
+
 ```json
 {"status": "success", "response": "opened"}
 ```
 
 ### 4. add
+
 Adds a BibTeX entry to the currently open library.
 
 **Request:**
+
 ```json
 {
   "command": "add",
@@ -93,6 +104,7 @@ Adds a BibTeX entry to the currently open library.
 ```
 
 **Response:**
+
 ```json
 {"status": "success", "response": "added"}
 ```
@@ -195,12 +207,14 @@ sendToJabRef(bibEntry);
 ## Troubleshooting
 
 ### Connection Refused
+
 - Ensure the WebSocket server is enabled in preferences
 - Check that JabRef is running
 - Verify the correct port number (default: 23116)
 - Check firewall settings (should allow localhost connections)
 
 ### Commands Not Working
+
 - Ensure a library is open in JabRef for `add` command
 - Check JSON formatting (must be valid JSON)
 - Verify command names are spelled correctly (case-sensitive)
@@ -208,6 +222,7 @@ sendToJabRef(bibEntry);
 ## Implementation Details
 
 The WebSocket server:
+
 - Implements RFC 6455 WebSocket protocol
 - Uses pure Java (no external WebSocket libraries)
 - Runs in a separate thread
