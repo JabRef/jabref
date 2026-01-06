@@ -149,6 +149,10 @@ public class WebSocketListenerServer implements Runnable {
                     break;
                 }
                 payloadLength = java.nio.ByteBuffer.wrap(extendedPayloadLengthBytes).getLong();
+                if (payloadLength < 0) {
+                    LOGGER.warn("WebSocket payload length overflow (negative signed long)");
+                    break;
+                }
             }
 
             // Close frame
@@ -164,19 +168,38 @@ public class WebSocketListenerServer implements Runnable {
             }
 
             // Text frame
-            if (opcode == 0x01 && fin && masked) {
-                byte[] maskingKey = new byte[4];
-                System.arraycopy(buffer, maskOffset, maskingKey, 0, 4);
-
-                byte[] payload = new byte[payloadLength];
-                System.arraycopy(buffer, maskOffset + 4, payload, 0, payloadLength);
-
-                // Unmask payload
-                for (int i = 0; i < payloadLength; i++) {
-                    payload[i] = (byte) (payload[i] ^ maskingKey[i % 4]);
+            if (opcode == 0x01 && fin) {
+                if (!masked) {
+                    LOGGER.warn("Received unmasked client-to-server frame, violates RFC 6455");
+                    break;
                 }
 
-                String message = new String(payload, StandardCharsets.UTF_8);
+                java.io.InputStream in = clientSocket.getInputStream();
+
+                // Validate payload size for array allocation
+                if (payloadLength > Integer.MAX_VALUE) {
+                    LOGGER.warn("WebSocket payload too large: {}", payloadLength);
+                    break;
+                }
+                int intPayloadLength = (int) payloadLength;
+
+                // Read masking key (4 bytes) then the masked payload
+                byte[] maskingKey = in.readNBytes(4);
+                if (maskingKey.length < 4) {
+                    break;
+                }
+
+                byte[] maskedPayload = in.readNBytes(intPayloadLength);
+                if (maskedPayload.length < intPayloadLength) {
+                    break;
+                }
+
+                byte[] payloadBytes = new byte[intPayloadLength];
+                for (int i = 0; i < intPayloadLength; i++) {
+                    payloadBytes[i] = (byte) (maskedPayload[i] ^ maskingKey[i % 4]);
+                }
+
+                String message = new String(payloadBytes, StandardCharsets.UTF_8);
                 LOGGER.debug("Received WebSocket message: {}", message);
 
                 // Handle the message
