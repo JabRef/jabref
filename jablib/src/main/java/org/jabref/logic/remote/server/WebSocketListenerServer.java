@@ -121,32 +121,34 @@ public class WebSocketListenerServer implements Runnable {
     }
 
     private void handleWebSocketMessages(Socket clientSocket, OutputStream output) throws IOException {
-        byte[] buffer = new byte[4096];
-        int bytesRead;
-
-        while (!Thread.interrupted() && (bytesRead = clientSocket.getInputStream().read(buffer)) != -1) {
-            if (bytesRead < 2) {
-                continue;
+        while (!Thread.interrupted() && !clientSocket.isClosed()) {
+            // Read the first two bytes to get FIN, opcode, and payload length
+            byte[] header = clientSocket.getInputStream().readNBytes(2);
+            if (header.length < 2) {
+                break; // Connection closed
             }
 
-            // Parse WebSocket frame
-            byte firstByte = buffer[0];
-            byte secondByte = buffer[1];
+            byte firstByte = header[0];
+            byte secondByte = header[1];
 
             boolean fin = (firstByte & 0x80) != 0;
             int opcode = firstByte & 0x0F;
             boolean masked = (secondByte & 0x80) != 0;
-            int payloadLength = secondByte & 0x7F;
-
-            int maskOffset = 2;
+            long payloadLength = secondByte & 0x7F;
 
             // Handle extended payload length
             if (payloadLength == 126) {
-                payloadLength = ((buffer[2] & 0xFF) << 8) | (buffer[3] & 0xFF);
-                maskOffset = 4;
+                byte[] extendedPayloadLengthBytes = clientSocket.getInputStream().readNBytes(2);
+                if (extendedPayloadLengthBytes.length < 2) {
+                    break;
+                }
+                payloadLength = ((extendedPayloadLengthBytes[0] & 0xFF) << 8) | (extendedPayloadLengthBytes[1] & 0xFF);
             } else if (payloadLength == 127) {
-                // For very large payloads (not typically needed for our use case)
-                maskOffset = 10;
+                byte[] extendedPayloadLengthBytes = clientSocket.getInputStream().readNBytes(8);
+                if (extendedPayloadLengthBytes.length < 8) {
+                    break;
+                }
+                payloadLength = java.nio.ByteBuffer.wrap(extendedPayloadLengthBytes).getLong();
             }
 
             // Close frame
@@ -191,6 +193,11 @@ public class WebSocketListenerServer implements Runnable {
             // Parse JSON-like message (simple parsing without external dependencies)
             String command = extractJsonValue(message, "command");
             String argument = extractJsonValue(message, "argument");
+
+            if (command == null) {
+                LOGGER.debug("No command found in WebSocket message");
+                return "{\"status\":\"error\",\"message\":\"Command not specified\"}";
+            }
 
             LOGGER.debug("Processing command: {} with argument: {}", command, argument);
 
