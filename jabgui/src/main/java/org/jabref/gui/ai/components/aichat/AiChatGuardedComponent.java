@@ -5,7 +5,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.util.EmbeddingModelGuardedComponent;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -32,7 +31,6 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
 
     private final ObservableList<ChatMessage> chatHistory;
     private final BibDatabaseContext bibDatabaseContext;
-    private final StateManager stateManager;
     private final ObservableList<BibEntry> entries;
     private final AiService aiService;
     private final DialogService dialogService;
@@ -44,7 +42,6 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     public AiChatGuardedComponent(AiService aiService,
                                   StringProperty name,
                                   ObservableList<ChatMessage> chatHistory,
-                                  StateManager stateManager,
                                   BibDatabaseContext bibDatabaseContext,
                                   ObservableList<BibEntry> entries,
                                   BibEntryTypesManager entryTypesManager,
@@ -60,7 +57,6 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
         this.aiService = aiService;
         this.name = name;
         this.chatHistory = chatHistory;
-        this.stateManager = stateManager;
         this.bibDatabaseContext = bibDatabaseContext;
         this.entries = entries;
         this.entryTypesManager = entryTypesManager;
@@ -78,7 +74,6 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                 aiService,
                 name,
                 chatHistory,
-                stateManager,
                 entries,
                 bibDatabaseContext,
                 entryTypesManager,
