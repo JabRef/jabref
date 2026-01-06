@@ -30,13 +30,18 @@ public class RemotePreferences {
     private final BooleanProperty enableLanguageServer;
     private final IntegerProperty languageServerPort;
 
-    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort) {
+    private final IntegerProperty webSocketPort;
+    private final BooleanProperty enableWebSocketServer;
+
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort, int webSocketPort, boolean enableWebSocketServer) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
         this.httpPort = new SimpleIntegerProperty(httpPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
         this.enableLanguageServer = new SimpleBooleanProperty(enableLanguageServer);
         this.languageServerPort = new SimpleIntegerProperty(languageServerPort);
+        this.webSocketPort = new SimpleIntegerProperty(webSocketPort);
+        this.enableWebSocketServer = new SimpleBooleanProperty(enableWebSocketServer);
     }
 
     public int getPort() {
@@ -121,6 +126,34 @@ public class RemotePreferences {
 
     public void setEnableLanguageServer(boolean enableLanguageServer) {
         this.enableLanguageServer.setValue(enableLanguageServer);
+    }
+
+    public int getWebSocketPort() {
+        return webSocketPort.getValue();
+    }
+
+    public IntegerProperty webSocketPortProperty() {
+        return webSocketPort;
+    }
+
+    public void setWebSocketPort(int webSocketPort) {
+        this.webSocketPort.setValue(webSocketPort);
+    }
+
+    public boolean isDifferentWebSocketPort(int otherWebSocketPort) {
+        return getWebSocketPort() != otherWebSocketPort;
+    }
+
+    public boolean enableWebSocketServer() {
+        return enableWebSocketServer.getValue();
+    }
+
+    public BooleanProperty enableWebSocketServerProperty() {
+        return enableWebSocketServer;
+    }
+
+    public void setEnableWebSocketServer(boolean enableWebSocketServer) {
+        this.enableWebSocketServer.setValue(enableWebSocketServer);
     }
 
     /// Gets the IP address where both the remote server and the http server are listening.

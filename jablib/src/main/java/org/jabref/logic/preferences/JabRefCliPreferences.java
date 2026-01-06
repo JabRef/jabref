@@ -383,6 +383,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String ENABLE_HTTP_SERVER = "enableHttpServer";
     private static final String ENABLE_LANGUAGE_SERVER = "enableLanguageServer";
     private static final String LANGUAGE_SERVER_PORT = "languageServerPort";
+    private static final String WEBSOCKET_SERVER_PORT = "webSocketServerPort";
+    private static final String ENABLE_WEBSOCKET_SERVER = "enableWebSocketServer";
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
@@ -676,6 +678,8 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(ENABLE_LANGUAGE_SERVER, Boolean.FALSE);
         defaults.put(LANGUAGE_SERVER_PORT, 2087);
 
+        defaults.put(ENABLE_WEBSOCKET_SERVER, Boolean.FALSE);
+        defaults.put(WEBSOCKET_SERVER_PORT, 23116);
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
         defaults.put(LAST_USED_EXPORT, "");
@@ -1419,7 +1423,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInt(HTTP_SERVER_PORT),
                 getBoolean(ENABLE_HTTP_SERVER),
                 getBoolean(ENABLE_LANGUAGE_SERVER),
-                getInt(LANGUAGE_SERVER_PORT));
+                getInt(LANGUAGE_SERVER_PORT),
+                getInt(WEBSOCKET_SERVER_PORT),
+                getBoolean(ENABLE_WEBSOCKET_SERVER));
 
         EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
@@ -1427,6 +1433,8 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_HTTP_SERVER, newValue));
         EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(LANGUAGE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_LANGUAGE_SERVER, newValue));
+        EasyBind.listen(remotePreferences.webSocketPortProperty(), (_, _, newValue) -> putInt(WEBSOCKET_SERVER_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableWebSocketServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_WEBSOCKET_SERVER, newValue));
 
         return remotePreferences;
     }
