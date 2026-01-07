@@ -4,8 +4,8 @@ This document explains the WebSocket endpoint implemented by the `JabRefWebSocke
 
 ## Files
 
-- `JabRefWebSocketApp` implementation: [jabsrv/src/main/java/org/jabref/http/server/ws/JabRefWebSocketApp.java](jabsrv/src/main/java/org/jabref/http/server/ws/JabRefWebSocketApp.java)
-- Server startup: [jabsrv/src/main/java/org/jabref/http/server/Server.java](jabsrv/src/main/java/org/jabref/http/server/Server.java)
+- `JabRefWebSocketApp` implementation: [jabsrv/src/main/java/org/jabref/http/server/ws/JabRefWebSocketApp.java](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/ws/JabRefWebSocketApp.java)
+- Server startup: [jabsrv/src/main/java/org/jabref/http/server/Server.java](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/Server.java)
 
 ## Endpoint
 
