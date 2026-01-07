@@ -18,34 +18,25 @@ public class JabRefWebSocketApp extends WebSocketApplication {
 
     private final ServiceLocator serviceLocator;
 
-    private RemoteMessageHandler handler;
+    private final RemoteMessageHandler handler;
 
     public JabRefWebSocketApp(ServiceLocator serviceLocator) {
-        this.serviceLocator = serviceLocator;
+        this.handler = serviceLocator.getService(RemoteMessageHandler.class);
+        if (this.handler == null) {
+            LOGGER.warn("RemoteMessageHandler not available in ServiceLocator");
+        }
     }
 
     @Override
     public void onConnect(WebSocket socket) {
         LOGGER.debug("WebSocket connected: {}", socket);
-        if (handler == null) {
-            handler = serviceLocator.getService(RemoteMessageHandler.class);
-            if (handler == null) {
-                LOGGER.warn("RemoteMessageHandler not available in ServiceLocator");
-            }
-        }
     }
 
     @Override
     public void onMessage(WebSocket socket, String text) {
         LOGGER.debug("WS received text: {}", text);
 
-        // Always fetch handler from ServiceLocator for each message
-        RemoteMessageHandler currentHandler = serviceLocator.getService(RemoteMessageHandler.class);
-        if (currentHandler == null) {
-            LOGGER.warn("RemoteMessageHandler not available in ServiceLocator");
-        }
-
-        String response = handleTextMessage(text, currentHandler);
+        String response = handleTextMessage(text, handler);
         if (response != null) {
             socket.send(response);
         }
@@ -84,13 +75,13 @@ public class JabRefWebSocketApp extends WebSocketApplication {
                     return "{\"status\":\"success\",\"response\":\"focused\"}";
                 case "open":
                     if (argument != null && !argument.isEmpty() && handler != null) {
-                        handler.handleCommandLineArguments(new String[]{"--import", argument});
+                        handler.handleCommandLineArguments(new String[] {"--import", argument});
                         return "{\"status\":\"success\",\"response\":\"opened\"}";
                     }
                     return "{\"status\":\"error\",\"message\":\"No file specified\"}";
                 case "add":
                     if (argument != null && !argument.isEmpty() && handler != null) {
-                        handler.handleCommandLineArguments(new String[]{"--importBibtex", argument});
+                        handler.handleCommandLineArguments(new String[] {"--importBibtex", argument});
                         return "{\"status\":\"success\",\"response\":\"added\"}";
                     }
                     return "{\"status\":\"error\",\"message\":\"No BibTeX entry specified.\"}";

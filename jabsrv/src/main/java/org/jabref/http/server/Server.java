@@ -170,6 +170,8 @@ public class Server {
             listener.registerAddOn(new WebSocketAddOn());
         }
 
+        // Clear previous registrations from the static engine to ensure isolation
+        WebSocketEngine.getEngine().unregisterAll();
         WebSocketEngine.getEngine().register("", "/ws", new org.jabref.http.server.ws.JabRefWebSocketApp(serviceLocator));
 
         // Now start the server

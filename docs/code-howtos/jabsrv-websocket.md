@@ -2,11 +2,13 @@
 
 This document explains the WebSocket endpoint implemented by the `JabRefWebSocketApp` and how clients and the application integrate with it.
 
-**Files**
+## Files
+
 - `JabRefWebSocketApp` implementation: [jabsrv/src/main/java/org/jabref/http/server/ws/JabRefWebSocketApp.java](jabsrv/src/main/java/org/jabref/http/server/ws/JabRefWebSocketApp.java)
 - Server startup: [jabsrv/src/main/java/org/jabref/http/server/Server.java](jabsrv/src/main/java/org/jabref/http/server/Server.java)
 
-**Endpoint**
+## Endpoint
+
 - Path: `/ws`
 - Protocol: WebSocket (RFC 6455)
 - Transport: Text messages (UTF-8)

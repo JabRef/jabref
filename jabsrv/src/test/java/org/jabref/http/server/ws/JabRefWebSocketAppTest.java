@@ -2,7 +2,9 @@ package org.jabref.http.server.ws;
 
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
+
 import org.jabref.logic.remote.server.RemoteMessageHandler;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,5 +61,4 @@ public class JabRefWebSocketAppTest {
         assertNotNull(response);
         assertTrue(response.contains("pong"));
     }
-
 }
