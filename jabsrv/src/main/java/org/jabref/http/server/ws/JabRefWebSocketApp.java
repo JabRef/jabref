@@ -21,7 +21,8 @@ public class JabRefWebSocketApp extends WebSocketApplication {
     private final RemoteMessageHandler handler;
 
     public JabRefWebSocketApp(ServiceLocator serviceLocator) {
-        this.handler = serviceLocator.getService(RemoteMessageHandler.class);
+        this.serviceLocator = serviceLocator;
+        this.handler = this.serviceLocator.getService(RemoteMessageHandler.class);
         if (this.handler == null) {
             LOGGER.warn("RemoteMessageHandler not available in ServiceLocator");
         }
@@ -89,7 +90,7 @@ public class JabRefWebSocketApp extends WebSocketApplication {
                     return "{\"status\":\"error\",\"message\":\"Unknown command: " + command + "\"}";
             }
         } catch (Exception e) {
-            LOGGER.error("Error processing WebSocket message", e);
+            LOGGER.error("Error processing WebSocket message: {}", e.getMessage(), e);
             return "{\"status\":\"error\",\"message\":\"Internal error\"}";
         }
     }
