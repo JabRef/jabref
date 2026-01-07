@@ -32,6 +32,8 @@
 //DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.0
 //DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
+//DEPS org.glassfish.grizzly:grizzly-websockets:4.0.2
+//DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS com.konghq:unirest-modules-gson:4.7.0
@@ -44,6 +46,7 @@
 //DEPS tools.jackson.core:jackson-databind:3.0.3
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.3
 //DEPS org.apache.commons:commons-lang3:3.20.0
+
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
@@ -79,6 +82,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 
