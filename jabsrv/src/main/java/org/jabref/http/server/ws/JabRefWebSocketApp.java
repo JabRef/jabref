@@ -1,18 +1,17 @@
 package org.jabref.http.server.ws;
 
-import org.glassfish.grizzly.websockets.DataFrame;
-import org.glassfish.grizzly.websockets.WebSocket;
-import org.glassfish.grizzly.websockets.WebSocketApplication;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.jabref.logic.remote.server.RemoteMessageHandler;
+import org.glassfish.grizzly.websockets.DataFrame;
+import org.glassfish.grizzly.websockets.WebSocket;
+import org.glassfish.grizzly.websockets.WebSocketApplication;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.jspecify.annotations.Nullable;
-import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JabRefWebSocketApp extends WebSocketApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefWebSocketApp.class);

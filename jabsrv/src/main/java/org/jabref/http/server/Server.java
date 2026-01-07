@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
-import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
@@ -22,13 +21,14 @@ import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.websockets.WebSocketAddOn;
 import org.glassfish.grizzly.websockets.WebSocketEngine;
-import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
