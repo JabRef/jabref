@@ -62,7 +62,7 @@ public class JabRefWebSocketApp extends WebSocketApplication {
         return true;
     }
 
-    private String handleTextMessage(String message, RemoteMessageHandler handler) {
+    String handleTextMessage(String message, RemoteMessageHandler handler) {
         try {
             String command = extractJsonValue(message, "command");
             String argument = extractJsonValue(message, "argument");
