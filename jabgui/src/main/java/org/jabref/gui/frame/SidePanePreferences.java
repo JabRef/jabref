@@ -28,7 +28,7 @@ public class SidePanePreferences {
 
     private SidePanePreferences() {
         this(
-                EnumSet.of(SidePaneType.GROUPS), // Default visible panes (OPEN_OFFICE omitted)
+                EnumSet.of(SidePaneType.WEB_SEARCH, SidePaneType.GROUPS), // Default visible panes (OPEN_OFFICE omitted)
                 Collections.emptyMap(),                                   // Default preferred positions
                 0                                                         // Default web search fetcher index
         );
@@ -69,9 +69,7 @@ public class SidePanePreferences {
     }
 
     public void setAll(SidePanePreferences preferences) {
-        if (!preferences.visiblePanes().isEmpty()) {
-            this.setVisiblePanes(preferences.visiblePanes());
-        }
+        this.setVisiblePanes(preferences.visiblePanes());
         this.setPreferredPositions(preferences.getPreferredPositions());
         this.webSearchFetcherSelected.set(preferences.getWebSearchFetcherSelected());
     }
