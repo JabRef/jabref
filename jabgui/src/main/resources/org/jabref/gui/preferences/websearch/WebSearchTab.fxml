@@ -48,7 +48,7 @@
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Search Engine URL Templates"/>
-    <VBox fx:id="searchEngineContainer"/>
+    <VBox fx:id="searchEngineContainer" spacing="10.0" />
 
     <Label styleClass="sectionHeader" text="%Pre-selected fetchers"/>
     <VBox fx:id="fetchersContainer"/>
