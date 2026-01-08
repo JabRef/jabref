@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -21,6 +22,10 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -30,6 +35,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -128,5 +134,94 @@ class PseudonymizationTest {
         PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(mappingInfoTarget, result);
 
         assertTrue(Files.exists(target));
+    }
+
+    @Test
+    void pseudonymizeGroups() {
+        // given
+        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup("Root"));
+        GroupTreeNode used = root.addSubgroup(new ExplicitGroup("Used", GroupHierarchyType.INDEPENDENT, ','));
+        used.addSubgroup(new ExplicitGroup("Sub", GroupHierarchyType.INDEPENDENT, ','));
+
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.getMetaData().setGroups(root);
+
+        Pseudonymization pseudonymization = new Pseudonymization();
+
+        // when
+        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
+        GroupTreeNode newRoot = result.bibDatabaseContext().getMetaData().getGroups().orElseThrow();
+
+        // then
+        assertEquals("group-1", newRoot.getName());
+        assertTrue(newRoot.getFirstChild().isPresent());
+
+        GroupTreeNode newUsed = newRoot.getFirstChild().orElseThrow();
+        assertEquals("group-2", newUsed.getName());
+        assertTrue(newUsed.getFirstChild().isPresent());
+
+        GroupTreeNode newSub = newUsed.getFirstChild().orElseThrow();
+        assertEquals("group-3", newSub.getName());
+
+        Map<String, String> mapping = result.valueMapping();
+        assertEquals("Root", mapping.get("group-1"));
+        assertEquals("Used", mapping.get("group-2"));
+        assertEquals("Sub", mapping.get("group-3"));
+    }
+
+    @Test
+    void pseudonymizeEntriesWithGroup() {
+        // given
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(
+                new BibEntry("first").withField(StandardField.GROUPS, "MyGroup"),
+                new BibEntry("second").withField(StandardField.GROUPS, "MyGroup, OtherGroup"),
+                new BibEntry("third").withField(StandardField.GROUPS, "OtherGroup")
+        )));
+
+        Pseudonymization pseudonymization = new Pseudonymization();
+
+        // when
+        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
+
+        // then
+        List<BibEntry> entries = result.bibDatabaseContext().getEntries();
+        assertEquals(3, entries.size());
+
+        assertEquals(Optional.of("group-1"), entries.getFirst().getField(StandardField.GROUPS));
+        assertEquals(Optional.of("group-1, group-2"), entries.get(1).getField(StandardField.GROUPS));
+        assertEquals(Optional.of("group-2"), entries.get(2).getField(StandardField.GROUPS));
+
+        Map<String, String> mapping = result.valueMapping();
+        assertEquals("MyGroup", mapping.get("group-1"));
+        assertEquals("OtherGroup", mapping.get("group-2"));
+    }
+
+    @Test
+    void pseudonymizeEntryWithMultipleGroups() {
+        // given
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(
+                new BibEntry("first").withField(StandardField.GROUPS, "one, two, three")
+        )));
+
+        Pseudonymization pseudonymization = new Pseudonymization();
+
+        // when
+        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
+
+        // then
+        BibEntry pseudonymizedEntry = result.bibDatabaseContext().getEntries().getFirst();
+        String pseudonymizedGroups = pseudonymizedEntry.getField(StandardField.GROUPS).orElseThrow();
+
+        String[] groups = pseudonymizedGroups.split(", ");
+        assertEquals(3, groups.length);
+
+        assertEquals("group-1", groups[0]);
+        assertEquals("group-2", groups[1]);
+        assertEquals("group-3", groups[2]);
+
+        Map<String, String> mapping = result.valueMapping();
+        assertEquals("one", mapping.get(groups[0]));
+        assertEquals("two", mapping.get(groups[1]));
+        assertEquals("three", mapping.get(groups[2]));
     }
 }
