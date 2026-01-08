@@ -247,29 +247,30 @@ class FileUtilTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-                test.file, www.example.com/test.file
-                test.file, http://www.example.com/test.file
-                test.file, https://www.example.com/test.file
-                test.file, www.example.com/path/to/test.file
-                test.file, http://www.example.com/path/to/test.file
-                test.file, https://www.example.com/path/to/test.file
-                test.file, https://www.example.com/not\\a\\windows\\path/test.file
-                test.file, https://www.example.com////test.file
-                blank, https://www.example.com/path/to/blank
-                blank, https://www.example.com/not\\a\\windows\\path/blank
-                not\\a\\windows.file, https://www.example.com/path/to/not\\a\\windows.file
-                test.file, https://www.example.com/path/to/test.file?field=value
-                test.file, https://www.example.com/path/to/test.file?a=1&b=2
-                test.file, https://www.example.com/path/to/test.file?search=for+a+file
-                blank, https://www.example.com/path/to/blank?search=for+a+file
+            test.file, www.example.com/test.file
+            test.file, http://www.example.com/test.file
+            test.file, https://www.example.com/test.file
+            test.file, www.example.com/path/to/test.file
+            test.file, http://www.example.com/path/to/test.file
+            test.file, https://www.example.com/path/to/test.file
+            test.file, https://www.example.com/not%5Ca%5Cwindows%5Cpath/test.file
+            ____test.file, https://www.example.com////test.file
+            blank, https://www.example.com/path/to/blank
+            blank, https://www.example.com/not%5Ca%5Cwindows%5Cpath/blank
+            # last part is not\\a\\windows.file
+            windows.file, https://www.example.com/path/to/no%5Ca%5Cwindows.file
+            test.file, https://www.example.com/path/to/test.file?field=value
+            test.file, https://www.example.com/path/to/test.file?a=1&b=2
+            test.file, https://www.example.com/path/to/test.file?search=for+a+file
+            blank, https://www.example.com/path/to/blank?search=for+a+file
             """)
     void getFileNameFromUrlsCorrectly(String file, String url) {
         assertEquals(file, FileUtil.getFileNameFromUrl(url).orElse("file.pdf"), "from '" + url + "'");
     }
 
     @Test
-    void getEmptyFileNameFromUrlCorrectly() {
-        assertEquals(Optional.empty(), FileUtil.getFileNameFromUrl("https://www.example.com/path/to/?nothing=at+all"), "from 'https://www.example.com/path/to/?nothing=at+all'");
+    void getLastPathFragmentAsNameFallback() {
+        assertEquals(Optional.of("to"), FileUtil.getFileNameFromUrl("https://www.example.com/path/to/?nothing=at+all"), "from 'https://www.example.com/path/to/?nothing=at+all'");
     }
 
     @Test

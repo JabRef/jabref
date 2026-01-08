@@ -139,12 +139,24 @@ public class FileUtil {
             LOGGER.warn("Was not a valid URL {}", link, e);
             return Optional.empty();
         }
-        Path fileName = Path.of(uri.getPath()).getFileName();
+        String pathFragment = uri.getPath();
+        Path path;
+        try {
+            path = Path.of(pathFragment);
+        } catch (InvalidPathException e) {
+            // Try to keep something of the invalid path fragment
+            return Optional.of(FileNameCleaner.cleanFileName(pathFragment));
+        }
+        Path fileName = path.getFileName();
         if (fileName == null) {
             // Happens if there is no path, e.g., at https://example.com/
             return Optional.empty();
         }
-        return Optional.of(fileName.toString());
+        String fileNameString = fileName.toString();
+        if (fileNameString.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(fileNameString);
     }
 
     /**
