@@ -1,6 +1,6 @@
 package org.jabref.gui.keyboard;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -32,7 +32,7 @@ class KeyBindingsRestartWarningTest {
     @Test
     void storeSettingsDoesNotAddRestartWarningWhenNoChanges() {
         viewModel.storeSettings();
-        assertEquals(Collections.emptyList(), viewModel.getRestartWarnings());
+        assertEquals(List.of(), viewModel.getRestartWarnings());
     }
 
     @Test

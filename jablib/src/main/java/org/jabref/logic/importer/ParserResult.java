@@ -3,7 +3,6 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -189,7 +188,7 @@ public class ParserResult {
 
     /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
     public Range getFieldRange(BibEntry entry, Field field) {
-        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Map.of());
 
         if (rangeMap.isEmpty()) {
             return Range.NULL_RANGE;
@@ -207,7 +206,7 @@ public class ParserResult {
 
     /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
     public Range getCompleteEntryIndicator(BibEntry entry) {
-        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Map.of());
         Range range = rangeMap.get(InternalField.KEY_FIELD);
         if (range != null) {
             // this ensures that the line is highlighted from the beginning of the entry so it highlights "@Article{key," (but only if on the same line) and not just the citation key

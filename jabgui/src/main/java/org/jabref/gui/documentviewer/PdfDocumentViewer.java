@@ -1,6 +1,7 @@
 package org.jabref.gui.documentviewer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -61,7 +62,7 @@ public class PdfDocumentViewer extends StackPane {
             placeholderLabel.setText(Localization.lang("Loading PDF..."));
             placeholderLabel.setVisible(true);
 
-            try (var inputStream = Files.newInputStream(document)) {
+            try (InputStream inputStream = Files.newInputStream(document)) {
                 pdfView.load(inputStream);
                 pdfView.setPage(currentPage.get());
                 pdfView.setVisible(true);
