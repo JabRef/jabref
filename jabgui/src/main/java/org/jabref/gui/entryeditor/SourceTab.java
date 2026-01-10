@@ -282,7 +282,10 @@ public class SourceTab extends EntryEditorTab {
             if (database.getEntryCount() > 1) {
                 LOGGER.error("More than one entry found.");
                 // We use the error dialog as the notification is hidden
-                dialogService.showErrorDialogAndWait(Localization.lang("More than one entry found."));
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Problem with parsing entry"),
+                        Localization.lang("Parsing failed because more than one entry was found. Please check your BibTeX syntax.")
+                );
                 return;
             }
 
