@@ -42,6 +42,8 @@ module org.jabref.jabsrv {
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;
     requires org.glassfish.grizzly.http.server;
+    requires org.glassfish.grizzly.websockets;
+    requires jakarta.servlet;
     requires jakarta.validation;
     requires jakarta.ws.rs;
 
