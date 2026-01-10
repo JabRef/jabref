@@ -13,7 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue where a redundant validation listener was causing duplicate error dialogs when invalid BibTeX source was detected in the SourceTab. [#14805](https://github.com/JabRef/jabref/issues/14805)
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
-- In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
+- We added a new "Directory structure" group type that automatically creates subgroups mirroring a directory structure from the file system. [#10930](https://github.com/JabRef/jabref/issues/10930)
 
 ### Changed
 

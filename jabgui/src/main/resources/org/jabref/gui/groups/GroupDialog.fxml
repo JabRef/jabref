@@ -203,6 +203,19 @@
                     </VBox>
                 </StackPane>
             </HBox>
+            <!-- Directory structure option - separate from radio buttons -->
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <CheckBox fx:id="directoryStructureCheckbox" text="%Directory structure">
+                    <tooltip>
+                        <Tooltip text="%Dynamically group entries by linked files in a directory"/>
+                    </tooltip>
+                </CheckBox>
+                <Label text="%root path:" disable="${!directoryStructureCheckbox.selected}"/>
+                <TextField fx:id="directoryGroupPath" HBox.hgrow="ALWAYS" prefHeight="25.0" 
+                           disable="${!directoryStructureCheckbox.selected}"/>
+                <Button onAction="#directoryGroupBrowse" text="%Browse" prefHeight="25.0"
+                        disable="${!directoryStructureCheckbox.selected}"/>
+            </HBox>
         </VBox>
     </content>
     <padding>
