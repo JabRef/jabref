@@ -119,18 +119,39 @@ public class SaveDatabaseAction {
                          .orElse(SaveOrder.getDefaultSaveOrder());
     }
 
-    public void saveSelectedAsPlain() {
-        askForSavePath().ifPresent(path -> {
-            try {
-                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
-                preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(path);
-                dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
-            } catch (SaveException ex) {
-                LOGGER.error("A problem occurred when trying to save the file", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+   public void saveSelectedAsPlain() {
+    askForSavePath().ifPresent(path -> {
+        try {
+            saveDatabase(path, true, StandardCharsets.UTF_8,
+                    BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
+
+            Path pathToStore = path;
+
+            if (preferences.getInternalPreferences().isMemoryStickMode()) {
+                Path baseDir = Path.of(System.getProperty("user.dir"));
+                try {
+                    pathToStore = baseDir.relativize(path);
+                } catch (IllegalArgumentException ignored) {
+                    // fallback to absolute path
+                }
             }
-        });
-    }
+
+            preferences.getLastFilesOpenedPreferences()
+                       .getFileHistory()
+                       .newFile(pathToStore);
+
+            dialogService.notify(Localization.lang(
+                    "Saved selected to '%0'.", path.toString()));
+        } catch (SaveException ex) {
+            LOGGER.error("A problem occurred when trying to save the file", ex);
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Save library"),
+                    Localization.lang("Could not save file."),
+                    ex);
+        }
+    });
+}
+
 
     /**
      * @param file the new file name to save the database to. This is stored in the database context of the panel upon
@@ -169,8 +190,22 @@ public class SaveDatabaseAction {
             libraryTab.installAutosaveManagerAndBackupManager();
             libraryTab.createIndexManager();
 
-            preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
-        }
+           Path pathToStore = file;
+
+           if (preferences.getInternalPreferences().isMemoryStickMode()) {
+               Path baseDir = Path.of(System.getProperty("user.dir"));
+             try {
+                    pathToStore = baseDir.relativize(file);
+                 } catch (IllegalArgumentException ignored) {
+                // fallback to absolute path
+             }
+             }
+
+               preferences.getLastFilesOpenedPreferences()
+               .getFileHistory()
+               .newFile(pathToStore);
+
+            }
         return saveResult;
     }
 
