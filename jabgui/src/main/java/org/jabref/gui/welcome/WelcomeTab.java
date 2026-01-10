@@ -33,6 +33,7 @@ import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
+import org.jabref.gui.importer.actions.ImportCitaviAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -251,6 +252,9 @@ public class WelcomeTab extends Tab {
         Hyperlink importIntoNewLibraryLink = createActionLink(Localization.lang("Import into new library..."),
                 this::importIntoNewLibrary
         );
+
+        Hyperlink importCitaviLink = createActionLink(Localization.lang("Import from Citavi") + "...",
+                () -> new ImportCitaviAction(tabContainer, preferences, taskExecutor, dialogService).execute());
 
         VBox container = new VBox();
         container.getStyleClass().add("welcome-links-content");
