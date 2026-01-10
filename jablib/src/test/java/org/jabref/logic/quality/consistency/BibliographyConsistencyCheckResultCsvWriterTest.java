@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -29,6 +30,8 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
 
     private final BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
+    private final BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+
     @Test
     void checkSimpleLibrary(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
@@ -42,7 +45,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(second);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
         });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
@@ -73,7 +76,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
         });
 
         Path csvFile = tempDir.resolve("checkDifferentOutputSymbols-result.csv");
@@ -119,7 +122,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(fifth);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
         });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
@@ -141,17 +144,24 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
     void checkLibraryWithoutIssues(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNAL, "some journal")
+                .withField(StandardField.YEAR, "2025")
                 .withField(StandardField.PAGES, "some pages");
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "some title")
+                .withField(StandardField.JOURNAL, "some journal")
+                .withField(StandardField.YEAR, "2026")
                 .withField(StandardField.PAGES, "some pages");
+
         BibDatabase database = new BibDatabase();
         database.insertEntry(first);
         database.insertEntry(second);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
         });
 
         Path csvFile = tempDir.resolve("checkLibraryWithoutIssues-result.csv");
@@ -170,7 +180,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
         Path csvFile = file.resolveSibling("biblio-cited.csv");
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext, (_, _) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext, entryTypesManager, (_, _) -> {
         });
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
              BibliographyConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true)) {
