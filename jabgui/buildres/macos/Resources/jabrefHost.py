@@ -10,28 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
-# Note that the package structure is different when installed as a .app bundle on MacOs, so the path must be altered.
-script_dir = Path(__file__).resolve().parent.parent
-JABREF_PATH = script_dir / "bin/JabRef"
-
-# on mac we must only two  folder upwards
-if sys.platform.startswith('darwin'):
-    script_dir = Path(__file__).resolve().parent.parent
-if not JABREF_PATH.exists():
-    JABREF_PATH = script_dir / "MacOS/JabRef"
-
-if not JABREF_PATH.exists():
-    logging.error("Could not determine JABREF_PATH")
-    send_message({"message": "error", "output": "Could not find JabRef. Please check that it is installed correctly."})
-    sys.exit(-1)
-
-logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"
-if not logging_dir.exists():
-    logging_dir.mkdir(parents=True)
-logging.basicConfig(filename=str(logging_dir / "jabref_browser_extension.log"))
-
-# Read a message from stdin and decode it.
+# Read a message fro/m stdin and decode it.
 def get_message():
     raw_length = sys.stdin.buffer.read(4)
     if not raw_length:
@@ -64,14 +43,47 @@ def send_message(message):
     sys.stdout.buffer.flush()
 
 
-def add_jabref_entry(data):
+def add_jabref_entry(jabref_path, data):
     """Send string via cli as literal to preserve special characters"""
-    cmd = str(JABREF_PATH).split() + ["--importBibtex", r"{}".format(data)]
+    cmd = str(jabref_path).split() + ["--importBibtex", r"{}".format(data)]
     logging.info("Try to execute command {}".format(cmd))
     response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     logging.info("Called JabRef and got: {}".format(response))
     return response
 
+# --- Main Logic ---
+
+# We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
+# Note that the package structure is different when installed as a .app bundle on MacOs, so the path must be altered.
+
+# Current script: jabgui/buildres/macos/Resources/jabrefHost.py
+current_script = Path(__file__).resolve()
+
+# 1. Check for Development Build (Gradle installDist)
+# Path: jabgui/build/install/jabgui/bin/JabRef
+# From current: ../../../../build/install/jabgui/bin/JabRef
+dev_build_path = current_script.parent.parent.parent.parent / "build/install/jabgui/bin/JabRef"
+
+if dev_build_path.exists():
+    JABREF_PATH = dev_build_path
+else:
+    # Fallback to standard app bundle structure
+    # Standard Mac App: JabRef.app/Contents/Resources/jabrefHost.py
+    # Executable: JabRef.app/Contents/MacOS/JabRef
+    JABREF_PATH = current_script.parent.parent / "MacOS/JabRef"
+
+
+
+logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"
+if not logging_dir.exists():
+    logging_dir.mkdir(parents=True)
+logging.basicConfig(filename=str(logging_dir / "jabref_browser_extension.log"), level=logging.INFO)
+
+if not JABREF_PATH.exists():
+    logging.error("Could not determine JABREF_PATH")
+    # We can now safely call send_message because it is defined above
+    send_message({"message": "error", "output": "Could not find JabRef. Please check that it is installed correctly."})
+    sys.exit(-1)
 
 logging.info("Starting JabRef backend")
 
@@ -87,14 +99,14 @@ if "status" in message and message["status"] == "validate":
         response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         logging.error("Failed to call JabRef: {} {}".format(exc.returncode, exc.output))
-        send_message({"message": "jarNotFound", "path": JABREF_PATH})
+        send_message({"message": "jarNotFound", "path": str(JABREF_PATH)})
     else:
         logging.info("Response: {}".format(response))
         send_message({"message": "jarFound"})
 else:
     entry = message["text"]
     try:
-        output = add_jabref_entry(entry)
+        output = add_jabref_entry(JABREF_PATH, entry)
         send_message({"message": "ok", "output": str(output)})
     except subprocess.CalledProcessError as exc:
         logging.error("Failed to call JabRef: {} {}".format(exc.returncode, exc.output))
