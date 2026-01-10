@@ -52,6 +52,7 @@ public class EntryEditorPreferences {
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
     private final ObjectProperty<CitationFetcherType> citationFetcherType;
     private final BooleanProperty shouldShowSciteTab;
+    private final BooleanProperty shouldShowCitationContextTab;
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
 
@@ -70,6 +71,7 @@ public class EntryEditorPreferences {
                                   JournalPopupEnabled journalPopupEnabled,
                                   CitationFetcherType citationFetcherType,
                                   boolean showSciteTab,
+                                  boolean showCitationContextTab,
                                   boolean showUserCommentsFields,
                                   double previewWidthDividerPosition) {
 
@@ -88,6 +90,7 @@ public class EntryEditorPreferences {
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
         this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
+        this.shouldShowCitationContextTab = new SimpleBooleanProperty(showCitationContextTab);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
@@ -262,6 +265,18 @@ public class EntryEditorPreferences {
 
     public void setShouldShowSciteTab(boolean shouldShowSciteTab) {
         this.shouldShowSciteTab.set(shouldShowSciteTab);
+    }
+
+    public boolean shouldShowCitationContextTab() {
+        return this.shouldShowCitationContextTab.get();
+    }
+
+    public BooleanProperty shouldShowCitationContextTabProperty() {
+        return this.shouldShowCitationContextTab;
+    }
+
+    public void setShouldShowCitationContextTab(boolean shouldShowCitationContextTab) {
+        this.shouldShowCitationContextTab.set(shouldShowCitationContextTab);
     }
 
     public boolean shouldShowUserCommentsFields() {
