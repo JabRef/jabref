@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.cleanup.CleanupJournalRelatedPanel"
+         spacing="10.0" type="VBox">
+
+    <padding>
+        <Insets top="10.0" left="20.0"/>
+    </padding>
+
+    <VBox>
+        <VBox.margin>
+            <Insets left="20.0" />
+        </VBox.margin>
+        <Label text="%Manage journal abbreviations" />
+        <ComboBox fx:id="cleanupJournalBox" />
+    </VBox>
+
+</fx:root>
