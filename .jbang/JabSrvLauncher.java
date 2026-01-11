@@ -38,7 +38,7 @@
 //DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.5.0
-//DEPS de.undercouch:citeproc-java:3.4.0
+//DEPS de.undercouch:citeproc-java:3.4.1
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 //DEPS tools.jackson.core:jackson-core:3.0.3
 //DEPS tools.jackson.core:jackson-databind:3.0.3
