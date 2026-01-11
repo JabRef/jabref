@@ -102,7 +102,7 @@ dependencies.constraints {
     api("io.github.classgraph:classgraph:4.8.184")
     api("io.github.java-diff-utils:java-diff-utils:4.16")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
-    api("io.github.thibaultmeyer:cuid:2.0.4")
+    api("io.github.thibaultmeyer:cuid:2.0.5")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
     api("io.zonky.test:embedded-postgres:2.1.1")
