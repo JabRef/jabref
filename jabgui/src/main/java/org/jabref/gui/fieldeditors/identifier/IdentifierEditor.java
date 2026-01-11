@@ -91,6 +91,12 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+ 
+        java.util.stream.Stream.of(fetchInformationByIdentifierButton, lookupIdentifierButton, shortenDOIButton)
+            .forEach(button -> {
+                button.visibleProperty().bind(viewModel.textProperty().isNotEmpty());
+                button.managedProperty().bind(button.visibleProperty());
+            });
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {
