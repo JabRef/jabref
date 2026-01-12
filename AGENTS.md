@@ -1,7 +1,7 @@
 ## Our policy
 
 > [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
+> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
 
 This `AGENTS.md` file acts as a set of instructions that some AI coding tools can read. For more information please read our [AI policy](./CONTRIBUTING.md#ai-usage-policy).
 
@@ -60,7 +60,7 @@ Agents **must not**:
    BAD: new HashSet<>(Arrays.asList(...))
    GOOD: Set.of(...)
 - Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
-- To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
+- To create an empty list or map we use `List.of()` and `Map.of()` instead of `Collections.emptyList()` and `Collections.emptyMap()`.
 - Correctly spelled variable names (meaning: no typos in variable names).
 - Use StringJoiner instead of StringBuilder (if possible)
 - Prefer immutability and explicit nullability (JSpecify)
