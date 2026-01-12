@@ -78,8 +78,8 @@ public abstract class AbstractJabKitTest {
      * @return the error code
      */
     int executeToLog(String... args) {
-        var or = System.out;
-        var orErr = System.err;
+        PrintStream or = System.out;
+        PrintStream orErr = System.err;
 
         System.setOut(new PrintStream(outWriter, true));
         System.setErr(new PrintStream(errWriter, true));

@@ -687,8 +687,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes(defaults.visiblePanes());
         Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions(defaults);
         return new SidePanePreferences(
-                backingStoreVisiblePanes.isEmpty() ? defaults.visiblePanes() : backingStoreVisiblePanes,
-                backingStorePreferredPositions.isEmpty() ? defaults.getPreferredPositions() : backingStorePreferredPositions,
+                backingStoreVisiblePanes,
+                backingStorePreferredPositions,
                 getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
         );
     }
@@ -716,7 +716,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private Map<SidePaneType, Integer> getSidePanePreferredPositions(SidePanePreferences defaults) {
         // If either one is missing the preferences are corrupt or empty, thus fall back to default
         if (!hasKey(SIDE_PANE_COMPONENT_NAMES) || !hasKey(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS)) {
-            LOGGER.debug("SidePane preferred positions corrupt, falling back to default");
+            LOGGER.debug("SidePane preferred positions corrupt or empty, falling back to default");
             return defaults.getPreferredPositions();
         }
 
