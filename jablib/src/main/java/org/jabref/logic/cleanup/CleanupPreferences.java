@@ -10,7 +10,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 public class CleanupPreferences {
-
     private final ObservableSet<CleanupStep> activeJobs;
     private final ObjectProperty<FieldFormatterCleanupActions> fieldFormatterCleanups;
 
@@ -104,6 +103,14 @@ public class CleanupPreferences {
         /*
          * Converts Math Subject Classification Codes presented in Keywords into their Descriptions
          */
-        CONVERT_MSC_CODES
+        CONVERT_MSC_CODES,
+        /**
+         * Abbreviate or unabbreviate journal titles
+         */
+        ABBREVIATE_DEFAULT,
+        ABBREVIATE_DOTLESS,
+        ABBREVIATE_SHORTEST_UNIQUE,
+        UNABBREVIATE,
+        NO_CHANGES
     }
 }

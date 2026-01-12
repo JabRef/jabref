@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -17,7 +19,9 @@
             <Insets left="20.0" />
         </VBox.margin>
         <Label text="%Manage journal abbreviations" />
-        <ComboBox fx:id="cleanupJournalBox" />
+        <ComboBox fx:id="cleanupJournalBox">
+        </ComboBox>
     </VBox>
+
 
 </fx:root>

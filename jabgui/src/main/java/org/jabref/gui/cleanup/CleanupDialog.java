@@ -81,11 +81,13 @@ public class CleanupDialog extends BaseDialog<Void> {
         CleanupSingleFieldPanel singleFieldPanel = new CleanupSingleFieldPanel(initialPreset, viewModel);
         CleanupFileRelatedPanel fileRelatedPanel = new CleanupFileRelatedPanel(databaseContext, initialPreset, filePreferences, viewModel);
         CleanupMultiFieldPanel multiFieldPanel = new CleanupMultiFieldPanel(initialPreset, viewModel);
+        CleanupJournalRelatedPanel journalRelatedPanel = new CleanupJournalRelatedPanel(initialPreset, viewModel);
 
         tabPane.getTabs().setAll(
                 new Tab(Localization.lang("Single field"), singleFieldPanel),
                 new Tab(Localization.lang("File-related"), fileRelatedPanel),
-                new Tab(Localization.lang("Multi-field"), multiFieldPanel)
+                new Tab(Localization.lang("Multi-field"), multiFieldPanel),
+                new Tab(Localization.lang("Journal-related"), journalRelatedPanel)
         );
 
         Button btn = (Button) getDialogPane().lookupButton(cleanUpButton);
