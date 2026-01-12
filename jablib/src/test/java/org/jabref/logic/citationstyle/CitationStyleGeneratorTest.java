@@ -92,7 +92,7 @@ class CitationStyleGeneratorTest {
         // if the default citation style (ieee.csl) changes this has to be modified
         String expected = """
                   <div class="csl-entry">
-                    <div class="csl-left-margin">[1]</div><div class="csl-right-inline">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style="font-style: italic">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, July 2016, doi: 10.1001/bla.blubb.</div>
+                    <div class="csl-left-margin">[1]</div><div class="csl-right-inline">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style="font-style: italic">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, Jul 2016, doi: 10.1001/bla.blubb.</div>
                   </div>
                 """;
 
@@ -178,7 +178,7 @@ class CitationStyleGeneratorTest {
     void htmlFormat() {
         String expectedCitation = """
                   <div class="csl-entry">
-                    <div class="csl-left-margin">[1]</div><div class="csl-right-inline">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style="font-style: italic">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, July 2016, doi: 10.1001/bla.blubb.</div>
+                    <div class="csl-left-margin">[1]</div><div class="csl-right-inline">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style="font-style: italic">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, Jul 2016, doi: 10.1001/bla.blubb.</div>
                   </div>
                 """;
 
@@ -188,7 +188,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void textFormat() {
-        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.\n";
+        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul 2016, doi: 10.1001/bla.blubb.\n";
 
         String actualCitation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER).getFirst();
         assertEquals(expectedCitation, actualCitation);
@@ -196,7 +196,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void markdownFormat() {
-        String expectedCitation = "\\[1\\]B\\. Smith\\, B\\. Jones\\, and J\\. Williams\\, “Title of the test entry\\,” *BibTeX Journal*\\, vol\\. 34\\, no\\. 3\\, pp\\. 45–67\\, July 2016\\, doi\\: 10\\.1001\\/bla\\.blubb\\.<br />\n";
+        String expectedCitation = "\\[1\\]B\\. Smith\\, B\\. Jones\\, and J\\. Williams\\, “Title of the test entry\\,” *BibTeX Journal*\\, vol\\. 34\\, no\\. 3\\, pp\\. 45–67\\, Jul 2016\\, doi\\: 10\\.1001\\/bla\\.blubb\\.<br />\n";
 
         String actualCitation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, MARKDOWN_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER).getFirst();
         assertEquals(expectedCitation, actualCitation);
@@ -221,7 +221,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void handleAmpersand() {
-        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Famous quote: “&TitleTest&” - that is it,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.\n";
+        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Famous quote: “&TitleTest&” - that is it,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul 2016, doi: 10.1001/bla.blubb.\n";
         testEntry.setField(StandardField.TITLE, "Famous quote: “&TitleTest&” - that is it");
 
         String actualCitation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER).getFirst();
