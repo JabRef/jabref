@@ -198,6 +198,7 @@ public class WebFetchers {
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
+        set.add(new SsrnFetcher(importFormatPreferences));
         set.add(new EuropePmcFetcher());
         set.add(new MedlineFetcher(importerPreferences));
         set.add(new TitleFetcher(importFormatPreferences));
