@@ -40,6 +40,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -81,7 +82,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private NewEntryDialogTab currentApproach;
 
     private final GuiPreferences preferences;
+
     private final NewEntryPreferences newEntryPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
+
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     @Inject private StateManager stateManager;
@@ -129,8 +133,13 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         this.initialApproach = initialApproach;
         this.currentApproach = initialApproach;
 
+        // This is required for new NewEntryViewModel(preferences, ...
         this.preferences = preferences;
+
+        // Required by this class
+        importFormatPreferences = preferences.getImportFormatPreferences();
         this.newEntryPreferences = preferences.getNewEntryPreferences();
+
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
 
@@ -306,7 +315,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                             Platform.runLater(() -> {
                                 // [impl->req~newentry.clipboard.autofocus~1]
                                 idLookupSpecify.setSelected(true);
-                                WebFetchers.getIdBasedFetcherForIdentifier(identifier, preferences.getImportFormatPreferences())
+                                WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences)
                                            .ifPresent(idFetcher::setValue);
                             });
                         },
@@ -667,7 +676,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
      */
     private void updateFetcherFromIdentifierText(@Nullable String text) {
         Identifier.from(text)
-                  .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, preferences.getImportFormatPreferences()))
+                  .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences))
                 .map(fetcher -> fetcherFromName(fetcher.getName()))
                   .ifPresent(idFetcher::setValue);
     }
