@@ -111,6 +111,6 @@ public class CleanupPreferences {
         ABBREVIATE_DOTLESS,
         ABBREVIATE_SHORTEST_UNIQUE,
         UNABBREVIATE,
-        NO_CHANGES
+        ABBREVIATION_NO_CHANGES
     }
 }

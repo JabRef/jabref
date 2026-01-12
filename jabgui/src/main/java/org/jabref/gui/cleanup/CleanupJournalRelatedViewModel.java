@@ -13,29 +13,21 @@ public class CleanupJournalRelatedViewModel {
             CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
             CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
             CleanupPreferences.CleanupStep.UNABBREVIATE,
-            CleanupPreferences.CleanupStep.NO_CHANGES
+            CleanupPreferences.CleanupStep.ABBREVIATION_NO_CHANGES
     );
 
-    private final ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleObjectProperty<>();
-    private final CleanupPreferences preferences;
+    public final ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleObjectProperty<>();
+    public final CleanupPreferences preferences;
 
     public CleanupJournalRelatedViewModel(CleanupPreferences preferences) {
         this.preferences = preferences;
         selectedJournalCleanupOption.set(getInitialMethod());
     }
 
-    public ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOptionProperty() {
-        return selectedJournalCleanupOption;
-    }
-
-    public CleanupPreferences.CleanupStep getSelectedJournalCleanupOption() {
-        return selectedJournalCleanupOption.get();
-    }
-
     private CleanupPreferences.CleanupStep getInitialMethod() {
         return CLEANUP_JOURNAL_METHODS.stream()
                                       .filter(preferences::isActive)
                                       .findFirst()
-                                      .orElse(CleanupPreferences.CleanupStep.NO_CHANGES);
+                                      .orElse(CleanupPreferences.CleanupStep.ABBREVIATION_NO_CHANGES);
     }
 }

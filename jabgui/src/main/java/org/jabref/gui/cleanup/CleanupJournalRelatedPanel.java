@@ -49,7 +49,7 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
                             "Abbreviate (shortest unique)";
                     case UNABBREVIATE ->
                             "Unabbreviate";
-                    case NO_CHANGES ->
+                    case ABBREVIATION_NO_CHANGES ->
                             "No changes";
                     default ->
                             object.toString();
@@ -65,14 +65,18 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
     }
 
     private void bindProperties() {
-        cleanupJournalBox.valueProperty().bindBidirectional(viewModel.selectedJournalCleanupOptionProperty());
+        cleanupJournalBox.valueProperty().bindBidirectional(viewModel.selectedJournalCleanupOption);
     }
 
     @Override
     public CleanupTabSelection getSelectedTab() {
-        EnumSet<CleanupPreferences.CleanupStep> selectedJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
-        selectedJobs.add(viewModel.getSelectedJournalCleanupOption());
+        EnumSet<CleanupPreferences.CleanupStep> selectedMethods = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
-        return CleanupTabSelection.ofJobs(CleanupJournalRelatedViewModel.CLEANUP_JOURNAL_METHODS, selectedJobs);
+        CleanupPreferences.CleanupStep selected = viewModel.selectedJournalCleanupOption.get();
+        if (!selected.equals(CleanupPreferences.CleanupStep.ABBREVIATION_NO_CHANGES)) {
+            selectedMethods.add(viewModel.selectedJournalCleanupOption.get());
+        }
+
+        return CleanupTabSelection.ofJobs(CleanupJournalRelatedViewModel.CLEANUP_JOURNAL_METHODS, selectedMethods);
     }
 }
