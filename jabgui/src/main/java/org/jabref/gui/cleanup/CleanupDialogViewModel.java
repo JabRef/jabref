@@ -23,6 +23,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
 import org.jabref.logic.cleanup.CleanupWorker;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -42,6 +43,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private final UndoManager undoManager;
     private final Supplier<LibraryTab> tabSupplier;
     private final TaskExecutor taskExecutor;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
@@ -53,13 +55,14 @@ public class CleanupDialogViewModel extends AbstractViewModel {
             @NonNull StateManager stateManager,
             @NonNull UndoManager undoManager,
             Supplier<LibraryTab> tabSupplier,
-            TaskExecutor taskExecutor
+            TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository
     ) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         this.tabSupplier = tabSupplier; // can be null
         this.taskExecutor = taskExecutor; // can be null
@@ -135,7 +138,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     /**
      * Runs the cleanup on the entry and records the change.
      *
-     * @return true iff entry was modified
+     * @return true if entry was modified
      */
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
@@ -144,7 +147,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences()
+                preferences.getTimestampPreferences(),
+                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                journalAbbreviationRepository
         );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);

@@ -18,6 +18,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -40,11 +41,12 @@ public class CleanupDialog extends BaseDialog<Void> {
                          StateManager stateManager,
                          UndoManager undoManager,
                          Supplier<LibraryTab> tabSupplier,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         JournalAbbreviationRepository journalAbbreviationRepository) {
         super();
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
-                stateManager, undoManager, tabSupplier, taskExecutor
+                stateManager, undoManager, tabSupplier, taskExecutor, journalAbbreviationRepository
         );
 
         init(databaseContext, preferences);
@@ -56,11 +58,12 @@ public class CleanupDialog extends BaseDialog<Void> {
                          CliPreferences preferences,
                          DialogService dialogService,
                          StateManager stateManager,
-                         UndoManager undoManager) {
+                         UndoManager undoManager,
+                         JournalAbbreviationRepository journalAbbreviationRepository) {
 
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
-                stateManager, undoManager, null, null
+                stateManager, undoManager, null, null, journalAbbreviationRepository
         );
 
         viewModel.setTargetEntries(List.of(targetEntry));

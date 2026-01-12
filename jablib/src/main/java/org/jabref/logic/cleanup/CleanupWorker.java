@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.journals.AbbreviationType;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,12 +22,16 @@ public class CleanupWorker {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
+    private final boolean useFJournalField;
     private final List<JabRefException> failures;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, boolean useFJournalField, JournalAbbreviationRepository abbreviationRepository) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.abbreviationRepository = abbreviationRepository;
+        this.useFJournalField = useFJournalField;
         this.failures = new ArrayList<>();
     }
 
@@ -87,6 +93,14 @@ public class CleanupWorker {
                     new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->
                     new FileLinksCleanup();
+            case ABBREVIATE_DEFAULT ->
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DEFAULT, useFJournalField);
+            case ABBREVIATE_DOTLESS ->
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DOTLESS, useFJournalField);
+            case ABBREVIATE_SHORTEST_UNIQUE ->
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.SHORTEST_UNIQUE, useFJournalField);
+            case UNABBREVIATE ->
+                    new UnabbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository);
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

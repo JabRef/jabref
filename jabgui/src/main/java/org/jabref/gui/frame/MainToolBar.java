@@ -36,6 +36,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -61,6 +62,7 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
     private final CountingUndoManager undoManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -77,7 +79,7 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       CountingUndoManager undoManager) {
+                       CountingUndoManager undoManager, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -90,6 +92,7 @@ public class MainToolBar extends ToolBar {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         createToolBar();
     }
@@ -143,7 +146,7 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         pushToApplicationButton,
                         factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager))),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository))),
 
                 new Separator(Orientation.VERTICAL),
 

@@ -113,6 +113,7 @@ public class MainMenu extends MenuBar {
     private final AiService aiService;
     private final PreviewControls previewControls;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -130,7 +131,8 @@ public class MainMenu extends MenuBar {
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,
                     PreviewControls previewControls,
-                    GitHandlerRegistry gitHandlerRegistry) {
+                    GitHandlerRegistry gitHandlerRegistry, JournalAbbreviationRepository journalAbbreviationRepository
+    ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
@@ -148,6 +150,7 @@ public class MainMenu extends MenuBar {
         this.aiService = aiService;
         this.previewControls = previewControls;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         createMenu();
     }
@@ -272,7 +275,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository)),
 
                 new SeparatorMenuItem(),
 

@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 
@@ -16,17 +17,19 @@ public class CleanupSingleAction extends SimpleCommand {
     private final StateManager stateManager;
     private final BibEntry entry;
     private final UndoManager undoManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public CleanupSingleAction(BibEntry entry,
                                CliPreferences preferences,
                                DialogService dialogService,
                                StateManager stateManager,
-                               UndoManager undoManager) {
+                               UndoManager undoManager, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.entry = entry;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -43,7 +46,8 @@ public class CleanupSingleAction extends SimpleCommand {
                 preferences,
                 dialogService,
                 stateManager,
-                undoManager
+                undoManager,
+                journalAbbreviationRepository
         );
 
         dialogService.showCustomDialogAndWait(cleanupDialog);
