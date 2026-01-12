@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -83,20 +84,12 @@ public class FileUtil {
      * @return the extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(@NonNull String fileName) {
-        Path realFileName = Path.of(fileName.trim()).getFileName();
-        if (realFileName == null) {
+        int dotPosition = fileName.lastIndexOf('.');
+        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dotPosition + 1).trim());
+        } else {
             return Optional.empty();
         }
-        String realFileNameString = realFileName.toString();
-        String extension = FilenameUtils.getExtension(realFileNameString);
-        if (StringUtil.isNullOrEmpty(extension)) {
-            return Optional.empty();
-        }
-        if (realFileNameString.startsWith(".") && (realFileNameString.length() == extension.length() + 1)) {
-            // In case ".tmp" is asked for the extension, the answer is empty (and not tmp)
-            return Optional.empty();
-        }
-        return Optional.of(extension);
     }
 
     /**
