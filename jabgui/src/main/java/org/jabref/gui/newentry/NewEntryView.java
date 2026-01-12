@@ -305,7 +305,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                             Platform.runLater(() -> {
                                 // [impl->req~newentry.clipboard.autofocus~1]
                                 idLookupSpecify.setSelected(true);
-                                WebFetchers.getIdBasedFetcherFoIdentifier(identifier, preferences.getImportFormatPreferences())
+                                WebFetchers.getIdBasedFetcherForIdentifier(identifier, preferences.getImportFormatPreferences())
                                            .ifPresent(idFetcher::setValue);
                             });
                         },
@@ -665,7 +665,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
      */
     private void updateFetcherFromIdentifierText(@Nullable String text) {
         Identifier.from(text)
-                  .flatMap(identifier -> WebFetchers.getIdBasedFetcherFoIdentifier(identifier, preferences.getImportFormatPreferences()))
+                  .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, preferences.getImportFormatPreferences()))
                 .map(fetcher -> fetcherFromName(fetcher.getName()))
                   .ifPresent(idFetcher::setValue);
     }

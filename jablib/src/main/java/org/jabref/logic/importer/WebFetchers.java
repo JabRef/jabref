@@ -99,7 +99,7 @@ public class WebFetchers {
     }
 
     /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field, ImportFormatPreferences) ]
-    public static Optional<IdBasedFetcher> getIdBasedFetcherFoIdentifier(Identifier identifier, ImportFormatPreferences importFormatPreferences) {
+    public static Optional<IdBasedFetcher> getIdBasedFetcherForIdentifier(Identifier identifier, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
         // All identifiers listed here should also appear at {@link org.jabref.gui.mergeentries.FetchAndMergeEntry.SUPPORTED_FIELDS} and vice versa.
