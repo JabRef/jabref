@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors.identifier;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
@@ -93,17 +94,17 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
 
-        java.util.stream.Stream.of(fetchInformationByIdentifierButton, lookupIdentifierButton)
-                .forEach(button -> {
-                    button.visibleProperty().bind(viewModel.textProperty().isNotEmpty());
-                    button.managedProperty().bind(button.visibleProperty());
-                });
+        Stream.of(fetchInformationByIdentifierButton, lookupIdentifierButton)
+              .forEach(button -> {
+                  button.visibleProperty().bind(viewModel.textProperty().isNotEmpty());
+                  button.managedProperty().bind(button.visibleProperty());
+              });
 
         shortenDOIButton.managedProperty().bind(shortenDOIButton.visibleProperty());
         if (StandardField.DOI.equals(field)) {
             shortenDOIButton.visibleProperty().bind(viewModel.textProperty().isNotEmpty());
         } else {
-            shortenDOIButton.visibleProperty().unbind(); 
+            shortenDOIButton.visibleProperty().unbind();
             shortenDOIButton.setVisible(false);
         }
     }
