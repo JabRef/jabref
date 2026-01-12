@@ -267,7 +267,7 @@ class FileUtilTest {
             blank, https://www.example.com/path/to/blank?search=for+a+file
             """)
     void getFileNameFromUrlsCorrectly(String file, String url) {
-        assertEquals(file, FileUtil.getFileNameFromUrl(url).orElse("file.pdf"), "from '" + url + "'");
+        assertEquals(Optional.of(file), FileUtil.getFileNameFromUrl(url));
     }
 
     @Test
