@@ -256,11 +256,12 @@ class FileUtilTest {
             test.file, http://www.example.com/path/to/test.file
             test.file, https://www.example.com/path/to/test.file
             test.file, https://www.example.com/not%5Ca%5Cwindows%5Cpath/test.file
-            ____test.file, https://www.example.com////test.file
+            # Linux: test.file, https://www.example.com////test.file
+            # Windows: ____test.file, https://www.example.com////test.file
             blank, https://www.example.com/path/to/blank
             blank, https://www.example.com/not%5Ca%5Cwindows%5Cpath/blank
-            # last part is not\\a\\windows.file
-            windows.file, https://www.example.com/path/to/no%5Ca%5Cwindows.file
+            # Windows: last part is not\\a\\windows.file
+            # Windows: windows.file, https://www.example.com/path/to/not%5Ca%5Cwindows.file
             test.file, https://www.example.com/path/to/test.file?field=value
             test.file, https://www.example.com/path/to/test.file?a=1&b=2
             test.file, https://www.example.com/path/to/test.file?search=for+a+file
