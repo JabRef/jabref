@@ -74,7 +74,7 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
 
         CleanupPreferences.CleanupStep selected = viewModel.selectedJournalCleanupOption.get();
         if (!selected.equals(CleanupPreferences.CleanupStep.ABBREVIATION_NO_CHANGES)) {
-            selectedMethods.add(viewModel.selectedJournalCleanupOption.get());
+            selectedMethods.add(selected);
         }
 
         return CleanupTabSelection.ofJobs(CleanupJournalRelatedViewModel.CLEANUP_JOURNAL_METHODS, selectedMethods);
