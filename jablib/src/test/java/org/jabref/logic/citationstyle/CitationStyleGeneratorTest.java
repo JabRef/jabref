@@ -196,7 +196,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void markdownFormat() {
-        String expectedCitation = "\\[1\\]B\\. Smith\\, B\\. Jones\\, and J\\. Williams\\, “Title of the test entry\\,” *BibTeX Journal*\\, vol\\. 34\\, no\\. 3\\, pp\\. 45–67\\, Jul. 2016\\, doi\\: 10\\.1001\\/bla\\.blubb\\.<br />\n";
+        String expectedCitation = "\\[1\\]B\\. Smith\\, B\\. Jones\\, and J\\. Williams\\, “Title of the test entry\\,” *BibTeX Journal*\\, vol\\. 34\\, no\\. 3\\, pp\\. 45–67\\, Jul\\. 2016\\, doi\\: 10\\.1001\\/bla\\.blubb\\.<br />\n";
 
         String actualCitation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, MARKDOWN_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER).getFirst();
         assertEquals(expectedCitation, actualCitation);
