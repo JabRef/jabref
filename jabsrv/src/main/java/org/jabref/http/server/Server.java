@@ -34,9 +34,12 @@ import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private final CliPreferences preferences;
@@ -46,7 +49,7 @@ public class Server {
     }
 
     /// Entry point for the CLI (backwards-compatible)
-    public HttpServer run(List<Path> files, URI uri) {
+    public @Nullable HttpServer run(List<Path> files, URI uri) {
         return run(files, uri, null);
     }
 
@@ -55,9 +58,9 @@ public class Server {
      * If {@code remoteMessageHandler} is null, no handler is registered and WebSocket handlers will
      * receive null when looking it up (they should handle that case).
      */
-    public HttpServer run(List<Path> files, URI uri, RemoteMessageHandler remoteMessageHandler) {
+    public @Nullable HttpServer run(List<Path> files, URI uri, @Nullable RemoteMessageHandler remoteMessageHandler) {
         List<Path> filesToServeList;
-        if (files == null || files.isEmpty()) {
+        if (files.isEmpty()) {
             LOGGER.debug("No library available to serve, serving the demo library...");
             // Server.class.getResource("...") is always null here, thus trying relative path
             // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
@@ -78,7 +81,9 @@ public class Server {
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, remoteMessageHandler, "remoteMessageHandler", RemoteMessageHandler.class);
+        if (remoteMessageHandler != null) {
+            ServiceLocatorUtilities.addOneConstant(serviceLocator, remoteMessageHandler, "remoteMessageHandler", RemoteMessageHandler.class);
+        }
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -97,7 +102,7 @@ public class Server {
     }
 
     /// Entry point for the GUI (delegates to overload that can accept a handler)
-    public HttpServer run(SrvStateManager srvStateManager, URI uri) {
+    public @Nullable HttpServer run(SrvStateManager srvStateManager, URI uri) {
         return run(srvStateManager, uri, null);
     }
 
@@ -105,7 +110,7 @@ public class Server {
      * GUI entry that allows supplying a RemoteMessageHandler to be registered in the ServiceLocator.
      * This mirrors the CLI entrypoint which accepts a handler so WebSocket code can lookup and use it.
      */
-    public HttpServer run(SrvStateManager srvStateManager, URI uri, RemoteMessageHandler remoteMessageHandler) {
+    public @Nullable HttpServer run(SrvStateManager srvStateManager, URI uri, @Nullable RemoteMessageHandler remoteMessageHandler) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
@@ -119,7 +124,7 @@ public class Server {
         return startServer(serviceLocator, uri);
     }
 
-    private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
+    private @Nullable HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
@@ -179,7 +184,7 @@ public class Server {
             server.start();
         } catch (Exception e) {
             LOGGER.error("Failed to start HTTP server", e);
-            throw new RuntimeException(e);
+            return null;
         }
 
         return server;
@@ -203,7 +208,6 @@ public class Server {
         return sslContextConfig.createSSLContext(false);
     }
 
-    @NonNull
     private Path getSslCert() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(
