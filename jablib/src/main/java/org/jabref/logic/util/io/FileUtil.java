@@ -82,8 +82,8 @@ public class FileUtil {
      *
      * @return the extension (without leading dot), trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(String fileName) {
-        Path realFileName = Path.of(fileName).getFileName();
+    public static Optional<String> getFileExtension(@NonNull String fileName) {
+        Path realFileName = Path.of(fileName.trim()).getFileName();
         if (realFileName == null) {
             return Optional.empty();
         }
@@ -104,15 +104,30 @@ public class FileUtil {
      *
      * @return the extension (without leading dot), trimmed and in lowercase
      */
-    public static Optional<String> getFileExtension(Path file) {
+    public static Optional<String> getFileExtension(@NonNull Path file) {
         return getFileExtension(file.getFileName().toString());
     }
 
-    /**
-     * @return the name part of a file name (i.e., everything before last ".")
-     */
+    /// Returns the name part of a file name.
+    ///
+    /// Typically, this is everything before last ".".
+    /// Exception: if only a single dot is contained and nothing is before the last dot - all is returned
+    ///
+    /// - `test.txt` -> `test`
+    /// - `.tmp` -> `.tmp` (Exception - different than [FilenameUtils#getBaseName(String)])
     public static String getBaseName(String fileName) {
-        return FilenameUtils.getBaseName(fileName);
+        Path path;
+        try {
+            path = Path.of(fileName.trim());
+        } catch (InvalidPathException e) {
+            return fileName;
+        }
+        String realFileName = path.getFileName().toString();
+        String baseName = FilenameUtils.getBaseName(realFileName);
+        if ("".equals(baseName)) {
+            return realFileName;
+        }
+        return baseName;
     }
 
     /**

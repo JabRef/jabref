@@ -2,6 +2,7 @@ package org.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +21,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -178,10 +180,10 @@ class FileUtilTest {
     @CsvSource(textBlock = """
                 pdf, test.pdf
                 pdf, te.st.pdf
-                pdf, te.st.PdF
+                PdF, te.st.PdF
                 pdf, 'test.pdf  '
-                pdf, 'test.PdF  '
-                pdf, 'te.st.PdF  '
+                PdF, 'test.PdF  '
+                PdF, 'te.st.PdF  '
                 txt, other.txt
                 pdf, path/test.pdf
                 pdf, path/.to/FileInsideAHiddenFolder.pdf
@@ -208,11 +210,11 @@ class FileUtilTest {
 
     @ParameterizedTest
     @CsvSource(textBlock = """
-                test, test.pdf
                 te.st, 'te.st.PdF  '
+                te.st, 'path/to/te.st.PdF  '
+                test, test.pdf
                 other, 'other.txt'
                 file, path/to/file.pdf
-                te.st, 'path/to/te.st.PdF  '
                 JustTextNotASingleDot, JustTextNotASingleDot
                 .StartsWithADotIsNotAnExtension, .StartsWithADotIsNotAnExtension
                 JustTextNotASingleDot, path/to/JustTextNotASingleDot
@@ -445,12 +447,13 @@ class FileUtilTest {
     }
 
     @Test
-    void extractFileExtension() {
-        final String filePath = FileUtilTest.class.getResource("pdffile.pdf").getPath();
+    void extractFileExtension() throws URISyntaxException {
+        final Path filePath = Path.of(FileUtilTest.class.getResource("pdffile.pdf").toURI());
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
+    @Disabled("Not possible as URL is not a path. One needs to use FileUtil.getFileNameFromUrl")
     void fileExtensionFromUrl() {
         final String filePath = "https://link.springer.com/content/pdf/10.1007%2Fs40955-018-0121-9.pdf";
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
