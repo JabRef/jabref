@@ -19,8 +19,8 @@ public class CompositeIdFetcher {
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         try {
             return Identifier.from(identifier)
-                      .flatMap(id -> WebFetchers.getIdBasedFetcherForIdentifier(id, importFormatPreferences))
-                      .flatMap(Unchecked.function(fetcher -> fetcher.performSearchById(identifier)));
+                             .flatMap(id -> WebFetchers.getIdBasedFetcherForIdentifier(id, importFormatPreferences))
+                             .flatMap(Unchecked.function(fetcher -> fetcher.performSearchById(identifier)));
         } catch (UncheckedException e) {
             throw (FetcherException) e.getCause();
         }
