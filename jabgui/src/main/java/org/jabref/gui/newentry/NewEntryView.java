@@ -677,7 +677,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private void updateFetcherFromIdentifierText(@Nullable String text) {
         Identifier.from(text)
                   .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences))
-                .map(fetcher -> fetcherFromName(fetcher.getName()))
+                  .map(fetcher -> fetcherFromName(fetcher.getName()))
                   .ifPresent(idFetcher::setValue);
     }
 
