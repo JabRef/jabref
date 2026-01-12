@@ -97,50 +97,50 @@ class KeyBindingsTabModelTest {
     void saveNewKeyBindingsToPreferences() {
         assumeFalse(OS.OS_X);
 
-        setKeyBindingViewModel(KeyBinding.ABBREVIATE);
+        setKeyBindingViewModel(KeyBinding.MERGE_ENTRIES);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "J", "J", KeyCode.J, true, true, true, false);
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
         model.storeSettings();
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
     }
 
     @Test
     void saveNewSpecialKeysKeyBindingsToPreferences() {
-        setKeyBindingViewModel(KeyBinding.ABBREVIATE);
+        setKeyBindingViewModel(KeyBinding.MERGE_ENTRIES);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "F1", "F1", KeyCode.F1, true, false, false, false);
 
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
         model.storeSettings();
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
     }
 
     @Test
     void setAllKeyBindingsToDefault() {
         assumeFalse(OS.OS_X);
 
-        setKeyBindingViewModel(KeyBinding.ABBREVIATE);
+        setKeyBindingViewModel(KeyBinding.MERGE_ENTRIES);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);
 
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
 
         model.setNewBindingForCurrent(shortcutKeyEvent);
         model.storeSettings();
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
 
         keyBindingRepository.resetToDefault();
         model.storeSettings();
 
         // Explanation: Due to the fix for #14237, modifying a key binding and then resetting
         // it back to default is still considered a change in the repository state.
-        // Therefore, ABBREVIATE is still expected to match this shortcut here.
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        // Therefore, MERGE_ENTRIES is still expected to match this shortcut here.
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
     }
 
     @Test
@@ -160,23 +160,23 @@ class KeyBindingsTabModelTest {
     void setSingleKeyBindingToDefault() {
         assumeFalse(OS.OS_X);
 
-        KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);
+        KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.MERGE_ENTRIES);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);
 
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
 
         model.setNewBindingForCurrent(shortcutKeyEvent);
         model.storeSettings();
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
 
         viewModel.resetToDefault();
         model.storeSettings();
 
         // Explanation: Due to the fix for #14237, modifying a key binding and then resetting
         // it back to default is still considered a change in the repository state.
-        // Therefore, ABBREVIATE is still expected to match this shortcut here.
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        // Therefore, MERGE_ENTRIES is still expected to match this shortcut here.
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
     }
 
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {
