@@ -98,6 +98,7 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
             return List.of(new SearchQueryNode(Optional.empty(), term));
         }
 
+        // TODO: Here, there is no unescaping of the field (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
 
         // Pseudo-fields

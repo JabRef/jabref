@@ -75,6 +75,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NewEntryView extends BaseDialog<BibEntry> {
     private static final String BIBTEX_REGEX = "^@([A-Za-z]+)\\{,";
@@ -296,31 +297,33 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         viewModel.populateDOICache();
+        viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+            if (isValid) {
+                Tooltip.install(idText, idTextTooltip);
+            } else {
+                Tooltip.uninstall(idText, idTextTooltip);
+            }
+        });
 
-        // [impl->req~newentry.clipboard.autofocus~1]
-        Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
-        if (validClipboardId.isPresent()) {
-            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
-                if (isValid) {
-                    Tooltip.install(idText, idTextTooltip);
-                } else {
-                    Tooltip.uninstall(idText, idTextTooltip);
-                }
-            });
+        extractIdentifierFromClipboard()
+                .ifPresentOrElse(identifier -> {
+                            idText.setText(ClipBoardManager.getContents().trim());
+                            idText.selectAll();
+                            Platform.runLater(() -> {
+                                // [impl->req~newentry.clipboard.autofocus~1]
+                                idLookupSpecify.setSelected(true);
+                                fetcherForIdentifier(identifier).ifPresent(idFetcher::setValue);
+                            });
+                        },
+                        () -> Platform.runLater(() -> idLookupGuess.setSelected(true)));
 
-            idText.setText(ClipBoardManager.getContents().trim());
-            idText.selectAll();
-
-            Identifier id = validClipboardId.get();
-            Platform.runLater(() -> {
-                idLookupSpecify.setSelected(true);
-                fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
-            });
-        } else {
-            Platform.runLater(() -> idLookupGuess.setSelected(true));
-        }
-
-        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
+            preferences.setIdLookupGuessing(newValue);
+            // When switching to auto-detect mode, detect identifier type from current text
+            if (newValue) {
+                updateFetcherFromIdentifierText(idText.getText());
+            }
+        });
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
@@ -333,6 +336,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
+
+        // Auto-detect identifier type when typing in the identifier field
+        // Only works when "Automatically determine identifier type" is selected
+        idText.textProperty().addListener((_, _, newValue) -> {
+            if (idLookupGuess.isSelected()) {
+                updateFetcherFromIdentifierText(newValue);
+            }
+        });
 
         idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
@@ -463,9 +474,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void execute() {
-        // :TODO: These button text changes aren't actually visible, due to the UI thread not being able to perform the
-        // update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
-        // a `Platform.runLater(...)` which would probably fix this.
+        // TODO: These button text changes aren't actually visible, due to the UI thread not being able to perform the
+        //       update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
+        //       a `Platform.runLater(...)` which would probably fix this.
         switch (currentApproach) {
             case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
                 // We do nothing here.
@@ -499,7 +510,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             final EntryType type = entry.getType();
 
             final Button button = new Button(type.getDisplayName());
-            button.setMinWidth(Button.USE_PREF_SIZE);
             button.setMaxWidth(Double.MAX_VALUE);
             button.setUserData(entry);
             button.setOnAction(_ -> onEntryTypeSelected(type));
@@ -655,37 +665,33 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return PlainCitationParserChoice.RULE_BASED_GENERAL;
     }
 
-    private Optional<Identifier> extractValidIdentifierFromClipboard() {
+    /**
+     * Updates the fetcher based on the identifier text.
+     * Detects the identifier type and sets the appropriate fetcher if a valid identifier is found.
+     *
+     * @param text the identifier text to parse
+     */
+    private void updateFetcherFromIdentifierText(@Nullable String text) {
+        Identifier.from(text)
+                  .flatMap(identifier -> fetcherForIdentifier(identifier))
+                  .ifPresent(idFetcher::setValue);
+    }
+
+    private Optional<Identifier> extractIdentifierFromClipboard() {
         String clipboardText = ClipBoardManager.getContents().trim();
-
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            Optional<Identifier> identifier = Identifier.from(clipboardText);
-            if (identifier.isPresent()) {
-                Identifier id = identifier.get();
-                boolean isValid = switch (id) {
-                    case DOI doi ->
-                            DOI.isValid(doi.asString());
-                    case ISBN isbn ->
-                            isbn.isValid();
-                    default ->
-                            true;
-                };
-                if (isValid) {
-                    return Optional.of(id);
-                }
-            }
+            return Identifier.from(clipboardText);
         }
-
         return Optional.empty();
     }
 
     private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
         for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
-                    (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
-                            (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
-                            (id instanceof RFC && fetcher instanceof RfcFetcher) ||
-                            (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
+                    (id instanceof ISBN && fetcher instanceof IsbnFetcher) ||
+                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
                 return Optional.of(fetcher);
             }
         }

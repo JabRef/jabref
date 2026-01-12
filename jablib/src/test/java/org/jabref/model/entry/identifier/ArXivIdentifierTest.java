@@ -192,4 +192,38 @@ class ArXivIdentifierTest {
 
         assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "1", "")), parsed);
     }
+
+    @Test
+    void findInTextFindsArxivFromHtmlUrlWithFragment() {
+        Optional<ArXivIdentifier> parsed =
+                ArXivIdentifier.findInText(
+                        "https://arxiv.org/html/2503.08641v1#bib.bib5"
+                );
+
+        assertEquals(
+                Optional.of(new ArXivIdentifier("2503.08641", "1", "")),
+                parsed
+        );
+    }
+
+    @Test
+    void findInTextFindsArxivInsideText() {
+        Optional<ArXivIdentifier> parsed =
+                ArXivIdentifier.findInText(
+                        "https://arxiv.org/abs/1502.05795v1"
+                );
+
+        assertEquals(
+                Optional.of(new ArXivIdentifier("1502.05795", "1", "")),
+                parsed
+        );
+    }
+
+    @Test
+    void findInTextReturnsEmptyForNonArxivText() {
+        Optional<ArXivIdentifier> parsed =
+                ArXivIdentifier.findInText("this text has no identifiers");
+
+        assertEquals(Optional.empty(), parsed);
+    }
 }
