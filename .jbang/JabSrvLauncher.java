@@ -14,39 +14,37 @@
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabsrv
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
+//DEPS com.google.guava:guava:33.5.0-jre
+//DEPS com.konghq:unirest-modules-gson:4.7.1
+//DEPS de.undercouch:citeproc-java:3.4.1
+//DEPS info.picocli:picocli:4.7.7
+//DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
+//DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
+//DEPS jakarta.validation:jakarta.validation-api:3.1.1
+//DEPS net.harawata:appdirs:1.5.0
+//DEPS org.apache.commons:commons-lang3:3.20.0
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
+//DEPS org.bouncycastle:bcprov-jdk18on:1.83
+//DEPS org.postgresql:postgresql:42.7.8
 //DEPS org.slf4j:slf4j-api:2.0.17
+//DEPS org.slf4j:jul-to-slf4j:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
-//DEPS org.slf4j:jul-to-slf4j:2.0.17
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
-//DEPS info.picocli:picocli:4.7.7
-//DEPS org.postgresql:postgresql:42.7.8
-//DEPS org.bouncycastle:bcprov-jdk18on:1.83
-//DEPS com.konghq:unirest-modules-gson:4.7.1
-//DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
-//DEPS org.glassfish.jersey.core:jersey-server:4.0.0
-//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.0
-//DEPS org.glassfish.hk2:hk2-api:3.1.1
-//DEPS org.glassfish.hk2:hk2-utils:3.1.1
-//DEPS org.glassfish.hk2:hk2-locator:3.1.1
-//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.0
 //DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS org.glassfish.grizzly:grizzly-websockets:4.0.2
-//DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
-//DEPS jakarta.validation:jakarta.validation-api:3.1.1
+//DEPS org.glassfish.hk2:hk2-api:3.1.1
+//DEPS org.glassfish.hk2:hk2-locator:3.1.1
+//DEPS org.glassfish.hk2:hk2-utils:3.1.1
+//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.0
+//DEPS org.glassfish.jersey.core:jersey-server:4.0.0
+//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.0
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
-//DEPS com.konghq:unirest-modules-gson:4.7.1
-//DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS net.harawata:appdirs:1.5.0
-//DEPS de.undercouch:citeproc-java:3.4.1
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 //DEPS tools.jackson.core:jackson-core:3.0.3
 //DEPS tools.jackson.core:jackson-databind:3.0.3
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.3
-//DEPS org.apache.commons:commons-lang3:3.20.0
-
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
@@ -83,7 +81,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/ws/JabRefWebSocketApp.java
-
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 
