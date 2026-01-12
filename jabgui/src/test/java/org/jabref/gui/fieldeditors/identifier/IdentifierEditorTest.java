@@ -21,7 +21,6 @@ class IdentifierEditorTest extends ApplicationTest {
     public void start(Stage stage) {
         fetchButton = new Button();
         fetchButton.setId("fetchInformationByIdentifierButton");
-        
         textField = new EditorTextField();
         textField.setId("textField");
         textField.setText("");
@@ -36,12 +35,13 @@ class IdentifierEditorTest extends ApplicationTest {
 
     @Test
     void fetchButtonTogglesVisibilityBasedOnText() {
+        interact(() -> textField.setText(""));
         FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isInvisible());
 
-        clickOn("#textField").write("10.1001/jama.2017.18444");
+        clickOn(textField).write("10.1001/jama.2017.18444");
         FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isVisible());
 
-        clickOn("#textField").eraseText(30);
+        interact(() -> textField.setText(""));
         FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isInvisible());
     }
 }
