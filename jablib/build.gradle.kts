@@ -282,9 +282,6 @@ tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadLtwaFile")
     src("https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv")
     dest(ltwaCsvFile)
     overwrite(false)
-    onlyIf {
-        !ltwaCsvFile.get().asFile.exists()
-    }
 }
 
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
