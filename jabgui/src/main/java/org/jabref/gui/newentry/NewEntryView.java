@@ -83,8 +83,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     private final GuiPreferences preferences;
 
-    private final NewEntryPreferences newEntryPreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final NewEntryPreferences newEntryPreferences;
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -137,7 +137,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         this.preferences = preferences;
 
         // Required by this class
-        importFormatPreferences = preferences.getImportFormatPreferences();
+        this.importFormatPreferences = preferences.getImportFormatPreferences();
         this.newEntryPreferences = preferences.getNewEntryPreferences();
 
         this.libraryTab = libraryTab;
