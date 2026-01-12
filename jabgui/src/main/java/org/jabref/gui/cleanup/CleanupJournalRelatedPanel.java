@@ -35,13 +35,12 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
     private void initializeComboBox() {
         cleanupJournalBox.getItems().setAll(CleanupJournalRelatedViewModel.CLEANUP_JOURNAL_METHODS);
 
-        cleanupJournalBox.setConverter(new StringConverter<CleanupPreferences.CleanupStep>() {
+        cleanupJournalBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(CleanupPreferences.CleanupStep object) {
-                if (object == null) {
-                    return "";
-                }
                 return switch (object) {
+                    case null ->
+                            "";
                     case ABBREVIATE_DEFAULT ->
                             "Abbreviate (default)";
                     case ABBREVIATE_DOTLESS ->
