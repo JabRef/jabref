@@ -168,7 +168,7 @@ class CSLFormatUtilsTest {
 
                 // Numeric type "[1]", brackets, newlines
                 Arguments.of(
-                        "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
+                        "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
@@ -202,7 +202,7 @@ class CSLFormatUtilsTest {
                 // Small-caps
                 Arguments.of(
                         "<smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps> and <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "De Montfort University (author-date/Harvard)".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-breaking spaces
@@ -302,7 +302,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "(Smith, Jones and Williams, 2016)",
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "De Montfort University (author-date/Harvard)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -426,7 +426,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "(Garcia and Lee, 2021; Smith and Johnson, 2020)",
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "De Montfort University (author-date/Harvard)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -497,7 +497,7 @@ class CSLFormatUtilsTest {
 
                 // Type: "[1]"
                 Arguments.of(
-                        "[3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, July 2016, doi: 10.1001/bla.blubb.<p></p>",
+                        "[3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
                 ),
 
