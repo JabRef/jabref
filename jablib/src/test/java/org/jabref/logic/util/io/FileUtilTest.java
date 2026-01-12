@@ -244,7 +244,7 @@ class FileUtilTest {
         file = file.replace('/', File.separatorChar);
         Optional<String> resultFromString = FileUtil.getFileExtension(file);
         Optional<String> resultFromPath = FileUtil.getFileExtension(Path.of(file));
-        assertEquals(resultFromString.orElse("EMPTY"), resultFromPath.orElse("EMPTY"), "difference between Strings and Path from '" + file + "'");
+        assertEquals(resultFromString, resultFromPath);
     }
 
     @ParameterizedTest
