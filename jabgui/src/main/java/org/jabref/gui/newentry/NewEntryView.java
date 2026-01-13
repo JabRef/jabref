@@ -21,6 +21,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -510,6 +511,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             final EntryType type = entry.getType();
 
             final Button button = new Button(type.getDisplayName());
+            button.setMinWidth(Region.USE_PREF_SIZE);
             button.setMaxWidth(Double.MAX_VALUE);
             button.setUserData(entry);
             button.setOnAction(_ -> onEntryTypeSelected(type));

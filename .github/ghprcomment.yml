@@ -46,9 +46,6 @@
     IntelliJ auto format covers some cases.
     There seem to be issues with your code style and autoformat configuration.
     Please reformat your code (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>) and commit, then push.
-
-
-    In special cases, consider using `// formatter:off` and `// formatter:on` annotations to allow deviation from the code style.
 - jobName: Checkstyle
   workflowName: 'Source Code Tests'
   message: >

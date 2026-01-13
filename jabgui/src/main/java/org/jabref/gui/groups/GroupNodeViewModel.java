@@ -569,7 +569,7 @@ public class GroupNodeViewModel {
                 if (!node.matches(entry)) {
                     yield false;
                 }
-                var parent = node.getParent();
+                Optional<GroupTreeNode> parent = node.getParent();
                 while (parent.isPresent()) {
                     if (!parent.get().matches(entry)) {
                         yield false;
