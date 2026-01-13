@@ -17,6 +17,8 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 public class UnabbreviateJournalCleanupTest {
     private UnabbreviateJournalCleanup cleanup;
@@ -141,6 +143,29 @@ public class UnabbreviateJournalCleanupTest {
 
         assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
         assertEquals(Optional.empty(), entry.getField(AMSField.FJOURNAL));
+    }
+
+    @Test
+    void OnEmptyFJournalFieldShouldUseJournalAbbreviationRepository() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Foo")
+                .withField(AMSField.FJOURNAL, "");
+
+        Abbreviation abbreviationJournal = new Abbreviation("Journal of Foo", "J. Foo");
+        Mockito.when(repositoryMock.isKnownName("J. Foo")).thenReturn(true);
+        Mockito.when(repositoryMock.isAbbreviatedName("J. Foo")).thenReturn(true);
+        Mockito.when(repositoryMock.get("J. Foo")).thenReturn(Optional.of(abbreviationJournal));
+
+        List<FieldChange> changes = cleanup.cleanup(entry);
+
+        List<FieldChange> expected = List.of(
+                new FieldChange(entry, StandardField.JOURNAL, "J. Foo", "Journal of Foo")
+        );
+        assertEquals(expected, changes);
+
+        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
+        assertEquals(Optional.empty(), entry.getField(AMSField.FJOURNAL));
+        verify(repositoryMock, atLeastOnce()).get("J. Foo");
     }
 
     @Test
