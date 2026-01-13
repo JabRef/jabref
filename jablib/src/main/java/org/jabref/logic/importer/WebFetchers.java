@@ -228,6 +228,7 @@ public class WebFetchers {
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
+        set.add(new SsrnFetcher(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new SemanticScholar(importerPreferences));
         set.add(new OpenAlex());
