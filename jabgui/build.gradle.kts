@@ -240,4 +240,6 @@ tasks.test {
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"
     )
+
+    maxParallelForks = 1
 }

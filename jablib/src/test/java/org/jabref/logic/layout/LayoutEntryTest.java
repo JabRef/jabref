@@ -87,7 +87,7 @@ class LayoutEntryTest {
     @Test
     void parseTwoMethodsWithoutArguments() {
         String input = "bla,foo";
-        var result = LayoutEntry.parseMethodsCalls(input);
+        List<List<String>> result = LayoutEntry.parseMethodsCalls(input);
         assertEquals(2, result.size());
         assertEquals("bla", result.getFirst().getFirst());
         assertEquals("foo", result.get(1).getFirst());
