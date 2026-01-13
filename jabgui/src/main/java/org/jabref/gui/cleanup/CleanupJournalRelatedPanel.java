@@ -9,6 +9,7 @@ import javafx.util.StringConverter;
 
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
+import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
@@ -42,15 +43,15 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
                     case null ->
                             "";
                     case ABBREVIATE_DEFAULT ->
-                            "Abbreviate (default)";
+                            Localization.lang("Abbreviate (default)");
                     case ABBREVIATE_DOTLESS ->
-                            "Abbreviate (dotless)";
+                            Localization.lang("Abbreviate (dotless)");
                     case ABBREVIATE_SHORTEST_UNIQUE ->
-                            "Abbreviate (shortest unique)";
+                            Localization.lang("Abbreviate (shortest unique)");
                     case UNABBREVIATE ->
-                            "Unabbreviate";
+                            Localization.lang("Unabbreviate");
                     case ABBREVIATION_NO_CHANGES ->
-                            "No changes";
+                            Localization.lang("No changes");
                     default ->
                             object.toString();
                 };
