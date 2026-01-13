@@ -103,7 +103,8 @@ public class KeyBindingViewModel {
 
         // gather the pressed modifier keys
         String modifiers = "";
-        if (evt.isShortcutDown()) {
+        // Normalize platform differences: treat CTRL or META as "shortcut"
+        if (evt.isShortcutDown() || evt.isControlDown() || evt.isMetaDown()) {
             modifiers = "shortcut+";
         }
         if (evt.isShiftDown()) {

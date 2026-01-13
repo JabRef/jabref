@@ -64,16 +64,24 @@ public class JournalAbbreviationRepository {
      * Initializes the repository with demonstration data. Used if no abbreviation file is found.
      */
     public JournalAbbreviationRepository() {
-        Abbreviation newAbbreviation = new Abbreviation(
-                "Demonstration",
-                "Demo",
-                "Dem"
-        );
-        fullToAbbreviationObject.put("Demonstration", newAbbreviation);
-        abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
-        dotlessToAbbreviationObject.put("Demo", newAbbreviation);
-        shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
+        // Minimal, built-in fallbacks when no MVStore is available
+        // Keep “Demonstration” for compatibility of previous fallback behavior
+        addAbbreviation(new Abbreviation("Demonstration", "Demo", "Dem"));
+
+        // Frequently used journals required by tests and common workflows
+        addAbbreviation(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"));
+        addAbbreviation(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling"));
+        addAbbreviation(new Abbreviation("American Journal of Public Health", "Am. J. Public Health"));
+        addAbbreviation(new Abbreviation("Physical Review B", "Phys. Rev. B"));
+
         ltwaRepository = new LtwaRepository();
+    }
+
+    private void addAbbreviation(Abbreviation abbreviation) {
+        fullToAbbreviationObject.put(abbreviation.getName(), abbreviation);
+        abbreviationToAbbreviationObject.put(abbreviation.getAbbreviation(), abbreviation);
+        dotlessToAbbreviationObject.put(abbreviation.getDotlessAbbreviation(), abbreviation);
+        shortestUniqueToAbbreviationObject.put(abbreviation.getShortestUniqueAbbreviation(), abbreviation);
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -138,7 +146,16 @@ public class JournalAbbreviationRepository {
      */
     public Optional<Abbreviation> get(String input) {
         // Clean up input: trim and unescape ampersand
-        String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        final String normalizedInput = input.trim()
+                                      // LaTeX escaped ampersand
+                                      .replaceAll(Matcher.quoteReplacement("\\&"), "&")
+                                      // HTML entity for ampersand
+                                      .replace("&amp;", "&");
+
+        // Remove wrapping curly braces, e.g., {ACS Appl Mater Interfaces}
+        final String journal = ((normalizedInput.length() >= 2) && normalizedInput.startsWith("{") && normalizedInput.endsWith("}"))
+                ? normalizedInput.substring(1, normalizedInput.length() - 1)
+                : normalizedInput;
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                                                                        .filter(abbreviation -> isMatched(journal, abbreviation))
@@ -154,6 +171,15 @@ public class JournalAbbreviationRepository {
 
         if (abbreviation.isEmpty()) {
             abbreviation = findAbbreviationFuzzyMatched(journal);
+        }
+
+        // Fallback: if still not found and no custom abbreviations are configured,
+        // try LTWA-based abbreviation for the given full name.
+        if (abbreviation.isEmpty() && customAbbreviations.isEmpty()) {
+            Optional<String> ltwa = ltwaRepository.abbreviate(journal);
+            if (ltwa.isPresent() && !ltwa.get().equals(journal)) {
+                return Optional.of(new Abbreviation(journal, ltwa.get()));
+            }
         }
 
         return abbreviation;

@@ -1,0 +1,673 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.3.0-20251116230000+0000/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Parallel Configuration Cache is an incubating feature.
+Configuration on demand is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: :jabgui:test
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:generateExternalPluginSpecBuilders
+> Task :build-logic:extractPrecompiledScriptPluginPlugins
+> Task :build-logic:generateScriptPluginAdapters
+> Task :build-logic:pluginDescriptors
+> Task :build-logic:processResources
+> Task :build-logic:compilePluginsBlocks
+> Task :build-logic:generatePrecompiledScriptPluginAccessors
+> Task :build-logic:compileKotlin
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:classes
+> Task :build-logic:jar
+[WARN] [Java Module Dependencies] org.glassfish.jersey.tests.framework.core=group:artifact missing in /workspaces/jabref/gradle/modules.properties
+> Task :jabls:processResources NO-SOURCE
+> Task :jablib:extractMaintainers
+> Task :jabsrv:processResources
+> Task :test-support:processResources NO-SOURCE
+
+> Task :jablib:downloadLtwaFile UP-TO-DATE
+Download https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv
+
+> Task :jabgui:processTestResources
+> Task :jabgui:processResources
+
+> Task :jablib:generateGrammarSource
+warning(180): org/jabref/logic/journals/ltwa/Ltwa.g4::: chars 'A' used multiple times in set 'A'..'Z' | 'a'..'z'
+warning(180): org/jabref/logic/journals/ltwa/Ltwa.g4::: chars 'a' used multiple times in set 'A'..'Z' | 'a'..'z'
+warning(180): org/jabref/logic/journals/ltwa/Ltwa.g4::: chars '\u00E0' used multiple times in set 'A'..'Z' | 'a'..'z' | '\u00C0'..'\u00D6' | '\u00E0'..'\u00F6'
+
+> Task :jablib:generateJournalListMV
+JBang not found. Checking cached version latest
+Downloading https://www.jbang.dev/releases/latest/download/version.txt
+100%
+Executing JBang command: /root/.gradle/caches/jbang/jbang-0.135.1/bin/jbang run /workspaces/jabref/build-support/src/main/java/JournalListMvGenerator.java
+
+Path /workspaces/jabref/jablib/src/main/abbrv.jabref.org/journals does not exist
+
+> Task :jablib:generateCitationStyleCatalog
+JBang not found. Checking cached version latest
+Downloading https://www.jbang.dev/releases/latest/download/version.txt
+100%
+Executing JBang command: /root/.gradle/caches/jbang/jbang-0.135.1/bin/jbang run /workspaces/jabref/build-support/src/main/java/CitationStyleCatalogGenerator.java
+
+[main] ERROR CitationStyleCatalogGenerator - Could not find any citation style. Tried with ieee.csl. Tried in /workspaces/jabref. Current directory: /workspaces/jabref/.
+
+> Task :jablib:generateLtwaListMV SKIPPED
+> Task :jablib:processResources
+
+> Task :jablib:compileJava
+warning: unknown enum constant Id.CLASS
+  reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/BibDatabase.java:374: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+        return bibtexStrings.get(id);
+        ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/BibDatabase.java:699: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+        return entriesId.get(id);
+        ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/JabRefException.java:11: warning: [NullAway] initializer method does not guarantee @NonNull field localizedMessage (line 9) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public JabRefException(String message) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/JabRefException.java:15: warning: [NullAway] initializer method does not guarantee @NonNull field localizedMessage (line 9) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public JabRefException(String message, Throwable cause) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/JabRefException.java:29: warning: [NullAway] initializer method does not guarantee @NonNull field localizedMessage (line 9) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public JabRefException(Throwable cause) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/JabRefException.java:38: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+            return message;
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/ChainNode.java:45: warning: [NullAway] initializer method does not guarantee @NonNull fields parent (line 33), child (line 37) are initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public ChainNode(Class<T> derivingClass) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/ChainNode.java:46: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        parent = null;
+               ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/ChainNode.java:47: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        child = null;
+              ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/ChainNode.java:72: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.parent = parent;
+                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/ChainNode.java:132: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        child = null;
+              ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Date.java:103: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        endDate = null;
+                ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Date.java:104: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        season = null;
+               ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Date.java:116: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.season = null;
+                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Date.java:122: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.endDate = null;
+                     ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/ParsedEntryLink.java:20: warning: [NullAway] initializer method does not guarantee @NonNull field database (line 12) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public ParsedEntryLink(BibEntry bibEntry) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/groups/GroupTreeNode.java:38: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+        setGroup(group, false, false, null);
+                                      ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/TreeNode.java:57: warning: [NullAway] initializer method does not guarantee @NonNull field parent (line 45) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public TreeNode(Class<T> derivingClass) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/TreeNode.java:58: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        parent = null;
+               ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/TreeNode.java:417: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+        child.setParent(null);
+                        ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/TreeNode.java:433: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+            child.get().setParent(null);
+                                  ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/cleanup/FieldFormatterCleanup.java:57: warning: [NullAway] passing @Nullable parameter 'oldValue' where @NonNull is required
+        String newValue = formatter.format(oldValue);
+                                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/BibtexString.java:87: warning: [NullAway] initializer method does not guarantee @NonNull field parsedSerialization (line 79) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public BibtexString(String name, String content) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/KeyCollisionException.java:7: warning: [NullAway] initializer method does not guarantee @NonNull field id (line 5) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public KeyCollisionException() {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/KeyCollisionException.java:16: warning: [NullAway] initializer method does not guarantee @NonNull field id (line 5) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public KeyCollisionException(String msg, Throwable exception) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/KeyCollisionException.java:20: warning: [NullAway] initializer method does not guarantee @NonNull field id (line 5) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public KeyCollisionException(Throwable exception) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/event/FieldChangedEvent.java:56: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.newValue = fieldChange.getNewValue();
+                      ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/event/FieldChangedEvent.java:57: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.oldValue = fieldChange.getOldValue();
+                      ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/event/FieldChangedEvent.java:58: warning: [NullAway] read of @NonNull field oldValue before initialization
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+                                                                ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/event/FieldChangedEvent.java:58: warning: [NullAway] read of @NonNull field newValue before initialization
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+                                                                          ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/event/FieldChangedEvent.java:70: warning: [NullAway] dereferenced expression newValue is @Nullable
+            return newValue.length();
+                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/schema/DublinCoreSchemaCustom.java:31: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+            return null;
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/schema/DublinCoreSchemaCustom.java:63: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+        return null;
+        ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/study/StudyQuery.java:13: warning: [NullAway] initializer method does not guarantee @NonNull field query (line 4) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public StudyQuery() {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/study/StudyDatabase.java:16: warning: [NullAway] initializer method does not guarantee @NonNull field name (line 5) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public StudyDatabase() {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/study/Study.java:45: warning: [NullAway] initializer method does not guarantee @NonNull fields authors (line 23), title (line 25), researchQuestions (line 27), queries (line 30), databases (line 32) are initialized along all control-flow paths (remember to check for exceptions or early returns).
+    private Study() {
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/groups/TexGroup.java:35: warning: [NullAway] initializer method does not guarantee @NonNull field keysUsedInAux (line 29) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    TexGroup(String name,
+    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/groups/TexGroup.java:133: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        keysUsedInAux = null;
+                      ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/groups/SearchGroup.java:95: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+            return null;
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/search/query/SearchQuery.java:33: warning: [NullAway] initializer method does not guarantee @NonNull fields context (line 25), searchResults (line 27) are initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public SearchQuery(@NonNull String searchExpression, EnumSet<SearchFlags> searchFlags) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/search/query/SearchResult.java:25: warning: [NullAway] initializer method does not guarantee @NonNull fields contentResultStringsHtml (line 22), annotationsResultStringsHtml (line 23) are initialized along all control-flow paths (remember to check for exceptions or early returns).
+    private SearchResult(boolean hasFulltextResults,
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/search/query/SearchResult.java:40: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+        this(false, "", "", "", -1, null);
+                                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/ootext/OOText.java:23: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+            return null;
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/ootext/OOText.java:33: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+            return null;
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/uno/UnoCrossRef.java:51: warning: [NullAway] passing @Nullable parameter 'e.getMessage()' where @NonNull is required
+            throw new CreationException(e.getMessage());
+                                                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/uno/UnoNamed.java:33: warning: [NullAway] passing @Nullable parameter 'e.getMessage()' where @NonNull is required
+            throw new CreationException(e.getMessage());
+                                                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/style/CitationGroups.java:132: warning: [NullAway] dereferenced expression citationGroupsUnordered.get(groupId) is @Nullable
+            citationGroupsUnordered.get(groupId).setIndexInGlobalOrder(Optional.of(i));
+                                                ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/style/CitedKeys.java:31: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+        return data.get(citationKey);
+        ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/rangesort/FunctionalTextViewCursor.java:80: warning: [NullAway] passing @Nullable parameter 'initialSelection' where @NonNull is required
+                return OOResult.ok(new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor));
+                                                                                 ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/rangesort/FunctionalTextViewCursor.java:101: warning: [NullAway] passing @Nullable parameter 'initialPosition' where @NonNull is required
+            restore(doc, initialPosition, initialSelection);
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/rangesort/FunctionalTextViewCursor.java:109: warning: [NullAway] passing @Nullable parameter 'initialPosition' where @NonNull is required
+            restore(doc, initialPosition, initialSelection);
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/openoffice/rangesort/FunctionalTextViewCursor.java:114: warning: [NullAway] passing @Nullable parameter 'initialPosition' where @NonNull is required
+        return OOResult.ok(new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor));
+                                                        ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/SpecialFieldValue.java:11: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+    CLEAR_PRIORITY(null),
+                   ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/SpecialFieldValue.java:18: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+    CLEAR_RANK(null),
+               ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/SpecialFieldValue.java:25: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+    CLEAR_READ_STATUS(null),
+                      ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/BiblatexApaField.java:26: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.displayName = null;
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/BiblatexApaField.java:44: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.displayName = null;
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/AMSField.java:17: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.displayName = null;
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/AMSField.java:35: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.displayName = null;
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/FieldFactory.java:77: warning: [NullAway] passing @Nullable parameter 'type' where @NonNull is required
+                                                   BiblatexSoftwareField.fromName(type, fieldName)),
+                                                                                  ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/FieldFactory.java:78: warning: [NullAway] passing @Nullable parameter 'type' where @NonNull is required
+                                           BiblatexApaField.fromName(type, fieldName)),
+                                                                     ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/FieldFactory.java:79: warning: [NullAway] passing @Nullable parameter 'type' where @NonNull is required
+                                   AMSField.fromName(type, fieldName))
+                                                     ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/BiblatexSoftwareField.java:26: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.displayName = null;
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/field/BiblatexSoftwareField.java:44: warning: [NullAway] assigning @Nullable expression to @NonNull field
+        this.displayName = null;
+                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:46: warning: [NullAway] initializer method does not guarantee @NonNull field latexFreeAuthor (line 33) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:24: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+    public static final Author OTHERS = new Author("", "", null, "others", null);
+                                                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:24: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+    public static final Author OTHERS = new Author("", "", null, "others", null);
+                                                                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:52: warning: [NullAway] assigning @Nullable expression to @NonNull field
+            this.givenName = null;
+                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:57: warning: [NullAway] assigning @Nullable expression to @NonNull field
+            this.givenNameAbbreviated = null;
+                                      ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:62: warning: [NullAway] assigning @Nullable expression to @NonNull field
+            this.namePrefix = null;
+                            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:72: warning: [NullAway] assigning @Nullable expression to @NonNull field
+                this.familyName = null;
+                                ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:78: warning: [NullAway] assigning @Nullable expression to @NonNull field
+            this.nameSuffix = null;
+                            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:322: warning: [NullAway] passing @Nullable parameter 'first' where @NonNull is required
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr);
+                                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:322: warning: [NullAway] passing @Nullable parameter 'givenNameAbbreviated' where @NonNull is required
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr);
+                                                ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:322: warning: [NullAway] passing @Nullable parameter 'von' where @NonNull is required
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr);
+                                                                      ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:322: warning: [NullAway] passing @Nullable parameter 'last' where @NonNull is required
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr);
+                                                                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/Author.java:322: warning: [NullAway] passing @Nullable parameter 'jr' where @NonNull is required
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr);
+                                                                                 ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/entry/AuthorList.java:135: warning: [NullAway] initializer method does not guarantee @NonNull field latexFreeAuthors (line 125) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    private AuthorList(@NonNull List<Author> authors) {
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/KeyChangeListener.java:41: warning: [NullAway] passing @Nullable parameter 'null' where @NonNull is required
+            citeKey.ifPresent(oldkey -> updateEntryLinks(null, oldkey));
+                                                         ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/KeyChangeListener.java:51: warning: [NullAway] passing @Nullable parameter 'oldKey' where @NonNull is required
+                     replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
+                                                     ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/KeyChangeListener.java:56: warning: [NullAway] passing @Nullable parameter 'oldKey' where @NonNull is required
+                     replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
+                                                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/model/database/event/EntriesAddedEvent.java:28: warning: [NullAway] assigning @Nullable expression to @NonNull field
+            this.firstEntry = null;
+                            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/biblog/BibtexLogParser.java:65: warning: [NullAway] passing @Nullable parameter 'fieldName' where @NonNull is required
+                    fieldName,
+                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/biblog/BibtexLogParser.java:97: warning: [NullAway] passing @Nullable parameter 'fieldName' where @NonNull is required
+                    fieldName,
+                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/ai/chatting/model/Gpt4AllModel.java:121: warning: [NullAway] @NonNull field Gpt4AllModel$TextGenerationRequest$Builder.model not initialized
+            private String model;
+                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/ai/chatting/model/Gpt4AllModel.java:122: warning: [NullAway] @NonNull field Gpt4AllModel$TextGenerationRequest$Builder.messages not initialized
+            private List<Message> messages;
+                                  ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/ai/chatting/model/Gpt4AllModel.java:123: warning: [NullAway] @NonNull field Gpt4AllModel$TextGenerationRequest$Builder.temperature not initialized
+            private Double temperature;
+                           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/ai/chatting/model/Gpt4AllModel.java:124: warning: [NullAway] @NonNull field Gpt4AllModel$TextGenerationRequest$Builder.max_tokens not initialized
+            private Integer max_tokens;
+                            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/ai/chatting/AiChatLogic.java:62: warning: [NullAway] initializer method does not guarantee @NonNull field chatMemory (line 58) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public AiChatLogic(AiPreferences aiPreferences,
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/util/BackgroundTask.java:60: warning: [NullAway] initializer method does not guarantee @NonNull fields onRunning (line 48), onSuccess (line 49), onException (line 50), onFinished (line 51) are initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public BackgroundTask() {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/util/DelayTaskThrottler.java:33: warning: [NullAway] initializer method does not guarantee @NonNull field scheduledTask (line 28) is initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public DelayTaskThrottler(int delay) {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/ai/summarization/GenerateSummaryTask.java:121: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+                return null;
+                ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java:56: warning: [NullAway] returning @Nullable expression from method with @NonNull return type
+            return null;
+            ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/journals/ltwa/LtwaTsvParser.java:66: warning: [NullAway] passing @Nullable parameter 'abbreviation' where @NonNull is required
+                entries.add(new LtwaEntry(word, abbreviation, languages));
+                                                ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/preferences/JabRefCliPreferences.java:501: warning: [NullAway] initializer method does not guarantee @NonNull fields userAndHost (line 465), libraryPreferences (line 467), doiPreferences (line 468), ownerPreferences (line 469), timestampPreferences (line 470), openOfficePreferences (line 471), importerPreferences (line 472), grobidPreferences (line 473), protectedTermsPreferences (line 474), mrDlibPreferences (line 475), filePreferences (line 476), remotePreferences (line 477), proxyPreferences (line 478), sslPreferences (line 479), searchPreferences (line 480), autoLinkPreferences (line 481), exportPreferences (line 482), nameFormatterPreferences (line 483), bibEntryPreferences (line 484), internalPreferences (line 485), xmpPreferences (line 486), cleanupPreferences (line 487), citationKeyPatternPreferences (line 488), journalAbbreviationPreferences (line 489), fieldPreferences (line 490), aiPreferences (line 491), lastFilesOpenedPreferences (line 492), pushToApplicationPreferences (line 493), gitPreferences (line 494) are initialized along all control-flow paths (remember to check for exceptions or early returns).
+    public JabRefCliPreferences() {
+           ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/preferences/JabRefCliPreferences.java:456: warning: [NullAway] @NonNull static field singleton not initialized
+    private static JabRefCliPreferences singleton;
+                                        ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/preferences/JabRefCliPreferences.java:738: warning: [NullAway] dereferenced expression AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI) is @Nullable
+        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI).getName());
+                                                                                                    ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/preferences/JabRefCliPreferences.java:739: warning: [NullAway] dereferenced expression AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI) is @Nullable
+        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());
+                                                                                                          ^
+    (see http://t.uber.com/nullaway )
+/workspaces/jabref/jablib/src/main/java/org/jabref/logic/preferences/JabRefCliPreferences.java:740: warning: [NullAway] dereferenced expression AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI) is @Nullable
+        defaults.put(AI_GEMINI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI).getName());
+                                                                                                  ^
+    (see http://t.uber.com/nullaway )
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /workspaces/jabref/jablib/src/main/java/org/jabref/logic/bibtex/comparator/MetaDataDiff.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+100 warnings
+
+> Task :jablib:classes
+> Task :jablib:jar
+> Task :jabls:compileJava
+> Task :jabls:classes
+> Task :jabls:jar
+> Task :test-support:compileJava
+> Task :test-support:classes
+> Task :test-support:jar
+> Task :jabsrv:compileJava
+> Task :jabsrv:classes
+> Task :jabsrv:jar
+
+> Task :jabgui:compileJava
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :jabgui:classes
+
+> Task :jabgui:compileTestJava
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :jabgui:testClasses
+2026-01-13 19:07:08 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 5 started executing tests.
+
+> Task :jabgui:test
+
+
+2026-01-13 19:07:09 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 5 finished executing tests.
+2026-01-13 19:07:10 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 6 started executing tests.
+2026-01-13 19:07:11 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 6 finished executing tests.
+2026-01-13 19:07:12 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 7 started executing tests.
+2026-01-13 19:07:13 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 7 finished executing tests.
+2026-01-13 19:07:14 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 8 started executing tests.
+2026-01-13 19:07:15 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 8 finished executing tests.
+2026-01-13 19:07:16 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 9 started executing tests.
+2026-01-13 19:07:16 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 9 finished executing tests.
+2026-01-13 19:07:17 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 10 started executing tests.
+2026-01-13 19:07:18 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 10 finished executing tests.
+2026-01-13 19:07:19 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 11 started executing tests.
+2026-01-13 19:07:20 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 11 finished executing tests.
+2026-01-13 19:07:21 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 12 started executing tests.
+2026-01-13 19:07:22 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 12 finished executing tests.
+2026-01-13 19:07:23 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 13 started executing tests.
+2026-01-13 19:07:23 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 13 finished executing tests.
+2026-01-13 19:07:24 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 14 started executing tests.
+2026-01-13 19:08:00 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 14 finished executing tests.
+2026-01-13 19:08:02 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 15 started executing tests.
+
+> Task :jabgui:test
+[0K[1morg.jabref.gui.preferences.keybindings.KeyBindingViewModelTest[m
+
+[0K[1m  Test [22mverifyStoreSettingsWritesChanges()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <Optional[shortcut+shift+L]> but was: <Optional[shift+L]>
+      at app/org.jabref/org.jabref.gui.preferences.keybindings.KeyBindingViewModelTest.verifyStoreSettingsWritesChanges(KeyBindingViewModelTest.java:90)
+[m
+
+[0K[1morg.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest[m
+
+[0K[1m  Test [22mjournalAbbreviationWithEscapedAmpersand()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    journal = {ACS Appl. Mater. Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    journal = {ACS Applied Materials & Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.journalAbbreviationWithEscapedAmpersand(JournalAbbreviationRepositoryTest.java:197)
+[/[]
+[0K[1m  Test [22mabbreviationsWithEscapedAmpersand()[31m FAILED[31m
+
+  java.util.NoSuchElementException: No value present
+      at org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.abbreviationsWithEscapedAmpersand(JournalAbbreviationRepositoryTest.java:177)
+[m
+[0K[1m  Test [22mjournalDotlessAbbreviationWithCurlyBraces()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    journal = {ACS Applied Materials & Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    journal = {{ACS Appl Mater Interfaces}},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.journalDotlessAbbreviationWithCurlyBraces(JournalAbbreviationRepositoryTest.java:281)
+[m
+[0K[1m  Test [22mjournalDotlessAbbreviation()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    journal = {ACS Applied Materials & Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    journal = {ACS Appl Mater Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.journalDotlessAbbreviation(JournalAbbreviationRepositoryTest.java:270)
+[m
+[0K[1m  Test [22munabbreviateWithJournalExistsAndFJournalNot()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    journal = {ACS Applied Materials & Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    journal = {ACS Appl. Mater. Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.unabbreviateWithJournalExistsAndFJournalNot(JournalAbbreviationRepositoryTest.java:247)
+[m
+[0K[1m  Test [22mdotlessForPhysRevB()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    journal = {Physical Review B},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    journal = {Phys Rev B},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.dotlessForPhysRevB(JournalAbbreviationRepositoryTest.java:323)
+[m
+[0K[1m  Test [22mgetFromAbbreviatedName()[31m FAILED[31m
+
+  java.util.NoSuchElementException: No value present
+      at org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.getFromAbbreviatedName(JournalAbbreviationRepositoryTest.java:172)
+[m
+[0K[1m  Test [22mgetFromFullName()[31m FAILED[31m
+
+  java.util.NoSuchElementException: No value present
+      at org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.getFromFullName(JournalAbbreviationRepositoryTest.java:167)
+[m
+[0K[1m  Test [22mjournalAbbreviateWithoutEscapedAmpersand()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    journal = {ACS Appl. Mater. Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    journal = {ACS Applied Materials & Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.journalAbbreviateWithoutEscapedAmpersand(JournalAbbreviationRepositoryTest.java:221)
+[m
+[0K[1m  Test [22mjournalAbbreviateWithEmptyFJournal()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    fjournal = {ACS Applied Materials & Interfaces},
+    journal = {ACS Appl. Mater. Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    fjournal = {&nbsp;},
+    journal = {ACS Applied Materials & Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.journalAbbreviateWithEmptyFJournal(JournalAbbreviationRepositoryTest.java:236)
+[m
+[0K[1m  Test [22mjournalUnabbreviate()[31m FAILED[31m
+
+  org.opentest4j.AssertionFailedError: expected: <@article{,
+    journal = {ACS Applied Materials & Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }> but was: <@article{,
+    journal = {ACS Appl. Mater. Interfaces},
+    _jabref_shared = {sharedId: -1, version: 1}
+  }>
+      at app/org.jabref/org.jabref.logic.journals_gui.JournalAbbreviationRepositoryTest.journalUnabbreviate(JournalAbbreviationRepositoryTest.java:208)
+[m
+
+2026-01-13 19:08:26 [Test worker] org.gradle.api.internal.tasks.testing.worker.TestWorker.execute()
+INFO: Gradle Test Executor 15 finished executing tests.
+
+> Task :jabgui:test FAILED
+
+[0K[1;31mFAILURE: [39mExecuted 765 tests in 1m 18s (12 failed, 6 skipped)[m
+
+
+765 tests completed, 12 failed, 6 skipped
+
+[Incubating] Problems report is available at: file:///workspaces/jabref/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':jabgui:test'.
+> There were failing tests. See the report at: file:///workspaces/jabref/jabgui/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 2m 32s
+29 actionable tasks: 28 executed, 1 up-to-date
+Configuration cache entry stored.
