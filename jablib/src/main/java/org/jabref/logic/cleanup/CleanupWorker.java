@@ -36,6 +36,8 @@ public class CleanupWorker {
             changes.addAll(job.cleanup(entry));
             if (job instanceof MoveFilesCleanup cleanup) {
                 failures.addAll(cleanup.getIoExceptions());
+            } else if (job instanceof XmpMetadataCleanup cleanup) {
+                failures.addAll(cleanup.getFailures());
             }
         }
 
@@ -87,6 +89,8 @@ public class CleanupWorker {
                     new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->
                     new FileLinksCleanup();
+            case REMOVE_XMP_METADATA ->
+                    new XmpMetadataCleanup(databaseContext, filePreferences);
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

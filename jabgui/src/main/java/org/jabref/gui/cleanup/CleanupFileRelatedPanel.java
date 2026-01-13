@@ -29,6 +29,7 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanupRenamePdfOnlyRelativePaths;
     @FXML private CheckBox cleanupDeletedFiles;
     @FXML private CheckBox cleanupUpgradeExternalLinks;
+    @FXML private CheckBox cleanupRemoveXmpMetadata;
 
     private final CleanupFileViewModel viewModel;
     private final CleanupDialogViewModel dialogViewModel;
@@ -76,6 +77,7 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
         cleanupRenamePdfOnlyRelativePaths.selectedProperty().bindBidirectional(viewModel.renamePdfOnlyRelativeSelected);
         cleanupDeletedFiles.selectedProperty().bindBidirectional(viewModel.deleteFilesSelected);
         cleanupUpgradeExternalLinks.selectedProperty().bindBidirectional(viewModel.upgradeLinksSelected);
+        cleanupRemoveXmpMetadata.selectedProperty().bindBidirectional(viewModel.removeXmpMetadataSelected);
     }
 
     public CleanupTabSelection getSelectedTab() {

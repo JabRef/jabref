@@ -135,7 +135,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     /**
      * Runs the cleanup on the entry and records the change.
      *
-     * @return true iff entry was modified
+     * @return true if entry was modified
      */
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,

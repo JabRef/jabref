@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.model.entry.BibEntry;
-
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.xml.DomXmpParser;
 import org.apache.xmpbox.xml.XmpParsingException;
@@ -55,10 +53,10 @@ public class XmpUtilShared {
      * @param path the path to the PDF.
      * @return whether a BibEntry was found in the given PDF.
      */
-    public static boolean hasMetadata(Path path, XmpPreferences xmpPreferences) {
+    public static boolean hasMetadata(Path path) {
         try {
-            List<BibEntry> bibEntries = new XmpUtilReader().readXmp(path, xmpPreferences);
-            return !bibEntries.isEmpty();
+            List<XMPMetadata> metadata = new XmpUtilReader().readRawXmp(path);
+            return !metadata.isEmpty();
         } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;

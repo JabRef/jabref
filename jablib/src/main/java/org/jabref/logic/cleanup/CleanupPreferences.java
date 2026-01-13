@@ -101,6 +101,7 @@ public class CleanupPreferences {
         MOVE_PDF,
         FIX_FILE_LINKS,
         CLEAN_UP_ISSN,
+        REMOVE_XMP_METADATA,
         /*
          * Converts Math Subject Classification Codes presented in Keywords into their Descriptions
          */
