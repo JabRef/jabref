@@ -277,7 +277,6 @@ public class SaveDatabaseAction {
                                               LOGGER.warn("Git push failed", pushEx);
                                               dialogService.notify(Localization.lang("Git: Committed locally (Push failed)"));
                                           }
-
                                       } catch (Exception e) {
                                           LOGGER.error("Git auto-save failed", e);
                                           dialogService.notify(Localization.lang("Git: Auto-save failed. Check logs."));
