@@ -373,6 +373,12 @@ public class MetaData {
 
     public void putUnknownMetaDataItem(@NonNull String key, @NonNull List<String> value) {
         unknownMetaData.put(key, value);
+        postChange();
+    }
+
+    public void removeUnknownMetaDataItem(String key) {
+        unknownMetaData.remove(key);
+        postChange();
     }
 
     @Override

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.jabref.gui.libraryproperties.git.GitPropertiesView"
+      styleClass="propertiesTab" spacing="20">
+
+    <children>
+        <VBox spacing="10">
+            <Label text="Git Integration" styleClass="sectionHeader"/>
+            <CheckBox fx:id="autoCommitCheckBox" text="Automatically commit and push changes to Git on save"/>
+        </VBox>
+    </children>
+
+</VBox>

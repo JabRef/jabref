@@ -7,6 +7,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -242,8 +244,50 @@ public class SaveDatabaseAction {
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
+
+                dialogService.notify(Localization.lang("Library saved"));
+
+                // Attempt to perform Git auto-save if enabled in Library Properties
+                try {
+                    Map<String, List<String>> metaDataMap = libraryTab.getBibDatabaseContext()
+                                                                      .getMetaData()
+                                                                      .getUnknownMetaData();
+
+                    boolean isGitEnabled = metaDataMap.entrySet().stream()
+                                                      .filter(entry -> {
+                                                          String key = entry.getKey();
+                                                          return key != null && key.trim().equalsIgnoreCase("gitEnabled");
+                                                      })
+                                                      .flatMap(entry -> entry.getValue().stream())
+                                                      .anyMatch(value -> {
+                                                          return value != null && value.trim().equalsIgnoreCase("true");
+                                                      });
+
+                    if (isGitEnabled) {
+                        GitHandler.fromAnyPath(targetPath, preferences.getGitPreferences())
+                                  .ifPresent(gitHandler -> {
+                                      try {
+                                          String commitMsg = "Automatic update via JabRef: " + targetPath.getFileName();
+                                          gitHandler.createCommitOnCurrentBranch(commitMsg, false);
+
+                                          try {
+                                              gitHandler.pushCommitsToRemoteRepository();
+                                              dialogService.notify(Localization.lang("Git: Auto-committed and pushed."));
+                                          } catch (Exception pushEx) {
+                                              LOGGER.warn("Git push failed", pushEx);
+                                              dialogService.notify(Localization.lang("Git: Committed locally (Push failed)"));
+                                          }
+
+                                      } catch (Exception e) {
+                                          LOGGER.error("Git auto-save failed", e);
+                                          dialogService.notify(Localization.lang("Git: Auto-save failed. Check logs."));
+                                      }
+                                  });
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Error during Git auto-save execution", e);
+                }
             }
-            dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
             LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
