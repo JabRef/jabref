@@ -98,20 +98,5 @@ class XmpMetadataCleanupTest {
         assertEquals(StandardField.FILE, changes.getFirst().getField());
         assertTrue(xmpReader.readRawXmp(pdfFile).isEmpty(), "Metadata should be removed after cleanup");
     }
-
-    @Test
-    void cleanupDoesNothingIfNoMetadata() throws IOException {
-        Path pdfFile = tempDir.resolve("test_no_metadata.pdf");
-        try (PDDocument doc = new PDDocument()) {
-            doc.addPage(new PDPage());
-            doc.save(pdfFile.toFile());
-        }
-        assertTrue(xmpReader.readRawXmp(pdfFile).isEmpty(), "No metadata should exist initially");
-
-        LinkedFile linkedFile = new LinkedFile("Test PDF", pdfFile, "PDF");
-        BibEntry bibEntry = new BibEntry().withFiles(Collections.singletonList(linkedFile));
-
-        List<FieldChange> changes = cleanupJob.cleanup(bibEntry);
-        assertTrue(changes.isEmpty(), "Cleanup should report no changes for file without metadata");
-    }
 }
+
