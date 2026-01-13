@@ -852,9 +852,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.
-        // For bulk imports (size > 1), leave all entries selected.
-        // This prevents navigation history pollution because the listener's
-        // check (entries.size() == 1) naturally skips adding to history.
+        // For bulk imports (size > 1), we skip the clearAndSelect call.
+        // This prevents navigation history pollution because the listener
+        // only adds to history when entries.size() == 1.
         if (entries.size() == 1) {
             if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
                 showAndEdit(entries.getFirst());
