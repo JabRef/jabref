@@ -17,6 +17,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.jabref.logic.xmp.DublinCoreExtractor.DC_SOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -81,6 +83,7 @@ class XmpMetadataCleanupTest {
         olly2018.setField(StandardField.OWNER, "me");
         olly2018.setField(StandardField.REVIEW, "review");
         olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
+        olly2018.setField(new UnknownField((DC_SOURCE)), "JabRef");
 
         xmpWriter.writeXmp(pdfFile, olly2018, null);
         assertFalse(xmpReader.readRawXmp(pdfFile).isEmpty(), "Metadata should exist before cleanup");

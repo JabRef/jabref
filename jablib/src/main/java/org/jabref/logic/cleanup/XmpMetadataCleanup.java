@@ -51,7 +51,7 @@ public class XmpMetadataCleanup implements CleanupJob {
                         changed.set(true);
                     } catch (IOException | TransformerException e) {
                         LOGGER.error("Problem removing XMP metadata from file {}", path, e);
-                        failures.add(new JabRefException(Localization.lang("Problem removing XMP metadata from file %0", path.toString()), e));
+                        failures.add(new JabRefException(Localization.lang("Problem removing XMP metadata from file: %0", path.toString()), e));
                     }
                 }
             });
