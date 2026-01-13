@@ -17,7 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We moved journal abbreviation from the "Quality" menu to the "Clean up entries" dialog [#11791](https://github.com/JabRef/jabref/issues/11791)
+- We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog [#11791](https://github.com/JabRef/jabref/issues/11791)
 
 ### Fixed
 
