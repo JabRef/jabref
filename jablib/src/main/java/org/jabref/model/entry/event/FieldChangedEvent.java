@@ -6,6 +6,8 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <code>FieldChangedEvent</code> is fired when a field of <code>BibEntry</code> has been modified, removed or added.
  */
@@ -60,7 +62,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this(fieldChange, EntriesEventSource.LOCAL);
     }
 
-    private int computeMajorCharacterChange(String oldValue, String newValue) {
+    private int computeMajorCharacterChange(@Nullable String oldValue, @Nullable String newValue) {
         // Objects.equals first checks '=='
         if (Objects.equals(oldValue, newValue)) {
             return 0;
