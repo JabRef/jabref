@@ -401,7 +401,7 @@ public class JabRefFrameViewModel {
                 if (!keysToSelect.contains(citationKey)) {
                     continue;
                 }
-                if (firstFoundTab != null) {
+                if (firstFoundTab == null) {
                     firstFoundTab = libraryTab;
                 }
                 LOGGER.debug("Found entry {} in library tab {}", citationKey, libraryTab);

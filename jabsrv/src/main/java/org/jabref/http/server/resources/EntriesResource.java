@@ -55,6 +55,9 @@ public class EntriesResource {
         if (!"current".equals(id)) {
             throw new BadRequestException("Only currently selected library possible");
         }
+        if (bibtex == null || bibtex.isBlank()) {
+            throw new BadRequestException("BibTeX data must not be empty.");
+        }
         uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(bibtex)));
     }
 
