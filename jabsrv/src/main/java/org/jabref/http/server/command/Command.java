@@ -24,7 +24,7 @@ import org.glassfish.hk2.api.ServiceLocator;
 public abstract class Command {
 
     @JsonIgnore
-    private ServiceLocator serviceLocator;
+    protected ServiceLocator serviceLocator;
 
     public void setServiceLocator(ServiceLocator serviceLocator) {
         this.serviceLocator = serviceLocator;
