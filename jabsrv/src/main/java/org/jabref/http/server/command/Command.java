@@ -18,7 +18,6 @@ import org.glassfish.hk2.api.ServiceLocator;
         property = "command")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = SelectEntriesCommand.class, name = "selectentries"),
-        @JsonSubTypes.Type(value = AppendBibTeXCommand.class, name = "appendbibtex"),
         @JsonSubTypes.Type(value = OpenLibrariesCommand.class, name = "open"),
         @JsonSubTypes.Type(value = FocusCommand.class, name = "focus")
 })

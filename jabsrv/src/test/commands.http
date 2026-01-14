@@ -1,4 +1,17 @@
-#### select entries in the demo library
+#### Focus current JabRef instance
+
+POST  http://localhost:23119/commands
+Content-Type: application/json
+
+{
+  "command": "focus"
+}
+
+#### Append BibTeX to current opened library
+
+# This is not a command - one needs to go through the REST API
+
+#### Select entries in the demo library
 
 POST  http://localhost:23119/commands
 Content-Type: application/json
@@ -9,13 +22,4 @@ Content-Type: application/json
     "Corti_2009",
     "Keen_2001"
   ]
-}
-
-#### Focus current JabRef instance
-
-POST  http://localhost:23119/commands
-Content-Type: application/json
-
-{
-  "command": "focus"
 }

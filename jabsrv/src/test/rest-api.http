@@ -86,3 +86,18 @@ Accept: application/x-bibtex-library-csl+json
 ### GET not available library
 
 GET http://localhost:23119/libraries/notfound
+
+## Creation
+
+JabRef offers `current` for the currently selected tab
+
+### Add BibTeX to current library
+
+// Works in UI mode only
+
+POST http://localhost:23119/libraries/current/entries
+Content-Type: application/x-bibtex
+
+@article{demo,
+  title = {Added by REST}
+}

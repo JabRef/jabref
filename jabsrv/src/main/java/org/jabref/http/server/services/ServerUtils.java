@@ -63,6 +63,12 @@ public class ServerUtils {
         }
 
         if (filesToServe.isEmpty()) {
+            // empty filesToServe indicates GUI mode
+
+            if ("current".equals(id)) {
+                return srvStateManager.getActiveDatabase().orElseThrow(NotFoundException::new);
+            }
+
             return srvStateManager.getOpenDatabases().stream()
                                   .filter(context -> context.getDatabasePath().isPresent())
                                   .filter(context -> {
