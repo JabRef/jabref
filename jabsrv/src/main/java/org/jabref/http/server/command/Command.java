@@ -41,6 +41,8 @@ public abstract class Command {
                            .build();
         }
         uiMessageHandler.handleUiCommands(List.of(uiCommand));
-        return Response.noContent().build();
+
+        // RESTish response "accepted", because the UI processes the command asynchronously - and we do not know the result of the processing
+        return Response.accepted().build();
     }
 }
