@@ -3,11 +3,14 @@ package org.jabref.logic;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public sealed interface UiCommand {
     record BlankWorkspace() implements UiCommand {
     }
 
-    record JumpToEntryKey(String citationKey) implements UiCommand {
+    record SelectEntryKeys(List<String> citationKey) implements UiCommand {
     }
 
     record OpenLibraries(List<Path> toImport) implements UiCommand {

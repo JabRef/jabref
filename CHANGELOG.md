@@ -18,6 +18,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- REST-API: Command resource: `command` instead of `commandId`.
+
 ### Fixed
 
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)

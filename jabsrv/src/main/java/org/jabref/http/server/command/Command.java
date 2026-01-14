@@ -11,9 +11,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.hk2.api.ServiceLocator;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
+/// Example calls are documented at `jabsrv/src/test/commands.http`
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
-        property = "commandId")
+        property = "command")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = SelectEntriesCommand.class, name = "selectentries"),
         @JsonSubTypes.Type(value = AppendBibTeXCommand.class, name = "appendbibtex"),

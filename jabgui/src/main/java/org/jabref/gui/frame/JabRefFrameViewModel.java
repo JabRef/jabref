@@ -6,9 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -20,7 +22,6 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.cli.CliImportHelper;
-import org.jabref.logic.UiMessageHandler;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -30,6 +31,7 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.OpenDatabase;
@@ -46,6 +48,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,14 +194,14 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         // Handle jumpToEntry
         // Needs to go last, because it requires all libraries opened
         uiCommands.stream()
-                  .filter(UiCommand.JumpToEntryKey.class::isInstance)
-                  .map(UiCommand.JumpToEntryKey.class::cast)
-                  .map(UiCommand.JumpToEntryKey::citationKey)
+                  .filter(UiCommand.SelectEntryKeys.class::isInstance)
+                  .map(UiCommand.SelectEntryKeys.class::cast)
+                  .map(UiCommand.SelectEntryKeys::citationKey)
                   .filter(Objects::nonNull)
-                  .findAny().ifPresent(entryKey -> {
-                      LOGGER.debug("Jump to entry {} requested", entryKey);
+                  .findAny().ifPresent(entryKeys -> {
+                      LOGGER.debug("Jump to entry(s) {} requested", entryKeys);
                       // tabs must be present and contents async loaded for an entry to be selected
-                      waitForLoadingFinished(() -> jumpToEntry(entryKey));
+                      waitForLoadingFinished(() -> selectEntries(entryKeys));
                   });
     }
 
@@ -379,30 +382,42 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         });
     }
 
-    private void jumpToEntry(String entryKey) {
+    @NullMarked
+    private void selectEntries(List<String> entryKeys) {
         // check current library tab first
         LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
         List<LibraryTab> sortedTabs = tabContainer.getLibraryTabs().stream()
                                                   .sorted(Comparator.comparing(tab -> tab != currentLibraryTab))
                                                   .toList();
+        Set<String> keysToSelect = new HashSet<>(entryKeys);
+        LibraryTab firstFoundTab = null;
         for (LibraryTab libraryTab : sortedTabs) {
-            Optional<BibEntry> bibEntry = libraryTab.getDatabase()
-                                                    .getEntries().stream()
-                                                    .filter(entry -> entry.getCitationKey().orElse("")
-                                                                          .equals(entryKey))
-                                                    .findAny();
-            if (bibEntry.isPresent()) {
-                LOGGER.debug("Found entry {} in library tab {}", entryKey, libraryTab);
-                libraryTab.clearAndSelect(bibEntry.get());
-                tabContainer.showLibraryTab(libraryTab);
-                break;
+            List<BibEntry> entrysToSelectInCurrentTab = new ArrayList<>(keysToSelect.size());
+            for (BibEntry entry : libraryTab.getDatabase()
+                                            .getEntries()) {
+                Optional<String> citationKeyOptional = entry.getCitationKey();
+                if (citationKeyOptional.isEmpty()) {
+                    continue;
+                }
+                String citationKey = citationKeyOptional.get();
+                if (!keysToSelect.contains(citationKey)) {
+                    continue;
+                }
+                if (firstFoundTab != null) {
+                    firstFoundTab = libraryTab;
+                }
+                LOGGER.debug("Found entry {} in library tab {}", citationKey, libraryTab);
+                keysToSelect.remove(citationKey);
+                entrysToSelectInCurrentTab.add(entry);
             }
+            libraryTab.clearAndSelect(entrysToSelectInCurrentTab);
         }
-
         LOGGER.trace("End of loop");
-
-        if (stateManager.getSelectedEntries().isEmpty()) {
-            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
+        if (firstFoundTab != null) {
+            tabContainer.showLibraryTab(firstFoundTab);
+        }
+        for (String key : keysToSelect) {
+            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", key));
         }
     }
 }

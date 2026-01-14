@@ -1,18 +1,21 @@
-#### select different entries in the demo library
+#### select entries in the demo library
 
 POST  http://localhost:23119/commands
 Content-Type: application/json
-Accept: application/json
 
 {
-  "commandId": "selectentries",
-  "libraryId": "Chocolate.bib-670214c9",
+  "command": "selectentries",
   "citationKeys":[
     "Corti_2009",
     "Keen_2001"
-  ],
-  "entryIds":[
-    "00000010"
   ]
 }
 
+#### Focus current JabRef instance
+
+POST  http://localhost:23119/commands
+Content-Type: application/json
+
+{
+  "command": "focus"
+}
