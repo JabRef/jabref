@@ -2,8 +2,6 @@ package org.jabref.logic;
 
 import java.util.List;
 
-import org.jabref.logic.UiCommand;
-
 /**
  * Specifies an interface that can process either cli or remote commands to the ui
  * <p>
