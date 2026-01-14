@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
+- REST-API: More added more commands (`selectentries`, `open`, `focus`).
+- REST-API: Added the possibility to trigger the import dialogg
 
 ### Changed
 
