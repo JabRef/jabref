@@ -73,6 +73,8 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntriesResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
