@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 /// Manages the HttpServerThread through typical life cycle methods.
 ///
-/// open -> start -> stop
-/// openAndStart -> stop
+/// - open -> start -> stop
+/// - openAndStart -> stop
 ///
 /// Observer: isOpen, isNotStartedBefore
 public class HttpServerManager implements AutoCloseable {
