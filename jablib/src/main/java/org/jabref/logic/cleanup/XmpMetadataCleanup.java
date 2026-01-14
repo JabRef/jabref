@@ -3,7 +3,6 @@ package org.jabref.logic.cleanup;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,6 +12,7 @@ import javax.xml.transform.TransformerException;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -56,7 +56,11 @@ public class XmpMetadataCleanup implements CleanupJob {
 
         if (changed.get()) {
             // Since only metadata is removed, no field "changes" but we still return a list
-            return Collections.singletonList(new FieldChange(entry, StandardField.FILE, entry.getField(StandardField.FILE).orElse(null), entry.getField(StandardField.FILE).orElse(null)));
+            return List.of(new FieldChange(
+                    entry,
+                    StandardField.FILE,
+                    entry.getField(StandardField.FILE).orElse(StandardFileType.PDF.toString()),
+                    entry.getField(StandardField.FILE).orElse(StandardFileType.PDF.toString())));
         }
         return new ArrayList<>();
     }
