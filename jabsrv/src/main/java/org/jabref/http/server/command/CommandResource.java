@@ -26,7 +26,6 @@ public class CommandResource {
         try {
             Command command = objectMapper.readValue(jsonCommand, Command.class);
             command.setServiceLocator(serviceLocator);
-
             return command.execute();
         } catch (JacksonException e) {
             return Response.serverError().entity(e.getMessage()).build();
