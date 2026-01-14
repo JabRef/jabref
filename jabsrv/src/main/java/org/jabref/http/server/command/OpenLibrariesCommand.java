@@ -4,20 +4,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.UiMessageHandler;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.hk2.api.ServiceLocator;
 
 @JsonTypeName("open")
-public class OpenLibrariesCommand implements Command {
-
-    @JsonIgnore
-    private ServiceLocator serviceLocator;
+public class OpenLibrariesCommand extends Command {
 
     @JsonProperty
     private List<String> paths = new ArrayList<>();
@@ -30,8 +26,8 @@ public class OpenLibrariesCommand implements Command {
         UiMessageHandler handler = getServiceLocator().getService(UiMessageHandler.class);
         if (handler == null) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                          .entity("UiMessageHandler not available.")
-                          .build();
+                           .entity("UiMessageHandler not available.")
+                           .build();
         }
 
         List<Path> pathList = paths.stream()

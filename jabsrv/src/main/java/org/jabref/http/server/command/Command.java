@@ -1,7 +1,11 @@
 package org.jabref.http.server.command;
 
-import org.jabref.http.SrvStateManager;
+import java.util.List;
 
+import org.jabref.logic.UiCommand;
+import org.jabref.logic.UiMessageHandler;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.ws.rs.core.Response;
@@ -16,17 +20,25 @@ import org.glassfish.hk2.api.ServiceLocator;
         @JsonSubTypes.Type(value = OpenLibrariesCommand.class, name = "open"),
         @JsonSubTypes.Type(value = FocusCommand.class, name = "focus")
 })
-public interface Command {
+public abstract class Command {
 
-    default Response execute() {
-        return Response.serverError().build();
+    @JsonIgnore
+    private ServiceLocator serviceLocator;
+
+    public void setServiceLocator(ServiceLocator serviceLocator) {
+        this.serviceLocator = serviceLocator;
     }
 
-    void setServiceLocator(ServiceLocator serviceLocator);
+    public abstract Response execute();
 
-    ServiceLocator getServiceLocator();
-
-    default SrvStateManager getSrvStateManager() {
-        return getServiceLocator().getService(SrvStateManager.class);
+    protected Response execute(UiCommand uiCommand) {
+        UiMessageHandler uiMessageHandler = serviceLocator.getService(UiMessageHandler.class);
+        if (uiMessageHandler == null) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                           .entity("This command is not supported in CLI mode.")
+                           .build();
+        }
+        uiMessageHandler.handleUiCommands(List.of(uiCommand));
+        return Response.noContent().build();
     }
 }

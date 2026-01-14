@@ -16,15 +16,14 @@ public sealed interface UiCommand {
     record AppendToCurrentLibrary(List<Path> toAppend) implements UiCommand {
     }
 
-    record Focus() implements UiCommand {
-    }
-
-    /// @deprecated used by the browser extension only
-    @Deprecated
+    /// "Twin" to [#AppendToCurrentLibrary]. Accepts BibTeX as text instead stored in a file.
     record AppendBibTeXToCurrentLibrary(String bibtex) implements UiCommand {
     }
 
-    /// @deprecated used by the browser extension only
+    record Focus() implements UiCommand {
+    }
+
+    /// @deprecated used by the 2025 browser extension only
     @Deprecated
     record AppendFileOrUrlToCurrentLibrary(String location) implements UiCommand {
     }

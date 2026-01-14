@@ -10,6 +10,5 @@ import org.jabref.logic.UiCommand;
  * See {@link org.jabref.logic.remote.server.RemoteMessageHandler}
  */
 public interface UiMessageHandler {
-
     void handleUiCommands(List<UiCommand> uiCommands);
 }
