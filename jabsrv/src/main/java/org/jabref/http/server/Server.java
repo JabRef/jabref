@@ -84,11 +84,19 @@ public class Server {
 
     /// Entry point for the GUI
     public HttpServer run(SrvStateManager srvStateManager, URI uri) {
+        return run(srvStateManager, null, uri);
+    }
+
+    /// Entry point for the GUI with UiMessageHandler
+    public HttpServer run(SrvStateManager srvStateManager, Object uiMessageHandler, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
+        if (uiMessageHandler != null) {
+            ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler);
+        }
 
         return startServer(serviceLocator, uri);
     }

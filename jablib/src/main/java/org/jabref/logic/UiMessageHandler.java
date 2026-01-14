@@ -1,4 +1,4 @@
-package org.jabref.gui.frame;
+package org.jabref.logic;
 
 import java.util.List;
 

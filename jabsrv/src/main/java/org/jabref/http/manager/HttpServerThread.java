@@ -20,12 +20,18 @@ public class HttpServerThread extends Thread {
 
     private final Server server;
     private final SrvStateManager srvStateManager;
+    private final Object uiMessageHandler;
     private final URI uri;
 
     private HttpServer httpServer;
 
     public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, URI uri) {
+        this(cliPreferences, srvStateManager, null, uri);
+    }
+
+    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, Object uiMessageHandler, URI uri) {
         this.srvStateManager = srvStateManager;
+        this.uiMessageHandler = uiMessageHandler;
         this.uri = uri;
         this.server = new Server(cliPreferences);
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
@@ -34,7 +40,7 @@ public class HttpServerThread extends Thread {
     @Override
     public void run() {
         try {
-            httpServer = this.server.run(srvStateManager, uri);
+            httpServer = this.server.run(srvStateManager, uiMessageHandler, uri);
         } catch (ProcessingException e) {
             LOGGER.error("Failed to start HTTP server thread", e);
         }

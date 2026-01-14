@@ -16,7 +16,7 @@ import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.frame.UiMessageHandler;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;

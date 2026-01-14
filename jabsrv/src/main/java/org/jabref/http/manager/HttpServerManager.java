@@ -21,15 +21,16 @@ public class HttpServerManager implements AutoCloseable {
     private HttpServerThread httpServerThread;
 
     public synchronized void start(CliPreferences preferences, SrvStateManager srvStateManager, URI uri) {
+        start(preferences, srvStateManager, null, uri);
+    }
+
+    public synchronized void start(CliPreferences preferences, SrvStateManager srvStateManager, Object uiMessageHandler, URI uri) {
         if (httpServerThread != null) {
             LOGGER.warn("HTTP server manager already started, cannot start again.");
             return;
         }
 
-        httpServerThread = new HttpServerThread(preferences, srvStateManager, uri);
-        // This enqueues the thread to run in the background
-        // The JVM will take care of running it at some point in time in the future
-        // Thus, we cannot check directly if it really runs
+        httpServerThread = new HttpServerThread(preferences, srvStateManager, uiMessageHandler, uri);
         httpServerThread.start();
         LOGGER.debug("Triggered HTTP server start up.");
     }

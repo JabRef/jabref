@@ -20,6 +20,7 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.cli.CliImportHelper;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
