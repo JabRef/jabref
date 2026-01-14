@@ -2,15 +2,7 @@
 
 // This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
 
-// You can start an http server using following command:
-//
-// npx @jbangdev/jbang https://github.com/JabRef/jabref/blob/main/.jbang/JabSrvLauncher.java
-//
-// in case JBang is installed (https://www.jbang.dev/download/), following command works, too:
-//
-// jbang https://github.com/JabRef/jabref/blob/main/.jbang/JabSrvLauncher.java
-
-// Alternatively, you can push the green play button in org.jabref.http.server.cli.ServerCli.
+// Start the HTTP server using Gradle > JabRef > jabserv-cli > Tasks > application > run
 
 ### Get a HTML page asking the user to go to /libraries
 
