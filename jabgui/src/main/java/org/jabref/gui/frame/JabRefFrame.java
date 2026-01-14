@@ -157,7 +157,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 undoManager,
                 clipBoardManager,
                 taskExecutor);
-        Injector.setModelOrService(UiMessageHandler.class, viewModel);
+        Injector.setModelOrService(UiMessageHandler.class, this);
 
         FrameDndHandler frameDndHandler = new FrameDndHandler(
                 tabbedPane,

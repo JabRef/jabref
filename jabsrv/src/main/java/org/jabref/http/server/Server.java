@@ -19,6 +19,7 @@ import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
 import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -30,9 +31,12 @@ import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private final CliPreferences preferences;
@@ -44,7 +48,7 @@ public class Server {
     /// Entry point for the CLI
     public HttpServer run(List<Path> files, URI uri) {
         List<Path> filesToServeList;
-        if (files == null || files.isEmpty()) {
+        if (files.isEmpty()) {
             LOGGER.debug("No library available to serve, serving the demo library...");
             // Server.class.getResource("...") is always null here, thus trying relative path
             // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
@@ -88,14 +92,14 @@ public class Server {
     }
 
     /// Entry point for the GUI with UiMessageHandler
-    public HttpServer run(SrvStateManager srvStateManager, Object uiMessageHandler, URI uri) {
+    public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
         if (uiMessageHandler != null) {
-            ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler);
+            ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler, "uimessagehandler", UiMessageHandler.class);
         }
 
         return startServer(serviceLocator, uri);

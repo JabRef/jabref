@@ -31,7 +31,6 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.UiCommand;
-import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.OpenDatabase;
@@ -52,7 +51,7 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JabRefFrameViewModel implements UiMessageHandler {
+public class JabRefFrameViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
     private final GuiPreferences preferences;
@@ -152,15 +151,12 @@ public class JabRefFrameViewModel implements UiMessageHandler {
      *
      * @param uiCommands to be handled
      */
-    @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
             checkForBibInUpperDir();
             return;
         }
-
-        assert !uiCommands.isEmpty();
 
         // Handle blank workspace
         boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
