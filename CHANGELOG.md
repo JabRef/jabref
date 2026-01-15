@@ -15,13 +15,17 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
+- REST-API: Added more commands (`selectentries`, `open`, `focus`).
+- REST-API: Added the possibility to trigger the import dialog
 
 ### Changed
 
 - We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog [#11791](https://github.com/JabRef/jabref/issues/11791)
+- REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 
 ### Fixed
 
+- Fixed redundant action icons showing in empty identifier fields (DOI, Eprint, ISBN) [#14821](https://github.com/JabRef/jabref/pull/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
 - We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
