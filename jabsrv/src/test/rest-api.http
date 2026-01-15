@@ -2,7 +2,7 @@
 
 // This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
 
-// Start the HTTP server using Gradle > JabRef > jabserv-cli > Tasks > application > run
+// Start the HTTP server using Gradle > JabRef > jabsrv-cli > Tasks > application > run
 
 ### Get a HTML page asking the user to go to /libraries
 
