@@ -3,6 +3,8 @@ package org.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -15,7 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -25,12 +26,14 @@ import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,38 +78,100 @@ public class FileUtil {
     /**
      * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
-     * @return the extension (without leading dot), trimmed and in lowercase.
-     */
-    public static Optional<String> getFileExtension(String fileName) {
-        int dotPosition = fileName.lastIndexOf('.');
-        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
+     * In case the filename starts with a "." and only has one ".", the part after the dot is NOT the extension
      *
      * @return the extension (without leading dot), trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(Path file) {
+    public static Optional<String> getFileExtension(@NonNull String fileName) {
+        Path realFileName = Path.of(fileName.trim()).getFileName();
+        if (realFileName == null) {
+            return Optional.empty();
+        }
+        String realFileNameString = realFileName.toString();
+        String extension = FilenameUtils.getExtension(realFileNameString);
+        if (StringUtil.isNullOrEmpty(extension)) {
+            return Optional.empty();
+        }
+        if (realFileNameString.startsWith(".") && (realFileNameString.length() == extension.length() + 1)) {
+            // In case ".tmp" is asked for the extension, the answer is empty (and not tmp)
+            return Optional.empty();
+        }
+        return Optional.of(extension);
+    }
+
+    /**
+     * Returns the extension of a file or Optional.empty() if the file does not have one (no "." in name).
+     *
+     * @return the extension (without leading dot), trimmed and in lowercase
+     */
+    public static Optional<String> getFileExtension(@NonNull Path file) {
         return getFileExtension(file.getFileName().toString());
     }
 
-    /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
-     */
-    public static String getBaseName(String fileNameWithExtension) {
-        return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
+    /// Returns the name part of a file name.
+    ///
+    /// Typically, this is everything before last ".".
+    /// Exception: if only a single dot is contained and nothing is before the last dot - all is returned
+    ///
+    /// - `test.txt` -> `test`
+    /// - `.tmp` -> `.tmp` (Exception - different than [FilenameUtils#getBaseName(String)])
+    public static String getBaseName(String fileName) {
+        Path path;
+        try {
+            path = Path.of(fileName.trim());
+        } catch (InvalidPathException e) {
+            return fileName;
+        }
+        String realFileName = path.getFileName().toString();
+        String baseName = FilenameUtils.getBaseName(realFileName);
+        if ("".equals(baseName)) {
+            return realFileName;
+        }
+        return baseName;
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * @return the name part of a file name (i.e., everything before last ".")
      */
     public static String getBaseName(Path fileNameWithExtension) {
         return getBaseName(fileNameWithExtension.getFileName().toString());
+    }
+
+    /**
+     * Extracts the filename from a URL, which is found between the last slash '/' and first query '?'.
+     * Does not check that the file is a valid URL.
+     *
+     * @param link the URL string to extract the filename from
+     * @return the extracted filename, or Optional.empty if there is none.
+     */
+    public static Optional<String> getFileNameFromUrl(@NonNull String link) {
+        // Apache Commons IO has no good support; FilenameUtils.getName(link) doesn't strip query parameters
+        // Source: https://stackoverflow.com/a/33871029/873282
+        URI uri;
+        try {
+            uri = new URI(link);
+        } catch (URISyntaxException e) {
+            LOGGER.warn("Was not a valid URL {}", link, e);
+            return Optional.empty();
+        }
+        String pathFragment = uri.getPath();
+        Path path;
+        try {
+            path = Path.of(pathFragment);
+        } catch (InvalidPathException e) {
+            // Try to keep something of the invalid path fragment
+            return Optional.of(FileNameCleaner.cleanFileName(pathFragment));
+        }
+        Path fileName = path.getFileName();
+        if (fileName == null) {
+            // Happens if there is no path, e.g., at https://example.com/
+            return Optional.empty();
+        }
+        String fileNameString = fileName.toString();
+        if (fileNameString.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(fileNameString);
     }
 
     /**
@@ -347,11 +412,7 @@ public class FileUtil {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
         if (targetName.isEmpty() || "-".equals(targetName)) {
-            targetName = entry.getCitationKey().orElse("default");
-        }
-
-        if ("default".equals(targetName)) {
-            return Optional.empty();
+            return entry.getCitationKey().map(FileNameCleaner::cleanFileName);
         }
 
         // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename

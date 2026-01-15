@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
@@ -76,7 +77,7 @@ class EuropePmcFetcherTest {
     @Test
     void searchByDoiTermReturnsWijedasa() throws FetcherException {
         // Use Europe PMC fielded search: DOI
-        var results = fetcher.performSearch("doi:10.1111/gcb.13516");
+        List<BibEntry> results = fetcher.performSearch("doi:10.1111/gcb.13516");
         BibEntry first = results.getFirst();
         first.clearField(StandardField.ABSTRACT);
         assertEquals(entryWijedasa, first);
