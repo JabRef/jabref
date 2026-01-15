@@ -6,9 +6,9 @@ import java.util.List;
 import javafx.application.Platform;
 
 import org.jabref.cli.ArgumentProcessor;
-import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
 
 import org.slf4j.Logger;
