@@ -29,8 +29,6 @@
           <emptyLine />
           <package name="org.jabref" withSubpackages="true" static="false" />
           <emptyLine />
-          <package name="" withSubpackages="true" static="false" />
-          <emptyLine />
           <package name="" withSubpackages="true" static="true" />
         </value>
       </option>
