@@ -335,7 +335,8 @@ public class XmpUtilWriter {
         // Reason: Apache PDFBox does not support writing while the file is opened
         // See https://issues.apache.org/jira/browse/PDFBOX-4028
         Path newFile = Files.createTempFile("JabRef", "pdf");
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
+        FileUtil.copyFile(path, newFile, true);
+        try (PDDocument document = Loader.loadPDF(newFile.toFile())) {
             if (document.isEncrypted()) {
                 throw new EncryptedPdfsNotSupportedException();
             }
@@ -343,8 +344,7 @@ public class XmpUtilWriter {
             if (catalog.getMetadata() != null) {
                 catalog.setMetadata(null);
             }
-            document.save(newFile.toFile());
-            FileUtil.copyFile(newFile, path, true);
+            document.save(path.toFile());
         } catch (IOException e) {
             LOGGER.debug("Could not remove XMP metadata", e);
             throw new TransformerException(

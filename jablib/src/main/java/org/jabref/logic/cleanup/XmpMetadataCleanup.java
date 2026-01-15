@@ -13,6 +13,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.xmp.XmpUtilShared;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -44,12 +45,14 @@ public class XmpMetadataCleanup implements CleanupJob {
         for (LinkedFile file : files) {
             Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
             filePath.ifPresent(path -> {
-                try {
-                    XmpUtilWriter.removeXmpMetadata(path);
-                    changed.set(true);
-                } catch (IOException | TransformerException e) {
-                    LOGGER.error("Problem removing XMP metadata from file {}", path, e);
-                    failures.add(new JabRefException(Localization.lang("Problem removing XMP metadata from file: %0", path.toString()), e));
+                if (XmpUtilShared.hasMetadata(path)) {
+                    try {
+                        XmpUtilWriter.removeXmpMetadata(path);
+                        changed.set(true);
+                    } catch (IOException | TransformerException e) {
+                        LOGGER.error("Problem removing XMP metadata from file {}", path, e);
+                        failures.add(new JabRefException(Localization.lang("Problem removing XMP metadata from file: %0", path.toString()), e));
+                    }
                 }
             });
         }
