@@ -15,19 +15,7 @@ jobs:
   generate-and-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'corretto'
-          java-version: '24'
-          check-latest: true
-          cache: 'gradle'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+      - uses: ./.github/actions/setup-without-gitversion
 
       - name: Generate aggregated CycloneDX SBOM
         run: ./gradlew cyclonedxBom
