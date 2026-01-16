@@ -36,6 +36,7 @@
       </option>
       <option name="RECORD_COMPONENTS_WRAP" value="0" />
       <option name="MULTI_CATCH_TYPES_WRAP" value="0" />
+      <option name="ENABLE_JAVADOC_FORMATTING" value="false" />
     </JavaCodeStyleSettings>
     <codeStyleSettings language="JAVA">
       <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
