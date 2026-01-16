@@ -8,35 +8,41 @@ The source is located in the project `jabsrv`.
 
 The resource for a library is implemented at [`org.jabref.http.server.resources.LibraryResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java).
 
-## Start http server
+Some offered resources and possible interactions are shown at [`jabsrv/src/test/*.http`](../../jabsrv/srv/test/) using [IntelliJ's http syntax](https://www.jetbrains.com/help/idea/exploring-http-syntax.html).
 
-### Starting with IntelliJ
+## Design principles
 
-The class starting the server is located in the project `jabsrv-cli` and is called `org.jabref.http.server.cli.ServerCli`.
+The JabRef http API tries to be "RESTful".
+It wants to reach [Level 2 of Richardson's maturity model](https://martinfowler.com/articles/richardsonMaturityModel.html).
 
-Test files to server can be passed as arguments.
-If that list is also empty, the file `src/main/resources/org/jabref/http/server/http-server-demo.bib` is served.
+The main reason to follow this principle is to be consistent to other RESTful HTTP APIs.
 
-### Starting with JBang
+See [`rest-api.http`](../../jabsrv/src/test/rest-api.http) for example interactions.
 
-In case you want to interact only with the http server and do not want to set up or run IntelliJ, [JBang](https://www.jbang.dev/download/) can be used.
+Recommended reading:
 
-In the repository root, run following command:
+- [REST API Design Rulebook](https://www.oreilly.com/library/view/rest-api-design/9781449317904/)
+- [RESTful Web Services Cookbook](https://www.oreilly.com/library/view/restful-web-services/9780596809140/)
+
+### Limits of RESTful HTTP design
+
+RESTful HTTP design reaches its limits when doing "commands".
+For instance, when focussing an entry, one should not `POST` `command: select` to an entry resource.
+We opted to introduce a `command` resource to serve UI commands, such as selecting and entry or focusing the current JabRef instance.
+
+See [`commands.http`](../../jabsrv/src/test/commands.http) for example interactions.
+
+### Used libraries
+
+To be standards based, [JAX-RS](https://projects.eclipse.org/projects/ee4j.rest) is used as the API specification language.
+As implementation of JAX-RS, the reference implementation [Jersey](https://eclipse-ee4j.github.io/jersey/) is used.
+
+## Starting the http server
+
+In IntelliJ: Gradle > JabRef > jabsrv-cli > Tasks > application > run
 
 ```shell
-jbang .jbang/JabSrvLauncher.java
-```
-
-JBang also offers running without explicit installation, if you have node installed (and WSL available in the case of Windows):
-
-```shell
-npx @jbangdev/jbang .jbang/JabSrvLauncher.java
-```
-
-### Starting with gradle
-
-```shell
-./gradlew run :jabsrv:run
+./gradlew :jabsrv-cli:run
 ```
 
 Gradle output:
@@ -53,23 +59,20 @@ Stop JabSrv using Ctrl+C
 > :jabsrv:run
 ```
 
-IntelliJ output, if `org.jabref.http.server.ServerCli#main` is executed:
-
-```shell
-DEBUG: Starting server...
-2023-04-22 11:44:59 [ForkJoinPool.commonPool-worker-1] org.glassfish.grizzly.http.server.NetworkListener.start()
-INFO: Started listener bound to [localhost:6051]
-2023-04-22 11:44:59 [ForkJoinPool.commonPool-worker-1] org.glassfish.grizzly.http.server.HttpServer.start()
-INFO: [HttpServer] Started.
-2023-04-22 11:44:59 [ForkJoinPool.commonPool-worker-1] org.jabref.http.server.ServerCli.lambda$startServer$4()
-DEBUG: Server started.
-```
+Navigate to <http://localhost:23119/libraries> to see the last opened libraries.
 
 ## Served libraries
 
-The last opened libraries are served.
-`demo` serves Chocolate.bib.
-Additional libraries can be served by passing them as arguments.
+The last opened libraries are served as default.
+Additionally, more files can be passed as arguments.
+If that list is also empty, the last opened libraries are served.
+
+At the library resources, the library name `demo` serves `Chocolate.bib`.
+The library name `current` denotes the currently focussed library in JabRef.
+
+```shell
+./gradlew :jabsrv-cli:run --args="../jablib/src/test/resources/testbib/complex.bib"
+```
 
 ## Developing with IntelliJ
 
