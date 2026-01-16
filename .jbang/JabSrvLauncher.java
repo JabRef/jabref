@@ -27,7 +27,7 @@
 //DEPS org.apache.commons:commons-lang3:3.20.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
 //DEPS org.bouncycastle:bcprov-jdk18on:1.83
-//DEPS org.postgresql:postgresql:42.7.8
+//DEPS org.postgresql:postgresql:42.7.9
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
