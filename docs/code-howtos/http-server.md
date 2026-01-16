@@ -12,10 +12,10 @@ Some offered resources and possible interactions are shown at [`jabsrv/src/test/
 
 ## Design principles
 
-The JabRef http API tries to be "RESTful".
+The JabRef HTTP API tries to be "RESTful".
 It wants to reach [Level 2 of Richardson's maturity model](https://martinfowler.com/articles/richardsonMaturityModel.html).
 
-The main reason to follow this principle is to be consistent to other RESTful HTTP APIs.
+The main reason to follow this principle is to be consistent with other RESTful HTTP APIs.
 
 See [`rest-api.http`](../../jabsrv/src/test/rest-api.http) for example interactions.
 
@@ -28,7 +28,7 @@ Recommended reading:
 
 RESTful HTTP design reaches its limits when doing "commands".
 For instance, when focussing an entry, one should not `POST` `command: select` to an entry resource.
-We opted to introduce a `command` resource to serve UI commands, such as selecting and entry or focusing the current JabRef instance.
+So, we opted to introduce a `command` resource to serve UI commands, such as selecting and entry or focussing the current JabRef instance.
 
 See [`commands.http`](../../jabsrv/src/test/commands.http) for example interactions.
 
