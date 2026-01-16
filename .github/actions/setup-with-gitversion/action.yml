@@ -10,4 +10,4 @@ runs:
     - name: Run GitVersion
       id: gitversion
       uses: gittools/actions/gitversion/execute@v3.2.1
-    - uses: ./.github/actions/gradle-setup
+    - uses: ./.github/actions/setup-gradle
