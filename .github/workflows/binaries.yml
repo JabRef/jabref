@@ -238,6 +238,9 @@ jobs:
       - name: Install pigz and cache (linux)
         if: (startsWith(matrix.os, 'ubuntu'))
         uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pigz
+          version: 1.0
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
@@ -252,16 +255,6 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
       - uses: ./.github/actions/setup-gradle
-      - name: Install pigz and cache (linux)
-        if: (startsWith(matrix.os, 'ubuntu'))
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
 
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
