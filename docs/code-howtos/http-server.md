@@ -17,7 +17,7 @@ It wants to reach [Level 2 of Richardson's maturity model](https://martinfowler.
 
 The main reason to follow this principle is to be consistent with other RESTful HTTP APIs.
 
-See [`rest-api.http`](../../jabsrv/src/test/rest-api.http) for example interactions.
+See [`jabsrv/src/test/rest-api.http`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/test/rest-api.http) for example interactions.
 
 Recommended reading:
 
@@ -30,7 +30,7 @@ RESTful HTTP design reaches its limits when doing "commands".
 For instance, when focussing an entry, one should not `POST` `command: select` to an entry resource.
 So, we opted to introduce a `command` resource to serve UI commands, such as selecting and entry or focussing the current JabRef instance.
 
-See [`commands.http`](../../jabsrv/src/test/commands.http) for example interactions.
+See [`jabsrv/src/test/commands.http`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/test/commands.http) for example interactions.
 
 ### Used libraries
 
