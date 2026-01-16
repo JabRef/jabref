@@ -84,6 +84,12 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - uses: ./.github/actions/setup-with-gitversion
 
       # region Publish JabLib on Maven Central

@@ -44,7 +44,12 @@ jobs:
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
@@ -52,7 +57,12 @@ jobs:
     name: OpenRewrite
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
@@ -77,7 +87,12 @@ jobs:
     name: Modernizer
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -169,7 +184,12 @@ jobs:
     name: JavaDoc
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - run: ./gradlew javadoc
 
   tests:
@@ -179,7 +199,12 @@ jobs:
       matrix:
         module: [jablib, jabkit, jabsrv, jabgui]
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -202,7 +227,12 @@ jobs:
       matrix:
         module: [jablib]
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
         run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -212,7 +242,12 @@ jobs:
     name: "JabKit Smoke Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - run: ./gradlew :jabkit:runJabKitPortableSmokeTest
 
   databasetests:
@@ -233,7 +268,12 @@ jobs:
     steps:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Run tests on PostgreSQL
         run: ./gradlew :jablib:databaseTest --rerun-tasks
         env:
@@ -272,7 +312,7 @@ jobs:
           files_ignore: |
             jablib/src/main/java/**/*-*.java
 
-      - uses: ./.github/actions/setup-without-gitversion
+      - uses: ./.github/actions/setup-gradle
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
 
       # Build all JBang scripts
@@ -323,7 +363,7 @@ jobs:
             jablib-examples/jbang/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
-      - uses: ./.github/actions/setup-without-gitversion
+      - uses: ./.github/actions/setup-gradle
       - name: Modify ${{ matrix.script }} to include changed classes
         shell: bash
         # We always run, because changes in jabls, jabsrv also could cause JBang to fail

@@ -48,7 +48,12 @@ jobs:
     name: Fetcher tests
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:

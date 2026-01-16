@@ -15,7 +15,12 @@ jobs:
   generate-and-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-without-gitversion
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
 
       - name: Generate aggregated CycloneDX SBOM
         run: ./gradlew cyclonedxBom
