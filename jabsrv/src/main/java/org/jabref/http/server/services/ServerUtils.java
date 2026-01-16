@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -62,7 +63,13 @@ public class ServerUtils {
             }
         }
 
-        if (filesToServe.isEmpty()) {
+        if (!(srvStateManager instanceof JabRefSrvStateManager)) {
+            // GUI mode
+
+            if ("current".equals(id)) {
+                return srvStateManager.getActiveDatabase().orElseThrow(NotFoundException::new);
+            }
+
             return srvStateManager.getOpenDatabases().stream()
                                   .filter(context -> context.getDatabasePath().isPresent())
                                   .filter(context -> {
