@@ -16,8 +16,10 @@ import org.jabref.model.entry.BibEntry;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
+import org.jspecify.annotations.NullMarked;
 
-public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser implements PlainCitationParser {
+@NullMarked
+public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser {
     private final AiTemplatesService aiTemplatesService;
     private final ImportFormatPreferences importFormatPreferences;
     private final ChatModel llm;
@@ -57,6 +59,18 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
         }
     }
 
+    private String getBibtexStringFromLlm(String searchQuery) {
+        String systemMessage = aiTemplatesService.makeCitationParsingSystemMessage();
+        String userMessage = aiTemplatesService.makeCitationParsingUserMessage(searchQuery);
+
+        return llm.chat(
+                List.of(
+                        new SystemMessage(systemMessage),
+                        new UserMessage(userMessage)
+                )
+        ).aiMessage().text();
+    }
+
     @Override
     public List<BibEntry> parseMultiplePlainCitations(String text) throws FetcherException {
         String systemMessage = aiTemplatesService.makeCitationParsingSystemMessage();
@@ -78,17 +92,5 @@ public class LlmPlainCitationParser extends PdfImporterWithPlainCitationParser i
         }
         entries.forEach(entry -> eprintCleanup.cleanup(entry));
         return entries;
-    }
-
-    private String getBibtexStringFromLlm(String searchQuery) {
-        String systemMessage = aiTemplatesService.makeCitationParsingSystemMessage();
-        String userMessage = aiTemplatesService.makeCitationParsingUserMessage(searchQuery);
-
-        return llm.chat(
-                List.of(
-                        new SystemMessage(systemMessage),
-                        new UserMessage(userMessage)
-                )
-        ).aiMessage().text();
     }
 }

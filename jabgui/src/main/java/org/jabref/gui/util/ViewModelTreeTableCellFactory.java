@@ -22,9 +22,15 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Callback<S, String> toTooltip;
+    private Callback<S, String> toStyleClass;
 
     public ViewModelTreeTableCellFactory<S> withText(Callback<S, String> toText) {
         this.toText = toText;
+        return this;
+    }
+
+    public ViewModelTreeTableCellFactory<S> withStyleClass(Callback<S, String> toStyleClass) {
+        this.toStyleClass = toStyleClass;
         return this;
     }
 
@@ -75,6 +81,9 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));
+                    }
+                    if (toStyleClass != null) {
+                        getStyleClass().add(toStyleClass.call(viewModel));
                     }
                 }
             }

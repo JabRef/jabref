@@ -80,10 +80,12 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getResetIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> evt -> keyBinding.resetToDefault())
+                .withStyleClass(keyBinding -> "keybinding-table-icon-cell")
                 .install(resetColumn);
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getClearIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> evt -> keyBinding.clear())
+                .withStyleClass(keyBinding -> "keybinding-table-icon-cell")
                 .install(clearColumn);
 
         viewModel.keyBindingPresets().forEach(preset -> presetsButton.getItems().add(createMenuItem(preset)));

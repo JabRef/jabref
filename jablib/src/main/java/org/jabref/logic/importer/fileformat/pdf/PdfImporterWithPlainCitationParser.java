@@ -9,7 +9,9 @@ import org.jabref.logic.importer.plaincitation.ReferencesBlockFromPdfFinder;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class PdfImporterWithPlainCitationParser extends BibliographyFromPdfImporter implements PlainCitationParser {
 
     @Override
