@@ -26,7 +26,7 @@ Recommended reading:
 
 ### Limits of RESTful HTTP design
 
-RESTful HTTP design reaches its limits when doing "commands".
+RESTful HTTP design reaches its limits when performing "commands".
 For instance, when focussing an entry, one should not `POST` `command: select` to an entry resource.
 So, we opted to introduce a `command` resource to serve UI commands, such as selecting and entry or focussing the current JabRef instance.
 
