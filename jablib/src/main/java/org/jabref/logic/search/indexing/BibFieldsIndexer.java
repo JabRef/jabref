@@ -307,36 +307,29 @@ public class BibFieldsIndexer {
     }
 
     private void insertField(BibEntry entry, Field field) {
-        String insertFieldQuery = """
-                INSERT INTO %s ("%s", "%s", "%s", "%s")
-                VALUES (?, ?, ?, ?)
-                """.formatted(
-                schemaMainTableReference,
-                ENTRY_ID,
-                FIELD_NAME,
-                FIELD_VALUE_LITERAL,
-                FIELD_VALUE_TRANSFORMED);
-
-        // Inserts or updates date-related fields (e.g., date, year, month, day) into the index.
-        // If a conflict occurs (e.g., the same ENTRY_ID and FIELD_NAME already exist),
-        // the existing values are overwritten with the new ones to ensure the latest data is stored.
-        String insertDateFieldQuery = """
-                INSERT INTO %s ("%s", "%s", "%s", "%s")
-                VALUES (?, ?, ?, ?)
-                ON CONFLICT ("%s", "%s")
-                DO UPDATE SET "%s" = EXCLUDED."%s", "%s" = EXCLUDED."%s"
-                """.formatted(
-                schemaMainTableReference,
-                ENTRY_ID,
-                FIELD_NAME,
-                FIELD_VALUE_LITERAL,
-                FIELD_VALUE_TRANSFORMED,
-                ENTRY_ID, FIELD_NAME,
-                FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
-                FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
+        if (!entry.hasField(field)) {
+            LOGGER.warn("Entry {} does not have field {}", entry.getCitationKey().orElseGet(() -> entry.getAuthorTitleYear()), field.getName());
+        }
 
         String entryId = entry.getId();
         if (DATE_FIELDS.contains(field)) {
+            // Inserts or updates date-related fields (e.g., date, year, month, day) into the index.
+            // If a conflict occurs (e.g., the same ENTRY_ID and FIELD_NAME already exist),
+            // the existing values are overwritten with the new ones to ensure the latest data is stored.
+            String insertDateFieldQuery = """
+                    INSERT INTO %s ("%s", "%s", "%s", "%s")
+                    VALUES (?, ?, ?, ?)
+                    ON CONFLICT ("%s", "%s")
+                    DO UPDATE SET "%s" = EXCLUDED."%s", "%s" = EXCLUDED."%s"
+                    """.formatted(
+                    schemaMainTableReference,
+                    ENTRY_ID,
+                    FIELD_NAME,
+                    FIELD_VALUE_LITERAL,
+                    FIELD_VALUE_TRANSFORMED,
+                    ENTRY_ID, FIELD_NAME,
+                    FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
+                    FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {
                 for (Field dateField : DATE_FIELDS) {
                     Optional<String> resolvedDateValue = entry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
@@ -365,9 +358,10 @@ public class BibFieldsIndexer {
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(upsertFieldQuery)) {
                 String value = entry.getField(field).orElse("");
-
                 Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-                assert resolvedFieldLatexFree.isPresent();
+                if (resolvedFieldLatexFree.isEmpty()) {
+                    LOGGER.warn("Could not resolve field at entry {} for field {} - current value '{}'", entry.getCitationKey().orElseGet(() -> entry.getAuthorTitleYear()), field.getName(), value);
+                }
                 addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
                 preparedStatement.executeBatch();
             } catch (SQLException e) {

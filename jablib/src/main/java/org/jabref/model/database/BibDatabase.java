@@ -71,12 +71,12 @@ public class BibDatabase {
     // Reverse index for citation links
     private final Map<String, Set<BibEntry>> citationIndex = new ConcurrentHashMap<>();
 
-    private String preamble;
+    @Nullable private String preamble;
 
     // All file contents below the last entry in the file
     private String epilog = "";
 
-    private String sharedDatabaseID;
+    @Nullable private String sharedDatabaseID;
 
     private String newLineSeparator = System.lineSeparator();
 
@@ -301,22 +301,18 @@ public class BibDatabase {
         });
     }
 
-    /**
-     * Returns the database's preamble.
-     * If the preamble text consists only of whitespace, then also an empty optional is returned.
-     */
+    /// Returns the database's preamble.
+    /// If the preamble text consists only of whitespace, then also an empty optional is returned.
+    @NonNull
     public synchronized Optional<String> getPreamble() {
-        if (StringUtil.isBlank(preamble)) {
-            return Optional.empty();
-        } else {
-            return Optional.of(preamble);
-        }
+        return Optional.ofNullable(preamble)
+                       .filter(StringUtil::isNotBlank);
     }
 
     /**
      * Sets the database's preamble.
      */
-    public synchronized void setPreamble(String preamble) {
+    public synchronized void setPreamble(@Nullable String preamble) {
         this.preamble = preamble;
     }
 
@@ -490,22 +486,21 @@ public class BibDatabase {
         return resultingEntry;
     }
 
-    /**
-     * If the label represents a string contained in this database, returns
-     * that string's content. Resolves references to other strings, taking
-     * care not to follow a circular reference pattern.
-     * If the string is undefined, returns null.
-     */
-    private String resolveString(@NonNull String label, @NonNull Set<String> usedIds, @NonNull Set<String> allUsedIds) {
+    /// If the label represents a string contained in this database, returns
+    /// that string's content. Resolves references to other strings, taking
+    /// care not to follow a circular reference pattern.
+    /// If the string is undefined, returns null.
+    @NonNull
+    private Optional<String> resolveString(@NonNull String label, @NonNull Set<String> usedIds, @NonNull Set<String> allUsedIds) {
         for (BibtexString string : bibtexStrings.values()) {
             if (string.getName().equalsIgnoreCase(label)) {
-                // First check if this string label has been resolved
+                // First, check if this string label has been resolved
                 // earlier in this recursion. If so, we have a
-                // circular reference, and have to stop to avoid
+                // circular reference and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
                     LOGGER.info("Stopped due to circular reference in strings: {}", label);
-                    return label;
+                    return Optional.of(label);
                 }
                 // If not, log this string's ID now.
                 usedIds.add(string.getId());
@@ -520,14 +515,14 @@ public class BibDatabase {
                 // ID again:
                 usedIds.remove(string.getId());
 
-                return result;
+                return Optional.of(result);
             }
         }
 
         // If we get to this point, the string has obviously not been defined locally.
         // Check if one of the standard BibTeX month strings has been used:
         Optional<Month> month = Month.getMonthByShortName(label);
-        return month.map(Month::getFullName).orElse(null);
+        return month.map(Month::getFullName);
     }
 
     private String resolveContent(String result, Set<String> usedIds, Set<String> allUsedIds) {
@@ -547,16 +542,16 @@ public class BibDatabase {
                     // We found the boundaries of the string ref,
                     // now resolve that one.
                     String refLabel = res.substring(next + 1, stringEnd);
-                    String resolved = resolveString(refLabel, usedIds, allUsedIds);
+                    Optional<String> resolved = resolveString(refLabel, usedIds, allUsedIds);
 
-                    if (resolved == null) {
+                    if (resolved.isEmpty()) {
                         // Could not resolve string. Display the #
                         // characters rather than removing them:
                         newRes.append(res, next, stringEnd + 1);
                     } else {
                         // The string was resolved, so we display its meaning only,
                         // stripping the # characters signifying the string label:
-                        newRes.append(resolved);
+                        newRes.append(resolved.get());
                     }
                     piv = stringEnd + 1;
                 } else {
