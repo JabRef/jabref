@@ -53,28 +53,7 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:

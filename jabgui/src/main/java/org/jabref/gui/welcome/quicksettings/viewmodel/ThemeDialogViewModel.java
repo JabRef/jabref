@@ -1,5 +1,6 @@
 package org.jabref.gui.welcome.quicksettings.viewmodel;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javafx.beans.property.ObjectProperty;
@@ -80,8 +81,7 @@ public class ThemeDialogViewModel extends AbstractViewModel {
 
     public boolean isValidConfiguration() {
         if (selectedThemeProperty.get() == ThemeTypes.CUSTOM) {
-            return !customPathProperty.get().trim().isEmpty() &&
-                    Path.of(customPathProperty.get()).toFile().exists();
+            return !customPathProperty.get().trim().isEmpty() && Files.exists(Path.of(customPathProperty.get()));
         }
         return selectedThemeProperty.get() != null;
     }

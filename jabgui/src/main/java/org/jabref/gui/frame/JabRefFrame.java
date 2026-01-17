@@ -54,6 +54,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -156,7 +157,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 undoManager,
                 clipBoardManager,
                 taskExecutor);
-        Injector.setModelOrService(UiMessageHandler.class, viewModel);
+        Injector.setModelOrService(UiMessageHandler.class, this);
 
         FrameDndHandler frameDndHandler = new FrameDndHandler(
                 tabbedPane,
@@ -693,11 +694,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
-        if (uiCommands.stream().anyMatch(UiCommand.Focus.class::isInstance)) {
-            mainStage.toFront();
-            return;
-        }
-        viewModel.handleUiCommands(uiCommands);
+        Platform.runLater(() -> {
+            if (uiCommands.stream().anyMatch(UiCommand.Focus.class::isInstance)) {
+                mainStage.toFront();
+            }
+            viewModel.handleUiCommands(uiCommands);
+        });
     }
 
     /**

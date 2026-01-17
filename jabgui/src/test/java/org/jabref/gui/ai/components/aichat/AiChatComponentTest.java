@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
@@ -95,14 +94,11 @@ class AiChatComponentTest {
     private AiChatComponent createComponent() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         final AiChatComponent[] holder = new AiChatComponent[1];
-        StateManager mockStateManager = mock(StateManager.class);
-        when(mockStateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList());
         Platform.runLater(() -> {
             holder[0] = new AiChatComponent(
                     aiService,
                     new SimpleStringProperty("entry"),
                     FXCollections.observableArrayList(),
-                    mockStateManager,
                     FXCollections.observableArrayList(),
                     bibDatabaseContext,
                     mock(BibEntryTypesManager.class),

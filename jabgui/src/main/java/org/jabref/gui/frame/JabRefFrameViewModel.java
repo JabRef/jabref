@@ -6,9 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -45,10 +47,11 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JabRefFrameViewModel implements UiMessageHandler {
+public class JabRefFrameViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
     private final GuiPreferences preferences;
@@ -146,17 +149,16 @@ public class JabRefFrameViewModel implements UiMessageHandler {
      * Handles commands submitted by the command line or by the remote host to be executed in the ui
      * Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
      *
+     * Does NOT handle focus - this is done in JabRefFrame
+     *
      * @param uiCommands to be handled
      */
-    @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
             checkForBibInUpperDir();
             return;
         }
-
-        assert !uiCommands.isEmpty();
 
         // Handle blank workspace
         boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
@@ -190,14 +192,14 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         // Handle jumpToEntry
         // Needs to go last, because it requires all libraries opened
         uiCommands.stream()
-                  .filter(UiCommand.JumpToEntryKey.class::isInstance)
-                  .map(UiCommand.JumpToEntryKey.class::cast)
-                  .map(UiCommand.JumpToEntryKey::citationKey)
+                  .filter(UiCommand.SelectEntryKeys.class::isInstance)
+                  .map(UiCommand.SelectEntryKeys.class::cast)
+                  .map(UiCommand.SelectEntryKeys::citationKey)
                   .filter(Objects::nonNull)
-                  .findAny().ifPresent(entryKey -> {
-                      LOGGER.debug("Jump to entry {} requested", entryKey);
+                  .findAny().ifPresent(entryKeys -> {
+                      LOGGER.debug("Jump to entry(s) {} requested", entryKeys);
                       // tabs must be present and contents async loaded for an entry to be selected
-                      waitForLoadingFinished(() -> jumpToEntry(entryKey));
+                      waitForLoadingFinished(() -> selectEntries(entryKeys));
                   });
     }
 
@@ -378,30 +380,42 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         });
     }
 
-    private void jumpToEntry(String entryKey) {
+    @NullMarked
+    private void selectEntries(List<String> entryKeys) {
         // check current library tab first
         LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
         List<LibraryTab> sortedTabs = tabContainer.getLibraryTabs().stream()
                                                   .sorted(Comparator.comparing(tab -> tab != currentLibraryTab))
                                                   .toList();
+        Set<String> keysToSelect = new HashSet<>(entryKeys);
+        LibraryTab firstFoundTab = null;
         for (LibraryTab libraryTab : sortedTabs) {
-            Optional<BibEntry> bibEntry = libraryTab.getDatabase()
-                                                    .getEntries().stream()
-                                                    .filter(entry -> entry.getCitationKey().orElse("")
-                                                                          .equals(entryKey))
-                                                    .findAny();
-            if (bibEntry.isPresent()) {
-                LOGGER.debug("Found entry {} in library tab {}", entryKey, libraryTab);
-                libraryTab.clearAndSelect(bibEntry.get());
-                tabContainer.showLibraryTab(libraryTab);
-                break;
+            List<BibEntry> entrysToSelectInCurrentTab = new ArrayList<>(keysToSelect.size());
+            for (BibEntry entry : libraryTab.getDatabase()
+                                            .getEntries()) {
+                Optional<String> citationKeyOptional = entry.getCitationKey();
+                if (citationKeyOptional.isEmpty()) {
+                    continue;
+                }
+                String citationKey = citationKeyOptional.get();
+                if (!keysToSelect.contains(citationKey)) {
+                    continue;
+                }
+                if (firstFoundTab == null) {
+                    firstFoundTab = libraryTab;
+                }
+                LOGGER.debug("Found entry {} in library tab {}", citationKey, libraryTab);
+                keysToSelect.remove(citationKey);
+                entrysToSelectInCurrentTab.add(entry);
             }
+            libraryTab.clearAndSelect(entrysToSelectInCurrentTab);
         }
-
         LOGGER.trace("End of loop");
-
-        if (stateManager.getSelectedEntries().isEmpty()) {
-            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
+        if (firstFoundTab != null) {
+            tabContainer.showLibraryTab(firstFoundTab);
+        }
+        for (String key : keysToSelect) {
+            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", key));
         }
     }
 }

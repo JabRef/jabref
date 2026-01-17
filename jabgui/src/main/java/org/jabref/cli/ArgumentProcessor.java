@@ -77,7 +77,7 @@ public class ArgumentProcessor {
         }
 
         if (StringUtil.isNotBlank(guiCli.jumpToKey)) {
-            uiCommands.add(new UiCommand.JumpToEntryKey(guiCli.jumpToKey));
+            uiCommands.add(new UiCommand.SelectEntryKeys(List.of(guiCli.jumpToKey)));
         }
 
         if (guiCli.libraries != null && !guiCli.libraries.isEmpty()) {

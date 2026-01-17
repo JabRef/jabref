@@ -39,6 +39,7 @@ jobs:
         if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
         env:
           CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "Raw payload:"
           cat <<EOF

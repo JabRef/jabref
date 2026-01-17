@@ -1,4 +1,4 @@
-package org.jabref.http.server;
+package org.jabref.http.server.resources;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,8 +42,6 @@ public class EntryResource {
      * @param id      The name of the library
      * @param entryId The CitationKey of the BibEntry
      * @return a basic entry preview as plain text
-     * @throws IOException
-     * @throws NotFoundException
      */
     @GET
     @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")

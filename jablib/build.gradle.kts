@@ -19,7 +19,7 @@ plugins {
 
     id("dev.jbang") version "0.4.0"
 
-    id("net.ltgt.errorprone") version "4.3.0"
+    id("net.ltgt.errorprone") version "4.4.0"
     id("net.ltgt.nullaway") version "2.3.0"
 }
 

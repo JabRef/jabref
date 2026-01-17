@@ -4,16 +4,20 @@ import java.net.URI;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.Server;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.preferences.CliPreferences;
 
 import jakarta.ws.rs.ProcessingException;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This thread wrapper is required to be able to interrupt the http server, e.g. when JabRef is closing down the http server should shutdown as well.
  */
+@NullMarked
 public class HttpServerThread extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerThread.class);
@@ -22,10 +26,15 @@ public class HttpServerThread extends Thread {
     private final SrvStateManager srvStateManager;
     private final URI uri;
 
+    @Nullable
+    private final UiMessageHandler uiMessageHandler;
+
+    @Nullable
     private HttpServer httpServer;
 
-    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, URI uri) {
+    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
         this.srvStateManager = srvStateManager;
+        this.uiMessageHandler = uiMessageHandler;
         this.uri = uri;
         this.server = new Server(cliPreferences);
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
@@ -34,7 +43,7 @@ public class HttpServerThread extends Thread {
     @Override
     public void run() {
         try {
-            httpServer = this.server.run(srvStateManager, uri);
+            httpServer = this.server.run(srvStateManager, uiMessageHandler, uri);
         } catch (ProcessingException e) {
             LOGGER.error("Failed to start HTTP server thread", e);
         }

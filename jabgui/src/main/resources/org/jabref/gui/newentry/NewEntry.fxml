@@ -18,130 +18,238 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="600" xmlns="http://javafx.com/javafx/8.0.171"
-            fx:controller="org.jabref.gui.newentry.NewEntryView">
-    <buttonTypes>
-        <ButtonType fx:constant="CANCEL"/>
-        <ButtonType fx:id="generateButtonType" buttonData="OK_DONE" text="%Create"/>
-    </buttonTypes>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="600"
+        xmlns="http://javafx.com/javafx/8.0.171"
+        fx:controller="org.jabref.gui.newentry.NewEntryView">
     <content>
-        <TabPane fx:id="tabs">
-            <Tab fx:id="tabAddEntry" text="%Choose Entry Type" closable="false">
+        <TabPane
+                fx:id="tabs">
+            <Tab fx:id="tabAddEntry"
+                 text="%Choose Entry Type"
+                 closable="false">
                 <VBox spacing="10.0">
-                    <padding><Insets top="10.0"/></padding>
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
                     <Label text="%The 'add entry' tool uses the last-selected entry type from this menu.">
-                        <font><Font name="System Italic" size="13.0"/></font>
-                        <padding><Insets bottom="5.0"/></padding>
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                        <padding>
+                            <Insets bottom="5.0"/>
+                        </padding>
                     </Label>
-                    <TitledPane fx:id="entryRecommendedTitle" text="%Recommended types" animated="false">
-                        <content>
-                            <TilePane fx:id="entryRecommended" hgap="2.0" vgap="2.0"/>
-                        </content>
+                    <TitledPane
+                            fx:id="entryRecommendedTitle"
+                            text="%Recommended types"
+                            animated="false">
+                        <TilePane
+                                fx:id="entryRecommended"
+                                hgap="2.0"
+                                vgap="2.0"/>
                     </TitledPane>
-                    <TitledPane fx:id="entryOtherTitle" text="%Other types" animated="false">
-                        <content>
-                            <TilePane fx:id="entryOther" hgap="2.0" vgap="2.0"/>
-                        </content>
+                    <TitledPane
+                            fx:id="entryOtherTitle"
+                            text="%Other types"
+                            animated="false">
+                        <TilePane
+                                fx:id="entryOther"
+                                hgap="2.0"
+                                vgap="2.0"/>
                     </TitledPane>
-                    <TitledPane fx:id="entryCustomTitle" text="%Custom types" animated="false">
-                        <content>
-                            <TilePane fx:id="entryCustom" hgap="2.0" vgap="2.0"/>
-                        </content>
+                    <TitledPane
+                            fx:id="entryCustomTitle"
+                            text="%Custom types"
+                            animated="false">
+                        <TilePane
+                                fx:id="entryCustom"
+                                hgap="2.0"
+                                vgap="2.0"/>
                     </TitledPane>
-                    <TitledPane fx:id="entryNonStandardTitle" text="%Non-standard types" animated="false">
-                        <content>
-                            <TilePane fx:id="entryNonStandard" hgap="2.0" vgap="2.0"/>
-                        </content>
+                    <TitledPane
+                            fx:id="entryNonStandardTitle"
+                            text="%Non-standard types"
+                            animated="false">
+                        <TilePane
+                                fx:id="entryNonStandard"
+                                hgap="2.0"
+                                vgap="2.0"/>
                     </TitledPane>
                 </VBox>
             </Tab>
 
-            <Tab fx:id="tabLookupIdentifier" text="%Enter Identifier" closable="false">
+            <Tab fx:id="tabLookupIdentifier"
+                 text="%Enter Identifier"
+                 closable="false">
                 <VBox spacing="10.0">
-                    <padding><Insets top="10.0"/></padding>
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
                     <Label text="%You can also paste identifiers (using 'Ctrl + V') into the JabRef table to add entries directly.">
-                        <font><Font name="System Italic" size="13.0"/></font>
-                        <padding><Insets bottom="5.0"/></padding>
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                        <padding>
+                            <Insets bottom="5.0"/>
+                        </padding>
                     </Label>
-                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <HBox alignment="CENTER_LEFT"
+                          spacing="10.0">
                         <Label text="%Identifier"/>
-                        <StackPane HBox.hgrow="ALWAYS">
-                            <TextField fx:id="idText" prefHeight="30.0" HBox.hgrow="ALWAYS">
+                        <StackPane
+                                HBox.hgrow="ALWAYS">
+                            <TextField
+                                    fx:id="idText"
+                                    prefHeight="30.0"
+                                    HBox.hgrow="ALWAYS">
                                 <tooltip>
-                                    <Tooltip fx:id="idTextTooltip" text="%Specify the source identifier to look up."/>
+                                    <Tooltip
+                                            fx:id="idTextTooltip"
+                                            text="%Specify the source identifier to look up."/>
                                 </tooltip>
                             </TextField>
-                            <Hyperlink fx:id="idJumpLink" StackPane.alignment="CENTER_RIGHT" text="%Jump to entry" visible="false" style="-fx-padding: 0 15 0 0;"/>
+                            <Hyperlink
+                                    fx:id="idJumpLink"
+                                    StackPane.alignment="CENTER_RIGHT"
+                                    text="%Jump to entry"
+                                    visible="false"
+                                    style="-fx-padding: 0 15 0 0;"/>
                         </StackPane>
                     </HBox>
                     <VBox spacing="5.0">
-                        <RadioButton fx:id="idLookupGuess" text="%Automatically determine identifier type">
+                        <RadioButton
+                                fx:id="idLookupGuess"
+                                text="%Automatically determine identifier type">
                             <tooltip>
-                                <Tooltip text="%If selected, the provided identifier will automatically parsed and searched for.\nThis process may not always return correct results."/>
+                                <Tooltip
+                                        text="%If selected, the provided identifier will automatically parsed and searched for.\nThis process may not always return correct results."/>
                             </tooltip>
                         </RadioButton>
-                        <HBox alignment="CENTER_LEFT" spacing="5.0">
-                            <RadioButton fx:id="idLookupSpecify" text="%Identifier type">
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="5.0">
+                            <RadioButton
+                                    fx:id="idLookupSpecify"
+                                    text="%Identifier type">
                                 <tooltip>
-                                    <Tooltip text="%If selected, the specified type will be used for parsing and searching the provided identifier."/>
+                                    <Tooltip
+                                            text="%If selected, the specified type will be used for parsing and searching the provided identifier."/>
                                 </tooltip>
                             </RadioButton>
-                            <ComboBox fx:id="idFetcher" prefHeight="30.0" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+                            <ComboBox
+                                    fx:id="idFetcher"
+                                    prefHeight="30.0"
+                                    HBox.hgrow="ALWAYS"
+                                    maxWidth="1.7976931348623157E308">
                                 <tooltip>
-                                    <Tooltip text="%Specify the type of the provided identifier."/>
+                                    <Tooltip
+                                            text="%Specify the type of the provided identifier."/>
                                 </tooltip>
                             </ComboBox>
                         </HBox>
                     </VBox>
                     <VBox spacing="5.0">
-                        <padding><Insets top="5.0"/></padding>
-                        <Label fx:id="idErrorInvalidText" text="%You must provide an identifier.">
-                            <font><Font name="System Italic" size="13.0"/></font>
+                        <padding>
+                            <Insets top="5.0"/>
+                        </padding>
+                        <Label fx:id="idErrorInvalidText"
+                               text="%You must provide an identifier.">
+                            <font>
+                                <Font name="System Italic"
+                                      size="13.0"/>
+                            </font>
                         </Label>
-                        <Label fx:id="idErrorInvalidFetcher" text="%You must select an identifier type.">
-                            <font><Font name="System Italic" size="13.0"/></font>
+                        <Label fx:id="idErrorInvalidFetcher"
+                               text="%You must select an identifier type.">
+                            <font>
+                                <Font name="System Italic"
+                                      size="13.0"/>
+                            </font>
                         </Label>
                     </VBox>
                 </VBox>
             </Tab>
 
-            <Tab fx:id="tabInterpretCitations" text="%Interpret Citations" closable="false">
+            <Tab fx:id="tabInterpretCitations"
+                 text="%Interpret Citations"
+                 closable="false">
                 <VBox spacing="10.0">
-                    <padding><Insets top="10.0"/></padding>
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
                     <Label text="%Enter plain citations to parse, separated by blank lines.">
-                        <font><Font name="System Italic" size="13.0"/></font>
-                        <padding><Insets bottom="5.0"/></padding>
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                        <padding>
+                            <Insets bottom="5.0"/>
+                        </padding>
                     </Label>
-                    <TextArea fx:id="interpretText" VBox.vgrow="always" wrapText="true"/>
-                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <TextArea
+                            fx:id="interpretText"
+                            VBox.vgrow="always"
+                            wrapText="true"/>
+                    <HBox alignment="CENTER_LEFT"
+                          spacing="10.0">
                         <Label text="%Parser"/>
-                        <ComboBox fx:id="interpretParser" prefHeight="30.0" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
+                        <ComboBox
+                                fx:id="interpretParser"
+                                prefHeight="30.0"
+                                HBox.hgrow="ALWAYS"
+                                maxWidth="1.7976931348623157E308">
                             <tooltip>
-                                <Tooltip text="%Specify the parser to use for interpreting the provided citations."/>
+                                <Tooltip
+                                        text="%Specify the parser to use for interpreting the provided citations."/>
                             </tooltip>
                         </ComboBox>
                     </HBox>
-                    <VBox spacing="0.0">
+                    <VBox>
                         <Label text="%Plain citation parsing may generate inappropriate results.">
-                            <font><Font name="System Italic" size="13.0"/></font>
+                            <font>
+                                <Font name="System Italic"
+                                      size="13.0"/>
+                            </font>
                         </Label>
                         <Label text="%Verify all entries added with this method.">
-                            <font><Font name="System Italic" size="13.0"/></font>
+                            <font>
+                                <Font name="System Italic"
+                                      size="13.0"/>
+                            </font>
                         </Label>
                     </VBox>
                 </VBox>
             </Tab>
 
-            <Tab fx:id="tabSpecifyBibtex" text="%Specify Bib(La)TeX" closable="false">
+            <Tab fx:id="tabSpecifyBibtex"
+                 text="%Specify Bib(La)TeX"
+                 closable="false">
                 <VBox spacing="10.0">
-                    <padding><Insets top="10.0"/></padding>
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
                     <Label text="%Enter Bib(La)TeX sources to generate entries from.">
-                        <font><Font name="System Italic" size="13.0"/></font>
-                        <padding><Insets bottom="5.0"/></padding>
+                        <font>
+                            <Font name="System Italic"
+                                  size="13.0"/>
+                        </font>
+                        <padding>
+                            <Insets bottom="5.0"/>
+                        </padding>
                     </Label>
-                    <TextArea fx:id="bibtexText" VBox.vgrow="always" wrapText="true"/>
+                    <TextArea
+                            fx:id="bibtexText"
+                            VBox.vgrow="always"
+                            wrapText="true"/>
                 </VBox>
             </Tab>
         </TabPane>
     </content>
+    <ButtonType
+            fx:constant="CANCEL"/>
+    <ButtonType
+            fx:id="generateButtonType"
+            buttonData="OK_DONE"
+            text="%Create"/>
 </DialogPane>
