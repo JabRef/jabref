@@ -161,7 +161,6 @@ class AiModelServiceTest {
                 "https://api.huggingface.co",
                 "test-key"
         );
-
         assertEquals(List.of(), models);
     }
 
