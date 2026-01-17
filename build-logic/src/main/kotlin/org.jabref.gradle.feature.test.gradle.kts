@@ -13,13 +13,15 @@ testing {
 }
 
 tasks.withType<Test>().configureEach {
-    // Enable parallel tests (on desktop).
-    if (!providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)) {
-        // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-        maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
-        // See https://docs.gradle.org/current/userguide/performance.html#b_fork_tests_into_multiple_processes for details.
-        forkEvery = 100
-    }
+    // Note: For now, parallel handling with gradle is enough
+    //       How to enable parallel JUnit tests **in addition**: https://docs.junit.org/6.0.1/writing-tests/parallel-execution.html
+
+    // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
+
+    // Even in sequential tests, to a "force" cleanup
+    // See https://docs.gradle.org/current/userguide/performance.html#b_fork_tests_into_multiple_processes for details.
+    forkEvery = 100
 }
 
 testlogger {
