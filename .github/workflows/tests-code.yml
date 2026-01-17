@@ -314,6 +314,13 @@ jobs:
 
       - uses: ./.github/actions/setup-gradle
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - name: Setup JDK
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'corretto'
+          check-latest: true
 
       # Build all JBang scripts
       - run: |
@@ -364,6 +371,12 @@ jobs:
           files_ignore: |
             jablib/src/main/java/**/*-*.java
       - uses: ./.github/actions/setup-gradle
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'corretto'
+          check-latest: true
       - name: Modify ${{ matrix.script }} to include changed classes
         shell: bash
         # We always run, because changes in jabls, jabsrv also could cause JBang to fail
