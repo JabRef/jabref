@@ -9,10 +9,8 @@ java {
         // - jitpack.yml
         // - .sdkmanrc
         // - .devcontainer/devcontainer.json#L34 - there, also check if the gradleVersion matches the one of gradle/wrapper/gradle-wrapper.properties
-        // - .github/workflows/binaries*.yml
-        // - .github/workflows/publish.yml
-        // - .github/workflows/tests*.yml
-        // - .github/workflows/update-gradle-wrapper.yml
+        // - .github/actions/setup-gradle/action.yml
+        // - .github/workflows/test-code.yml
         // - .jbang/Jab*.java
         // - .moderne/moderne.yml
         // - build-support/src/main/java/*.java
