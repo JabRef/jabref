@@ -20,13 +20,14 @@ import org.jabref.model.database.BibDatabaseModeDetection;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Role of an importer for JabRef.
  */
+@NullMarked
 public abstract class Importer implements Comparable<Importer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Importer.class);
@@ -40,7 +41,7 @@ public abstract class Importer implements Comparable<Importer> {
      * Thus, the correct behavior is to return false if it is certain that the file is not of the suitable type, and
      * true otherwise. Returning true is the safe choice if not certain.
      */
-    public abstract boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException;
+    public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
     /**
      * Check whether the source is in the correct format for this importer.
@@ -49,7 +50,7 @@ public abstract class Importer implements Comparable<Importer> {
      * @return true, if the file is in a recognized format
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public boolean isRecognizedFormat(@NonNull Path filePath) throws IOException {
+    public boolean isRecognizedFormat(Path filePath) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath)) {
             return isRecognizedFormat(bufferedReader);
         }
@@ -62,7 +63,7 @@ public abstract class Importer implements Comparable<Importer> {
      * @return true, if the data is in a recognized format
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public boolean isRecognizedFormat(@NonNull String data) throws IOException {
+    public boolean isRecognizedFormat(String data) throws IOException {
         try (Reader reader = Reader.of(data);
              BufferedReader bufferedReader = new BufferedReader(reader)) {
             return isRecognizedFormat(bufferedReader);
@@ -88,7 +89,7 @@ public abstract class Importer implements Comparable<Importer> {
      *
      * @param input the input to read from
      */
-    public abstract ParserResult importDatabase(@NonNull BufferedReader input) throws IOException;
+    public abstract ParserResult importDatabase(BufferedReader input) throws IOException;
 
     /**
      * Parse the database in the specified file.

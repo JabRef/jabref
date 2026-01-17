@@ -1,7 +1,7 @@
 ## Our policy
 
 > [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
+> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
 
 This `AGENTS.md` file acts as a set of instructions that some AI coding tools can read. For more information please read our [AI policy](./CONTRIBUTING.md#ai-usage-policy).
 
@@ -60,7 +60,7 @@ Agents **must not**:
    BAD: new HashSet<>(Arrays.asList(...))
    GOOD: Set.of(...)
 - Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
-- To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
+- To create an empty list or map we use `List.of()` and `Map.of()` instead of `Collections.emptyList()` and `Collections.emptyMap()`.
 - Correctly spelled variable names (meaning: no typos in variable names).
 - Use StringJoiner instead of StringBuilder (if possible)
 - Prefer immutability and explicit nullability (JSpecify)
@@ -92,25 +92,18 @@ Agents **must not**:
 
 ### Comments
 
-- In case Java comments are added, they should match the code following. They should be a high-level summary or guidance of the following code (and not some random text or just re-stating the obvious)
-- Comments should add new information (e.g. reasoning of the code). It should not be plainly derived from the code itself.
+- Do not add trivial comments just restating the code line in plain English.
+- When commenting, focus on the "why" and general idea.
 
-   Example for trivial comments:
+Example for trivial comments (to be avoided):
 
-   ```java
-   // Commit the staged changes
-   RevCommit commit = git.commit()
-   fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
-   ```
+```java
+// Commit the staged changes
+RevCommit commit = git.commit()
+fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
+```
 
-   Write without comments:
-
-   ```java
-   RevCommit commit = git.commit()
-   fieldName = fieldName.trim().toLowerCase();
-   ```
-
-   Note: This rule does not apply to fixes of spelling mistakes
+Both comments must not be added.
 
 ### Favor Optionals over nulls
 
@@ -127,13 +120,14 @@ Agents **must not**:
    Following is fine:
 
    ```java
-   Optional<String> resolved = bibEntry.getResolvedFieldOrAlias(...);
-   resolved.ifPresent(value -> doSomething(value));
+   bibEntry.getResolvedFieldOrAlias(...)
+           .ifPresent(value -> doSomething(value));
    ```
 
-- If the java.util.Optional is really present, use use `get()` (and not `orElse(\"\")`)
+- If the `java.util.Optional` is really present, use use `get()` (and not `orElse(\"\")`)
+- Use `ifPresentOrElse` instead of `if ...isPresent() { ... }  else { ... }`
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
-- Use JSpecify annotations instead of `null` checks
+- Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
 - `null` should never be passed to a method (except it has the same name).
 
 ### Exceptions

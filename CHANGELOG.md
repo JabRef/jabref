@@ -11,9 +11,30 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We fixed an issue where a redundant validation listener was causing duplicate error dialogs when invalid BibTeX source was detected in the SourceTab. [#14805](https://github.com/JabRef/jabref/issues/14805)
+- We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
+- In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
+- We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
+- We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
+- REST-API: Added more commands (`selectentries`, `open`, `focus`).
+- REST-API: Added the possibility to trigger the import dialog
+
 ### Changed
 
+- REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
+- macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
+
 ### Fixed
+
+- Fixed redundant action icons showing in empty identifier fields (DOI, Eprint, ISBN) [#14821](https://github.com/JabRef/jabref/pull/14821)
+- Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
+- We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
+- We fixed an issue where exporting group chat to JSON resulted in empty entries array. [#14647](https://github.com/JabRef/jabref/issues/14647)
+- We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
+- We fixed an issue when warning for duplicate entries in the "New Entry" dialog. [#14662](https://github.com/JabRef/jabref/pull/14662)
+- We fixed the Quality > Automatically set file links button. Now if a file is moved, the button can relink the moved file to the broken linked file. [#9798](https://github.com/JabRef/jabref/issues/9798)
+- We fixed an issue where JabRef would not start on Linux ARM due to missing binaries for postgres-embedded [#14783](https://github.com/JabRef/jabref/issues/14783)
+- We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
 
 ### Removed
 
@@ -29,7 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added 15 non-standard BibLaTeX entry types (Audio, Image, Legal, ...) to the group "Non-standard types" group in the New Entry dialog and in the context menu. [#12963](https://github.com/JabRef/jabref/issues/12963)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
-- We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
+- We added "IEEE" as another option for parsing plain text citations. [#14233](https://github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - We added `--provider=crossref` to `get-cited-works` at `JabKit`. [#14357](https://github.com/JabRef/jabref/pull/14357)
@@ -57,7 +78,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - In case of invalid BibTeX in the source tab, a notification is displayed (instead of an exception). [#14504](https://github.com/JabRef/jabref/pull/14504)
 - We separated the "Clean up entries" dialog into three tabs for clarity. [#13819](https://github.com/JabRef/jabref/issues/13819)
 - `JabKit`: `--porcelain` does not output any logs to the console anymore. [#14244](https://github.com/JabRef/jabref/pull/14244)
-- macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> now opens the terminal in the active library directory. [#14130](https://github.com/JabRef/jabref/issues/14130)
 - After importing, now all imported entries are marked. [#13535](https://github.com/JabRef/jabref/pull/13535)
 - The URL integrity check now checks the complete URL syntax. [#14370](https://github.com/JabRef/jabref/pull/14370)

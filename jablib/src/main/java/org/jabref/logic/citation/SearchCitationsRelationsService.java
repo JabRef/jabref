@@ -3,14 +3,19 @@ package org.jabref.logic.citation;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.ObjectProperty;
+
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepositoryShell;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -23,20 +28,42 @@ public class SearchCitationsRelationsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchCitationsRelationsService.class);
 
-    private final CitationFetcher citationFetcher;
+    private CitationFetcher citationFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences,
                                            ImportFormatPreferences importFormatPreferences,
                                            FieldPreferences fieldPreferences,
+                                           ObjectProperty<CitationFetcherType> citationFetcherTypeProperty,
+                                           CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                           GrobidPreferences grobidPreferences,
+                                           AiService aiService,
                                            BibEntryTypesManager entryTypesManager) {
-        this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);
+        this.citationFetcher = CitationFetcherType.getCitationFetcher(
+                citationFetcherTypeProperty.get(),
+                importerPreferences,
+                importFormatPreferences,
+                citationKeyPatternPreferences,
+                grobidPreferences,
+                aiService);
+
+        citationFetcherTypeProperty.addListener((_, _, newValue) -> {
+            this.citationFetcher = CitationFetcherType.getCitationFetcher(
+                    newValue,
+                    importerPreferences,
+                    importFormatPreferences,
+                    citationKeyPatternPreferences,
+                    grobidPreferences,
+                    aiService);
+        });
+
         this.relationsRepository = BibEntryCitationsAndReferencesRepositoryShell.of(
                 Directories.getCitationsRelationsDirectory(),
                 importerPreferences.getCitationsRelationsStoreTTL(),
                 importFormatPreferences,
                 fieldPreferences,
-                entryTypesManager
+                entryTypesManager,
+                citationFetcherTypeProperty
         );
     }
 

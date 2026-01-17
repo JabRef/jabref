@@ -32,8 +32,7 @@ import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 import com.tobiasdiez.easybind.optional.OptionalWrapper;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 
 @AllowedToUseLogic("because it needs access to citation pattern and cleanups")
 public class MetaData {
@@ -59,7 +58,7 @@ public class MetaData {
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
     public static final String BLG_FILE_PATH = "blgFilePath";
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
+
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
@@ -70,13 +69,13 @@ public class MetaData {
     private final Map<String, Path> blgFilePathMap = new HashMap<>();
     private Optional<Version> groupSearchSyntaxVersion = Optional.empty();
 
-    private Charset encoding;
-    private SaveOrder saveOrder;
-    private String defaultCiteKeyPattern;
-    private FieldFormatterCleanupActions saveActions;
-    private BibDatabaseMode mode;
+    @Nullable private Charset encoding;
+    @Nullable private SaveOrder saveOrder;
+    @Nullable private String defaultCiteKeyPattern;
+    @Nullable private FieldFormatterCleanupActions saveActions;
+    @Nullable private BibDatabaseMode mode;
     private boolean isProtected;
-    private String librarySpecificFileDirectory;
+    @Nullable private String librarySpecificFileDirectory;
 
     @NonNull
     private final ContentSelectors contentSelectors = new ContentSelectors();
@@ -84,7 +83,7 @@ public class MetaData {
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
-    private String versionDBStructure;
+    @Nullable private String versionDBStructure;
 
     /**
      * Constructs an empty metadata.

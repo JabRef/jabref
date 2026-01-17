@@ -40,7 +40,7 @@ dependencies {
     implementation("org.jabref:afterburner.fx")
     implementation("org.kordamp.ikonli:ikonli-javafx")
     implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack")
-    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
+    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation") //jitpack
     implementation("de.saxsys:mvvmfx")
     implementation("org.fxmisc.flowless:flowless")
     implementation("org.fxmisc.richtext:richtextfx")
@@ -126,7 +126,7 @@ application {
     mainClass.set("org.jabref.Launcher")
     mainModule.set("org.jabref")
 
-    application.applicationDefaultJvmArgs = listOf(
+    applicationDefaultJvmArgs = listOf(
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
@@ -152,7 +152,7 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
-    // general jLinkOptions are set in "--generate-cds-archive"
+    // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
         options.addAll(
@@ -251,4 +251,6 @@ tasks.test {
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"
     )
+
+    maxParallelForks = 1
 }

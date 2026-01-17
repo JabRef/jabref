@@ -8,6 +8,8 @@ import java.util.Objects;
 /// It might be a custom field added by the user.
 /// It also might originate from an importer if the source "field" cannot be mapped to one of the existing fields by its name and/or properties.
 /// It is not called "CustomField", because there was the idea that StandardFields could be customized.
+///
+/// This can be instantiated with [org.jabref.model.entry.field.FieldFactory#parseField(java.lang.String)]
 public class UnknownField implements Field {
     private String name;
     private final EnumSet<FieldProperty> properties;

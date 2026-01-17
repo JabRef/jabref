@@ -9,8 +9,11 @@ import java.time.ZoneId;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javafx.beans.property.ObjectProperty;
+
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
@@ -41,18 +44,22 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     // should only be read for closing - all other maps initialized at constructor
     private final MVStore store;
 
+    private final ObjectProperty<CitationFetcherType> citationFetcherPropertyType;
+
     @VisibleForTesting
     MVStoreBibEntryRelationRepository(Path path,
                                       String mapName,
                                       int storeTTLInDays,
                                       BibEntryTypesManager entryTypesManager,
                                       ImportFormatPreferences importFormatPreferences,
-                                      FieldPreferences fieldPreferences) {
+                                      FieldPreferences fieldPreferences,
+                                      ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
         this(
                 path,
                 mapName,
                 storeTTLInDays,
-                new BibEntryHashSetSerializer(entryTypesManager, importFormatPreferences, fieldPreferences)
+                new BibEntryHashSetSerializer(entryTypesManager, importFormatPreferences, fieldPreferences),
+                citationFetcherTypeProperty
         );
     }
 
@@ -60,7 +67,8 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     MVStoreBibEntryRelationRepository(Path path,
                                       String mapName,
                                       int storeTTLInDays,
-                                      BasicDataType<LinkedHashSet<BibEntry>> serializer) {
+                                      BasicDataType<LinkedHashSet<BibEntry>> serializer,
+                                      ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
         try {
             Files.createDirectories(path.getParent());
             if (!Files.exists(path)) {
@@ -79,13 +87,14 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
                 .open();
         this.relationsMap = store.openMap(mapName, mapConfiguration);
         this.insertionTimeStampMap = store.openMap(mapName + MAP_SUFFIX_TIME_STAMP);
+        this.citationFetcherPropertyType = citationFetcherTypeProperty;
     }
 
     @Override
     public List<BibEntry> getRelations(BibEntry entry) {
         return entry
                 .getDOI()
-                .map(doi -> relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>()).stream().toList())
+                .map(doi -> relationsMap.getOrDefault(doi.asString() + citationFetcherPropertyType.get().getName(), new LinkedHashSet<>()).stream().toList())
                 .orElse(List.of());
     }
 
@@ -97,14 +106,14 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
         entry.getDOI().ifPresent(doi -> {
             if (!relations.isEmpty()) {
                 // Save the relations
-                LinkedHashSet<BibEntry> relationsAlreadyStored = relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>());
+                LinkedHashSet<BibEntry> relationsAlreadyStored = relationsMap.getOrDefault(doi.asString() + citationFetcherPropertyType.get().getName(), new LinkedHashSet<>());
                 relationsAlreadyStored.addAll(relations);
-                relationsMap.put(doi.asString(), relationsAlreadyStored);
+                relationsMap.put(doi.asString() + citationFetcherPropertyType.get().getName(), relationsAlreadyStored);
             }
 
             // Save insertion timestamp
             LocalDateTime insertionTime = LocalDateTime.now(TIME_STAMP_ZONE_ID);
-            insertionTimeStampMap.put(doi.asString(), insertionTime);
+            insertionTimeStampMap.put(doi.asString() + citationFetcherPropertyType.get().getName(), insertionTime);
         });
     }
 
@@ -112,7 +121,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     synchronized public boolean containsKey(BibEntry entry) {
         return entry
                 .getDOI()
-                .map(doi -> relationsMap.containsKey(doi.asString()))
+                .map(doi -> relationsMap.containsKey(doi.asString() + citationFetcherPropertyType.get().getName()))
                 .orElse(false);
     }
 
@@ -127,10 +136,10 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
         return entry.getDOI()
                     .map(doi -> {
                         String doiString = doi.asString();
-                        if (!insertionTimeStampMap.containsKey(doiString)) {
+                        if (!insertionTimeStampMap.containsKey(doiString + citationFetcherPropertyType.get().getName())) {
                             return true;
                         }
-                        LocalDateTime lastRun = insertionTimeStampMap.get(doiString);
+                        LocalDateTime lastRun = insertionTimeStampMap.get(doiString + citationFetcherPropertyType.get().getName());
                         return lastRun.isBefore(now.minusDays(storeTTLInDays));
                     })
                     // No DOI existing - allow update

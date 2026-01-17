@@ -223,6 +223,10 @@ public class JabRefGUI extends Application {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getFieldPreferences(),
+                preferences.getEntryEditorPreferences().citationFetcherTypeProperty(),
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getGrobidPreferences(),
+                JabRefGUI.aiService,
                 entryTypesManager
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
@@ -438,7 +442,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            httpServerManager.start(preferences, stateManager, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());

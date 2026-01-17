@@ -23,13 +23,18 @@ public class CompositeIdFetcher {
     }
 
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        // All identifiers listed here should also be appear at {@link org.jabref.gui.mergeentries.FetchAndMergeEntry.SUPPORTED_FIELDS} and vice versa.
+        // All identifiers listed here should also appear at {@link org.jabref.gui.mergeentries.FetchAndMergeEntry.SUPPORTED_FIELDS} and vice versa.
+
+        Optional<Identifier> identifierOpt = Identifier.from(identifier);
+        if (identifierOpt.isEmpty()) {
+            return Optional.empty();
+        }
 
         Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
             return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().asString());
         }
-        Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
+        Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.findInText(identifier);
         if (arXivIdentifier.isPresent()) {
             return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().asString());
         }

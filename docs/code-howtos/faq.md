@@ -39,7 +39,7 @@ Background: [OpenRewrite](https://docs.openrewrite.org/) is an automated refacto
 
 ### `org.jabref.logic.l10n.LocalizationConsistencyTest findMissingLocalizationKeys` <span style="color:red">FAILED</span>
 
-You have probably used Strings that are visible on the UI (to the user) but not wrapped them using `Localization.lang(...)` and added them to the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties).
+You have probably used Strings that are visible on the UI (to the user) but not wrapped them using `Localization.lang(...)` and added them to the [localization properties file](https://github.com/JabRef/jabref/blob/main/jablib/src/main/resources/l10n/JabRef_en.properties).
 
 Read more about the [background and format of localization](https://devdocs.jabref.org/code-howtos/localization.html) in JabRef.
 

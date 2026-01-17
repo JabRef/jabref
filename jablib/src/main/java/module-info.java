@@ -173,6 +173,10 @@ open module org.jabref.jablib {
 
     // region: SQL databases
     requires embedded.postgres;
+    // For arm, we explicitly need to add these as well
+    requires embedded.postgres.binaries.darwin.arm64v8;
+    requires embedded.postgres.binaries.linux.arm64v8;
+
     requires org.tukaani.xz;
     requires org.postgresql.jdbc;
     // endregion
