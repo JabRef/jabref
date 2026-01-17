@@ -65,13 +65,9 @@ public class AiModelService {
     public List<String> fetchModelsSynchronously(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         for (AiModelProvider provider : modelProviders) {
             if (provider.supports(aiProvider)) {
-                try {
-                    List<String> models = provider.fetchModels(aiProvider, apiBaseUrl, apiKey);
-                    if (models.isEmpty()) {
-                        return models;
-                    }
-                } catch (Exception e) {
-                    LOGGER.debug("Failed to fetch models for {}", aiProvider.getLabel(), e);
+                List<String> models = provider.fetchModels(aiProvider, apiBaseUrl, apiKey);
+                if (models.isEmpty()) {
+                    return models;
                 }
             }
         }

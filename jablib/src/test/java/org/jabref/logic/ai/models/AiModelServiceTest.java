@@ -66,7 +66,7 @@ class AiModelServiceTest {
                 "https://api.openai.com",
                 null
         );
-        assertTrue(models.isEmpty());
+       assertEquals(List.of(), models);
     }
 
     @Test
@@ -76,7 +76,7 @@ class AiModelServiceTest {
                 "https://api.openai.com",
                 "   "
         );
-        assertTrue(models.isEmpty());
+        assertEquals(List.of(), models);
     }
 
     @Test
@@ -86,7 +86,7 @@ class AiModelServiceTest {
                 "https://invalid-url-that-does-not-exist-12345.com",
                 "test-key"
         );
-        assertTrue(models.isEmpty());
+        assertEquals(List.of(), models);
     }
 
     @Test
@@ -103,7 +103,7 @@ class AiModelServiceTest {
 
         long duration = System.currentTimeMillis() - startTime;
 
-        assertTrue(models.isEmpty());
+        assertEquals(List.of(), models);
         // Unirest default timeout is around 10 seconds, allow margin for test execution
         assertTrue(duration < 15000, "Should timeout within reasonable time, but took " + duration + "ms");
     }
@@ -120,9 +120,8 @@ class AiModelServiceTest {
         );
 
         assertNotNull(models);
-        assertFalse(models.isEmpty());
         // Should fall back to static models
-        assertTrue(models.contains("gpt-4o-mini"));
+        assertEquals(List.of("gpt-4o-mini, gpt-4o, gpt-4, gpt-4-turbo, gpt-3.5-turbo"), models);
     }
 
     @Test
@@ -134,7 +133,6 @@ class AiModelServiceTest {
         );
 
         assertNotNull(models);
-        assertFalse(models.isEmpty());
         // Should return static models as fallback
         List<String> staticModels = aiModelService.getStaticModels(AiProvider.OPEN_AI);
         assertEquals(staticModels, models);
@@ -149,7 +147,6 @@ class AiModelServiceTest {
         );
 
         assertNotNull(models);
-        assertFalse(models.isEmpty());
         // Should return static models as fallback
         List<String> staticModels = aiModelService.getStaticModels(AiProvider.OPEN_AI);
         assertEquals(staticModels, models);
@@ -164,7 +161,7 @@ class AiModelServiceTest {
                 "test-key"
         );
 
-        assertTrue(models.isEmpty());
+        assertEquals(List.of(), models);
     }
 
     @Test

@@ -46,12 +46,10 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
                 models = parseModelsFromResponse(response.getBody());
                 LOGGER.info("Successfully fetched {} models from {}", models.size(), aiProvider.getLabel());
             } else {
-                LOGGER.debug("Failed to fetch models from {} (status: {})", aiProvider.getLabel(), response.getStatus());
+                LOGGER.info("Failed to fetch models from {} (status: {})", aiProvider.getLabel(), response.getStatus());
             }
         } catch (UnirestException e) {
-            LOGGER.debug("Failed to fetch models from {}", aiProvider.getLabel(), e);
-        } catch (Exception e) {
-            LOGGER.debug("Unexpected error while fetching models from {}", aiProvider.getLabel(), e);
+            LOGGER.error("Failed to fetch models from {}", aiProvider.getLabel(), e);
         }
 
         return models;
