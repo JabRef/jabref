@@ -66,7 +66,7 @@ class AiModelServiceTest {
                 "https://api.openai.com",
                 null
         );
-       assertEquals(List.of(), models);
+        assertEquals(List.of(), models);
     }
 
     @Test
@@ -121,7 +121,8 @@ class AiModelServiceTest {
 
         assertNotNull(models);
         // Should fall back to static models
-        assertEquals(List.of("gpt-4o-mini, gpt-4o, gpt-4, gpt-4-turbo, gpt-3.5-turbo"), models);
+        List<String> fallbackModels = aiModelService.getStaticModels(AiProvider.OPEN_AI);
+        assertEquals(fallbackModels, models);
     }
 
     @Test
