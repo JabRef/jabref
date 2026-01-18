@@ -8,7 +8,7 @@ The source is located in the project `jabsrv`.
 
 The resource for a library is implemented at [`org.jabref.http.server.resources.LibraryResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java).
 
-Some offered resources and possible interactions are shown at [`jabsrv/src/test/*.http`](../../jabsrv/srv/test/) using [IntelliJ's http syntax](https://www.jetbrains.com/help/idea/exploring-http-syntax.html).
+Some offered resources and possible interactions are shown at [`jabsrv/src/test/*.http`](https://github.com/JabRef/jabref/tree/main/jabsrv/src/test) using [IntelliJ's http syntax](https://www.jetbrains.com/help/idea/exploring-http-syntax.html).
 
 ## Design principles
 
