@@ -165,8 +165,8 @@ dependencies.constraints {
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
-    api("org.xmlunit:xmlunit-core:2.10.4")
-    api("org.xmlunit:xmlunit-matchers:2.10.4")
+    api("org.xmlunit:xmlunit-core:2.11.0")
+    api("org.xmlunit:xmlunit-matchers:2.11.0")
     api("org.yaml:snakeyaml:2.5")
     api("tech.units:indriya:2.2.3")
 }
