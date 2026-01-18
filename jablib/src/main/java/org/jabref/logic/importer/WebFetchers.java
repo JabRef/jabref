@@ -145,13 +145,14 @@ public class WebFetchers {
     /**
      * @return sorted set containing search based fetchers
      */
-    public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+    public static synchronized SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         // Caching is allowed as the properties work with observables -> any update of the preferences will be used by the fetchers at the next call
         if (searchBasedFetchers != null) {
             return searchBasedFetchers;
         }
 
         searchBasedFetchers = new TreeSet<>(new CompositeSearchFirstComparator());
+
         searchBasedFetchers.add(new ArXivFetcher(importFormatPreferences));
         searchBasedFetchers.add(new ISIDOREFetcher());
         searchBasedFetchers.add(new INSPIREFetcher(importFormatPreferences));
