@@ -170,7 +170,6 @@ public class WebFetchers {
         searchBasedFetchers.add(new CiteSeer());
         searchBasedFetchers.add(new DOAJFetcher(importFormatPreferences));
         searchBasedFetchers.add(new IEEE(importFormatPreferences, importerPreferences));
-        searchBasedFetchers.add(new CompositeSearchBasedFetcher(searchBasedFetchers, importerPreferences, 30));
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         searchBasedFetchers.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
@@ -182,6 +181,10 @@ public class WebFetchers {
         searchBasedFetchers.add(new EuropePmcFetcher());
         // Even though Unpaywall is used differently, adding it here enables "smooth" setting of the email (as fetcher key) in the preferences UI
         searchBasedFetchers.add(new UnpaywallFetcher(importerPreferences));
+
+        // Make all search-based fetchers available for pre-selection
+        searchBasedFetchers.add(new CompositeSearchBasedFetcher(searchBasedFetchers, importerPreferences, 30));
+
         return searchBasedFetchers;
     }
 
