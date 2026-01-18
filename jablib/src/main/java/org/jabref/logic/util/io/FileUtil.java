@@ -421,6 +421,13 @@ public class FileUtil {
         // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
 
+        //Truncates filename to prevent MAX_PATH issues on Windows
+        //Limits the length to 128 characters to reserve space for the directory path and file extension
+        final int MAX_FILENAME_LENGTH = 128; 
+        if (targetName.length() > MAX_FILENAME_LENGTH) {
+            targetName = targetName.substring(0, MAX_FILENAME_LENGTH);
+        }
+
         return Optional.of(targetName);
     }
 

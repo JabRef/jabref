@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -509,6 +510,18 @@ class FileUtilTest {
         } else {
             assertTrue(FileUtil.detectBadFileName(fileName));
         }
+    }
+    
+    @Test
+    void createFileNameFromPatternTruncatesVeryLongTitles() {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "a".repeat(300));
+
+        Optional<String> result = FileUtil.createFileNameFromPattern(database, entry, "[title]");
+
+        assertTrue(result.isPresent());
+        assertEquals(128, result.get().length());
     }
 
     /// Tests for issue <https://github.com/JabRef/jabref/issues/12995>
