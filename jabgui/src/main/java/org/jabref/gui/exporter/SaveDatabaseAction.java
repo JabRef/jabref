@@ -24,6 +24,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.libraryproperties.git.GitPropertiesViewModel;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -253,29 +254,32 @@ public class SaveDatabaseAction {
                                                                       .getMetaData()
                                                                       .getUnknownMetaData();
 
-                    boolean isGitEnabled = metaDataMap.entrySet().stream()
-                                                      .filter(entry -> {
-                                                          String key = entry.getKey();
-                                                          return key != null && key.trim().equalsIgnoreCase("gitEnabled");
-                                                      })
-                                                      .flatMap(entry -> entry.getValue().stream())
-                                                      .anyMatch(value -> {
-                                                          return value != null && value.trim().equalsIgnoreCase("true");
-                                                      });
+                    boolean shouldCommit = metaDataMap.getOrDefault(GitPropertiesViewModel.GIT_AUTO_COMMIT, List.of())
+                                                      .contains("true");
 
-                    if (isGitEnabled) {
+                    boolean shouldPush = metaDataMap.getOrDefault(GitPropertiesViewModel.GIT_AUTO_PUSH, List.of())
+                                                    .contains("true");
+
+                    if (shouldCommit || shouldPush) {
                         GitHandler.fromAnyPath(targetPath, preferences.getGitPreferences())
                                   .ifPresent(gitHandler -> {
                                       try {
-                                          String commitMsg = "Automatic update via JabRef: " + targetPath.getFileName();
-                                          gitHandler.createCommitOnCurrentBranch(commitMsg, false);
+                                          if (shouldCommit) {
+                                              String commitMsg = "Automatic update via JabRef: " + targetPath.getFileName();
+                                              gitHandler.createCommitOnCurrentBranch(commitMsg, false);
+                                              dialogService.notify(Localization.lang("Git: Changes committed."));
+                                          }
 
-                                          try {
-                                              gitHandler.pushCommitsToRemoteRepository();
-                                              dialogService.notify(Localization.lang("Git: Auto-committed and pushed."));
-                                          } catch (Exception pushEx) {
-                                              LOGGER.warn("Git push failed", pushEx);
-                                              dialogService.notify(Localization.lang("Git: Committed locally (Push failed)"));
+                                          if (shouldPush) {
+                                              gitHandler.pullOnCurrentBranch();
+
+                                              try {
+                                                  gitHandler.pushCommitsToRemoteRepository();
+                                                  dialogService.notify(Localization.lang("Git: Pushed to remote."));
+                                              } catch (Exception pushEx) {
+                                                  LOGGER.warn("Git push failed", pushEx);
+                                                  dialogService.notify(Localization.lang("Git: Committed locally (Push failed)"));
+                                              }
                                           }
                                       } catch (Exception e) {
                                           LOGGER.error("Git auto-save failed", e);

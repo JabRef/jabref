@@ -4,14 +4,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.libraryproperties.git.GitPropertiesViewModel;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -25,6 +28,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -266,6 +270,29 @@ public class OpenDatabaseAction extends SimpleCommand {
                 parserResult = OpenDatabase.loadDatabase(fileToLoad,
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
+            }
+
+            try {
+                Map<String, List<String>> metaData = parserResult.getMetaData().getUnknownMetaData();
+
+                boolean shouldPull = metaData.getOrDefault(GitPropertiesViewModel.GIT_AUTO_PULL, Collections.emptyList()).contains("true");
+                boolean legacyEnabled = metaData.getOrDefault(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.emptyList()).contains("true");
+
+                if (shouldPull || legacyEnabled) {
+                    Optional<GitHandler> gitHandler = GitHandler.fromAnyPath(fileToLoad, preferences.getGitPreferences());
+                    if (gitHandler.isPresent()) {
+                        UiTaskExecutor.runInJavaFXThread(() ->
+                                dialogService.notify(Localization.lang("Git: Pulling latest changes...")));
+
+                        gitHandler.get().pullOnCurrentBranch();
+
+                        parserResult = OpenDatabase.loadDatabase(fileToLoad,
+                                preferences.getImportFormatPreferences(),
+                                fileUpdateMonitor);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Git auto-pull failed on open. Continuing with local file.", e);
             }
 
             if (parserResult.hasWarnings()) {

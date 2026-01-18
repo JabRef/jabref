@@ -30,44 +30,63 @@ class GitPropertiesViewModelTest {
 
     @Test
     void testInitialStateIsFalse() {
+        viewModel.setValues();
         assertFalse(viewModel.autoCommitProperty().get());
+        assertFalse(viewModel.autoPullProperty().get());
+        assertFalse(viewModel.autoPushProperty().get());
     }
 
     @Test
-    void testSetValuesReadsTrueFromMetadata() {
-        metaData.putUnknownMetaDataItem("gitEnabled", Collections.singletonList("true"));
+    void testSetValuesReadsLegacyKey() {
+        metaData.putUnknownMetaDataItem(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
 
         viewModel.setValues();
 
         assertTrue(viewModel.autoCommitProperty().get());
+        assertTrue(viewModel.autoPullProperty().get());
+        assertTrue(viewModel.autoPushProperty().get());
     }
 
     @Test
-    void testSetValuesReadsFalseFromMetadata() {
-        metaData.putUnknownMetaDataItem("gitEnabled", Collections.singletonList("false"));
+    void testSetValuesReadsGranularKeys() {
+        metaData.putUnknownMetaDataItem(GitPropertiesViewModel.GIT_AUTO_COMMIT, Collections.singletonList("true"));
 
         viewModel.setValues();
 
-        assertFalse(viewModel.autoCommitProperty().get());
+        assertTrue(viewModel.autoCommitProperty().get());
+        assertFalse(viewModel.autoPullProperty().get());
+        assertFalse(viewModel.autoPushProperty().get());
     }
 
     @Test
-    void testStoreSettingsWritesTrue() {
+    void testStoreSettingsWritesGranularKeys() {
+        // checks "Commit" and "Push"
         viewModel.autoCommitProperty().set(true);
+        viewModel.autoPullProperty().set(false);
+        viewModel.autoPushProperty().set(true);
+
         viewModel.storeSettings();
 
         Map<String, List<String>> data = metaData.getUnknownMetaData();
-        assertTrue(data.containsKey("gitEnabled"));
-        assertEquals(Collections.singletonList("true"), data.get("gitEnabled"));
+
+        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_COMMIT));
+        assertFalse(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PULL));
+        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PUSH));
     }
 
     @Test
-    void testStoreSettingsRemovesKeyWhenDisabled() {
-        metaData.putUnknownMetaDataItem("gitEnabled", Collections.singletonList("true"));
+    void testStoreSettingsRemovesLegacyKey() {
+        metaData.putUnknownMetaDataItem(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
 
-        viewModel.autoCommitProperty().set(false);
+        viewModel.setValues();
         viewModel.storeSettings();
 
-        assertFalse(metaData.getUnknownMetaData().containsKey("gitEnabled"));
+        Map<String, List<String>> data = metaData.getUnknownMetaData();
+
+        assertFalse(data.containsKey(GitPropertiesViewModel.LEGACY_GIT_ENABLED));
+
+        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_COMMIT));
+        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PULL));
+        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PUSH));
     }
 }

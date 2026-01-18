@@ -10,9 +10,10 @@
 
     <children>
         <VBox spacing="10">
-            <Label text="Git Integration" styleClass="sectionHeader"/>
-            <CheckBox fx:id="autoCommitCheckBox" text="Automatically commit and push changes to Git on save"/>
+            <Label text="Git Automation" styleClass="sectionHeader"/>
+            <CheckBox fx:id="autoCommitCheckBox" text="Commit"/>
+            <CheckBox fx:id="autoPullCheckBox" text="Pull"/>
+            <CheckBox fx:id="autoPushCheckBox" text="Push"/>
         </VBox>
     </children>
-
 </VBox>

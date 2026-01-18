@@ -17,7 +17,9 @@ import com.airhacks.afterburner.views.ViewLoader;
  */
 public class GitPropertiesView extends AbstractPropertiesTabView<GitPropertiesViewModel> {
 
+    @FXML private CheckBox autoPullCheckBox;
     @FXML private CheckBox autoCommitCheckBox;
+    @FXML private CheckBox autoPushCheckBox;
 
     public GitPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -36,7 +38,9 @@ public class GitPropertiesView extends AbstractPropertiesTabView<GitPropertiesVi
 
     @FXML
     public void initialize() {
+        autoPullCheckBox.selectedProperty().bindBidirectional(viewModel.autoPullProperty());
         autoCommitCheckBox.selectedProperty().bindBidirectional(viewModel.autoCommitProperty());
+        autoPushCheckBox.selectedProperty().bindBidirectional(viewModel.autoPushProperty());
     }
 
     @Override
