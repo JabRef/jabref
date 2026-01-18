@@ -222,21 +222,24 @@ public class WebFetchers {
                                                                      ImportFormatPreferences importFormatPreferences,
                                                                      FilePreferences filePreferences,
                                                                      BibDatabaseContext databaseContext) {
-        SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
-        set.add(new INSPIREFetcher(importFormatPreferences));
+        SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
+
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
+        set.add(new CrossRef());
         set.add(new DoiFetcher(importFormatPreferences));
+        set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
+
         set.add(new IssnFetcher());
         // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+
         set.add(new MathSciNet(importFormatPreferences));
-        set.add(new CrossRef());
-        set.add(new SsrnFetcher(importFormatPreferences));
-        set.add(new ZbMATH(importFormatPreferences));
-        set.add(new SemanticScholar(importerPreferences));
         set.add(new OpenAlex());
         set.add(new ResearchGate(importFormatPreferences));
+        set.add(new SemanticScholar(importerPreferences));
+        set.add(new SsrnFetcher(importFormatPreferences));
+        set.add(new ZbMATH(importFormatPreferences));
 
         // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
         // We list it here, because otherwise, it would be much more effort (other UI button, ...)
@@ -249,9 +252,11 @@ public class WebFetchers {
      * @return sorted set containing id fetchers
      */
     public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
-        SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
-        set.add(new CrossRef());
+        SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
+
         set.add(new ArXivFetcher(importFormatPreferences));
+        set.add(new CrossRef());
+
         return set;
     }
 
@@ -265,13 +270,13 @@ public class WebFetchers {
         fetchers.add(new DoiResolution(importFormatPreferences.doiPreferences()));
 
         // Publishers
+        fetchers.add(new ACS());
+        fetchers.add(new ApsFetcher());
+        fetchers.add(new ArXivFetcher(importFormatPreferences));
+        fetchers.add(new IacrEprintFetcher(importFormatPreferences));
+        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new ScienceDirect(importerPreferences));
         fetchers.add(new SpringerNatureFullTextFetcher(importerPreferences));
-        fetchers.add(new ACS());
-        fetchers.add(new ArXivFetcher(importFormatPreferences));
-        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
-        fetchers.add(new ApsFetcher());
-        fetchers.add(new IacrEprintFetcher(importFormatPreferences));
 
         // Meta search
         fetchers.add(new CiteSeer());
@@ -283,6 +288,7 @@ public class WebFetchers {
         fetchers.add(new ResearchGate(importFormatPreferences));
         fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new UnpaywallFetcher(importerPreferences));
+
         return fetchers;
     }
 
