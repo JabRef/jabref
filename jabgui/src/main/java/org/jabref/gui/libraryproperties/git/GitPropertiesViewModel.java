@@ -37,9 +37,11 @@ public class GitPropertiesViewModel implements PropertiesTabViewModel {
     public BooleanProperty autoPullProperty() {
         return autoPullProperty;
     }
+
     public BooleanProperty autoCommitProperty() {
         return autoCommitProperty;
     }
+
     public BooleanProperty autoPushProperty() {
         return autoPushProperty;
     }
