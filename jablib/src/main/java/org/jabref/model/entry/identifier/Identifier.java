@@ -31,6 +31,7 @@ public interface Identifier {
 
     Optional<URI> getExternalURI();
 
+    /// @implNote Should be consistent with [org.jabref.logic.importer.WebFetchers#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences)
     static Optional<Identifier> from(String identifier) {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
