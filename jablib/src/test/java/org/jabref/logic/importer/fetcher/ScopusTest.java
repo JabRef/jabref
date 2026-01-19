@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
@@ -108,19 +109,18 @@ class ScopusTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcher
     @Test
     void searchByAuthorFindsEntries() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Steinmacher");
-
-        assertFalse(fetchedEntries.isEmpty());
+        assertNotEquals(List.of(), fetchedEntries);
     }
 
     @Test
     void searchResultContainsExpectedFields() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("machine learning neural networks");
+        assertNotEquals(List.of(), fetchedEntries);
 
-        assertFalse(fetchedEntries.isEmpty());
         BibEntry firstEntry = fetchedEntries.getFirst();
 
         // Check that essential fields are populated
-        assertTrue(firstEntry.getField(StandardField.TITLE).isPresent());
+        assertNotEquals(Optional.empty(), firstEntry.getField(StandardField.TITLE));
         // Scopus entries should have DOI or URL
         assertTrue(firstEntry.getField(StandardField.DOI).isPresent() ||
                 firstEntry.getField(StandardField.URL).isPresent());
