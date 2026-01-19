@@ -40,11 +40,10 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetcher;
-import org.jabref.logic.importer.fetcher.ArXivFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.RfcFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -53,12 +52,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
-import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.model.entry.identifier.RFC;
-import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
@@ -87,8 +81,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private final NewEntryDialogTab initialApproach;
     private NewEntryDialogTab currentApproach;
 
-    private final GuiPreferences guiPreferences;
-    private final NewEntryPreferences preferences;
+    private final GuiPreferences preferences;
+
+    private final ImportFormatPreferences importFormatPreferences;
+    private final NewEntryPreferences newEntryPreferences;
+
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     @Inject private StateManager stateManager;
@@ -136,8 +133,13 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         this.initialApproach = initialApproach;
         this.currentApproach = initialApproach;
 
-        this.guiPreferences = preferences;
-        this.preferences = preferences.getNewEntryPreferences();
+        // This is required for new NewEntryViewModel(preferences, ...
+        this.preferences = preferences;
+
+        // Required by this class
+        this.importFormatPreferences = preferences.getImportFormatPreferences();
+        this.newEntryPreferences = preferences.getNewEntryPreferences();
+
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
 
@@ -177,10 +179,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 } else if (clipboardText.split(LINE_BREAK)[0].matches(BIBTEX_REGEX)) {
                     approach = NewEntryDialogTab.SPECIFY_BIBTEX;
                 } else {
-                    approach = preferences.getLatestApproach();
+                    approach = newEntryPreferences.getLatestApproach();
                 }
             } else {
-                approach = preferences.getLatestApproach();
+                approach = newEntryPreferences.getLatestApproach();
             }
         }
 
@@ -211,7 +213,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     @FXML
     public void initialize() {
-        viewModel = new NewEntryViewModel(guiPreferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
+        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
 
         visualizer.setDecoration(new IconValidationDecorator());
 
@@ -231,15 +233,15 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     private void initializeAddEntry() {
         entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
-        entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
+        entryRecommendedTitle.expandedProperty().bindBidirectional(newEntryPreferences.typesRecommendedExpandedProperty());
         entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());
 
         entryOtherTitle.managedProperty().bind(entryOtherTitle.visibleProperty());
-        entryOtherTitle.expandedProperty().bindBidirectional(preferences.typesOtherExpandedProperty());
+        entryOtherTitle.expandedProperty().bindBidirectional(newEntryPreferences.typesOtherExpandedProperty());
         entryOther.managedProperty().bind(entryOther.visibleProperty());
 
         entryCustomTitle.managedProperty().bind(entryCustomTitle.visibleProperty());
-        entryCustomTitle.expandedProperty().bindBidirectional(preferences.typesCustomExpandedProperty());
+        entryCustomTitle.expandedProperty().bindBidirectional(newEntryPreferences.typesCustomExpandedProperty());
         entryCustom.managedProperty().bind(entryCustom.visibleProperty());
 
         entryNonStandardTitle.managedProperty().bind(entryNonStandardTitle.visibleProperty());
@@ -291,7 +293,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idLookupGuess.setToggleGroup(toggleGroup);
         idLookupSpecify.setToggleGroup(toggleGroup);
 
-        if (preferences.getIdLookupGuessing()) {
+        if (newEntryPreferences.getIdLookupGuessing()) {
             idLookupGuess.selectedProperty().set(true);
         } else {
             idLookupSpecify.selectedProperty().set(true);
@@ -313,13 +315,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                             Platform.runLater(() -> {
                                 // [impl->req~newentry.clipboard.autofocus~1]
                                 idLookupSpecify.setSelected(true);
-                                fetcherForIdentifier(identifier).ifPresent(idFetcher::setValue);
+                                WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences)
+                                           .ifPresent(idFetcher::setValue);
                             });
                         },
                         () -> Platform.runLater(() -> idLookupGuess.setSelected(true)));
 
         idLookupGuess.selectedProperty().addListener((_, _, newValue) -> {
-            preferences.setIdLookupGuessing(newValue);
+            newEntryPreferences.setIdLookupGuessing(newValue);
             // When switching to auto-detect mode, detect identifier type from current text
             if (newValue) {
                 updateFetcherFromIdentifierText(idText.getText());
@@ -330,13 +333,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
         idFetcher.disableProperty().bind(idLookupSpecify.selectedProperty().not());
         idFetcher.valueProperty().bindBidirectional(viewModel.idFetcherProperty());
-        IdBasedFetcher initialFetcher = fetcherFromName(preferences.getLatestIdFetcher(), idFetcher.getItems());
+        IdBasedFetcher initialFetcher = fetcherFromName(newEntryPreferences.getLatestIdFetcher());
         if (initialFetcher == null) {
-            final IdBasedFetcher defaultFetcher = new DoiFetcher(guiPreferences.getImportFormatPreferences());
-            initialFetcher = fetcherFromName(defaultFetcher.getName(), idFetcher.getItems());
+            initialFetcher = fetcherFromName(DoiFetcher.NAME);
         }
         idFetcher.setValue(initialFetcher);
-        idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
+        idFetcher.setOnAction(_ -> newEntryPreferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
         // Auto-detect identifier type when typing in the identifier field
         // Only works when "Automatically determine identifier type" is selected
@@ -354,7 +356,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
 
         TextInputControl textInput = idText;
-        EditorValidator validator = new EditorValidator(this.guiPreferences);
+        EditorValidator validator = new EditorValidator(this.preferences);
         validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);
     }
 
@@ -369,13 +371,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         interpretParser.itemsProperty().bind(viewModel.interpretParsersProperty());
         new ViewModelListCellFactory<PlainCitationParserChoice>().withText(PlainCitationParserChoice::getLocalizedName).install(interpretParser);
         interpretParser.valueProperty().bindBidirectional(viewModel.interpretParserProperty());
-        PlainCitationParserChoice initialParser = parserFromName(preferences.getLatestInterpretParser(), interpretParser.getItems());
+        PlainCitationParserChoice initialParser = parserFromName(newEntryPreferences.getLatestInterpretParser(), interpretParser.getItems());
         if (initialParser == null) {
-            final PlainCitationParserChoice defaultParser = PlainCitationParserChoice.RULE_BASED_GENERAL;
-            initialParser = parserFromName(defaultParser.getLocalizedName(), interpretParser.getItems());
+            initialParser = parserFromName(PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName(), interpretParser.getItems());
         }
         interpretParser.setValue(initialParser);
-        interpretParser.setOnAction(_ -> preferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName()));
+        interpretParser.setOnAction(_ -> newEntryPreferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName()));
     }
 
     private void initializeSpecifyBibTeX() {
@@ -396,7 +397,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         currentApproach = NewEntryDialogTab.CHOOSE_ENTRY_TYPE;
-        preferences.setLatestApproach(NewEntryDialogTab.CHOOSE_ENTRY_TYPE);
+        newEntryPreferences.setLatestApproach(NewEntryDialogTab.CHOOSE_ENTRY_TYPE);
 
         if (generateButton != null) {
             generateButton.disableProperty().unbind();
@@ -412,7 +413,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         currentApproach = NewEntryDialogTab.ENTER_IDENTIFIER;
-        preferences.setLatestApproach(NewEntryDialogTab.ENTER_IDENTIFIER);
+        newEntryPreferences.setLatestApproach(NewEntryDialogTab.ENTER_IDENTIFIER);
 
         if (idText != null) {
             Platform.runLater(() -> idText.requestFocus());
@@ -431,7 +432,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;
-        preferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
+        newEntryPreferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
 
         if (interpretText != null) {
             Platform.runLater(() -> interpretText.requestFocus());
@@ -450,7 +451,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         currentApproach = NewEntryDialogTab.SPECIFY_BIBTEX;
-        preferences.setLatestApproach(NewEntryDialogTab.SPECIFY_BIBTEX);
+        newEntryPreferences.setLatestApproach(NewEntryDialogTab.SPECIFY_BIBTEX);
 
         if (bibtexText != null) {
             Platform.runLater(() -> bibtexText.requestFocus());
@@ -463,7 +464,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void onEntryTypeSelected(EntryType type) {
-        preferences.setLatestImmediateType(type);
+        newEntryPreferences.setLatestImmediateType(type);
         result = new BibEntry(type);
         this.close();
     }
@@ -538,7 +539,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return null;
     }
 
-    private static String descriptionOfStandardEntryType(StandardEntryType type) {
+    private static @NonNull String descriptionOfStandardEntryType(StandardEntryType type) {
         // These descriptions are taken from subsection 2.1 of the biblatex package documentation.
         // Biblatex is a superset of bibtex, with more elaborate descriptions, so its documentation is preferred.
         // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
@@ -610,7 +611,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         };
     }
 
-    private static String descriptionOfNonStandardEntryType(BiblatexNonStandardEntryType type) {
+    private static @NonNull String descriptionOfNonStandardEntryType(BiblatexNonStandardEntryType type) {
         // These descriptions are taken from subsection 2.1.3 of the biblatex package documentation.
         // Non-standard Types (BibLaTeX only) - these use the @misc driver in standard bibliography styles.
         // See [https://mirrors.ibiblio.org/pub/mirrors/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf].
@@ -648,8 +649,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         };
     }
 
-    private static IdBasedFetcher fetcherFromName(String fetcherName, List<IdBasedFetcher> fetchers) {
-        for (IdBasedFetcher fetcher : fetchers) {
+    private @Nullable IdBasedFetcher fetcherFromName(String fetcherName) {
+        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if (fetcher.getName().equals(fetcherName)) {
                 return fetcher;
             }
@@ -675,7 +676,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
      */
     private void updateFetcherFromIdentifierText(@Nullable String text) {
         Identifier.from(text)
-                  .flatMap(identifier -> fetcherForIdentifier(identifier))
+                  .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences))
+                  .map(fetcher -> fetcherFromName(fetcher.getName()))
                   .ifPresent(idFetcher::setValue);
     }
 
@@ -683,19 +685,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
             return Identifier.from(clipboardText);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
-        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
-            if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
-                    (id instanceof ISBN && fetcher instanceof IsbnFetcher) ||
-                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
-                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
-                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
-                return Optional.of(fetcher);
-            }
         }
         return Optional.empty();
     }
