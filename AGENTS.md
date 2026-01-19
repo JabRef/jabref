@@ -54,33 +54,37 @@ Agents **must not**:
 
 - Target the configured **Gradle toolchain**
 - Use **Java 24+ features**
-- Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
-   Using JavaFX Obersvable lists is considered best practice, too.
-- Use modern Java data structures
-   BAD: new HashSet<>(Arrays.asList(...))
-   GOOD: Set.of(...)
-- Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
-- To create an empty list or map we use `List.of()` and `Map.of()` instead of `Collections.emptyList()` and `Collections.emptyMap()`.
-- Correctly spelled variable names (meaning: no typos in variable names).
-- Use StringJoiner instead of StringBuilder (if possible)
-- Prefer immutability and explicit nullability (JSpecify)
-- New methods (and new classes) should follow the Single-responsibility principle (SRP).
+  - Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
+    Using JavaFX Obersvable lists is considered best practice, too.
+  - Use modern Java data structures
+    BAD: new HashSet<>(Arrays.asList(...))
+    GOOD: Set.of(...)
+  - Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
+  - To create an empty list or map we use `List.of()` and `Map.of()` instead of `Collections.emptyList()` and `Collections.emptyMap()`.
+  - Use Java Text blocks (\"\"\") for multiline string constants
 
-### Style
+### General Java style
 
 - Follow existing formatting; do not reformat unrelated code
 - Match naming conventions exactly
 - Keep methods small and focused
+- New methods (and new classes) should follow the Single-responsibility principle (SRP).
 - Avoid code duplication
 - Avoid premature abstractions
 - Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
+- Follow the principles of "Effective Java"
+- Follow the principles of "Clean Code"
 - Ensure that tests are green before committing
+
+### Java code style
+
+- Correctly spelled variable names (meaning: no typos in variable names).
+- Use StringJoiner instead of StringBuilder (if possible)
+- Prefer immutability and explicit nullability (JSpecify)
+- DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
 - Code should not be reformatted only because of syntax. There need to be new statements added if reformatting.
-- Follow the principles of \"Effective Java\"
-- Follow the principles of \"Clean Code\"
 - Remove commented code. (To keep a history of changes git was made for.)
 - No \"new Thread()\", use \"org.jabref.logic.util.BackgroundTask\" and its \"executeWith\"
-- Use Java Text blocks (\"\"\") for multiline string constants
 - Use compiled patterns (Pattern.compile)
    Examples:
    NOT: x.matches(\".*\\\\s{2,}.*\")
@@ -89,6 +93,8 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
+- Use specific exceptions, `catch (Exception e)` is a no-go
+- At exception, always `LOGGER.debug` (or higher level)
 
 ### Comments
 
