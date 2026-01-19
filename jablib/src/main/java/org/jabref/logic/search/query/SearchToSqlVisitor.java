@@ -176,6 +176,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         }
 
         // fielded expression
+        // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText();
         int operator = ctx.operator().getStart().getType();
 

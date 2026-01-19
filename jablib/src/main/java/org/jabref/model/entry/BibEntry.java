@@ -412,16 +412,11 @@ public class BibEntry {
         return this;
     }
 
-    /**
-     * If not present, {@link BibEntry#getAuthorTitleYear(int)} can be used
-     */
+    /// If not present, [BibEntry#getAuthorTitleYear(int)] can be used
+    @NonNull
     public Optional<String> getCitationKey() {
-        String key = fields.get(InternalField.KEY_FIELD);
-        if (StringUtil.isBlank(key)) {
-            return Optional.empty();
-        } else {
-            return Optional.of(key);
-        }
+        return Optional.ofNullable(fields.get(InternalField.KEY_FIELD))
+                       .filter(StringUtil::isNotBlank);
     }
 
     public boolean hasCitationKey() {

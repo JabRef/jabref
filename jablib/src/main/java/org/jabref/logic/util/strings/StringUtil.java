@@ -23,6 +23,8 @@ import org.jabref.model.strings.UnicodeToReadableCharMap;
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
@@ -632,15 +634,15 @@ public class StringUtil {
         return resultSB.toString();
     }
 
-    public static boolean isNullOrEmpty(String toTest) {
+    public static boolean isNullOrEmpty(@Nullable String toTest) {
         return (toTest == null) || toTest.isEmpty();
     }
 
-    public static boolean isBlank(String string) {
+    public static boolean isBlank(@Nullable String string) {
         return (string == null) || string.isBlank();
     }
 
-    public static boolean isBlank(Optional<String> string) {
+    public static boolean isBlank(@NonNull Optional<String> string) {
         return string.isEmpty() || isBlank(string.get());
     }
 
