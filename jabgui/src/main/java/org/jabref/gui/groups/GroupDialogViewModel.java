@@ -330,7 +330,7 @@ public class GroupDialogViewModel {
         AbstractGroup resultingGroup = null;
         try {
             String groupName = nameProperty.getValue().trim();
-            // Check Directory structure checkbox first (has priority over radio buttons)
+            // Check Directory group type
             if (typeDirectoryProperty.get()) {
                 resultingGroup = new DirectoryGroup(
                         groupName,
