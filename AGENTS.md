@@ -80,8 +80,7 @@ Agents **must not**:
 
 - Correctly spelled variable names (meaning: no typos in variable names).
 - Use StringJoiner instead of StringBuilder (if possible)
-- Prefer immutability and explicit nullability (JSpecify)
-- DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
+- Prefer immutability and explicit nullability (JSpecify - see below)
 - Code should not be reformatted only because of syntax. There need to be new statements added if reformatting.
 - Remove commented code. (To keep a history of changes git was made for.)
 - No \"new Thread()\", use \"org.jabref.logic.util.BackgroundTask\" and its \"executeWith\"
@@ -132,9 +131,13 @@ Both comments must not be added.
 
 - If the `java.util.Optional` is really present, use use `get()` (and not `orElse(\"\")`)
 - Use `ifPresentOrElse` instead of `if ...isPresent() { ... }  else { ... }`
+
+### Dealing with `null`
+
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
 - Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
 - `null` should never be passed to a method (except it has the same name).
+- DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
 
 ### Exceptions
 
@@ -148,8 +151,8 @@ Both comments must not be added.
    ```java
    try {
        // do some actions
-   } catch (Exception e) {
-       LOGGER.info(\"Failed to push: \".concat(e.toString()));
+   } catch (IOException e) {
+       LOGGER.info("Failed to push: ".concat(e.toString()));
    }
    ```
 
@@ -160,8 +163,8 @@ Both comments must not be added.
    ```java
    try {
        // do some actions
-   } catch (Exception e) {
-       LOGGER.info(\"Failed to push\", e);
+   } catch (IOException e) {
+       LOGGER.info("Failed to push", e);
    }
    ```
 
@@ -174,6 +177,11 @@ Both comments must not be added.
   Note: This rule does not apply for import statements.
 - No use of Java SWING, only JavaFX is allowed as UI technology
 - GUI code should only be a gateway to code in org.jabref.logic. More complex code regarding non-GUI operations should go into org.jabref.logic. Think of layerd archicture.
+- Labels should not end with \":\"
+
+   BAD: `<Label text="%Git Username:"/>`
+
+   GOOD: `<Label text="%Git Username"/>`
 
 #### Localization
 
@@ -210,7 +218,7 @@ Both comments must not be added.
    and with FileDialogConfiguration offers the Builder pattern.
    (see e.g NewLibraryFromPdfAction)
 
-#### Testing
+#### Testing / JUnit
 
 - In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
 - Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
@@ -263,11 +271,6 @@ Both comments must not be added.
    <Label text=\"%Want to help?\"/>
    ```
 
-- Labels should not end with \":\"
-
-   BAD: `<Label text="%Git Username:"/>`
-
-   GOOD: `<Label text="%Git Username"/>`
 - Plain JUnit assert should be used instead of org.assertj (if possible)
 
    BAD: assertThat(gitPreferences.getAutoPushEnabled()).isFalse();
