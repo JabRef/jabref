@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -21,6 +21,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
@@ -75,12 +76,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             getSelectionHtml();
             """;
 
+    private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
+
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
+
+    private final BookCoverFetcher bookCoverFetcher;
 
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
@@ -105,6 +110,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
+
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -223,39 +230,44 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        AtomicReference<String> baseURL = new AtomicReference<>("");
-        if (databaseContext != null) {
-            databaseContext
-                    .getFirstExistingFileDir(preferences.getFilePreferences())
-                    .ifPresent(baseDirPath -> {
-                        try {
-                            String baseUrl = baseDirPath.toUri().toURL().toExternalForm();
-                            // Ensure the base URL ends with a slash for correct relative path resolution
-                            if (!baseUrl.endsWith("/")) {
-                                baseUrl += "/";
-                            }
-                            baseURL.set(baseUrl);
-                        } catch (MalformedURLException e) {
-                            LOGGER.error("Malformed URL for base directory: {}", baseDirPath, e);
-                        }
-                    });
-        }
-        layoutText = formatPreviewText(baseURL.get(), text);
+        String baseURL = getBaseURL().orElse("");
+        String coverIfAny = getCoverImageURL().map(COVER_IMAGE_FORMAT_HTML::formatted).orElse("");
+        layoutText = formatPreviewText(baseURL, coverIfAny, text);
         highlightLayoutText();
         setHvalue(0);
     }
 
-    private static String formatPreviewText(String baseUrl, String text) {
+    private Optional<String> getBaseURL() {
+        if (databaseContext == null) {
+            return Optional.empty();
+        }
+        return databaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(path -> {
+            String url = path.toUri().toString();
+            if (!url.endsWith("/")) {
+                url += "/";
+            }
+            return url;
+        });
+    }
+
+    private Optional<String> getCoverImageURL() {
+        if (entry != null) {
+            return bookCoverFetcher.getDownloadedCoverForEntry(entry).map(path -> path.toUri().toString());
+        }
+        return Optional.empty();
+    }
+
+    private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
         return """
                 <html>
                     <head>
                         <base href="%s">
                     </head>
                     <body id="previewBody">
-                        <div id="content"> %s </div>
+                        %s <div id="content"> %s </div>
                     </body>
                 </html>
-                """.formatted(baseUrl, text);
+                """.formatted(baseUrl, coverIfAny, text);
     }
 
     private void highlightLayoutText() {
@@ -310,7 +322,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        clipBoardManager.setContent((String) previewView.getEngine().executeScript("document.body.innerText"));
+        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
+        ClipboardContent content = new ClipboardContent();
+        content.putString(plainText);
+        clipBoardManager.setContent(content);
     }
 
     public void copySelectionToClipBoard() {

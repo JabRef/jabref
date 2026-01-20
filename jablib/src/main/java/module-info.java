@@ -40,6 +40,7 @@ open module org.jabref.jablib {
     exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
     exports org.jabref.logic.ai;
+    exports org.jabref.logic.ai.models;
     exports org.jabref.logic.pdf;
     exports org.jabref.model.database.event;
     exports org.jabref.model.entry.event;
@@ -172,6 +173,10 @@ open module org.jabref.jablib {
 
     // region: SQL databases
     requires embedded.postgres;
+    // For arm, we explicitly need to add these as well
+    requires embedded.postgres.binaries.darwin.arm64v8;
+    requires embedded.postgres.binaries.linux.arm64v8;
+
     requires org.tukaani.xz;
     requires org.postgresql.jdbc;
     // endregion
