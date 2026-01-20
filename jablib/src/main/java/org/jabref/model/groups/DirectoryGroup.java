@@ -79,9 +79,9 @@ public class DirectoryGroup extends AbstractGroup {
      */
     public boolean hasFileInDirectory(BibEntry entry) {
         return entry.getFiles().stream()
-                .map(LinkedFile::getLink)
-                .map(Path::of)
-                .anyMatch(this::isFileInDirectory);
+                    .map(LinkedFile::getLink)
+                    .map(Path::of)
+                    .anyMatch(this::isFileInDirectory);
     }
 
     /**
@@ -116,12 +116,12 @@ public class DirectoryGroup extends AbstractGroup {
 
         try (Stream<Path> paths = Files.list(directoryPath)) {
             return paths.filter(Files::isDirectory)
-                    .sorted()
-                    .map(subDir -> new DirectoryGroup(
-                            subDir.getFileName().toString(),
-                            GroupHierarchyType.INCLUDING,
-                            subDir))
-                    .toList();
+                        .sorted()
+                        .map(subDir -> new DirectoryGroup(
+                                subDir.getFileName().toString(),
+                                GroupHierarchyType.INCLUDING,
+                                subDir))
+                        .toList();
         } catch (IOException e) {
             LOGGER.warn("Error scanning subdirectories of {}", directoryPath, e);
             return List.of();
