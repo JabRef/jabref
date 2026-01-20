@@ -469,7 +469,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 citingTask.cancel();
             }
             entryEditorPreferences.setCitationFetcherType(newValue);
-            searchForRelations(citingComponents, citedByComponents, true);
+            searchForRelations(citingComponents, citedByComponents, false);
         });
 
         // Create SplitPane to hold all nodes above
