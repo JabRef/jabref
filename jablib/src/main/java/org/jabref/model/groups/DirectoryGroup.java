@@ -13,7 +13,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import org.jspecify.annotations.NonNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
