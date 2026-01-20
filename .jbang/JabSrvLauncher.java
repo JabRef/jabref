@@ -33,7 +33,7 @@
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.glassfish.grizzly:grizzly-framework:5.0.0
-//DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
+//DEPS org.glassfish.grizzly:grizzly-http-server:5.0.0
 //DEPS org.glassfish.grizzly:grizzly-websockets:4.0.2
 //DEPS org.glassfish.hk2:hk2-api:3.1.1
 //DEPS org.glassfish.hk2:hk2-locator:3.1.1
