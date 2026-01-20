@@ -3,7 +3,6 @@ package org.jabref.model.groups;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +10,9 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.LinkedFile;
+
+import org.jspecify.annotations.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +36,9 @@ public class DirectoryGroup extends AbstractGroup {
      * @param context       The hierarchical context
      * @param directoryPath The path to the directory this group mirrors
      */
-    public DirectoryGroup(String name, GroupHierarchyType context, Path directoryPath) {
+    public DirectoryGroup(@NonNull String name, @NonNull GroupHierarchyType context, @NonNull Path directoryPath) {
         super(name, context);
-        this.directoryPath = Objects.requireNonNull(directoryPath, "directoryPath must not be null");
+        this.directoryPath = directoryPath.toAbsolutePath().normalize();
     }
 
     /**
@@ -78,16 +79,10 @@ public class DirectoryGroup extends AbstractGroup {
      * @return true if the entry has a file in this directory
      */
     public boolean hasFileInDirectory(BibEntry entry) {
-        return entry.getField(StandardField.FILE).map(fileField -> {
-            // Parse the file field and check if any file is in this directory
-            // File field format: description:path:type
-            String[] parts = fileField.split(":");
-            if (parts.length >= 2) {
-                Path filePath = Path.of(parts[1]);
-                return isFileInDirectory(filePath);
-            }
-            return false;
-        }).orElse(false);
+        return entry.getFiles().stream()
+                .map(LinkedFile::getLink)
+                .map(Path::of)
+                .anyMatch(this::isFileInDirectory);
     }
 
     /**
@@ -95,10 +90,10 @@ public class DirectoryGroup extends AbstractGroup {
      */
     private boolean isFileInDirectory(Path filePath) {
         try {
-            Path normalizedDir = directoryPath.toAbsolutePath().normalize();
             Path normalizedFile = filePath.toAbsolutePath().normalize();
-            return normalizedFile.startsWith(normalizedDir);
-        } catch (Exception e) {
+            return normalizedFile.startsWith(directoryPath);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Invalid file path: {}", filePath, e);
             return false;
         }
     }
@@ -115,24 +110,23 @@ public class DirectoryGroup extends AbstractGroup {
      * @return List of DirectoryGroup objects for immediate subdirectories
      */
     public List<DirectoryGroup> scanSubdirectories() {
-        List<DirectoryGroup> subgroups = new ArrayList<>();
-
         if (!Files.isDirectory(directoryPath)) {
             LOGGER.warn("Cannot scan subdirectories: {} is not a directory", directoryPath);
-            return subgroups;
+            return List.of();
         }
 
         try (Stream<Path> paths = Files.list(directoryPath)) {
-            paths.filter(Files::isDirectory).sorted().forEach(subDir -> {
-                String subDirName = subDir.getFileName().toString();
-                DirectoryGroup subgroup = new DirectoryGroup(subDirName, GroupHierarchyType.INCLUDING, subDir);
-                subgroups.add(subgroup);
-            });
+            return paths.filter(Files::isDirectory)
+                    .sorted()
+                    .map(subDir -> new DirectoryGroup(
+                            subDir.getFileName().toString(),
+                            GroupHierarchyType.INCLUDING,
+                            subDir))
+                    .toList();
         } catch (IOException e) {
-            LOGGER.error("Error scanning subdirectories of {}", directoryPath, e);
+            LOGGER.warn("Error scanning subdirectories of {}", directoryPath, e);
+            return List.of();
         }
-
-        return subgroups;
     }
 
     /**
