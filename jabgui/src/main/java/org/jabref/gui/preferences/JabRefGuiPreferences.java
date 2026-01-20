@@ -469,7 +469,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private EntryEditorPreferences getEntryEditorPreferencesBackingStore(EntryEditorPreferences defaults){
         return new EntryEditorPreferences(
-                defaults.getEntryEditorTabs(),
+                getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
                 getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
                 getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
@@ -492,22 +492,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
      *
      * @return A map of the currently defined tabs in the entry editor from scratch to cache
      */
-    /*private Map<String, Set<Field>> getEntryEditorTabs() {
+    private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
 
         if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            // Nothing set (or wrong configuration), then we use default values
-            tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
-            tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
+            return EntryEditorPreferences.getDefaultEntryEditorTabs();
         }
 
         for (int i = 0; i < tabNames.size(); i++) {
             tabs.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
         }
         return tabs;
-    }*/
+    }
 
     /**
      * Stores the defined tabs and corresponding fields in the preferences.

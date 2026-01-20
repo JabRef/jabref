@@ -71,7 +71,7 @@ public class EntryEditorPreferences {
                 true,
                 true,
                 true,
-                JournalPopupEnabled.ENABLED,
+                JournalPopupEnabled.DISABLED,
                 true,
                 true,
                 0.5
