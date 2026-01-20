@@ -11,10 +11,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CitationCommentWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommentWriter.class);
@@ -26,7 +27,7 @@ public class CitationCommentWriter {
     private final Field commentField;
     private final String username;
 
-    public CitationCommentWriter(@NonNull String username) {
+    public CitationCommentWriter(String username) {
         if (username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be blank");
         }
@@ -42,11 +43,11 @@ public class CitationCommentWriter {
         return username;
     }
 
-    public String formatContext(@NonNull CitationContext context) {
+    public String formatContext(CitationContext context) {
         return CONTEXT_FORMAT.formatted(context.sourceCitationKey(), context.contextText());
     }
 
-    public String formatContexts(@NonNull List<CitationContext> contexts) {
+    public String formatContexts(List<CitationContext> contexts) {
         if (contexts.isEmpty()) {
             return "";
         }
@@ -55,7 +56,7 @@ public class CitationCommentWriter {
                        .collect(Collectors.joining(CONTEXT_SEPARATOR));
     }
 
-    public boolean addContextToEntry(@NonNull BibEntry entry, @NonNull CitationContext context) {
+    public boolean addContextToEntry(BibEntry entry, CitationContext context) {
         String formattedContext = formatContext(context);
         Optional<String> existingComment = entry.getField(commentField);
 
@@ -73,7 +74,7 @@ public class CitationCommentWriter {
         return true;
     }
 
-    public int addContextsToEntry(@NonNull BibEntry entry, @NonNull List<CitationContext> contexts) {
+    public int addContextsToEntry(BibEntry entry, List<CitationContext> contexts) {
         if (contexts.isEmpty()) {
             return 0;
         }
@@ -129,7 +130,7 @@ public class CitationCommentWriter {
         return trimmedExisting + CONTEXT_SEPARATOR + newContent;
     }
 
-    public boolean removeContextsFromSource(@NonNull BibEntry entry, @NonNull String sourceCitationKey) {
+    public boolean removeContextsFromSource(BibEntry entry, String sourceCitationKey) {
         Optional<String> existingComment = entry.getField(commentField);
         if (existingComment.isEmpty() || existingComment.get().isBlank()) {
             return false;
@@ -165,11 +166,11 @@ public class CitationCommentWriter {
         return removedAny;
     }
 
-    public void clearComment(@NonNull BibEntry entry) {
+    public void clearComment(BibEntry entry) {
         entry.clearField(commentField);
     }
 
-    public List<String> getContextsFromSource(@NonNull BibEntry entry, @NonNull String sourceCitationKey) {
+    public List<String> getContextsFromSource(BibEntry entry, String sourceCitationKey) {
         Optional<String> existingComment = entry.getField(commentField);
         if (existingComment.isEmpty() || existingComment.get().isBlank()) {
             return List.of();
@@ -188,7 +189,7 @@ public class CitationCommentWriter {
         return !getContextsFromSource(entry, sourceCitationKey).isEmpty();
     }
 
-    public int countContexts(@NonNull BibEntry entry) {
+    public int countContexts(BibEntry entry) {
         Optional<String> existingComment = entry.getField(commentField);
         if (existingComment.isEmpty() || existingComment.get().isBlank()) {
             return 0;

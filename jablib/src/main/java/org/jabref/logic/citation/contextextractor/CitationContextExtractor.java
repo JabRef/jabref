@@ -28,6 +28,10 @@ public class CitationContextExtractor {
             "\\[([A-Z][a-zA-Z]+\\d{2,4}[a-z]?)\\]"
     );
 
+    private static final Pattern SENTENCE_END_PATTERN = Pattern.compile(
+            "(?<![A-Z][a-z]\\.)(?<![A-Z]\\.)(?<=\\.|\\?|!)\\s+(?=[A-Z\"])|$"
+    );
+
     private final int contextSentencesBefore;
     private final int contextSentencesAfter;
 
@@ -105,11 +109,7 @@ public class CitationContextExtractor {
     private List<SentencePosition> splitIntoSentences(String text) {
         List<SentencePosition> sentences = new ArrayList<>();
 
-        Pattern sentenceEnd = Pattern.compile(
-                "(?<![A-Z][a-z]\\.)(?<![A-Z]\\.)(?<=\\.|\\?|!)\\s+(?=[A-Z\"])|$"
-        );
-
-        Matcher matcher = sentenceEnd.matcher(text);
+        Matcher matcher = SENTENCE_END_PATTERN.matcher(text);
         int lastEnd = 0;
 
         while (matcher.find()) {

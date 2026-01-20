@@ -151,35 +151,36 @@ public class CitationContextIntegrationService {
         List<PdfSection> relevantSections = sections.getCitationRelevantSections();
         String textToAnalyze;
 
-        if (!relevantSections.isEmpty()) {
+        if (relevantSections.isEmpty()) {
+            LOGGER.debug("No citation-relevant sections found, using full text");
+            textToAnalyze = sections.fullText();
+        } else {
             LOGGER.debug("Found {} citation-relevant sections", relevantSections.size());
             StringBuilder sb = new StringBuilder();
             for (PdfSection section : relevantSections) {
                 sb.append(section.content()).append("\n\n");
             }
             textToAnalyze = sb.toString();
-        } else {
-            LOGGER.debug("No citation-relevant sections found, using full text");
-            textToAnalyze = sections.fullText();
         }
 
-        if (llmContextExtractor != null) {
-            LOGGER.info("Using LLM-based citation context extraction");
-            try {
-                CitationContextList llmContexts = llmContextExtractor.extractContexts(textToAnalyze, sourceCitationKey);
-                result.addAll(llmContexts.getContexts());
-                LOGGER.info("LLM extracted {} citation contexts", llmContexts.size());
+        if (llmContextExtractor == null) {
+            LOGGER.info("Using regex-based citation context extraction (AI not enabled)");
+            extractWithRegex(textToAnalyze, sourceCitationKey, result);
+            return result;
+        }
 
-                if (llmContexts.isEmpty()) {
-                    LOGGER.info("LLM returned no results, falling back to regex extraction");
-                    extractWithRegex(textToAnalyze, sourceCitationKey, result);
-                }
-            } catch (Exception e) {
-                LOGGER.warn("LLM extraction failed, falling back to regex", e);
+        LOGGER.info("Using LLM-based citation context extraction");
+        try {
+            CitationContextList llmContexts = llmContextExtractor.extractContexts(textToAnalyze, sourceCitationKey);
+            result.addAll(llmContexts.getContexts());
+            LOGGER.info("LLM extracted {} citation contexts", llmContexts.size());
+
+            if (llmContexts.isEmpty()) {
+                LOGGER.info("LLM returned no results, falling back to regex extraction");
                 extractWithRegex(textToAnalyze, sourceCitationKey, result);
             }
-        } else {
-            LOGGER.info("Using regex-based citation context extraction (AI not enabled)");
+        } catch (Exception e) {
+            LOGGER.warn("LLM extraction failed, falling back to regex", e);
             extractWithRegex(textToAnalyze, sourceCitationKey, result);
         }
 

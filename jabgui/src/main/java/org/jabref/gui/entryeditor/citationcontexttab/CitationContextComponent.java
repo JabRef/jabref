@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -26,6 +23,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiService;
@@ -84,7 +82,7 @@ public class CitationContextComponent extends BorderPane {
         initializeComponent();
 
         entry.getFieldBinding(org.jabref.model.entry.field.StandardField.FILE)
-             .addListener((obs, oldVal, newVal) -> Platform.runLater(this::refreshContent));
+             .addListener((obs, oldVal, newVal) -> UiTaskExecutor.runInJavaFXThread(this::refreshContent));
     }
 
     private void refreshContent() {
@@ -295,14 +293,14 @@ public class CitationContextComponent extends BorderPane {
                               try {
                                   Optional<Path> resolvedPath = linkedFile.findIn(bibDatabaseContext, preferences.getFilePreferences());
                                   if (resolvedPath.isPresent()) {
-                                      LOGGER.info("Processing PDF: {}", resolvedPath.get());
+                                      LOGGER.debug("Processing PDF: {}", resolvedPath.get());
 
                                       List<CitationContextIntegrationService.MatchedContext> matched =
                                               service.previewDocument(resolvedPath.get(), sourceCitationKey);
                                       allMatched.addAll(matched);
 
                                       int currentSize = allMatched.size();
-                                      Platform.runLater(() -> {
+                                      UiTaskExecutor.runInJavaFXThread(() -> {
                                           statusLabel.setText(Localization.lang("Found %0 citation context(s)...", String.valueOf(currentSize)));
                                       });
                                   }
@@ -443,66 +441,6 @@ public class CitationContextComponent extends BorderPane {
                     Localization.lang("Contexts applied"),
                     message
             );
-        }
-    }
-
-    public static class ExtractedContextRow {
-        private final SimpleBooleanProperty selected;
-        private final SimpleStringProperty citationMarker;
-        private final SimpleStringProperty targetEntry;
-        private final SimpleStringProperty contextText;
-        private final SimpleStringProperty status;
-        private final CitationContextIntegrationService.MatchedContext matchedContext;
-
-        public ExtractedContextRow(String citationMarker, String targetEntry, String contextText,
-                                   String status, boolean selected,
-                                   CitationContextIntegrationService.MatchedContext matchedContext) {
-            this.selected = new SimpleBooleanProperty(selected);
-            this.citationMarker = new SimpleStringProperty(citationMarker);
-            this.targetEntry = new SimpleStringProperty(targetEntry);
-            this.contextText = new SimpleStringProperty(contextText);
-            this.status = new SimpleStringProperty(status);
-            this.matchedContext = matchedContext;
-        }
-
-        public boolean isSelected() {
-            return selected.get();
-        }
-
-        public void setSelected(boolean selected) {
-            this.selected.set(selected);
-        }
-
-        public SimpleBooleanProperty selectedProperty() {
-            return selected;
-        }
-
-        public SimpleStringProperty citationMarkerProperty() {
-            return citationMarker;
-        }
-
-        public SimpleStringProperty targetEntryProperty() {
-            return targetEntry;
-        }
-
-        public SimpleStringProperty contextTextProperty() {
-            return contextText;
-        }
-
-        public String getStatus() {
-            return status.get();
-        }
-
-        public void setStatus(String status) {
-            this.status.set(status);
-        }
-
-        public SimpleStringProperty statusProperty() {
-            return status;
-        }
-
-        public CitationContextIntegrationService.MatchedContext getMatchedContext() {
-            return matchedContext;
         }
     }
 }
