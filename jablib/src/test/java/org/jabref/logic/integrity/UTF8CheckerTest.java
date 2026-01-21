@@ -33,7 +33,7 @@ class UTF8CheckerTest {
     /// when the entry is encoded in Non-Utf-8 charset and the Library
     /// environment is Non UTF-8.
     /// Finally, we need to reset the environment charset.
-    /// 
+    ///
     @Test
     void fieldDoesNotAcceptUmlauts() {
         UTF8Checker checker = new UTF8Checker(Charset.forName("GBK"));
@@ -44,7 +44,7 @@ class UTF8CheckerTest {
 
     /// To check the UTF8Checker.UTF8EncodingChecker
     /// in NonUTF8 char array (should return false)
-    /// 
+    ///
     @Test
     void NonUTF8EncodingCheckerTest() {
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);

@@ -76,7 +76,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /// Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
-/// 
+///
 /// Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @ResourceLock("Localization.lang")

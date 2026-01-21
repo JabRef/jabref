@@ -43,7 +43,7 @@ class StudyFetcher {
     }
 
     /// Queries all catalogs on the given searchQuery.
-    /// 
+    ///
     /// @param searchQuery The query the search is performed for.
     /// @return Mapping of each fetcher by name and all their retrieved publications as a BibDatabase
     private List<FetchResult> performSearchOnQuery(String searchQuery) {

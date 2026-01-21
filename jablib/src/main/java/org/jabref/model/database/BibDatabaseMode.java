@@ -18,7 +18,7 @@ public enum BibDatabaseMode {
     }
 
     /// Returns the opposite mode of the current mode as {@link BibDatabaseMode}.
-    /// 
+    ///
     /// @return biblatex if the current mode is BIBTEX, BibTeX else
     public BibDatabaseMode getOppositeMode() {
         if (this == BIBTEX) {
@@ -31,7 +31,7 @@ public enum BibDatabaseMode {
     /// Returns the {@link BibDatabaseMode} that equals the given string. The use of capital and small letters
     /// in the string doesn't matter.If neither "bibtex" nor "biblatex" is the given string, then an
     /// {@link IllegalArgumentException} will be thrown.
-    /// 
+    ///
     /// @return BIBTEX, if the string is bibtex<br>
     /// BIBLATEX, if the string is biblatex<br>
     public static BibDatabaseMode parse(String data) {

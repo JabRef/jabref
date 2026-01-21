@@ -29,7 +29,7 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
 
     /// Converts ordinal numbers to superscripts, e.g. 1st, 2nd or 3rd.
     /// Will replace ordinal numbers even if they are semantically wrong, e.g. 21rd
-    /// 
+    ///
     /// <h4>Example</h4>
     /// <pre>{@code
     /// 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing

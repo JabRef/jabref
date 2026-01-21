@@ -67,7 +67,7 @@ public class BibEntryTypesManager {
 
     /// For a given database mode, determine all custom entry types, i.e. types that are not overwritten standard types but real custom types.
     /// For example, a modified "article" type will not be included in the list, but an entry type like "MyCustomType" will be included.
-    /// 
+    ///
     /// @param mode the BibDatabaseMode to be checked
     /// @return the list of all found custom types
     public List<BibEntryType> getAllCustomTypes(BibDatabaseMode mode) {
@@ -80,7 +80,7 @@ public class BibEntryTypesManager {
     }
 
     /// Required to check if during load of a .bib file the customization of the entry type is different
-    /// 
+    ///
     /// @return true if the given type is unknown here or is different from the stored one
     public boolean isDifferentCustomOrModifiedType(BibEntryType type, BibDatabaseMode mode) {
         Optional<BibEntryType> currentlyStoredType = enrich(type.getType(), mode);
@@ -168,7 +168,7 @@ public class BibEntryTypesManager {
     }
 
     /// This method returns the BibEntryType for the entry type.
-    /// 
+    ///
     /// @param mode the mode of the BibDatabase, may be null
     public Optional<BibEntryType> enrich(EntryType type, BibDatabaseMode mode) {
         return getEntryTypes(mode).enrich(type);

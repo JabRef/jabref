@@ -20,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// For additional tests see for
-/// 
+///
 /// -  purify: {@link org.jabref.logic.bst.util.BstPurifierTest}
 /// -  width: {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
 /// -  format.name: {@link org.jabref.logic.bst.util.BstNameFormatterTest}
 /// -  change.case: {@link org.jabref.logic.bst.util.BstCaseChangersTest}
 /// -  prefix: {@link org.jabref.logic.bst.util.BstTextPrefixerTest}
-/// 
+///
 class BstFunctionsTest {
     @Test
     void compareFunctions() throws RecognitionException {

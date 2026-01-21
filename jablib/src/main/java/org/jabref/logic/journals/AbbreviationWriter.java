@@ -17,7 +17,7 @@ public final class AbbreviationWriter {
 
     /// This method will write the list of abbreviations to a file on the file system specified by the given path. If the
     /// file already exists its content will be overridden, otherwise a new file will be created.
-    /// 
+    ///
     /// @param path          to a file (doesn't have to exist just yet)
     /// @param abbreviations as a list specifying which entries should be written
     public static void writeOrCreate(Path path, List<Abbreviation> abbreviations) throws IOException {

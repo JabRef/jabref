@@ -49,7 +49,7 @@ public final class BstCaseChanger {
         }
 
         /// Convert bstFormat char into ENUM
-    /// 
+    ///
     /// @throws IllegalArgumentException if char is not 't', 'l', 'u'
         public static FormatMode of(final char bstFormat) {
             for (FormatMode mode : FormatMode.values()) {
@@ -69,7 +69,7 @@ public final class BstCaseChanger {
     }
 
     /// Changes case of the given string s
-    /// 
+    ///
     /// @param s      the string to handle
     /// @param format the format
     public static String changeCase(String s, FormatMode format) {
@@ -134,7 +134,7 @@ public final class BstCaseChanger {
     /// special character. In general, this code will do reasonably well if there
     /// is other stuff, too, between braces, but it doesn't try to do anything
     /// special with |colon|s.
-    /// 
+    ///
     /// @param start the current position. It points to the opening brace
     private int convertSpecialChar(StringBuilder sb, char[] c, int start, FormatMode format) {
         int i = start;
@@ -167,7 +167,7 @@ public final class BstCaseChanger {
     /// Convert the given string according to the format character (title, lower,
     /// up) and append the result to the stringBuffer, return the updated
     /// position.
-    /// 
+    ///
     /// @return the new position
     private int convertAccented(char[] c, int start, String s, StringBuilder sb, FormatMode format) {
         int pos = start;
@@ -248,10 +248,10 @@ public final class BstCaseChanger {
 
     /// Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
     /// If nothing found, return Optional.empty()
-    /// 
-    /// 
+    ///
+    ///
     /// Also used by BibtexPurify
-    /// 
+    ///
     /// @param c   the current "String"
     /// @param pos the position
     /// @return the special LaTeX character or null

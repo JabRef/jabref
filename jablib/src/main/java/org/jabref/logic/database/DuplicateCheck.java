@@ -321,7 +321,7 @@ public class DuplicateCheck {
     /// them is a duplicate of the given entry, as per
     /// Util.isDuplicate(BibEntry, BibEntry), the duplicate is returned.
     /// The search is terminated when the first duplicate is found.
-    /// 
+    ///
     /// @param database The database to search.
     /// @param entry    The entry of which we are looking for duplicates.
     /// @return The first duplicate entry found. Empty Optional if no duplicates are found.

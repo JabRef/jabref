@@ -92,7 +92,7 @@ class ThemeManagerTest {
     /// subsystem, it was decided to drop this functionality in particular, as there is no use case for it and removing
     /// this does simplify the implementation of the theme system.
     /// See https://github.com/JabRef/jabref/pull/7336#issuecomment-874267375
-    /// 
+    ///
     /// @throws IOException when the testfile cannot be created
     @Disabled
     @Test

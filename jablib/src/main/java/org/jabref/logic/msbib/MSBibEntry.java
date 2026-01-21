@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /// MSBib entry representation
-/// 
+///
 /// @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
 /// @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
 /// @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
@@ -227,7 +227,7 @@ class MSBibEntry {
     }
 
     /// Gets the dom representation for one entry, used for export
-    /// 
+    ///
     /// @param document XmlDocument
     /// @return XmlElement represenation of one entry
     public Element getEntryDom(Document document) {

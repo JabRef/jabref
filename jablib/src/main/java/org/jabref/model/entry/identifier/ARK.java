@@ -11,11 +11,11 @@ import org.jabref.logic.util.URLUtil;
 /// is used in an eprint field, it will only be possible to open the ARK in the browner; no lookup
 /// or extraction of biography information will be possible.
 /// <br><br>
-/// 
+///
 /// ARK identifiers are typically prefixed with "ark:/". Even though the prefix does not help identify the resource, it appears
 /// to be the standard because many websites that feature ARKs, such as archive.org, include it. For the convenience of our users
 /// and to provide them with ability to copy/paste the ark as is, we support arks with or without the prefix.
-/// 
+///
 @AllowedToUseLogic("Because URL utility is needed")
 public class ARK extends EprintIdentifier {
     private final String ark;

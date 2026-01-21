@@ -54,9 +54,9 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /// Tries to find a fulltext URL for a given BibTex entry.
-    /// 
+    ///
     /// Uses the DOI if present, otherwise the arXiv identifier.
-    /// 
+    ///
     /// @param entry The Bibtex entry
     /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
     /// @throws IOException      if a page could not be fetched correctly
@@ -175,7 +175,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /// This is copy-paste from CrossRef, need to be checked.
-    /// 
+    ///
     /// @param item an entry received, needs to be parsed into a BibEntry
     /// @return The BibEntry that corresponds to the received object
     /// @throws ParseException if the JSONObject could not be parsed
@@ -208,7 +208,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /// Returns the localized name of this fetcher. The title can be used to display the fetcher in the menu and in the side pane.
-    /// 
+    ///
     /// @return the localized name
     @Override
     public String getName() {
@@ -216,7 +216,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
     }
 
     /// Looks for hits which are matched by the given {@link BibEntry}.
-    /// 
+    ///
     /// @param entry entry to search bibliographic information for
     /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
     /// @throws FetcherException if an error linked to the Fetcher applies

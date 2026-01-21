@@ -72,9 +72,9 @@ public class FileUtil {
     }
 
     /// Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
-    /// 
+    ///
     /// In case the filename starts with a "." and only has one ".", the part after the dot is NOT the extension
-    /// 
+    ///
     /// @return the extension (without leading dot), trimmed and in lowercase.
     public static Optional<String> getFileExtension(@NonNull String fileName) {
         Path realFileName = Path.of(fileName.trim()).getFileName();
@@ -94,7 +94,7 @@ public class FileUtil {
     }
 
     /// Returns the extension of a file or Optional.empty() if the file does not have one (no "." in name).
-    /// 
+    ///
     /// @return the extension (without leading dot), trimmed and in lowercase
     public static Optional<String> getFileExtension(@NonNull Path file) {
         return getFileExtension(file.getFileName().toString());
@@ -129,7 +129,7 @@ public class FileUtil {
 
     /// Extracts the filename from a URL, which is found between the last slash '/' and first query '?'.
     /// Does not check that the file is a valid URL.
-    /// 
+    ///
     /// @param link the URL string to extract the filename from
     /// @return the extracted filename, or Optional.empty if there is none.
     public static Optional<String> getFileNameFromUrl(@NonNull String link) {
@@ -163,9 +163,9 @@ public class FileUtil {
     }
 
     /// Returns a valid filename for most operating systems.
-    /// 
+    ///
     /// It uses {@link FileNameCleaner#cleanFileName(String)} to remove illegal characters.} and then truncates the length to 255 chars, see {@link #MAXIMUM_FILE_NAME_LENGTH}.
-    /// 
+    ///
     /// For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);
@@ -184,9 +184,9 @@ public class FileUtil {
 
     /// Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
     /// gets "demo.bib.sav" and not "demo.sav"
-    /// 
+    ///
     /// *Warning: If "ext" is passed, this is literally added. Thus `addExtension("tmp.txt", "ext")` leads to "tmp.txtext".*
-    /// 
+    ///
     /// @param path      the path to add the extension to
     /// @param extension the extension to add
     /// @return the modified file name
@@ -218,7 +218,7 @@ public class FileUtil {
     }
 
     /// Creates the minimal unique path substring for each file among multiple file paths.
-    /// 
+    ///
     /// @param paths the file paths
     /// @return the minimal unique path substring for each file path
     public static List<String> uniquePathSubstrings(List<String> paths) {
@@ -259,7 +259,7 @@ public class FileUtil {
     }
 
     /// Copies a file.
-    /// 
+    ///
     /// @param pathToSourceFile      Path Source file
     /// @param pathToDestinationFile Path Destination file
     /// @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
@@ -286,10 +286,10 @@ public class FileUtil {
 
     /// Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
     /// possible.
-    /// 
+    ///
     /// This method works correctly only if directories are sorted decent in their length i.e.
     /// /home/user/literature/important before /home/user/literature.
-    /// 
+    ///
     /// @param file        the file to be shortened
     /// @param directories directories to check
     public static Path relativize(Path file, List<Path> directories) {
@@ -332,7 +332,7 @@ public class FileUtil {
 
     /// Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
     /// possible.
-    /// 
+    ///
     /// @param path the file path to be shortened
     public static Path relativize(Path path, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
@@ -340,7 +340,7 @@ public class FileUtil {
     }
 
     /// Relativizes all BibEntries given to (!) the given database context
-    /// 
+    ///
     /// ⚠ Modifies the entries in the list ⚠
     public static List<BibEntry> relativize(List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
@@ -361,7 +361,7 @@ public class FileUtil {
     }
 
     /// Returns the list of linked files. The files have the absolute filename
-    /// 
+    ///
     /// @param entries  list of BibTeX entries
     /// @param fileDirs list of directories to try for expansion
     /// @return list of files. May be empty
@@ -373,7 +373,7 @@ public class FileUtil {
     }
 
     /// Determines filename provided by an entry in a database
-    /// 
+    ///
     /// @param database        the database, where the entry is located
     /// @param entry           the entry to which the file should be linked to
     /// @param fileNamePattern the filename pattern
@@ -395,7 +395,7 @@ public class FileUtil {
     }
 
     /// Determines directory name provided by an entry in a database
-    /// 
+    ///
     /// @param database             the database, where the entry is located
     /// @param entry                the entry to which the directory should be linked to
     /// @param directoryNamePattern the dirname pattern
@@ -414,7 +414,7 @@ public class FileUtil {
     }
 
     /// Finds a file inside a directory structure. Will also look for the file inside nested directories.
-    /// 
+    ///
     /// @param filename      the name of the file that should be found
     /// @param rootDirectory the rootDirectory that will be searched
     /// @return the path to the first file that matches the defined conditions
@@ -438,7 +438,7 @@ public class FileUtil {
 
     /// Converts a relative filename to an absolute one, if necessary. Returns
     /// an empty optional if the file does not exist.
-    /// 
+    ///
     /// Will look in each of the given directories starting from the beginning and
     /// returning the first found file to match if any.
     public static Optional<Path> find(@NonNull String fileName, @NonNull List<@NonNull Path> directories) {
@@ -458,7 +458,7 @@ public class FileUtil {
     }
 
     /// Converts a relative filename to an absolute one, if necessary.
-    /// 
+    ///
     /// @param fileName  the filename (e.g., a .pdf file), may contain path separators
     /// @param directory the directory which should be search starting point
     /// @return an empty optional if the file does not exist, otherwise, the absolute path
@@ -494,7 +494,7 @@ public class FileUtil {
     }
 
     /// Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
-    /// 
+    ///
     /// @param filename    the name of the file that should be found
     /// @param directories the directories that will be searched
     /// @return a list including all found paths to files that match the defined conditions
@@ -514,7 +514,7 @@ public class FileUtil {
     }
 
     /// Test if the file is a bib file by simply checking the extension to be ".bib"
-    /// 
+    ///
     /// @param file The file to check
     /// @return True if file extension is ".bib", false otherwise
     public static boolean isBibFile(Path file) {
@@ -522,7 +522,7 @@ public class FileUtil {
     }
 
     /// Test if the file is an image file by simply checking if its extension is an image extension
-    /// 
+    ///
     /// @param file The file to check
     /// @return true if file extension is an image, false otherwise
     public static boolean isImage(Path file) {
@@ -530,7 +530,7 @@ public class FileUtil {
     }
 
     /// Test if the file is a pdf file by simply checking the extension to be ".pdf"
-    /// 
+    ///
     /// @param file The file to check
     /// @return True if file extension is ".pdf", false otherwise
     public static boolean isPDFFile(Path file) {
@@ -544,7 +544,7 @@ public class FileUtil {
     }
 
     /// Detect illegal characters in given filename.
-    /// 
+    ///
     /// @param fileName the fileName to detect
     /// @return Boolean whether there is an illegal name.
     /// @see org.jabref.logic.util.io.FileNameCleaner#cleanFileName

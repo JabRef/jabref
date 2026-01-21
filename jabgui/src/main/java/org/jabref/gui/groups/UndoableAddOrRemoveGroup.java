@@ -33,7 +33,7 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
     private final int m_editType;
 
     /// Creates an object that can undo/redo an edit event.
-    /// 
+    ///
     /// @param groupsRoot The global groups root.
     /// @param editType   The type of editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN,
     /// REMOVE_NODE_AND_CHILDREN)

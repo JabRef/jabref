@@ -264,7 +264,7 @@ public class ImportHandler {
     /// Imports an entry into the database with duplicate checking and handling.
     /// Creates a copy of the entry for processing - the original entry parameter is not modified.
     /// The copied entry may be modified during cleanup and duplicate handling.
-    /// 
+    ///
     /// @param entry the entry to import (original will not be modified)
     /// @param decision the duplicate resolution strategy to apply
     /// @param tracker tracks the import status of the entry
@@ -377,7 +377,7 @@ public class ImportHandler {
     }
 
     /// Generate keys for given entries.
-    /// 
+    ///
     /// @param entries entries to generate keys for
     private void generateKeys(List<BibEntry> entries) {
         if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {

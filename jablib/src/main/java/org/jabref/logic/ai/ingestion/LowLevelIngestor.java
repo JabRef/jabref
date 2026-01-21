@@ -55,7 +55,7 @@ public class LowLevelIngestor {
 
     /// Add document to embedding store.
     /// This method does not check if file was already ingested.
-    /// 
+    ///
     /// @param document     - document to add.
     /// @param stopProperty - in case you want to stop the ingestion process, set this property to true.
     public void ingestDocument(Document document, ReadOnlyBooleanProperty stopProperty, IntegerProperty workDone, IntegerProperty workMax) throws InterruptedException {

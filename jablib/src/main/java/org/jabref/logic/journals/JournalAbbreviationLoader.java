@@ -14,13 +14,13 @@ import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// 
+///
 /// This class loads abbreviations from a CSV file and stores them into a MV file ({@link #readAbbreviationsFromCsvFile(Path)}
 /// It can also create an {@link JournalAbbreviationRepository} based on an MV file ({@link #loadRepository(JournalAbbreviationPreferences)}.
-/// 
-/// 
+///
+///
 /// Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
-/// 
+///
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);

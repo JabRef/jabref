@@ -34,10 +34,10 @@ public class OOProcess {
 
     /// The comparator used to sort within a group of merged
     /// citations.
-    /// 
+    ///
     /// The term used here is "multicite". The option controlling the
     /// order is "MultiCiteChronological" in style files.
-    /// 
+    ///
     /// Yes, they are always sorted one way or another.
     public static Comparator<BibEntry> comparatorForMulticite(JStyle style) {
         if (style.getMultiCiteChronological()) {

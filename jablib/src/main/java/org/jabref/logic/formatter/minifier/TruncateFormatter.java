@@ -10,7 +10,7 @@ public class TruncateFormatter extends Formatter {
     private final String KEY;
 
     /// The TruncateFormatter truncates a string after the given index and removes trailing whitespaces.
-    /// 
+    ///
     /// @param truncateIndex truncate a string after this index.
     public TruncateFormatter(final int truncateIndex) {
         TRUNCATE_AFTER = truncateIndex >= 0 ? truncateIndex : Integer.MAX_VALUE;

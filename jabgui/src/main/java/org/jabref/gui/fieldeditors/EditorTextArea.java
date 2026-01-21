@@ -59,7 +59,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     }
 
     /// Set pasteActionHandler variable to passed handler
-    /// 
+    ///
     /// @param handler an instance of PasteActionHandler that describes paste behavior
     public void setPasteActionHandler(@NonNull Runnable handler) {
         this.pasteActionHandler = handler;

@@ -128,16 +128,16 @@ import org.slf4j.LoggerFactory;
 
 /// The `JabRefPreferences` class provides the preferences and their defaults using
 /// the JDK `java.util.prefs` class.
-/// 
+///
 /// Internally it defines symbols used to pick a value from the `java.util.prefs`
 /// interface and keeps a hashmap with all the default values.
-/// 
+///
 /// There are still some similar preferences classes ({@link OpenOfficePreferences} and
 /// {@link SharedDatabasePreferences}) which also use the `java.util.prefs` API.
-/// 
+///
 /// contents of the defaults HashMap that are defined in this class.
 /// There are more default parameters in this map which belong to separate preference classes.
-/// 
+///
 /// This class is injected into formatter using reflection to avoid tight coupling and
 /// is easier than injecting via constructor due to amount of refactoring
 @Singleton
@@ -899,7 +899,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// ************************************************************************************************************
     /// *
     /// Check whether a key is set (differently from null).
-    /// 
+    ///
     /// @param key The key to check.
     /// @return true if the key is set, false otherwise.
     public boolean hasKey(String key) {
@@ -1016,7 +1016,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Clear all preferences.
-    /// 
+    ///
     /// @throws BackingStoreException if JabRef is unable to write to the registry/the
     /// preferences storage
     @Override
@@ -1037,7 +1037,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Removes the given key from the preferences.
-    /// 
+    ///
     /// @throws IllegalArgumentException if the key does not exist
     @Override
     public void deleteKey(String key) throws IllegalArgumentException {
@@ -1122,7 +1122,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// Removes all entries keyed by prefix+number, where number is equal to or higher
     /// than the given number.
-    /// 
+    ///
     /// @param number or higher.
     protected void purgeSeries(String prefix, int number) {
         int n = number;
@@ -1133,7 +1133,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Exports Preferences to an XML file.
-    /// 
+    ///
     /// @param path Path to export to
     @Override
     public void exportPreferences(Path path) throws JabRefException {
@@ -1150,7 +1150,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Imports Preferences from an XML file.
-    /// 
+    ///
     /// @param path Path of file to import from
     /// @throws JabRefException thrown if importing the preferences failed due to an
     /// InvalidPreferencesFormatException or an IOException

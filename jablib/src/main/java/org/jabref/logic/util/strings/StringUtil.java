@@ -55,7 +55,7 @@ public class StringUtil {
     }
 
     /// Quote special characters.
-    /// 
+    ///
     /// @param toQuote   The String which may contain special characters.
     /// @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
     /// @param quoteChar The quoting character.
@@ -129,12 +129,12 @@ public class StringUtil {
 
     /// Concatenate all strings in the array from index 'from' to 'to' (excluding
     /// to) with the given separator.
-    /// 
+    ///
     /// Example:
-    /// 
+    ///
     /// String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
     /// "ab\\cd\\ed"
-    /// 
+    ///
     /// @param to Excluding strings[to]
     public static String join(String[] strings, String separator, int from, int to) {
         if ((strings.length == 0) || (from >= to)) {
@@ -180,7 +180,7 @@ public class StringUtil {
 
     /// Formats field contents for output. Must be "symmetric" with the parse method above, so stored and reloaded fields
     /// are not mangled.
-    /// 
+    ///
     /// @param in         the string to wrap
     /// @param wrapAmount the number of characters belonging to a line of text
     /// @param newline    the newline character(s)
@@ -209,7 +209,7 @@ public class StringUtil {
 
     /// Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
     /// Wrapping is done using newline and tab character.
-    /// 
+    ///
     /// @param line          the line of text to be wrapped and appended
     /// @param wrapAmount    the number of characters belonging to a line of text
     /// @param newlineString a string containing the newline character(s)
@@ -245,7 +245,7 @@ public class StringUtil {
     /// Decodes an encoded double String array back into array form. The array
     /// is assumed to be square, and delimited by the characters ';' (first dim) and
     /// ':' (second dim).
-    /// 
+    ///
     /// @param value The encoded String to be decoded.
     /// @return The decoded String array.
     public static String[][] decodeStringDoubleArray(String value) {
@@ -292,7 +292,7 @@ public class StringUtil {
     /// Wrap all uppercase letters, or sequences of uppercase letters, in curly
     /// braces. Ignore letters within a pair of # character, as these are part of
     /// a string label that should not be modified.
-    /// 
+    ///
     /// @param s The string to modify.
     /// @return The resulting string after wrapping capitals.
     public static String putBracesAroundCapitals(String s) {
@@ -342,7 +342,7 @@ public class StringUtil {
     /// This method looks for occurrences of capital letters enclosed in an
     /// arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
     /// pairs of braces are removed.
-    /// 
+    ///
     /// @param s The String to analyze.
     /// @return A new String with braces removed.
     public static String removeBracesAroundCapitals(String s) {
@@ -357,7 +357,7 @@ public class StringUtil {
     /// This method looks for occurrences of capital letters enclosed in one pair
     /// of braces, e.g. "{AB}". All these are replaced by only the capitals in
     /// between the braces.
-    /// 
+    ///
     /// @param s The String to analyze.
     /// @return A new String with braces removed.
     private static String removeSingleBracesAroundCapitals(String s) {
@@ -373,15 +373,15 @@ public class StringUtil {
 
     /// Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
     /// AKA normalize newlines
-    /// 
+    ///
     /// We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
-    /// 
+    ///
     /// <h4>Example</h4>
     /// <pre>{@code
     /// Legacy Macintosh \r -> OS.NEWLINE
     /// Windows \r\n -> OS.NEWLINE
     /// }</pre>
-    /// 
+    ///
     /// @return a String with only OS.NEWLINE as line breaks
     public static String unifyLineBreaks(String s, String newline) {
         return LINE_BREAKS.matcher(s).replaceAll(newline);
@@ -389,7 +389,7 @@ public class StringUtil {
 
     /// Checks if the given String has exactly one pair of surrounding curly braces <br>
     /// Strings with escaped characters in curly braces at the beginning and end are respected, too
-    /// 
+    ///
     /// @param toCheck The string to check
     /// @return True, if the check was successful. False otherwise.
     public static boolean isInCurlyBrackets(String toCheck) {
@@ -433,9 +433,9 @@ public class StringUtil {
     }
 
     /// Optimized method for converting a String into an Integer
-    /// 
+    ///
     /// From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
-    /// 
+    ///
     /// @param str the String holding an Integer value
     /// @return the int value of str
     /// @throws NumberFormatException if str cannot be parsed to an int
@@ -462,9 +462,9 @@ public class StringUtil {
     }
 
     /// Optimized method for converting a String into an Integer
-    /// 
+    ///
     /// From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
-    /// 
+    ///
     /// @param str the String holding an Integer value
     /// @return the int value of str or Optional.empty() if not possible
     public static Optional<Integer> intValueOfOptional(String str) {
@@ -495,9 +495,9 @@ public class StringUtil {
     /// <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
     /// standard</a>. This method will return an empty
     /// String if the input is null or empty.
-    /// 
+    ///
     /// URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
-    /// 
+    ///
     /// @param in The String whose non-valid characters we want to remove.
     /// @return The in String, stripped of non-valid characters.
     public static String stripNonValidXMLCharacters(String in) {
@@ -568,7 +568,7 @@ public class StringUtil {
     }
 
     /// Return a String with n spaces
-    /// 
+    ///
     /// @param n Number of spaces
     /// @return String with n spaces
     public static String repeatSpaces(int n) {
@@ -576,7 +576,7 @@ public class StringUtil {
     }
 
     /// Return a String with n copies of the char c
-    /// 
+    ///
     /// @param n Number of copies
     /// @param c char to copy
     /// @return String with n copies of c
@@ -625,7 +625,7 @@ public class StringUtil {
     }
 
     /// Unquote special characters.
-    /// 
+    ///
     /// @param toUnquote The String which may contain quoted special characters.
     /// @param quoteChar The quoting character.
     /// @return A String with all quoted characters unquoted.
@@ -667,7 +667,7 @@ public class StringUtil {
 
     /// Returns a list of words contained in the given text.
     /// Whitespace, comma and semicolon are considered as separator between words.
-    /// 
+    ///
     /// @param text the input
     /// @return a list of words
     public static List<String> getStringAsWords(String text) {
@@ -706,7 +706,7 @@ public class StringUtil {
     }
 
     /// Encloses the given string with " if there is a space contained
-    /// 
+    ///
     /// @return Returns a string
     public static String quoteStringIfSpaceIsContained(String string) {
         if (string.contains(" ")) {
@@ -718,7 +718,7 @@ public class StringUtil {
 
     /// Checks if the given string contains any whitespace characters. The supported whitespace characters
     /// are the set of characters matched by `\s` in regular expressions, which are `[ \t\n\x0B\f\r]`.
-    /// 
+    ///
     /// @param s The string to check
     /// @return `True` if the given string does contain at least one whitespace character, `False` otherwise
     public static boolean containsWhitespace(String s) {

@@ -152,7 +152,7 @@ public class Version {
     }
 
     /// Checks if this version should be updated to one of the given ones. Ignoring the other Version if this one is Stable and the other one is not.
-    /// 
+    ///
     /// @return The version this one should be updated to, or an empty Optional
     public Optional<Version> shouldBeUpdatedTo(List<Version> availableVersions) {
         Optional<Version> newerVersion = Optional.empty();
@@ -166,7 +166,7 @@ public class Version {
     }
 
     /// Checks if this version should be updated to the given one. Ignoring the other Version if this one is Stable and the other one is not.
-    /// 
+    ///
     /// @return True if this version should be updated to the given one
     public boolean shouldBeUpdatedTo(Version otherVersion) {
         // ignoring the other version if it is not stable, except if this version itself is not stable

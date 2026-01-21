@@ -37,9 +37,9 @@ public class FieldFormatterCleanup implements CleanupJob {
     }
 
     /// Runs the formatter on the specified field in the given entry.
-    /// 
+    ///
     /// If the formatter returns an empty string, then the field is removed.
-    /// 
+    ///
     /// @param fieldKey the field on which to run the formatter
     /// @param entry    the entry to be cleaned up
     /// @return a list of changes of the entry

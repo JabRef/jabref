@@ -7,7 +7,7 @@ import org.jabref.logic.formatter.Formatter;
 import org.jspecify.annotations.NonNull;
 
 /// Clean up field values by formatting Unicode values by using the <a href="https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms">Normal form "Normalization Form Canonical Composition" (NFC)</a>: Characters are decomposed and then recomposed by canonical equivalence.
-/// 
+///
 /// The {@link org.jabref.logic.integrity.UnicodeNormalFormCanonicalCompositionCheck} is for checking the presence of other Unicode representations.
 public class NormalizeUnicodeFormatter extends Formatter {
 

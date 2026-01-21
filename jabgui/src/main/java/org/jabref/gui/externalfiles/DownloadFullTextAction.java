@@ -120,7 +120,7 @@ public class DownloadFullTextAction extends SimpleCommand {
 
     /// This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
     /// from the findFullTexts map and then downloads the file into the given targetDirectory
-    /// 
+    ///
     /// @param databaseContext the active database
     /// @param url             the url "key"
     /// @param entry           the entry "value"

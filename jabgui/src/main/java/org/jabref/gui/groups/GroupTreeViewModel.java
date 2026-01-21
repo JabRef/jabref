@@ -242,7 +242,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     /// Adds JabRef suggested groups under the "All Entries" parent node.
     /// Assumes the parent is already validated as "All Entries" by the caller.
-    /// 
+    ///
     /// @param parent The "All Entries" parent node.
     public void addSuggestedGroups(GroupNodeViewModel parent) {
         currentDatabase.ifPresent(database -> {
@@ -276,7 +276,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     /// Check if it is necessary to show a group modified, reassign entry dialog <br>
     /// Group name change is handled separately
-    /// 
+    ///
     /// @param oldGroup Original Group
     /// @param newGroup Edited group
     /// @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise

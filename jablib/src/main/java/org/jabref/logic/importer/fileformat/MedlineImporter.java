@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Importer for the Medline/Pubmed format.
-/// 
+///
 /// check here for details on the format https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
 public class MedlineImporter extends Importer implements Parser {
 
@@ -1052,7 +1052,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     /// Handles text entities that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
-    /// 
+    ///
     private void handleTextElement(XMLStreamReader reader, List<String> textList, String startElement)
             throws XMLStreamException {
         StringBuilder result = new StringBuilder();
@@ -1061,7 +1061,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     /// Handles text entities of abstracts that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
-    /// 
+    ///
     private void handleAbstractTextElement(XMLStreamReader reader, List<String> textList, String startElement)
             throws XMLStreamException {
         StringBuilder result = new StringBuilder();

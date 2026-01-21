@@ -93,9 +93,9 @@ public class BackupManager {
 
     /// Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
     /// file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
-    /// 
+    ///
     /// This method is not thread-safe. The caller has to ensure that this method is not called in parallel.
-    /// 
+    ///
     /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
     public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences);
@@ -106,14 +106,14 @@ public class BackupManager {
     }
 
     /// Marks the backup as discarded at the library which is associated with the given {@link BibDatabaseContext}.
-    /// 
+    ///
     /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
     public static void discardBackup(BibDatabaseContext bibDatabaseContext, Path backupDir) {
         RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.discardBackup(backupDir));
     }
 
     /// Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
-    /// 
+    ///
     /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
     /// @param backupDir          The path to the backup directory
     /// @param createBackup       True, if a backup should be created
@@ -124,9 +124,9 @@ public class BackupManager {
 
     /// Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
     /// newer and different from the original.
-    /// 
+    ///
     /// In case a discarded file is present, the method also returns `false`, See also {@link #discardBackup(Path)}.
-    /// 
+    ///
     /// @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
     /// @return `true` if backup file exists AND differs from originalPath. `false` is the
     /// "default" return value in the good case. In case a discarded file exists, `false` is returned, too.
@@ -179,7 +179,7 @@ public class BackupManager {
     }
 
     /// Restores the backup file by copying and overwriting the original one.
-    /// 
+    ///
     /// @param originalPath Path to the file which should be equalized to the backup file.
     public static void restoreBackup(Path originalPath, Path backupDir) {
         Optional<Path> backupPath = getLatestBackupPath(originalPath, backupDir);
@@ -199,9 +199,9 @@ public class BackupManager {
     }
 
     /// This method is called as soon as the scheduler says: "Do the backup"
-    /// 
+    ///
     /// *SIDE EFFECT: Deletes oldest backup file*
-    /// 
+    ///
     /// @param backupPath the full path to the file where the library should be backed up to
     void performBackup(Path backupPath) {
         if (!needsBackup) {
@@ -283,7 +283,7 @@ public class BackupManager {
     }
 
     /// Marks the backups as discarded.
-    /// 
+    ///
     /// We do not delete any files, because the user might want to recover old backup files.
     /// Therefore, we mark discarded backups by a --discarded file.
     public void discardBackup(Path backupDir) {
@@ -347,7 +347,7 @@ public class BackupManager {
 
     /// Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
     /// This method should only be used when closing a database/JabRef in a normal way.
-    /// 
+    ///
     /// @param backupDir    The backup directory
     /// @param createBackup If the backup manager should still perform a backup
     private void shutdown(Path backupDir, boolean createBackup) {

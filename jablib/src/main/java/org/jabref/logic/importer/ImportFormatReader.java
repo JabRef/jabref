@@ -95,10 +95,10 @@ public class ImportFormatReader {
     }
 
     /// Format for a given CLI-ID.
-    /// 
+    ///
     /// Will return the first format according to the default-order of
     /// format that matches the given ID.
-    /// 
+    ///
     /// @param cliId CLI-Id
     /// @return Import Format or `null` if none matches
     private Optional<Importer> getByCliId(String cliId) {
@@ -167,7 +167,7 @@ public class ImportFormatReader {
 
     /// Tries to import entries by iterating through the available import filters,
     /// and keeping the import that seems the most promising
-    /// 
+    ///
     /// @param importDatabase     the function to import the entries with a formatter
     /// @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
     /// @return an UnknownFormatImport with the imported entries and metadata
@@ -219,7 +219,7 @@ public class ImportFormatReader {
 
     /// Tries to import a String by iterating through the available import filters,
     /// and keeping the import that seems the most promising
-    /// 
+    ///
     /// @param data the string to import
     /// @return an UnknownFormatImport with the imported entries and metadata
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)

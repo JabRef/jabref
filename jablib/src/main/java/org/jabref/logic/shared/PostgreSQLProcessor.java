@@ -27,7 +27,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     }
 
     /// Creates and sets up the needed tables and columns according to the database type.
-    /// 
+    ///
     /// @throws SQLException in case of error
     @Override
     public void setUp() throws SQLException {

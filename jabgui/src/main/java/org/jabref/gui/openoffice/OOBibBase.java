@@ -118,7 +118,7 @@ public class OOBibBase {
     }
 
     /// A simple test for document availability.
-    /// 
+    ///
     /// See also `isDocumentConnectionMissing` for a test actually attempting to use the connection.
     public boolean isConnectedToDocument() {
         return this.connection.isConnectedToDocument();
@@ -467,22 +467,22 @@ public class OOBibBase {
     }
 
     /// Apply editable parts of citationEntries to the document: store pageInfo.
-    /// 
+    ///
     /// Does not change presentation.
-    /// 
+    ///
     /// Note: we use no undo context here, because only DocumentConnection.setUserDefinedStringPropertyValue() is called, and Undo in LO will not undo that.
-    /// 
+    ///
     /// GUI: "Manage citations" dialog "OK" button. Called from: ManageCitationsDialogViewModel.storeSettings
-    /// 
-    /// 
+    ///
+    ///
     /// Currently the only editable part is pageInfo.
-    /// 
+    ///
     /// Since the only call to applyCitationEntries() only changes pageInfo w.r.t those returned by getCitationEntries(), we can do with the following restrictions:
-    /// 
+    ///
     /// -  Missing pageInfo means no action.
     /// -  Missing CitationEntry means no action (no attempt to remove
     /// citation from the text).
-    /// 
+    ///
     public void guiActionApplyCitationEntries(List<CitationEntry> citationEntries) {
         final String errorTitle = Localization.lang("Problem modifying citation");
 
@@ -509,14 +509,14 @@ public class OOBibBase {
     }
 
     /// Creates a citation group from `entries` at the cursor.
-    /// 
+    ///
     /// Uses LO undo context "Insert citation".
-    /// 
+    ///
     /// Note: Undo does not remove or reestablish custom properties.
-    /// 
+    ///
     /// @param entries            The entries to cite.
     /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
-    /// 
+    ///
     /// Consistency: for each entry in `entries`: looking it up in `syncOptions.get().databases` (if present) should yield `database`.
     /// @param style              The bibliography style we are using.
     /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
@@ -693,7 +693,7 @@ public class OOBibBase {
     } // MergeCitationGroups
 
     /// GUI action "Separate citations".
-    /// 
+    ///
     /// Do the opposite of MergeCitationGroups. Combined markers are split, with a space inserted between.
     public void guiActionSeparateCitations(List<BibDatabase> databases, OOStyle style) {
         final String errorTitle = Localization.lang("Problem during separating cite markers");
@@ -747,9 +747,9 @@ public class OOBibBase {
     }
 
     /// GUI action for "Export cited"
-    /// 
+    ///
     /// Does not refresh the bibliography.
-    /// 
+    ///
     /// @param returnPartialResult If there are some unresolved keys, shall we return an otherwise nonempty result, or Optional.empty()?
     public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, boolean returnPartialResult) {
         final Optional<BibDatabase> FAIL = Optional.empty();
@@ -814,7 +814,7 @@ public class OOBibBase {
     }
 
     /// GUI action, refreshes citation markers and bibliography.
-    /// 
+    ///
     /// @param databases Must have at least one.
     /// @param style     Style.
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOStyle style) {

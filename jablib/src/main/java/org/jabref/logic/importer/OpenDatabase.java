@@ -14,7 +14,7 @@ public class OpenDatabase {
     }
 
     /// Load database (bib-file)
-    /// 
+    ///
     /// @param fileToOpen Name of the BIB-file to open
     /// @return ParserResult which never is null
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)

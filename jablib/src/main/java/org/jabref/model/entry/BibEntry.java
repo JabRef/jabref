@@ -122,7 +122,7 @@ public class BibEntry {
     private String parsedSerialization = "";
 
     /// Marks whether the complete serialization, which was read from file, should be used.
-    /// 
+    ///
     /// Is set to `true`, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
     private boolean changed;
 
@@ -178,7 +178,7 @@ public class BibEntry {
     }
 
     /// Map an (empty) field of a BibEntry to a field of a cross-referenced entry.
-    /// 
+    ///
     /// @param targetField field name of the BibEntry
     /// @param targetEntry type of the BibEntry
     /// @param sourceEntry type of the cross-referenced BibEntry
@@ -300,12 +300,12 @@ public class BibEntry {
 
     /// Returns the text stored in the given field of the given bibtex entry
     /// which belongs to the given database.
-    /// 
+    ///
     /// If a database is given, this function will try to resolve any string
     /// references in the field-value.
     /// Also, if a database is given, this function will try to find values for
     /// unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
-    /// 
+    ///
     /// @param field    The field to return the value of.
     /// @param database The database of the bibtex entry.
     /// @return The resolved field value or null if not found.
@@ -359,9 +359,9 @@ public class BibEntry {
     }
 
     /// Sets this entry's identifier (ID).
-    /// 
+    ///
     /// The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
-    /// 
+    ///
     /// @param id The ID to be used
     @VisibleForTesting
     public void setId(@NonNull String id) {
@@ -374,7 +374,7 @@ public class BibEntry {
 
     /// Sets the citation key. Note: This is *not* the internal Id of this entry.
     /// The internal Id is always present, whereas the citation key might not be present.
-    /// 
+    ///
     /// @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
     public Optional<FieldChange> setCitationKey(String newKey) {
         return setField(InternalField.KEY_FIELD, newKey);
@@ -469,9 +469,9 @@ public class BibEntry {
     }
 
     /// Internal method used to get the content of a field (or its alias)
-    /// 
+    ///
     /// Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
-    /// 
+    ///
     /// @param field         the field
     /// @param getFieldValue the method to get the value of a given field in a given entry
     /// @return determined field value
@@ -553,9 +553,9 @@ public class BibEntry {
     }
 
     /// Return the LaTeX-free contents of the given field or its alias an Optional
-    /// 
+    ///
     /// For details see also {@link #getFieldOrAlias(Field)}
-    /// 
+    ///
     /// @param name the name of the field
     /// @return the stored latex-free content of the field (or its alias)
     public Optional<String> getFieldOrAliasLatexFree(Field name) {
@@ -569,7 +569,7 @@ public class BibEntry {
     }
 
     /// Set a field, and notify listeners about the change.
-    /// 
+    ///
     /// @param field       The field to set
     /// @param value       The value to set
     /// @param eventSource Source the event is sent from
@@ -601,7 +601,7 @@ public class BibEntry {
     }
 
     /// Set a field, and notify listeners about the change.
-    /// 
+    ///
     /// @param field The field to set.
     /// @param value The value to set.
     public Optional<FieldChange> setField(Field field, String value) {
@@ -609,7 +609,7 @@ public class BibEntry {
     }
 
     /// Remove the mapping for the field name, and notify listeners about the change.
-    /// 
+    ///
     /// @param field The field to clear.
     public Optional<FieldChange> clearField(Field field) {
         return clearField(field, EntriesEventSource.LOCAL);
@@ -617,7 +617,7 @@ public class BibEntry {
 
     /// Remove the mapping for the field name, and notify listeners about
     /// the change including the {@link EntriesEventSource}.
-    /// 
+    ///
     /// @param field       the field to clear.
     /// @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
@@ -639,7 +639,7 @@ public class BibEntry {
     /// Determines whether this entry has all the given fields present. If a non-null
     /// database argument is given, this method will try to look up missing fields in
     /// entries linked by the "crossref" field, if any.
-    /// 
+    ///
     /// @param fields   An array of field names to be checked.
     /// @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning
     /// that no attempt will be made to follow crossrefs.
@@ -710,9 +710,9 @@ public class BibEntry {
     }
 
     /// Creates a short textual description of the entry in the format: `Author1, Author2: Title (Year)`
-    /// 
+    ///
     /// If `0` is passed as `maxCharacters`, the description is not truncated.
-    /// 
+    ///
     /// @param maxCharacters The maximum number of characters (additional
     /// characters are replaced with "..."). Set to 0 to disable truncation.
     /// @return A short textual description of the entry in the format:
@@ -743,7 +743,7 @@ public class BibEntry {
     }
 
     /// Returns the title of the given BibTeX entry as an Optional.
-    /// 
+    ///
     /// @return an Optional containing the title of a BibTeX entry in case it exists, otherwise return an empty Optional.
     public Optional<String> getTitle() {
         return getField(StandardField.TITLE);
@@ -758,7 +758,7 @@ public class BibEntry {
     }
 
     /// Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
-    /// 
+    ///
     /// @return will return the publication date of the entry or null if no year was found.
     public Optional<Date> getPublicationDate() {
         return getFieldOrAlias(StandardField.DATE).flatMap(Date::parse);
@@ -806,7 +806,7 @@ public class BibEntry {
     }
 
     /// Check if a keyword already exists (case insensitive), if not: add it
-    /// 
+    ///
     /// @param keyword Keyword to add
     public void addKeyword(@NonNull String keyword, Character delimiter) {
         if (keyword.isEmpty()) {
@@ -823,7 +823,7 @@ public class BibEntry {
     }
 
     /// Add multiple keywords to entry
-    /// 
+    ///
     /// @param keywords Keywords to add
     public void addKeywords(@NonNull Collection<String> keywords, Character delimiter) {
         keywords.forEach(keyword -> addKeyword(keyword, delimiter));
@@ -892,14 +892,14 @@ public class BibEntry {
     }
 
     /// On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
-    /// 
+    ///
     /// The content is
-    /// 
-    /// 
+    ///
+    ///
     /// - comments before entry
     /// - entry type
     /// - fields (including the citation key {@link InternalField#KEY_FIELD}
-    /// 
+    ///
     @Override
     public int hashCode() {
         return Objects.hash(type.getValue(), fields, commentsBeforeEntry);
@@ -1031,7 +1031,7 @@ public class BibEntry {
     }
 
     /// Gets a list of linked files.
-    /// 
+    ///
     /// @return the list of linked files, is never null but can be empty.
     /// Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
     public List<LinkedFile> getFiles() {
@@ -1070,9 +1070,9 @@ public class BibEntry {
     // endregion
 
     /// Checks {@link StandardField#CITES} for a list of citation keys and returns them.
-    /// 
+    ///
     /// Empty citation keys are not returned. There is no consistency check made.
-    /// 
+    ///
     /// @return List of citation keys; empty list if field is empty or not available.
     public SequencedSet<String> getCites() {
         return this.getField(StandardField.CITES)
@@ -1122,10 +1122,10 @@ public class BibEntry {
     }
 
     /// Helper method to add a downloaded file to the entry.
-    /// 
+    ///
     /// Use-case: URL is contained in the file, the file is downloaded and should then replace the url.
     /// This method. adds the given path (as file) to the entry and removes the url.
-    /// 
+    ///
     /// @param linkToDownloadedFile the link to the file, which was downloaded
     /// @param downloadedFile       the path to be added to the entry
     public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
@@ -1152,7 +1152,7 @@ public class BibEntry {
 
     /// Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
     /// intersection, priority is given to THIS entry's field value.
-    /// 
+    ///
     /// @param other another BibEntry from which fields are sourced from
     public void mergeWith(BibEntry other) {
         mergeWith(other, Set.of());
@@ -1160,7 +1160,7 @@ public class BibEntry {
 
     /// Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
     /// intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
-    /// 
+    ///
     /// @param other                  another BibEntry from which fields are sourced from
     /// @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {

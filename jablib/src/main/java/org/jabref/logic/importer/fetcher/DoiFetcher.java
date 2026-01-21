@@ -217,7 +217,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     /// Returns registration agency. Optional.empty() if no agency is found.
-    /// 
+    ///
     /// @param doi the DOI to be searched
     public Optional<String> getAgency(DOI doi) throws FetcherException, MalformedURLException {
         Optional<String> agency = Optional.empty();

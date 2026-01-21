@@ -35,7 +35,7 @@ public class Password {
     }
 
     /// Encrypts the set phrase/password with a symmetric encryption algorithm.
-    /// 
+    ///
     /// @return Encrypted phrase/password
     public String encrypt() throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
@@ -43,7 +43,7 @@ public class Password {
     }
 
     /// Decrypts the set phrase/password which was encrypted via {@link Password#encrypt()}.
-    /// 
+    ///
     /// @return Decrypted phrase/password
     public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);

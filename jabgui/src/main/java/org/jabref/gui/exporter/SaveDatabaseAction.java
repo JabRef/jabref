@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 
 /// Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for save operations
 /// when closing a database or quitting the applications.
-/// 
+///
 /// The save operation is loaded off of the GUI thread using {@link BackgroundTask}. Callers can query whether the
 /// operation was canceled, or whether it was successful.
 public class SaveDatabaseAction {
@@ -170,7 +170,7 @@ public class SaveDatabaseAction {
 
     /// Asks the user for the path to save to. Stores the directory to the preferences, which is used next time when
     /// opening the dialog.
-    /// 
+    ///
     /// @return the path set by the user
     private Optional<Path> askForSavePath() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()

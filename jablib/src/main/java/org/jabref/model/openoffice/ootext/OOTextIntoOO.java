@@ -99,32 +99,32 @@ public class OOTextIntoOO {
     }
 
     /// Insert a text with formatting indicated by HTML-like tags, into a text at the position given by a cursor.
-    /// 
+    ///
     /// Limitation: understands no entities. It does not receive any either, unless the user provides it.
-    /// 
+    ///
     /// To limit the damage `TAG_NAME_REGEXP` and `ATTRIBUTE_NAME_REGEXP` explicitly lists the names we care about.
-    /// 
+    ///
     /// Notable changes w.r.t insertOOFormattedTextAtCurrentLocation:
-    /// 
+    ///
     /// - new tags:
-    /// 
+    ///
     /// - `<span lang="zxx">` - earlier was applied from code
-    /// 
+    ///
     /// - `<span oo:CharStyleName="CharStylename">` - earlier was applied from code, for "CitationCharacterFormat"
-    /// 
+    ///
     /// - `
 ` start new paragraph - earlier was applied from code
-    /// 
+    ///
     /// - `<p oo:ParaStyleName="ParStyleName">` : start new paragraph and apply ParStyleName - earlier was applied from code
-    /// 
+    ///
     /// - `<tt>` - earlier: known, but ignored - now: equivalent to `<span oo:CharStyleName="Example">` - `<oo:referenceToPageNumberOfReferenceMark>` (self-closing)
-    /// 
+    ///
     /// - closing tags try to properly restore state (in particular, the "not directly set" state) instead of dictating an "off" state. This makes a difference when the value inherited from another level (for example the paragraph) is not the "off" state.
-    /// 
+    ///
     /// An example: a style with `ReferenceParagraphFormat="JR_bibentry"` Assume JR_bibentry in LibreOffice is a paragraph style that prescribes "bold" font. LAYOUT only prescribes bold around year. Which parts of the bibliography entries should come out as bold?
-    /// 
+    ///
     /// - The user can format citation marks (it is enough to format their start) and the properties not (everywhere) dictated by the style are preserved (where they are not).
-    /// 
+    ///
     /// @param position The cursor giving the insert location. Not modified.
     /// @param ootext   The marked-up text to insert.
     public static void write(@NonNull XTextDocument doc,
@@ -312,7 +312,7 @@ public class OOTextIntoOO {
     }
 
     /// Purpose: in some cases we do not want to inherit direct formatting from the context.
-    /// 
+    ///
     /// In particular, when filling the bibliography title and body.
     public static void removeDirectFormatting(XTextCursor cursor) {
         XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
@@ -488,7 +488,7 @@ public class OOTextIntoOO {
         }
 
         /// Given a list of property name, property value pairs, construct and push a new layer describing the intended state after these have been applied.
-    /// 
+    ///
     /// Opening tags usually call this.
         void pushLayer(List<OOPair<String, Object>> settings) {
             ArrayList<Optional<Object>> oldLayer = layers.peek();
@@ -516,7 +516,7 @@ public class OOTextIntoOO {
         }
 
         /// Apply the current desired formatting state to a cursor.
-    /// 
+    ///
     /// The idea is to minimize the number of calls to OpenOffice.
         void apply(XTextCursor cursor) {
             XMultiPropertySet mps = UnoCast.cast(XMultiPropertySet.class, cursor).get();

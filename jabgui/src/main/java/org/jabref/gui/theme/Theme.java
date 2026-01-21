@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 
 /// Represents one of three types of a css based Theme for JabRef:
-/// 
+///
 /// The Default type of theme is the light theme (which is in fact the absence of any theme), the dark theme is currently
 /// the only embedded theme and the custom themes, that can be created by loading a proper css file.
 public class Theme {
@@ -69,14 +69,14 @@ public class Theme {
     /// This should be a file system path, but the raw string is
     /// returned even if it is not valid in some way. For this reason, the main use case for this getter is to
     /// storing or display the user preference, rather than to read and use the CSS file.
-    /// 
+    ///
     /// @return the raw configured CSS location. Guaranteed to be non-null.
     public String getName() {
         return name;
     }
 
     /// This method allows callers to obtain the theme's additional stylesheet.
-    /// 
+    ///
     /// @return called with the stylesheet location if there is an additional stylesheet present and available. The
     /// location will be a local URL. Typically it will be a `'data:'` URL where the CSS is embedded. However for
     /// large themes it can be `'file:'`.

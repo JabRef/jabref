@@ -37,26 +37,26 @@ public final class ConferenceUtils {
     }
 
     /// Attempts to extract the string enclosed in the first deepest set of parentheses from the given input string.
-    /// 
+    ///
     /// This method uses a regular expression `\(([^()]*)\)` to find the innermost parenthesized substring.
     /// Only the **first match** is considered; any additional matching substrings in the input are ignored.
-    /// 
-    /// 
-    /// 
+    ///
+    ///
+    ///
     /// If a match is found, leading and trailing whitespace around the string is stripped. If the resulting string is not
     /// empty, it is returned wrapped in an `Optional`. Otherwise, an empty `Optional` is returned.
-    /// 
-    /// 
+    ///
+    ///
     /// Examples:
-    /// 
+    ///
     /// - `"(SERA)"` -> `Optional.of("SERA")`
     /// - `"Conference ( ABC )"` -> `Optional.of("ABC")`
     /// - `"This (SERA) has multiple (CONF) acronyms"` -> `Optional.of("SERA")`
     /// - `"Input with empty () parentheses"` -> `Optional.empty()`
     /// - `"Input with empty (        ) whitespace in parens"` -> `Optional.empty()`
     /// - `""` -> `Optional.empty()`
-    /// 
-    /// 
+    ///
+    ///
     /// @param input the string to search, must not be `null`
     /// @return an `Optional` containing the extracted and trimmed string from the first set of parentheses,
     /// or `Optional.empty()` if no string is found
@@ -79,20 +79,20 @@ public final class ConferenceUtils {
 
     /// Generates possible acronym candidates from the given input string by splitting on common delimiters and extracting
     /// substrings within the specified cutoff length.
-    /// 
+    ///
     /// Candidates are ordered in a {@link TreeSet} such that longer strings are positioned before shorter ones, with
     /// lexicographical ordering used to break ties. This prevents overfitting on composite acronyms during lookup (like
     /// between `IEEE-IV` and `IV`) by pushing the shorter substrings to the end.
     /// A maximum of 50 candidates are generated to avoid excessive expansion.
     /// The splitting delimiters are `whitespace`, `,`, `'`, `_`, `:`, `.`, and `-`.
     /// Delimiters between acronyms are kept, if the cutoff length allows.
-    /// 
-    /// 
+    ///
+    ///
     /// For example, given the input string `"IEEE-IV'2022"` and a cutoff of `11`, this method generates the
     /// following candidates in order: `"IEEE-IV", "IV'2022", "2022", "IEEE", "IV"`. Notice that `"IEEE-IV"`
     /// is positioned ahead and retains the `-` in between.
-    /// 
-    /// 
+    ///
+    ///
     /// @param input  the raw string to extract acronym candidates from, must not be `null`
     /// @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
     /// @return a set of acronym candidates ordered by descending length and then lexicographically,
@@ -162,9 +162,9 @@ public final class ConferenceUtils {
     }
 
     /// Normalizes a raw conference title query string into a simplified form suitable for fuzzy matching.
-    /// 
+    ///
     /// The normalization process performs the following steps:
-    /// 
+    ///
     /// <ol>
     /// - Removes all substrings enclosed in parentheses, e.g., `"proceedings (ICSE 2022)"` -> `"Proceedings"`.
     /// - Removes all years of form `19XX` or `20xx` (e.g., `1999`, `2022`) and ordinals in
@@ -175,15 +175,15 @@ public final class ConferenceUtils {
     /// - Concatenates the remaining tokens into a normalized string without delimiters.
     /// - Removes leading false-start tokens like `"ofthe"`, `"of"`, or `"the"`.
     /// </ol>
-    /// 
+    ///
     /// Note that the input is expected to already be lowercased before calling this method.
-    /// 
-    /// 
+    ///
+    ///
     /// An example:
     /// `"proceedings of the 3rd international conference on machine learning (icml 2018)"` ->
     /// `"internationalconferenceonmachinelearning"`
-    /// 
-    /// 
+    ///
+    ///
     /// @param input the pre-lowercased raw string to normalize, must not be `null`
     /// @return a normalized string representation of the input
     public static String normalize(@NonNull String input) {

@@ -34,11 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Parses the references from the "References" section from a PDF.
-/// 
+///
 /// Currently, IEEE two column format is supported.
-/// 
+///
 /// To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
-/// 
+///
 /// TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
 @AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
 public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporter implements PlainCitationParser {

@@ -20,11 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Similar to {@link ExtractReferencesAction}. This action creates a new library, the other action "just" appends to the current library
-/// 
-/// 
+///
+///
 /// - Mode choice A: online or offline
 /// - Mode choice B: complete entry or single file (the latter is not implemented)
-/// 
+///
 public abstract class NewLibraryFromPdfAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction.class);
 

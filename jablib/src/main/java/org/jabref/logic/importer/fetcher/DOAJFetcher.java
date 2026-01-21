@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Fetches data from the Directory of Open Access Journals (DOAJ)
-/// 
+///
 /// @see <a href="https://doaj.org/api/v1/docs">API documentation</a>
 public class DOAJFetcher implements SearchBasedParserFetcher {
 
@@ -45,7 +45,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     }
 
     /// Convert a JSONObject containing a bibJSON entry to a BibEntry
-    /// 
+    ///
     /// @param bibJsonEntry The JSONObject to convert
     /// @return the converted BibEntry
     public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {

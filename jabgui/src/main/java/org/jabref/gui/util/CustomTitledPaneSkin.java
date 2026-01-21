@@ -23,7 +23,7 @@ import javafx.scene.transform.Rotate;
 
 import static javafx.css.StyleConverter.getEnumConverter;
 
-/// 
+///
 /// CustomTitledPaneSkin with option to move arrow to the right
 /// https://stackoverflow.com/a/55085777/3450689s
 public class CustomTitledPaneSkin extends TitledPaneSkin {

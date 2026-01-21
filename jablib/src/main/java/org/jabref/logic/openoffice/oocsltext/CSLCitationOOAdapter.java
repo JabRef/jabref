@@ -33,7 +33,7 @@ import com.sun.star.uno.Exception;
 /// It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
 /// It uses {@link OpenOfficePreferences} to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
 /// Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
-/// 
+///
 /// @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
 /// These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
 /// In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
@@ -111,7 +111,7 @@ public class CSLCitationOOAdapter {
 
     /// Inserts in-text citations for a group of entries.
     /// Comparable to LaTeX's \citet command.
-    /// 
+    ///
     /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, Exception {

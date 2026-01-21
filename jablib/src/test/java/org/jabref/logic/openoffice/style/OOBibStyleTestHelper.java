@@ -85,7 +85,7 @@ class OOBibStyleTestHelper {
     }
 
     /// Reproduce old method
-    /// 
+    ///
     /// @param inList true means label for the bibliography
     static String runGetNumCitationMarker2a(JStyle style,
                                             List<Integer> num, int minGroupingCount, boolean inList) {

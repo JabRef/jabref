@@ -59,7 +59,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     /// Computes an appendix to a citation key that could make it unique. We use a-z for numbers 0-25, and then aa-az, ba-bz, etc.
-    /// 
+    ///
     /// @param number The appendix number.
     /// @return The String to append.
     private static String getAppendix(int number) {
@@ -93,7 +93,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     /// Generate a citation key for the given {@link BibEntry}.
-    /// 
+    ///
     /// @param entry a {@link BibEntry}
     /// @return a citation key based on the user's preferences
     public String generateKey(@NonNull BibEntry entry) {
@@ -107,7 +107,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     /// A letter will be appended to the key based on the user's preferences, either always or to prevent duplicated keys.
-    /// 
+    ///
     /// @param key    the new key
     /// @param oldKey the old key
     /// @return a key, if needed, with an appended letter
@@ -157,7 +157,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     /// Using preferences, replace matches to the provided regex with a string.
-    /// 
+    ///
     /// @param key the citation key
     /// @return the citation key where matches to the regex are replaced
     private String replaceWithRegex(String key) {
@@ -185,7 +185,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     /// A helper method to create a {@link Function} that takes a single bracketed expression, expands it, and cleans the key.
-    /// 
+    ///
     /// @param entry the {@link BibEntry} that a citation key is generated for
     /// @return a cleaned citation key for the given {@link BibEntry}
     private Function<String, String> expandBracketContent(BibEntry entry) {
@@ -207,7 +207,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     /// Generates a citation key for the given entry, and sets the key.
-    /// 
+    ///
     /// @param entry the entry to generate the key for
     /// @return the change to the key (or an empty optional if the key was not changed)
     public Optional<FieldChange> generateAndSetKey(BibEntry entry) {

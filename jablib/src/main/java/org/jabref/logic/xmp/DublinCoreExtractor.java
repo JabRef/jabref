@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class is used for *both* conversion from Dublin Core to BibTeX and conversion form BibTeX to Dublin Core
-/// 
+///
 /// Related class: {@link org.jabref.logic.xmp.DocumentInformationExtractor}
 public class DublinCoreExtractor {
 
@@ -123,7 +123,7 @@ public class DublinCoreExtractor {
 
     /// This method sets all fields, which are custom in BibTeX and therefore supported by JabRef, but which are not
     /// included in the DublinCore format.
-    /// 
+    ///
     /// The relation attribute of DublinCore is abused to store these custom fields. The prefix `bibtex` is used.
     private void extractBibTexFields() {
         Predicate<String> isBibTeXElement = s -> s.startsWith(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX);
@@ -229,16 +229,16 @@ public class DublinCoreExtractor {
     }
 
     /// Helper function for retrieving a BibEntry from the DublinCore metadata in a PDF file.
-    /// 
+    ///
     /// To understand how to get hold of a DublinCore have a look in the test cases for XMPUtil.
-    /// 
+    ///
     /// The BibEntry is build by mapping individual fields in the dublin core (like creator, title, subject) to fields in
     /// a bibtex bibEntry. In case special "bibtex/" entries are contained, the normal dublin core fields take
     /// precedence. For instance, the dublin core date takes precedence over bibtex/month.
-    /// 
+    ///
     /// The opposite method is {@link DublinCoreExtractor#fillDublinCoreSchema()}
-    /// 
-    /// 
+    ///
+    ///
     /// @return The bibEntry extracted from the document information.
     public Optional<BibEntry> extractBibtexEntry() {
         // first extract "bibtex/" entries

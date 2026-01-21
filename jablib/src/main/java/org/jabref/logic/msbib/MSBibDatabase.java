@@ -46,7 +46,7 @@ public class MSBibDatabase {
 
     /// Creates a new {@link MSBibDatabase} for **export**.
     /// Directly converts the given entries.
-    /// 
+    ///
     /// @param database The bib database
     /// @param entries  List of {@link BibEntry}
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
@@ -61,7 +61,7 @@ public class MSBibDatabase {
     }
 
     /// Imports entries from an office XML file
-    /// 
+    ///
     /// @return List of {@link BibEntry}
     public List<BibEntry> importEntriesFromXml(BufferedReader reader) {
         entriesForExport = new HashSet<>();

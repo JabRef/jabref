@@ -36,7 +36,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
     /// Adds a view for a specific metadata difference to the container.
     /// Default view if not a group diff.
-    /// 
+    ///
     /// @param container      The parent container to add the difference view to
     /// @param diff           The metadata difference to display
     /// @param metadataChange The metadata change object containing all changes
@@ -54,7 +54,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     /// Creates a scroll pane showing simple text differences.
-    /// 
+    ///
     /// @param diff The difference to display
     /// @return Configured ScrollPane showing the difference
     private ScrollPane createDefaultDiffScrollPane(MetaDataDiff.Difference diff) {
@@ -70,7 +70,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     /// Creates a split pane showing differences in groups tree structure.
-    /// 
+    ///
     /// @param metadataChange The metadata change containing groups differences
     /// @return Configured SplitPane showing groups differences
     private SplitPane createGroupDiffSplitPane(MetadataChange metadataChange) {
@@ -115,7 +115,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     /// Creates a configured scroll pane for a text area.
-    /// 
+    ///
     /// @param textArea The text area to wrap in a scroll pane
     /// @return Configured ScrollPane
     private ScrollPane createScrollPane(StyleClassedTextArea textArea) {
@@ -129,7 +129,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     /// Creates a configured text area for displaying diff content.
-    /// 
+    ///
     /// @return Configured StyleClassedTextArea
     private StyleClassedTextArea createConfiguredTextArea() {
         StyleClassedTextArea textArea = new StyleClassedTextArea();
@@ -140,7 +140,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     /// Extracts the groups tree content from metadata as a string.
-    /// 
+    ///
     /// @param metadata The metadata containing groups
     /// @return String representation of groups tree, or empty string if no groups
     private String getMetadataGroupsContent(MetaData metadata) {
@@ -150,7 +150,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     /// Converts a group tree to a string representation with indentation.
-    /// 
+    ///
     /// @param node The root node of the group tree
     /// @return String representation of the group tree
     private String convertGroupTreeToString(GroupTreeNode node) {
@@ -160,7 +160,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     /// Recursively appends a group tree node to the string builder.
-    /// 
+    ///
     /// @param node    The current node to append
     /// @param builder The string builder to append to
     /// @param level   The current depth level in the tree (for indentation)

@@ -97,7 +97,7 @@ public class ControlHelper {
     }
 
     /// If needed, truncates a given string to `maxCharacters`, adding `ellipsisString` instead.
-    /// 
+    ///
     /// @param text             text which should be truncated, if needed
     /// @param maxCharacters    maximum amount of characters which the resulting text should have, including the
     /// `ellipsisString`; if set to -1, then the default length of 75 characters will be

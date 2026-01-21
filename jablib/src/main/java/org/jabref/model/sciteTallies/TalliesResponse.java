@@ -13,7 +13,7 @@ public record TalliesResponse(
         int citingPublications) {
 
     /// Creates a {@link TalliesResponse} from a JSONObject (dictionary/map)
-    /// 
+    ///
     /// @param jsonObject The JSON object holding the tally values
     /// @return a new {@link TalliesResponse}
     public static TalliesResponse fromJSONObject(JSONObject jsonObject) {

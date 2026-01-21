@@ -179,7 +179,7 @@ public class LocalizationParser {
     }
 
     /// Loads the fxml file and returns all used language resources.
-    /// 
+    ///
     /// Note: FXML prefixes localization keys with `%`.
     private static Collection<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
         Collection<String> result = new ArrayList<>();

@@ -114,7 +114,7 @@ public class ActionHelper {
     /// Check if at least one of the selected entries has linked files
     /// <br>
     /// Used in {@link org.jabref.gui.maintable.OpenSelectedEntriesFilesAction} when multiple entries selected
-    /// 
+    ///
     /// @param stateManager manager for the state of the GUI
     /// @return a boolean binding
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {

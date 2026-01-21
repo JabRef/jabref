@@ -89,7 +89,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     private final Path pathToStudyDataDirectory;
 
     /// This is used to create a new study
-    /// 
+    ///
     /// @param pathToStudyDataDirectory This directory is proposed in the file chooser
     public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
         this.pathToStudyDataDirectory = pathToStudyDataDirectory;
@@ -104,7 +104,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     /// This is used to edit an existing study.
-    /// 
+    ///
     /// @param study          the study to edit
     /// @param studyDirectory the directory of the study
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {

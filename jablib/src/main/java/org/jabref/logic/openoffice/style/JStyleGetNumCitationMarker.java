@@ -31,12 +31,12 @@ class JStyleGetNumCitationMarker {
     }
 
     /// Create a numeric marker for use in the bibliography as label for the entry.
-    /// 
+    ///
     /// To support for example numbers in superscript without brackets for the text,
     /// but "[1]" form for the bibliography, the style can provide
     /// the optional "BracketBeforeInList" and "BracketAfterInList" strings
     /// to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
-    /// 
+    ///
     /// @return "[${number}]" where
     /// "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
     /// "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
@@ -154,25 +154,25 @@ class JStyleGetNumCitationMarker {
     }
 
     /// Format a number-based citation marker for the given number or numbers.
-    /// 
+    ///
     /// @param entries          Provide the citation numbers.
-    /// 
+    ///
     /// An Optional.empty() number means: could not look this up
     /// in the databases. Positive integers are the valid numbers.
-    /// 
+    ///
     /// Duplicate citation numbers are allowed:
-    /// 
+    ///
     /// - If their pageInfos are identical, only a
     /// single instance is emitted.
-    /// 
+    ///
     /// - If their pageInfos differ, the number is emitted with each
     /// distinct pageInfo.
-    /// 
+    ///
     /// pageInfos are expected to be normalized
     /// @param minGroupingCount Zero and negative means never group.
     /// Only used by tests to override the value in style.
     /// @return The text for the citation.
-    /// 
+    ///
     public static OOText getNumCitationMarker2(JStyle style,
                                                List<CitationMarkerNumericEntry> entries,
                                                int minGroupingCount) {

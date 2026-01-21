@@ -18,7 +18,7 @@ public class MinifyNameListFormatter extends Formatter {
     }
 
     /// Replaces three or more authors with and others.
-    /// 
+    ///
     /// <h4>Example</h4>
     /// <pre>{@code
     /// Stefan Kolb -> Stefan Kolb

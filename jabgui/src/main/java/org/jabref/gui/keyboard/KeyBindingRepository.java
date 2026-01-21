@@ -48,7 +48,7 @@ public class KeyBindingRepository {
     }
 
     /// Check if the given keyCombination equals the given keyEvent
-    /// 
+    ///
     /// @param combination as KeyCombination
     /// @param keyEvent    as KeEvent
     /// @return true if matching, else false
@@ -108,7 +108,7 @@ public class KeyBindingRepository {
     }
 
     /// Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
-    /// 
+    ///
     /// If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()) {
@@ -127,7 +127,7 @@ public class KeyBindingRepository {
     }
 
     /// Checks if the given KeyEvent matches the given KeyBinding.
-    /// 
+    ///
     /// Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
     public boolean matches(KeyEvent event, KeyBinding keyBinding) {
         return mapToKeyBindings(event)
@@ -144,7 +144,7 @@ public class KeyBindingRepository {
     }
 
     /// Check if the given KeyBinding equals the given keyEvent
-    /// 
+    ///
     /// @param binding  as KeyBinding
     /// @param keyEvent as KeEvent
     /// @return true if matching, else false

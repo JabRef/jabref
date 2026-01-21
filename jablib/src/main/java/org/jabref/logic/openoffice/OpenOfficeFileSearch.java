@@ -21,7 +21,7 @@ public class OpenOfficeFileSearch {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeFileSearch.class);
 
     /// Detects existing installation of OpenOffice and LibreOffice.
-    /// 
+    ///
     /// @return a list of detected installation paths
     public static List<Path> detectInstallations() {
         if (OS.WINDOWS) {

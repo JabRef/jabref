@@ -22,7 +22,7 @@ public class EntryComparator implements Comparator<BibEntry> {
     private final boolean binary;
     private final Comparator<BibEntry> next;
 
-    /// 
+    ///
     /// @param binary     true: the presence of fields is checked; false: the content of the fields is compared
     /// @param descending true: if the most different entry should get the highest score
     /// @param field      the field to sort on

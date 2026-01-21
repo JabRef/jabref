@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// From Bibtex:
-/// 
+///
 /// "The |built_in| function {\.{format.name\$}} pops the
 /// top three literals (they are a string, an integer, and a string
 /// literal, in that order). The last string literal represents a
@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 /// described in the \BibTeX\ documentation. Finally, this function
 /// pushes the formatted name. If any of the types is incorrect, it
 /// complains and pushes the null string."
-/// 
+///
 /// Sounds easy - is a nightmare... X-(
-/// 
+///
 public class BstNameFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstNameFormatter.class);
 
@@ -33,7 +33,7 @@ public class BstNameFormatter {
     }
 
     /// Formats the nth author of the author name list by a given format string
-    /// 
+    ///
     /// @param authorsNameList The string from an author field
     /// @param whichName       index of the list, starting with 1
     /// @param formatString    TODO

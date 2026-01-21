@@ -38,13 +38,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Represents everything related to a BIB file.
-/// 
+///
 /// The entries are stored in BibDatabase, the other data in MetaData
 /// and the options relevant for this file in Defaults.
-/// 
-/// 
+///
+///
 /// To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
-/// 
+///
 @AllowedToUseLogic("because it needs access to shared database features")
 @NullMarked
 public class BibDatabaseContext {
@@ -111,7 +111,7 @@ public class BibDatabaseContext {
     }
 
     /// Get the path where this database was last saved to or loaded from, if any.
-    /// 
+    ///
     /// @return Optional of the relevant Path, or Optional.empty() if none is defined.
     public Optional<Path> getDatabasePath() {
         return Optional.ofNullable(path);
@@ -153,7 +153,7 @@ public class BibDatabaseContext {
     /// - the database's metadata can specify a library-specific directory.
     /// - the database's metadata can specify a user-specific directory.
     /// </ol>
-    /// 
+    ///
     /// The settings are prioritized in the following order, and the first defined setting is used:
     /// <ol>
     /// - user-specific metadata directory
@@ -161,7 +161,7 @@ public class BibDatabaseContext {
     /// - BIB file directory (if configured in the preferences AND none of the two above directories are configured)
     /// - preferences directory (if .bib file directory should not be used according to the (global) preferences)
     /// </ol>
-    /// 
+    ///
     /// @param preferences The fileDirectory preferences
     /// @return List of existing absolute paths
     public List<Path> getFileDirectories(FilePreferences preferences) {
@@ -198,7 +198,7 @@ public class BibDatabaseContext {
     }
 
     /// Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
-    /// 
+    ///
     /// @return the path - or an empty optional, if none of the directories exists
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
         return getFileDirectories(preferences).stream()
@@ -334,9 +334,9 @@ public class BibDatabaseContext {
     }
 
     /// Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
-    /// 
+    ///
     /// This is required, because of {@link #hashCode()} implementation.
-    /// 
+    ///
     /// @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
     public String getUid() {
         return uid;

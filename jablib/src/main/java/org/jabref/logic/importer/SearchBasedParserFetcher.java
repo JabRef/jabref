@@ -16,26 +16,26 @@ import org.jabref.model.search.query.BaseQueryNode;
 /// - Parse the response to get a list of {@link BibEntry}
 /// - Post-process fetched entries
 /// </ol>
-/// 
+///
 /// This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
 /// JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
-/// 
-/// 
+///
+///
 /// This interface inherits {@link SearchBasedFetcher}, because the methods `performSearch` have to be provided by both.
 /// As non-BibTeX web fetcher one could do "magic" stuff without this helper interface and directly use {@link WebFetcher}, but this is more work.
-/// 
-/// 
+///
+///
 /// Note that this interface "should" be an abstract class.
 /// However, Java does not support multi inheritance with classes (but with interfaces).
 /// We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
-/// 
+///
 
 public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
 
     /// This method is used to send queries with advanced URL parameters.
     /// This method is necessary as the performSearch method does not support certain URL parameters that are used for
     /// fielded search, such as a title, author, or year parameter.
-    /// 
+    ///
     /// @param queryNode the first search node
     @Override
     default List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
@@ -67,7 +67,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
     Parser getParser();
 
     /// Constructs a URL based on the lucene query.
-    /// 
+    ///
     /// @param queryList the list that contains the parsed nodes
     URL getURLForQuery(BaseQueryNode queryList) throws URISyntaxException, MalformedURLException, FetcherException;
 }

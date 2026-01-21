@@ -143,7 +143,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     }
 
     /// Returns username, password and ssl as Properties Object
-    /// 
+    ///
     /// @return Properties with values for user, password and ssl
     public Properties asProperties() {
         Properties props = new Properties();

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /// Tries to import BibTeX data trying multiple {@link PdfImporter}s and merging the results.
 /// See {@link PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
-/// 
+///
 /// After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
 public class PdfMergeMetadataImporter extends PdfImporter {
 
@@ -68,7 +68,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     /// Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
-    /// 
+    ///
     /// Algorithm:
     /// 1. Store all candidates (possible {@link BibEntry}ies) in a list. First elements in this list will have higher
     /// priority for merging, which means that more fields will be stored for first entries, rather than last.

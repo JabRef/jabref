@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Readings on XMP are available at docs/code-howtos/xmp-parsing.md
-/// 
+///
 /// See also {@link org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation}
 public class XmpUtilReader {
 
@@ -42,7 +42,7 @@ public class XmpUtilReader {
     }
 
     /// Will read the XMPMetadata from the given pdf file, closing the file afterwards.
-    /// 
+    ///
     /// @param path The path to read the XMPMetadata from.
     /// @return The XMPMetadata object found in the file
     public List<XMPMetadata> readRawXmp(Path path) throws IOException {
@@ -60,12 +60,12 @@ public class XmpUtilReader {
     }
 
     /// Merges all XMP data together in one entry.
-    /// 
+    ///
     /// Try to read the given BibTexEntry from the given PDF file.
-    /// 
+    ///
     /// Looks at the DocumentInformation and the XMP metadata.
     /// Regarding the XMP metadata, only Dublin Core is supported.
-    /// 
+    ///
     /// @param path     the path to the PDF file
     /// @param document the PDF document to read from (should have been created from `path`
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
@@ -110,15 +110,15 @@ public class XmpUtilReader {
         return result.stream().toList();
     }
 
-    /// 
+    ///
     /// This method is a hack to generate multiple XMPMetadata objects, because the
     /// implementation of the pdfbox does not support methods for reading multiple
     /// DublinCoreSchemas from a single metadata entry.
-    /// 
-    /// 
+    ///
+    ///
     /// Moreover, DomXmpParser does not handle unknown namespaces
-    /// 
-    /// 
+    ///
+    ///
     /// @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
     private List<XMPMetadata> getXmpMetadata(PDDocument document) {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -166,7 +166,7 @@ public class XmpUtilReader {
     }
 
     /// Loads the specified file with the basic pdfbox functionality and uses an empty string as default password.
-    /// 
+    ///
     /// @param path The path to load.
     /// @throws IOException from the underlying @link PDDocument#load(File)
     public PDDocument loadWithAutomaticDecryption(Path path) throws IOException {

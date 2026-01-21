@@ -13,7 +13,7 @@ public class AuxParserStatisticsProvider {
     }
 
     /// Prints parsing statistics
-    /// 
+    ///
     /// @param includeMissingEntries shows the missing entries as text (the GUI renderes them at another place)
     public String getInformation(boolean includeMissingEntries) {
         String missingEntries = "";

@@ -1,7 +1,7 @@
 package org.jabref.gui.journals;
 
 /// Defines the different abbreviation types that JabRef can operate with.
-/// 
+///
 /// DEFAULT: Default abbreviation type, which is the standard behavior.
 /// DOTLESS: Abbreviation type that does not include dots in the abbreviation.
 /// SHORTEST_UNIQUE: Abbreviation type that generates the shortest unique abbreviation.

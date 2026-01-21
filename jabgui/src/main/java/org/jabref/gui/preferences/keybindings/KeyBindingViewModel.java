@@ -20,7 +20,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 /// class. It has two properties representing the localized name of an
 /// action and its key bind. It can also represent a key binding category
 /// instead of a key bind itself.
-/// 
+///
 public class KeyBindingViewModel {
 
     private KeyBinding keyBinding = null;
@@ -85,7 +85,7 @@ public class KeyBindingViewModel {
 
     /// Sets a a new key bind to this objects key binding object if
     /// the given key event is a valid combination of keys.
-    /// 
+    ///
     /// @param evt as KeyEvent
     /// @return true if the KeyEvent is a valid binding, false else
     public boolean setNewBinding(KeyEvent evt) {

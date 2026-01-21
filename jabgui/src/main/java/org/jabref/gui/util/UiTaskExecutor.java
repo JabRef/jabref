@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /// A very simple implementation of the {@link TaskExecutor} interface.
 /// Every submitted task is invoked in a separate thread.
-/// 
+///
 /// In case something does not interact well with JavaFX, you can use the {@link HeadlessExecutorService}
 public class UiTaskExecutor implements TaskExecutor {
 
@@ -61,7 +61,7 @@ public class UiTaskExecutor implements TaskExecutor {
     }
 
     /// Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
-    /// 
+    ///
     /// @param action the {@link Runnable} to run
     /// @throws NullPointerException if `action` is `null`
     public static void runAndWaitInJavaFXThread(@NonNull Runnable action) {
@@ -94,7 +94,7 @@ public class UiTaskExecutor implements TaskExecutor {
 
     /// This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
     /// The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
-    /// 
+    ///
     /// @param task the BackgroundTask to run
     /// @param <V>  The background task type
     /// @return Future of a JavaFX Task which will execute the call method a background thread
@@ -117,7 +117,7 @@ public class UiTaskExecutor implements TaskExecutor {
 
     /// Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
     /// #execute(BackgroundTask)}.
-    /// 
+    ///
     /// @param <V>  type of return value of the task
     /// @param task the task to run
     public <V> Future<V> execute(Task<V> task) {
@@ -151,7 +151,7 @@ public class UiTaskExecutor implements TaskExecutor {
 
     /// Generates a wrapper with a JavaFX {@link Task} for our BackgroundTask monitoring the progress based on the data given from the task.
     /// `call` is routed to the given task object.
-    /// 
+    ///
     /// @param task the BackgroundTask to wrap
     /// @return a new Javafx Task object
     public static <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {

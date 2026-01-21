@@ -57,14 +57,14 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /// Fetcher for ArXiv that merges fields from arXiv-issued DOIs (and user-issued ones when applicable) to get more information overall.
-/// 
+///
 /// These are the post-processing steps applied to the original fetch from ArXiv's API:
 /// <ol>
 /// - Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
 /// - Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
 /// - Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).
 /// </ol>
-/// 
+///
 /// @see <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">arXiv.org blog </a> for more info about arXiv-issued DOIs
 /// @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
 /// @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed description on how to use the API
@@ -131,7 +131,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Remove duplicate values on "KEYWORD" field, if any. Al
-    /// 
+    ///
     /// @param bibEntry A BibEntry to modify
     private void adaptKeywordsFrom(BibEntry bibEntry) {
         Optional<String> allKeywords = bibEntry.getField(StandardField.KEYWORDS);
@@ -155,7 +155,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// <br/><br/>
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed
     /// {@link #DOI_PREFIX} + the entry's ArXiv ID
-    /// 
+    ///
     /// @param arXivId An ArXiv ID
     /// @return ArXiv-issued DOI
     private static String getAutomaticDoi(String arXivId) {
@@ -165,7 +165,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// Get ArXiv-issued DOI from the arXiv entry itself.
     /// <br/><br/>
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed {@link #DOI_PREFIX} + the entry's ArXiv ID
-    /// 
+    ///
     /// @param arXivBibEntry A Bibtex Entry, formatted as a ArXiv entry. Must contain an EPRINT field
     /// @return ArXiv-issued DOI, or Empty, if method could not retrieve it
     private static Optional<String> getAutomaticDoi(BibEntry arXivBibEntry) {
@@ -183,7 +183,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// Get ArXiv-issued DOI from ArXiv Identifier object
     /// <br/><br/>
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed {@link #DOI_PREFIX} + the entry's ArXiv ID
-    /// 
+    ///
     /// @param arXivId An ArXiv ID as internal object
     /// @return ArXiv-issued DOI
     private static String getAutomaticDoi(ArXivIdentifier arXivId) {
@@ -199,7 +199,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// <br/><br/>
     /// User-issued DOIs are identifiers associated with some ArXiv entries that can associate an entry with an external service, like
     /// <a href="https://link.springer.com/">Springer Link</a>.
-    /// 
+    ///
     /// @param arXivBibEntry An ArXiv Bibtex entry from where the DOI is extracted
     /// @return User-issued DOI, if any field exists and if it's not an automatic one (see {@link #getAutomaticDoi(ArXivIdentifier)})
     private static Optional<String> getManualDoi(BibEntry arXivBibEntry) {
@@ -207,7 +207,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get the Bibtex Entry from a Future API request (uses blocking) and treat exceptions.
-    /// 
+    ///
     /// @param bibEntryFuture A CompletableFuture that parallelize the API fetching process
     /// @return the fetch result
     private static Optional<BibEntry> waitForBibEntryRetrieval(CompletableFuture<Optional<BibEntry>> bibEntryFuture) throws FetcherException {
@@ -223,7 +223,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Eventually merge the ArXiv Bibtex entry with a Future Bibtex entry (ArXiv/user-assigned DOIs)
-    /// 
+    ///
     /// @param arXivEntry     The entry to merge into
     /// @param bibEntryFuture A future result of the fetching process
     /// @param priorityFields Which fields from "bibEntryFuture" to prioritize, replacing them on "arXivEntry"
@@ -246,7 +246,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Infuse arXivBibEntryPromise with additional fields in an asynchronous way
-    /// 
+    ///
     /// @param arXivBibEntry An existing entry to be updated with new/modified fields
     private void inplaceAsyncInfuseArXivWithDoi(BibEntry arXivBibEntry) {
         CompletableFuture<Optional<BibEntry>> arXivBibEntryCompletedFuture = CompletableFuture.completedFuture(Optional.of(arXivBibEntry));
@@ -261,7 +261,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Infuse arXivBibEntryFuture with additional fields in an asynchronous way, accelerating the process by providing a valid ArXiv ID
-    /// 
+    ///
     /// @param arXivBibEntryFuture A future entry that (if it exists) will be updated with new/modified fields
     /// @param arXivId             An ArXiv ID for the main reference (from ArXiv), so that the retrieval of ArXiv-issued DOI metadata can be faster
     /// @throws FetcherException when failed to fetch the main ArtXiv Bibtex entry ('arXivBibEntryFuture').
@@ -306,7 +306,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     /// Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
     /// and modify resulting BibEntries with additional info from the ArXiv-issued DOI
-    /// 
+    ///
     /// @param queryNode the first search query node
     /// @return A list of entries matching the complex query
     @Override
@@ -355,11 +355,11 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Fetcher for the arXiv.
-    /// 
+    ///
     /// @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
     /// @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
     /// description on how to use the API
-    /// 
+    ///
     /// Similar implementions:
     /// <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
     /// <a href="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
@@ -480,12 +480,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         /// Queries the API.
-    /// 
+    ///
     /// If only `searchQuery` is given, then the API will return results for each article that matches the query.
     /// If only `ids` is given, then the API will return results for each article in the list.
     /// If both `searchQuery` and `ids` are given, then the API will return each article in
     /// `ids` that matches `searchQuery`. This allows the API to act as a results filter.
-    /// 
+    ///
     /// @param searchQuery the search query used to find articles;
     /// <a href="http://arxiv.org/help/api/user-manual#query_details">details</a>
     /// @param ids         a list of arXiv identifiers
@@ -570,7 +570,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         /// Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
-    /// 
+    ///
     /// @param queryNode the first search node
     /// @return A list of entries matching the complex query
         @Override

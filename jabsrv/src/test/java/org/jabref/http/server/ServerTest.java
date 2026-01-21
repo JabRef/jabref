@@ -31,10 +31,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /// Abstract test class to
-/// 
+///
 /// - Initialize the JCL to SLF4J bridge
 /// - Provide injection capabilities of JabRef's preferences and Gson<./li>
-/// 
+///
 /// More information on testing with Jersey is available at <a href="https://eclipse-ee4j.github.io/jersey.github.io/documentation/latest/test-framework.html">the Jersey's testing documentation</a>.
 public abstract class ServerTest extends JerseyTest {
 

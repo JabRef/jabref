@@ -115,7 +115,7 @@ public record CSLStyleLoader(
     }
 
     /// Adds a new external CSL style if it's valid.
-    /// 
+    ///
     /// @return Optional containing the added CitationStyle if valid, empty otherwise
     public Optional<CitationStyle> addStyleIfValid(@NonNull String stylePath) {
         Optional<CitationStyle> newStyleOptional = CSLStyleUtils.createCitationStyleFromFile(stylePath);
@@ -139,7 +139,7 @@ public record CSLStyleLoader(
     }
 
     /// Removes a style from the external styles list.
-    /// 
+    ///
     /// @return true if the style was removed, false otherwise
     public boolean removeStyle(@NonNull CitationStyle style) {
         if (!style.isInternalStyle()) {

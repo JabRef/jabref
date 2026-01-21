@@ -173,7 +173,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     /// Called on:
     /// (1) Dialog initialization (default load)
     /// (2) User triggers Browse or Reset in BibLogSettingsPane
-    /// 
+    ///
     /// This reloads .blg warnings and merges them into the main message list.
     private void reloadBlgWarnings() {
         try {

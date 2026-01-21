@@ -26,7 +26,7 @@ public class LtwaTsvParser {
     }
 
     /// Parse LTWA entries from the given file.
-    /// 
+    ///
     /// @return List of LtwaEntry objects
     /// @throws IOException If an I/O error occurs
     public List<LtwaEntry> parse() throws IOException {

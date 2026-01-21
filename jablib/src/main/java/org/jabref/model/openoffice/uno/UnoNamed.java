@@ -13,9 +13,9 @@ public class UnoNamed {
     }
 
     /// Insert a new instance of a service at the provided cursor position.
-    /// 
+    ///
     /// @param service For example "com.sun.star.text.ReferenceMark", "com.sun.star.text.Bookmark" or "com.sun.star.text.TextSection".
-    /// 
+    ///
     /// Passed to this.asXMultiServiceFactory().createInstance(service) The result is expected to support the XNamed and XTextContent interfaces.
     /// @return The XNamed interface, in case we need to check the actual name.
     static XNamed insertNamedTextContent(String service, DocumentAnnotation documentAnnotation)

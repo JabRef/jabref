@@ -30,7 +30,7 @@ public class SlrGitHandler extends GitHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlrGitHandler.class);
 
     /// Initialize the handler for the given repository
-    /// 
+    ///
     /// @param repositoryPath The root of the initialized git repository
     public SlrGitHandler(Path repositoryPath, GitPreferences gitPreferences) {
         super(repositoryPath, gitPreferences);
@@ -46,7 +46,7 @@ public class SlrGitHandler extends GitHandler {
     }
 
     /// Calculates the diff between the HEAD and the previous commit of the sourceBranch.
-    /// 
+    ///
     /// @param sourceBranch The name of the branch that is the target of the calculation
     /// @return Returns the patch (diff) between the head of the sourceBranch and its previous commit HEAD^1
     String calculatePatchOfNewSearchResults(String sourceBranch) throws IOException, GitAPIException {
@@ -86,7 +86,7 @@ public class SlrGitHandler extends GitHandler {
     /// Ignores any changes made to the study definition file.
     /// The reason for this is that the study definition file cannot be patched the same way as the bib files, as the
     /// order of fields in the yml file matters.
-    /// 
+    ///
     /// @param patch the patch (diff) as a string
     /// @return Returns a map where each file has its path as a key and the string contains the hunk of new results
     Map<Path, String> parsePatchForAddedEntries(String patch) throws IOException, GitAPIException {

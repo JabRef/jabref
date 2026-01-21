@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 
 /// Represents a word in a title of a bibtex entry.
-/// 
+///
 /// A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
 public final class Word {
     /// Set containing common lowercase function words

@@ -42,7 +42,7 @@ public class Localization {
     }
 
     /// Public access to all messages that are not menu-entries
-    /// 
+    ///
     /// @param key    The key of the message in unescaped form like "All fields"
     /// @param params Replacement strings for parameters %0, %1, etc.
     /// @return The message with replaced parameters
@@ -57,7 +57,7 @@ public class Localization {
 
     /// Sets the language and loads the appropriate translations. Note, that this function should be called before any
     /// other function of this class.
-    /// 
+    ///
     /// @param language Language identifier like "en", "de", etc.
     public static void setLanguage(Language language) {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
@@ -85,7 +85,7 @@ public class Localization {
     }
 
     /// Returns the messages bundle, e.g. to load FXML files correctly translated.
-    /// 
+    ///
     /// @return The internally cashed bundle.
     public static LocalizationBundle getMessages() {
         // avoid situations where this function is called before any language was set
@@ -98,7 +98,7 @@ public class Localization {
     /// Creates and caches the language bundles used in JabRef for a particular language. This function first loads
     /// correct version of the "escaped" bundles that are given in {@link l10n}. After that, it stores the unescaped
     /// version in a cached {@link LocalizationBundle} for fast access.
-    /// 
+    ///
     /// @param locale Localization to use.
     private static void createResourceBundles(Locale locale) {
         ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale);
@@ -107,7 +107,7 @@ public class Localization {
     }
 
     /// Helper function to create a Map from the key/value pairs of a bundle.
-    /// 
+    ///
     /// @param baseBundle JabRef language bundle with keys and values for translations.
     /// @return Lookup map for the baseBundle.
     private static Map<String, String> createLookupMap(ResourceBundle baseBundle) {
@@ -122,7 +122,7 @@ public class Localization {
 
     /// This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
     /// the keys are the "unescaped" strings from the bundle property files.
-    /// 
+    ///
     /// @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
     /// @param key    The lookup key.
     /// @param params The parameters that should be inserted into the message

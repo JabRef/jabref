@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
-/// 
+///
 /// Note that we also have custom fetchers in place.
 /// See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
 public class DoiResolution implements FulltextFetcher {

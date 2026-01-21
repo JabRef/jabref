@@ -24,7 +24,7 @@ public enum Season {
 
     /// Find season by number.
     /// If the number is not in the valid range, then an empty Optional is returned.
-    /// 
+    ///
     /// @param number 21-24 is valid
     public static Optional<Season> getSeasonByNumber(int number) {
         for (Season season : Season.values()) {
@@ -37,7 +37,7 @@ public enum Season {
 
     /// Find season by name case-insensitive.
     /// If no matching season is found, then an empty Optional is returned.
-    /// 
+    ///
     /// @param name spring, summer, autumn, winter
     public static Optional<Season> getSeasonByName(String name) {
         for (Season season : Season.values()) {
@@ -51,7 +51,7 @@ public enum Season {
     /// This method accepts three types of seasons:
     /// - Double Digit seasons from 21 to 24
     /// - Full English Season identifiers.
-    /// 
+    ///
     /// @param value the given value
     /// @return the corresponding Season instance
     public static Optional<Season> parse(String value) {
@@ -79,7 +79,7 @@ public enum Season {
     }
 
     /// Parses a season having the string in German standard form
-    /// 
+    ///
     /// @param value a String that represents a season in German form
     /// @return the corresponding season instance, empty if input is not in German
     /// form
@@ -100,14 +100,14 @@ public enum Season {
     }
 
     /// Returns the number of the Season: SPRING -> 21, SUMMER -> 22  etc.
-    /// 
+    ///
     /// @return number of the season in the Year
     public int getNumber() {
         return number;
     }
 
     /// Returns the name of the long in unabbreviated english.
-    /// 
+    ///
     /// @return Season
     public String getName() {
         return name;

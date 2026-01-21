@@ -26,7 +26,7 @@ public class UnoCrossRef {
     }
 
     /// Insert a clickable cross-reference to a reference mark, with a label containing the target's page number.
-    /// 
+    ///
     /// May need a documentConnection.refresh() after, to update the text shown.
     public static void insertReferenceToPageNumberOfReferenceMark(XTextDocument doc,
                                                                   String referenceMarkName,

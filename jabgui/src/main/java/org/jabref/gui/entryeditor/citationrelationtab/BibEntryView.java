@@ -23,7 +23,7 @@ public class BibEntryView {
             StandardEntryType.InProceedings, StandardEntryType.InCollection);
 
     /// Creates a layout for a given {@link BibEntry} to be displayed in a List
-    /// 
+    ///
     /// @param entry {@link BibEntry} to display
     /// @return layout container displaying the entry
     public static Node getEntryNode(BibEntry entry) {
@@ -58,7 +58,7 @@ public class BibEntryView {
     }
 
     /// Gets the correct Icon for a given {@link EntryType}
-    /// 
+    ///
     /// @param type {@link EntryType} to get Icon for
     /// @return Icon corresponding to {@link EntryType}
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
@@ -73,7 +73,7 @@ public class BibEntryView {
     }
 
     /// Checks if text contains right-to-left characters
-    /// 
+    ///
     /// @param text Text to check
     /// @return true if text contains RTL characters
     private static boolean isRTL(String text) {
@@ -88,7 +88,7 @@ public class BibEntryView {
 
     /// Creates a text node for the summary with horizontal scrolling for RTL text,
     /// avoiding JavaFX bug related to RTL text wrapping
-    /// 
+    ///
     /// @param text The summary text content
     /// @return Node with either:
     /// - ScrollPane (for RTL text)
@@ -107,7 +107,7 @@ public class BibEntryView {
 
     /// Creates a label with horizontal scrolling for RTL text,
     /// avoiding JavaFX bug related to RTL text wrapping
-    /// 
+    ///
     /// @param text The label text content
     /// @return Node with either:
     /// - ScrollPane (for RTL text)

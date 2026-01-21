@@ -344,7 +344,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Method to create main SplitPane holding all lists, buttons and labels for tab and starts search
-    /// 
+    ///
     /// @param entry BibEntry which is currently selected in JabRef Database
     /// @return SplitPane to display
     private SplitPane getPaneAndStartSearch(BibEntry entry) {
@@ -480,7 +480,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Styles a given CheckListView to display BibEntries either with a hyperlink or an add button
-    /// 
+    ///
     /// @param listView CheckListView to style
     private void styleFetchedListView(CheckListView<CitationRelationItem> listView) {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
@@ -612,7 +612,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Method to style heading labels
-    /// 
+    ///
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
@@ -626,7 +626,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Method to style refresh buttons
-    /// 
+    ///
     /// @param node node to style
     private void styleTopBarNode(Node node, double offset) {
         AnchorPane.setTopAnchor(node, 0.0);
@@ -635,7 +635,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Determines if tab should be shown according to preferences
-    /// 
+    ///
     /// @param entry Currently selected BibEntry
     /// @return whether tab should be shown
     @Override
@@ -827,7 +827,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Function to import selected entries to the database. Also writes the entries to import to the CITING/CITED field
-    /// 
+    ///
     /// @param entriesToImport entries to import
     private void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
         citingTask.cancel();
@@ -839,7 +839,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /// Function to open possible duplicate entries window to compare duplicate entries
-    /// 
+    ///
     /// @param citationRelationItem duplicate in the citation relations tab
     /// @param listView             CheckListView to display citations
     private void openPossibleDuplicateEntriesWindow(CitationRelationItem citationRelationItem, CheckListView<CitationRelationItem> listView) {

@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class GroupsParser {
 
     /// Identifier for SmartGroup (deprecated, replaced by {@link ExplicitGroup}).
-    /// 
+    ///
     /// @deprecated Kept for backward compatibility during migration.
     @Deprecated
     private static final String SMART_GROUP_ID_FOR_MIGRATION = "SmartGroup:";
@@ -95,7 +95,7 @@ public class GroupsParser {
     }
 
     /// Re-create a group instance from a textual representation.
-    /// 
+    ///
     /// @param input The result from the group's toString() method.
     /// @return New instance of the encoded group.
     /// @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
@@ -210,7 +210,7 @@ public class GroupsParser {
     }
 
     /// Parses s and recreates the KeywordGroup from it.
-    /// 
+    ///
     /// @param input The String representation obtained from KeywordGroup.toString()
     private static KeywordGroup keywordGroupFromString(String input, Character keywordSeparator) {
         assert input.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID);
@@ -295,7 +295,7 @@ public class GroupsParser {
     }
 
     /// Parses s and recreates the SearchGroup from it.
-    /// 
+    ///
     /// @param input The String representation obtained from SearchGroup.toString(), or null if incompatible
     private static AbstractGroup searchGroupFromString(String input) {
         assert input.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID);

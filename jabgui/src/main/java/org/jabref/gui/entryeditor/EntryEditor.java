@@ -84,12 +84,12 @@ import org.jspecify.annotations.NonNull;
 
 /// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
 /// an entry in the table)
-/// 
+///
 /// It hosts the tabs (required, general, optional) and the buttons to the left.
-/// 
+///
 /// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
 /// the text fields to update themselves if the change is made from somewhere else.
-/// 
+///
 /// The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
 public class EntryEditor extends BorderPane implements PreviewControls, AdaptVisibleTabs {
     private final Supplier<LibraryTab> tabSupplier;
@@ -404,7 +404,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     /// The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
     /// These should be shown. Already hard-coded ones (above and below this code block) should be removed.
     /// This method does this calculation.
-    /// 
+    ///
     /// @return Map of tab names and the fields to show in them.
     private Map<String, Set<Field>> getAdditionalUserConfiguredTabs() {
         Map<String, Set<Field>> entryEditorTabList = new HashMap<>(preferences.getEntryEditorPreferences().getEntryEditorTabs());
@@ -602,7 +602,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     /// Checks if the given TextField is the first field in the currently selected tab.
-    /// 
+    ///
     /// @param node the Node to check
     /// @return true if this is the first field in the current tab, false otherwise
     boolean isFirstFieldInCurrentTab(Node node) {
@@ -639,7 +639,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     /// Checks if the given TextField is the last field in the currently selected tab.
-    /// 
+    ///
     /// @param node the Node to check
     /// @return true if this is the last field in the current tab, false otherwise
     boolean isLastFieldInCurrentTab(Node node) {

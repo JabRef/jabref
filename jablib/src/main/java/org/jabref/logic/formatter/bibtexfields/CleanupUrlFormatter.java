@@ -13,9 +13,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jspecify.annotations.NonNull;
 
 /// Cleanup URL link.
-/// 
+///
 /// Expose string representations URL links clean up logic.
-/// 
+///
 public class CleanupUrlFormatter extends Formatter {
 
     // This regexp find "url=" or "to=" parameter in full link and get text after them
@@ -32,15 +32,15 @@ public class CleanupUrlFormatter extends Formatter {
     }
 
     /// Escape and decodes a String from the application/x-www-form-urlencoded MIME format.
-    /// 
+    ///
     /// Method will also try to find a URL placed after "url=" or "to=".
-    /// 
+    ///
     /// The conversion process is the same as executed by {@link URLDecoder} to try to
     /// take guarantees against code injections.
-    /// 
+    ///
     /// The plus sign is replaced by its correspondent code (%2b) to avoid the character
     /// to be replaced by a space during the decoding execution.
-    /// 
+    ///
     /// @param url should not be null
     /// @return the decoded URL as a String representation
     /// @see URLDecoder#decode(String, Charset)

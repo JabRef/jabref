@@ -46,18 +46,18 @@ public abstract class AbstractQueryTransformer {
 
     /// Returns the logical AND operator used by the library
     /// Note: whitespaces have to be included around the operator
-    /// 
+    ///
     /// Example: `" AND "`
     protected abstract String getLogicalAndOperator();
 
     /// Returns the logical OR operator used by the library
     /// Note: whitespaces have to be included around the operator
-    /// 
+    ///
     /// Example: `" OR "`
     protected abstract String getLogicalOrOperator();
 
     /// Returns the logical NOT operator used by the library
-    /// 
+    ///
     /// Example: `"!"`
     protected abstract String getLogicalNotOperator();
 
@@ -137,7 +137,7 @@ public abstract class AbstractQueryTransformer {
 
     /// Return a string representation of the year-range fielded term
     /// Should follow the structure yyyy-yyyy
-    /// 
+    ///
     /// Example: `2015-2021`
     protected String handleYearRange(String yearRange) {
         parseYearRange(yearRange);
@@ -153,7 +153,7 @@ public abstract class AbstractQueryTransformer {
     }
 
     /// Return a string representation of the un-fielded (default fielded) term
-    /// 
+    ///
     /// Default implementation: just return the term (in quotes if a space is contained)
     protected Optional<String> handleUnFieldedTerm(String term) {
         return Optional.of(StringUtil.quoteStringIfSpaceIsContained(term));
@@ -194,7 +194,7 @@ public abstract class AbstractQueryTransformer {
 
     /// Parses the given query string into a complex query using lucene.
     /// Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
-    /// 
+    ///
     /// @param queryNode The first search node
     /// @return A query string containing all fields that are contained in the original lucene query and
     /// that are expressible in the library specific query language, other information either is discarded or

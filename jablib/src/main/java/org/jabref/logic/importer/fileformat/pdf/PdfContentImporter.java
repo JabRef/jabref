@@ -35,12 +35,12 @@ import org.jspecify.annotations.Nullable;
 import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 
 /// Parses data of the first page of the PDF and creates a BibTeX entry.
-/// 
+///
 /// Currently, Springer, and IEEE formats are supported.
-/// 
+///
 /// In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
 /// please see {@link RuleBasedBibliographyPdfImporter}.
-/// 
+///
 /// If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
 public class PdfContentImporter extends PdfImporter {
 
@@ -59,12 +59,12 @@ public class PdfContentImporter extends PdfImporter {
     private String year;
 
     /// Removes all non-letter characters at the end
-    /// 
+    ///
     /// EXCEPTION: a closing bracket is NOT removed
-    /// 
-    /// 
+    ///
+    ///
     /// TODO: Additionally replace multiple subsequent spaces by one space, which will cause a rename of this method
-    /// 
+    ///
     private String removeNonLettersAtEnd(String input) {
         String result = input.trim();
         if (result.isEmpty()) {
@@ -293,23 +293,23 @@ public class PdfContentImporter extends PdfImporter {
     /// Parses the first page content of a PDF document and extracts bibliographic information such as title, author,
     /// abstract, keywords, and other relevant metadata. This method processes the content line-by-line and uses
     /// custom parsing logic to identify and assemble information blocks from academic papers.
-    /// 
+    ///
     /// idea: split[] contains the different lines, blocks are separated by empty lines, treat each block
     /// or do special treatment at authors (which are not broken).
     /// Therefore, we do a line-based and not a block-based splitting i points to the current line
     /// curString (mostly) contains the current block,
     /// the different lines are joined into one and thereby separated by " "
-    /// 
+    ///
     /// This method follows the structure typically found in academic paper PDFs:
     /// - First, it attempts to detect the title by font size, if available, or by text position.
     /// - Authors are then processed line-by-line until reaching the next section.
     /// - Abstract and keywords, if found, are extracted as they appear on the page.
     /// - Finally, conference details, DOI, and publication information are parsed from the lower blocks.
-    /// 
+    ///
     /// The parsing logic also identifies and categorizes entries based on keywords such as "Abstract" or "Keywords"
     /// and specific terms that denote sections. Additionally, this method can handle
     /// publisher-specific formats like Springer or IEEE, extracting data like series, volume, and conference titles.
-    /// 
+    ///
     /// @param firstpageContents The raw content of the PDF's first page, which may contain metadata and main content.
     /// @param lineSeparator     The line separator used to format and unify line breaks in the text content.
     /// @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the
@@ -622,10 +622,10 @@ public class PdfContentImporter extends PdfImporter {
     /// Fill curString with lines until "" is found
     /// No trailing space is added
     /// i is advanced to the next non-empty line (ignoring white space)
-    /// 
+    ///
     /// Lines containing only white spaces are ignored,
     /// but NOT considered as ""
-    /// 
+    ///
     /// Uses GLOBAL variables lines, curLine, i
     private void fillCurStringWithNonEmptyLines() {
         // ensure that curString does not end with " "
@@ -648,7 +648,7 @@ public class PdfContentImporter extends PdfImporter {
     /// resets curString
     /// curString now contains the last block (until "" reached)
     /// Trailing space is added
-    /// 
+    ///
     /// invariant before/after: i points to line before the last handled block
     private void readLastBlock() {
         while ((lineIndex >= 0) && lines[lineIndex].trim().isEmpty()) {

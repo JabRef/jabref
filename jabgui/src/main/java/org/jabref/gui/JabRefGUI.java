@@ -377,7 +377,7 @@ public class JabRefGUI extends Application {
     }
 
     /// prints the data from the screen (only in debug mode)
-    /// 
+    ///
     /// @param mainStage JabRef's stage
     private void debugLogWindowState(Stage mainStage) {
         LOGGER.debug("""

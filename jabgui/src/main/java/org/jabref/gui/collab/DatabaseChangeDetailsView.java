@@ -26,7 +26,7 @@ public sealed abstract class DatabaseChangeDetailsView extends AnchorPane permit
 
     /// Set left, top, right, bottom anchors based on common offset parameter for the given child
     /// and attach it to children.
-    /// 
+    ///
     /// @param child the child node of the implementation
     /// @see AnchorPane#getChildren()
     /// @see javafx.collections.ObservableList#setAll(Object[])

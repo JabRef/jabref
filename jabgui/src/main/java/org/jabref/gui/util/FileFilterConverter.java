@@ -40,7 +40,7 @@ public class FileFilterConverter {
     /// Determines the appropriate file extension filter based on the given file.
     /// If the file is recognized as a BibTeX file, it returns a BibTeX-specific extension filter.
     /// Otherwise, it returns a generic filter.
-    /// 
+    ///
     /// @param file The file to check.
     /// @return The corresponding Extension Filter for the file type.
     public static FileChooser.ExtensionFilter determineExtensionFilter(Path file) {

@@ -100,7 +100,7 @@ public class IconTheme {
 
     /// Looks up the URL for the image representing the given function, in the resource
     /// file listing images.
-    /// 
+    ///
     /// @param name The name of the icon, such as "open", "save", "saveAs" etc.
     /// @return The URL to the actual image to use.
     public static URL getIconUrl(@NonNull String name) {
@@ -114,7 +114,7 @@ public class IconTheme {
     /// Read a typical java property url into a Map. Currently doesn't support escaping
     /// of the '=' character - it simply looks for the first '=' to determine where the key ends.
     /// Both the key and the value is trimmed for whitespace at the ends.
-    /// 
+    ///
     /// @param url    The URL to read information from.
     /// @param prefix A String to prefix to all values read. Can represent e.g. the directory where icon files are to be
     /// found.

@@ -13,9 +13,9 @@ public class GetContext {
     }
 
     /// Get the text belonging to cursor with up to charBefore and charAfter characters of context.
-    /// 
+    ///
     /// The actual context may be smaller than requested.
-    /// 
+    ///
     /// @param charBefore Number of characters requested.
     /// @param charAfter  Number of characters requested.
     /// @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.

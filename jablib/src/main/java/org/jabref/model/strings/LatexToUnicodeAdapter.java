@@ -18,7 +18,7 @@ public class LatexToUnicodeAdapter {
     private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
 
     /// Attempts to resolve all LaTeX in the String.
-    /// 
+    ///
     /// @param inField a String containing LaTeX
     /// @return a String with LaTeX resolved into Unicode, or the original String if the LaTeX could not be parsed
     public static String format(@NonNull String inField) {
@@ -26,7 +26,7 @@ public class LatexToUnicodeAdapter {
     }
 
     /// Attempts to resolve all LaTeX in the String.
-    /// 
+    ///
     /// @param inField a String containing LaTeX
     /// @return an `Optional<String>` with LaTeX resolved into Unicode or `empty` on failure.
     public static Optional<String> parse(@NonNull String inField) {

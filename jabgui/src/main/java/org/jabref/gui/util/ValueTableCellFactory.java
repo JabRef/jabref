@@ -19,7 +19,7 @@ import javafx.util.Callback;
 import org.jabref.logic.util.strings.StringUtil;
 
 /// Constructs a {@link TableCell} based on the value of the cell and a bunch of specified converter methods.
-/// 
+///
 /// @param <S> view model of table row
 /// @param <T> cell value
 public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {

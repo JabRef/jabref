@@ -7,19 +7,19 @@ import org.jspecify.annotations.Nullable;
 
 /// Represents a node in a chain.
 /// We view a chain as a vertical hierarchy and thus refer to the previous node as parent and the next node is a child.
-/// 
+///
 /// In usual implementations, nodes function as wrappers around a data object. Thus normally they have a value property
 /// which allows access to the value stored in the node.
 /// In contrast to this approach, the ChainNode&lt;T> class is designed to be used as a base class which provides the
 /// tree traversing functionality via inheritance.
-/// 
+///
 /// Example usage:
 /// private class BasicChainNode extends ChainNode&lt;BasicChainNode> {
 /// public BasicChainNode() {
 /// super(BasicChainNode.class);
 /// }
 /// }
-/// 
+///
 /// @param <T> the type of the class
 @SuppressWarnings("unchecked")
 // We use some explicit casts of the form "(T) this". The constructor ensures that this cast is valid.
@@ -31,7 +31,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     private T child;
 
     /// Constructs a chain node without parent and no child.
-    /// 
+    ///
     /// @param derivingClass class deriving from TreeNode&lt;T>. It should always be "T.class".
     /// We need this parameter since it is hard to get this information by other means.
     public ChainNode(Class<T> derivingClass) {
@@ -44,24 +44,24 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     }
 
     /// Returns this node's parent or an empty Optional if this node has no parent.
-    /// 
+    ///
     /// @return this node's parent T, or an empty Optional if this node has no parent
     public Optional<T> getParent() {
         return Optional.ofNullable(parent);
     }
 
     /// Sets the parent node of this node.
-    /// 
+    ///
     /// This method does not set this node as the child of the new parent, nor does it remove this node
     /// from the old parent. You should probably call {@link #moveTo(ChainNode)} to change the chain.
-    /// 
+    ///
     /// @param parent the new parent
     protected void setParent(@Nullable T parent) {
         this.parent = parent;
     }
 
     /// Returns this node's child or an empty Optional if this node has no child.
-    /// 
+    ///
     /// @return this node's child T, or an empty Optional if this node has no child
     public Optional<T> getChild() {
         return Optional.ofNullable(child);
@@ -69,7 +69,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
 
     /// Adds the node as the child. Also sets the parent of the given node to this node.
     /// The given node is not allowed to already be in a tree (i.e. it has to have no parent).
-    /// 
+    ///
     /// @param child the node to add as child
     /// @return the child node
     /// @throws UnsupportedOperationException if the given node has already a parent
@@ -86,7 +86,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
 
     /// Removes this node from its parent and makes it a child of the specified node.
     /// In this way the whole subchain based at this node is moved to the given node.
-    /// 
+    ///
     /// @param target the new parent
     /// @throws NullPointerException          if target is null
     /// @throws UnsupportedOperationException if target is an descendant of this node
@@ -113,9 +113,9 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     }
 
     /// Returns true if this node is an ancestor of the given node.
-    /// 
+    ///
     /// A node is considered an ancestor of itself.
-    /// 
+    ///
     /// @param anotherNode node to test
     /// @return true if anotherNode is a descendant of this node
     /// @throws NullPointerException if anotherNode is null

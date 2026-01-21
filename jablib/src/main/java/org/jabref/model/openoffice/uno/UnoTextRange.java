@@ -13,7 +13,7 @@ public class UnoTextRange {
     }
 
     /// If original is in a footnote, return a range containing the corresponding footnote marker.
-    /// 
+    ///
     /// Returns Optional.empty if not in a footnote.
     public static Optional<XTextRange> getFootnoteMarkRange(XTextRange original) {
         Optional<XFootnote> footer = UnoCast.cast(XFootnote.class, original.getText());

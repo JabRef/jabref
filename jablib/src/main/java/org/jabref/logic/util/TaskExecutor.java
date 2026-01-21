@@ -10,13 +10,13 @@ import java.util.concurrent.TimeUnit;
 public interface TaskExecutor {
 
     /// Runs the given task and returns a Future representing that task.
-    /// 
+    ///
     /// @param <V>  type of return value of the task
     /// @param task the task to run
     <V> Future<V> execute(BackgroundTask<V> task);
 
     /// Submits a one-shot task that becomes enabled after the given delay.
-    /// 
+    ///
     /// @param task  the task to execute
     /// @param delay the time from now to delay execution
     /// @param unit  the time unit of the delay parameter

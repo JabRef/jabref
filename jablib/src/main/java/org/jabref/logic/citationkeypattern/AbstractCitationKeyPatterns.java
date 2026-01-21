@@ -51,7 +51,7 @@ public abstract class AbstractCitationKeyPatterns {
     /// DatabaseCitationKeyPattern). This method first tries to obtain the object from this CitationKeyPattern via the
     /// `get` method of `Hashtable`. If this fails, we try the default.<br /> If that fails, we try
     /// the parent.<br /> If that fails, we return the DEFAULT_LABELPATTERN<br />
-    /// 
+    ///
     /// @param entryType a `String`
     /// @return the list of Strings for the given key. First entry: the complete key
     public CitationKeyPattern getValue(EntryType entryType) {
@@ -75,14 +75,14 @@ public abstract class AbstractCitationKeyPatterns {
     }
 
     /// This method is called "...Value" to be in line with the other methods
-    /// 
+    ///
     /// @return null if not available.
     public CitationKeyPattern getDefaultValue() {
         return this.defaultPattern;
     }
 
     /// Sets the DEFAULT PATTERN for this key pattern
-    /// 
+    ///
     /// @param bibtexKeyPattern the pattern to store
     public void setDefaultValue(@NonNull String bibtexKeyPattern) {
         this.defaultPattern = new CitationKeyPattern(bibtexKeyPattern);

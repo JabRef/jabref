@@ -27,7 +27,7 @@ public class AutomaticDateGroup extends AutomaticGroup {
 
     /// Gets the field used for date extraction.
     /// Required by GroupSerializer for serialization.
-    /// 
+    ///
     /// @return The field (e.g., StandardField.DATE or StandardField.YEAR)
     public Field getField() {
         return field;
@@ -35,7 +35,7 @@ public class AutomaticDateGroup extends AutomaticGroup {
 
     /// Gets the granularity level for date grouping.
     /// Required by GroupSerializer for serialization.
-    /// 
+    ///
     /// @return The granularity (YEAR, MONTH, or FULL_DATE)
     public DateGranularity getGranularity() {
         return granularity;

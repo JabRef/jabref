@@ -10,16 +10,16 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 
 /// All implementing classes should additionally offer
-/// 
-/// 
+///
+///
 /// - `public static Optional&lt;Class> parse(String value)`
 /// - `public static boolean isValid(String value)`
-/// 
+///
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public interface Identifier {
 
     /// Returns the identifier as String
-    /// 
+    ///
     /// @return the identifier as String
     String asString();
 

@@ -14,7 +14,7 @@ public class StringSimilarity {
     private final int METRIC_THRESHOLD = 4;
 
     /// String similarity based on Levenshtein, ignoreCase, and fixed metric threshold of 4.
-    /// 
+    ///
     /// @param a String to compare
     /// @param b String to compare
     /// @return true if Strings are considered as similar by the algorithm
@@ -53,11 +53,11 @@ public class StringSimilarity {
     }
 
     /// Returns the Longest Common Substring (LCS) similarity rating between two strings, ignoring case.
-    /// 
+    ///
     /// This function uses the following formula = `(length of longest substring) / (length of shorter string)`.
     /// The longest common substring is calculated using a space-optimized dynamic programming implementation of the LCS
     /// algorithm found <a href="https://en.wikipedia.org/wiki/Longest_common_substring">on Wikipedia</a>.
-    /// 
+    ///
     public static double LCSSimilarity(String first, String second) {
         if (first.isEmpty() && second.isEmpty()) {
             return 1.0;
@@ -93,7 +93,7 @@ public class StringSimilarity {
     }
 
     /// Compare two strings on the basis of word-by-word correlation analysis.
-    /// 
+    ///
     /// @param s1 The first string
     /// @param s2 The second string
     /// @return a value in the interval [0, 1] indicating the degree of match.

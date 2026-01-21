@@ -7,7 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TableCell;
 
 /// Constructs a {@link TableCell} based on an optional value of the cell and a bunch of specified converter methods.
-/// 
+///
 /// @param <S> view model of table row
 /// @param <T> cell value
 public class OptionalValueTableCellFactory<S, T> extends ValueTableCellFactory<S, Optional<T>> {

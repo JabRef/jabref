@@ -24,7 +24,7 @@ public class StringManipulator {
     }
 
     /// Change word casing in a string from the given position to the next word boundary.
-    /// 
+    ///
     /// @param text          The text to manipulate.
     /// @param caretPosition The index to start from.
     /// @param targetCase    The case mode the string should be changed to.
@@ -53,7 +53,7 @@ public class StringManipulator {
     }
 
     /// Delete all characters in a string from the given position to the next word boundary.
-    /// 
+    ///
     /// @param caretPosition The index to start from.
     /// @param text          The text to manipulate.
     /// @param direction     The direction to search.
@@ -76,7 +76,7 @@ public class StringManipulator {
     }
 
     /// Utility method to find the next whitespace position in string after text
-    /// 
+    ///
     /// @param caretPosition The current caret position
     /// @param text          The string to search in
     /// @param direction     The direction to move through string
@@ -110,7 +110,7 @@ public class StringManipulator {
     }
 
     /// Capitalize the word on the right side of the cursor.
-    /// 
+    ///
     /// @param caretPosition The position of the cursor
     /// @param text          The string to manipulate
     /// @return String       The resulting text and caret position.
@@ -119,7 +119,7 @@ public class StringManipulator {
     }
 
     /// Make all characters in the word uppercase.
-    /// 
+    ///
     /// @param caretPosition The position of the cursor
     /// @param text          The string to manipulate
     /// @return String       The resulting text and caret position.
@@ -128,7 +128,7 @@ public class StringManipulator {
     }
 
     /// Make all characters in the word lowercase.
-    /// 
+    ///
     /// @param caretPosition The position of the cursor
     /// @param text          The string to manipulate
     /// @return String       The resulting text and caret position.
@@ -137,7 +137,7 @@ public class StringManipulator {
     }
 
     /// Remove the next word on the right side of the cursor.
-    /// 
+    ///
     /// @param caretPosition The position of the cursor
     /// @param text          The string to manipulate
     /// @return String       The resulting text and caret position.
@@ -146,7 +146,7 @@ public class StringManipulator {
     }
 
     /// Remove the previous word on the left side of the cursor.
-    /// 
+    ///
     /// @param caretPosition The position of the cursor
     /// @param text          The string to manipulate
     /// @return String       The resulting text and caret position.

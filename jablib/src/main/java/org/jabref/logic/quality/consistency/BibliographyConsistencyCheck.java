@@ -92,13 +92,13 @@ public class BibliographyConsistencyCheck {
     }
 
     /// Checks the consistency of the given entries by looking at the present and absent fields.
-    /// 
+    ///
     /// Computation takes place grouped by each entryType.
     /// Computes the fields set in all entries. In case entries of the same type has more fields defined, it is output.
-    /// 
+    ///
     /// This class *does not* check whether all required fields are present or if the fields are valid for the entry type.
     /// That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
-    /// 
+    ///
     /// @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
     public Result check(BibDatabaseContext bibContext, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type

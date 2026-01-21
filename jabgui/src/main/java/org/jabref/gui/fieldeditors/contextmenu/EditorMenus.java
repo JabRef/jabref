@@ -29,7 +29,7 @@ import com.tobiasdiez.easybind.EasyBind;
 public class EditorMenus {
 
     /// The default context menu with a specific menu for normalizing person names regarding to BibTex rules.
-    /// 
+    ///
     /// @param textInput text-input-control that this menu will be connected to
     /// @return menu containing items of the default menu and an item for normalizing person names
     public static Supplier<List<MenuItem>> getNameMenu(final TextInputControl textInput) {
@@ -45,7 +45,7 @@ public class EditorMenus {
     }
 
     /// The default context menu with a specific menu copying a DOI/ DOI URL.
-    /// 
+    ///
     /// @param textField text-field that this menu will be connected to
     /// @return menu containing items of the default menu and an item for copying a DOI/DOI URL
     public static Supplier<List<MenuItem>> getDOIMenu(TextField textField, DialogService dialogService) {
@@ -64,7 +64,7 @@ public class EditorMenus {
     }
 
     /// The default context menu with a specific menu item to cleanup URL.
-    /// 
+    ///
     /// @param textField text field that this menu will be connected to
     /// @return menu containing items of the default menu and an item to cleanup a URL
     public static Supplier<List<MenuItem>> getCleanupUrlMenu(TextField textField) {

@@ -11,9 +11,9 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jspecify.annotations.NonNull;
 
 /// A registry that manages {@link GitHandler} instances per Git repository.
-/// 
+///
 /// Ensures that each Git repository (identified by its root path) has a single `GitHandler` instance shared across the application.
-/// 
+///
 /// Usage:
 /// - {@link #get(Path)} — for known repository root paths (must contain a .git folder).
 /// - {@link #fromAnyPath(Path)} — for arbitrary paths inside a Git repo; will locate the repo root first.

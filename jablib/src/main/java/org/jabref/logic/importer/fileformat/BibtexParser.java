@@ -128,9 +128,9 @@ public class BibtexParser implements Parser {
     }
 
     /// Parses BibtexEntries from the given string and returns one entry found (or null if none found)
-    /// 
+    ///
     /// It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
-    /// 
+    ///
     /// @return An `Optional<BibEntry>. Optional.empty()` if non was found or an error occurred.
     public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) throws ParseException {
         Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
@@ -160,11 +160,11 @@ public class BibtexParser implements Parser {
     }
 
     /// Parses BibTeX data found when reading from reader.
-    /// 
+    ///
     /// The reader will be consumed.
-    /// 
+    ///
     /// Multiple calls to parse() return the same results
-    /// 
+    ///
     /// Handling of encoding is done at {@link BibtexImporter}
     public ParserResult parse(@NonNull Reader in) throws IOException {
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
@@ -473,7 +473,7 @@ public class BibtexParser implements Parser {
     }
 
     /// Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string. Removes the JabRef file header, if it is found
-    /// 
+    ///
     /// @return the text read so far
     private String dumpTextReadSoFarToString() {
         String result = getPureTextFromFile();
@@ -492,7 +492,7 @@ public class BibtexParser implements Parser {
     }
 
     /// Purges the given stringToPurge (if it exists) from the given context
-    /// 
+    ///
     /// @return a stripped version of the context
     private String purge(String context, String stringToPurge) {
         // purge the given string line if it exists
@@ -528,7 +528,7 @@ public class BibtexParser implements Parser {
     }
 
     /// Removes all eof characters from a StringBuilder and returns a new String with the resulting content
-    /// 
+    ///
     /// @return a String without eof characters
     private String purgeEOFCharacters(String input) {
         StringBuilder remainingText = new StringBuilder();
@@ -861,7 +861,7 @@ public class BibtexParser implements Parser {
     }
 
     /// Tries to restore the key
-    /// 
+    ///
     /// @return rest of key on success, otherwise empty string
     /// @throws IOException on Reader-Error
     private String fixKey() throws IOException {
@@ -956,7 +956,7 @@ public class BibtexParser implements Parser {
     }
 
     /// pushes buffer back into input
-    /// 
+    ///
     /// @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
     private void unreadBuffer(StringBuilder stringBuilder) throws IOException {
         for (int i = stringBuilder.length() - 1; i >= 0; --i) {

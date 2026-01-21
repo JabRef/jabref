@@ -10,13 +10,13 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
 /// This class represents all supported IEEETran entry types.
-/// 
+///
 /// See <a href="http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf">http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf</a>
-/// 
+///
 /// Electronic, IEEETranBSTCTL, Periodical, Patent, Standard
 public class IEEETranEntryTypeDefinitions {
     /// Electronic entry type for internet references
-    /// 
+    ///
     /// Required fields:
     /// Optional fields: author, month, year, title, language, howpublished, organization, address, note, url
     private static final BibEntryType ELECTRONIC = new BibEntryTypeBuilder()
@@ -35,7 +35,7 @@ public class IEEETranEntryTypeDefinitions {
             .build();
 
     /// The periodical entry type is used for journals and magazines.
-    /// 
+    ///
     /// Required fields: title, year
     /// Optional fields: editor, language, series, volume, number, organization, month, note, url
     private static final BibEntryType PERIODICAL = new BibEntryTypeBuilder()
@@ -45,7 +45,7 @@ public class IEEETranEntryTypeDefinitions {
             .build();
 
     /// Entry type for patents.
-    /// 
+    ///
     /// Required fields: nationality, number, year or yearfiled
     /// Optional fields: author, title, language, assignee, address, type, number, day, dayfiled, month, monthfiled, note, url
     private static final BibEntryType PATENT = new BibEntryTypeBuilder()
@@ -57,7 +57,7 @@ public class IEEETranEntryTypeDefinitions {
             .build();
 
     /// The standard entry type is used for proposed or formally published standards.
-    /// 
+    ///
     /// Required fields: title, organization or institution
     /// Optional fields: author, language, howpublished, type, number, revision, address, month, year, note, url
     private static final BibEntryType STANDARD = new BibEntryTypeBuilder()

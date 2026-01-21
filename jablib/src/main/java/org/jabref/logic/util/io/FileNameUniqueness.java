@@ -19,7 +19,7 @@ public class FileNameUniqueness {
     private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile("(.*) \\(\\d+\\)");
 
     /// Returns a file name such that it does not match any existing files in targetDirectory
-    /// 
+    ///
     /// @param targetDirectory The directory in which filename should be unique
     /// @param fileName        Suggested name for the file
     /// @return a file name such that it does not match any existing files in targetDirectory
@@ -29,7 +29,7 @@ public class FileNameUniqueness {
 
     /// Generates a unique filename in the target directory while taking into account existing files that may be already
     /// linked to the same bibliography entry.
-    /// 
+    ///
     /// @param proposedName The proposed name for the file without any patchers for "(1)" etc.
     public static String generateUniqueFileName(Path targetDirectory, String proposedName) {
         String fileNameWithoutExtension = FileUtil.getBaseName(proposedName);
@@ -49,7 +49,7 @@ public class FileNameUniqueness {
 
     /// This function decide whether the newly downloaded file has the same content with other files
     /// It returns ture when the content is duplicate, while returns false if it is not
-    /// 
+    ///
     /// @param directory         The directory which saves the files (.pdf, for example)
     /// @param fileName          Suggest name for the newly downloaded file
     /// @param messageOnDeletion To display the error and success message
@@ -100,7 +100,7 @@ public class FileNameUniqueness {
     /// It will recover the file name to origin if it has duplicate mark such as " (1)"
     /// change the String whose format is "xxxxxx (number)" into "xxxxxx", while return the same String when it does not match the format
     /// This is the opposite function of getNonOverWritingFileName
-    /// 
+    ///
     /// @param fileName Suggested name for the file without extensionSuffix, if it has duplicate file name with other file, it will end with something like " (1)"
     /// @return Suggested name for the file without extensionSuffix and duplicate marks such as " (1)"
     public static String eraseDuplicateMarks(String fileName) {

@@ -29,7 +29,7 @@ public class UpdateField {
     }
 
     /// Undoable change of field value
-    /// 
+    ///
     /// @param nullFieldIfValueIsTheSame If true the field value is removed when the current value is equals to newValue
     public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue,
                                                     Boolean nullFieldIfValueIsTheSame) {

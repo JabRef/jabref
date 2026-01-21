@@ -23,7 +23,7 @@ public class UnoReferenceMark {
     }
 
     /// @throws NoDocumentException If cannot get reference marks
-    /// 
+    ///
     /// Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
     public static XNameAccess getNameAccess(XTextDocument doc)
             throws
@@ -39,7 +39,7 @@ public class UnoReferenceMark {
     }
 
     /// Names of all reference marks.
-    /// 
+    ///
     /// Empty list for nothing.
     public static List<String> getListOfNames(XTextDocument doc)
             throws NoDocumentException {
@@ -53,7 +53,7 @@ public class UnoReferenceMark {
     }
 
     /// Remove the named reference mark.
-    /// 
+    ///
     /// Removes both the text and the mark itself.
     public static void removeIfExists(XTextDocument doc, String name)
             throws
@@ -95,11 +95,11 @@ public class UnoReferenceMark {
     }
 
     /// Insert a new reference mark at the provided cursor position.
-    /// 
+    ///
     /// If `documentAnnotation.getAbsorb` is true, the text in the cursor range will become the text with gray background.
-    /// 
+    ///
     /// Note: LibreOffice 6.4.6.2 will create multiple reference marks with the same name without error or renaming. Its GUI does not allow this, but we can create them programmatically. In the GUI, clicking on any of those identical names will move the cursor to the same mark.
-    /// 
+    ///
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {

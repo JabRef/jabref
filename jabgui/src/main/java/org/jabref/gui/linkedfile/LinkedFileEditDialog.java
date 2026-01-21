@@ -45,7 +45,7 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
     }
 
     /// Constructor for editing an existing LinkedFile.
-    /// 
+    ///
     /// @param linkedFile The linked file to be edited.
     public LinkedFileEditDialog(LinkedFile linkedFile) {
         this.linkedFile = linkedFile;

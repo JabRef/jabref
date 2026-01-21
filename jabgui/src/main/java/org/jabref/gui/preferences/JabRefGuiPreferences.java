@@ -408,7 +408,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /// Get a Map of defined tab names to default tab fields.
-    /// 
+    ///
     /// @return A map of the currently defined tabs in the entry editor from scratch to cache
     private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
@@ -428,7 +428,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /// Stores the defined tabs and corresponding fields in the preferences.
-    /// 
+    ///
     /// @param customTabs a map of tab names and the corresponding set of fields to be displayed in
     private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
         String[] names = customTabs.keySet().toArray(String[]::new);

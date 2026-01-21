@@ -119,7 +119,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     /// string is basically marked up with "\i" marking that the iteration number should
     /// be inserted, and with "\p" marking that the file path of the current iteration
     /// should be inserted, plus additional markers.
-    /// 
+    ///
     /// @param format The marked-up string.
     /// @return the resulting format entries.
     private static List<FormatEntry> parseFormatString(String format) {

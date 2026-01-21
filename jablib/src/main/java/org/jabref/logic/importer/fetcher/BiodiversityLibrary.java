@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Fetches data from the Biodiversity Heritage Library
-/// 
+///
 /// @see <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
 public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Biodiversity Heritage";

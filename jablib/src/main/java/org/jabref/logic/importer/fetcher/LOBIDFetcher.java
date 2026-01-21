@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Fetches data from the LOBID API
-/// 
+///
 /// @see <a href="https://lobid.org/resources/api">API documentation</a> for more details
 public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParserFetcher {
 
@@ -42,7 +42,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
     private static final String API_URL = "https://lobid.org/resources/search";
 
     /// Gets the query URL
-    /// 
+    ///
     /// @param queryNode  the first parsed node
     /// @param pageNumber the number of the page indexed from 0
     /// @return URL

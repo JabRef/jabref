@@ -53,9 +53,9 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     }
 
     /// Tries to find a fulltext URL for a given BibTex entry.
-    /// 
+    ///
     /// Search by title first, as DOI is not searchable directly. When the title is not present, the search is made with DOI via google.com with site:researchgate.net
-    /// 
+    ///
     /// @param entry The Bibtex entry
     /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
     /// @throws IOException      if an IO operation has failed
@@ -178,8 +178,8 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
     /// Constructs a URL based on the query, size and page number.
     /// Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
-    /// 
-    /// 
+    ///
+    ///
     /// @param queryNode the search query.
     /// @return A URL that lets us download a .bib file
     private static URL getUrlForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
@@ -196,7 +196,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     }
 
     /// This method is used to send complex queries using fielded search.
-    /// 
+    ///
     /// @param queryNode the first node from the search parser
     /// @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
     /// @throws FetcherException if the ResearchGate refuses to serve the page
@@ -263,7 +263,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     }
 
     /// Looks for hits which are matched by the given {@link BibEntry}.
-    /// 
+    ///
     /// @param entry entry to search bibliographic information for
     /// @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
     /// @throws FetcherException if the ResearchGate refuses to serve the page

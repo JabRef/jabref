@@ -43,7 +43,7 @@ public class RegexFormatter extends Formatter {
     private final String replacement;
 
     /// Constructs a new regular expression-based formatter with the given RegEx.
-    /// 
+    ///
     /// @param input the regular expressions for matching and replacing given in the form {@code ("<regex>",
     /// "<replace>")}.
     public RegexFormatter(@NonNull String input) {

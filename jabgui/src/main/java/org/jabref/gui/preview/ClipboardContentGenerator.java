@@ -111,10 +111,10 @@ public record ClipboardContentGenerator(
     }
 
     /// Joins each citation using the platform-specific newline into a single Markdown string (from citeproc) and copies it to the clipboard.
-    /// 
+    ///
     /// A trailing newline is appended if missing to keep the behavior consistent with other output formats
     /// and to satisfy tests expecting a newline-terminated string.
-    /// 
+    ///
     /// @param citations the list of already-formatted citation strings to be combined as Markdown
     /// @return clipboard content containing the Markdown representation in its plain string flavor
     @VisibleForTesting

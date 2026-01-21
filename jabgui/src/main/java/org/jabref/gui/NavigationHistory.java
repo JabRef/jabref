@@ -17,7 +17,7 @@ public class NavigationHistory {
 
     /// Sets a new entry as the current one, clearing the forward history.
     /// The previously current entry is moved to the back stack.
-    /// 
+    ///
     /// @param entry The BibEntry to add to the history.
     public void add(BibEntry entry) {
         if (Objects.equals(currentEntry, entry)) {
@@ -35,7 +35,7 @@ public class NavigationHistory {
 
     /// Moves to the previous entry in the history.
     /// The current entry is pushed to the forward stack, and the last entry from the back stack becomes current.
-    /// 
+    ///
     /// @return An Optional containing the previous BibEntry, or an empty Optional if there's no history to go back to.
     public Optional<BibEntry> back() {
         if (canGoBack()) {
@@ -48,7 +48,7 @@ public class NavigationHistory {
 
     /// Moves to the next entry in the history.
     /// The current entry is pushed to the back stack, and the last entry from the forward stack becomes current.
-    /// 
+    ///
     /// @return An Optional containing the next BibEntry, or an empty Optional if there is no "forward" history.
     public Optional<BibEntry> forward() {
         if (canGoForward()) {

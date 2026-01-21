@@ -70,7 +70,7 @@ public final class CSLFormatUtils {
     /// Context: The HTML produced by {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} or {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} is not directly (completely) parsable by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
     /// For more details, read the documentation for the {@link OOTextIntoOO} class.
     /// <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">Additional Information</a>.
-    /// 
+    ///
     /// @param html The HTML string to be transformed into OO-write ready HTML.
     /// @return The formatted html string.
     public static String transformHTML(String html) {
@@ -119,7 +119,7 @@ public final class CSLFormatUtils {
 
     /// Alphanumeric citations are not natively supported by citeproc-java (see {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation}).
     /// Thus, we manually format a citation to produce its alphanumeric form.
-    /// 
+    ///
     /// @param entries the list of entries for which the alphanumeric citation is to be generated.
     /// @return the alphanumeric citation (for a single entry or a group of entries).
     public static String generateAlphanumericCitation(List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
@@ -167,9 +167,9 @@ public final class CSLFormatUtils {
     /// If a citation doesn't correspond to the first cited entry, the number should be changed to the appropriate current citation number.
     /// The numbers should be globally unique. If an entry has been cited before, the older citation number corresponding to it should be reused.
     /// The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".
-    /// 
+    ///
     /// **Precondition:** Use ONLY with numeric citation styles.
-    /// 
+    ///
     /// @param citation      the numeric citation with an unresolved number.
     /// @param currentNumber the correct number to update the citation with.
     /// @return the bibliographic citation with resolved number.
@@ -199,7 +199,7 @@ public final class CSLFormatUtils {
     }
 
     /// Extracts year from a citation having single or multiple entries, for the purpose of using in in-text citations.
-    /// 
+    ///
     /// @param formattedCitation the citation cleaned up and formatted using {@link CSLFormatUtils#transformHTML transformHTML}.
     public static String changeToInText(String formattedCitation) {
         Matcher matcher = YEAR_IN_CITATION_PATTERN.matcher(formattedCitation);

@@ -95,7 +95,7 @@ public class MetaDataParser {
     }
 
     /// Parses the data map and changes the given {@link MetaData} instance respectively.
-    /// 
+    ///
     /// @return the given metaData instance (which is modified, too)
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
@@ -161,12 +161,12 @@ public class MetaDataParser {
     }
 
     /// Parse the content of the value as provided by "raw" content.
-    /// 
+    ///
     /// We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
     /// because this leads to difficulties with UNC names.
-    /// 
+    ///
     /// No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
-    /// 
+    ///
     /// @param value the raw value (as stored in the .bib file)
     static String parseDirectory(String value) {
         value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);
@@ -257,7 +257,7 @@ public class MetaDataParser {
     }
 
     /// Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
-    /// 
+    ///
     /// @param entry    the metadata entry containing the user-specific .blg path.
     /// @param metaData the MetaData object to update.
     private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {

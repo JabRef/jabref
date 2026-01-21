@@ -6,7 +6,7 @@ import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.util.strings.StringUtil;
 
 /// Needs to be instantiated for each new query
-/// 
+///
 /// Stop words are ignored. See ADR-0022.
 public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     // These have to be integrated into the IEEE query URL as these are just supported as query parameters

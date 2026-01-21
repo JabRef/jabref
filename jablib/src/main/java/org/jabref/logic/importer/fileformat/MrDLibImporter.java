@@ -71,7 +71,7 @@ public class MrDLibImporter extends Importer {
     }
 
     /// Convert Buffered Reader response to string for JSON parsing.
-    /// 
+    ///
     /// @param input Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
     /// @return Returns an String containing the JSON document.
     private String convertToString(BufferedReader input) {
@@ -92,7 +92,7 @@ public class MrDLibImporter extends Importer {
     }
 
     /// Parses the input from the server to a ParserResult
-    /// 
+    ///
     /// @param input A BufferedReader with a reference to a string with the server's response
     private void parse(BufferedReader input) {
         // The Bibdatabase that gets returned in the ParserResult.
@@ -126,7 +126,7 @@ public class MrDLibImporter extends Importer {
     }
 
     /// Parses the JSON recommendations into bib entries
-    /// 
+    ///
     /// @param recommendation JSON object of a single recommendation returned by Mr. DLib
     /// @return A ranked bib entry created from the recommendation input
     private RankedBibEntry populateBibEntry(JSONObject recommendation) {

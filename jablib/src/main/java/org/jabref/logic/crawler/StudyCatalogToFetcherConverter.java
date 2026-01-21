@@ -26,16 +26,16 @@ class StudyCatalogToFetcherConverter {
     }
 
     /// Returns a list of instances of all active library fetchers.
-    /// 
+    ///
     /// A fetcher is considered active if there exists an library entry of the library the fetcher is associated with that is enabled.
-    /// 
+    ///
     /// @return Instances of all active fetchers defined in the study definition.
     public List<SearchBasedFetcher> getActiveFetchers() {
         return getFetchersFromLibraryEntries(this.libraryEntries);
     }
 
     /// Transforms a list of libraryEntries into a list of SearchBasedFetcher instances.
-    /// 
+    ///
     /// @param libraryEntries List of entries
     /// @return List of fetcher instances
     private List<SearchBasedFetcher> getFetchersFromLibraryEntries(List<StudyDatabase> libraryEntries) {
@@ -46,7 +46,7 @@ class StudyCatalogToFetcherConverter {
     }
 
     /// Transforms a library entry into a SearchBasedFetcher instance. This only works if the library entry specifies a supported fetcher.
-    /// 
+    ///
     /// @param studyDatabase the entry that will be converted
     /// @return An instance of the fetcher defined by the library entry.
     private SearchBasedFetcher createFetcherFromLibraryEntry(StudyDatabase studyDatabase) {

@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// With this class, the user of an instance can directly sort things. Without looking up anything in the preferences or in the UI.
-/// 
+///
 /// To avoid confusion at the caller, we offer ORIGINAL and SPECIFIED only. Not TABLE.
 public class SelfContainedSaveOrder extends SaveOrder {
 
@@ -21,7 +21,7 @@ public class SelfContainedSaveOrder extends SaveOrder {
     }
 
     /// Converts a SaveOrder to a SelfContainedSaveOrder
-    /// 
+    ///
     /// @throws IllegalArgumentException if `saveOrder` has {@link OrderType#TABLE}
     public static SelfContainedSaveOrder of(SaveOrder saveOrder) {
         if (saveOrder instanceof SelfContainedSaveOrder order) {

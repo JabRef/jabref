@@ -23,7 +23,7 @@ public class EntryAnnotationImporter {
     }
 
     /// Filter files with a web address containing "www."
-    /// 
+    ///
     /// @return a list of file parsed files
     private List<LinkedFile> getFilteredFileList() {
         return entry.getFiles().stream()
@@ -32,7 +32,7 @@ public class EntryAnnotationImporter {
     }
 
     /// Reads the annotations from the files that are attached to a BibEntry.
-    /// 
+    ///
     /// @param databaseContext The context is needed for the importer.
     /// @return Map from each PDF to a list of file annotations
     public Map<Path, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext databaseContext, FilePreferences filePreferences) {

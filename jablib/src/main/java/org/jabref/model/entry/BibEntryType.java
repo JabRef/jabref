@@ -26,9 +26,9 @@ public class BibEntryType implements Comparable<BibEntryType> {
     private final SequencedSet<OrFields> requiredFields;
 
     /// Provides an enriched EntryType with information about defined standards as mandatory fields etc.
-    /// 
+    ///
     /// A builder is available at {@link BibEntryTypeBuilder}
-    /// 
+    ///
     /// @param type           The EntryType this BibEntryType is wrapped around.
     /// @param allFields      A BibFields list of all fields, including the required fields
     /// @param requiredFields A OrFields list of just the required fields
@@ -56,7 +56,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /// Returns all required field names.
     /// If fields have an OR relationship the name includes both field names divided by /, e.g. author/editor.
     /// If you need all required fields as sole entities use @see{getRequiredFieldsFlat} .
-    /// 
+    ///
     /// @return a Set of required field name Strings
     public SequencedSet<OrFields> getRequiredFields() {
         return Collections.unmodifiableSequencedSet(requiredFields);

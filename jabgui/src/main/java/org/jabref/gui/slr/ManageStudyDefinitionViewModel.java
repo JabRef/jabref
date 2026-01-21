@@ -97,7 +97,7 @@ public class ManageStudyDefinitionViewModel {
     }
 
     /// Constructor for an existing study
-    /// 
+    ///
     /// @param study          The study to initialize the UI from
     /// @param studyDirectory The path where the study resides
     public ManageStudyDefinitionViewModel(@NonNull Study study,

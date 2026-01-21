@@ -28,7 +28,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfAnnotationImporter.class);
 
     /// Imports the comments from a pdf specified by its path
-    /// 
+    ///
     /// @param path a path to a pdf
     /// @return a list with the all the annotations found in the file of the path
     @Override

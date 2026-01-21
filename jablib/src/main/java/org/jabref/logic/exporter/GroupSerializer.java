@@ -94,7 +94,7 @@ public class GroupSerializer {
     /// representation contains both the tree structure and the textual
     /// representations of the group associated with each node.
     /// Every node is one entry in the list of strings.
-    /// 
+    ///
     /// @return a representation of the tree based at this node as a list of strings
     public List<String> serializeTree(GroupTreeNode node) {
         List<String> representation = new ArrayList<>();

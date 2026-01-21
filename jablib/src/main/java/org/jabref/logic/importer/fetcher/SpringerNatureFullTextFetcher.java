@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// FulltextFetcher implementation that attempts to find a PDF URL at SpringerLink.
-/// 
+///
 /// Uses Springer API, see <a href="https://dev.springer.com">https://dev.springer.com</a>
 public class SpringerNatureFullTextFetcher implements FulltextFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Springer";

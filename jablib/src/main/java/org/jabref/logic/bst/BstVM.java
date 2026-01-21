@@ -60,7 +60,7 @@ public class BstVM {
     }
 
     /// Transforms the given list of BibEntries to a rendered list of references using the parsed bst program
-    /// 
+    ///
     /// @param bibEntries  list of entries to convert
     /// @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
     /// @return list of references in plain text form

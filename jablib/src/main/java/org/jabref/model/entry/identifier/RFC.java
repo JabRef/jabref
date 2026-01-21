@@ -16,7 +16,7 @@ public class RFC extends EprintIdentifier {
     private final String rfcString;
 
     /// Constructs an RFC object from a given string.
-    /// 
+    ///
     /// @param rfcString The RFC ID or URL, which will be converted to lowercase and trimmed.
     /// @throws NullPointerException if the given rfcString is null.
     public RFC(@NonNull String rfcString) {
@@ -25,7 +25,7 @@ public class RFC extends EprintIdentifier {
 
     /// Parses the given input string to extract a valid RFC identifier.
     /// The input can be a plain RFC ID or a full URL.
-    /// 
+    ///
     /// @param input The input string, which could be in the form of an RFC ID (e.g., "rfc1234") or a complete URL.
     /// @return An Optional containing a valid RFC if the input matches the expected pattern, otherwise an empty Optional.
     public static Optional<RFC> parse(String input) {
@@ -48,7 +48,7 @@ public class RFC extends EprintIdentifier {
     }
 
     /// Generates an external URI that points to the RFC document on the rfc-editor website.
-    /// 
+    ///
     /// @return An Optional containing the URI if the construction succeeds, otherwise an empty Optional.
     @Override
     public Optional<URI> getExternalURI() {

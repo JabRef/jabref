@@ -10,7 +10,7 @@ public enum InternalField implements Field {
     KEY_FIELD("citationkey"),
 
     /// field which indicates the entrytype
-    /// 
+    ///
     /// Example: `@misc{key}`
     TYPE_HEADER("entrytype"),
 

@@ -101,7 +101,7 @@ public class AutoCompletePreferences {
     }
 
     /// Returns the list of fields for which autocomplete is enabled
-    /// 
+    ///
     /// @return List of field names
     public ObservableSet<Field> getCompleteFields() {
         return completeFields;

@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /// This class tests the BibtexImporter.
-/// 
+///
 /// Tests for writing can be found at {@link org.jabref.logic.exporter.BibDatabaseWriterTest}.
 /// Tests for parsing single entry BibTeX can be found at {@link BibtexParserTest}
 class BibtexImporterTest {

@@ -703,7 +703,7 @@ public class BstFunctions {
     /// precisely, a "special character", defined in Section 4) counts as
     /// a single text character, even if it's missing its matching right
     /// brace, and where braces don't count as text characters.
-    /// 
+    ///
     /// From BibTeXing: For the purposes of counting letters in labels,
     /// BibTEX considers everything contained inside the braces as a
     /// single letter.

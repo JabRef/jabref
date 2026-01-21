@@ -16,13 +16,13 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
 /// This class converts a query string written in lucene syntax into a complex  query.
-/// 
+///
 /// For simplicity this is currently limited to fielded data and the boolean AND operator.
 public class QueryParser {
 
     /// Parses the given query string into a complex query using lucene.
     /// Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
-    /// 
+    ///
     /// @param query The given query string
     /// @return A complex query containing all fields of the query string
     public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String query) {

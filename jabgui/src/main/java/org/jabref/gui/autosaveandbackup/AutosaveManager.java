@@ -68,7 +68,7 @@ public class AutosaveManager {
     }
 
     /// Starts the Autosaver which is associated with the given {@link BibDatabaseContext}.
-    /// 
+    ///
     /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
         AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext, coarseChangeFilter);
@@ -77,7 +77,7 @@ public class AutosaveManager {
     }
 
     /// Shuts down the Autosaver which is associated with the given {@link BibDatabaseContext}.
-    /// 
+    ///
     /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
         runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()

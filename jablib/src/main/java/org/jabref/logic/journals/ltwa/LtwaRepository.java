@@ -39,7 +39,7 @@ public class LtwaRepository {
     }
 
     /// Creates a new LtwaRepository from an MV store file.
-    /// 
+    ///
     /// @param ltwaListFile Path to the LTWA MVStore file
     public LtwaRepository(Path ltwaListFile) {
         this();
@@ -67,7 +67,7 @@ public class LtwaRepository {
     }
 
     /// Abbreviates a given title using the ISO4 rules.
-    /// 
+    ///
     /// @param title The title to be abbreviated
     /// @return The abbreviated title
     public Optional<String> abbreviate(String title) {

@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 /// - Let the user input meta data for the study.
 /// - Let JabRef do the crawling afterwards.
 /// </ol>
-/// 
+///
 /// Needs to inherit {@link ExistingStudySearchAction}, because that action implements the real crawling.
-/// 
+///
 /// There is the hook {@link StartNewStudyAction#crawlPreparation(Path)}, which is used by {@link ExistingStudySearchAction#crawl()}.
 public class StartNewStudyAction extends ExistingStudySearchAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartNewStudyAction.class);

@@ -18,7 +18,7 @@ public class YearFieldValuePlausibilityComparator implements FieldValuePlausibil
     }
 
     /// Compares the plausibility of two field values.
-    /// 
+    ///
     /// @param leftValue  value from the library (or candidate)
     /// @param rightValue value from the fetcher (or existing record)
     /// @return ComparisonResult indicating which year is more plausible: RIGHT_BETTER, LEFT_BETTER, or UNDETERMINED
@@ -73,7 +73,7 @@ public class YearFieldValuePlausibilityComparator implements FieldValuePlausibil
 
     /// Extracts the first 4-digit number found in the string.
     /// Used to identify year-like values such as "About 2000" or "Published in 1999".
-    /// 
+    ///
     /// @param value the input string possibly containing a year
     /// @return Optional containing the 4-digit year if found, otherwise Optional.empty()
     private Optional<Integer> extractYear(String value) {

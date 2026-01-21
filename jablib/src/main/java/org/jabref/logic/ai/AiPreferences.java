@@ -494,7 +494,7 @@ public class AiPreferences {
     }
 
     /// Listen to changes of preferences that are related to embeddings generation.
-    /// 
+    ///
     /// @param runnable The runnable that should be executed when the preferences change.
     public void addListenerToEmbeddingsParametersChange(Runnable runnable) {
         embeddingModel.addListener((observableValue, oldValue, newValue) -> {

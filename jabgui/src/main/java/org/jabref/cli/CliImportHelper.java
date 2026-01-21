@@ -25,7 +25,7 @@ public class CliImportHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(CliImportHelper.class);
 
     /// Reads URIs as input
-    /// 
+    ///
     /// @param location URL or file path to import
     public static Optional<ParserResult> importFile(String location,
                                                     CliPreferences cliPreferences,

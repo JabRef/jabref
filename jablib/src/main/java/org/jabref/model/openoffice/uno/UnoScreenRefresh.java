@@ -9,11 +9,11 @@ public class UnoScreenRefresh {
     }
 
     /// Disable screen refresh.
-    /// 
+    ///
     /// Must be paired with unlockControllers()
-    /// 
+    ///
     /// https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XModel.html
-    /// 
+    ///
     /// While there is at least one lock remaining, some notifications for display updates are not broadcasted.
     public static void lockControllers(XTextDocument doc) {
         doc.lockControllers();

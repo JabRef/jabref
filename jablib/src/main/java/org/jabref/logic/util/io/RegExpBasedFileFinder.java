@@ -35,7 +35,7 @@ class RegExpBasedFileFinder implements FileFinder {
     }
 
     /// Creates a Pattern that matches the file name corresponding to the last element of `fileParts` with any bracketed patterns expanded.
-    /// 
+    ///
     /// @throws IOException throws an IOException if a PatternSyntaxException occurs
     private Pattern createFileNamePattern(String[] fileParts, String extensionRegExp, BibEntry entry) throws IOException {
         // Protect the extension marker so that it isn't treated as a bracketed pattern
@@ -59,7 +59,7 @@ class RegExpBasedFileFinder implements FileFinder {
     }
 
     /// Helper method for both exact matching (if the file name were not created by JabRef) and cleaned file name matching.
-    /// 
+    ///
     /// @param expandedContent the expanded content of a bracketed expression
     /// @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
     private static String toFileNameRegex(String expandedContent) {
@@ -70,7 +70,7 @@ class RegExpBasedFileFinder implements FileFinder {
 
     /// Method for searching for files using regexp. A list of extensions and directories can be
     /// given.
-    /// 
+    ///
     /// @param entry       The entry to search for.
     /// @param extensions  The extensions that are acceptable.
     /// @param directories The root directories to search.
@@ -83,25 +83,25 @@ class RegExpBasedFileFinder implements FileFinder {
 
     /// Searches the given directory and filename pattern for a file for the
     /// BibTeX entry.
-    /// 
+    ///
     /// Used to fix:
-    /// 
+    ///
     /// http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
-    /// 
+    ///
     /// Requirements:
     /// - Be able to find the associated PDF in a set of given directories.
     /// - Be able to return a relative path or absolute path.
     /// - Be fast.
     /// - Allow for flexible naming schemes in the PDFs.
-    /// 
+    ///
     /// Syntax scheme for file:
-    /// 
+    ///
     /// - * Any subDir
     /// - ** Any subDir (recursive)
     /// - [key] Key from BibTeX file and database
     /// - .* Anything else is taken to be a Regular expression.
-    /// 
-    /// 
+    ///
+    ///
     /// @param entry non-null
     /// @param dirs  A set of root directories to start the search from. Paths are
     /// returned relative to these directories if relative is set to

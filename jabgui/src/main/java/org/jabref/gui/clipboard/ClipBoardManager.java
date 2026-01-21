@@ -61,7 +61,7 @@ public class ClipBoardManager {
 
     /// Add X11 clipboard support to a text input control. It is necessary to call this method in every input where you
     /// want to use it: `ClipBoardManager.addX11Support(TextInputControl input);`.
-    /// 
+    ///
     /// @param input the TextInputControl (e.g., TextField, TextArea, and children) where adding this functionality.
     /// @see <a href="https://www.uninformativ.de/blog/postings/2017-04-02/0/POSTING-en.html">Short summary for X11
     /// clipboards</a>
@@ -84,7 +84,7 @@ public class ClipBoardManager {
     }
 
     /// Get the String residing on the system clipboard.
-    /// 
+    ///
     /// @return any text found on the Clipboard; if none found, return an empty String.
     public static @NonNull String getContents() {
         String result = clipboard.getString();
@@ -116,7 +116,7 @@ public class ClipBoardManager {
     }
 
     /// Get the String residing on the primary clipboard (if it exists).
-    /// 
+    ///
     /// @return any text found on the primary Clipboard; if none found, try with the system clipboard.
     public static @NonNull String getContentsPrimary() {
         if (primary != null) {
@@ -133,7 +133,7 @@ public class ClipBoardManager {
     }
 
     /// Puts content onto the system clipboard.
-    /// 
+    ///
     /// @param content the ClipboardContent to set as current value of the system clipboard.
     public void setContent(ClipboardContent content) {
         clipboard.setContent(content);
@@ -141,7 +141,7 @@ public class ClipBoardManager {
     }
 
     /// Puts content onto the primary clipboard (if it exists).
-    /// 
+    ///
     /// @param content the ClipboardContent to set as current value of the primary clipboard.
     public void setPrimaryClipboardContent(ClipboardContent content) {
         if (primary != null) {

@@ -718,7 +718,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     /// `PageRange` and `PageCount` tags contain text
     /// with additional markers that need to be discarded.
-    /// 
+    ///
     /// Example `PageCount`:
     /// {@snippet :
     /// <PageCount>
@@ -730,7 +730,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     /// <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
     /// }
     /// Content of "ps" tag is returned by `getPages`.
-    /// 
+    ///
     /// Example `PageRange`:
     /// {@snippet :
     /// <PageRange>

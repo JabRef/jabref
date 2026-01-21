@@ -4,7 +4,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 
 /// Helper functions to produce some of the markup as understood by OOTextIntoOO.write
-/// 
+///
 /// These do not cover all tags, only those needed to embed markup from Layout and citation marker formatters into citation markers and bibliography.
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public class OOFormat {
@@ -13,27 +13,27 @@ public class OOFormat {
     }
 
     /// Mark `ootext` as using a character locale known to OO.
-    /// 
+    ///
     /// @param locale language[-country[-territory]]
-    /// 
+    ///
     /// https://www.openoffice.org/api/docs/common/ref/com/sun/star/lang/Locale.html
-    /// 
+    ///
     /// The country part is optional.
-    /// 
+    ///
     /// The territory part is not only optional, the allowed "codes are vendor and browser-specific", so probably best to avoid them if possible.
     public static OOText setLocale(OOText ootext, String locale) {
         return OOText.fromString("<span lang=\"%s\">".formatted(locale) + ootext.toString() + "</span>");
     }
 
     /// Mark `ootext` as using the character locale "zxx", which means "no language", "no linguistic content".
-    /// 
+    ///
     /// Used around citation marks, probably to turn off spellchecking.
     public static OOText setLocaleNone(OOText ootext) {
         return OOFormat.setLocale(ootext, "zxx");
     }
 
     /// Mark `ootext` using a character style `charStyle`
-    /// 
+    ///
     /// @param charStyle Name of a character style known to OO. May be empty for "Standard", which in turn means do not override any properties.
     public static OOText setCharStyle(OOText ootext, String charStyle) {
         return OOText.fromString("<span oo:CharStyleName=\"%s\">".formatted(charStyle)

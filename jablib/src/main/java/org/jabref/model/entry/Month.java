@@ -37,7 +37,7 @@ public enum Month {
 
     /// Find month by one-based number.
     /// If the number is not in the valid range, then an empty Optional is returned.
-    /// 
+    ///
     /// @param number 1-12 is valid
     public static Optional<Month> getMonthByNumber(int number) {
         for (Month month : Month.values()) {
@@ -50,7 +50,7 @@ public enum Month {
 
     /// Find month by shortName (3 letters) case-insensitive.
     /// If no matching month is found, then an empty Optional is returned.
-    /// 
+    ///
     /// @param shortName "jan", "feb", ...
     public static Optional<Month> getMonthByShortName(String shortName) {
         for (Month month : Month.values()) {
@@ -65,7 +65,7 @@ public enum Month {
     /// - Single and Double Digit months from 1 to 12 (01 to 12)
     /// - 3 Digit BibTeX strings (jan, feb, mar...) possibly with # prepended
     /// - Full English month identifiers.
-    /// 
+    ///
     /// @param value the given value
     /// @return the corresponding Month instance
     public static Optional<Month> parse(String value) {
@@ -99,7 +99,7 @@ public enum Month {
 
     /// Parses a month having the string in German standard form such as
     /// "Oktober" or in German short form such as "Okt"
-    /// 
+    ///
     /// @param value a String that represents a month in German form
     /// @return the corresponding month instance, empty if input is not in German
     /// form
@@ -149,7 +149,7 @@ public enum Month {
     }
 
     /// Returns the name of a Month in a short (3-letter) format. (jan, feb, mar, ...)
-    /// 
+    ///
     /// @return 3-letter identifier for a Month
     public String getShortName() {
         return shortName;
@@ -157,32 +157,32 @@ public enum Month {
 
     /// Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#' (FieldWriter.BIBTEX_STRING_START_END_SYMBOL).
     /// Example: #jan#, #feb#, etc.
-    /// 
+    ///
     /// See <a href="https://github.com/JabRef/jabref/issues/263#issuecomment-151246595">Issue 263</a> for a discussion on that thing.
     /// This seems to be an *invalid* format in terms of plain BiBTeX, but a *valid* format in the case of JabRef.
     /// The documentation is available at the <a href="https://docs.jabref.org/fields/strings">Strings help</a> of JabRef.
-    /// 
+    ///
     /// @return Month in JabRef format
     public String getJabRefFormat() {
         return (FieldWriter.BIBTEX_STRING_START_END_SYMBOL + "%s" + FieldWriter.BIBTEX_STRING_START_END_SYMBOL).formatted(shortName);
     }
 
     /// Returns the number of the Month in a 1-indexed fashion: 1 -> January, 2 -> February etc.
-    /// 
+    ///
     /// @return number of the month in the Year
     public int getNumber() {
         return number;
     }
 
     /// Returns the name of the long in unabbreviated English.
-    /// 
+    ///
     /// @return Month
     public String getFullName() {
         return fullName;
     }
 
     /// Returns the number of the Month in a 1-indexed fashion using exactly two digits: 01 -> January, 02 -> February...
-    /// 
+    ///
     /// @return number of the month in the Year with two digits
     public String getTwoDigitNumber() {
         return twoDigitNumber;

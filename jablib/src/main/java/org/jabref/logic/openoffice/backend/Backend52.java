@@ -51,7 +51,7 @@ public class Backend52 {
     }
 
     /// Get reference mark names from the document matching the pattern used for JabRef reference mark names.
-    /// 
+    ///
     /// Note: the names returned are in arbitrary order.
     public List<String> getJabRefReferenceMarkNames(XTextDocument doc)
             throws
@@ -61,7 +61,7 @@ public class Backend52 {
     }
 
     /// Names of custom properties belonging to us, but without a corresponding reference mark. These can be deleted.
-    /// 
+    ///
     /// @param citationGroupNames These are the names that are used.
     private List<String> findUnusedJabrefPropertyNames(XTextDocument doc,
                                                        List<String> citationGroupNames) {
@@ -145,9 +145,9 @@ public class Backend52 {
     }
 
     /// Create a reference mark at the end of `position` in the document.
-    /// 
+    ///
     /// On return `position` is collapsed, and is after the inserted space, or at the end of the reference mark.
-    /// 
+    ///
     /// @param citationKeys     Keys to be cited.
     /// @param pageInfos        An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
     /// @param position         Collapsed to its end.

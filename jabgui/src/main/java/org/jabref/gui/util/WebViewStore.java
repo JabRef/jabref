@@ -33,7 +33,7 @@ public class WebViewStore {
     }
 
     /// Returns a preloaded web view instance if available; And it will create a new one if not.
-    /// 
+    ///
     /// @return `WebView` instance
     /// @throws IllegalStateException if the webViewStore has not been initialized
     public static WebView get() {

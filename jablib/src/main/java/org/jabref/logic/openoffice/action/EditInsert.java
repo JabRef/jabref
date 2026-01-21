@@ -34,9 +34,9 @@ public class EditInsert {
     }
 
     /// In insertEntry we receive BibEntry values from the GUI.
-    /// 
+    ///
     /// In the document we store citations by their citation key.
-    /// 
+    ///
     /// If the citation key is missing, the best we can do is to notify the user. Or the programmer, that we cannot accept such input.
     private static String insertEntryGetCitationKey(BibEntry entry) {
         Optional<String> key = entry.getCitationKey();

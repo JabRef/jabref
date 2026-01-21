@@ -62,7 +62,7 @@ public class FileLink implements ParamLayoutFormatter {
 
     /// This method is called if the layout file specifies an argument for this
     /// formatter. We use it as an indicator of which file type we should look for.
-    /// 
+    ///
     /// @param arg The file type.
     @Override
     public void setArgument(String arg) {

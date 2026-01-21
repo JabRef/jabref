@@ -13,7 +13,7 @@ public final class StaxParser {
     /// Extracts the XML content inside the first
     /// encountered parent tag, including tag elements,
     /// attributes, namespace, prefix and contained text
-    /// 
+    ///
     /// @param reader the stream reader
     /// @return Returns the inner XML content
     public static String getXMLContent(XMLStreamReader reader) throws XMLStreamException {

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 
 /// Tests whole citation key patterns such as `[authorsAlpha][year]`.
 /// The concrete patterns such as `authorsAlpha` should better be tested at {@link BracketedPatternTest}.
-/// 
+///
 /// Concurrent execution leads to issues on GitHub actions.
 class CitationKeyGeneratorTest {
 
@@ -206,7 +206,7 @@ class CitationKeyGeneratorTest {
 
     /// Tests if cleanKey replaces Non-ASCII chars. There are quite a few chars that should be replaced. Perhaps there is
     /// a better method than the current.
-    /// 
+    ///
     /// not tested/ not in hashmap UNICODE_CHARS:
     /// {@code
     /// Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů    Ǣ ǣ ǖ ǘ ǚ ǜ
@@ -214,7 +214,7 @@ class CitationKeyGeneratorTest {
     /// Đ đ   Ů ů
     /// Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
     /// }
-    /// 
+    ///
     /// @see CitationKeyGenerator#cleanKey(String, String)
     @ParameterizedTest(name = "accents={0}, expectedResult={1}")
     @CsvSource(quoteCharacter = '"', textBlock = """

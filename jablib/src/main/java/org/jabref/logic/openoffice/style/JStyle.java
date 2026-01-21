@@ -43,15 +43,15 @@ import org.slf4j.LoggerFactory;
 
 /// This class embodies a bibliography formatting for OpenOffice, which is composed
 /// of the following elements:
-/// 
+///
 /// 1) Each OO BIB entry type must have a formatting. A formatting is an array of elements, each
 /// of which is either a piece of constant text, an entry field value, or a tab. Each element has
 /// a character format associated with it.
-/// 
+///
 /// 2) Many field values (e.g. author) need to be formatted before input to OpenOffice. The style
 /// has the responsibility of formatting all field values. Formatting is handled by 0-n
 /// JabRef LayoutFormatter classes.
-/// 
+///
 /// 3) If the entries are not numbered, a citation marker must be produced for each entry. This
 /// operation is performed for each JabRef BibEntry.
 @AllowedToUseClassGetResource("Required for jstyle loading")
@@ -270,7 +270,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// If this style was initialized from a file on disk, reload the style
     /// if the file has been modified since it was read.
-    /// 
+    ///
     /// @throws IOException in case of errors
     public void ensureUpToDate() throws IOException {
         if (!isUpToDate()) {
@@ -280,7 +280,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// If this style was initialized from a file on disk, reload the style
     /// information.
-    /// 
+    ///
     /// @throws IOException in case of error
     private void reload() throws IOException {
         if (styleFile != null) {
@@ -306,7 +306,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// If this style was initialized from a file on disk, check whether the file
     /// is unmodified since initialization.
-    /// 
+    ///
     /// @return true if the file has not been modified, false otherwise.
     private boolean isUpToDate() {
         if (styleFile == null) {
@@ -397,14 +397,14 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// After initializing this style from a file, this method can be used to check
     /// whether the file appeared to be a proper style file.
-    /// 
+    ///
     /// @return true if the file could be parsed as a style file, false otherwise.
     public boolean isValid() {
         return valid;
     }
 
     /// Parse a line providing bibliography structure information for an entry type.
-    /// 
+    ///
     /// @param line The string containing the structure description.
     private void handleStructureLine(String line) {
         int index = line.indexOf('=');
@@ -428,7 +428,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// Parse a line providing a property name and value.
-    /// 
+    ///
     /// @param line The line containing the formatter names.
     private void handlePropertiesLine(String line, Map<String, Object> map) {
         int index = line.indexOf('=');
@@ -468,7 +468,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// Convenience method for checking the property for whether we use number citations or
     /// author-year citations.
-    /// 
+    ///
     /// @return true if we use numbered citations, false otherwise.
     public boolean isNumberEntries() {
         return (Boolean) getProperty(IS_NUMBER_ENTRIES);
@@ -476,7 +476,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// Convenience method for checking the property for whether we sort the bibliography
     /// according to their order of appearance in the text.
-    /// 
+    ///
     /// @return true to sort by appearance, false to sort alphabetically.
     public boolean isSortByPosition() {
         return (Boolean) getProperty(IS_SORT_BY_POSITION);
@@ -484,7 +484,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// Convenience method for checking whether citation markers should be italicized.
     /// Will only be relevant if isFormatCitations() returns true.
-    /// 
+    ///
     /// @return true to indicate that citations should be in italics.
     public boolean isItalicCitations() {
         return (Boolean) citProperties.get(ITALIC_CITATIONS);
@@ -492,7 +492,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// Convenience method for checking whether citation markers should be bold.
     /// Will only be relevant if isFormatCitations() returns true.
-    /// 
+    ///
     /// @return true to indicate that citations should be in bold.
     public boolean isBoldCitations() {
         return (Boolean) citProperties.get(BOLD_CITATIONS);
@@ -501,7 +501,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// Convenience method for checking whether citation markers formatted
     /// according to the results of the isItalicCitations() and
     /// isBoldCitations() methods.
-    /// 
+    ///
     /// @return true to indicate that citations should be in italics.
     public boolean isFormatCitations() {
         return (Boolean) citProperties.get(FORMAT_CITATIONS);
@@ -516,7 +516,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// Get boolean property.
-    /// 
+    ///
     /// @param key The property key
     /// @return the value
     public boolean getBooleanCitProperty(String key) {
@@ -536,7 +536,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// Get a style property.
-    /// 
+    ///
     /// @param propName The property name.
     /// @return The property value, or null if it doesn't exist.
     public Object getProperty(String propName) {
@@ -544,7 +544,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// Indicate if it is an internal style
-    /// 
+    ///
     /// @return True if an internal style
     @Override
     public boolean isInternalStyle() {
@@ -672,7 +672,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// Format a number-based citation marker for the given entries.
-    /// 
+    ///
     /// @return The text for the citation.
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries) {
         final int minGroupingCount = this.getMinimumGroupingCount();
@@ -703,18 +703,18 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// citationMarkerEntries argument. If successive entries within
     /// the citation are uniquefied from each other, this method will
     /// perform a grouping of these entries.
-    /// 
+    ///
     /// If successive entries within the citation are uniquefied from
     /// each other, this method will perform a grouping of these
     /// entries.
-    /// 
+    ///
     /// @param citationMarkerEntries           The list of entries providing the
     /// data.
     /// @param inParenthesis                   Signals whether a parenthesized citation
     /// or an in-text citation is wanted.
     /// @param nonUniqueCitationMarkerHandling THROWS : Should throw if finds that uniqueLetters
     /// provided do not make the entries unique.
-    /// 
+    ///
     /// FORGIVEN : is needed to allow preliminary markers
     /// for freshly inserted citations without
     /// going throw the uniquefication process.

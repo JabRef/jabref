@@ -14,7 +14,7 @@ import net.harawata.appdirs.AppDirsFactory;
 /// See e.g. `org.jabref.gui.desktop.os.NativeDesktop#getApplicationDirectory()`
 public class Directories {
     /// Returns the path to the system's user directory.
-    /// 
+    ///
     /// @return the path
     public static Path getUserDirectory() {
         return Path.of(System.getProperty("user.home"));

@@ -26,7 +26,7 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
     Logger LOGGER = LoggerFactory.getLogger(IdParserFetcher.class);
 
     /// Constructs a URL based on the {@link BibEntry}.
-    /// 
+    ///
     /// @param entry the entry to look information for
     URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
 
@@ -34,7 +34,7 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
     Parser getParser();
 
     /// Extracts the identifier from the list of fetched entries.
-    /// 
+    ///
     /// @param inputEntry     the entry for which we are searching the identifier (can be used to find closest match in
     /// the result)
     /// @param fetchedEntries list of entries returned by the web service

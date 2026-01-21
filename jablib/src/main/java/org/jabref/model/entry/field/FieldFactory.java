@@ -45,7 +45,7 @@ public class FieldFactory {
 
     /// Type T is an entry type and is used to direct the mapping to the Java field class.
     /// This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
-    /// 
+    ///
     /// Supports also parsing of "UnknownField{name='rights'}" as field name (written by JabRef 5.x)
     public static <T extends EntryType> Field parseField(@Nullable T type, String fieldName) {
         // Check if the field name starts with "comment-" which indicates it's a UserSpecificCommentField
@@ -216,7 +216,7 @@ public class FieldFactory {
     }
 
     /// These are the fields JabRef always displays as default {@link JabRefCliPreferences#setLanguageDependentDefaultValues()}
-    /// 
+    ///
     /// A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
     /// a separate preferences object
     public static List<Field> getDefaultGeneralFields() {
@@ -226,7 +226,7 @@ public class FieldFactory {
     }
 
     /// Note: User configurability is discussed at <a href="https://github.com/JabRef/jabref/issues/9840">#9840</a>.
-    /// 
+    ///
     /// @param nonWrappableFields This comes from the preferences - and introduces user configuration.
     // TODO: Move somewhere more appropriate in the future
     public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {

@@ -28,7 +28,7 @@ public final class TextExtractor {
     }
 
     /// Extracts the text of a marked annotation such as highlights, underlines, strikeouts etc.
-    /// 
+    ///
     /// @return The text of the annotation
     /// @throws IOException If the PDFTextStripperByArea fails to initialize.
     public String extractMarkedText() throws IOException {

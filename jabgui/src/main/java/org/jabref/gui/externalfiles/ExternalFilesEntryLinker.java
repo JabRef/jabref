@@ -61,12 +61,12 @@ public class ExternalFilesEntryLinker {
         entry.addFiles(linkedFiles);
     }
 
-    /// 
+    ///
     /// - Move files to file directory
     /// - Use configured file directory pattern
     /// - Rename file to configured pattern (and skip renaming if file already exists)
     /// - Avoid overwriting files - by adding " {number}" after the file name
-    /// 
+    ///
     public void coveOrMoveFilesSteps(BibEntry entry, List<Path> files, boolean shouldMove) {
         List<LinkedFile> existingFiles = entry.getFiles();
         List<LinkedFile> linkedFiles = new ArrayList<>(files.size());

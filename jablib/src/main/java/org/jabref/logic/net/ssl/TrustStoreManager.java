@@ -130,7 +130,7 @@ public class TrustStoreManager {
 
     /// This method checks to see if the truststore is present in `storePath`,
     /// and if it isn't, it copies the default JDK truststore to the specified location.
-    /// 
+    ///
     /// @param storePath path of the truststore
     public static void createTruststoreFileIfNotExist(Path storePath) {
         try {

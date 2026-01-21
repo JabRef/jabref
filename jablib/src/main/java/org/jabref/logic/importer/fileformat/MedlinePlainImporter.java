@@ -25,7 +25,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jspecify.annotations.NonNull;
 
 /// Importer for the MEDLINE Plain format.
-/// 
+///
 /// check here for details on the format <a href="http://www.nlm.nih.gov/bsd/mms/medlineelements.html">...</a>
 public class MedlinePlainImporter extends Importer {
 

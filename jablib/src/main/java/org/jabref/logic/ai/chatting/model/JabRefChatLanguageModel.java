@@ -21,7 +21,7 @@ import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 
 /// Wrapper around langchain4j chat language model.
-/// 
+///
 /// Notice, that the real chat model is created lazily, when it's needed. This is done, so API key is fetched only,
 /// when user wants to chat with AI.
 public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {

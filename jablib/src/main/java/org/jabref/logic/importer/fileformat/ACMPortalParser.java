@@ -42,7 +42,7 @@ public class ACMPortalParser implements Parser {
     private static final String DOI_URL = "https://dl.acm.org/action/exportCiteProcCitation";
 
     /// Parse the DOI of the ACM Portal search result page and obtain the corresponding BibEntry
-    /// 
+    ///
     /// @param stream html stream
     /// @return BibEntry List
     @Override
@@ -57,7 +57,7 @@ public class ACMPortalParser implements Parser {
     }
 
     /// Parse all DOIs from the ACM Portal search results page
-    /// 
+    ///
     /// @param stream html stream
     /// @return DOI list
     public List<String> parseDoiSearchPage(InputStream stream) throws ParseException {
@@ -108,7 +108,7 @@ public class ACMPortalParser implements Parser {
     }
 
     /// Constructing the query url for the doi
-    /// 
+    ///
     /// @param doiList DOI List
     /// @return query URL
     public URL getUrlFromDoiList(List<String> doiList) throws URISyntaxException, MalformedURLException {
@@ -131,7 +131,7 @@ public class ACMPortalParser implements Parser {
     }
 
     /// Parse BibEntry from query result xml
-    /// 
+    ///
     /// @param jsonStr query result in JSON format
     /// @return BibEntry parsed from query result
     public BibEntry parseBibEntry(String jsonStr) {

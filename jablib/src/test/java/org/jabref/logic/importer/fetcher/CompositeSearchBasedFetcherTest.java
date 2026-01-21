@@ -103,7 +103,7 @@ class CompositeSearchBasedFetcherTest {
     }
 
     /// This method provides other methods with different sized sets of search-based fetchers wrapped in arguments.
-    /// 
+    ///
     /// @return A stream of Arguments wrapping set of fetchers.
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);

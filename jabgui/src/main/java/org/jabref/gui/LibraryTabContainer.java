@@ -23,7 +23,7 @@ public interface LibraryTabContainer {
     void addTab(LibraryTab libraryTab, boolean raisePanel);
 
     /// Closes a designated libraryTab
-    /// 
+    ///
     /// @param tab to be closed.
     /// @return true if closing the tab was successful
     boolean closeTab(@Nullable LibraryTab tab);

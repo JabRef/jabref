@@ -49,7 +49,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
     }
 
     /// Converts the {@link BibEntry} into {@link CSLItemData}.
-    /// 
+    ///
     /// <br>
     /// <table>
     /// <thead>

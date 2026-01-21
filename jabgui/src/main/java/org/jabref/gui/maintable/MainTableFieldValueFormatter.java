@@ -26,7 +26,7 @@ public class MainTableFieldValueFormatter {
 
     /// Format fields for {@link BibEntryTableViewModel}, according to user preferences and with latex translated to
     /// unicode if possible.
-    /// 
+    ///
     /// @param fields the fields argument of {@link BibEntryTableViewModel#getFields(OrFields)}.
     /// @param entry  the BibEntry of {@link BibEntryTableViewModel}.
     /// @return The formatted name field.
@@ -51,7 +51,7 @@ public class MainTableFieldValueFormatter {
 
     /// Format a name field for the table, according to user preferences and with latex expressions translated if
     /// possible.
-    /// 
+    ///
     /// @param nameToFormat The contents of the name field.
     /// @return The formatted name field.
     private String formatFieldWithAuthorValue(final String nameToFormat) {

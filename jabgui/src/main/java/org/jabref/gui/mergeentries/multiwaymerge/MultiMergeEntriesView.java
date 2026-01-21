@@ -214,7 +214,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     }
 
     /// Adds ToggleButtons for all fields that are set for this BibEntry
-    /// 
+    ///
     /// @param entrySourceColumn the entry to write
     /// @param columnIndex       the index of the column to write this entry to
     private void writeBibEntryToColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn, int columnIndex) {
@@ -228,7 +228,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
     /// Set up the button that displays the name of the source so that if it is clicked, all toggles in that column are
     /// selected.
-    /// 
+    ///
     /// @param sourceButton the header button to setup
     /// @param column       the column this button is heading
     private void setupSourceButtonAction(ToggleButton sourceButton, int column) {
@@ -246,7 +246,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     }
 
     /// Checks if the Field can be multiline
-    /// 
+    ///
     /// @param field the field to be checked
     /// @return true if the field may be multiline, false otherwise
     private boolean isMultilineField(Field field) {
@@ -384,7 +384,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         }
 
         /// Adds a row that represents this field
-    /// 
+    ///
     /// @param field the field to add to the view as a new row in the table
         private void addRow(Field field) {
             VBox.setVgrow(fieldEditorCell, Priority.ALWAYS);

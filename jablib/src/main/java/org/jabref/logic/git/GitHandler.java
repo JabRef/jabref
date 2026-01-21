@@ -46,7 +46,7 @@ public class GitHandler {
     private final GitPreferences gitPreferences;
 
     /// Initialize the handler for the given repository
-    /// 
+    ///
     /// @param repositoryPath The root of the initialized git repository
     public GitHandler(Path repositoryPath, GitPreferences gitPreferences) {
         this.repositoryPath = repositoryPath;
@@ -141,7 +141,7 @@ public class GitHandler {
     }
 
     /// Checkout the branch with the specified name, if it does not exist create it
-    /// 
+    ///
     /// @param branchToCheckout Name of the branch to check out
     public void checkoutBranch(String branchToCheckout) throws IOException, GitAPIException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
@@ -167,7 +167,7 @@ public class GitHandler {
     }
 
     /// Creates a commit on the currently checked out branch
-    /// 
+    ///
     /// @param amend Whether to amend to the last commit (true), or not (false)
     /// @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
     public boolean createCommitOnCurrentBranch(String commitMessage, boolean amend) throws IOException, GitAPIException {
@@ -199,7 +199,7 @@ public class GitHandler {
     }
 
     /// Merges the source branch into the target branch
-    /// 
+    ///
     /// @param targetBranch the name of the branch that is merged into
     /// @param sourceBranch the name of the branch that gets merged
     public void mergeBranches(String targetBranch, String sourceBranch, MergeStrategy mergeStrategy) throws IOException, GitAPIException {
@@ -321,9 +321,9 @@ public class GitHandler {
     }
 
     /// Try to locate the Git repository root by walking up the directory tree starting from the given path.
-    /// 
+    ///
     /// If a directory containing a .git folder is found, return that path.
-    /// 
+    ///
     /// @param anyPathInsideRepo the file or directory path that is assumed to be located inside a Git repository
     /// @return an optional containing the path to the Git repository root if found
     public static Optional<Path> findRepositoryRoot(Path anyPathInsideRepo) {

@@ -5,7 +5,7 @@ import java.util.List;
 import javafx.scene.Node;
 
 /// A prefsTab is a component displayed in the PreferenceDialog.
-/// 
+///
 /// It needs to extend from Component.
 public interface PreferencesTab {
 
@@ -16,7 +16,7 @@ public interface PreferencesTab {
     Node getBuilder();
 
     /// Should return the localized identifier to use for the tab.
-    /// 
+    ///
     /// @return Identifier for the tab (for instance "General", "Appearance" or "External Files").
     String getTabName();
 
@@ -36,7 +36,7 @@ public interface PreferencesTab {
 
     /// This method should be called after storing the preferences, This
     /// calls the appropriate method in the ViewModel.
-    /// 
+    ///
     /// @return The messages for the changed properties (e.g. "Changed language: English")
     List<String> getRestartWarnings();
 }

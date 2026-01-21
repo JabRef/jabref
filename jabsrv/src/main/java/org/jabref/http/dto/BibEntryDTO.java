@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// The data transfer object (DTO) for an BibEntry
-/// 
+///
 /// @param sharingMetadata the data used for sharing
 /// @param userComments    the comments before the BibTeX entry
 /// @param citationKey     the citation key (duplicated from BibEntry to ease processing by the client)

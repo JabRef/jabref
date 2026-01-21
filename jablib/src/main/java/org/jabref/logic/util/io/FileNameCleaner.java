@@ -3,7 +3,7 @@ package org.jabref.logic.util.io;
 /// This class is based on http://stackoverflow.com/a/5626340/873282
 /// extended with LEFT CURLY BRACE and RIGHT CURLY BRACE
 /// Replaces illegal characters in given file paths.
-/// 
+///
 /// Regarding the maximum length, see {@link FileUtil#getValidFileName(String)}
 public class FileNameCleaner {
 
@@ -11,7 +11,7 @@ public class FileNameCleaner {
     }
 
     /// Replaces illegal characters in given fileName by '_'
-    /// 
+    ///
     /// @param badFileName the fileName to clean
     /// @return a clean filename
     public static String cleanFileName(String badFileName) {
@@ -29,7 +29,7 @@ public class FileNameCleaner {
 
     /// Replaces illegal characters in given directoryName by '_'.
     /// Directory name may contain directory separators, e.g. 'deep/in/a/tree'; these are left untouched.
-    /// 
+    ///
     /// @param badFileName the fileName to clean
     /// @return a clean filename
     public static String cleanDirectoryName(String badFileName) {

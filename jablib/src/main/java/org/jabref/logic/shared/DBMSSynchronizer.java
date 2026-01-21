@@ -132,7 +132,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Sets the table structure of shared database if needed and pulls all shared entries to the new local database.
-    /// 
+    ///
     /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current
     /// shared database support ({@link DBMSProcessor}).
     public void initializeDatabases() throws DatabaseNotSupportedException {
@@ -212,7 +212,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Removes all local entries which are not present on shared database.
-    /// 
+    ///
     /// @param localEntries List of {@link BibEntry} the entries should be removed from
     /// @param sharedIDs    Set of all IDs which are present on shared database
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
@@ -325,7 +325,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Checks whether the current SQL connection is valid. In case that the connection is not valid a new {@link
     /// ConnectionLostEvent} is going to be sent.
-    /// 
+    ///
     /// @return `true` if the connection is valid, else `false`.
     public boolean checkCurrentConnection() {
         try {
@@ -342,7 +342,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Checks whether the {@link EntriesEventSource} of an {@link EntriesEvent} is crucial for this class.
-    /// 
+    ///
     /// @param event An {@link EntriesEvent}
     /// @return `true` if the event is able to trigger operations in {@link DBMSSynchronizer}, else
     /// `false`

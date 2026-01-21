@@ -19,13 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// LaTeX Aux to BibTeX Parser
-/// 
+///
 /// Extracts a subset of BibTeX entries from a BibDatabase that are included in an AUX file. Also supports nested AUX
 /// files (latex \\include).
-/// 
+///
 /// There exists no specification of the AUX file. Every package, class or document can write to the AUX file. The AUX
 /// file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
-/// 
+///
 /// BibTeX citation: \citation{x,y,z} Biblatex citation: \abx@aux@cite{x,y,z} Nested AUX files: \@input{x}
 public class DefaultAuxParser implements AuxParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);
@@ -36,7 +36,7 @@ public class DefaultAuxParser implements AuxParser {
     private final BibDatabase masterDatabase;
 
     /// Generates a database based on the given AUX file and BibTeX database
-    /// 
+    ///
     /// @param database BibTeX database
     public DefaultAuxParser(BibDatabase database) {
         masterDatabase = database;
@@ -110,7 +110,7 @@ public class DefaultAuxParser implements AuxParser {
     }
 
     /// Try to find an equivalent BibTeX entry inside the reference database for all keys inside the AUX file.
-    /// 
+    ///
     /// @param result AUX file
     private void resolveTags(AuxParserResult result) {
         List<BibEntry> entriesToInsert = new ArrayList<>();
@@ -136,7 +136,7 @@ public class DefaultAuxParser implements AuxParser {
     }
 
     /// Resolves and adds CrossRef entries to insert them in addition to the original entries
-    /// 
+    ///
     /// @param entries Entries to check for CrossRefs
     /// @param result  AUX file
     private void resolveCrossReferences(List<BibEntry> entries, AuxParserResult result) {
@@ -161,7 +161,7 @@ public class DefaultAuxParser implements AuxParser {
     }
 
     /// Insert a clone of each given entry. The clones are each given a new unique ID.
-    /// 
+    ///
     /// @param entries Entries to be cloned
     /// @param result  the parser result (representing the AUX file)
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {

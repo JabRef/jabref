@@ -157,7 +157,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     /// Checks whether the file exists or if a new file should be opened. The file will be added to the set of journal
     /// abbreviation files. If the file also exists its abbreviations will be read and written to the abbreviations
     /// property.
-    /// 
+    ///
     /// @param filePath path to the file
     private void openFile(Path filePath) {
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);

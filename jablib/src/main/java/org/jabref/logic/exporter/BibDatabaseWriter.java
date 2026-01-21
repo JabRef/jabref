@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}
-/// 
+///
 /// The opposite class is {@link org.jabref.logic.importer.fileformat.BibtexImporter}
 public class BibDatabaseWriter {
     public enum SaveType { WITH_JABREF_META_DATA, PLAIN_BIBTEX }
@@ -179,7 +179,7 @@ public class BibDatabaseWriter {
     }
 
     /// Saves the database, including only the specified entries.
-    /// 
+    ///
     /// @param entries A list of entries to save. The list itself is not modified in this code
     public void writePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
@@ -305,7 +305,7 @@ public class BibDatabaseWriter {
 
     /// Write all strings in alphabetical order, modified to produce a safe (for BibTeX) order of the strings if they
     /// reference each other.
-    /// 
+    ///
     /// @param database The database whose strings we should write.
     private void writeStrings(BibDatabase database) throws IOException {
         List<BibtexString> strings = database.getStringKeySet()

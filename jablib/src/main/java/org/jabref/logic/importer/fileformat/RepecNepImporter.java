@@ -204,16 +204,16 @@ public class RepecNepImporter extends Importer {
     }
 
     /// Read multiple lines.
-    /// 
+    ///
     /// Reads multiple lines until either
-    /// 
+    ///
     /// - an empty line
     /// - the end of file
     /// - the next working paper or
     /// - a keyword
-    /// 
+    ///
     /// is found. Whitespace at start or end of lines is trimmed except for one blank character.
-    /// 
+    ///
     /// @return result
     private String readMultipleLines(BufferedReader in) throws IOException {
         StringBuilder result = new StringBuilder(this.lastLine.trim());
@@ -226,7 +226,7 @@ public class RepecNepImporter extends Importer {
     }
 
     /// Implements grammar rule "TitleString".
-    /// 
+    ///
     /// @throws IOException in case of error
     private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
@@ -235,7 +235,7 @@ public class RepecNepImporter extends Importer {
     }
 
     /// Implements grammar rule "Authors"
-    /// 
+    ///
     /// @throws IOException in case of error
     private void parseAuthors(BibEntry be, BufferedReader in) throws IOException {
         // read authors and institutions
@@ -285,7 +285,7 @@ public class RepecNepImporter extends Importer {
     }
 
     /// Implements grammar rule "Abstract".
-    /// 
+    ///
     /// @throws IOException in case of error
     private void parseAbstract(BibEntry be, BufferedReader in) throws IOException {
         String theabstract = readMultipleLines(in);
@@ -296,7 +296,7 @@ public class RepecNepImporter extends Importer {
     }
 
     /// Implements grammar rule "AdditionalFields".
-    /// 
+    ///
     private void parseAdditionalFields(BibEntry be, boolean multilineUrlFieldAllowed, BufferedReader in)
             throws IOException {
 

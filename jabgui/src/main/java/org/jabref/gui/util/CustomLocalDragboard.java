@@ -18,7 +18,7 @@ public class CustomLocalDragboard {
     private final Map<Class<?>, Object> contents = new HashMap<>();
 
     /// Puts the value of the concrete class in a map. All previous content stored in the map is removed
-    /// 
+    ///
     /// @param type  The Type of the class
     /// @param value The value to store
     public <T> void putValue(Class<T> type, T value) {
@@ -43,14 +43,14 @@ public class CustomLocalDragboard {
     }
 
     /// Puts A List of {@link BibEntry} in the map All previous content is cleared
-    /// 
+    ///
     /// @param entries The list to put
     public void putBibEntries(List<BibEntry> entries) {
         putValue(BIB_ENTRIES, entries);
     }
 
     /// Get a List of {@link BibEntry} from the dragboard
-    /// 
+    ///
     /// @return List of BibEntry or empty list if no entries are avaiable
     public List<BibEntry> getBibEntries() {
         if (hasBibEntries()) {
@@ -64,14 +64,14 @@ public class CustomLocalDragboard {
     }
 
     /// Puts A List of {@link PreviewLayout} in the map All previous content is cleared
-    /// 
+    ///
     /// @param previewLayouts The list to put
     public void putPreviewLayouts(List<PreviewLayout> previewLayouts) {
         putValue(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS, previewLayouts);
     }
 
     /// Get a List of {@link PreviewLayout} from the dragboard
-    /// 
+    ///
     /// @return List of PreviewLayout or empty list if no entries are avaiable
     public List<PreviewLayout> getPreviewLayouts() {
         if (hasType(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS)) {

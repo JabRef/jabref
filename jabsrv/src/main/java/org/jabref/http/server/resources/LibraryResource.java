@@ -49,7 +49,7 @@ public class LibraryResource {
     Gson gson;
 
     /// At http://localhost:23119/libraries/{id}
-    /// 
+    ///
     /// @param id The specified library
     /// @return specified library in JSON format
     /// @throws IOException

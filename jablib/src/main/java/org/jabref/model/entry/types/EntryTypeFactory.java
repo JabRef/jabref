@@ -15,7 +15,7 @@ public class EntryTypeFactory {
 
     /// Checks whether two EntryTypeFactory are equal
     /// based on the equality of the type names and on the equality of the required and optional field lists
-    /// 
+    ///
     /// @return returns true if the two compared entry types have the same name and equal required and optional fields
     public static boolean nameAndFieldsAreEqual(BibEntryType type1, BibEntryType type2) {
         if ((type1 == null) && (type2 == null)) {

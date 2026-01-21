@@ -59,7 +59,7 @@ public class ApsFetcher implements FulltextFetcher {
     }
 
     /// Convert a DOI into an appropriate APS id.
-    /// 
+    ///
     /// @param doi A case insensitive DOI
     /// @return A DOI cased as APS likes it
     private Optional<String> getId(String doi) {

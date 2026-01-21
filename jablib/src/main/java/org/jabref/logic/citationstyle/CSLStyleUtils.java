@@ -43,7 +43,7 @@ public final class CSLStyleUtils {
     }
 
     /// Creates a CitationStyle from a file path.
-    /// 
+    ///
     /// @param styleFile Path to the CSL file
     /// @return Optional containing the CitationStyle if valid, empty otherwise
     public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
@@ -78,7 +78,7 @@ public final class CSLStyleUtils {
     }
 
     /// Creates a CitationStyle from the input stream.
-    /// 
+    ///
     /// @return Optional containing the CitationStyle if valid, empty otherwise
     private static Optional<CitationStyle> createCitationStyleFromSource(InputStream source, String filename, boolean isInternal) {
         try {
@@ -101,7 +101,7 @@ public final class CSLStyleUtils {
     }
 
     /// Parses the style information from a style content using StAX.
-    /// 
+    ///
     /// @param filename The filename of the style (for logging)
     /// @param content  The XML content of the style
     /// @return Optional containing the StyleInfo if valid, empty otherwise

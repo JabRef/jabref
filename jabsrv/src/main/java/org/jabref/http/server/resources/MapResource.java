@@ -29,9 +29,9 @@ public class MapResource {
     FilesToServe filesToServe;
 
     /// At http://localhost:23119/libraries/{id}/map <br><br>
-    /// 
+    ///
     /// Looks for the .jmp file in the directory of the given library ({id}.bib file).
-    /// 
+    ///
     /// @param id The given library
     /// @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
     /// @throws IOException
@@ -72,9 +72,9 @@ public class MapResource {
     }
 
     /// At http://localhost:23119/libraries/{id}/map <br><br>
-    /// 
+    ///
     /// Saves the mindmap next to its associated library.
-    /// 
+    ///
     /// @param id The given library
     /// @throws IOException
     @PUT

@@ -84,7 +84,7 @@ public class FieldEditorsMultilinePropertyTest {
     }
 
     /// Parse FieldEditors.java to get all field editors and their properties in function getForField
-    /// 
+    ///
     /// @return a map of field editor file path and its properties
     private static Map<Path, List<FieldProperty>> getEditorsWithPropertiesInFieldEditors() throws Exception {
         final String filePath = "src/main/java/org/jabref/gui/fieldeditors/FieldEditors.java";
@@ -158,7 +158,7 @@ public class FieldEditorsMultilinePropertyTest {
     }
 
     /// Check if the class implements FieldEditorFX interface
-    /// 
+    ///
     /// @param cu CompilationUnit
     /// @return true if the class implements FieldEditorFX interface
     private static boolean implementedFieldEditorFX(CompilationUnit cu) {
@@ -168,7 +168,7 @@ public class FieldEditorsMultilinePropertyTest {
     }
 
     /// Check if the class has a new EditorTextArea creation
-    /// 
+    ///
     /// @param cu CompilationUnit
     /// @return true if the class has a new EditorTextArea creation
     private static boolean hasEditorTextAreaCreationExisted(CompilationUnit cu) {
@@ -177,7 +177,7 @@ public class FieldEditorsMultilinePropertyTest {
     }
 
     /// Check if the class holds a TextInputControl field
-    /// 
+    ///
     /// @param cu CompilationUnit
     /// @return true if the class holds a TextInputControl field
     private static boolean holdTextInputControlField(CompilationUnit cu) {

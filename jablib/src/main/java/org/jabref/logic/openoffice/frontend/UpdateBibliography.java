@@ -55,7 +55,7 @@ public class UpdateBibliography {
     }
 
     /// Insert a paragraph break and create a text section for the bibliography.
-    /// 
+    ///
     /// Only called from `clearBibTextSectionContent2`
     private static void createBibTextSection2(XTextDocument doc)
             throws
@@ -70,7 +70,7 @@ public class UpdateBibliography {
     }
 
     /// Find and clear the text section BIB_SECTION_NAME to "", or create it.
-    /// 
+    ///
     /// Only called from: `rebuildBibTextSection`
     private static void clearBibTextSectionContent2(XTextDocument doc)
             throws
@@ -90,7 +90,7 @@ public class UpdateBibliography {
     }
 
     /// Only called from: `rebuildBibTextSection`
-    /// 
+    ///
     /// Assumes the section named BIB_SECTION_NAME exists.
     private static void populateBibTextSection(XTextDocument doc,
                                                OOFrontend frontend,

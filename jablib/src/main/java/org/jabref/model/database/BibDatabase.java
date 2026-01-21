@@ -118,7 +118,7 @@ public class BibDatabase {
 
     /// Returns a set of Strings, that contains all field names that are visible. This means that the fields
     /// are not internal fields. Internal fields are fields, that are starting with "_".
-    /// 
+    ///
     /// @return set of fieldnames, that are visible
     public Set<Field> getAllVisibleFields() {
         Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
@@ -136,7 +136,7 @@ public class BibDatabase {
 
     /// Collects entries having the specified citation key and returns these entries as list.
     /// The order of the entries is the order they appear in the database.
-    /// 
+    ///
     /// @return list of entries that contains the given key
     public synchronized List<BibEntry> getEntriesByCitationKey(String key) {
         List<BibEntry> result = new ArrayList<>();
@@ -156,7 +156,7 @@ public class BibDatabase {
     }
 
     /// Inserts the entry.
-    /// 
+    ///
     /// @param entry       entry to insert
     /// @param eventSource source the event is sent from
     public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
@@ -198,7 +198,7 @@ public class BibDatabase {
 
     /// Removes the given entries.
     /// The entries removed based on the id {@link BibEntry#getId()}
-    /// 
+    ///
     /// @param toBeDeleted Entries to delete
     public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
         removeEntries(toBeDeleted, EntriesEventSource.LOCAL);
@@ -206,7 +206,7 @@ public class BibDatabase {
 
     /// Removes the given entries.
     /// The entries are removed based on the id {@link BibEntry#getId()}
-    /// 
+    ///
     /// @param toBeDeleted Entry to delete
     /// @param eventSource Source the event is sent from
     public synchronized void removeEntries(@NonNull List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
@@ -307,7 +307,7 @@ public class BibDatabase {
 
     /// Replaces the existing lists of BibTexString with the given one
     /// Duplicates throw KeyCollisionException
-    /// 
+    ///
     /// @param stringsToAdd The collection of strings to set
     public void setStrings(List<BibtexString> stringsToAdd) {
         bibtexStrings = new ConcurrentHashMap<>();
@@ -352,7 +352,7 @@ public class BibDatabase {
     }
 
     /// Copies the preamble of another BibDatabase.
-    /// 
+    ///
     /// @param database another BibDatabase
     public void copyPreamble(BibDatabase database) {
         setPreamble(database.getPreamble().orElse(""));
@@ -390,7 +390,7 @@ public class BibDatabase {
 
     /// Take the given collection of BibEntry and resolve any string
     /// references.
-    /// 
+    ///
     /// @param entriesToResolve A collection of BibtexEntries in which all strings of the form
     /// #xxx# will be resolved against the hash map of string
     /// references stored in the database.
@@ -406,7 +406,7 @@ public class BibDatabase {
     }
 
     /// Take the given BibEntry and resolve any string references.
-    /// 
+    ///
     /// @param entry   A BibEntry in which all strings of the form #xxx# will be
     /// resolved against the hash map of string references stored in
     /// the database.
@@ -525,11 +525,11 @@ public class BibDatabase {
 
     /// Registers a listener object (subscriber) to the internal event bus.
     /// The following events are posted:
-    /// 
+    ///
     /// - {@link EntriesAddedEvent}
     /// - {@link EntryChangedEvent}
     /// - {@link EntriesRemovedEvent}
-    /// 
+    ///
     /// @param listener listener (subscriber) to add
     public void registerListener(Object listener) {
         this.eventBus.register(listener);
@@ -540,7 +540,7 @@ public class BibDatabase {
     }
 
     /// Unregisters an listener object.
-    /// 
+    ///
     /// @param listener listener (subscriber) to remove
     public void unregisterListener(Object listener) {
         try {
@@ -577,7 +577,7 @@ public class BibDatabase {
     }
 
     /// Generates and sets a random ID which is globally unique.
-    /// 
+    ///
     /// @return The generated sharedDatabaseID
     public String generateSharedDatabaseID() {
         this.sharedDatabaseID = new BigInteger(128, new SecureRandom()).toString(32);

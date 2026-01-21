@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetcher {
 
     /// Constructs a URL based on the {@link BibEntry}.
-    /// 
+    ///
     /// @param entry the entry to look information for
     URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
 

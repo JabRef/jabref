@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.Field;
 import org.jspecify.annotations.NullMarked;
 
 /// This class is used to anonymize a library. It is required to make private libraries available for public use.
-/// 
+///
 /// For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
 @NullMarked
 public class Pseudonymization {

@@ -48,7 +48,7 @@ public class FieldColumn extends MainTableColumn<String> {
     }
 
     /// Get the table column name to be displayed in the UI
-    /// 
+    ///
     /// @return name to be displayed. null if field is empty.
     @Override
     public String getDisplayName() {

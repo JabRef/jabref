@@ -36,7 +36,7 @@ public enum FileAnnotationType {
 
     /// Determines the FileAnnotationType of a raw PDAnnotation. Returns 'UNKNOWN' if the type is currently not in our
     /// list of FileAnnotationTypes.
-    /// 
+    ///
     /// @param annotation the raw PDAnnotation
     /// @return The determined FileAnnotationType
     public static FileAnnotationType parse(PDAnnotation annotation) {
@@ -49,7 +49,7 @@ public enum FileAnnotationType {
     }
 
     /// Determines if a String is a supported marked FileAnnotation type.
-    /// 
+    ///
     /// @param annotationType a type descriptor
     /// @return true if annotationType is a supported marked FileAnnotation type
     public static boolean isMarkedFileAnnotationType(String annotationType) {

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /// consider braces to be text characters; furthermore, this function appends any
 /// needed matching |right_brace|s. If any of the types is incorrect, it
 /// complains and pushes the null string.
-/// 
+///
 public class BstTextPrefixer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstTextPrefixer.class);
 

@@ -26,7 +26,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
 
 /// Fetches BibTeX data from DBLP (dblp.org)
-/// 
+///
 /// @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
 public class DBLPFetcher implements SearchBasedParserFetcher {
     public static final String FETCHER_NAME = "DBLP";

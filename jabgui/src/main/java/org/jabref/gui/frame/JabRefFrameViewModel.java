@@ -104,7 +104,7 @@ public class JabRefFrameViewModel {
     }
 
     /// Quit JabRef
-    /// 
+    ///
     /// @return true if the user chose to quit; false otherwise
     public boolean close() {
         // Ask if the user really wants to close, if there are still background tasks running
@@ -145,9 +145,9 @@ public class JabRefFrameViewModel {
 
     /// Handles commands submitted by the command line or by the remote host to be executed in the ui
     /// Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
-    /// 
+    ///
     /// Does NOT handle focus - this is done in JabRefFrame
-    /// 
+    ///
     /// @param uiCommands to be handled
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);

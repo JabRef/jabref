@@ -86,7 +86,7 @@ public class FieldWriter {
 
     /// Checks if the character at the specified index in the given text is escaped.
     /// A character is considered escaped if it is preceded by an odd number of backslashes (\).
-    /// 
+    ///
     /// @param text  the input string to check for escaped characters
     /// @param index the index of the character in the text to check for escaping
     /// @return true if the character at the specified index is escaped, false otherwise
@@ -103,7 +103,7 @@ public class FieldWriter {
     }
 
     /// Formats the content of a field.
-    /// 
+    ///
     /// @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
     /// @param content the content of the field
     /// @return a formatted string suitable for output
@@ -121,7 +121,7 @@ public class FieldWriter {
     }
 
     /// This method handles # in the field content to get valid bibtex strings
-    /// 
+    ///
     /// For instance, `#jan# - #feb#` gets  `jan #{ - } # feb` (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
     private String formatAndResolveStrings(String content) throws InvalidFieldValueException {
         checkBraces(content);

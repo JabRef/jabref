@@ -34,17 +34,17 @@ public class FileFieldParser {
     }
 
     /// Converts the string representation of LinkedFileData to a List of LinkedFile
-    /// 
+    ///
     /// The syntax of one element is description:path:type
     /// Multiple elements are concatenated with ;
-    /// 
+    ///
     /// The main challenges of the implementation are:
-    /// 
-    /// 
+    ///
+    ///
     /// - that XML characters might be included (thus one cannot simply split on ";")
     /// - some characters might be escaped
     /// - Windows absolute paths might be included without escaping
-    /// 
+    ///
     public static List<LinkedFile> parse(String value) {
         // We need state to have a more clean code. Thus, we instantiate the class and then return the result
         FileFieldParser fileFieldParser = new FileFieldParser(value);
@@ -147,12 +147,12 @@ public class FileFieldParser {
     }
 
     /// Converts the given textual representation of a LinkedFile object
-    /// 
+    ///
     /// SIDE EFFECT: The given entry list is cleared upon completion
-    /// 
+    ///
     /// Expected format is: description:link:fileType:sourceURL
     /// fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
-    /// 
+    ///
     /// @param entry the list of elements in the linked file textual representation
     /// @return a LinkedFile object
     static LinkedFile convert(List<String> entry) {

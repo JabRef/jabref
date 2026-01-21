@@ -80,13 +80,13 @@ public class DocumentInformationExtractor {
 
     /// Function for retrieving a BibEntry from the
     /// PDDocumentInformation in a PDF file.
-    /// 
+    ///
     /// To understand how to get hold of a PDDocumentInformation have a look in
     /// the test cases for XMPUtilTest.
-    /// 
+    ///
     /// The BibEntry is build by mapping individual fields in the document
     /// information (like author, title, keywords) to fields in a bibtex entry.
-    /// 
+    ///
     /// @return The bibtex entry found in the document information.
     public Optional<BibEntry> extractBibtexEntry() {
         this.extractAuthor();

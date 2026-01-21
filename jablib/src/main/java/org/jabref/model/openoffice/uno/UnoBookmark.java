@@ -33,7 +33,7 @@ public class UnoBookmark {
     }
 
     /// Get the XTextRange corresponding to the named bookmark.
-    /// 
+    ///
     /// @param name The name of the bookmark to find.
     /// @return The XTextRange for the bookmark, or Optional.empty().
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
@@ -46,9 +46,9 @@ public class UnoBookmark {
     }
 
     /// Insert a bookmark with the given name at the cursor provided, or with another name if the one we asked for is already in use.
-    /// 
+    ///
     /// In LibreOffice the another name is in "{name}{number}" format.
-    /// 
+    ///
     /// @return The XNamed interface of the bookmark.
     /// result.getName() should be checked by the caller, because its name may differ from the one requested.
     public static XNamed create(DocumentAnnotation documentAnnotation)

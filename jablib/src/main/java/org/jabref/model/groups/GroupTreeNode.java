@@ -27,7 +27,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     private ObjectProperty<AbstractGroup> groupProperty = new SimpleObjectProperty<>();
 
     /// Creates this node and associates the specified group with it.
-    /// 
+    ///
     /// @param group the group underlying this node
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
@@ -39,7 +39,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Returns the group underlying this node.
-    /// 
+    ///
     /// @return the group associated with this node
     public AbstractGroup getGroup() {
         return groupProperty.get();
@@ -50,14 +50,14 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Associates the specified group with this node.
-    /// 
+    ///
     /// @param newGroup the new group (has to be non-null)
     public void setGroup(@NonNull AbstractGroup newGroup) {
         this.groupProperty.set(newGroup);
     }
 
     /// Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
-    /// 
+    ///
     /// @param newGroup                        the new group (has to be non-null)
     /// @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new group
     /// @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
@@ -132,7 +132,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Get only groups containing all the entries or just groups containing any of the
-    /// 
+    ///
     /// @param entries    List of {@link BibEntry} to search for
     /// @param requireAll Whether to return only groups that must contain all entries
     /// @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained}
@@ -195,7 +195,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Get the name of the underlying group
-    /// 
+    ///
     /// @return String the name of the group
     public String getName() {
         return getGroup().getName();
@@ -213,7 +213,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Determines the entries in the specified list which are matched by this group.
-    /// 
+    ///
     /// @param entries list of entries to be searched
     /// @return matched entries
     public List<BibEntry> findMatches(List<BibEntry> entries) {
@@ -224,7 +224,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Determines the entries in the specified database which are matched by this group.
-    /// 
+    ///
     /// @param database database to be searched
     /// @return matched entries
     public List<BibEntry> findMatches(BibDatabase database) {
@@ -237,7 +237,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELIMITER}.
-    /// 
+    ///
     /// The name of the root is not included.
     public String getPath() {
         return getPathFromRoot().stream()
@@ -254,7 +254,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /// Finds a children using the given path. Each group name should be separated by {@link #PATH_DELIMITER}.
-    /// 
+    ///
     /// The path should be generated using {@link #getPath()}.
     public Optional<GroupTreeNode> getChildByPath(String pathToSource) {
         GroupTreeNode present = this;

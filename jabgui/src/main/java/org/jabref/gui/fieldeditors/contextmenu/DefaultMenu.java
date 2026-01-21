@@ -20,7 +20,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
     TextInputControl textInputControl;
 
     /// The default menu that contains functions for changing the case of text and doing several conversions.
-    /// 
+    ///
     /// @param textInputControl that this menu will be connected to
     public DefaultMenu(TextInputControl textInputControl) {
         this.textInputControl = textInputControl;

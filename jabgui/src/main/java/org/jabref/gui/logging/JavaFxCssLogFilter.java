@@ -7,7 +7,7 @@ import java.util.logging.LogRecord;
 
 /// Filters out very noisy JavaFX CSS warnings that are known upstream issues and do not indicate
 /// actionable problems for JabRef users. See JDK-8268657 and related JavaFX CSS warnings.
-/// 
+///
 /// We only filter java.util.logging WARN records whose message indicates a CSS lookup/conversion
 /// problem and that originate from processing a stylesheet (either JavaFX's modena.bss or
 /// JabRef's Base.css). All other log records are passed through unmodified.

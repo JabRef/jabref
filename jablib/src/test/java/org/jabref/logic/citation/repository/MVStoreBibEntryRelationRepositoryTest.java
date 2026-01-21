@@ -90,7 +90,7 @@ class MVStoreBibEntryRelationRepositoryTest {
     /// Create a fake list of relations for a bibEntry based on the {@link PaperDetails#toBibEntry()} logic
     /// that corresponds to this use case: we want to make sure that relations coming from SemanticScholar
     /// and mapped as BibEntry will be serializable by the MVStore.
-    /// 
+    ///
     /// @param entry should not be null
     /// @return never empty
     private List<BibEntry> createRelations(BibEntry entry) {

@@ -505,7 +505,7 @@ public class OpenOfficePanel {
     }
 
     /// Given the withText and inParenthesis options, return the corresponding citationType.
-    /// 
+    ///
     /// @param withText      False means invisible citation (no text).
     /// @param inParenthesis True means "(Au and Thor 2000)". False means "Au and Thor (2000)".
     private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis) {
@@ -585,7 +585,7 @@ public class OpenOfficePanel {
     }
 
     /// Check that all entries in the list have citation keys, if not ask if they should be generated
-    /// 
+    ///
     /// @param entries A list of entries to be checked
     /// @return true if all entries have citation keys, if it so may be after generating them
     private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {

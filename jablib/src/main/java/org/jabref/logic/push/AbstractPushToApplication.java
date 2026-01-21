@@ -133,7 +133,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     /// Constructs the command line arguments for pushing citations to the application.
     /// The method formats the citation key and prefixes/suffixes as per user preferences
     /// before invoking the application with the command to insert text.
-    /// 
+    ///
     /// @param keyString String containing the Bibtex keys to be pushed to the application
     /// @return String array with the command to call and its arguments
     @SuppressWarnings("unused")
@@ -142,7 +142,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     /// Function to get the command name in case it is different from the application name
-    /// 
+    ///
     /// @return String with the command name
     public String getCommandName() {
         return null;

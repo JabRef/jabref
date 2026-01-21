@@ -39,7 +39,7 @@ public class RfcFetcher implements IdBasedParserFetcher {
     }
 
     /// Get the URL of the RFC resource according to the given identifier
-    /// 
+    ///
     /// @param identifier the ID
     /// @return the URL of the RFC resource
     @Override

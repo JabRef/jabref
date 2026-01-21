@@ -11,7 +11,7 @@ public record UserHostInfo(
     /// Creates a new UserHostInfo from a user-host string.
     /// The user-host string is expected to be in the format "user-host".
     /// If the string does not contain a hyphen, the entire string is considered as the user and the host is empty.
-    /// 
+    ///
     /// @param userHostString the user-host string
     /// @return a new UserHostInfo
     public static UserHostInfo parse(String userHostString) {
@@ -28,7 +28,7 @@ public record UserHostInfo(
     /// Returns the user-host string representation.
     /// If the host is empty, only the user is returned.
     /// Otherwise, the format is "user-host".
-    /// 
+    ///
     /// @return the user-host string
     public String getUserHostString() {
         if (host.isEmpty()) {
@@ -39,7 +39,7 @@ public record UserHostInfo(
     }
 
     /// Checks if this UserHostInfo has the same host as the given UserHostInfo.
-    /// 
+    ///
     /// @param other the other UserHostInfo
     /// @return true if the hosts are the same and not empty, false otherwise
     public boolean hasSameHost(UserHostInfo other) {

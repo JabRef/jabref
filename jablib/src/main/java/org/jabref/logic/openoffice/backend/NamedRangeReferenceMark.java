@@ -46,11 +46,11 @@ public class NamedRangeReferenceMark implements NamedRange {
     }
 
     /// Insert `n` spaces in a way that reference marks just before or just after the cursor are not affected.
-    /// 
+    ///
     /// This is based on the observation, that starting two new paragraphs separates us from reference marks on either side.
-    /// 
+    ///
     /// The pattern used is: `safeInsertSpaces(n): para, para, left, space(n), right-delete, left(n), left-delete`
-    /// 
+    ///
     /// @param position  Where to insert (at position.getStart())
     /// @param numSpaces Number of spaces to insert.
     /// @return a new cursor, covering the just-inserted spaces.
@@ -133,7 +133,7 @@ public class NamedRangeReferenceMark implements NamedRange {
     }
 
     /// Remove it from the document.
-    /// 
+    ///
     /// See: removeCitationGroups
     @Override
     public void removeFromDocument(XTextDocument doc)
@@ -159,7 +159,7 @@ public class NamedRangeReferenceMark implements NamedRange {
     }
 
     /// Cursor for the reference marks as is, not prepared for filling, but does not need cleanFillCursor either.
-    /// 
+    ///
     /// @return Optional.empty() if reference mark is missing from the document, otherwise an XTextCursor for getMarkRange See: getRawCursorForCitationGroup
     @Override
     public Optional<XTextCursor> getRawCursor(XTextDocument doc)
@@ -353,7 +353,7 @@ public class NamedRangeReferenceMark implements NamedRange {
     }
 
     /// Remove brackets, but if the result would become empty, leave them; if the result would be a single characer, leave the left bracket.
-    /// 
+    ///
     /// See: cleanFillCursorForCitationGroup
     @Override
     public void cleanFillCursor(XTextDocument doc)

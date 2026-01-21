@@ -42,7 +42,7 @@ public class OOBibBaseConnect {
     private final XDesktop xDesktop;
 
     /// Created when connected to a document.
-    /// 
+    ///
     /// Cleared (to null) when we discover we lost the connection.
     private XTextDocument xTextDocument;
 
@@ -114,7 +114,7 @@ public class OOBibBaseConnect {
     }
 
     /// Run a dialog allowing the user to choose among the documents in `list`.
-    /// 
+    ///
     /// @return Null if no document was selected. Otherwise the document selected.
     private static XTextDocument selectDocumentDialog(List<XTextDocument> list,
                                                       DialogService dialogService) {
@@ -159,13 +159,13 @@ public class OOBibBaseConnect {
     }
 
     /// Choose a document to work with.
-    /// 
+    ///
     /// Assumes we have already connected to LibreOffice or OpenOffice.
-    /// 
+    ///
     /// If there is a single document to choose from, selects that. If there are more than one, shows selection dialog. If there are none, throws NoDocumentFoundException
-    /// 
+    ///
     /// After successful selection connects to the selected document and extracts some frequently used parts (starting points for managing its content).
-    /// 
+    ///
     /// Finally initializes this.xTextDocument with the selected document and parts extracted.
     public void selectDocument(boolean autoSelectForSingle)
             throws
@@ -197,7 +197,7 @@ public class OOBibBaseConnect {
     }
 
     /// A simple test for document availability.
-    /// 
+    ///
     /// See also `isDocumentConnectionMissing` for a test actually attempting to use teh connection.
     public boolean isConnectedToDocument() {
         return this.xTextDocument != null;

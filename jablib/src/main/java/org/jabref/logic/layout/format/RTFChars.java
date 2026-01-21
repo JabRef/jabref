@@ -9,17 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Transform a LaTeX-String to RTF.
-/// 
+///
 /// This method will:
-/// 
+///
 /// 1.) Remove LaTeX-Command sequences.
-/// 
+///
 /// 2.) Replace LaTeX-Special chars with RTF equivalents.
-/// 
+///
 /// 3.) Replace emph and textit and textbf with their RTF replacements.
-/// 
+///
 /// 4.) Take special care to save all unicode characters correctly.
-/// 
+///
 /// 5.) Replace --- by \emdash and -- by \endash.
 public class RTFChars implements LayoutFormatter {
 
@@ -195,7 +195,7 @@ public class RTFChars implements LayoutFormatter {
     }
 
     /// This method transforms the unicode of a special character into its base character: 233 (é) - > e
-    /// 
+    ///
     /// @param c long
     /// @return returns the basic character of the given unicode
     private String transformSpecialCharacter(long c) {

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /// Main class for generating summaries of {@link BibEntry}ies.
 /// Use this class in the logic and UI.
-/// 
+///
 /// In order for summary to be stored and loaded, the {@link BibEntry} must satisfy the following requirements:
 /// 1. There should exist an associated {@link BibDatabaseContext} for the {@link BibEntry}.
 /// 2. The database path of the associated {@link BibDatabaseContext} must be set.

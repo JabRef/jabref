@@ -57,7 +57,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     }
 
     /// Concatenates the formatted message of the given {@link LogEventViewModel}s by using a new line separator.
-    /// 
+    ///
     /// @return all messages as String
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()

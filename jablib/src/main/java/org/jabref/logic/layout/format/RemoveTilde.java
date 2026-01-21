@@ -3,7 +3,7 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 
 /// Replace a non-command tilde ~ by a space.
-/// 
+///
 /// Useful for formatting Latex code.
 public class RemoveTilde implements LayoutFormatter {
     @Override

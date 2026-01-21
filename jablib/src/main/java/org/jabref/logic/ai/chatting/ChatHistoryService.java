@@ -108,7 +108,7 @@ public class ChatHistoryService implements AutoCloseable {
     /// If the {@link BibEntry} satisfies requirements for serialization and deserialization of chat history (see
     /// the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
     /// {@link ChatHistoryStorage}.
-    /// 
+    ///
     /// It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
     /// but it's best to call it when the chat history {@link BibEntry} is no longer needed.
     public void closeChatHistoryForEntry(BibEntry entry) {
@@ -156,7 +156,7 @@ public class ChatHistoryService implements AutoCloseable {
     /// If the {@link GroupTreeNode} satisfies requirements for serialization and deserialization of chat history (see
     /// the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
     /// {@link ChatHistoryStorage}.
-    /// 
+    ///
     /// It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
     /// but it's best to call it when the chat history {@link GroupTreeNode} is no longer needed.
     public void closeChatHistoryForGroup(GroupTreeNode group) {

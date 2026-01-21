@@ -25,7 +25,7 @@ public class CitationStyleGenerator {
     }
 
     /// Generates a citation based on a given list of entries, .csl style source content and output format with a given {@link BibDatabaseContext}.
-    /// 
+    ///
     /// @implNote The citation is generated using an external library which may take some time, debatable if it is better to call it from outside the main Thread.
     public static String generateCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
         try {
@@ -37,7 +37,7 @@ public class CitationStyleGenerator {
     }
 
     /// Generates a bibliography list in HTML format based on a given list of entries and .csl style source content with a default {@link BibDatabaseContext}.
-    /// 
+    ///
     /// @implNote The bibliography is generated using an external library which may take some time, debatable if it is better to call it from outside the main Thread.
     protected static String generateBibliography(List<BibEntry> bibEntries, String style, BibEntryTypesManager entryTypesManager) {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(bibEntries));
@@ -46,7 +46,7 @@ public class CitationStyleGenerator {
     }
 
     /// Generates a bibliography list based on a given list of entries, .csl style source content and output format with a given {@link BibDatabaseContext}.
-    /// 
+    ///
     /// @implNote The bibliographies are generated using an external library which may take some time, debatable if it is better to call it from outside the main Thread.
     public static List<String> generateBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
         try {

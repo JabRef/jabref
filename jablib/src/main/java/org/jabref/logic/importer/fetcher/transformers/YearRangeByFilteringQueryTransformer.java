@@ -17,7 +17,7 @@ public abstract class YearRangeByFilteringQueryTransformer extends AbstractQuery
     /// The API does not support querying for a year range.
     /// Nevertheless, we store the start year and end year,
     /// because we filter it after fetching all results
-    /// 
+    ///
     /// @return "", because the provider does not support server-side filtering, but our client filters
     @Override
     protected String handleYearRange(String yearRange) {

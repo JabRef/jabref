@@ -21,7 +21,7 @@ public class AiModelService {
     /// Gets the list of available models for the given provider.
     /// First attempts to fetch models dynamically from the API.
     /// If that fails or times out, falls back to the hardcoded list.
-    /// 
+    ///
     /// @param aiProvider The AI provider
     /// @param apiBaseUrl The base URL for the API
     /// @param apiKey The API key for authentication (may be null)
@@ -40,7 +40,7 @@ public class AiModelService {
     }
 
     /// Gets the list of available models for the given provider, using only hardcoded values.
-    /// 
+    ///
     /// @param aiProvider The AI provider
     /// @return A list of available model names
     public List<String> getStaticModels(AiProvider aiProvider) {
@@ -49,7 +49,7 @@ public class AiModelService {
 
     /// Synchronously fetches the list of available models from the API.
     /// This method will block until the fetch completes or the HTTP client times out.
-    /// 
+    ///
     /// @param aiProvider The AI provider
     /// @param apiBaseUrl The base URL for the API
     /// @param apiKey The API key for authentication (may be null)

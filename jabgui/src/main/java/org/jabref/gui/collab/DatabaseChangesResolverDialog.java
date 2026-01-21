@@ -62,7 +62,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     /// A dialog going through given `changes`, which are diffs to the provided `database`.
     /// Each accepted change is written to the provided `database`.
-    /// 
+    ///
     /// @param changes  The list of changes
     /// @param database The database to apply the changes to
     public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle) {

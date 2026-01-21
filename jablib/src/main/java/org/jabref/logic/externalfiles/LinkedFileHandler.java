@@ -109,7 +109,7 @@ public class LinkedFileHandler {
     }
 
     /// If exists: the path already exists and has the same content as the given sourcePath
-    /// 
+    ///
     /// @param renamed The original/suggested filename was adapted to fit it
     private record GetTargetPathResult(boolean exists, boolean renamed, Path path) {
     }
@@ -237,7 +237,7 @@ public class LinkedFileHandler {
 
     /// Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
     /// Uses file extension from original file.
-    /// 
+    ///
     /// @return the suggested filename, including extension
     public String getSuggestedFileName() {
         String filename = linkedFile.getFileName().orElse("file");
@@ -249,7 +249,7 @@ public class LinkedFileHandler {
 
     /// Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
     /// Uses the provided file extension.
-    /// 
+    ///
     /// @param extension The extension of the file.
     /// @return the suggested filename, including extension
     public String getSuggestedFileName(@NonNull String extension) {
@@ -262,7 +262,7 @@ public class LinkedFileHandler {
     }
 
     /// Check to see if a file already exists in the target directory.  Search is not case sensitive.
-    /// 
+    ///
     /// @return First identified path that matches an existing file. This name can be used in subsequent calls to override the existing file.
     public Optional<Path> findExistingFile(LinkedFile linkedFile, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.

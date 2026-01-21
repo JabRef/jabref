@@ -21,14 +21,14 @@ public class UTF8Checker implements EntryChecker {
     /// - decode a String into a bytes array
     /// - attempts to decode the bytes array to a character array using the UTF-8 Charset
     /// </ol>
-    /// 
+    ///
     /// @param charset the charset used to decode BibEntry fields
     public UTF8Checker(Charset charset) {
         this.charset = charset;
     }
 
     /// Detect any non UTF-8 encoded field
-    /// 
+    ///
     /// @param entry the BibEntry of BibLatex.
     /// @return return the warning of UTF-8 check for BibLatex.
     @Override

@@ -11,7 +11,7 @@ public class GrobidUseDialogHelper {
 
     /// If the user has not explicitly opted-in/out of Grobid, we ask for permission to send data to Grobid by using
     /// a dialog. The users' preference is saved.
-    /// 
+    ///
     /// @param dialogService the DialogService to use
     /// @return if the user enabled Grobid, either in the past or after being asked by the dialog.
     public static boolean showAndWaitIfUserIsUndecided(DialogService dialogService, GrobidPreferences preferences) {

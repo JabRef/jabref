@@ -127,7 +127,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     /// Builds a new FileDialogConfiguration using the given path as the initial directory for use in
     /// dialogService.showFileOpenDialogAndGetMultipleFiles().
-    /// 
+    ///
     /// @param initialDirectory Path to use as the initial directory
     /// @return new FileDialogConfig with given initial directory
     public FileDialogConfiguration getFileDialogConfiguration(Path initialDirectory) {
@@ -152,7 +152,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     /// Opens the given file. If null or 404, nothing happens.
     /// In case the file is already opened, that panel is raised.
-    /// 
+    ///
     /// @param file the file, may be null or not existing
     public void openFile(Path file) {
         openFiles(new ArrayList<>(List.of(file)));
@@ -160,7 +160,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     /// Opens the given files. If one of it is null or 404, nothing happens.
     /// In case the file is already opened, that panel is raised.
-    /// 
+    ///
     /// @param filesToOpen the filesToOpen, may be null or not existing
     public void openFiles(List<Path> filesToOpen) {
         LibraryTab toRaise = null;
@@ -205,9 +205,9 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     /// This is the real file opening. Should be called via {@link #openFile(Path)}
-    /// 
+    ///
     /// Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
-    /// 
+    ///
     /// @param file the file, may be NOT null, but may not be existing
     private void openTheFile(@NonNull Path file) {
         if (!Files.exists(file)) {

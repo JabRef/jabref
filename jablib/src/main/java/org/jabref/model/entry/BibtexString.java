@@ -7,17 +7,17 @@ import java.util.Objects;
 public class BibtexString implements Cloneable {
 
     /// Type of a \@String.
-    /// 
+    ///
     /// Differentiate a \@String based on its usage:
-    /// 
+    ///
     /// - {@link #AUTHOR}: prefix "a", for author and editor fields.
     /// - {@link #INSTITUTION}: prefix "i", for institution and organization
     /// field
     /// - {@link #PUBLISHER}: prefix "p", for publisher fields
     /// - {@link #OTHER}: no prefix, for any field
-    /// 
+    ///
     /// Examples:
-    /// 
+    ///
     /// \@String { aKahle    = "Kahle, Brewster " } -> author
     /// \@String { aStallman = "Stallman, Richard" } -> author
     /// \@String { iMIT      = "{Massachusetts Institute of Technology ({MIT})}" } -> institution
@@ -26,9 +26,9 @@ public class BibtexString implements Cloneable {
     /// \@String { eg        = "for example" } -> other
     /// \@String { et        = " and " } -> other
     /// \@String { lBigMac   = "Big Mac" } -> other
-    /// 
+    ///
     /// Usage:
-    /// 
+    ///
     /// \@Misc {
     /// title       = "The GNU Project"
     /// author      = aStallman # et # aKahle
@@ -76,7 +76,7 @@ public class BibtexString implements Cloneable {
     private boolean hasChanged;
 
     /// Default constructor. Use this if in doubt.
-    /// 
+    ///
     /// In case this constructor is used - and the library is eventually written, the serialization is generated from scratch (and not some null from parsedSerialization)
     public BibtexString(String name, String content) {
         this.id = IdGenerator.next();
@@ -88,7 +88,7 @@ public class BibtexString implements Cloneable {
 
     /// This is used to set the parsed serialization of the string. This is used when the string is read from a BibTeX file.
     /// Do not use if not working with reading BibTeX files (or similar actions).     *
-    /// 
+    ///
     /// @param parsedSerialization The serialization read during parsing
     public BibtexString(String name, String content, String parsedSerialization) {
         this(name, content);

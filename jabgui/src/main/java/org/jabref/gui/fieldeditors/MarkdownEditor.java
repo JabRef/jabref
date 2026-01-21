@@ -99,7 +99,7 @@ public class MarkdownEditor extends SimpleEditor {
     }
 
     /// Inserts Markdown Link for a file dropped into the editor, copying file to the database file directory if necessary
-    /// 
+    ///
     /// @param file is the file that is dropped into the editor
     /// @param textArea is the Editor text area
     /// @return true if the Markdown Text was inserted, false otherwise

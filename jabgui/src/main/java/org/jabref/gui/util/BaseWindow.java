@@ -13,11 +13,11 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import com.airhacks.afterburner.injection.Injector;
 
 /// A base class for non-modal windows of JabRef.
-/// 
+///
 /// You can create a new instance of this class and set the title in the constructor. After that you can call
 /// {@link org.jabref.gui.DialogService#showCustomWindow(BaseWindow)} in order to show the window. All the JabRef styles
 /// will be applied.
-/// 
+///
 /// See {@link org.jabref.gui.ai.components.aichat.AiChatWindow} for example.
 public class BaseWindow extends Stage {
     public BaseWindow() {

@@ -11,11 +11,11 @@ import org.jabref.model.entry.field.StandardField;
 /// This class represents all supported BibTeX entry types.
 /// It is based on the information of <a href="https://tug.org/texmf-docs/bibtex/btxdoc.pdf">BibTeXing</a>, a manual
 /// by the original BibTeX author. Also enriched by new fields not existing back then (e.g., ISSN).
-/// 
+///
 /// The BibLaTeX entry types are defined at {@link BiblatexEntryTypeDefinitions}.
 public class BibtexEntryTypeDefinitions {
     /// An article from a journal or magazine.
-    /// 
+    ///
     /// Required fields: author, title, journal, year.
     /// Optional fields: volume, number, pages, month, note.
     private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()
@@ -25,7 +25,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// A book with an explicit publisher.
-    /// 
+    ///
     /// Required fields: author or editor, title, publisher, year.
     /// Optional fields: volume or number, series, address, edition, month, note.
     private static final BibEntryType BOOK = new BibEntryTypeBuilder()
@@ -35,7 +35,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// A work that is printed and bound, but without a named publisher or sponsoring institution.
-    /// 
+    ///
     /// Required field: title.
     /// Optional fields: author, howpublished, address, month, year, note.
     private static final BibEntryType BOOKLET = new BibEntryTypeBuilder()
@@ -45,7 +45,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// An article in a conference proceedings.
-    /// 
+    ///
     /// Required fields: author, title, booktitle, year.
     /// Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
     private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()
@@ -55,7 +55,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// A part of a book, which may be a chapter (or section or whatever) and/or a range of pages.
-    /// 
+    ///
     /// Required fields: author or editor, title, chapter and/or pages, publisher, year.
     /// Optional fields: volume or number, series, type, address, edition, month, note.
     private static final BibEntryType INBOOK = new BibEntryTypeBuilder()
@@ -76,7 +76,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// An article in a conference proceedings.
-    /// 
+    ///
     /// Required fields: author, title, booktitle, year.
     /// Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
     private static final BibEntryType INPROCEEDINGS = new BibEntryTypeBuilder()
@@ -92,7 +92,7 @@ public class BibtexEntryTypeDefinitions {
                                                                         .build();
 
     /// A Master's thesis.
-    /// 
+    ///
     /// Required fields: author, title, school, year.
     /// Optional fields: type, address, month, note.
     private static final BibEntryType MASTERSTHESIS = new BibEntryTypeBuilder()
@@ -102,7 +102,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// Use this type when nothing else fits.
-    /// 
+    ///
     /// Required fields: none.
     /// Optional fields: author, title, howpublished, month, year, note.
     private static final BibEntryType MISC = new BibEntryTypeBuilder()
@@ -111,7 +111,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// A PhD thesis.
-    /// 
+    ///
     /// Required fields: author, title, school, year.
     /// Optional fields: type, address, month, note.
     private static final BibEntryType PHDTHESIS = new BibEntryTypeBuilder()
@@ -121,7 +121,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// The proceedings of a conference.
-    /// 
+    ///
     /// Required fields: title, year.
     /// Optional fields: editor, volume or number, series, address, month, organization, publisher, note.
     private static final BibEntryType PROCEEDINGS = new BibEntryTypeBuilder()
@@ -131,7 +131,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// A report published by a school or other institution, usually numbered within a series.
-    /// 
+    ///
     /// Required fields: author, title, institution, year.
     /// Optional fields: type, number, address, month, note.
     private static final BibEntryType TECHREPORT = new BibEntryTypeBuilder()
@@ -141,7 +141,7 @@ public class BibtexEntryTypeDefinitions {
             .build();
 
     /// A document having an author and title, but not formally published.
-    /// 
+    ///
     /// Required fields: author, title, note.
     /// Optional fields: month, year.
     private static final BibEntryType UNPUBLISHED = new BibEntryTypeBuilder()

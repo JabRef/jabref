@@ -35,7 +35,7 @@ public class ExternalLinkCreator {
     // Note: We use configurable templates due to the requirement stated at https://github.com/JabRef/jabref/issues/12268#issuecomment-2523108605
 
     /// Get a URL to the search results of Google Scholar for the BibEntry's title
-    /// 
+    ///
     /// @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
     /// @return The URL if it was successfully created
     public Optional<String> getGoogleScholarSearchURL(BibEntry entry) {
@@ -48,7 +48,7 @@ public class ExternalLinkCreator {
     }
 
     /// Get a URL to the search results of Semantic Scholar for the BibEntry's title
-    /// 
+    ///
     /// @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
     /// @return The URL if it was successfully created
     public Optional<String> getSemanticScholarSearchURL(BibEntry entry) {
@@ -61,7 +61,7 @@ public class ExternalLinkCreator {
     }
 
     /// Get a URL to the search results of ShortScience for the BibEntry's title
-    /// 
+    ///
     /// @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
     /// @return The URL if it was successfully created
     public Optional<String> getShortScienceSearchURL(BibEntry entry) {
@@ -74,7 +74,7 @@ public class ExternalLinkCreator {
     }
 
     /// Builds a search URL using either template replacement or query parameters
-    /// 
+    ///
     /// @param baseUrl The custom or default base URL
     /// @param defaultUrl The fallback default URL
     /// @param title The title to search for
@@ -130,7 +130,7 @@ public class ExternalLinkCreator {
     }
 
     /// Builds a URL using query parameters (fallback method).
-    /// 
+    ///
     /// The parameter addAuthorIndex is used for Semantic Scholar service because it does not understand "author=XYZ", but it uses "author[0]=XYZ&author[1]=ABC".
     private Optional<String> buildUrlWithQueryParams(String baseUrl, String title, @Nullable String author, String serviceName, boolean addAuthorIndex) {
         try {

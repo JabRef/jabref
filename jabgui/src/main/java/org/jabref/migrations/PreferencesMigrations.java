@@ -186,7 +186,7 @@ public class PreferencesMigrations {
     }
 
     /// Migrate LabelPattern configuration from versions <=3.5 to new CitationKeyPatterns.
-    /// 
+    ///
     /// Introduced in <a href="https://github.com/JabRef/jabref/pull/1704">#1704</a>
     private static void upgradeLabelPatternToCitationKeyPattern(JabRefCliPreferences prefs, Preferences mainPrefsNode) {
         final String V3_6_DEFAULT_BIBTEX_KEYPATTERN = "defaultBibtexKeyPattern";
@@ -320,11 +320,11 @@ public class PreferencesMigrations {
     }
 
     /// Customizable preview style migrations
-    /// 
+    ///
     /// -  Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
     /// -  Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
     /// -  Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
-    /// 
+    ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
         String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
@@ -339,10 +339,10 @@ public class PreferencesMigrations {
     /// the preferences store the type of the column too, so that the formerly hardwired columns like the graphic groups
     /// column or the other icon columns can be reordered in the main table and behave like any other field column
     /// ("groups;linked_id;field:author;special:readstatus;extrafile:pdf;...").
-    /// 
+    ///
     /// Simple strings are by default parsed as a FieldColumn, so there is nothing to do there, but the formerly hard
     /// wired columns need to be added.
-    /// 
+    ///
     /// In 5.1 variable names in JabRefPreferences have changed to offer backward compatibility with pre 5.0 releases
     /// Pre 5.1: columnNames, columnWidths, columnSortTypes, columnSortOrder
     /// Since 5.1: mainTableColumnNames, mainTableColumnWidths, mainTableColumnSortTypes, mainTableColumnSortOrder
@@ -477,7 +477,7 @@ public class PreferencesMigrations {
     }
 
     /// In version 6.0 the formatting of the CleanUps preferences changed. Instead of using several keys that have have a variable name a single preference key is introduced containing just the active cleanup jobs. Also instead of a combined field for the field formatters and the enabled status of all of them, they are split for easier parsing.
-    /// 
+    ///
     /// <h3>Changes:</h3>
     /// <table>
     /// <tr> <td>                key                     </td> <td>  value </td> </tr>
@@ -553,13 +553,13 @@ public class PreferencesMigrations {
     }
 
     /// Migrates default fields of the "General" entry editor tab.
-    /// 
-    /// 
+    ///
+    ///
     /// This migration handles default configuration before and after v6.0-alpha.3.
     /// If the user current configuration matched with one of with known default field sets it gets updated to
     /// current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
-    /// 
-    /// 
+    ///
+    ///
     /// @param preferences the user's current GUI preferences
     /// @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {

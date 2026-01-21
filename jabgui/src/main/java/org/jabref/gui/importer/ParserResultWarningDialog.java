@@ -15,7 +15,7 @@ public class ParserResultWarningDialog {
     }
 
     /// Shows a dialog with the warnings from an import or open of a file
-    /// 
+    ///
     /// @param parserResult - ParserResult for the current import/open
     public static void showParserResultWarningDialog(@NonNull final ParserResult parserResult,
                                                      @NonNull final DialogService dialogService) {

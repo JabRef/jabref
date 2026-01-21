@@ -11,7 +11,7 @@ import org.jspecify.annotations.NonNull;
 /// This class defines a type of external files that can be linked to from JabRef.
 /// The class contains enough information to provide an icon, a standard extension
 /// and a link to which application handles files of this type.
-/// 
+///
 /// TODO: Move to model (and then adapt {@link org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel#fromFile(java.nio.file.Path, java.util.List, FilePreferences)}).
 public class CustomExternalFileType implements ExternalFileType {
 
@@ -41,7 +41,7 @@ public class CustomExternalFileType implements ExternalFileType {
     /// reading file type definitions from Preferences, where the available data types are
     /// limited. We assume that the array contains the same values as the main constructor,
     /// in the same order.
-    /// 
+    ///
     /// @param val arguments.
     public static ExternalFileType buildFromArgs(String[] val) {
         if ((val == null) || (val.length < 4) || (val.length > 5)) {
@@ -125,14 +125,14 @@ public class CustomExternalFileType implements ExternalFileType {
     }
 
     /// Get the string associated with this file type's icon.
-    /// 
+    ///
     /// @return The icon name.
     public String getIconName() {
         return iconName;
     }
 
     /// Set the string associated with this file type's icon.
-    /// 
+    ///
     /// @param name The icon name to use.
     public void setIconName(String name) {
         this.iconName = name;
@@ -163,7 +163,7 @@ public class CustomExternalFileType implements ExternalFileType {
 
     /// We define two file type objects as equal if their name, extension, openWith and
     /// iconName are equal.
-    /// 
+    ///
     /// @param object The file type to compare with.
     /// @return true if the file types are equal.
     @Override

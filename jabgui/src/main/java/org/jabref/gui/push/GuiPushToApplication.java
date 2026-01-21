@@ -16,7 +16,7 @@ public interface GuiPushToApplication extends PushToApplication {
     }
 
     /// Gets the icon associated with the application.
-    /// 
+    ///
     /// @return The icon for the application.
     JabRefIcon getApplicationIcon();
 

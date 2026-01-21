@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Controller for the .blg file settings panel.
-/// 
+///
 /// Binds the path text field to the ViewModel,
 /// and handles browse/reset button actions.
 public class BibLogSettingsPane {

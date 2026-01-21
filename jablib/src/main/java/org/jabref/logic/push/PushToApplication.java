@@ -10,7 +10,7 @@ public interface PushToApplication {
 
     /// Gets the display name for the push operation. This name is used
     /// in the GUI to represent the push action to the user.
-    /// 
+    ///
     /// @return The display name for the push operation.
     String getDisplayName();
 
@@ -29,12 +29,12 @@ public interface PushToApplication {
 
     /// Check whether this operation requires citation keys to be set for the entries. If true is returned an error message
     /// will be displayed if keys are missing.
-    /// 
+    ///
     /// @return true if citation keys are required for this operation.
     boolean requiresCitationKeys();
 
     /// Get the delimiter used to separate citation keys.
-    /// 
+    ///
     /// @return The delimiter as a String.
     String getDelimiter();
 

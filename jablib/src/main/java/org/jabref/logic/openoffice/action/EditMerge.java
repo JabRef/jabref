@@ -132,7 +132,7 @@ public class EditMerge {
     }
 
     /// Decide if group could be added to state.currentGroup
-    /// 
+    ///
     /// @param group        The CitationGroup to test
     /// @param currentRange The XTextRange corresponding to group.
     /// @return false if cannot add, true if can.  If returned true, then state.cursorBetween and state.currentGroupCursor are expanded to end at the start of currentRange.

@@ -5,19 +5,19 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
 /// Will return the Authors to match the OrgSci format:
-/// 
-/// 
+///
+///
 /// - That is the first author is LastFirst, but all others are FirstLast.
 /// - First names are abbreviated
 /// - Spaces between abbreviated first names are NOT removed. Use
 /// NoSpaceBetweenAbbreviations to achieve this.
-/// 
-/// 
+///
+///
 /// See the testcase for examples.
-/// 
-/// 
+///
+///
 /// Idea from: http://stuermer.ch/blog/bibliography-reference-management-with-jabref.html
-/// 
+///
 public class AuthorOrgSci implements LayoutFormatter {
 
     @Override

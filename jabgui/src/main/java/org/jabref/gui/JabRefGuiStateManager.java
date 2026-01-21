@@ -49,8 +49,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class manages the GUI-state of JabRef, including:
-/// 
-/// 
+///
+///
 /// - currently selected database
 /// - currently selected group
 /// - active search
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 /// - focus owner
 /// - dialog window sizes/positions
 /// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
-/// 
+///
 public class JabRefGuiStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);

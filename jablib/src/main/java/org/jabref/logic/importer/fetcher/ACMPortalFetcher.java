@@ -42,7 +42,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     }
 
     /// Constructing the url for the searchpage.
-    /// 
+    ///
     /// @param queryNode the first query node
     /// @return query URL
     @Override
@@ -53,7 +53,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     }
 
     /// Gets an instance of ACMPortalParser.
-    /// 
+    ///
     /// @return the parser which can process the results returned from the ACM Portal search page
     @Override
     public Parser getParser() {

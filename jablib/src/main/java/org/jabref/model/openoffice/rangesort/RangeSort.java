@@ -19,7 +19,7 @@ public class RangeSort {
     }
 
     /// Compare two RangeHolders (using RangeHolder.getRange()) within an XText.
-    /// 
+    ///
     /// Note: since we only look at the ranges, this comparison is generally not consistent with `equals` on the RangeHolders. Probably should not be used for key comparison in `TreeMap<RangeHolder>` or `Set<RangeHolder>`
     private static class HolderComparatorWithinPartition implements Comparator<RangeHolder> {
 
@@ -38,7 +38,7 @@ public class RangeSort {
     }
 
     /// Sort a list of RangeHolder values known to share the same getText().
-    /// 
+    ///
     /// Note: RangeHolder.getRange() is called many times.
     public static <V extends RangeHolder> void sortWithinPartition(List<V> rangeHolders) {
         if (rangeHolders.isEmpty()) {

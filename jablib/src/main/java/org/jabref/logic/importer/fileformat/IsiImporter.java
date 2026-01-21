@@ -357,7 +357,7 @@ public class IsiImporter extends Importer {
     }
 
     /// Will expand ISI first names.
-    /// 
+    ///
     /// Fixed bug from: <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306">...</a>
     public static String isiAuthorConvert(String author) {
         String[] s = author.split(",");

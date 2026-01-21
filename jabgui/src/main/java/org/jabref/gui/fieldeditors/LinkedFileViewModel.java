@@ -354,7 +354,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /// Gets the filename for the current linked file and compares it to the new suggested filename.
-    /// 
+    ///
     /// @return true if the suggested filename is same as current filename.
     public boolean isGeneratedNameSameAsOriginal() {
         Path file = Path.of(this.linkedFile.getLink());
@@ -365,7 +365,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /// Compares suggested directory of current linkedFile with existing filepath directory.
-    /// 
+    ///
     /// @return true if suggested filepath is same as existing filepath.
     public boolean isGeneratedPathSameAsOriginal() {
         FilePreferences filePreferences = preferences.getFilePreferences();
@@ -406,7 +406,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     /// Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link)
     /// and then proceeds accordingly.
-    /// 
+    ///
     /// @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
     /// successfully, does not exist in the first place, or the user choose to remove it)
     public boolean delete() {

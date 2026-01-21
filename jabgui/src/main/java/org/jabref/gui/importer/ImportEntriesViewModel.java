@@ -181,7 +181,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     }
 
     /// Called after the user selected the entries to import. Does the real import stuff.
-    /// 
+    ///
     /// @param entriesToImport subset of the entries contained in parserResult
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
         // Remember the selection in the dialog
@@ -207,7 +207,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     }
 
     /// Checks if there are duplicates to the given entry in the list of entries to be imported.
-    /// 
+    ///
     /// @param entry The entry to search for duplicates of.
     /// @return A possible duplicate, if any, or null if none were found.
     private Optional<BibEntry> findInternalDuplicate(BibEntry entry) {

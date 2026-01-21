@@ -4,7 +4,7 @@ import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 
 /// Represents a document annotation.
-/// 
+///
 /// @param doc    The document
 /// @param name   For the ReferenceMark, Bookmark, TextSection. If the name is already in use, LibreOffice may change the name.
 /// @param range  Cursor marking the location or range for the thing to be inserted.

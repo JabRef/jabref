@@ -21,7 +21,7 @@ public class SSRN extends EprintIdentifier {
     private final Integer abstractId;
 
     /// Tries to parse an SSRN identifier
-    /// 
+    ///
     /// @param string Either a number or a SSRN url that has the abstract ID in it
     /// @throws NullPointerException     If you pass a null to the constructor
     /// @throws IllegalArgumentException Invalid string passed to the constructor
@@ -68,7 +68,7 @@ public class SSRN extends EprintIdentifier {
     }
 
     /// Generate the DOI based on the SSRN
-    /// 
+    ///
     /// @return a DOI formatted as `10.2139/ssrn.[article]`
     public DOI toDoi() {
         return new DOI("10.2139/ssrn." + abstractId);

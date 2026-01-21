@@ -13,7 +13,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jspecify.annotations.NonNull;
 
 /// Helper class to get a Layout object.
-/// 
+///
 /// <pre>
 /// <code>
 /// LayoutHelper helper = new LayoutHelper(...a reader...);

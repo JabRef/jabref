@@ -26,7 +26,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.reactfx.util.TriConsumer;
 
 /// Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
-/// 
+///
 /// @param <S> view model
 public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, TableRow<S>> {
 

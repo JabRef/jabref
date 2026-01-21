@@ -105,7 +105,7 @@ public class Date {
     }
 
     /// Creates a Date from date and endDate.
-    /// 
+    ///
     /// @param date    the start date
     /// @param endDate the start date
     public Date(TemporalAccessor date, TemporalAccessor endDate) {
@@ -121,7 +121,7 @@ public class Date {
     }
 
     /// Creates a Date from date and endDate.
-    /// 
+    ///
     /// @param dateString the string to extract the date information
     /// @throws DateTimeParseException if dataString is mal-formatted
     public static Optional<Date> parse(@NonNull String dateString) {
@@ -299,7 +299,7 @@ public class Date {
     }
 
     /// Create a date with a string with era indicator.
-    /// 
+    ///
     /// @param dateString the string which contain era indicator to extract the date information
     /// @return the date information with TemporalAccessor type
     private static TemporalAccessor parseDateWithEraIndicator(String dateString) {
@@ -319,7 +319,7 @@ public class Date {
     }
 
     /// Create a date whose month is represented as a season.
-    /// 
+    ///
     /// @param dateString the string which contain season to extract the date information
     /// @return the date information with TemporalAccessor type
     private static Optional<Date> parseDateWithSeason(String dateString) {

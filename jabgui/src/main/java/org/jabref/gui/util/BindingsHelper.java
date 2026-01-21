@@ -171,7 +171,7 @@ public class BindingsHelper {
     }
 
     /// Invokes `subscriber` for the every new value of `observable`, but not for the current value.
-    /// 
+    ///
     /// @param observable observable value to subscribe to
     /// @param subscriber action to invoke for values of `observable`.
     /// @return a subscription that can be used to stop invoking subscriber for any further `observable` changes.

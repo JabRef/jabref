@@ -32,7 +32,7 @@ public class ExternalFileTypes {
     }
 
     /// Look up the external file type registered with this name, if any.
-    /// 
+    ///
     /// @param name The file type name.
     /// @return The ExternalFileType registered, or null if none.
     public static Optional<ExternalFileType> getExternalFileTypeByName(String name, ExternalApplicationsPreferences externalApplicationsPreferences) {
@@ -45,7 +45,7 @@ public class ExternalFileTypes {
     }
 
     /// Look up the external file type registered for this extension, if any.
-    /// 
+    ///
     /// @param extension The file extension.
     /// @return The ExternalFileType registered, or null if none.
     public static Optional<ExternalFileType> getExternalFileTypeByExt(String extension, ExternalApplicationsPreferences externalApplicationsPreferences) {
@@ -54,7 +54,7 @@ public class ExternalFileTypes {
     }
 
     /// Returns true if there is an external file type registered for this extension.
-    /// 
+    ///
     /// @param extension The file extension.
     /// @return true if an ExternalFileType with the extension exists, false otherwise
     public static boolean isExternalFileTypeByExt(String extension, ExternalApplicationsPreferences externalApplicationsPreferences) {
@@ -62,7 +62,7 @@ public class ExternalFileTypes {
     }
 
     /// Look up the external file type registered for this filename, if any.
-    /// 
+    ///
     /// @param filename The name of the file whose type to look up.
     /// @return The ExternalFileType registered, or null if none.
     public static Optional<ExternalFileType> getExternalFileTypeForName(String filename, ExternalApplicationsPreferences externalApplicationsPreferences) {
@@ -79,7 +79,7 @@ public class ExternalFileTypes {
     }
 
     /// Look up the external file type registered for this MIME type, if any.
-    /// 
+    ///
     /// @param mimeType The MIME type.
     /// @return The ExternalFileType registered, or null if none. For the mime type "text/html", a valid file type is
     /// guaranteed to be returned.

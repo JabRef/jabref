@@ -100,7 +100,7 @@ public class ParserResult {
     }
 
     /// Add a parser warning.
-    /// 
+    ///
     /// @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
     public void addWarning(@NonNull String s) {
         addWarning(Range.NULL_RANGE, s);

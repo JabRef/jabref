@@ -30,9 +30,9 @@ public class UpdateCitationMarkers {
     }
 
     /// Visit each reference mark in referenceMarkNames, overwrite its text content.
-    /// 
+    ///
     /// After each fillCitationMarkInCursor call check if we lost the BIB_SECTION_NAME bookmark and recreate it if we did.
-    /// 
+    ///
     /// @param style Bibliography style to use.
     public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, JStyle style)
             throws
@@ -85,7 +85,7 @@ public class UpdateCitationMarkers {
     }
 
     /// Inserts a citation group in the document: creates and fills it.
-    /// 
+    ///
     /// @param citationKeys     BibTeX keys of
     /// @param citationText     Text for the citation. A citation mark or placeholder if not yet available.
     /// @param position         Location to insert at.

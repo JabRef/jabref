@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 /// This task generates a new summary for an entry.
 /// It will check if summary was already generated.
 /// And it also will store the summary.
-/// 
+///
 /// This task is created in the {@link SummariesService}, and stored then in a {@link SummariesStorage}.
 public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryTask.class);

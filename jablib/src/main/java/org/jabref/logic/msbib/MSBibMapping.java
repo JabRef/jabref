@@ -164,7 +164,7 @@ public class MSBibMapping {
     }
 
     /// <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
-    /// 
+    ///
     /// @param language The language to transform
     /// @return 1033 (american english) as default. LCID otherwise.
     public static int getLCID(String language) {
@@ -172,7 +172,7 @@ public class MSBibMapping {
     }
 
     /// <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
-    /// 
+    ///
     /// @param LCID The LCID to transform
     /// @return "english" as default. Corresponding language from BiMap otherwise.
     public static String getLanguage(int LCID) {

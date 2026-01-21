@@ -9,7 +9,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /// This is an immutable class that keeps information regarding single author. It is just a container for the information, with very simple methods to access it.
-/// 
+///
 /// Current usage: only methods `getLastOnly`, `getFirstLast`, and `getLastFirst` are used; all other methods are provided for completeness.
 @AllowedToUseLogic("because it needs to use formatter")
 public class Author {
@@ -29,9 +29,9 @@ public class Author {
     private Author latexFreeAuthor;
 
     /// Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
-    /// 
+    ///
     /// In case only the last part is passed, enclosing braces are
-    /// 
+    ///
     /// @param givenName            the first name of the author (may consist of several tokens, like "Charles Louis Xavier Joseph" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
     /// @param givenNameAbbreviated the abbreviated first name of the author (may consist of several tokens, like "C. L. X. J." in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin"). It is a responsibility of the caller to create a reasonable abbreviation of the first name.
     /// @param namePrefix           the von part of the author's name (may consist of several tokens, like "de la" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
@@ -163,7 +163,7 @@ public class Author {
     }
 
     /// Compare this object with the given one.
-    /// 
+    ///
     /// @return `true` iff the other object is an Author and all fields are `Objects.equals`.
     @Override
     public boolean equals(Object other) {
@@ -183,42 +183,42 @@ public class Author {
     }
 
     /// Returns the first name of the author stored in this object ("First").
-    /// 
+    ///
     /// @return first name of the author (may consist of several tokens)
     public Optional<String> getGivenName() {
         return Optional.ofNullable(givenName);
     }
 
     /// Returns the abbreviated first name of the author stored in this object ("F.").
-    /// 
+    ///
     /// @return abbreviated first name of the author (may consist of several tokens)
     public Optional<String> getGivenNameAbbreviated() {
         return Optional.ofNullable(givenNameAbbreviated);
     }
 
     /// Returns the von part of the author's name stored in this object ("von", "name prefix").
-    /// 
+    ///
     /// @return von part of the author's name (may consist of several tokens)
     public Optional<String> getNamePrefix() {
         return Optional.ofNullable(namePrefix);
     }
 
     /// Returns the last name of the author stored in this object ("Last").
-    /// 
+    ///
     /// @return last name of the author (may consist of several tokens)
     public Optional<String> getFamilyName() {
         return Optional.ofNullable(familyName);
     }
 
     /// Returns the name suffix ("junior") part of the author's name stored in this object ("Jr").
-    /// 
+    ///
     /// @return junior part of the author's name (may consist of several tokens) or null if the author does not have a Jr. Part
     public Optional<String> getNameSuffix() {
         return Optional.ofNullable(nameSuffix);
     }
 
     /// Returns von-part followed by last name ("von Last"). If both fields were specified as <CODE>null</CODE>, the empty string <CODE>""</CODE> is returned.
-    /// 
+    ///
     /// @return 'von Last'
     public String getNamePrefixAndFamilyName() {
         if (namePrefix == null || namePrefix.isEmpty()) {
@@ -229,7 +229,7 @@ public class Author {
     }
 
     /// Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.
-    /// 
+    ///
     /// @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
     /// @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
     public String getFamilyGiven(boolean abbr) {
@@ -244,7 +244,7 @@ public class Author {
     }
 
     /// Returns the author's name in form 'First von Last, Jr.' with the first name full or abbreviated depending on parameter.
-    /// 
+    ///
     /// @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
     /// @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F. von Last, Jr.' (if <CODE>abbr==true</CODE>)
     public String getGivenFamily(boolean abbr) {
@@ -270,7 +270,7 @@ public class Author {
     }
 
     /// Returns the name as "Last, Jr, F." omitting the von-part and removing starting braces.
-    /// 
+    ///
     /// @return "Last, Jr, F." as described above or "" if all these parts are empty.
     public String getNameForAlphabetization() {
         StringBuilder res = new StringBuilder();

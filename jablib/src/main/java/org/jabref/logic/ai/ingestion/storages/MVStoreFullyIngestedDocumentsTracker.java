@@ -10,7 +10,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
 
 /// This class is responsible for recording the information about which documents (or documents) have been fully ingested.
-/// 
+///
 /// The class also records the document modification time.
 public class MVStoreFullyIngestedDocumentsTracker extends MVStoreBase implements FullyIngestedDocumentsTracker {
     private static final String INGESTED_MAP_NAME = "ingested";

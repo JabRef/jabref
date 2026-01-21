@@ -6,7 +6,7 @@ import org.jabref.model.search.SearchMatcher;
 import org.jspecify.annotations.NonNull;
 
 /// Inverts the search result.
-/// 
+///
 /// Example:
 /// false --> true
 /// true --> false

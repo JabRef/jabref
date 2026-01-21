@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// A {@link LocaleProvider} that loads locales from a directory in the current module.
-/// 
+///
 /// This implementation is only a slight adaption of {@link de.undercouch.citeproc.DefaultLocaleProvider}.
 public class JabRefLocaleProvider implements LocaleProvider {
 

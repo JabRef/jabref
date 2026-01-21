@@ -66,7 +66,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     /// When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
     /// Input: Any text query (&term)
     /// Output: List of UIDs matching the query
-    /// 
+    ///
     /// @see <a href="https://www.ncbi.nlm.nih.gov/books/NBK25500/">www.ncbi.nlm.nih.gov/books/NBK25500/</a>
     private List<String> getPubMedIdsFromQuery(String query) throws FetcherException {
         boolean fetchIDs = false;
@@ -169,7 +169,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
 
     /// Fetch and parse an medline item from eutils.ncbi.nlm.nih.gov.
     /// The E-utilities generate a huge XML file containing all entries for the ids
-    /// 
+    ///
     /// @param ids A list of IDs to search for.
     /// @return Will return an empty list on error.
     private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {

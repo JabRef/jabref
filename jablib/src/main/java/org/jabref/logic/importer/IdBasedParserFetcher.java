@@ -23,7 +23,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher, ParserFetcher {
     Logger LOGGER = LoggerFactory.getLogger(IdBasedParserFetcher.class);
 
     /// Constructs a URL based on the query.
-    /// 
+    ///
     /// @param identifier the ID
     URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException;
 

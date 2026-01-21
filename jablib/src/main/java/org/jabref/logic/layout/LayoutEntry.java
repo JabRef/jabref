@@ -342,7 +342,7 @@ class LayoutEntry {
     }
 
     /// Do layout for general formatters (no bibtex-entry fields).
-    /// 
+    ///
     /// @param databaseContext Bibtex Database
     public String doLayout(BibDatabaseContext databaseContext, Charset encoding) {
         switch (type) {

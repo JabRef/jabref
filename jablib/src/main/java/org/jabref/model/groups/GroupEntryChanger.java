@@ -11,7 +11,7 @@ import org.jabref.model.entry.BibEntry;
 public interface GroupEntryChanger {
 
     /// Adds the specified entries to this group.
-    /// 
+    ///
     /// @return If this group or one or more entries was/were modified as a
     /// result of this operation, a list of changes is returned.
     List<FieldChange> add(Collection<BibEntry> entriesToAdd);
@@ -21,7 +21,7 @@ public interface GroupEntryChanger {
     }
 
     /// Removes the specified entries from this group.
-    /// 
+    ///
     /// @return If this group or one or more entries was/were modified as a
     /// result of this operation, a list of changes is returned.
     List<FieldChange> remove(List<BibEntry> entriesToRemove);

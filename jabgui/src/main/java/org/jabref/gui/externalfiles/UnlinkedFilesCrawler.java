@@ -71,7 +71,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     /// <br>
     /// The files are filtered according to the {@link DateRange} filter value
     /// and then sorted according to the {@link ExternalFileSorter} value.
-    /// 
+    ///
     /// @param unlinkedPDFFileFilter contains a BibDatabaseContext which is used to determine whether the file is linked
     /// @return FileNodeViewModel containing the data of the current directory and all subdirectories
     /// @throws IOException if directory is not a directory or empty

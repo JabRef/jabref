@@ -153,7 +153,7 @@ public enum KeyBinding {
     }
 
     /// This method returns the default key binding, the key(s) which are assigned
-    /// 
+    ///
     /// @return The default key binding
     public String getDefaultKeyBinding() {
         return defaultBinding;

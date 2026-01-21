@@ -20,7 +20,7 @@ public class ShortDOIService {
     private static final String BASIC_URL = "https://shortdoi.org/";
 
     /// Obtains shortened DOI name for given DOI
-    /// 
+    ///
     /// @param doi DOI
     /// @return A shortened DOI name
     public DOI getShortDOI(DOI doi) throws ShortDOIServiceException {

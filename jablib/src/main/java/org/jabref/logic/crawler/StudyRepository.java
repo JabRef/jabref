@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class manages all aspects of the study process related to the repository.
-/// 
+///
 /// It includes the parsing of the study definition file (study.bib) into a Study instance,
 /// the structured persistence of the crawling results for the study within the file based repository,
 /// as well as the sharing, and versioning of results using git.
@@ -70,7 +70,7 @@ public class StudyRepository {
     private final BibEntryTypesManager bibEntryTypesManager;
 
     /// Creates a study repository.
-    /// 
+    ///
     /// @param pathToRepository Where the repository root is located.
     /// @param gitHandler       The git handler that manages any interaction with the remote repository
     /// @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
@@ -159,7 +159,7 @@ public class StudyRepository {
     }
 
     /// The study definition file contains all the definitions of a study. This method extracts this study from the yaml study definition file
-    /// 
+    ///
     /// @return Returns the BibEntries parsed from the study definition file.
     /// @throws IOException Problem opening the input stream.
     private Study parseStudyFile() throws IOException {
@@ -167,7 +167,7 @@ public class StudyRepository {
     }
 
     /// Returns all query strings of the study definition
-    /// 
+    ///
     /// @return List of all queries as Strings.
     public List<String> getSearchQueryStrings() {
         return study.getQueries()
@@ -177,7 +177,7 @@ public class StudyRepository {
     }
 
     /// Extracts all active fetchers from the library entries.
-    /// 
+    ///
     /// @return List of BibEntries of type Library
     /// @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
     public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
@@ -275,7 +275,7 @@ public class StudyRepository {
 
     /// Creates a folder using the query and its corresponding query id.
     /// This folder name is unique for each query, as long as the query id in the study definition is unique for each query.
-    /// 
+    ///
     /// @param query The query the folder is created for
     private void createQueryResultFolder(String query) throws IOException {
         Path queryResultFolder = getPathToQueryDirectory(query);
@@ -316,19 +316,19 @@ public class StudyRepository {
     /// Returns a string that can be used as a folder name.
     /// This removes all characters from the query that are illegal for directory names.
     /// Structure: ID-trimmed query
-    /// 
+    ///
     /// Examples:
     /// Input: '(title: test-title AND abstract: Test)' as a query entry with id 12345678
     /// Output: '12345678 - title= test-title AND abstract= Test'
-    /// 
+    ///
     /// Input: 'abstract: Test*' as a query entry with id 87654321
     /// Output: '87654321 - abstract= Test'
-    /// 
+    ///
     /// Input: '"test driven"' as a query entry with id 12348765
     /// Output: '12348765 - test driven'
-    /// 
+    ///
     /// Note that this method might be similar to {@link org.jabref.logic.util.io.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
-    /// 
+    ///
     /// @param query that is trimmed and combined with its query id
     /// @return a unique folder name for any query.
     private String trimNameAndAddID(String query) {
@@ -350,7 +350,7 @@ public class StudyRepository {
     }
 
     /// Persists the crawling results in the local file based repository.
-    /// 
+    ///
     /// @param crawlResults The results that shall be persisted.
     private void persistResults(List<QueryResult> crawlResults) throws IOException, SaveException {
         DatabaseMerger merger = new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator());

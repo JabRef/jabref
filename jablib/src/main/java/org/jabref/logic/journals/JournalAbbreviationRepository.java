@@ -32,7 +32,7 @@ public class JournalAbbreviationRepository {
     private final LtwaRepository ltwaRepository;
 
     /// Initializes the internal data based on the abbreviations found in the given MV file
-    /// 
+    ///
     /// @param journalList    The path to the MV file containing the journal abbreviations.
     /// @param ltwaRepository The LTWA repository to use for abbreviations.
     public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
@@ -120,7 +120,7 @@ public class JournalAbbreviationRepository {
 
     /// Attempts to get the abbreviation of the journal given.
     /// if no exact match is found, attempts a fuzzy match on full journal names.
-    /// 
+    ///
     /// @param input The journal name (either full name or abbreviated name).
     public Optional<Abbreviation> get(String input) {
         // Clean up input: trim and unescape ampersand

@@ -32,7 +32,7 @@ public class FileFieldWriter {
 
     /// Encodes a two-dimensional String array into a single string, using ':' and
     /// ';' as separators. The characters ':' and ';' are escaped with '\'.
-    /// 
+    ///
     /// @param values The String array.
     /// @return The encoded String.
     public static String encodeStringArray(String[][] values) {
@@ -43,7 +43,7 @@ public class FileFieldWriter {
 
     /// Encodes a String array into a single string, using ':' as separator.
     /// The characters ':' and ';' are escaped with '\'.
-    /// 
+    ///
     /// @param entry The String array.
     /// @return The encoded String.
     private static String encodeStringArray(String[] entry) {

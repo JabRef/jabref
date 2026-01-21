@@ -13,7 +13,7 @@ import org.jabref.model.openoffice.style.CitationType;
 import org.jspecify.annotations.NonNull;
 
 /// How and what is encoded in reference mark names under JabRef 5.2.
-/// 
+///
 /// - pageInfo does not appear here. It is not encoded in the mark name.
 class Codec52 {
     private static final String BIB_CITATION = "JR_cite";
@@ -67,13 +67,13 @@ class Codec52 {
     }
 
     /// Produce a reference mark name for JabRef for the given citationType and list citation keys that does not yet appear among the reference marks of the document.
-    /// 
+    ///
     /// @param usedNames    Reference mark names already in use.
     /// @param citationKeys Identifies the cited sources.
     /// @param citationType Encodes the effect of withText and inParenthesis options.
-    /// 
+    ///
     /// The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
-    /// 
+    ///
     /// Or the first unused in this series, after removals.
     public static String getUniqueMarkName(Set<String> usedNames,
                                            List<String> citationKeys,
@@ -92,7 +92,7 @@ class Codec52 {
     }
 
     /// Parse a JabRef (reference) mark name.
-    /// 
+    ///
     /// @return Optional.empty() on failure.
     public static Optional<ParsedMarkName> parseMarkName(String refMarkName) {
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
@@ -113,7 +113,7 @@ class Codec52 {
     }
 
     /// Filter a list of reference mark names by `isJabRefReferenceMarkName`
-    /// 
+    ///
     /// @param names The list to be filtered.
     public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
         return names.stream()

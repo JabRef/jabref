@@ -45,7 +45,7 @@ public class DatabaseFileLookup {
     /// for the provided file for every {@link BibEntry} in the database. <br>
     /// <br>
     /// For the matching, the absolute file paths will be used.
-    /// 
+    ///
     /// @param pathname A {@link File} Object.
     /// @return `true`, if the file Object is stored in at least one
     /// entry in the database, otherwise `false`.

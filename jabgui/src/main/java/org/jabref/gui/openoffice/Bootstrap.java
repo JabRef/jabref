@@ -55,15 +55,15 @@ import com.sun.star.uno.XComponentContext;
 /// Bootstrap offers functionality to obtain a context or simply
 /// a service manager.
 /// The service manager can create a few basic services, whose implementations  are:
-/// 
+///
 /// - com.sun.star.comp.loader.JavaLoader
 /// - com.sun.star.comp.urlresolver.UrlResolver
 /// - com.sun.star.comp.bridgefactory.BridgeFactory
 /// - com.sun.star.comp.connections.Connector
 /// - com.sun.star.comp.connections.Acceptor
 /// - com.sun.star.comp.servicemanager.ServiceManager
-/// 
-/// 
+///
+///
 /// Other services can be inserted into the service manager by
 /// using its XSet interface:
 /// <pre>
@@ -101,10 +101,10 @@ public class Bootstrap {
     /// list.remove("--nologo");
     /// list.remove("--nodefault");
     /// list.add("--invisible");
-    /// 
+    ///
     /// Bootstrap.bootstrap( list.toArray( new String[list.size()] );
     /// </pre>
-    /// 
+    ///
     /// @return an array of default commandline options
     /// @see #bootstrap(String[])
     /// @since LibreOffice 5.1
@@ -113,7 +113,7 @@ public class Bootstrap {
     }
 
     /// backwards compatibility stub.
-    /// 
+    ///
     /// @param context_entries the hash table contains mappings of entry names (type string) to context entries (type class ComponentContextEntry).
     /// @return a new context.
     /// @throws Exception if things go awry.
@@ -122,7 +122,7 @@ public class Bootstrap {
     }
 
     /// Bootstraps an initial component context with service manager and basic jurt components inserted.
-    /// 
+    ///
     /// @param context_entries the hash table contains mappings of entry names (type string) to context entries (type class ComponentContextEntry).
     /// @return a new context.
     /// @throws Exception if things go awry.
@@ -153,9 +153,9 @@ public class Bootstrap {
     }
 
     /// Bootstraps a servicemanager with the jurt base components registered.
-    /// 
+    ///
     /// See also UNOIDL `com.sun.star.lang.ServiceManager`.
-    /// 
+    ///
     /// @return a freshly bootstrapped service manager
     /// @throws Exception if things go awry.
     public static XMultiServiceFactory createSimpleServiceManager() throws Exception {
@@ -163,9 +163,9 @@ public class Bootstrap {
     }
 
     /// Bootstraps the initial component context from a native UNO installation.
-    /// 
+    ///
     /// @return a freshly bootstrapped component context.
-    /// 
+    ///
     /// See also
     /// `cppuhelper/defaultBootstrap_InitialComponentContext()`.
     /// @throws Exception if things go awry.
@@ -174,7 +174,7 @@ public class Bootstrap {
     }
 
     /// Backwards compatibility stub.
-    /// 
+    ///
     /// @param ini_file             ini_file (may be null: uno.rc besides cppuhelper lib)
     /// @param bootstrap_parameters bootstrap parameters (maybe null)
     /// @return a freshly bootstrapped component context.
@@ -184,10 +184,10 @@ public class Bootstrap {
     }
 
     /// Bootstraps the initial component context from a native UNO installation.
-    /// 
+    ///
     /// See also
     /// `cppuhelper/defaultBootstrap_InitialComponentContext()`.
-    /// 
+    ///
     /// @param ini_file             ini_file (may be null: uno.rc besides cppuhelper lib)
     /// @param bootstrap_parameters bootstrap parameters (maybe null)
     /// @return a freshly bootstrapped component context.
@@ -236,7 +236,7 @@ public class Bootstrap {
     private static native Object cppuhelper_bootstrap(String ini_file, String bootstrap_parameters[], ClassLoader loader);
 
     /// Bootstraps the component context from a UNO installation.
-    /// 
+    ///
     /// @return a bootstrapped component context.
     /// @throws BootstrapException if things go awry.
     /// @since UDK 3.1.0
@@ -246,7 +246,7 @@ public class Bootstrap {
     }
 
     /// Bootstraps the component context from a UNO installation.
-    /// 
+    ///
     /// @param argArray an array of strings - commandline options to start instance of soffice with
     /// @return a bootstrapped component context.
     /// @throws BootstrapException if things go awry.

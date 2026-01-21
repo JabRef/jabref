@@ -35,7 +35,7 @@ public class ExportCited {
     /// @param databases The databases to look up the citation keys in the document from.
     /// @return A new database, with cloned entries.
     /// If a key is not found, it is added to result.unresolvedKeys
-    /// 
+    ///
     /// Cross references (in StandardField.CROSSREF) are followed (not recursively): If the referenced entry is found, it is included in the result. If it is not found, it is silently ignored.
     public static GenerateDatabaseResult generateDatabase(XTextDocument doc, List<BibDatabase> databases)
             throws

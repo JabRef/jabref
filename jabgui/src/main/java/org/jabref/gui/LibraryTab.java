@@ -391,9 +391,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Sets the title of the tab modification-asterisk filename – path-fragment
-    /// 
+    ///
     /// The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
-    /// 
+    ///
     /// Example: *jabref-authors.bib – testbib
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();
@@ -581,7 +581,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
     /// Keep track of user preference:
     /// if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
-    /// 
+    ///
     /// @param numberOfEntries number of entries user is selecting
     /// @return true if user confirm to delete entry
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
@@ -620,7 +620,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// Ask if the user really wants to close the given database.
     /// Offers to save or discard the changes -- or return to the library
-    /// 
+    ///
     /// @return `true` if the user chooses to close the database
     private boolean confirmClose() {
         // Database could not have been changed, since it is still loading
@@ -734,7 +734,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
-    /// 
+    ///
     /// @return A list containing the selected entries. Is never null.
     public List<BibEntry> getSelectedEntries() {
         return mainTable.getSelectedEntries();
@@ -918,7 +918,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Removes the selected entries and files linked to selected entries from the database
-    /// 
+    ///
     /// @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
     private int doDeleteEntry(StandardActions mode, List<BibEntry> entries) {
         if (entries.isEmpty()) {
@@ -1014,7 +1014,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Creates a new library tab. Contents are loaded by the `dataLoadingTask`. Most of the other parameters are required by `resetChangeMonitor()`.
-    /// 
+    ///
     /// @param dataLoadingTask The task to execute to load the data asynchronously.
     /// @param file            the path to the file (loaded by the dataLoadingTask)
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,

@@ -105,7 +105,7 @@ public class DOI implements Identifier {
     private boolean isShortDoi = false;
 
     /// Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.
-    /// 
+    ///
     /// @param doi the DOI/Short DOI string
     /// @throws NullPointerException     if DOI/Short DOI is null
     /// @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
@@ -144,10 +144,10 @@ public class DOI implements Identifier {
     }
 
     /// Creates an `Optional<DOI>` from various schemes including URL, URN, and plain DOIs.
-    /// 
+    ///
     /// Useful for suppressing the {@link java.lang.IllegalArgumentException IllegalArgumentException}
     /// of the constructor and checking for {@link java.util.Optional#isPresent} instead.
-    /// 
+    ///
     /// @param doi the DOI/Short DOI string
     /// @return an Optional containing the DOI or an empty Optional
     public static Optional<DOI> parse(String doi) {
@@ -174,7 +174,7 @@ public class DOI implements Identifier {
     }
 
     /// Determines whether a DOI/Short DOI is valid or not
-    /// 
+    ///
     /// @param doi the DOI/Short DOI string
     /// @return true if DOI is valid, false otherwise
     public static boolean isValid(String doi) {
@@ -182,7 +182,7 @@ public class DOI implements Identifier {
     }
 
     /// Tries to find a DOI/Short DOI inside the given text.
-    /// 
+    ///
     /// @param text the Text which might contain a DOI/Short DOI
     /// @return an Optional containing the DOI or an empty Optional
     public static Optional<DOI> findInText(String text) {
@@ -216,7 +216,7 @@ public class DOI implements Identifier {
     }
 
     /// Return the plain DOI/Short DOI
-    /// 
+    ///
     /// @return the plain DOI/Short DOI value.
     @Override
     public String asString() {
@@ -224,14 +224,14 @@ public class DOI implements Identifier {
     }
 
     /// Determines whether DOI is short DOI or not
-    /// 
+    ///
     /// @return true if DOI is short DOI, false otherwise
     public boolean isShortDoi() {
         return isShortDoi;
     }
 
     /// Return a URI presentation for the DOI/Short DOI
-    /// 
+    ///
     /// @return an encoded URI representation of the DOI/Short DOI
     @Override
     public Optional<URI> getExternalURI() {
@@ -256,7 +256,7 @@ public class DOI implements Identifier {
     }
 
     /// Return an ASCII URL presentation for the DOI/Short DOI
-    /// 
+    ///
     /// @return an encoded URL representation of the DOI/Short DOI
     public String getURIAsASCIIString() {
         return getExternalURI().map(URI::toASCIIString).orElse("");

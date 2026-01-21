@@ -157,7 +157,7 @@ public class DeleteFileAction extends SimpleCommand {
     }
 
     /// Deletes the files from the entry and optionally from disk.
-    /// 
+    ///
     /// @param deleteFromDisk if true, the files are deleted from disk, otherwise they are only removed from the entry
     private void deleteFiles(boolean deleteFromDisk) {
         // default: We have a success
@@ -173,7 +173,7 @@ public class DeleteFileAction extends SimpleCommand {
     }
 
     /// Helper method to delete the specified file from disk
-    /// 
+    ///
     /// @param linkedFile The LinkedFile (file which linked to an entry) to be deleted from disk
     private void deleteFileHelper(BibDatabaseContext databaseContext, LinkedFile linkedFile) {
         Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);

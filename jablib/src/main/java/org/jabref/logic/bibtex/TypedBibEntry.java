@@ -33,7 +33,7 @@ public class TypedBibEntry {
 
     /// Checks the fields of the entry whether all required fields are set.
     /// In other words: It is checked whether this entry contains all fields it needs to be complete.
-    /// 
+    ///
     /// @return true if all required fields are set, false otherwise
     public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
         Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);

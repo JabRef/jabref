@@ -18,7 +18,7 @@ public final class JsonReader {
     }
 
     /// Converts the given input stream into a {@link JSONObject}.
-    /// 
+    ///
     /// @return A {@link JSONObject}. An empty JSON object is returned in the case an empty stream is passed.
     public static JSONObject toJsonObject(InputStream inputStream) throws ParseException {
         try {

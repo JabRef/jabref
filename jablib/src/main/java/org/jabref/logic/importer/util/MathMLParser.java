@@ -31,7 +31,7 @@ public final class MathMLParser {
 
     /// Parses the MathML element into its corresponding
     /// LaTeX representation, using an XSLT transformation file
-    /// 
+    ///
     /// @param reader the stream reader
     /// @return Returns the LaTeX representation
     public static String parse(XMLStreamReader reader) {

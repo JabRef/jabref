@@ -53,7 +53,7 @@ public class TemplateExporter extends Exporter {
     private boolean customExport;
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
-    /// 
+    ///
     /// @param displayName Name to display to the user.
     /// @param consoleName Name to call this format in the console.
     /// @param lfFileName  Name of the main layout file.
@@ -68,7 +68,7 @@ public class TemplateExporter extends Exporter {
     }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
-    /// 
+    ///
     /// @param name       to display to the user and to call this format in the console.
     /// @param lfFileName Name of the main layout file.
     /// @param extension  May or may not contain the . (for instance .txt).
@@ -87,7 +87,7 @@ public class TemplateExporter extends Exporter {
     }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
-    /// 
+    ///
     /// @param displayName Name to display to the user.
     /// @param consoleName Name to call this format in the console.
     /// @param lfFileName  Name of the main layout file.
@@ -104,7 +104,7 @@ public class TemplateExporter extends Exporter {
     }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
-    /// 
+    ///
     /// @param displayName        Name to display to the user.
     /// @param consoleName        Name to call this format in the console.
     /// @param lfFileName         Name of the main layout file.
@@ -135,16 +135,16 @@ public class TemplateExporter extends Exporter {
     /// Indicate whether this is a custom export.
     /// A custom export looks for its layout files using a normal file path,
     /// while a built-in export looks in the classpath.
-    /// 
+    ///
     /// @param custom true to indicate a custom export format.
     public void setCustomExport(boolean custom) {
         this.customExport = custom;
     }
 
     /// This method should return a reader from which the given layout file can be read.
-    /// 
+    ///
     /// Subclasses of TemplateExporter are free to override and provide their own implementation.
-    /// 
+    ///
     /// @param filename the filename
     /// @return a newly created reader
     /// @throws IOException if the reader could not be created (e.g., file is not found)

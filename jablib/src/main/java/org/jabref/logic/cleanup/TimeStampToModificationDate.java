@@ -16,7 +16,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 /// This class handles the migration from timestamp field to creationdate and modificationdate fields.
-/// 
+///
 /// If the old updateTimestamp setting is enabled, the timestamp field for each entry are migrated to the date-modified field.
 /// Otherwise it is migrated to the date-added field.
 public class TimeStampToModificationDate implements CleanupJob {

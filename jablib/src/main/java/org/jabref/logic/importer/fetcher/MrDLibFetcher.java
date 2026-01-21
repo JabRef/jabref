@@ -96,7 +96,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     /// Contact the server with the title of the selected item
-    /// 
+    ///
     /// @return Returns the server response. This is an XML document as a String.
     private String makeServerRequest(URL url) throws FetcherException {
         URLDownload urlDownload = new URLDownload(url);
@@ -109,7 +109,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     /// Constructs the query based on title of the BibEntry. Adds statistical stuff to the url.
-    /// 
+    ///
     /// @param queryWithTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
     /// @return the string used to make the query at mdl server
     private URL constructQuery(String queryWithTitle) throws URISyntaxException, MalformedURLException {
