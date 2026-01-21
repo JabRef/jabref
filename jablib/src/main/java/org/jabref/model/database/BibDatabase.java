@@ -33,7 +33,6 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.event.EntriesEventSource;
-import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -521,7 +520,7 @@ public class BibDatabase {
     /// The following events are posted:
     ///
     /// - {@link EntriesAddedEvent}
-    /// - {@link EntryChangedEvent}
+    /// - {@link org.jabref.model.entry.event.EntryChangedEvent}
     /// - {@link EntriesRemovedEvent}
     ///
     /// @param listener listener (subscriber) to add

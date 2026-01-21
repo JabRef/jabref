@@ -1,6 +1,5 @@
 package org.jabref.gui.mergeentries.threewaymerge.toolbar;
 
-import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -172,7 +171,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     ///
     ///
     /// This method is required because {@link EasyBinding} class doesn't have a method to invert a boolean property,
-    /// like {@link BooleanExpression#not()}
+    /// like {@link javafx.beans.binding.BooleanExpression#not()}
     ///
     public EasyBinding<Boolean> notShowDiffProperty() {
         return showDiffProperty().map(showDiff -> !showDiff);

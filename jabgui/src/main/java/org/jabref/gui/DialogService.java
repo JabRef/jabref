@@ -12,11 +12,8 @@ import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
@@ -32,12 +29,12 @@ import org.controlsfx.dialog.ProgressDialog;
 /// This interface provides methods to create dialogs and show them to the user.
 public interface DialogService extends NotificationService {
 
-    /// This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
+    /// This will create and display new {@link javafx.scene.control.ChoiceDialog} of type T with a default choice and a collection of possible choices
     ///
     /// @implNote The implementation should accept `null` for `defaultChoice`, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
     <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices);
 
-    /// This will create and display new {@link ChoiceDialog} of type T with a collection of possible choices
+    /// This will create and display new {@link javafx.scene.control.ChoiceDialog} of type T with a collection of possible choices
     default <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices) {
         return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
     }
@@ -48,10 +45,10 @@ public interface DialogService extends NotificationService {
         return showEditableChoiceDialogAndWait(title, content, okButtonLabel, null, choices, converter);
     }
 
-    /// This will create and display new {@link TextInputDialog} with a text fields to enter data
+    /// This will create and display new {@link javafx.scene.control.TextInputDialog} with a text fields to enter data
     Optional<String> showInputDialogAndWait(String title, String content);
 
-    /// This will create and display new {@link TextInputDialog} with a text field with a default value to enter data
+    /// This will create and display new {@link javafx.scene.control.TextInputDialog} with a text field with a default value to enter data
     Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue);
 
     /// This will create and display a new information dialog.
@@ -165,7 +162,7 @@ public interface DialogService extends NotificationService {
                                                        ButtonType... buttonTypes);
 
     /// This will create and display a new dialog showing a custom {@link DialogPane}
-    /// using custom {@link ButtonType}s, and attaches optional {@link Tooltip}s to the buttons.
+    /// using custom {@link ButtonType}s, and attaches optional {@link javafx.scene.control.Tooltip}s to the buttons.
     /// Useful for providing additional context to the user through tooltips
     /// without cluttering the main dialog content.
     ///

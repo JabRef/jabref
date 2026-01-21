@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import javafx.scene.control.CheckBoxTreeItem;
-
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.DateRange;
@@ -60,7 +58,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     /// <br>
     /// All files matched by the given {@link UnlinkedPDFFileFilter} are taken into the resulting tree. <br>
     /// <br>
-    /// The result will be a tree structure of nodes of the type {@link CheckBoxTreeItem}. <br>
+    /// The result will be a tree structure of nodes of the type {@link javafx.scene.control.CheckBoxTreeItem}. <br>
     /// <br>
     /// The user objects that are attached to the nodes is the {@link FileNodeViewModel}, which wraps the {@link
     /// File}-Object. <br>

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
-import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -254,7 +253,7 @@ public class XmpUtilWriter {
     /// The method will overwrite existing BibTeX-XMP-data, but keep other
     /// existing metadata.
     ///
-    /// The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(String, Path)}.
+    /// The code for using PDFBox is also used at {@link org.jabref.logic.exporter.EmbeddedBibFilePdfExporter#embedBibTex(String, Path)}.
     ///
     /// @param path          The file to write the entries to.
     /// @param bibtexEntries The entries to write to the file. *

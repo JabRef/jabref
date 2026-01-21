@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.logic.FilePreferences;
 
 import org.jspecify.annotations.NonNull;
 
@@ -12,7 +11,7 @@ import org.jspecify.annotations.NonNull;
 /// The class contains enough information to provide an icon, a standard extension
 /// and a link to which application handles files of this type.
 ///
-/// TODO: Move to model (and then adapt {@link org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel#fromFile(java.nio.file.Path, java.util.List, FilePreferences)}).
+/// TODO: Move to model (and then adapt {@link org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel#fromFile(java.nio.file.Path, java.util.List, org.jabref.logic.FilePreferences)}).
 public class CustomExternalFileType implements ExternalFileType {
 
     private String name;

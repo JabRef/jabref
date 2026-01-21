@@ -1,6 +1,5 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,7 +45,6 @@ public class DatabaseFileLookup {
     /// <br>
     /// For the matching, the absolute file paths will be used.
     ///
-    /// @param pathname A {@link File} Object.
     /// @return `true`, if the file Object is stored in at least one
     /// entry in the database, otherwise `false`.
     public boolean lookupDatabase(Path pathname) {

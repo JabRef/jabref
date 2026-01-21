@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -43,7 +42,7 @@ public class CleanupUrlFormatter extends Formatter {
     ///
     /// @param url should not be null
     /// @return the decoded URL as a String representation
-    /// @see URLDecoder#decode(String, Charset)
+    /// @see URLDecoder#decode(String, java.nio.charset.Charset)
     @Override
     public String format(@NonNull String url) {
         String toDecode = Objects

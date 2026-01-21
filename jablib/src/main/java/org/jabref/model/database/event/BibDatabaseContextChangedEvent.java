@@ -1,10 +1,6 @@
 package org.jabref.model.database.event;
 
-import org.jabref.model.entry.event.EntriesEvent;
-import org.jabref.model.groups.event.GroupUpdatedEvent;
-import org.jabref.model.metadata.event.MetaDataChangedEvent;
-
-/// This event is automatically fired at the same time as {@link EntriesEvent}, {@link GroupUpdatedEvent}, or {@link MetaDataChangedEvent},
+/// This event is automatically fired at the same time as {@link org.jabref.model.entry.event.EntriesEvent}, {@link org.jabref.model.groups.event.GroupUpdatedEvent}, or {@link org.jabref.model.metadata.event.MetaDataChangedEvent},
 /// because all three inherit from this class.
 public abstract class BibDatabaseContextChangedEvent {
     // If the event has been filtered out

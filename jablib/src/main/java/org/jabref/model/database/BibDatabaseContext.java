@@ -30,7 +30,6 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.study.Study;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -137,7 +136,7 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    /// Returns whether this .bib file belongs to a {@link Study}
+    /// Returns whether this .bib file belongs to a {@link org.jabref.model.study.Study}
     public boolean isStudy() {
         return this.getDatabasePath()
                    .map(path -> Crawler.FILENAME_STUDY_RESULT_BIB.equals(path.getFileName().toString()) &&

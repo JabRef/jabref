@@ -7,7 +7,6 @@ import java.util.List;
 
 import javafx.scene.input.ClipboardContent;
 
-import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -70,7 +69,7 @@ public record ClipboardContentGenerator(
         }
     }
 
-    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link BstPreviewLayout})
+    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link org.jabref.logic.bst.BstPreviewLayout})
     /// and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
     @VisibleForTesting
     static ClipboardContent processPreview(List<String> citations) {

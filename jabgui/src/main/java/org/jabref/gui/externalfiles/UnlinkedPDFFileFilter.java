@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
@@ -9,14 +8,12 @@ import java.nio.file.Path;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.DatabaseFileLookup;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 
-/// {@link FileFilter} implementation, that allows only files which are not linked in any of the {@link BibEntry}s of the
-/// specified {@link BibDatabase}.
+/// {@link java.io.FileFilter} implementation, that allows only files which are not linked in any of the {@link org.jabref.model.entry.BibEntry}s of the
+/// specified {@link org.jabref.model.database.BibDatabase}.
 ///
-/// This {@link FileFilter} sits on top of another {@link FileFilter} -implementation, which it first consults. Only if
+/// This {@link java.io.FileFilter} sits on top of another {@link java.io.FileFilter} -implementation, which it first consults. Only if
 /// this major filefilter has accepted a file, this implementation will verify on that file.
 public class UnlinkedPDFFileFilter implements DirectoryStream.Filter<Path> {
 

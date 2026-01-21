@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
-/// An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while making backups and
+/// An intelligent {@link java.util.concurrent.ExecutorService} with a {@link java.util.concurrent.BlockingQueue} prevents a high load while making backups and
 /// rejects all redundant backup tasks. This class does not manage the .bak file which is created when opening a
 /// database.
 public class BackupManager {
