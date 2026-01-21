@@ -39,9 +39,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Writing is done at {@link org.jabref.logic.exporter.MetaDataSerializer}.
- */
+/// Writing is done at {@link org.jabref.logic.exporter.MetaDataSerializer}.
 public class MetaDataParser {
 
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
@@ -91,18 +89,14 @@ public class MetaDataParser {
         return Optional.of(entryTypeBuilder.build());
     }
 
-    /**
-     * Parses the given data map and returns a new resulting {@link MetaData} instance.
-     */
+    /// Parses the given data map and returns a new resulting {@link MetaData} instance.
     public MetaData parse(Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         return parse(new MetaData(), data, keywordSeparator, userAndHost);
     }
 
-    /**
-     * Parses the data map and changes the given {@link MetaData} instance respectively.
-     *
-     * @return the given metaData instance (which is modified, too)
-     */
+    /// Parses the data map and changes the given {@link MetaData} instance respectively.
+    /// 
+    /// @return the given metaData instance (which is modified, too)
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
         Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
@@ -166,16 +160,14 @@ public class MetaDataParser {
         return metaData;
     }
 
-    /**
-     * Parse the content of the value as provided by "raw" content.
-     * <p>
-     * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
-     * because this leads to difficulties with UNC names.
-     * <p>
-     * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
-     *
-     * @param value the raw value (as stored in the .bib file)
-     */
+    /// Parse the content of the value as provided by "raw" content.
+    /// 
+    /// We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
+    /// because this leads to difficulties with UNC names.
+    /// 
+    /// No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
+    /// 
+    /// @param value the raw value (as stored in the .bib file)
     static String parseDirectory(String value) {
         value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);
         if (value.contains("\\\\\\\\")) {
@@ -195,10 +187,8 @@ public class MetaDataParser {
                            MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
     }
 
-    /**
-     * Returns the first item in the list.
-     * If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
-     */
+    /// Returns the first item in the list.
+    /// If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
     private static String getSingleItem(List<String> value) throws ParseException {
         if (value.size() == 1) {
             return value.getFirst();
@@ -224,9 +214,7 @@ public class MetaDataParser {
         return orderedValue;
     }
 
-    /**
-     * Reads the next unit. Units are delimited by ';' (MetaData.SEPARATOR_CHARACTER).
-     */
+    /// Reads the next unit. Units are delimited by ';' (MetaData.SEPARATOR_CHARACTER).
     private static Optional<String> getNextUnit(Reader reader) throws IOException {
         int c;
         boolean escape = false;
@@ -268,12 +256,10 @@ public class MetaDataParser {
         }
     }
 
-    /**
-     * Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
-     *
-     * @param entry    the metadata entry containing the user-specific .blg path.
-     * @param metaData the MetaData object to update.
-     */
+    /// Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
+    /// 
+    /// @param entry    the metadata entry containing the user-specific .blg path.
+    /// @param metaData the MetaData object to update.
     private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {
         String user = entry.getKey().substring(MetaData.BLG_FILE_PATH.length() + 1);
         List<String> values;

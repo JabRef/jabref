@@ -3,43 +3,39 @@ package org.jabref.model.entry;
 import java.util.Locale;
 import java.util.Objects;
 
-/**
- * This class models a BibTex String ("@String")
- */
+/// This class models a BibTex String ("@String")
 public class BibtexString implements Cloneable {
 
-    /**
-     * Type of a \@String.
-     * <p>
-     * Differentiate a \@String based on its usage:
-     * <p>
-     * - {@link #AUTHOR}: prefix "a", for author and editor fields.
-     * - {@link #INSTITUTION}: prefix "i", for institution and organization
-     * field
-     * - {@link #PUBLISHER}: prefix "p", for publisher fields
-     * - {@link #OTHER}: no prefix, for any field
-     * <p>
-     * Examples:
-     * <p>
-     * \@String { aKahle    = "Kahle, Brewster " } -> author
-     * \@String { aStallman = "Stallman, Richard" } -> author
-     * \@String { iMIT      = "{Massachusetts Institute of Technology ({MIT})}" } -> institution
-     * \@String { pMIT      = "{Massachusetts Institute of Technology ({MIT}) press}" } -> publisher
-     * \@String { anct      = "Anecdote" } -> other
-     * \@String { eg        = "for example" } -> other
-     * \@String { et        = " and " } -> other
-     * \@String { lBigMac   = "Big Mac" } -> other
-     * <p>
-     * Usage:
-     * <p>
-     * \@Misc {
-     * title       = "The GNU Project"
-     * author      = aStallman # et # aKahle
-     * institution = iMIT
-     * publisher   = pMIT
-     * note        = "Just " # eg
-     * }
-     */
+    /// Type of a \@String.
+    /// 
+    /// Differentiate a \@String based on its usage:
+    /// 
+    /// - {@link #AUTHOR}: prefix "a", for author and editor fields.
+    /// - {@link #INSTITUTION}: prefix "i", for institution and organization
+    /// field
+    /// - {@link #PUBLISHER}: prefix "p", for publisher fields
+    /// - {@link #OTHER}: no prefix, for any field
+    /// 
+    /// Examples:
+    /// 
+    /// \@String { aKahle    = "Kahle, Brewster " } -> author
+    /// \@String { aStallman = "Stallman, Richard" } -> author
+    /// \@String { iMIT      = "{Massachusetts Institute of Technology ({MIT})}" } -> institution
+    /// \@String { pMIT      = "{Massachusetts Institute of Technology ({MIT}) press}" } -> publisher
+    /// \@String { anct      = "Anecdote" } -> other
+    /// \@String { eg        = "for example" } -> other
+    /// \@String { et        = " and " } -> other
+    /// \@String { lBigMac   = "Big Mac" } -> other
+    /// 
+    /// Usage:
+    /// 
+    /// \@Misc {
+    /// title       = "The GNU Project"
+    /// author      = aStallman # et # aKahle
+    /// institution = iMIT
+    /// publisher   = pMIT
+    /// note        = "Just " # eg
+    /// }
     public enum Type {
         AUTHOR("a"),
         INSTITUTION("i"),
@@ -79,11 +75,9 @@ public class BibtexString implements Cloneable {
     private String parsedSerialization;
     private boolean hasChanged;
 
-    /**
-     * Default constructor. Use this if in doubt.
-     * <p>
-     * In case this constructor is used - and the library is eventually written, the serialization is generated from scratch (and not some null from parsedSerialization)
-     */
+    /// Default constructor. Use this if in doubt.
+    /// 
+    /// In case this constructor is used - and the library is eventually written, the serialization is generated from scratch (and not some null from parsedSerialization)
     public BibtexString(String name, String content) {
         this.id = IdGenerator.next();
         this.name = name;
@@ -92,12 +86,10 @@ public class BibtexString implements Cloneable {
         type = Type.get(name);
     }
 
-    /**
-     * This is used to set the parsed serialization of the string. This is used when the string is read from a BibTeX file.
-     * Do not use if not working with reading BibTeX files (or similar actions).     *
-     *
-     * @param parsedSerialization The serialization read during parsing
-     */
+    /// This is used to set the parsed serialization of the string. This is used when the string is read from a BibTeX file.
+    /// Do not use if not working with reading BibTeX files (or similar actions).     *
+    /// 
+    /// @param parsedSerialization The serialization read during parsing
     public BibtexString(String name, String content, String parsedSerialization) {
         this(name, content);
         this.parsedSerialization = parsedSerialization;
@@ -113,9 +105,7 @@ public class BibtexString implements Cloneable {
         hasChanged = true;
     }
 
-    /**
-     * Returns the name/label of the string
-     */
+    /// Returns the name/label of the string
     public String getName() {
         return name;
     }

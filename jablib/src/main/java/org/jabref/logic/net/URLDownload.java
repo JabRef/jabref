@@ -92,17 +92,13 @@ public class URLDownload {
                .setDefaultHeader("User-Agent", USER_AGENT);
     }
 
-    /**
-     * @param source the URL to download from
-     * @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
-     */
+    /// @param source the URL to download from
+    /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
     public URLDownload(String source) throws MalformedURLException {
         this(URLUtil.create(source));
     }
 
-    /**
-     * @param source The URL to download.
-     */
+    /// @param source The URL to download.
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
@@ -179,12 +175,10 @@ public class URLDownload {
         return Optional.empty();
     }
 
-    /**
-     * Check the connection by using the HEAD request.
-     * UnirestException can be thrown for invalid request.
-     *
-     * @return the status code of the response
-     */
+    /// Check the connection by using the HEAD request.
+    /// UnirestException can be thrown for invalid request.
+    /// 
+    /// @return the status code of the response
     public boolean canBeReached() throws UnirestException {
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
@@ -209,22 +203,18 @@ public class URLDownload {
         }
     }
 
-    /**
-     * Downloads the web resource to a String. Uses UTF-8 as encoding.
-     *
-     * @return the downloaded string
-     */
+    /// Downloads the web resource to a String. Uses UTF-8 as encoding.
+    /// 
+    /// @return the downloaded string
     public String asString() throws FetcherException {
         return asString(StandardCharsets.UTF_8, this.openConnection());
     }
 
-    /**
-     * Downloads the web resource to a String.
-     *
-     * @param encoding   the desired String encoding
-     * @param connection an existing connection
-     * @return the downloaded string
-     */
+    /// Downloads the web resource to a String.
+    /// 
+    /// @param encoding   the desired String encoding
+    /// @param connection an existing connection
+    /// @return the downloaded string
     private static String asString(Charset encoding, URLConnection connection) throws FetcherException {
         try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {
@@ -251,11 +241,9 @@ public class URLDownload {
         }
     }
 
-    /**
-     * Downloads the web resource to a file.
-     *
-     * @param destination the destination file path.
-     */
+    /// Downloads the web resource to a file.
+    /// 
+    /// @param destination the destination file path.
     public void toFile(Path destination) throws FetcherException {
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
@@ -297,11 +285,9 @@ public class URLDownload {
         return new ProgressInputStream(new BufferedInputStream(inputStream), fileSize);
     }
 
-    /**
-     * Downloads the web resource to a temporary file.
-     *
-     * @return the path of the temporary file.
-     */
+    /// Downloads the web resource to a temporary file.
+    /// 
+    /// @return the path of the temporary file.
     public Path toTemporaryFile() throws FetcherException {
         // Determine file name and extension from source url
         String sourcePath = source.getPath();
@@ -340,13 +326,11 @@ public class URLDownload {
         }
     }
 
-    /**
-     * Open a connection to this object's URL (with specified settings).
-     * <p>
-     * If accessing an HTTP URL, remember to close the resulting connection after usage.
-     *
-     * @return an open connection
-     */
+    /// Open a connection to this object's URL (with specified settings).
+    /// 
+    /// If accessing an HTTP URL, remember to close the resulting connection after usage.
+    /// 
+    /// @return an open connection
     public URLConnection openConnection() throws FetcherException {
         URLConnection connection;
         try {

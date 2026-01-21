@@ -17,19 +17,15 @@ import org.jabref.logic.util.StandardFileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Utility class for handling Citation Style Language (CSL) files.
- * Contains shared functionality used by both runtime ({@link CSLStyleLoader}) and build-time ({@link org.jabref.generators.CitationStyleCatalogGenerator}) components.
- */
+/// Utility class for handling Citation Style Language (CSL) files.
+/// Contains shared functionality used by both runtime ({@link CSLStyleLoader}) and build-time ({@link org.jabref.generators.CitationStyleCatalogGenerator}) components.
 public final class CSLStyleUtils {
     private static final String STYLES_ROOT = "/csl-styles";
     private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
-    /**
-     * Style information record (title, numeric nature, has bibliography specification, bibliography uses hanging indent) for a citation style.
-     */
+    /// Style information record (title, numeric nature, has bibliography specification, bibliography uses hanging indent) for a citation style.
     public record StyleInfo(String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent) {
     }
 
@@ -41,19 +37,15 @@ public final class CSLStyleUtils {
         // prevent instantiation
     }
 
-    /**
-     * Checks if the given style file is a CitationStyle based on its extension
-     */
+    /// Checks if the given style file is a CitationStyle based on its extension
     public static boolean isCitationStyleFile(String styleFile) {
         return StandardFileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);
     }
 
-    /**
-     * Creates a CitationStyle from a file path.
-     *
-     * @param styleFile Path to the CSL file
-     * @return Optional containing the CitationStyle if valid, empty otherwise
-     */
+    /// Creates a CitationStyle from a file path.
+    /// 
+    /// @param styleFile Path to the CSL file
+    /// @return Optional containing the CitationStyle if valid, empty otherwise
     public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
         if (!isCitationStyleFile(styleFile)) {
             LOGGER.error("Not a .csl style file: {}", styleFile);
@@ -85,11 +77,9 @@ public final class CSLStyleUtils {
         return Optional.empty();
     }
 
-    /**
-     * Creates a CitationStyle from the input stream.
-     *
-     * @return Optional containing the CitationStyle if valid, empty otherwise
-     */
+    /// Creates a CitationStyle from the input stream.
+    /// 
+    /// @return Optional containing the CitationStyle if valid, empty otherwise
     private static Optional<CitationStyle> createCitationStyleFromSource(InputStream source, String filename, boolean isInternal) {
         try {
             String content = new String(source.readAllBytes());
@@ -110,13 +100,11 @@ public final class CSLStyleUtils {
         }
     }
 
-    /**
-     * Parses the style information from a style content using StAX.
-     *
-     * @param filename The filename of the style (for logging)
-     * @param content  The XML content of the style
-     * @return Optional containing the StyleInfo if valid, empty otherwise
-     */
+    /// Parses the style information from a style content using StAX.
+    /// 
+    /// @param filename The filename of the style (for logging)
+    /// @param content  The XML content of the style
+    /// @return Optional containing the StyleInfo if valid, empty otherwise
     public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         try {
             XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(Reader.of(content));

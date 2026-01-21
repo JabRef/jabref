@@ -11,9 +11,7 @@ import org.jabref.model.study.StudyDatabase;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * View representation of {@link StudyDatabase}
- */
+/// View representation of {@link StudyDatabase}
 public class StudyCatalogItem {
     private final StringProperty name;
     private final BooleanProperty enabled;

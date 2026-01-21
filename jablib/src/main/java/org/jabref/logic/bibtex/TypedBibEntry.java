@@ -12,9 +12,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode}-dependent results
- */
+/// Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode}-dependent results
 public class TypedBibEntry {
 
     private final BibEntry entry;
@@ -33,12 +31,10 @@ public class TypedBibEntry {
         this.mode = databaseContext.getMode();
     }
 
-    /**
-     * Checks the fields of the entry whether all required fields are set.
-     * In other words: It is checked whether this entry contains all fields it needs to be complete.
-     *
-     * @return true if all required fields are set, false otherwise
-     */
+    /// Checks the fields of the entry whether all required fields are set.
+    /// In other words: It is checked whether this entry contains all fields it needs to be complete.
+    /// 
+    /// @return true if all required fields are set, false otherwise
     public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
         Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);
         if (type.isPresent()) {
@@ -48,9 +44,7 @@ public class TypedBibEntry {
         }
     }
 
-    /**
-     * Gets the display name for the type of the entry.
-     */
+    /// Gets the display name for the type of the entry.
     public String getTypeForDisplay() {
         return entry.getType().getDisplayName();
     }

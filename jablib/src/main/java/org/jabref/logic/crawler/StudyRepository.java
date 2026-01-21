@@ -42,13 +42,11 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class manages all aspects of the study process related to the repository.
- * <p>
- * It includes the parsing of the study definition file (study.bib) into a Study instance,
- * the structured persistence of the crawling results for the study within the file based repository,
- * as well as the sharing, and versioning of results using git.
- */
+/// This class manages all aspects of the study process related to the repository.
+/// 
+/// It includes the parsing of the study definition file (study.bib) into a Study instance,
+/// the structured persistence of the crawling results for the study within the file based repository,
+/// as well as the sharing, and versioning of results using git.
 public class StudyRepository {
     // Tests work with study.yml
     public static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
@@ -71,16 +69,14 @@ public class StudyRepository {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager bibEntryTypesManager;
 
-    /**
-     * Creates a study repository.
-     *
-     * @param pathToRepository Where the repository root is located.
-     * @param gitHandler       The git handler that manages any interaction with the remote repository
-     * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
-     *                                  contain the study definition file.
-     * @throws IOException              Thrown if the given repository does not exist, or the study definition file
-     *                                  does not exist
-     */
+    /// Creates a study repository.
+    /// 
+    /// @param pathToRepository Where the repository root is located.
+    /// @param gitHandler       The git handler that manages any interaction with the remote repository
+    /// @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
+    /// contain the study definition file.
+    /// @throws IOException              Thrown if the given repository does not exist, or the study definition file
+    /// does not exist
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
                            CliPreferences preferences,
@@ -132,9 +128,7 @@ public class StudyRepository {
         }
     }
 
-    /**
-     * Returns entries stored in the repository for a certain query and fetcher
-     */
+    /// Returns entries stored in the repository for a certain query and fetcher
     public BibDatabaseContext getFetcherResultEntries(String query, String fetcherName) throws IOException {
         if (Files.exists(getPathToFetcherResultFile(query, fetcherName))) {
             return OpenDatabase.loadDatabase(getPathToFetcherResultFile(query, fetcherName),
@@ -144,9 +138,7 @@ public class StudyRepository {
         return new BibDatabaseContext();
     }
 
-    /**
-     * Returns the merged entries stored in the repository for a certain query
-     */
+    /// Returns the merged entries stored in the repository for a certain query
     public BibDatabaseContext getQueryResultEntries(String query) throws IOException {
         if (Files.exists(getPathToQueryResultFile(query))) {
             return OpenDatabase.loadDatabase(getPathToQueryResultFile(query),
@@ -156,9 +148,7 @@ public class StudyRepository {
         return new BibDatabaseContext();
     }
 
-    /**
-     * Returns the merged entries stored in the repository for all queries
-     */
+    /// Returns the merged entries stored in the repository for all queries
     public BibDatabaseContext getStudyResultEntries() throws IOException {
         if (Files.exists(getPathToStudyResultFile())) {
             return OpenDatabase.loadDatabase(getPathToStudyResultFile(),
@@ -168,21 +158,17 @@ public class StudyRepository {
         return new BibDatabaseContext();
     }
 
-    /**
-     * The study definition file contains all the definitions of a study. This method extracts this study from the yaml study definition file
-     *
-     * @return Returns the BibEntries parsed from the study definition file.
-     * @throws IOException Problem opening the input stream.
-     */
+    /// The study definition file contains all the definitions of a study. This method extracts this study from the yaml study definition file
+    /// 
+    /// @return Returns the BibEntries parsed from the study definition file.
+    /// @throws IOException Problem opening the input stream.
     private Study parseStudyFile() throws IOException {
         return new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);
     }
 
-    /**
-     * Returns all query strings of the study definition
-     *
-     * @return List of all queries as Strings.
-     */
+    /// Returns all query strings of the study definition
+    /// 
+    /// @return List of all queries as Strings.
     public List<String> getSearchQueryStrings() {
         return study.getQueries()
                     .parallelStream()
@@ -190,12 +176,10 @@ public class StudyRepository {
                     .collect(Collectors.toList());
     }
 
-    /**
-     * Extracts all active fetchers from the library entries.
-     *
-     * @return List of BibEntries of type Library
-     * @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
-     */
+    /// Extracts all active fetchers from the library entries.
+    /// 
+    /// @return List of BibEntries of type Library
+    /// @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
     public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
         return study.getDatabases()
                     .parallelStream()
@@ -207,18 +191,16 @@ public class StudyRepository {
         return study;
     }
 
-    /**
-     * Persists the result locally and remotely by following the steps:
-     * Precondition: Currently checking out work branch
-     * <ol>
-     *     <li>Update the work and search branch</li>
-     *     <li>Persist the results on the search branch</li>
-     *     <li>Manually patch the diff of the search branch onto the work branch (as the merging will not work in
-     *     certain cases without a conflict as it is context sensitive. But for this use case we do not need it to be
-     *     context sensitive. So we can just prepend the patch without checking the "context" lines.</li>
-     *     <li>Update the remote tracking branches of the work and search branch</li>
-     * </ol>
-     */
+    /// Persists the result locally and remotely by following the steps:
+    /// Precondition: Currently checking out work branch
+    /// <ol>
+    /// - Update the work and search branch
+    /// - Persist the results on the search branch
+    /// - Manually patch the diff of the search branch onto the work branch (as the merging will not work in
+    /// certain cases without a conflict as it is context sensitive. But for this use case we do not need it to be
+    /// context sensitive. So we can just prepend the patch without checking the "context" lines.
+    /// - Update the remote tracking branches of the work and search branch
+    /// </ol>
     public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException, JabRefException {
         updateWorkAndSearchBranch();
 
@@ -243,10 +225,8 @@ public class StudyRepository {
         }
     }
 
-    /**
-     * Update the remote tracking branches of the work and search branches
-     * The currently checked out branch is not changed if the method is executed successfully
-     */
+    /// Update the remote tracking branches of the work and search branches
+    /// The currently checked out branch is not changed if the method is executed successfully
     private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException, JabRefException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
 
@@ -261,10 +241,8 @@ public class StudyRepository {
         gitHandler.checkoutBranch(currentBranch);
     }
 
-    /**
-     * Updates the local work and search branches with changes from their tracking remote branches
-     * The currently checked out branch is not changed if the method is executed successfully
-     */
+    /// Updates the local work and search branches with changes from their tracking remote branches
+    /// The currently checked out branch is not changed if the method is executed successfully
     private void updateWorkAndSearchBranch() throws IOException, GitAPIException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
 
@@ -279,9 +257,7 @@ public class StudyRepository {
         gitHandler.checkoutBranch(currentBranch);
     }
 
-    /**
-     * Create for each query a folder, and for each fetcher a bib file in the query folder to store its results.
-     */
+    /// Create for each query a folder, and for each fetcher a bib file in the query folder to store its results.
     private void setUpRepositoryStructureForQueriesAndFetchers() throws IOException {
         // Cannot use stream here since IOException has to be thrown
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
@@ -297,12 +273,10 @@ public class StudyRepository {
         createStudyResultFile();
     }
 
-    /**
-     * Creates a folder using the query and its corresponding query id.
-     * This folder name is unique for each query, as long as the query id in the study definition is unique for each query.
-     *
-     * @param query The query the folder is created for
-     */
+    /// Creates a folder using the query and its corresponding query id.
+    /// This folder name is unique for each query, as long as the query id in the study definition is unique for each query.
+    /// 
+    /// @param query The query the folder is created for
     private void createQueryResultFolder(String query) throws IOException {
         Path queryResultFolder = getPathToQueryDirectory(query);
         createFolder(queryResultFolder);
@@ -339,26 +313,24 @@ public class StudyRepository {
         }
     }
 
-    /**
-     * Returns a string that can be used as a folder name.
-     * This removes all characters from the query that are illegal for directory names.
-     * Structure: ID-trimmed query
-     * <p>
-     * Examples:
-     * Input: '(title: test-title AND abstract: Test)' as a query entry with id 12345678
-     * Output: '12345678 - title= test-title AND abstract= Test'
-     * <p>
-     * Input: 'abstract: Test*' as a query entry with id 87654321
-     * Output: '87654321 - abstract= Test'
-     * <p>
-     * Input: '"test driven"' as a query entry with id 12348765
-     * Output: '12348765 - test driven'
-     * <p>
-     * Note that this method might be similar to {@link org.jabref.logic.util.io.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
-     *
-     * @param query that is trimmed and combined with its query id
-     * @return a unique folder name for any query.
-     */
+    /// Returns a string that can be used as a folder name.
+    /// This removes all characters from the query that are illegal for directory names.
+    /// Structure: ID-trimmed query
+    /// 
+    /// Examples:
+    /// Input: '(title: test-title AND abstract: Test)' as a query entry with id 12345678
+    /// Output: '12345678 - title= test-title AND abstract= Test'
+    /// 
+    /// Input: 'abstract: Test*' as a query entry with id 87654321
+    /// Output: '87654321 - abstract= Test'
+    /// 
+    /// Input: '"test driven"' as a query entry with id 12348765
+    /// Output: '12348765 - test driven'
+    /// 
+    /// Note that this method might be similar to {@link org.jabref.logic.util.io.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
+    /// 
+    /// @param query that is trimmed and combined with its query id
+    /// @return a unique folder name for any query.
     private String trimNameAndAddID(String query) {
         // Replace all field: with field= for folder name
         String trimmedNamed = MATCH_COLON.matcher(query).replaceAll("=");
@@ -372,18 +344,14 @@ public class StudyRepository {
         return id + " - " + trimmedNamed;
     }
 
-    /**
-     * Helper to compute the query id for folder name creation.
-     */
+    /// Helper to compute the query id for folder name creation.
     private String computeIDForQuery(String query) {
         return String.valueOf(query.hashCode());
     }
 
-    /**
-     * Persists the crawling results in the local file based repository.
-     *
-     * @param crawlResults The results that shall be persisted.
-     */
+    /// Persists the crawling results in the local file based repository.
+    /// 
+    /// @param crawlResults The results that shall be persisted.
     private void persistResults(List<QueryResult> crawlResults) throws IOException, SaveException {
         DatabaseMerger merger = new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator());
         BibDatabase newStudyResultEntries = new BibDatabase();

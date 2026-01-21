@@ -31,12 +31,10 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
- * <p>
- * Note that we also have custom fetchers in place.
- * See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
- */
+/// FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
+/// 
+/// Note that we also have custom fetchers in place.
+/// See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
 public class DoiResolution implements FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
@@ -136,10 +134,8 @@ public class DoiResolution implements FulltextFetcher {
         return Optional.empty();
     }
 
-    /**
-     * Scan for {@code <meta name="citation_pdf_url">}.
-     * See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
-     */
+    /// Scan for `<meta name="citation_pdf_url">`.
+    /// See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
     private Optional<URL> citationMetaTag(Document html) {
         Elements citationPdfUrlElement = html.head().select("meta[name='citation_pdf_url']");
         Optional<String> citationPdfUrl = citationPdfUrlElement.stream().map(e -> e.attr("content")).findFirst();

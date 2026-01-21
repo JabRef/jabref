@@ -36,13 +36,11 @@ import org.jspecify.annotations.Nullable;
 import static java.util.Comparator.comparingDouble;
 import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_KEY;
 
-/**
- * A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
- * <p>
- * Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
- * string (the content).
- * <p>
- */
+/// A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
+/// 
+/// Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
+/// string (the content).
+/// 
 public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore<TextSegment> {
 
     private static final EmbeddingRecord EMPTY_EMBEDDING_RECORD = new EmbeddingRecord(null, "", new float[0]);

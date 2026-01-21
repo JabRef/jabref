@@ -88,17 +88,15 @@ public class OOFrontend {
         return citationGroups;
     }
 
-    /**
-     * Creates a list of {@code RangeSortable<CitationGroup>} values for our {@code CitationGroup} values. Originally designed to be passed to {@code visualSort}.
-     * <p>
-     * The elements of the returned list are actually of type {@code RangeSortEntry<CitationGroup>}.
-     * <p>
-     * The result is sorted within {@code XTextRange.getText()} partitions of the citation groups according to their {@code XTextRange} (before mapping to footnote marks).
-     * <p>
-     * In the result, RangeSortable.getIndexInPosition() contains unique indexes within the original partition (not after mapFootnotesToFootnoteMarks).
-     *
-     * @param mapFootnotesToFootnoteMarks If true, replace ranges in footnotes with the range of the corresponding footnote mark. This is used for numbering the citations.
-     */
+    /// Creates a list of `RangeSortable<CitationGroup>` values for our `CitationGroup` values. Originally designed to be passed to `visualSort`.
+    /// 
+    /// The elements of the returned list are actually of type `RangeSortEntry<CitationGroup>`.
+    /// 
+    /// The result is sorted within `XTextRange.getText()` partitions of the citation groups according to their `XTextRange` (before mapping to footnote marks).
+    /// 
+    /// In the result, RangeSortable.getIndexInPosition() contains unique indexes within the original partition (not after mapFootnotesToFootnoteMarks).
+    /// 
+    /// @param mapFootnotesToFootnoteMarks If true, replace ranges in footnotes with the range of the corresponding footnote mark. This is used for numbering the citations.
     private List<RangeSortable<CitationGroup>> createVisualSortInput(XTextDocument doc,
                                                                      boolean mapFootnotesToFootnoteMarks)
             throws
@@ -152,10 +150,8 @@ public class OOFrontend {
         return new ArrayList<>(result);
     }
 
-    /**
-     * @param mapFootnotesToFootnoteMarks If true, sort reference marks in footnotes as if they appeared at the corresponding footnote mark.
-     * @return citation groups sorted by their visual positions. Limitation: for two column layout visual (top-down, left-right) order does not match the expected (textual) order.
-     */
+    /// @param mapFootnotesToFootnoteMarks If true, sort reference marks in footnotes as if they appeared at the corresponding footnote mark.
+    /// @return citation groups sorted by their visual positions. Limitation: for two column layout visual (top-down, left-right) order does not match the expected (textual) order.
     private List<CitationGroup> getVisuallySortedCitationGroups(XTextDocument doc,
                                                                 boolean mapFootnotesToFootnoteMarks,
                                                                 FunctionalTextViewCursor fcursor)
@@ -172,11 +168,9 @@ public class OOFrontend {
                      .collect(Collectors.toList());
     }
 
-    /**
-     * Return citation groups in visual order within (but not across) XText partitions.
-     * <p>
-     * This is (1) sufficient for combineCiteMarkers which looks for consecutive XTextRanges within each XText, (2) not confused by multicolumn layout or multipage display.
-     */
+    /// Return citation groups in visual order within (but not across) XText partitions.
+    /// 
+    /// This is (1) sufficient for combineCiteMarkers which looks for consecutive XTextRanges within each XText, (2) not confused by multicolumn layout or multipage display.
     public List<CitationGroup>
     getCitationGroupsSortedWithinPartitions(XTextDocument doc, boolean mapFootnotesToFootnoteMarks)
             throws
@@ -190,16 +184,14 @@ public class OOFrontend {
         return sortables.stream().map(RangeSortable::getContent).collect(Collectors.toList());
     }
 
-    /**
-     * Create a citation group for the given citation keys, at the end of position.
-     * <p>
-     * On return {@code position} is collapsed, and is after the inserted space, or at the end of the reference mark.
-     *
-     * @param citationKeys     In storage order
-     * @param pageInfos        In storage order
-     * @param position         Collapsed to its end.
-     * @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
-     */
+    /// Create a citation group for the given citation keys, at the end of position.
+    /// 
+    /// On return `position` is collapsed, and is after the inserted space, or at the end of the reference mark.
+    /// 
+    /// @param citationKeys     In storage order
+    /// @param pageInfos        In storage order
+    /// @param position         Collapsed to its end.
+    /// @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
@@ -228,9 +220,7 @@ public class OOFrontend {
         return group;
     }
 
-    /**
-     * Remove {@code group} both from the document and notify {@code citationGroups}
-     */
+    /// Remove `group` both from the document and notify `citationGroups`
     public void removeCitationGroup(CitationGroup group, XTextDocument doc)
             throws
             WrappedTargetException,
@@ -252,11 +242,9 @@ public class OOFrontend {
         }
     }
 
-    /**
-     * ranges controlled by citation groups should not overlap with each other.
-     *
-     * @return Optional.empty() if the reference mark is missing.
-     */
+    /// ranges controlled by citation groups should not overlap with each other.
+    /// 
+    /// @return Optional.empty() if the reference mark is missing.
     public Optional<XTextRange> getMarkRange(XTextDocument doc, CitationGroup group)
             throws
             NoDocumentException,
@@ -272,9 +260,7 @@ public class OOFrontend {
         return backend.getFillCursorForCitationGroup(group, doc);
     }
 
-    /**
-     * Remove brackets added by getFillCursorForCitationGroup.
-     */
+    /// Remove brackets added by getFillCursorForCitationGroup.
     public void cleanFillCursorForCitationGroup(XTextDocument doc, CitationGroup group)
             throws
             NoDocumentException,
@@ -283,9 +269,7 @@ public class OOFrontend {
         backend.cleanFillCursorForCitationGroup(group, doc);
     }
 
-    /**
-     * @return A RangeForOverlapCheck for each citation group. result.size() == nRefMarks
-     */
+    /// @return A RangeForOverlapCheck for each citation group. result.size() == nRefMarks
     public List<RangeForOverlapCheck<CitationGroupId>> citationRanges(XTextDocument doc)
             throws
             NoDocumentException,
@@ -337,11 +321,9 @@ public class OOFrontend {
         return result;
     }
 
-    /**
-     * @return A range for each footnote mark where the footnote contains at least one citation group. Purpose: We do not want markers of footnotes containing reference marks to overlap with reference marks. Overwriting these footnote marks might kill our reference marks in the footnote.
-     * <p>
-     * Note: Here we directly communicate to the document, not through the backend. This is because mapping ranges to footnote marks does not depend on how do we mark or structure those ranges.
-     */
+    /// @return A range for each footnote mark where the footnote contains at least one citation group. Purpose: We do not want markers of footnotes containing reference marks to overlap with reference marks. Overwriting these footnote marks might kill our reference marks in the footnote.
+    /// 
+    /// Note: Here we directly communicate to the document, not through the backend. This is because mapping ranges to footnote marks does not depend on how do we mark or structure those ranges.
     public List<RangeForOverlapCheck<CitationGroupId>>
     footnoteMarkRanges(XTextDocument doc, List<RangeForOverlapCheck<CitationGroupId>> citationRanges) {
         // We partition by XText and use a single range from
@@ -401,13 +383,11 @@ public class OOFrontend {
         return msg.toString();
     }
 
-    /**
-     * Check for any overlap between userRanges and protected ranges.
-     * <p>
-     * Assume userRanges is small (usually 1 elements for checking the cursor)
-     * <p>
-     * Returns on first problem found.
-     */
+    /// Check for any overlap between userRanges and protected ranges.
+    /// 
+    /// Assume userRanges is small (usually 1 elements for checking the cursor)
+    /// 
+    /// Returns on first problem found.
     public OOVoidResult<JabRefException>
     checkRangeOverlapsWithCursor(XTextDocument doc,
                                  List<RangeForOverlapCheck<CitationGroupId>> userRanges,
@@ -437,10 +417,8 @@ public class OOFrontend {
                 rangeOverlapsToMessage(overlaps)));
     }
 
-    /**
-     * @param requireSeparation Report range pairs that only share a boundary.
-     * @param reportAtMost      Limit number of overlaps reported (0 for no limit)
-     */
+    /// @param requireSeparation Report range pairs that only share a boundary.
+    /// @param reportAtMost      Limit number of overlaps reported (0 for no limit)
     public OOVoidResult<JabRefException> checkRangeOverlaps(XTextDocument doc,
                                                             List<RangeForOverlapCheck<CitationGroupId>> userRanges,
                                                             boolean requireSeparation,
@@ -466,23 +444,21 @@ public class OOFrontend {
                 rangeOverlapsToMessage(overlaps)));
     }
 
-    /**
-     * GUI: Get a list of CitationEntry objects corresponding to citations in the document.
-     * <p>
-     * Called from: ManageCitationsDialogViewModel constructor.
-     *
-     * @return A list with entries corresponding to citations in the text, in arbitrary order (same order as from getJabRefReferenceMarkNames). Note: visual or alphabetic order could be more manageable for the user. We could provide these here, but switching between them needs change on GUI (adding a toggle or selector).
-     * <p>
-     * Note: CitationEntry implements Comparable, where compareTo() and equals() are based on refMarkName.  The order used in the "Manage citations" dialog does not seem to use that.
-     * <p>
-     * The 1st is labeled "Citation" (show citation in bold, and some context around it).
-     * <p>
-     * The columns can be sorted by clicking on the column title.  For the "Citation" column, the sorting is based on the content, (the context before the citation), not on the citation itself.
-     * <p>
-     * In the "Extra information ..." column some visual indication of the editable part could be helpful.
-     * <p>
-     * Wish: selecting an entry (or a button in the line) in the GUI could move the cursor in the document to the entry.
-     */
+    /// GUI: Get a list of CitationEntry objects corresponding to citations in the document.
+    /// 
+    /// Called from: ManageCitationsDialogViewModel constructor.
+    /// 
+    /// @return A list with entries corresponding to citations in the text, in arbitrary order (same order as from getJabRefReferenceMarkNames). Note: visual or alphabetic order could be more manageable for the user. We could provide these here, but switching between them needs change on GUI (adding a toggle or selector).
+    /// 
+    /// Note: CitationEntry implements Comparable, where compareTo() and equals() are based on refMarkName.  The order used in the "Manage citations" dialog does not seem to use that.
+    /// 
+    /// The 1st is labeled "Citation" (show citation in bold, and some context around it).
+    /// 
+    /// The columns can be sorted by clicking on the column title.  For the "Citation" column, the sorting is based on the content, (the context before the citation), not on the citation itself.
+    /// 
+    /// In the "Extra information ..." column some visual indication of the editable part could be helpful.
+    /// 
+    /// Wish: selecting an entry (or a button in the line) in the GUI could move the cursor in the document to the entry.
     public List<CitationEntry> getCitationEntries(XTextDocument doc)
             throws
             WrappedTargetException,

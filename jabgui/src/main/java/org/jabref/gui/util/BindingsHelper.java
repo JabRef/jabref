@@ -29,9 +29,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.PreboundBinding;
 import com.tobiasdiez.easybind.Subscription;
 
-/**
- * Helper methods for javafx binding. Some methods are taken from https://bugs.openjdk.java.net/browse/JDK-8134679
- */
+/// Helper methods for javafx binding. Some methods are taken from https://bugs.openjdk.java.net/browse/JDK-8134679
 public class BindingsHelper {
 
     private BindingsHelper() {
@@ -59,25 +57,19 @@ public class BindingsHelper {
         return list;
     }
 
-    /**
-     * Binds propertyA bidirectional to propertyB using the provided map functions to convert between them.
-     */
+    /// Binds propertyA bidirectional to propertyB using the provided map functions to convert between them.
     public static <A, B> void bindBidirectional(Property<A> propertyA, Property<B> propertyB, Function<A, B> mapAtoB, Function<B, A> mapBtoA) {
         Consumer<B> updateA = newValueB -> propertyA.setValue(mapBtoA.apply(newValueB));
         Consumer<A> updateB = newValueA -> propertyB.setValue(mapAtoB.apply(newValueA));
         bindBidirectional(propertyA, propertyB, updateA, updateB);
     }
 
-    /**
-     * Binds propertyA bidirectional to propertyB while using updateB to update propertyB when propertyA changed.
-     */
+    /// Binds propertyA bidirectional to propertyB while using updateB to update propertyB when propertyA changed.
     public static <A> void bindBidirectional(Property<A> propertyA, ObservableValue<A> propertyB, Consumer<A> updateB) {
         bindBidirectional(propertyA, propertyB, propertyA::setValue, updateB);
     }
 
-    /**
-     * Binds propertyA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar for updateA.
-     */
+    /// Binds propertyA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar for updateA.
     public static <A, B> void bindBidirectional(ObservableValue<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<A> updateB) {
         final BidirectionalBinding<A, B> binding = new BidirectionalBinding<>(propertyA, propertyB, updateA, updateB);
 
@@ -163,9 +155,7 @@ public class BindingsHelper {
         };
     }
 
-    /**
-     * Returns a wrapper around the given list that posts changes on the JavaFX thread.
-     */
+    /// Returns a wrapper around the given list that posts changes on the JavaFX thread.
     public static <T> ObservableList<T> forUI(ObservableList<T> list) {
         return new UiThreadList<>(list);
     }
@@ -180,14 +170,12 @@ public class BindingsHelper {
         });
     }
 
-    /**
-     * Invokes {@code subscriber} for the every new value of {@code observable}, but not for the current value.
-     *
-     * @param observable observable value to subscribe to
-     * @param subscriber action to invoke for values of {@code observable}.
-     * @return a subscription that can be used to stop invoking subscriber for any further {@code observable} changes.
-     * @apiNote {@link EasyBind#subscribe(ObservableValue, Consumer)} is similar but also invokes the {@code subscriber} for the current value
-     */
+    /// Invokes `subscriber` for the every new value of `observable`, but not for the current value.
+    /// 
+    /// @param observable observable value to subscribe to
+    /// @param subscriber action to invoke for values of `observable`.
+    /// @return a subscription that can be used to stop invoking subscriber for any further `observable` changes.
+    /// @apiNote {@link EasyBind#subscribe(ObservableValue, Consumer)} is similar but also invokes the `subscriber` for the current value
     public static <T> Subscription subscribeFuture(ObservableValue<T> observable, Consumer<? super T> subscriber) {
         ChangeListener<? super T> listener = (obs, oldValue, newValue) -> subscriber.accept(newValue);
         observable.addListener(listener);

@@ -29,11 +29,9 @@ import org.apache.xmpbox.type.BadFieldValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is used for <em>both</em> conversion from Dublin Core to BibTeX and conversion form BibTeX to Dublin Core
- * <p>
- * Related class: {@link org.jabref.logic.xmp.DocumentInformationExtractor}
- */
+/// This class is used for *both* conversion from Dublin Core to BibTeX and conversion form BibTeX to Dublin Core
+/// 
+/// Related class: {@link org.jabref.logic.xmp.DocumentInformationExtractor}
 public class DublinCoreExtractor {
 
     public static final String DC_COVERAGE = "coverage";
@@ -49,19 +47,15 @@ public class DublinCoreExtractor {
 
     private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
-    /**
-     * @param dcSchema      Metadata in DublinCore format.
-     * @param resolvedEntry The BibEntry object, which is filled during metadata extraction.
-     */
+    /// @param dcSchema      Metadata in DublinCore format.
+    /// @param resolvedEntry The BibEntry object, which is filled during metadata extraction.
     public DublinCoreExtractor(DublinCoreSchema dcSchema, XmpPreferences xmpPreferences, BibEntry resolvedEntry) {
         this.dcSchema = dcSchema;
         this.xmpPreferences = xmpPreferences;
         this.bibEntry = resolvedEntry;
     }
 
-    /**
-     * Editor in BibTeX - Contributor in DublinCore
-     */
+    /// Editor in BibTeX - Contributor in DublinCore
     private void extractEditor() {
         List<String> contributors = dcSchema.getContributors();
         if ((contributors != null) && !contributors.isEmpty()) {
@@ -69,9 +63,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Author in BibTeX - Creator in DublinCore
-     */
+    /// Author in BibTeX - Creator in DublinCore
     private void extractAuthor() {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
@@ -79,9 +71,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * BibTeX-Fields : year, [month], [day] - 'dc:date' in DublinCore
-     */
+    /// BibTeX-Fields : year, [month], [day] - 'dc:date' in DublinCore
     private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
@@ -95,9 +85,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Abstract in BibTeX - Description in DublinCore
-     */
+    /// Abstract in BibTeX - Description in DublinCore
     private void extractAbstract() {
         String description = null;
         try {
@@ -110,9 +98,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * DOI in BibTeX - Identifier in DublinCore
-     */
+    /// DOI in BibTeX - Identifier in DublinCore
     private void extractDOI() {
         String identifier = dcSchema.getIdentifier();
         if (!StringUtil.isNullOrEmpty(identifier)) {
@@ -127,9 +113,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Publisher are equivalent in both formats (BibTeX and DublinCore)
-     */
+    /// Publisher are equivalent in both formats (BibTeX and DublinCore)
     private void extractPublisher() {
         List<String> publishers = dcSchema.getPublishers();
         if ((publishers != null) && !publishers.isEmpty()) {
@@ -137,12 +121,10 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * This method sets all fields, which are custom in BibTeX and therefore supported by JabRef, but which are not
-     * included in the DublinCore format.
-     * <p>
-     * The relation attribute of DublinCore is abused to store these custom fields. The prefix <code>bibtex</code> is used.
-     */
+    /// This method sets all fields, which are custom in BibTeX and therefore supported by JabRef, but which are not
+    /// included in the DublinCore format.
+    /// 
+    /// The relation attribute of DublinCore is abused to store these custom fields. The prefix `bibtex` is used.
     private void extractBibTexFields() {
         Predicate<String> isBibTeXElement = s -> s.startsWith(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX);
         Consumer<String> splitBibTeXElement = s -> {
@@ -173,9 +155,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Rights are equivalent in both formats (BibTeX and DublinCore)
-     */
+    /// Rights are equivalent in both formats (BibTeX and DublinCore)
     private void extractRights() {
         String rights = null;
         try {
@@ -188,9 +168,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Source is equivalent in both formats (BibTeX and DublinCore)
-     */
+    /// Source is equivalent in both formats (BibTeX and DublinCore)
     private void extractSource() {
         String source = dcSchema.getSource();
         if (!StringUtil.isNullOrEmpty(source)) {
@@ -198,9 +176,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Keywords in BibTeX - Subjects in DublinCore
-     */
+    /// Keywords in BibTeX - Subjects in DublinCore
     private void extractSubject() {
         List<String> subjects = dcSchema.getSubjects();
         if ((subjects != null) && !subjects.isEmpty()) {
@@ -208,9 +184,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Title is equivalent in both formats (BibTeX and DublinCore)
-     */
+    /// Title is equivalent in both formats (BibTeX and DublinCore)
     private void extractTitle() {
         String title = null;
         try {
@@ -223,10 +197,8 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Type is equivalent in both formats (BibTeX and DublinCore)
-     * <p>Opposite method: {@link DublinCoreExtractor#fillType()}
-     */
+    /// Type is equivalent in both formats (BibTeX and DublinCore)
+    /// Opposite method: {@link DublinCoreExtractor#fillType()}
     private void extractType() {
         List<String> types = dcSchema.getTypes();
         if ((types != null) && !types.isEmpty()) {
@@ -237,9 +209,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * No equivalent in BibTeX. Will create an unknown "Coverage" field.
-     */
+    /// No equivalent in BibTeX. Will create an unknown "Coverage" field.
     private void extractCoverage() {
         String coverage = dcSchema.getCoverage();
         if (!StringUtil.isNullOrEmpty(coverage)) {
@@ -247,9 +217,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Language is equivalent in both formats (BibTeX and DublinCore)
-     */
+    /// Language is equivalent in both formats (BibTeX and DublinCore)
     private void extractLanguages() {
         StringBuilder builder = new StringBuilder();
 
@@ -260,20 +228,18 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * Helper function for retrieving a BibEntry from the DublinCore metadata in a PDF file.
-     * <p>
-     * To understand how to get hold of a DublinCore have a look in the test cases for XMPUtil.
-     * <p>
-     * The BibEntry is build by mapping individual fields in the dublin core (like creator, title, subject) to fields in
-     * a bibtex bibEntry. In case special "bibtex/" entries are contained, the normal dublin core fields take
-     * precedence. For instance, the dublin core date takes precedence over bibtex/month.
-     * <p>
-     * The opposite method is {@link DublinCoreExtractor#fillDublinCoreSchema()}
-     * </p>
-     *
-     * @return The bibEntry extracted from the document information.
-     */
+    /// Helper function for retrieving a BibEntry from the DublinCore metadata in a PDF file.
+    /// 
+    /// To understand how to get hold of a DublinCore have a look in the test cases for XMPUtil.
+    /// 
+    /// The BibEntry is build by mapping individual fields in the dublin core (like creator, title, subject) to fields in
+    /// a bibtex bibEntry. In case special "bibtex/" entries are contained, the normal dublin core fields take
+    /// precedence. For instance, the dublin core date takes precedence over bibtex/month.
+    /// 
+    /// The opposite method is {@link DublinCoreExtractor#fillDublinCoreSchema()}
+    /// 
+    /// 
+    /// @return The bibEntry extracted from the document information.
     public Optional<BibEntry> extractBibtexEntry() {
         // first extract "bibtex/" entries
         this.extractBibTexFields();
@@ -300,9 +266,7 @@ public class DublinCoreExtractor {
         return Optional.of(bibEntry);
     }
 
-    /**
-     * BibTeX: editor; DC: 'dc:contributor'
-     */
+    /// BibTeX: editor; DC: 'dc:contributor'
     private void fillContributor(String authors) {
         AuthorList list = AuthorList.parse(authors);
         for (Author author : list.getAuthors()) {
@@ -310,9 +274,7 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * BibTeX: author; DC: 'dc:creator'
-     */
+    /// BibTeX: author; DC: 'dc:creator'
     private void fillCreator(String creators) {
         AuthorList list = AuthorList.parse(creators);
         for (Author author : list.getAuthors()) {
@@ -320,38 +282,28 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * BibTeX: year, month; DC: 'dc:date'
-     */
+    /// BibTeX: year, month; DC: 'dc:date'
     private void fillDate() {
         bibEntry.getFieldOrAlias(StandardField.DATE)
                 .ifPresent(publicationDate -> dcSchema.addUnqualifiedSequenceValue("date", publicationDate));
     }
 
-    /**
-     * BibTeX: abstract; DC: 'dc:description'
-     */
+    /// BibTeX: abstract; DC: 'dc:description'
     private void fillDescription(String description) {
         dcSchema.setDescription(description);
     }
 
-    /**
-     * BibTeX:doi; DC: 'dc:identifier'
-     */
+    /// BibTeX:doi; DC: 'dc:identifier'
     private void fillIdentifier(String identifier) {
         dcSchema.setIdentifier(identifier);
     }
 
-    /**
-     * BibTeX: publisher, DC: dc:publisher
-     */
+    /// BibTeX: publisher, DC: dc:publisher
     private void fillPublisher(String publisher) {
         dcSchema.addPublisher(publisher);
     }
 
-    /**
-     * BibTeX: keywords; DC: 'dc:subject'
-     */
+    /// BibTeX: keywords; DC: 'dc:subject'
     private void fillKeywords(String value) {
         String[] keywords = value.split(xmpPreferences.getKeywordSeparator().toString());
         for (String keyword : keywords) {
@@ -359,46 +311,34 @@ public class DublinCoreExtractor {
         }
     }
 
-    /**
-     * BibTeX: title; DC: 'dc:title'
-     */
+    /// BibTeX: title; DC: 'dc:title'
     private void fillTitle(String title) {
         dcSchema.setTitle(title);
     }
 
-    /**
-     * BibTeX: Coverage (Custom Field); DC Field : Coverage
-     */
+    /// BibTeX: Coverage (Custom Field); DC Field : Coverage
     private void fillCoverage(String coverage) {
         dcSchema.setCoverage(coverage);
     }
 
-    /**
-     * BibTeX: language; DC: dc:language
-     */
+    /// BibTeX: language; DC: dc:language
     private void fillLanguages(String languages) {
         Arrays.stream(languages.split(","))
               .forEach(dcSchema::addLanguage);
     }
 
-    /**
-     * BibTeX: Rights (Custom Field); DC: dc:rights
-     */
+    /// BibTeX: Rights (Custom Field); DC: dc:rights
     private void fillRights(String rights) {
         dcSchema.addRights(null, rights.split(",")[0]);
     }
 
-    /**
-     * BibTeX: Source (Custom Field); DC: Source
-     */
+    /// BibTeX: Source (Custom Field); DC: Source
     private void fillSource(String source) {
         dcSchema.setSource(source);
     }
 
-    /**
-     * All others (+ citation key) get packaged in the dc:relation attribute with <code>bibtex/</code> prefix in the content.
-     * The value of the given field is fetched from the class variable {@link DublinCoreExtractor#bibEntry}.
-     */
+    /// All others (+ citation key) get packaged in the dc:relation attribute with `bibtex/` prefix in the content.
+    /// The value of the given field is fetched from the class variable {@link DublinCoreExtractor#bibEntry}.
     private void fillCustomField(Field field) {
         // We write the plain content of the field, because this is a custom DC field content with the semantics that
         // BibTeX data is stored. Thus, we do not need to get rid of BibTeX, but can keep it.
@@ -406,9 +346,7 @@ public class DublinCoreExtractor {
         dcSchema.addRelation(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName() + '/' + value);
     }
 
-    /**
-     * Opposite method: {@link DublinCoreExtractor#extractType()}
-     */
+    /// Opposite method: {@link DublinCoreExtractor#extractType()}
     private void fillType() {
         // BibTeX: entry type; DC: 'dc:type'
         TypedBibEntry typedEntry = new TypedBibEntry(bibEntry, BibDatabaseMode.BIBTEX);

@@ -8,11 +8,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 
-/**
- * Cited keys are collected from the citations in citation groups.
- * <p>
- * They contain backreferences to the corresponding citations in {@code where}. This allows the extra information generated using CitedKeys to be distributed back to the in-text citations.
- */
+/// Cited keys are collected from the citations in citation groups.
+/// 
+/// They contain backreferences to the corresponding citations in `where`. This allows the extra information generated using CitedKeys to be distributed back to the in-text citations.
 public class CitedKey implements
         ComparableCitedKey,
         CitationMarkerNormEntry,
@@ -93,9 +91,7 @@ public class CitedKey implements
         this.normCitMarker = normCitMarker;
     }
 
-    /**
-     * Appends to end of {@code where}
-     */
+    /// Appends to end of `where`
     void addPath(CitationPath path, Citation cit) {
         this.where.add(path);
 

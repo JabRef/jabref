@@ -15,12 +15,10 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * This class handles the migration from timestamp field to creationdate and modificationdate fields.
- * <p>
- * If the old updateTimestamp setting is enabled, the timestamp field for each entry are migrated to the date-modified field.
- * Otherwise it is migrated to the date-added field.
- */
+/// This class handles the migration from timestamp field to creationdate and modificationdate fields.
+/// 
+/// If the old updateTimestamp setting is enabled, the timestamp field for each entry are migrated to the date-modified field.
+/// Otherwise it is migrated to the date-added field.
 public class TimeStampToModificationDate implements CleanupJob {
 
     private final Field timeStampField;
@@ -29,11 +27,9 @@ public class TimeStampToModificationDate implements CleanupJob {
         timeStampField = timestampPreferences.getTimestampField();
     }
 
-    /**
-     * Formats the time stamp into the local date and time format.
-     * If the existing timestamp could not be parsed, the day/month/year "1" is used.
-     * For the time portion 00:00:00 is used.
-     */
+    /// Formats the time stamp into the local date and time format.
+    /// If the existing timestamp could not be parsed, the day/month/year "1" is used.
+    /// For the time portion 00:00:00 is used.
     private Optional<String> formatTimeStamp(String timeStamp) {
         Optional<Date> parsedDate = Date.parse(timeStamp);
         if (parsedDate.isEmpty()) {
@@ -51,10 +47,8 @@ public class TimeStampToModificationDate implements CleanupJob {
         }
     }
 
-    /**
-     * Returns the month value of the passed date if available.
-     * Otherwise returns the current month.
-     */
+    /// Returns the month value of the passed date if available.
+    /// Otherwise returns the current month.
     private int getMonth(Date date) {
         if (date.getMonth().isPresent()) {
             return date.getMonth().get().getNumber();

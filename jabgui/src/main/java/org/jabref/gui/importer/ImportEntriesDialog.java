@@ -93,14 +93,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
-    /**
-     * Creates an import dialog for entries from file sources.
-     * This constructor is used for importing entries from local files, BibTeX files,
-     * or other file-based sources that don't require pagination or search functionality.
-     *
-     * @param database the database to import into
-     * @param task     the task executed for parsing the selected files(s).
-     */
+    /// Creates an import dialog for entries from file sources.
+    /// This constructor is used for importing entries from local files, BibTeX files,
+    /// or other file-based sources that don't require pagination or search functionality.
+    /// 
+    /// @param database the database to import into
+    /// @param task     the task executed for parsing the selected files(s).
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
@@ -110,15 +108,13 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         initializeDialog();
     }
 
-    /**
-     * Creates an import dialog for entries from web-based search sources.
-     * This constructor is used for importing entries that support pagination and require search queries.
-     *
-     * @param database database where the imported entries will be added
-     * @param task     task that handles parsing and loading entries from the search results
-     * @param fetcher  the search-based fetcher implementation used to retrieve entries from the web source
-     * @param query    the search string used to find relevant entries
-     */
+    /// Creates an import dialog for entries from web-based search sources.
+    /// This constructor is used for importing entries that support pagination and require search queries.
+    /// 
+    /// @param database database where the imported entries will be added
+    /// @param task     task that handles parsing and loading entries from the search results
+    /// @param fetcher  the search-based fetcher implementation used to retrieve entries from the web source
+    /// @param query    the search string used to find relevant entries
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
         this.task = task;

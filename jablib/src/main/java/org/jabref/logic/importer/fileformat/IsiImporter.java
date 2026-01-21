@@ -330,9 +330,7 @@ public class IsiImporter extends Importer {
         return value.replace("-", "--");
     }
 
-    /**
-     * Parses the month and returns it in the JabRef format
-     */
+    /// Parses the month and returns it in the JabRef format
     static String parseMonth(String value) {
         String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
@@ -358,11 +356,9 @@ public class IsiImporter extends Importer {
         return null;
     }
 
-    /**
-     * Will expand ISI first names.
-     * <p>
-     * Fixed bug from: <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306">...</a>
-     */
+    /// Will expand ISI first names.
+    /// 
+    /// Fixed bug from: <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306">...</a>
     public static String isiAuthorConvert(String author) {
         String[] s = author.split(",");
         if (s.length != 2) {

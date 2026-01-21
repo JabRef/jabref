@@ -41,9 +41,7 @@ public class ControlHelper {
         });
     }
 
-    /**
-     * Returns a text formatter that restricts input to integers
-     */
+    /// Returns a text formatter that restricts input to integers
     public static TextFormatter<String> getIntegerTextFormatter() {
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String text = change.getText();
@@ -63,9 +61,7 @@ public class ControlHelper {
         }
     }
 
-    /**
-     * Determines where the mouse is in the given cell.
-     */
+    /// Determines where the mouse is in the given cell.
     public static DroppingMouseLocation getDroppingMouseLocation(Cell<?> cell, DragEvent event) {
         if ((cell.getHeight() * 0.25) > event.getY()) {
             return DroppingMouseLocation.TOP;
@@ -100,17 +96,15 @@ public class ControlHelper {
         removePseudoClasses(cell, dragOverBottom, dragOverCenter, dragOverTop);
     }
 
-    /**
-     * If needed, truncates a given string to <code>maxCharacters</code>, adding <code>ellipsisString</code> instead.
-     *
-     * @param text             text which should be truncated, if needed
-     * @param maxCharacters    maximum amount of characters which the resulting text should have, including the
-     *                         <code>ellipsisString</code>; if set to -1, then the default length of 75 characters will be
-     *                         used
-     * @param ellipsisString   string which should be used for indicating the truncation
-     * @param ellipsisPosition location in the given text where the truncation should be performed
-     * @return the new, truncated string
-     */
+    /// If needed, truncates a given string to `maxCharacters`, adding `ellipsisString` instead.
+    /// 
+    /// @param text             text which should be truncated, if needed
+    /// @param maxCharacters    maximum amount of characters which the resulting text should have, including the
+    /// `ellipsisString`; if set to -1, then the default length of 75 characters will be
+    /// used
+    /// @param ellipsisString   string which should be used for indicating the truncation
+    /// @param ellipsisPosition location in the given text where the truncation should be performed
+    /// @return the new, truncated string
     public static String truncateString(String text, int maxCharacters, String ellipsisString, EllipsisPosition ellipsisPosition) {
         if (text == null || text.isEmpty()) {
             return text; // return original

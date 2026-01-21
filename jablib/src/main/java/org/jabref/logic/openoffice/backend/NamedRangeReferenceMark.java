@@ -34,9 +34,7 @@ public class NamedRangeReferenceMark implements NamedRange {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NamedRangeReferenceMark.class);
 
-    /**
-     * reference mark name
-     */
+    /// reference mark name
     private final String rangeId;
 
     private NamedRangeReferenceMark(String rangeId) {
@@ -47,17 +45,15 @@ public class NamedRangeReferenceMark implements NamedRange {
         return rangeId;
     }
 
-    /**
-     * Insert {@code n} spaces in a way that reference marks just before or just after the cursor are not affected.
-     * <p>
-     * This is based on the observation, that starting two new paragraphs separates us from reference marks on either side.
-     * <p>
-     * The pattern used is: {@code safeInsertSpaces(n): para, para, left, space(n), right-delete, left(n), left-delete}
-     *
-     * @param position  Where to insert (at position.getStart())
-     * @param numSpaces Number of spaces to insert.
-     * @return a new cursor, covering the just-inserted spaces.
-     */
+    /// Insert `n` spaces in a way that reference marks just before or just after the cursor are not affected.
+    /// 
+    /// This is based on the observation, that starting two new paragraphs separates us from reference marks on either side.
+    /// 
+    /// The pattern used is: `safeInsertSpaces(n): para, para, left, space(n), right-delete, left(n), left-delete`
+    /// 
+    /// @param position  Where to insert (at position.getStart())
+    /// @param numSpaces Number of spaces to insert.
+    /// @return a new cursor, covering the just-inserted spaces.
     public static XTextCursor safeInsertSpacesBetweenReferenceMarks(XTextRange position, int numSpaces) {
         // Start with an empty cursor at position.getStart();
         XText text = position.getText();
@@ -127,9 +123,7 @@ public class NamedRangeReferenceMark implements NamedRange {
         return new NamedRangeReferenceMark(refMarkName);
     }
 
-    /**
-     * @return Optional.empty if there is no corresponding range.
-     */
+    /// @return Optional.empty if there is no corresponding range.
     static Optional<NamedRangeReferenceMark> getFromDocument(XTextDocument doc, String refMarkName)
             throws
             NoDocumentException,
@@ -138,11 +132,9 @@ public class NamedRangeReferenceMark implements NamedRange {
                                .map(e -> new NamedRangeReferenceMark(refMarkName));
     }
 
-    /**
-     * Remove it from the document.
-     * <p>
-     * See: removeCitationGroups
-     */
+    /// Remove it from the document.
+    /// 
+    /// See: removeCitationGroups
     @Override
     public void removeFromDocument(XTextDocument doc)
             throws
@@ -156,9 +148,7 @@ public class NamedRangeReferenceMark implements NamedRange {
         return rangeId;
     }
 
-    /**
-     * @return Optional.empty if the reference mark is missing. See: UnoReferenceMark.getAnchor
-     */
+    /// @return Optional.empty if the reference mark is missing. See: UnoReferenceMark.getAnchor
     @Override
     public Optional<XTextRange> getMarkRange(XTextDocument doc)
             throws
@@ -168,11 +158,9 @@ public class NamedRangeReferenceMark implements NamedRange {
         return UnoReferenceMark.getAnchor(doc, name);
     }
 
-    /**
-     * Cursor for the reference marks as is, not prepared for filling, but does not need cleanFillCursor either.
-     *
-     * @return Optional.empty() if reference mark is missing from the document, otherwise an XTextCursor for getMarkRange See: getRawCursorForCitationGroup
-     */
+    /// Cursor for the reference marks as is, not prepared for filling, but does not need cleanFillCursor either.
+    /// 
+    /// @return Optional.empty() if reference mark is missing from the document, otherwise an XTextCursor for getMarkRange See: getRawCursorForCitationGroup
     @Override
     public Optional<XTextCursor> getRawCursor(XTextDocument doc)
             throws
@@ -195,9 +183,7 @@ public class NamedRangeReferenceMark implements NamedRange {
         return full;
     }
 
-    /**
-     * See: getFillCursorForCitationGroup
-     */
+    /// See: getFillCursorForCitationGroup
     @Override
     public XTextCursor getFillCursor(XTextDocument doc)
             throws
@@ -366,11 +352,9 @@ public class NamedRangeReferenceMark implements NamedRange {
         }
     }
 
-    /**
-     * Remove brackets, but if the result would become empty, leave them; if the result would be a single characer, leave the left bracket.
-     * <p>
-     * See: cleanFillCursorForCitationGroup
-     */
+    /// Remove brackets, but if the result would become empty, leave them; if the result would be a single characer, leave the left bracket.
+    /// 
+    /// See: cleanFillCursorForCitationGroup
     @Override
     public void cleanFillCursor(XTextDocument doc)
             throws

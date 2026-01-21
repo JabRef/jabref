@@ -13,30 +13,24 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Extracts the text of marked annotations using bounding boxes.
- */
+/// Extracts the text of marked annotations using bounding boxes.
 @AllowedToUseAwt("org.apache.pdfbox.text.PDFTextStripperByArea.addRegion uses AWT's Rectangle to indicate a region")
 public final class TextExtractor {
 
     private final COSArray boundingBoxes;
     private final PDPage page;
 
-    /**
-     * @param page          the page the annotation is on, must not be null
-     * @param boundingBoxes the raw annotation, must not be null
-     */
+    /// @param page          the page the annotation is on, must not be null
+    /// @param boundingBoxes the raw annotation, must not be null
     public TextExtractor(@NonNull PDPage page, @NonNull COSArray boundingBoxes) {
         this.page = page;
         this.boundingBoxes = boundingBoxes;
     }
 
-    /**
-     * Extracts the text of a marked annotation such as highlights, underlines, strikeouts etc.
-     *
-     * @return The text of the annotation
-     * @throws IOException If the PDFTextStripperByArea fails to initialize.
-     */
+    /// Extracts the text of a marked annotation such as highlights, underlines, strikeouts etc.
+    /// 
+    /// @return The text of the annotation
+    /// @throws IOException If the PDFTextStripperByArea fails to initialize.
     public String extractMarkedText() throws IOException {
         // Text has to be extracted by the rectangle calculated from the marking
         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();

@@ -38,9 +38,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A custom exporter to write bib entries to an embedded bib file.
- */
+/// A custom exporter to write bib entries to an embedded bib file.
 public class EmbeddedBibFilePdfExporter extends Exporter {
     public static String EMBEDDED_FILE_NAME = "main.bib";
 
@@ -57,11 +55,9 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         this.fieldPreferences = fieldPreferences;
     }
 
-    /**
-     * @param databaseContext the database to export from
-     * @param file            the file to write to. If it contains "split", then the output is split into different files
-     * @param entries         a list containing all entries that should be exported
-     */
+    /// @param databaseContext the database to export from
+    /// @param file            the file to write to. If it contains "split", then the output is split into different files
+    /// @param entries         a list containing all entries that should be exported
     @Override
     public void export(@NonNull BibDatabaseContext databaseContext,
                        @NonNull Path file,
@@ -88,9 +84,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         embedBibTex(bibString, file);
     }
 
-    /**
-     * Similar method: {@link XmpUtilWriter#writeXmp(Path, BibEntry, org.jabref.model.database.BibDatabase)}
-     */
+    /// Similar method: {@link XmpUtilWriter#writeXmp(Path, BibEntry, org.jabref.model.database.BibDatabase)}
     private void embedBibTex(String bibTeX, Path path) throws IOException {
         if (!Files.exists(path) || !FileUtil.isPDFFile(path)) {
             return;

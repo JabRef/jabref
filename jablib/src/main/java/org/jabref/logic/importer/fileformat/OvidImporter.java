@@ -25,9 +25,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Imports an Ovid file.
- */
+/// Imports an Ovid file.
 public class OvidImporter extends Importer {
 
     private static final Pattern OVID_SOURCE_PATTERN = Pattern
@@ -111,12 +109,10 @@ public class OvidImporter extends Importer {
         return new ParserResult(bibitems);
     }
 
-    /**
-     * Convert a string of author names into a BibTeX-compatible format.
-     *
-     * @param content The name string.
-     * @return The formatted names.
-     */
+    /// Convert a string of author names into a BibTeX-compatible format.
+    /// 
+    /// @param content The name string.
+    /// @return The formatted names.
     private static String fixNames(String content) {
         String names;
         if (content.indexOf(';') > 0) { // LN FN; [LN FN;]*

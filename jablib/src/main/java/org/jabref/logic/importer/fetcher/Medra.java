@@ -26,13 +26,11 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 
-/**
- * A class for fetching DOIs from Medra
- *
- * @see <a href="https://data.medra.org">mEDRA Content Negotiation API</a> for an overview of the API
- * <p>
- * It requires "Accept" request Header attribute to be set to desired content-type.
- */
+/// A class for fetching DOIs from Medra
+/// 
+/// @see <a href="https://data.medra.org">mEDRA Content Negotiation API</a> for an overview of the API
+/// 
+/// It requires "Accept" request Header attribute to be set to desired content-type.
 public class Medra implements IdBasedParserFetcher {
 
     public static final String API_URL = "https://data.medra.org";

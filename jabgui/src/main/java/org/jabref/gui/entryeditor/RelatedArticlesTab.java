@@ -37,9 +37,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Tab displaying article recommendations based on the currently selected BibEntry
- */
+/// Tab displaying article recommendations based on the currently selected BibEntry
 public class RelatedArticlesTab extends EntryEditorTab {
 
     public static final String NAME = "Related articles";
@@ -68,12 +66,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
         setTooltip(new Tooltip(Localization.lang("Related articles")));
     }
 
-    /**
-     * Gets a StackPane of related article information to be displayed in the Related Articles tab
-     *
-     * @param entry The currently selected BibEntry on the JabRef UI.
-     * @return A StackPane with related article information to be displayed in the Related Articles tab.
-     */
+    /// Gets a StackPane of related article information to be displayed in the Related Articles tab
+    /// 
+    /// @param entry The currently selected BibEntry on the JabRef UI.
+    /// @return A StackPane with related article information to be displayed in the Related Articles tab.
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
         root.setId("related-articles-tab");
@@ -109,12 +105,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
         return root;
     }
 
-    /**
-     * Creates a VBox of the related article information to be used in the StackPane displayed in the Related Articles tab
-     *
-     * @param list List of BibEntries of related articles
-     * @return VBox of related article descriptions to be displayed in the Related Articles tab
-     */
+    /// Creates a VBox of the related article information to be used in the StackPane displayed in the Related Articles tab
+    /// 
+    /// @param list List of BibEntries of related articles
+    /// @return VBox of related article descriptions to be displayed in the Related Articles tab
     private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
         ScrollPane scrollPane = new ScrollPane();
 
@@ -163,11 +157,9 @@ public class RelatedArticlesTab extends EntryEditorTab {
         return scrollPane;
     }
 
-    /**
-     * Gets a ScrollPane to display error info when recommendations fail.
-     *
-     * @return ScrollPane to display in place of recommendations
-     */
+    /// Gets a ScrollPane to display error info when recommendations fail.
+    /// 
+    /// @return ScrollPane to display in place of recommendations
     private ScrollPane getErrorInfo() {
         ScrollPane scrollPane = new ScrollPane();
 
@@ -182,12 +174,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
         return scrollPane;
     }
 
-    /**
-     * Returns a consent dialog used to ask permission to send data to Mr. DLib.
-     *
-     * @param entry Currently selected BibEntry. (required to allow reloading of pane if accepted)
-     * @return StackPane returned to be placed into Related Articles tab.
-     */
+    /// Returns a consent dialog used to ask permission to send data to Mr. DLib.
+    /// 
+    /// @param entry Currently selected BibEntry. (required to allow reloading of pane if accepted)
+    /// @return StackPane returned to be placed into Related Articles tab.
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
         root.setId("related-articles-tab");

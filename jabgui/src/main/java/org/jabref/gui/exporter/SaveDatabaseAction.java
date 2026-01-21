@@ -47,13 +47,11 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for save operations
- * when closing a database or quitting the applications.
- * <p>
- * The save operation is loaded off of the GUI thread using {@link BackgroundTask}. Callers can query whether the
- * operation was canceled, or whether it was successful.
- */
+/// Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for save operations
+/// when closing a database or quitting the applications.
+/// 
+/// The save operation is loaded off of the GUI thread using {@link BackgroundTask}. Callers can query whether the
+/// operation was canceled, or whether it was successful.
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
@@ -87,9 +85,7 @@ public class SaveDatabaseAction {
         return save(libraryTab.getBibDatabaseContext(), mode);
     }
 
-    /**
-     * Asks the user for the path and saves afterward
-     */
+    /// Asks the user for the path and saves afterward
     public void saveAs() {
         askForSavePath().ifPresent(this::saveAs);
     }
@@ -132,11 +128,9 @@ public class SaveDatabaseAction {
         });
     }
 
-    /**
-     * @param file the new file name to save the database to. This is stored in the database context of the panel upon
-     *             successful save.
-     * @return true on successful save
-     */
+    /// @param file the new file name to save the database to. This is stored in the database context of the panel upon
+    /// successful save.
+    /// @return true on successful save
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
@@ -174,12 +168,10 @@ public class SaveDatabaseAction {
         return saveResult;
     }
 
-    /**
-     * Asks the user for the path to save to. Stores the directory to the preferences, which is used next time when
-     * opening the dialog.
-     *
-     * @return the path set by the user
-     */
+    /// Asks the user for the path to save to. Stores the directory to the preferences, which is used next time when
+    /// opening the dialog.
+    /// 
+    /// @return the path set by the user
     private Optional<Path> askForSavePath() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)

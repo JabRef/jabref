@@ -30,9 +30,7 @@ import org.slf4j.LoggerFactory;
 public class Highlighter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Highlighter.class);
 
-    /**
-     * Functions defined in {@link PostgreConstants#POSTGRES_FUNCTIONS}
-     */
+    /// Functions defined in {@link PostgreConstants#POSTGRES_FUNCTIONS}
     private static final String REGEXP_MARK = "SELECT regexp_mark(?, ?)";
     private static final String REGEXP_POSITIONS = "SELECT * FROM regexp_positions(?, ?)";
     private static Connection connection;

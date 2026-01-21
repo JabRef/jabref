@@ -62,13 +62,11 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         this.stateManager = stateManager;
     }
 
-    /**
-     * Since it's not possible to perform the same actions on all identifiers, specific implementations can call the {@code configure}
-     * method to tell the actions they can perform and the actions they can't. Based on this configuration, the view will enable/disable or
-     * show/hide certain UI elements for certain identifier editors.
-     * <p>
-     * <b>NOTE: This method MUST be called by all the implementation view models in their principal constructor</b>
-     */
+    /// Since it's not possible to perform the same actions on all identifiers, specific implementations can call the `configure`
+    /// method to tell the actions they can perform and the actions they can't. Based on this configuration, the view will enable/disable or
+    /// show/hide certain UI elements for certain identifier editors.
+    /// 
+    /// **NOTE: This method MUST be called by all the implementation view models in their principal constructor**
     protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier, boolean canShortenIdentifier) {
         this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
         this.canLookupIdentifier.set(canLookupIdentifier);

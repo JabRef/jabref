@@ -3,10 +3,8 @@ package org.jabref.logic.layout;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This is an abstract implementation of ParamLayoutFormatter, which provides some
- * functionality for the handling of argument strings.
- */
+/// This is an abstract implementation of ParamLayoutFormatter, which provides some
+/// functionality for the handling of argument strings.
 public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatter {
 
     private static final char SEPARATOR = ',';
@@ -14,13 +12,11 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
     protected AbstractParamLayoutFormatter() {
     }
 
-    /**
-     * Parse an argument string and return the parts of the argument. The parts are
-     * separated by commas, and escaped commas are reduced to literal commas.
-     *
-     * @param arg The argument string.
-     * @return A list of strings representing the parts of the argument.
-     */
+    /// Parse an argument string and return the parts of the argument. The parts are
+    /// separated by commas, and escaped commas are reduced to literal commas.
+    /// 
+    /// @param arg The argument string.
+    /// @return A list of strings representing the parts of the argument.
     protected static List<String> parseArgument(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();

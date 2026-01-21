@@ -2,17 +2,15 @@ package org.jabref.gui.icon;
 
 import org.kordamp.ikonli.Ikon;
 
-/**
- * Provides the same true-type font interface as MaterialDesignIcon itself, but uses a font we created ourselves that
- * contains icons that are not available in MaterialDesignIcons.
- * <p>
- * The glyphs of the ttf (speak: the icons) were created with Illustrator and a template from the material design icons
- * web-page. The art boards for each icon was exported as SVG and then converted with <a href="https://icomoon.io/app">
- * IcoMoon</a>. The final TTF font is located in the resource folder.
- *
- * @see <a href="https://github.com/JabRef/jabref/wiki/Custom-SVG-Icons-for-JabRef">Tutorial on our Wiki</a>
- * @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
- */
+/// Provides the same true-type font interface as MaterialDesignIcon itself, but uses a font we created ourselves that
+/// contains icons that are not available in MaterialDesignIcons.
+/// 
+/// The glyphs of the ttf (speak: the icons) were created with Illustrator and a template from the material design icons
+/// web-page. The art boards for each icon was exported as SVG and then converted with <a href="https://icomoon.io/app">
+/// IcoMoon</a>. The final TTF font is located in the resource folder.
+/// 
+/// @see <a href="https://github.com/JabRef/jabref/wiki/Custom-SVG-Icons-for-JabRef">Tutorial on our Wiki</a>
+/// @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
 public enum JabRefMaterialDesignIcon implements Ikon {
 
     TEX_STUDIO("jab-texstudio", '\ue900'),

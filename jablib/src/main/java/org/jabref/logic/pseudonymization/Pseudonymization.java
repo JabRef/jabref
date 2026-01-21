@@ -13,11 +13,9 @@ import org.jabref.model.entry.field.Field;
 
 import org.jspecify.annotations.NullMarked;
 
-/**
- * This class is used to anonymize a library. It is required to make private libraries available for public use.
- * <p>
- * For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
- */
+/// This class is used to anonymize a library. It is required to make private libraries available for public use.
+/// 
+/// For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
 @NullMarked
 public class Pseudonymization {
 
@@ -42,9 +40,7 @@ public class Pseudonymization {
         return new Result(result, valueMapping);
     }
 
-    /**
-     * @param fieldToValueToIdMap map containing the mapping from field to value to id, will be filled by this method
-     */
+    /// @param fieldToValueToIdMap map containing the mapping from field to value to id, will be filled by this method
     private static List<BibEntry> pseudonymizeEntries(BibDatabaseContext bibDatabaseContext, Map<Field, Map<String, Integer>> fieldToValueToIdMap) {
         List<BibEntry> entries = bibDatabaseContext.getEntries();
         List<BibEntry> newEntries = new ArrayList<>(entries.size());

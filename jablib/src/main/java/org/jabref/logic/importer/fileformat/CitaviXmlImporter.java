@@ -716,40 +716,38 @@ public class CitaviXmlImporter extends Importer implements Parser {
         }
     }
 
-    /**
-     * {@code PageRange} and {@code PageCount} tags contain text
-     * with additional markers that need to be discarded.
-     * <p>
-     * Example {@code PageCount}:
-     * {@snippet :
-     *   <PageCount>
-     *   <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
-     *   </PageCount>
-     *}
-     * Contents of {@code PageCount} after parsing above example data:
-     * {@snippet :
-     *   <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
-     *}
-     * Content of "ps" tag is returned by {@code getPages}.
-     * <p>
-     * Example {@code PageRange}:
-     * {@snippet :
-     *   <PageRange>
-     *   <![CDATA[
-     *     <sp> <n>34165</n> <in>true</in> <os>34165</os> <ps>34165</ps> </sp>
-     *     <ep> <n>34223</n> <in>true</in> <os>34223</os> <ps>34223</ps> </ep>
-     *     <os>34165-223</os>
-     *   ]]>
-     *   </PageRange>
-     *}
-     * Contents of {@code PageRange} after parsing above example data:
-     * {@snippet :
-     *   <sp> <n>24</n> <in>true</in> <os>24</os> <ps>24</ps> </sp>
-     *   <ep> <n>31</n> <in>true</in> <os>31</os> <ps>31</ps> </ep>
-     *   <os>24-31</os>
-     *}
-     * Content of "os" tag is returned by {@code getPages}.
-     */
+    /// `PageRange` and `PageCount` tags contain text
+    /// with additional markers that need to be discarded.
+    /// 
+    /// Example `PageCount`:
+    /// {@snippet :
+    /// <PageCount>
+    /// <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
+    /// </PageCount>
+    /// }
+    /// Contents of `PageCount` after parsing above example data:
+    /// {@snippet :
+    /// <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
+    /// }
+    /// Content of "ps" tag is returned by `getPages`.
+    /// 
+    /// Example `PageRange`:
+    /// {@snippet :
+    /// <PageRange>
+    /// <![CDATA[
+    /// <sp> <n>34165</n> <in>true</in> <os>34165</os> <ps>34165</ps> </sp>
+    /// <ep> <n>34223</n> <in>true</in> <os>34223</os> <ps>34223</ps> </ep>
+    /// <os>34165-223</os>
+    /// ]]>
+    /// </PageRange>
+    /// }
+    /// Contents of `PageRange` after parsing above example data:
+    /// {@snippet :
+    /// <sp> <n>24</n> <in>true</in> <os>24</os> <ps>24</ps> </sp>
+    /// <ep> <n>31</n> <in>true</in> <os>31</os> <ps>31</ps> </ep>
+    /// <os>24-31</os>
+    /// }
+    /// Content of "os" tag is returned by `getPages`.
     private String getPages(String pageRange, String pageCount) {
         String tmpStr = "";
         if ((pageCount != null) && (pageRange == null)) {

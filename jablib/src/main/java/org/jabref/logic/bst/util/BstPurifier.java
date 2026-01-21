@@ -3,16 +3,14 @@ package org.jabref.logic.bst.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- * The |built_in| function {\.{purify\$}} pops the top (string) literal, removes
- * nonalphanumeric characters except for |white_space| and |sep_char| characters
- * (these get converted to a |space|) and removes certain alphabetic characters
- * contained in the control sequences associated with a special character, and
- * pushes the resulting string. If the literal isn't a string, it complains and
- * pushes the null string.
- *
- */
+/// 
+/// The |built_in| function {\.{purify\$}} pops the top (string) literal, removes
+/// nonalphanumeric characters except for |white_space| and |sep_char| characters
+/// (these get converted to a |space|) and removes certain alphabetic characters
+/// contained in the control sequences associated with a special character, and
+/// pushes the resulting string. If the literal isn't a string, it complains and
+/// pushes the null string.
+/// 
 public class BstPurifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstPurifier.class);
 

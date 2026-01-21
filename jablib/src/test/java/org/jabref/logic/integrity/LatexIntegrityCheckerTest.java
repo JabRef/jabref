@@ -30,10 +30,8 @@ class LatexIntegrityCheckerTest {
         assertEquals(List.of(), checker.check(entry));
     }
 
-    /**
-     * This method provides inputs containing valid LaTeX Syntax which a proper parser
-     * should be able to parse without errors.
-     */
+    /// This method provides inputs containing valid LaTeX Syntax which a proper parser
+    /// should be able to parse without errors.
     private static Stream<Arguments> provideAcceptedInputs() {
         return Stream.of(
                 // Basic text inputs
@@ -146,11 +144,9 @@ class LatexIntegrityCheckerTest {
         assertEquals(List.of(new IntegrityMessage(expectedMessage, entry, field)), checker.check(entry));
     }
 
-    /**
-     * This method provides inputs containing invalid LaTeX syntax which no LaTeX parser should be able to parse
-     * without errors. The inputs are bundled with the {@link uk.ac.ed.ph.snuggletex.ErrorCode} output by the internal
-     * LaTeX parsers {@link uk.ac.ed.ph.snuggletex.SnuggleSession}.
-     */
+    /// This method provides inputs containing invalid LaTeX syntax which no LaTeX parser should be able to parse
+    /// without errors. The inputs are bundled with the {@link uk.ac.ed.ph.snuggletex.ErrorCode} output by the internal
+    /// LaTeX parsers {@link uk.ac.ed.ph.snuggletex.SnuggleSession}.
     private static Stream<Arguments> provideUnacceptedInputs() {
         return Stream.of(
 

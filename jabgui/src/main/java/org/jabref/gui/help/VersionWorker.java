@@ -18,21 +18,17 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This worker checks if there is a new version of JabRef available. If there is, it will display a dialog to the user
- * offering him multiple options to proceed (see changelog, go to the download page, ignore this version, and remind
- * later).
- * <p>
- * If the version check is executed manually and this is the latest version, it will also display a dialog to inform the
- * user.
- */
+/// This worker checks if there is a new version of JabRef available. If there is, it will display a dialog to the user
+/// offering him multiple options to proceed (see changelog, go to the download page, ignore this version, and remind
+/// later).
+/// 
+/// If the version check is executed manually and this is the latest version, it will also display a dialog to inform the
+/// user.
 public class VersionWorker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VersionWorker.class);
 
-    /**
-     * The current version of the installed JabRef
-     */
+    /// The current version of the installed JabRef
     private final Version installedVersion;
 
     private final DialogService dialogService;
@@ -51,10 +47,8 @@ public class VersionWorker {
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
     }
 
-    /**
-     * Returns a newer version excluding any non-stable versions, except if the installed one is unstable too. If no
-     * newer version was found, then an empty optional is returned.
-     */
+    /// Returns a newer version excluding any non-stable versions, except if the installed one is unstable too. If no
+    /// newer version was found, then an empty optional is returned.
     private Optional<Version> getNewVersion() throws IOException {
         List<Version> availableVersions = Version.getAllAvailableVersions();
         return installedVersion.shouldBeUpdatedTo(availableVersions);
@@ -74,9 +68,7 @@ public class VersionWorker {
                       .scheduleWith(taskExecutor, 30, TimeUnit.SECONDS);
     }
 
-    /**
-     * Prints the connection problem to the status bar and shows a dialog if it was executed manually
-     */
+    /// Prints the connection problem to the status bar and shows a dialog if it was executed manually
     private void showConnectionError(Exception exception, boolean manualExecution) {
         if (manualExecution) {
             String couldNotConnect = Localization.lang("Could not connect to the update server.");
@@ -86,10 +78,8 @@ public class VersionWorker {
         LOGGER.debug("Could not connect to the update server.", exception);
     }
 
-    /**
-     * Prints up-to-date to the status bar (and shows a dialog it was executed manually) if there is now new version.
-     * Shows a "New Version" Dialog to the user if there is.
-     */
+    /// Prints up-to-date to the status bar (and shows a dialog it was executed manually) if there is now new version.
+    /// Shows a "New Version" Dialog to the user if there is.
     private void showUpdateInfo(Optional<Version> newerVersion, boolean manualExecution) {
         // no new version could be found, only respect the ignored version on automated version checks
         if (newerVersion.isEmpty() || (newerVersion.get().equals(internalPreferences.getIgnoredVersion()) && !manualExecution)) {

@@ -4,12 +4,10 @@ import java.util.HashMap;
 
 public class UnicodeLigaturesMap extends HashMap<String, String> {
 
-    /**
-     * Ligature mapping taken from https://en.wikipedia.org/wiki/Typographic_ligature#Ligatures_in_Unicode_(Latin_alphabets)
-     * <p>
-     * The mapping is bijective. In case it is ever needed to turn the extended version back to unicode ligatures, the
-     * map can easily be reversed.
-     */
+    /// Ligature mapping taken from https://en.wikipedia.org/wiki/Typographic_ligature#Ligatures_in_Unicode_(Latin_alphabets)
+    /// 
+    /// The mapping is bijective. In case it is ever needed to turn the extended version back to unicode ligatures, the
+    /// map can easily be reversed.
     public UnicodeLigaturesMap() {
         put("\uA732", "AA");
         put("\uA733", "aa");

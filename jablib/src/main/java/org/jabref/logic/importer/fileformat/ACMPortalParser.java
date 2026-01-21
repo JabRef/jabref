@@ -41,12 +41,10 @@ public class ACMPortalParser implements Parser {
     private static final String HOST = "https://dl.acm.org";
     private static final String DOI_URL = "https://dl.acm.org/action/exportCiteProcCitation";
 
-    /**
-     * Parse the DOI of the ACM Portal search result page and obtain the corresponding BibEntry
-     *
-     * @param stream html stream
-     * @return BibEntry List
-     */
+    /// Parse the DOI of the ACM Portal search result page and obtain the corresponding BibEntry
+    /// 
+    /// @param stream html stream
+    /// @return BibEntry List
     @Override
     public List<BibEntry> parseEntries(InputStream stream) throws ParseException {
         List<BibEntry> bibEntries;
@@ -58,12 +56,10 @@ public class ACMPortalParser implements Parser {
         return bibEntries;
     }
 
-    /**
-     * Parse all DOIs from the ACM Portal search results page
-     *
-     * @param stream html stream
-     * @return DOI list
-     */
+    /// Parse all DOIs from the ACM Portal search results page
+    /// 
+    /// @param stream html stream
+    /// @return DOI list
     public List<String> parseDoiSearchPage(InputStream stream) throws ParseException {
         List<String> doiList = new ArrayList<>();
 
@@ -111,12 +107,10 @@ public class ACMPortalParser implements Parser {
         return bibEntries;
     }
 
-    /**
-     * Constructing the query url for the doi
-     *
-     * @param doiList DOI List
-     * @return query URL
-     */
+    /// Constructing the query url for the doi
+    /// 
+    /// @param doiList DOI List
+    /// @return query URL
     public URL getUrlFromDoiList(List<String> doiList) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(DOI_URL);
         uriBuilder.addParameter("targetFile", "custom-bibtex");
@@ -136,12 +130,10 @@ public class ACMPortalParser implements Parser {
         return type;
     }
 
-    /**
-     * Parse BibEntry from query result xml
-     *
-     * @param jsonStr query result in JSON format
-     * @return BibEntry parsed from query result
-     */
+    /// Parse BibEntry from query result xml
+    /// 
+    /// @param jsonStr query result in JSON format
+    /// @return BibEntry parsed from query result
     public BibEntry parseBibEntry(String jsonStr) {
         JsonObject jsonObject = JsonParser.parseString(jsonStr).getAsJsonObject();
         BibEntry bibEntry = new BibEntry();

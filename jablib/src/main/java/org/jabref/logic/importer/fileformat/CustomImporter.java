@@ -16,11 +16,9 @@ import org.jabref.logic.util.FileType;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Object with data for a custom importer.
- *
- * <p>Is also responsible for instantiating the class loader.</p>
- */
+/// Object with data for a custom importer.
+/// 
+/// Is also responsible for instantiating the class loader.
 public class CustomImporter extends Importer {
 
     private final String className;

@@ -28,15 +28,13 @@ public class MapResource {
     @Inject
     FilesToServe filesToServe;
 
-    /**
-     * At http://localhost:23119/libraries/{id}/map <br><br>
-     * <p>
-     * Looks for the .jmp file in the directory of the given library ({id}.bib file).
-     *
-     * @param id The given library
-     * @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
-     * @throws IOException
-     */
+    /// At http://localhost:23119/libraries/{id}/map <br><br>
+    /// 
+    /// Looks for the .jmp file in the directory of the given library ({id}.bib file).
+    /// 
+    /// @param id The given library
+    /// @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
+    /// @throws IOException
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJabMapJson(@PathParam("id") String id) throws IOException {
@@ -73,14 +71,12 @@ public class MapResource {
         return Files.readString(jabMapPath);
     }
 
-    /**
-     * At http://localhost:23119/libraries/{id}/map <br><br>
-     * <p>
-     * Saves the mindmap next to its associated library.
-     *
-     * @param id The given library
-     * @throws IOException
-     */
+    /// At http://localhost:23119/libraries/{id}/map <br><br>
+    /// 
+    /// Saves the mindmap next to its associated library.
+    /// 
+    /// @param id The given library
+    /// @throws IOException
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public void updateJabMapJson(@PathParam("id") String id, String fileContent) throws IOException {

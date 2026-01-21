@@ -19,16 +19,14 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A Repository that loads and stores the latest ICORE Conference Ranking Data and allows lookups using a conference's
- * acronym or title.
- * <p>
- * The ranking data is sourced from <a href="https://portal.core.edu.au/conf-ranks/">the ICORE Conference Ranking Portal</a>.
- * Since the website does not expose an API endpoint to fetch this data programmatically, it must be manually exported
- * from the website and stored as a resource. This means that when new ranking data is released, the old data must be
- * replaced and the <code>ICORE_RANK_DATA_FILE</code> variable must be modified to point to the new data file.
- * </p>
- */
+/// A Repository that loads and stores the latest ICORE Conference Ranking Data and allows lookups using a conference's
+/// acronym or title.
+/// 
+/// The ranking data is sourced from <a href="https://portal.core.edu.au/conf-ranks/">the ICORE Conference Ranking Portal</a>.
+/// Since the website does not expose an API endpoint to fetch this data programmatically, it must be manually exported
+/// from the website and stored as a resource. This means that when new ranking data is released, the old data must be
+/// replaced and the `ICORE_RANK_DATA_FILE` variable must be modified to point to the new data file.
+/// 
 public class ConferenceRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConferenceRepository.class);
     private static final String ICORE_RANK_DATA_FILE = "/icore/ICORE2023.csv";
@@ -96,19 +94,17 @@ public class ConferenceRepository {
         LOGGER.debug("Max acronym length seen in data: {}", maxAcronymLength);
     }
 
-    /**
-     * Searches the given query against the ICORE conference ranking data and returns a match, if found.
-     * <p>
-     * While searching, we first look for a conference acronym present inside parentheses, like <code>(ICSE)</code>
-     * or <code>(ICSE 2022)</code>. If acronym lookup fails, the query is processed further and matched against the list
-     * of conference titles.
-     * </p>
-     *
-     * @param bookTitle the string to search, must not be {@code null}
-     * @return an {@code Optional} conference entry, if found
-     * or {@code Optional.empty()} if no conference entry is found
-     * @implNote see {@link ConferenceRepository#fuzzySearchConferenceTitles} for more details on matching
-     */
+    /// Searches the given query against the ICORE conference ranking data and returns a match, if found.
+    /// 
+    /// While searching, we first look for a conference acronym present inside parentheses, like `(ICSE)`
+    /// or `(ICSE 2022)`. If acronym lookup fails, the query is processed further and matched against the list
+    /// of conference titles.
+    /// 
+    /// 
+    /// @param bookTitle the string to search, must not be `null`
+    /// @return an `Optional` conference entry, if found
+    /// or `Optional.empty()` if no conference entry is found
+    /// @implNote see {@link ConferenceRepository#fuzzySearchConferenceTitles} for more details on matching
     public Optional<ConferenceEntry> getConferenceFromBookTitle(@NonNull String bookTitle) {
         String query = bookTitle.strip().toLowerCase();
         ConferenceEntry conference;
@@ -148,30 +144,28 @@ public class ConferenceRepository {
         return Optional.empty();
     }
 
-    /**
-     * Searches the conference data for the given query string using a combination of Levenshtein similarity
-     * {@link StringSimilarity#similarity} and Longest Common Substring (LCS) similarity {@link StringSimilarity#LCSSimilarity}.
-     * <p>
-     * The input query is first fed through the normalizer at {@link ConferenceUtils#normalize} which strips away much of the
-     * noise.
-     * </p>
-     * <p>
-     * While searching, the function computes Levenshtein similarity and LCS similarity between the query and the current conference
-     * title (also normalized) and prioritizes them in the following order:
-     * <ol>
-     *     <li>Whenever LCS similarity returns <code>1.0</code>, i.e., a conference title is found entirely as a substring in the query.</li>
-     *     <li>Whenever Levenshtein similarity exceeds the threshold defined by the <code>LEVENSHTEIN_THRESHOLD</code> constant.</li>
-     *     <li>The combined weighted score of both LCS and Levenshtein similarities exceeds the <code>COMBINED_LCS_LEV_THRESHOLD</code>.</li>
-     * </ol>
-     * <p>
-     * The combined score is calculated as follows:
-     * <code>(0.6 * Levenshtein similarity) + (0.4 * LCS similarity)</code>
-     * </p>
-     *
-     * @param query The query string to be searched
-     * @return an {@code Optional} conference entry, if found
-     * or {@code Optional.empty()} if no conference entry is found
-     */
+    /// Searches the conference data for the given query string using a combination of Levenshtein similarity
+    /// {@link StringSimilarity#similarity} and Longest Common Substring (LCS) similarity {@link StringSimilarity#LCSSimilarity}.
+    /// 
+    /// The input query is first fed through the normalizer at {@link ConferenceUtils#normalize} which strips away much of the
+    /// noise.
+    /// 
+    /// 
+    /// While searching, the function computes Levenshtein similarity and LCS similarity between the query and the current conference
+    /// title (also normalized) and prioritizes them in the following order:
+    /// <ol>
+    /// - Whenever LCS similarity returns `1.0`, i.e., a conference title is found entirely as a substring in the query.
+    /// - Whenever Levenshtein similarity exceeds the threshold defined by the `LEVENSHTEIN_THRESHOLD` constant.
+    /// - The combined weighted score of both LCS and Levenshtein similarities exceeds the `COMBINED_LCS_LEV_THRESHOLD`.
+    /// </ol>
+    /// 
+    /// The combined score is calculated as follows:
+    /// `(0.6 * Levenshtein similarity) + (0.4 * LCS similarity)`
+    /// 
+    /// 
+    /// @param query The query string to be searched
+    /// @return an `Optional` conference entry, if found
+    /// or `Optional.empty()` if no conference entry is found
     private Optional<ConferenceEntry> fuzzySearchConferenceTitles(String query) {
         String bestMatch = "";
         double bestScore = 0.0;

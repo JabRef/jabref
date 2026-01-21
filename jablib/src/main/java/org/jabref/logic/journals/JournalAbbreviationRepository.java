@@ -19,9 +19,7 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.NonNull;
 
-/**
- * A repository for all journal abbreviations, including add and find methods.
- */
+/// A repository for all journal abbreviations, including add and find methods.
 public class JournalAbbreviationRepository {
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
@@ -33,12 +31,10 @@ public class JournalAbbreviationRepository {
     private final StringSimilarity similarity = new StringSimilarity();
     private final LtwaRepository ltwaRepository;
 
-    /**
-     * Initializes the internal data based on the abbreviations found in the given MV file
-     *
-     * @param journalList    The path to the MV file containing the journal abbreviations.
-     * @param ltwaRepository The LTWA repository to use for abbreviations.
-     */
+    /// Initializes the internal data based on the abbreviations found in the given MV file
+    /// 
+    /// @param journalList    The path to the MV file containing the journal abbreviations.
+    /// @param ltwaRepository The LTWA repository to use for abbreviations.
     public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
         MVMap<String, Abbreviation> mvFullToAbbreviationObject;
         try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
@@ -60,9 +56,7 @@ public class JournalAbbreviationRepository {
         this.ltwaRepository = ltwaRepository;
     }
 
-    /**
-     * Initializes the repository with demonstration data. Used if no abbreviation file is found.
-     */
+    /// Initializes the repository with demonstration data. Used if no abbreviation file is found.
     public JournalAbbreviationRepository() {
         Abbreviation newAbbreviation = new Abbreviation(
                 "Demonstration",
@@ -93,11 +87,9 @@ public class JournalAbbreviationRepository {
                 || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
     }
 
-    /**
-     * Returns true if the given journal name is contained in the list either in its full form
-     * (e.g., Physical Review Letters) or its abbreviated form (e.g., Phys. Rev. Lett.).
-     * If the exact match is not found, attempts a fuzzy match to recognize minor input errors.
-     */
+    /// Returns true if the given journal name is contained in the list either in its full form
+    /// (e.g., Physical Review Letters) or its abbreviated form (e.g., Phys. Rev. Lett.).
+    /// If the exact match is not found, attempts a fuzzy match to recognize minor input errors.
     public boolean isKnownName(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
@@ -105,9 +97,7 @@ public class JournalAbbreviationRepository {
         return get(journalName).isPresent();
     }
 
-    /**
-     * Get the LTWA abbreviation for the given journal name.
-     */
+    /// Get the LTWA abbreviation for the given journal name.
     public Optional<String> getLtwaAbbreviation(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return Optional.of(journalName);
@@ -115,10 +105,8 @@ public class JournalAbbreviationRepository {
         return ltwaRepository.abbreviate(journalName);
     }
 
-    /**
-     * Returns true if the given journal name is in its abbreviated form (e.g. Phys. Rev. Lett.). The test is strict,
-     * i.e., journals whose abbreviation is the same as the full name are not considered
-     */
+    /// Returns true if the given journal name is in its abbreviated form (e.g. Phys. Rev. Lett.). The test is strict,
+    /// i.e., journals whose abbreviation is the same as the full name are not considered
     public boolean isAbbreviatedName(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
@@ -130,12 +118,10 @@ public class JournalAbbreviationRepository {
                 || shortestUniqueToAbbreviationObject.containsKey(journal);
     }
 
-    /**
-     * Attempts to get the abbreviation of the journal given.
-     * if no exact match is found, attempts a fuzzy match on full journal names.
-     *
-     * @param input The journal name (either full name or abbreviated name).
-     */
+    /// Attempts to get the abbreviation of the journal given.
+    /// if no exact match is found, attempts a fuzzy match on full journal names.
+    /// 
+    /// @param input The journal name (either full name or abbreviated name).
     public Optional<Abbreviation> get(String input) {
         // Clean up input: trim and unescape ampersand
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");

@@ -29,13 +29,11 @@ public final class MathMLParser {
         throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
-    /**
-     * Parses the MathML element into its corresponding
-     * LaTeX representation, using an XSLT transformation file
-     *
-     * @param reader the stream reader
-     * @return Returns the LaTeX representation
-     */
+    /// Parses the MathML element into its corresponding
+    /// LaTeX representation, using an XSLT transformation file
+    /// 
+    /// @param reader the stream reader
+    /// @return Returns the LaTeX representation
     public static String parse(XMLStreamReader reader) {
         String xmlContent = "";
         String latexResult;

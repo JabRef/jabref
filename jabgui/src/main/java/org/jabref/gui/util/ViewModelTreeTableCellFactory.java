@@ -11,11 +11,9 @@ import javafx.util.Callback;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
- *
- * @param <S> view model
- */
+/// Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
+/// 
+/// @param <S> view model
 public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColumn<S, S>, TreeTableCell<S, S>> {
 
     private Callback<S, String> toText;

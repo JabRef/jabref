@@ -36,9 +36,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for fetching and merging bibliographic information
- */
+/// Class for fetching and merging bibliographic information
 public class FetchAndMergeEntry {
 
     // All identifiers listed here should also appear at {@link org.jabref.logic.importer.WebFetchers#getIdBasedFetcherFoIdentifier}

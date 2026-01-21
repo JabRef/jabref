@@ -14,9 +14,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Keep track of changes made to the columns (reordering, resorting, resizing).
- */
+/// Keep track of changes made to the columns (reordering, resorting, resizing).
 public class PersistenceVisualStateTable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceVisualStateTable.class);
@@ -44,23 +42,19 @@ public class PersistenceVisualStateTable {
              });
     }
 
-    /**
-     * Stores shown columns, their width and their {@link TableColumn.SortType} in preferences.
-     * The conversion to the "real" string in the preferences is made at
-     * {@link JabRefCliPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
-     */
+    /// Stores shown columns, their width and their {@link TableColumn.SortType} in preferences.
+    /// The conversion to the "real" string in the preferences is made at
+    /// {@link JabRefCliPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
     private void updateColumns() {
         List<MainTableColumnModel> list = toList(table.getColumns());
         LOGGER.debug("Updating columns to {}", list);
         preferences.setColumns(list);
     }
 
-    /**
-     * Stores the SortOrder of the Table in the preferences. This includes {@link TableColumn.SortType}.
-     * <br>
-     * Cannot be combined with updateColumns, because JavaFX would provide just an empty list for the sort order
-     * on other changes.
-     */
+    /// Stores the SortOrder of the Table in the preferences. This includes {@link TableColumn.SortType}.
+    /// <br>
+    /// Cannot be combined with updateColumns, because JavaFX would provide just an empty list for the sort order
+    /// on other changes.
     private void updateSortOrder() {
         LOGGER.debug("Updating sort order");
         preferences.setColumnSortOrder(toList(table.getSortOrder()));

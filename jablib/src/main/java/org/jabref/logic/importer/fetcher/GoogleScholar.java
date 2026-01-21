@@ -37,11 +37,9 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
- * <p>
- * Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
- */
+/// FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
+/// 
+/// Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
 public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
 

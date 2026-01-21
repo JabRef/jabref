@@ -84,11 +84,9 @@ class OOBibStyleTestHelper {
         return new CitationMarkerNumericBibEntryImpl(key, number);
     }
 
-    /**
-     * Reproduce old method
-     *
-     * @param inList true means label for the bibliography
-     */
+    /// Reproduce old method
+    /// 
+    /// @param inList true means label for the bibliography
     static String runGetNumCitationMarker2a(JStyle style,
                                             List<Integer> num, int minGroupingCount, boolean inList) {
         if (inList) {
@@ -153,10 +151,8 @@ class OOBibStyleTestHelper {
         return result;
     }
 
-    /**
-     * @implNote Similar to old API. pageInfo is new, and unlimAuthors is
-     * replaced with isFirstAppearanceOfSource
-     */
+    /// @implNote Similar to old API. pageInfo is new, and unlimAuthors is
+    /// replaced with isFirstAppearanceOfSource
     static String getCitationMarker2ab(JStyle style,
                                        List<BibEntry> entries,
                                        Map<BibEntry, BibDatabase> entryDBMap,

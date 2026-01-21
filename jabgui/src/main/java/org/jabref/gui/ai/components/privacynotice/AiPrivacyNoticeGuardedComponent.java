@@ -9,10 +9,8 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.DynamicallyChangeableNode;
 import org.jabref.logic.ai.AiPreferences;
 
-/**
- * A class that guards a component, before AI privacy policy is accepted.
- * Remember to call rebuildUi() method after initializing the guarded component. See {@link AiChatGuardedComponent} to look how it works.
- */
+/// A class that guards a component, before AI privacy policy is accepted.
+/// Remember to call rebuildUi() method after initializing the guarded component. See {@link AiChatGuardedComponent} to look how it works.
 public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangeableNode {
     private final AiPreferences aiPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;

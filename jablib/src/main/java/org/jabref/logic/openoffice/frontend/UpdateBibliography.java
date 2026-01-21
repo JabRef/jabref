@@ -34,9 +34,7 @@ public class UpdateBibliography {
         return UnoTextSection.getAnchor(doc, BIB_SECTION_NAME);
     }
 
-    /**
-     * Rebuilds the bibliography.
-     */
+    /// Rebuilds the bibliography.
     public static void rebuildBibTextSection(XTextDocument doc,
                                              OOFrontend frontend,
                                              CitedKeys bibliography,
@@ -56,11 +54,9 @@ public class UpdateBibliography {
                 alwaysAddCitedOnPages);
     }
 
-    /**
-     * Insert a paragraph break and create a text section for the bibliography.
-     * <p>
-     * Only called from `clearBibTextSectionContent2`
-     */
+    /// Insert a paragraph break and create a text section for the bibliography.
+    /// 
+    /// Only called from `clearBibTextSectionContent2`
     private static void createBibTextSection2(XTextDocument doc)
             throws
             CreationException {
@@ -73,11 +69,9 @@ public class UpdateBibliography {
         UnoTextSection.create(annotation);
     }
 
-    /**
-     * Find and clear the text section BIB_SECTION_NAME to "", or create it.
-     * <p>
-     * Only called from: `rebuildBibTextSection`
-     */
+    /// Find and clear the text section BIB_SECTION_NAME to "", or create it.
+    /// 
+    /// Only called from: `rebuildBibTextSection`
     private static void clearBibTextSectionContent2(XTextDocument doc)
             throws
             CreationException,
@@ -95,11 +89,9 @@ public class UpdateBibliography {
         }
     }
 
-    /**
-     * Only called from: `rebuildBibTextSection`
-     * <p>
-     * Assumes the section named BIB_SECTION_NAME exists.
-     */
+    /// Only called from: `rebuildBibTextSection`
+    /// 
+    /// Assumes the section named BIB_SECTION_NAME exists.
     private static void populateBibTextSection(XTextDocument doc,
                                                OOFrontend frontend,
                                                CitedKeys bibliography,

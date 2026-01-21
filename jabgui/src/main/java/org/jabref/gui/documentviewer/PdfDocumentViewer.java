@@ -20,9 +20,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A document viewer that wraps the PDFView control for displaying PDF documents.
- */
+/// A document viewer that wraps the PDFView control for displaying PDF documents.
 public class PdfDocumentViewer extends StackPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfDocumentViewer.class);

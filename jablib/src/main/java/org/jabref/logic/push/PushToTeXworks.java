@@ -8,12 +8,10 @@ public class PushToTeXworks extends AbstractPushToApplication {
 
     public static final PushApplications APPLICATION = PushApplications.TEXWORKS;
 
-    /**
-     * Constructs a new {@code PushToTeXworks} instance.
-     *
-     * @param notificationService The dialog service for displaying messages to the user.
-     * @param preferences         The service for accessing user preferences.
-     */
+    /// Constructs a new `PushToTeXworks` instance.
+    /// 
+    /// @param notificationService The dialog service for displaying messages to the user.
+    /// @param preferences         The service for accessing user preferences.
     public PushToTeXworks(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
     }

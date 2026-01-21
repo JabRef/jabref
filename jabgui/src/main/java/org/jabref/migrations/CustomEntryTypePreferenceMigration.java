@@ -41,11 +41,9 @@ class CustomEntryTypePreferenceMigration {
         preferences.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
-    /**
-     * Retrieves all deprecated information about the entry type in preferences, with the tag given by number.
-     * <p>
-     * (old implementation which has been copied)
-     */
+    /// Retrieves all deprecated information about the entry type in preferences, with the tag given by number.
+    /// 
+    /// (old implementation which has been copied)
     private static Optional<BibEntryType> getBibEntryType(int number, JabRefCliPreferences preferences) {
         String nr = String.valueOf(number);
         String name = preferences.get(CUSTOM_TYPE_NAME + nr);

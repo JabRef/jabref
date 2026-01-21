@@ -8,9 +8,7 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * This class transforms ordinal numbers into LaTeX superscripts.
- */
+/// This class transforms ordinal numbers into LaTeX superscripts.
 public class OrdinalsToSuperscriptFormatter extends Formatter {
 
     // find possible superscripts on word boundaries
@@ -29,15 +27,13 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
         return "ordinals_to_superscript";
     }
 
-    /**
-     * Converts ordinal numbers to superscripts, e.g. 1st, 2nd or 3rd.
-     * Will replace ordinal numbers even if they are semantically wrong, e.g. 21rd
-     *
-     * <h4>Example</h4>
-     * <pre>{@code
-     * 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing
-     * }</pre>
-     */
+    /// Converts ordinal numbers to superscripts, e.g. 1st, 2nd or 3rd.
+    /// Will replace ordinal numbers even if they are semantically wrong, e.g. 21rd
+    /// 
+    /// <h4>Example</h4>
+    /// <pre>{@code
+    /// 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing
+    /// }</pre>
     @Override
     public String format(@NonNull String value) {
         if (value.isEmpty()) {

@@ -76,20 +76,16 @@ public class InternalPreferences {
         return userAndHost;
     }
 
-    /**
-     * Returns the user and host information as a UserHostInfo object.
-     *
-     * @return the user and host information
-     */
+    /// Returns the user and host information as a UserHostInfo object.
+    /// 
+    /// @return the user and host information
     public UserHostInfo getUserHostInfo() {
         return UserHostInfo.parse(getUserAndHost());
     }
 
-    /**
-     * Sets the user and host information from a UserHostInfo object.
-     *
-     * @param userHostInfo the user and host information
-     */
+    /// Sets the user and host information from a UserHostInfo object.
+    /// 
+    /// @param userHostInfo the user and host information
     public void setUserHostInfo(UserHostInfo userHostInfo) {
         userAndHost.set(userHostInfo.getUserHostString());
     }

@@ -40,10 +40,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class provides a model for managing study definitions.
- * To visualize the model one can bind the properties to UI elements.
- */
+/// This class provides a model for managing study definitions.
+/// To visualize the model one can bind the properties to UI elements.
 public class ManageStudyDefinitionViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionViewModel.class);
 
@@ -74,9 +72,7 @@ public class ManageStudyDefinitionViewModel {
     private final StringProperty catalogsValidationMessage = new SimpleStringProperty();
     private final StringProperty validationHeaderMessage = new SimpleStringProperty();
 
-    /**
-     * Constructor for a new study
-     */
+    /// Constructor for a new study
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
                                           @NonNull WorkspacePreferences workspacePreferences,
@@ -100,12 +96,10 @@ public class ManageStudyDefinitionViewModel {
         initializeValidationBindings();
     }
 
-    /**
-     * Constructor for an existing study
-     *
-     * @param study          The study to initialize the UI from
-     * @param studyDirectory The path where the study resides
-     */
+    /// Constructor for an existing study
+    /// 
+    /// @param study          The study to initialize the UI from
+    /// @param studyDirectory The path where the study resides
     public ManageStudyDefinitionViewModel(@NonNull Study study,
                                           @NonNull Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,

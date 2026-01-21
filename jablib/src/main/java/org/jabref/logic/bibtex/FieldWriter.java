@@ -10,9 +10,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Converts JabRef's internal BibTeX representation of a BibTeX field to BibTeX text representation
- */
+/// Converts JabRef's internal BibTeX representation of a BibTeX field to BibTeX text representation
 public class FieldWriter {
 
     // See also ADR-0024
@@ -86,14 +84,12 @@ public class FieldWriter {
                 + text.substring(index + 1, Math.min(text.length(), index + neighbourSize + 1));
     }
 
-    /**
-     * Checks if the character at the specified index in the given text is escaped.
-     * A character is considered escaped if it is preceded by an odd number of backslashes (\).
-     *
-     * @param text  the input string to check for escaped characters
-     * @param index the index of the character in the text to check for escaping
-     * @return true if the character at the specified index is escaped, false otherwise
-     */
+    /// Checks if the character at the specified index in the given text is escaped.
+    /// A character is considered escaped if it is preceded by an odd number of backslashes (\).
+    /// 
+    /// @param text  the input string to check for escaped characters
+    /// @param index the index of the character in the text to check for escaping
+    /// @return true if the character at the specified index is escaped, false otherwise
     private static boolean isEscaped(String text, int index) {
         int indexCounter = 0;
         for (int i = index - 1; i >= 0; i--) {
@@ -106,14 +102,12 @@ public class FieldWriter {
         return indexCounter % 2 == 1;
     }
 
-    /**
-     * Formats the content of a field.
-     *
-     * @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
-     * @param content the content of the field
-     * @return a formatted string suitable for output
-     * @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
-     */
+    /// Formats the content of a field.
+    /// 
+    /// @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
+    /// @param content the content of the field
+    /// @return a formatted string suitable for output
+    /// @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
     public String write(Field field, String content) throws InvalidFieldValueException {
         if (content == null) {
             return FIELD_START + "" + FIELD_END;
@@ -126,11 +120,9 @@ public class FieldWriter {
         return formatAndResolveStrings(content);
     }
 
-    /**
-     * This method handles # in the field content to get valid bibtex strings
-     * <p>
-     * For instance, <code>#jan# - #feb#</code> gets  <code>jan #{ - } # feb</code> (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
-     */
+    /// This method handles # in the field content to get valid bibtex strings
+    /// 
+    /// For instance, `#jan# - #feb#` gets  `jan #{ - } # feb` (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
     private String formatAndResolveStrings(String content) throws InvalidFieldValueException {
         checkBraces(content);
 
@@ -192,9 +184,7 @@ public class FieldWriter {
         return stringBuilder.toString();
     }
 
-    /**
-     * Finds the first occurrence of # from the pivot point
-     */
+    /// Finds the first occurrence of # from the pivot point
     private static int getFirstOccurrenceOfStartEndSymbol(String content, int pivot) {
         int goFrom = pivot;
         int pos1 = pivot;
@@ -223,24 +213,20 @@ public class FieldWriter {
         return FIELD_START + content + FIELD_END;
     }
 
-    /**
-     * @param stringBuilder the StringBuilder to append the text to
-     * @param text          the text to append
-     */
+    /// @param stringBuilder the StringBuilder to append the text to
+    /// @param text          the text to append
     private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
         stringBuilder.append(FIELD_START);
         stringBuilder.append(text, startPos, endPos);
         stringBuilder.append(FIELD_END);
     }
 
-    /**
-     * @param stringBuilder the StringBuilder to append the text to
-     * @param text          the text use as basis to get the text to append
-     * @param startPos      the position in text where the text to add starts
-     * @param endPos        the position in text where the text to add ends
-     * @param isFirst       true if the label to write is the first one to write
-     * @param isLast        true if the label to write is the last one to write
-     */
+    /// @param stringBuilder the StringBuilder to append the text to
+    /// @param text          the text use as basis to get the text to append
+    /// @param startPos      the position in text where the text to add starts
+    /// @param endPos        the position in text where the text to add ends
+    /// @param isFirst       true if the label to write is the first one to write
+    /// @param isLast        true if the label to write is the last one to write
     private void writeStringLabel(StringBuilder stringBuilder, String text, int startPos, int endPos, boolean isFirst, boolean isLast) {
         String line = (isFirst ? "" : " # ") + text.substring(startPos, endPos) + (isLast ? "" : " # ");
         stringBuilder.append(line);

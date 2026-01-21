@@ -18,9 +18,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
- */
+/// Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
 public class ProtectedTermsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsParser.class);
@@ -67,11 +65,9 @@ public class ProtectedTermsParser {
         }
     }
 
-    /**
-     * Parse the description that starts after the # but don't include it in the terms
-     *
-     * @return line or null if the line contains the description
-     */
+    /// Parse the description that starts after the # but don't include it in the terms
+    /// 
+    /// @return line or null if the line contains the description
     private String setDescription(String line) {
         if (line.startsWith("#")) {
             description = line.substring(1).trim();

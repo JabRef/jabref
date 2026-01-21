@@ -39,12 +39,10 @@ public class FileHistoryMenu extends Menu {
         history.addListener((InvalidationListener) obs -> setItems());
     }
 
-    /**
-     * This method is to use typed letters to access recent libraries in menu.
-     *
-     * @param keyEvent a KeyEvent.
-     * @return false if typed char is invalid or not a number.
-     */
+    /// This method is to use typed letters to access recent libraries in menu.
+    /// 
+    /// @param keyEvent a KeyEvent.
+    /// @return false if typed char is invalid or not a number.
     public boolean openFileByKey(KeyEvent keyEvent) {
         if (keyEvent.getCharacter() == null) {
             return false;
@@ -58,10 +56,8 @@ public class FileHistoryMenu extends Menu {
         return true;
     }
 
-    /**
-     * Adds the filename to the top of the menu. If it already is in
-     * the menu, it is merely moved to the top.
-     */
+    /// Adds the filename to the top of the menu. If it already is in
+    /// the menu, it is merely moved to the top.
     public void newFile(Path file) {
         history.newFile(file);
         setItems();

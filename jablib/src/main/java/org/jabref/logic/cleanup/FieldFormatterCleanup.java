@@ -14,9 +14,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 
-/**
- * Formats a given entry field with the specified formatter.
- */
+/// Formats a given entry field with the specified formatter.
 public class FieldFormatterCleanup implements CleanupJob {
 
     private final Field field;
@@ -38,15 +36,13 @@ public class FieldFormatterCleanup implements CleanupJob {
         }
     }
 
-    /**
-     * Runs the formatter on the specified field in the given entry.
-     * <p>
-     * If the formatter returns an empty string, then the field is removed.
-     *
-     * @param fieldKey the field on which to run the formatter
-     * @param entry    the entry to be cleaned up
-     * @return a list of changes of the entry
-     */
+    /// Runs the formatter on the specified field in the given entry.
+    /// 
+    /// If the formatter returns an empty string, then the field is removed.
+    /// 
+    /// @param fieldKey the field on which to run the formatter
+    /// @param entry    the entry to be cleaned up
+    /// @return a list of changes of the entry
     private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do

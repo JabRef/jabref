@@ -10,13 +10,11 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 
-/**
- * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
- * structured as a node in a linked list of comparators, where each node can contain a link to a new comparator that
- * decides the ordering (by recursion) if this one can't find a difference. The next node, if any, is given at
- * construction time, and an arbitrary number of nodes can be included. If the entries are equal by this comparator, and
- * there is no next entry, the entries' unique IDs will decide the ordering.
- */
+/// This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
+/// structured as a node in a linked list of comparators, where each node can contain a link to a new comparator that
+/// decides the ordering (by recursion) if this one can't find a difference. The next node, if any, is given at
+/// construction time, and an arbitrary number of nodes can be included. If the entries are equal by this comparator, and
+/// there is no next entry, the entries' unique IDs will decide the ordering.
 public class EntryComparator implements Comparator<BibEntry> {
 
     private final Field sortField;
@@ -24,13 +22,11 @@ public class EntryComparator implements Comparator<BibEntry> {
     private final boolean binary;
     private final Comparator<BibEntry> next;
 
-    /**
-     *
-     * @param binary     true: the presence of fields is checked; false: the content of the fields is compared
-     * @param descending true: if the most different entry should get the highest score
-     * @param field      the field to sort on
-     * @param next       the next comparator to use (if the current comparator results in equality)
-     */
+    /// 
+    /// @param binary     true: the presence of fields is checked; false: the content of the fields is compared
+    /// @param descending true: if the most different entry should get the highest score
+    /// @param field      the field to sort on
+    /// @param next       the next comparator to use (if the current comparator results in equality)
     public EntryComparator(boolean binary, boolean descending, Field field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;

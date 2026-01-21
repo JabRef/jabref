@@ -2,9 +2,7 @@ package org.jabref.model.sciteTallies;
 
 import kong.unirest.core.json.JSONObject;
 
-/**
- * Simple model object to hold the scite.ai tallies data for a given DOI
- */
+/// Simple model object to hold the scite.ai tallies data for a given DOI
 public record TalliesResponse(
         String doi,
         int total,
@@ -14,12 +12,10 @@ public record TalliesResponse(
         int unclassified,
         int citingPublications) {
 
-    /**
-     * Creates a {@link TalliesResponse} from a JSONObject (dictionary/map)
-     *
-     * @param jsonObject The JSON object holding the tally values
-     * @return a new {@link TalliesResponse}
-     */
+    /// Creates a {@link TalliesResponse} from a JSONObject (dictionary/map)
+    /// 
+    /// @param jsonObject The JSON object holding the tally values
+    /// @return a new {@link TalliesResponse}
     public static TalliesResponse fromJSONObject(JSONObject jsonObject) {
         return new TalliesResponse(
                 jsonObject.getString("doi"),

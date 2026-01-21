@@ -29,17 +29,15 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 
-/**
- * This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
- * It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
- * It uses {@link OpenOfficePreferences} to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
- * Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
- *
- * @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
- * These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
- * In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
- * For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
- */
+/// This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
+/// It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
+/// It uses {@link OpenOfficePreferences} to retrieve the initial style (last selected style), the bibliography title and its paragraph style.
+/// Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
+/// 
+/// @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
+/// These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
+/// In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
+/// For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
 public class CSLCitationOOAdapter {
 
     private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
@@ -77,10 +75,8 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    /**
-     * Inserts a citation for a group of entries.
-     * Comparable to LaTeX's \cite command.
-     */
+    /// Inserts a citation for a group of entries.
+    /// Comparable to LaTeX's \cite command.
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, Exception {
         setStyle(selectedStyle);
@@ -113,12 +109,10 @@ public class CSLCitationOOAdapter {
         insertReferences(cursor, entries, ooText, isNumericStyle);
     }
 
-    /**
-     * Inserts in-text citations for a group of entries.
-     * Comparable to LaTeX's \citet command.
-     *
-     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
-     */
+    /// Inserts in-text citations for a group of entries.
+    /// Comparable to LaTeX's \citet command.
+    /// 
+    /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, Exception {
         setStyle(selectedStyle);
@@ -166,20 +160,16 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    /**
-     * Inserts "empty" citations for a list of entries at the cursor to the document.
-     * Adds the entries to the list for which bibliography is to be generated.
-     */
+    /// Inserts "empty" citations for a list of entries at the cursor to the document.
+    /// Adds the entries to the list for which bibliography is to be generated.
     public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
             throws CreationException, Exception {
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
         insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle());
     }
 
-    /**
-     * Creates a "Bibliography" section in the document and inserts a list of references.
-     * The list is generated based on the existing citations, in-text citations and empty citations in the document.
-     */
+    /// Creates a "Bibliography" section in the document and inserts a list of references.
+    /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, CreationException {
         if (!selectedStyle.hasBibliography()) {
@@ -222,9 +212,7 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    /**
-     * Inserts references and also adds a space before the citation if not already present ("smart space").
-     */
+    /// Inserts references and also adds a space before the citation if not already present ("smart space").
     private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle)
             throws CreationException, Exception {
         boolean preceedingSpaceExists;
@@ -247,9 +235,7 @@ public class CSLCitationOOAdapter {
         markManager.readAndUpdateExistingMarks();
     }
 
-    /**
-     * Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
-     */
+    /// Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
     private String updateSingleOrMultipleCitationNumbers(String citation, List<BibEntry> entries) {
         Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
         Matcher matcher = pattern.matcher(citation);
@@ -268,12 +254,10 @@ public class CSLCitationOOAdapter {
         return sb.toString();
     }
 
-    /**
-     * Ideally, the methods of this class are supposed to work with {@link CSLReferenceMarkManager}, and not {@link CSLReferenceMark} directly.
-     * However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
-     * Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
-     * Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
-     */
+    /// Ideally, the methods of this class are supposed to work with {@link CSLReferenceMarkManager}, and not {@link CSLReferenceMark} directly.
+    /// However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
+    /// Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
+    /// Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
     private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
             throws Exception, CreationException {
         boolean isNumericStyle = style.isNumericStyle();
@@ -372,10 +356,8 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    /**
-     * Checks if an entry has already been cited before in the document.
-     * Required for consistent numbering of numeric citations - if present, the number is to be reused, else a new number is to be assigned.
-     */
+    /// Checks if an entry has already been cited before in the document.
+    /// Required for consistent numbering of numeric citations - if present, the number is to be reused, else a new number is to be assigned.
     public boolean isCitedEntry(BibEntry entry) {
         String citationKey = entry.getCitationKey().orElse("");
         return markManager.hasCitationForKey(citationKey);

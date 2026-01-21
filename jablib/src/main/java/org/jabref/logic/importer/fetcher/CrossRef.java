@@ -36,11 +36,9 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 
-/**
- * A class for fetching DOIs from CrossRef
- * <p>
- * See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
- */
+/// A class for fetching DOIs from CrossRef
+/// 
+/// See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
 
     private static final String API_URL = "https://api.crossref.org/works";

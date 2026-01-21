@@ -19,11 +19,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Importer for COPAC format.
- * <p>
- * Documentation can be found online at: <a href="http://copac.ac.uk/faq/#format">http://copac.ac.uk/faq/#format</a>
- */
+/// Importer for COPAC format.
+/// 
+/// Documentation can be found online at: <a href="http://copac.ac.uk/faq/#format">http://copac.ac.uk/faq/#format</a>
 public class CopacImporter extends Importer {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");

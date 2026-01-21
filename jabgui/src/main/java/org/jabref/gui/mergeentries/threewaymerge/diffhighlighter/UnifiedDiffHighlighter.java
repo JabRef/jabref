@@ -11,10 +11,8 @@ import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
-/**
- * A diff highlighter in which differences of type {@link DeltaType#CHANGE} are unified and represented by an insertion
- * and deletion in the target text view. Normal addition and deletion are kept as they are.
- */
+/// A diff highlighter in which differences of type {@link DeltaType#CHANGE} are unified and represented by an insertion
+/// and deletion in the target text view. Normal addition and deletion are kept as they are.
 public final class UnifiedDiffHighlighter extends DiffHighlighter {
 
     public UnifiedDiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview, DiffMethod diffMethod) {

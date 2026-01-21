@@ -9,19 +9,15 @@ import org.jabref.model.entry.event.EntriesEventSource;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * {@link EntriesAddedEvent} is fired when at least {@link BibEntry} is being added to the {@link BibDatabase}.
- */
+/// {@link EntriesAddedEvent} is fired when at least {@link BibEntry} is being added to the {@link BibDatabase}.
 public class EntriesAddedEvent extends EntriesEvent {
 
     // firstEntry used by listeners that used to listen to AllInsertsFinishedEvent
     // final?
     private final BibEntry firstEntry;
 
-    /**
-     * @param bibEntries <code>List</code> of <code>BibEntry</code> objects which are being added.
-     * @param location   Location affected by this event
-     */
+    /// @param bibEntries `List` of `BibEntry` objects which are being added.
+    /// @param location   Location affected by this event
     public EntriesAddedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super(bibEntries, location);
         if (bibEntries.isEmpty()) {

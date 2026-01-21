@@ -24,22 +24,20 @@ import org.jabref.model.entry.types.EntryType;
 
 import org.jooq.lambda.Unchecked;
 
-/**
- * Outputs the findings as CSV.
- * <p>
- * Following symbols are used (as default):
- *
- * <ul>
- *     <li><code>x</code> - required field is present</li>
- *     <li><code>o</code> - optional field is present</li>
- *     <li><code>?</code> - unknown field is present</li>
- *     <li><code>-</code> - field is absent</li>
- * </ul>
- * <p>
- * Note that this classification is based on JabRef's definition and might not match the publisher's definition.
- *
- * @implNote We could have implemented a <code>PaperConsistencyCheckResultFormatter</code>, but that would have been too much effort.
- */
+/// Outputs the findings as CSV.
+/// 
+/// Following symbols are used (as default):
+/// 
+/// 
+/// - `x` - required field is present
+/// - `o` - optional field is present
+/// - `?` - unknown field is present
+/// - `-` - field is absent
+/// 
+/// 
+/// Note that this classification is based on JabRef's definition and might not match the publisher's definition.
+/// 
+/// @implNote We could have implemented a `PaperConsistencyCheckResultFormatter`, but that would have been too much effort.
 public abstract class BibliographyConsistencyCheckResultWriter implements Closeable {
 
     protected static final String REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "x";

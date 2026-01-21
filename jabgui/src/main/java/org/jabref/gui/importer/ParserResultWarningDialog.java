@@ -8,19 +8,15 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Class for generating a dialog showing warnings from ParserResult
- */
+/// Class for generating a dialog showing warnings from ParserResult
 public class ParserResultWarningDialog {
 
     private ParserResultWarningDialog() {
     }
 
-    /**
-     * Shows a dialog with the warnings from an import or open of a file
-     *
-     * @param parserResult - ParserResult for the current import/open
-     */
+    /// Shows a dialog with the warnings from an import or open of a file
+    /// 
+    /// @param parserResult - ParserResult for the current import/open
     public static void showParserResultWarningDialog(@NonNull final ParserResult parserResult,
                                                      @NonNull final DialogService dialogService) {
         // Return if no warnings

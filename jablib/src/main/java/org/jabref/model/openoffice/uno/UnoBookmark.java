@@ -19,9 +19,7 @@ public class UnoBookmark {
     private UnoBookmark() {
     }
 
-    /**
-     * Provides access to bookmarks by name.
-     */
+    /// Provides access to bookmarks by name.
     public static XNameAccess getNameAccess(XTextDocument doc)
             throws
             NoDocumentException {
@@ -34,12 +32,10 @@ public class UnoBookmark {
         }
     }
 
-    /**
-     * Get the XTextRange corresponding to the named bookmark.
-     *
-     * @param name The name of the bookmark to find.
-     * @return The XTextRange for the bookmark, or Optional.empty().
-     */
+    /// Get the XTextRange corresponding to the named bookmark.
+    /// 
+    /// @param name The name of the bookmark to find.
+    /// @return The XTextRange for the bookmark, or Optional.empty().
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
             throws
             WrappedTargetException,
@@ -49,23 +45,19 @@ public class UnoBookmark {
         return UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
     }
 
-    /**
-     * Insert a bookmark with the given name at the cursor provided, or with another name if the one we asked for is already in use.
-     * <p>
-     * In LibreOffice the another name is in "{name}{number}" format.
-     *
-     * @return The XNamed interface of the bookmark.
-     * result.getName() should be checked by the caller, because its name may differ from the one requested.
-     */
+    /// Insert a bookmark with the given name at the cursor provided, or with another name if the one we asked for is already in use.
+    /// 
+    /// In LibreOffice the another name is in "{name}{number}" format.
+    /// 
+    /// @return The XNamed interface of the bookmark.
+    /// result.getName() should be checked by the caller, because its name may differ from the one requested.
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {
         return UnoNamed.insertNamedTextContent("com.sun.star.text.Bookmark", documentAnnotation);
     }
 
-    /**
-     * Remove the named bookmark if it exists.
-     */
+    /// Remove the named bookmark if it exists.
     public static void removeIfExists(XTextDocument doc, String name)
             throws
             NoDocumentException,

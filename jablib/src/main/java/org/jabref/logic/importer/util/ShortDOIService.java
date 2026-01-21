@@ -14,19 +14,15 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 
-/**
- * Class for obtaining shortened DOI names. See <a href="https://shortdoi.org">https://shortdoi.org</a>.
- */
+/// Class for obtaining shortened DOI names. See <a href="https://shortdoi.org">https://shortdoi.org</a>.
 public class ShortDOIService {
 
     private static final String BASIC_URL = "https://shortdoi.org/";
 
-    /**
-     * Obtains shortened DOI name for given DOI
-     *
-     * @param doi DOI
-     * @return A shortened DOI name
-     */
+    /// Obtains shortened DOI name for given DOI
+    /// 
+    /// @param doi DOI
+    /// @return A shortened DOI name
     public DOI getShortDOI(DOI doi) throws ShortDOIServiceException {
         JSONObject responseJSON = makeRequest(doi);
         String shortDoi = responseJSON.getString("ShortDOI");

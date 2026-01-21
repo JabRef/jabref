@@ -41,13 +41,11 @@ public class Localization {
     private Localization() {
     }
 
-    /**
-     * Public access to all messages that are not menu-entries
-     *
-     * @param key    The key of the message in unescaped form like "All fields"
-     * @param params Replacement strings for parameters %0, %1, etc.
-     * @return The message with replaced parameters
-     */
+    /// Public access to all messages that are not menu-entries
+    /// 
+    /// @param key    The key of the message in unescaped form like "All fields"
+    /// @param params Replacement strings for parameters %0, %1, etc.
+    /// @return The message with replaced parameters
     public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
             System.err.println("Messages are not initialized before accessing key: " + key);
@@ -57,12 +55,10 @@ public class Localization {
         return lookup(localizedMessages, key, stringParams);
     }
 
-    /**
-     * Sets the language and loads the appropriate translations. Note, that this function should be called before any
-     * other function of this class.
-     *
-     * @param language Language identifier like "en", "de", etc.
-     */
+    /// Sets the language and loads the appropriate translations. Note, that this function should be called before any
+    /// other function of this class.
+    /// 
+    /// @param language Language identifier like "en", "de", etc.
     public static void setLanguage(Language language) {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
@@ -88,11 +84,9 @@ public class Localization {
         }
     }
 
-    /**
-     * Returns the messages bundle, e.g. to load FXML files correctly translated.
-     *
-     * @return The internally cashed bundle.
-     */
+    /// Returns the messages bundle, e.g. to load FXML files correctly translated.
+    /// 
+    /// @return The internally cashed bundle.
     public static LocalizationBundle getMessages() {
         // avoid situations where this function is called before any language was set
         if (locale == null) {
@@ -101,25 +95,21 @@ public class Localization {
         return localizedMessages;
     }
 
-    /**
-     * Creates and caches the language bundles used in JabRef for a particular language. This function first loads
-     * correct version of the "escaped" bundles that are given in {@link l10n}. After that, it stores the unescaped
-     * version in a cached {@link LocalizationBundle} for fast access.
-     *
-     * @param locale Localization to use.
-     */
+    /// Creates and caches the language bundles used in JabRef for a particular language. This function first loads
+    /// correct version of the "escaped" bundles that are given in {@link l10n}. After that, it stores the unescaped
+    /// version in a cached {@link LocalizationBundle} for fast access.
+    /// 
+    /// @param locale Localization to use.
     private static void createResourceBundles(Locale locale) {
         ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale);
         Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
         localizedMessages = new LocalizationBundle(createLookupMap(messages));
     }
 
-    /**
-     * Helper function to create a Map from the key/value pairs of a bundle.
-     *
-     * @param baseBundle JabRef language bundle with keys and values for translations.
-     * @return Lookup map for the baseBundle.
-     */
+    /// Helper function to create a Map from the key/value pairs of a bundle.
+    /// 
+    /// @param baseBundle JabRef language bundle with keys and values for translations.
+    /// @return Lookup map for the baseBundle.
     private static Map<String, String> createLookupMap(ResourceBundle baseBundle) {
         final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
         return new HashMap<>(baseKeys.stream().collect(
@@ -130,15 +120,13 @@ public class Localization {
         ));
     }
 
-    /**
-     * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
-     * the keys are the "unescaped" strings from the bundle property files.
-     *
-     * @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
-     * @param key    The lookup key.
-     * @param params The parameters that should be inserted into the message
-     * @return The final message with replaced parameters.
-     */
+    /// This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
+    /// the keys are the "unescaped" strings from the bundle property files.
+    /// 
+    /// @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
+    /// @param key    The lookup key.
+    /// @param params The parameters that should be inserted into the message
+    /// @return The final message with replaced parameters.
     private static String lookup(@NonNull LocalizationBundle bundle, @NonNull String key, String... params) {
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
@@ -148,9 +136,7 @@ public class Localization {
         return new LocalizationKeyParams(translation, params).replacePlaceholders();
     }
 
-    /**
-     * A bundle for caching localized strings. Needed to support JavaFX inline binding.
-     */
+    /// A bundle for caching localized strings. Needed to support JavaFX inline binding.
     private static class LocalizationBundle extends ResourceBundle {
 
         private final Map<String, String> lookup;

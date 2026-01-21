@@ -16,9 +16,7 @@ import org.jabref.model.entry.field.UnknownField;
 
 import com.google.common.collect.MoreCollectors;
 
-/**
- * A column that displays the text-value of the field
- */
+/// A column that displays the text-value of the field
 public class FieldColumn extends MainTableColumn<String> {
 
     private final OrFields fields;
@@ -49,11 +47,9 @@ public class FieldColumn extends MainTableColumn<String> {
         this.setSortable(true);
     }
 
-    /**
-     * Get the table column name to be displayed in the UI
-     *
-     * @return name to be displayed. null if field is empty.
-     */
+    /// Get the table column name to be displayed in the UI
+    /// 
+    /// @return name to be displayed. null if field is empty.
     @Override
     public String getDisplayName() {
         return FieldTextMapper.getDisplayName(fields);

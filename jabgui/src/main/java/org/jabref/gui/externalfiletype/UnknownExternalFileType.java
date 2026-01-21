@@ -3,12 +3,10 @@ package org.jabref.gui.externalfiletype;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 
-/**
- * Unknown external file type.
- * <p>
- * This instance represents a file type unknown to JabRef.
- * This can happen, for example, when a database is loaded which contains links to files of a type that has not been defined on this JabRef instance.
- */
+/// Unknown external file type.
+/// 
+/// This instance represents a file type unknown to JabRef.
+/// This can happen, for example, when a database is loaded which contains links to files of a type that has not been defined on this JabRef instance.
 public class UnknownExternalFileType implements ExternalFileType {
 
     private final String name;

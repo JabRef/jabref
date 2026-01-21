@@ -5,11 +5,9 @@ import java.util.Optional;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 
-/**
- * Comparator for rankings.
- * <p>
- * Inverse comparison of ranking as rank5 is higher than rank1
- */
+/// Comparator for rankings.
+/// 
+/// Inverse comparison of ranking as rank5 is higher than rank1
 public class RankingFieldComparator implements Comparator<Optional<SpecialFieldValueViewModel>> {
 
     @Override

@@ -13,10 +13,8 @@ import org.apache.xmpbox.xml.XmpParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * XMPUtilShared provides support for reading {@link org.jabref.logic.xmp.XmpUtilReader} and writing {@link org.jabref.logic.xmp.XmpUtilWriter} BibTeX data as XMP metadata
- * in PDF-documents.
- */
+/// XMPUtilShared provides support for reading {@link org.jabref.logic.xmp.XmpUtilReader} and writing {@link org.jabref.logic.xmp.XmpUtilWriter} BibTeX data as XMP metadata
+/// in PDF-documents.
 public class XmpUtilShared {
 
     public static final String BIBTEX_DI_FIELD_NAME_PREFIX = "bibtex/";
@@ -45,16 +43,14 @@ public class XmpUtilShared {
         }
     }
 
-    /**
-     * Will try to read XMP metadata from the given file, returning whether
-     * metadata was found.
-     * <p>
-     * Caution: This method is as expensive as it is reading the actual metadata
-     * itself from the PDF.
-     *
-     * @param path the path to the PDF.
-     * @return whether a BibEntry was found in the given PDF.
-     */
+    /// Will try to read XMP metadata from the given file, returning whether
+    /// metadata was found.
+    /// 
+    /// Caution: This method is as expensive as it is reading the actual metadata
+    /// itself from the PDF.
+    /// 
+    /// @param path the path to the PDF.
+    /// @return whether a BibEntry was found in the given PDF.
     public static boolean hasMetadata(Path path, XmpPreferences xmpPreferences) {
         try {
             List<BibEntry> bibEntries = new XmpUtilReader().readXmp(path, xmpPreferences);

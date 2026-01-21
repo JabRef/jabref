@@ -29,10 +29,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class provides a model for managing journal abbreviation lists. It provides all necessary methods to create,
- * modify or delete journal abbreviations and files. To visualize the model one can bind the properties to UI elements.
- */
+/// This class provides a model for managing journal abbreviation lists. It provides all necessary methods to create,
+/// modify or delete journal abbreviations and files. To visualize the model one can bind the properties to UI elements.
 public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel {
 
     private final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationsTabViewModel.class);
@@ -114,28 +112,22 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         addBuiltInList();
     }
 
-    /**
-     * Read all saved file paths and read their abbreviations.
-     */
+    /// Read all saved file paths and read their abbreviations.
     public void createFileObjects() {
         List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
         externalFiles.forEach(name -> openFile(Path.of(name)));
     }
 
-    /**
-     * This will set the {@code currentFile} property to the {@link AbbreviationsFileViewModel} object that was added to
-     * the {@code journalFiles} list property lastly. If there are no files in the list property this method will do
-     * nothing as the {@code currentFile} property is already {@code null}.
-     */
+    /// This will set the `currentFile` property to the {@link AbbreviationsFileViewModel} object that was added to
+    /// the `journalFiles` list property lastly. If there are no files in the list property this method will do
+    /// nothing as the `currentFile` property is already `null`.
     public void selectLastJournalFile() {
         if (!journalFiles.isEmpty()) {
             currentFile.set(journalFilesProperty().getLast());
         }
     }
 
-    /**
-     * This will load the built in abbreviation files and add it to the list of journal abbreviation files.
-     */
+    /// This will load the built in abbreviation files and add it to the list of journal abbreviation files.
     public void addBuiltInList() {
         BackgroundTask
                 .wrap(journalAbbreviationRepository::getAllLoaded)
@@ -152,10 +144,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 .executeWith(taskExecutor);
     }
 
-    /**
-     * This method shall be used to add a new journal abbreviation file to the set of journal abbreviation files. It
-     * basically just calls the {@link #openFile(Path)}} method.
-     */
+    /// This method shall be used to add a new journal abbreviation file to the set of journal abbreviation files. It
+    /// basically just calls the {@link #openFile(Path)}} method.
     public void addNewFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSV)
@@ -164,13 +154,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         dialogService.showFileSaveDialog(fileDialogConfiguration).ifPresent(this::openFile);
     }
 
-    /**
-     * Checks whether the file exists or if a new file should be opened. The file will be added to the set of journal
-     * abbreviation files. If the file also exists its abbreviations will be read and written to the abbreviations
-     * property.
-     *
-     * @param filePath path to the file
-     */
+    /// Checks whether the file exists or if a new file should be opened. The file will be added to the set of journal
+    /// abbreviation files. If the file also exists its abbreviations will be read and written to the abbreviations
+    /// property.
+    /// 
+    /// @param filePath path to the file
     private void openFile(Path filePath) {
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
@@ -196,12 +184,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::openFile);
     }
 
-    /**
-     * This method removes the currently selected file from the set of journal abbreviation files. This will not remove
-     * existing files from the file system. The {@code activeFile} property will always change to the previous file in
-     * the {@code journalFiles} list property, except the first file is selected. If so the next file will be selected
-     * except if there are no more files than the {@code activeFile} property will be set to {@code null}.
-     */
+    /// This method removes the currently selected file from the set of journal abbreviation files. This will not remove
+    /// existing files from the file system. The `activeFile` property will always change to the previous file in
+    /// the `journalFiles` list property, except the first file is selected. If so the next file will be selected
+    /// except if there are no more files than the `activeFile` property will be set to `null`.
     public void removeCurrentFile() {
         if (isFileRemovable.get()) {
             journalFiles.remove(currentFile.get());
@@ -211,10 +197,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         }
     }
 
-    /**
-     * Method to add a new abbreviation to the abbreviations list property. It also sets the currentAbbreviation
-     * property to the new abbreviation.
-     */
+    /// Method to add a new abbreviation to the abbreviations list property. It also sets the currentAbbreviation
+    /// property to the new abbreviation.
     public void addAbbreviation(Abbreviation abbreviationObject) {
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
@@ -234,9 +218,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 Localization.lang("Shortest unique abbreviation")));
     }
 
-    /**
-     * Method to change the currentAbbreviation property to a new abbreviation.
-     */
+    /// Method to change the currentAbbreviation property to a new abbreviation.
     void editAbbreviation(Abbreviation abbreviationObject) {
         if (isEditableAndRemovable.get()) {
             AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviationObject);
@@ -273,11 +255,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         shouldWriteLists = true;
     }
 
-    /**
-     * Method to delete the abbreviation set in the currentAbbreviation property. The currentAbbreviationProperty will
-     * be set to the previous or next abbreviation in the abbreviations property if applicable. Else it will be set to
-     * {@code null} if there are no abbreviations left.
-     */
+    /// Method to delete the abbreviation set in the currentAbbreviation property. The currentAbbreviationProperty will
+    /// be set to the previous or next abbreviation in the abbreviations property if applicable. Else it will be set to
+    /// `null` if there are no abbreviations left.
     public void deleteAbbreviation() {
         if ((currentAbbreviation.get() != null) && !currentAbbreviation.get().isPseudoAbbreviation()) {
             int index = abbreviations.indexOf(currentAbbreviation.get());
@@ -302,11 +282,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         shouldWriteLists = true;
     }
 
-    /**
-     * Calls the {@link AbbreviationsFileViewModel#writeOrCreate()} method for each file in the journalFiles property
-     * which will overwrite the existing files with the content of the abbreviations property of the AbbreviationsFile.
-     * Non-existing files will be created.
-     */
+    /// Calls the {@link AbbreviationsFileViewModel#writeOrCreate()} method for each file in the journalFiles property
+    /// which will overwrite the existing files with the content of the abbreviations property of the AbbreviationsFile.
+    /// Non-existing files will be created.
     public void saveJournalAbbreviationFiles() {
         journalFiles.forEach(file -> {
             try {
@@ -317,10 +295,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         });
     }
 
-    /**
-     * This method first saves all external files to its internal list, then writes all abbreviations to their files and
-     * finally updates the abbreviations auto complete.
-     */
+    /// This method first saves all external files to its internal list, then writes all abbreviations to their files and
+    /// finally updates the abbreviations auto complete.
     @Override
     public void storeSettings() {
         BackgroundTask

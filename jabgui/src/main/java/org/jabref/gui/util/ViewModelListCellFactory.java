@@ -26,11 +26,9 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
-/**
- * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
- *
- * @param <T> cell value
- */
+/// Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
+/// 
+/// @param <T> cell value
 public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
 
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");

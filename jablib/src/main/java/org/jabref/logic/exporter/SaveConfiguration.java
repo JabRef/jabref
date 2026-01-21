@@ -42,11 +42,9 @@ public class SaveConfiguration {
         return makeBackup;
     }
 
-    /**
-     * Required by {@link org.jabref.gui.autosaveandbackup.BackupManager}. Should not be used in other settings
-     *
-     * @param newMakeBackup whether a backup (.bak file) should be made
-     */
+    /// Required by {@link org.jabref.gui.autosaveandbackup.BackupManager}. Should not be used in other settings
+    /// 
+    /// @param newMakeBackup whether a backup (.bak file) should be made
     public SaveConfiguration withMakeBackup(Boolean newMakeBackup) {
         this.makeBackup = newMakeBackup;
         return this;

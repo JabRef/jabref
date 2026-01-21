@@ -52,16 +52,14 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         this.formatPreferences = importFormatPreferences;
     }
 
-    /**
-     * Tries to find a fulltext URL for a given BibTex entry.
-     * <p>
-     * Search by title first, as DOI is not searchable directly. When the title is not present, the search is made with DOI via google.com with site:researchgate.net
-     *
-     * @param entry The Bibtex entry
-     * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-     * @throws IOException      if an IO operation has failed
-     * @throws FetcherException if the ResearchGate refuses to serve the page
-     */
+    /// Tries to find a fulltext URL for a given BibTex entry.
+    /// 
+    /// Search by title first, as DOI is not searchable directly. When the title is not present, the search is made with DOI via google.com with site:researchgate.net
+    /// 
+    /// @param entry The Bibtex entry
+    /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+    /// @throws IOException      if an IO operation has failed
+    /// @throws FetcherException if the ResearchGate refuses to serve the page
     @Override
     public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         Document html;
@@ -178,14 +176,12 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
                     .get();
     }
 
-    /**
-     * Constructs a URL based on the query, size and page number.
-     * Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
-     * <p>
-     *
-     * @param queryNode the search query.
-     * @return A URL that lets us download a .bib file
-     */
+    /// Constructs a URL based on the query, size and page number.
+    /// Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
+    /// 
+    /// 
+    /// @param queryNode the search query.
+    /// @return A URL that lets us download a .bib file
     private static URL getUrlForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         String query = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
         URIBuilder source = new URIBuilder(SEARCH);
@@ -199,13 +195,11 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return TrustLevel.META_SEARCH;
     }
 
-    /**
-     * This method is used to send complex queries using fielded search.
-     *
-     * @param queryNode the first node from the search parser
-     * @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
-     * @throws FetcherException if the ResearchGate refuses to serve the page
-     */
+    /// This method is used to send complex queries using fielded search.
+    /// 
+    /// @param queryNode the first node from the search parser
+    /// @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
+    /// @throws FetcherException if the ResearchGate refuses to serve the page
     @Override
     public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         Document html;
@@ -268,13 +262,11 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return "ResearchGate";
     }
 
-    /**
-     * Looks for hits which are matched by the given {@link BibEntry}.
-     *
-     * @param entry entry to search bibliographic information for
-     * @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
-     * @throws FetcherException if the ResearchGate refuses to serve the page
-     */
+    /// Looks for hits which are matched by the given {@link BibEntry}.
+    /// 
+    /// @param entry entry to search bibliographic information for
+    /// @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
+    /// @throws FetcherException if the ResearchGate refuses to serve the page
     @Override
     public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();

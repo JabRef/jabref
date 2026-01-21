@@ -9,11 +9,9 @@ public class TruncateFormatter extends Formatter {
     private final int TRUNCATE_AFTER;
     private final String KEY;
 
-    /**
-     * The TruncateFormatter truncates a string after the given index and removes trailing whitespaces.
-     *
-     * @param truncateIndex truncate a string after this index.
-     */
+    /// The TruncateFormatter truncates a string after the given index and removes trailing whitespaces.
+    /// 
+    /// @param truncateIndex truncate a string after this index.
     public TruncateFormatter(final int truncateIndex) {
         TRUNCATE_AFTER = truncateIndex >= 0 ? truncateIndex : Integer.MAX_VALUE;
         KEY = "truncate" + TRUNCATE_AFTER;
@@ -29,9 +27,7 @@ public class TruncateFormatter extends Formatter {
         return KEY;
     }
 
-    /**
-     * Truncates a string after the given index.
-     */
+    /// Truncates a string after the given index.
     @Override
     public String format(final @NonNull String input) {
         final int index = Math.min(TRUNCATE_AFTER, input.length());

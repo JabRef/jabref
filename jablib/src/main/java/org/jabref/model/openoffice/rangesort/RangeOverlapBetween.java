@@ -17,13 +17,11 @@ public class RangeOverlapBetween {
     private RangeOverlapBetween() {
     }
 
-    /**
-     * Check for any overlap between two sets of XTextRange values.
-     * <p>
-     * Assume fewHolders is small (usually a single element, for checking the cursor)
-     * <p>
-     * Returns on first problem found.
-     */
+    /// Check for any overlap between two sets of XTextRange values.
+    /// 
+    /// Assume fewHolders is small (usually a single element, for checking the cursor)
+    /// 
+    /// Returns on first problem found.
     public static <V extends RangeHolder>
     List<RangeOverlap<V>> findFirst(XTextDocument doc,
                                     List<V> fewHolders,

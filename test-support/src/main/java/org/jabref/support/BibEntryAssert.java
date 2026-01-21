@@ -22,19 +22,15 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-/**
- * TODO: Make this a "public" class to enable jablib consumers benefitting from it, too.
- */
+/// TODO: Make this a "public" class to enable jablib consumers benefitting from it, too.
 public class BibEntryAssert {
 
-    /**
-     * Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
-     * contain a single entry
-     *
-     * @param clazz        the class where to call `getResourceAsStream`
-     * @param resourceName the resource to read
-     * @param entry        the entry to compare with
-     */
+    /// Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
+    /// contain a single entry
+    /// 
+    /// @param clazz        the class where to call `getResourceAsStream`
+    /// @param resourceName the resource to read
+    /// @param entry        the entry to compare with
     public static void assertEquals(Class<?> clazz, String resourceName, BibEntry entry)
             throws IOException {
         assertNotNull(clazz);
@@ -45,14 +41,12 @@ public class BibEntryAssert {
         }
     }
 
-    /**
-     * Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
-     * contain a single entry
-     *
-     * @param clazz        the class where to call `getResourceAsStream`
-     * @param resourceName the resource to read
-     * @param asIsEntries  a list containing a single entry to compare with
-     */
+    /// Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
+    /// contain a single entry
+    /// 
+    /// @param clazz        the class where to call `getResourceAsStream`
+    /// @param resourceName the resource to read
+    /// @param asIsEntries  a list containing a single entry to compare with
     public static void assertEquals(Class<?> clazz, String resourceName, List<BibEntry> asIsEntries)
             throws IOException {
         assertNotNull(clazz);
@@ -80,12 +74,10 @@ public class BibEntryAssert {
         return result.getDatabase().getEntries();
     }
 
-    /**
-     * Reads a bibtex database from the given InputStream. The list is compared with the given list.
-     *
-     * @param expectedInputStream the inputStream reading the entry from
-     * @param actualEntries       a list containing a single entry to compare with
-     */
+    /// Reads a bibtex database from the given InputStream. The list is compared with the given list.
+    /// 
+    /// @param expectedInputStream the inputStream reading the entry from
+    /// @param actualEntries       a list containing a single entry to compare with
     public static void assertEquals(InputStream expectedInputStream, List<BibEntry> actualEntries)
             throws IOException {
         assertNotNull(expectedInputStream);
@@ -103,27 +95,23 @@ public class BibEntryAssert {
         Assertions.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
     }
 
-    /**
-     * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
-     * compared to the given entry
-     *
-     * @param expected the inputStream reading the entry from
-     * @param actual   the entry to compare with
-     */
+    /// Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
+    /// compared to the given entry
+    /// 
+    /// @param expected the inputStream reading the entry from
+    /// @param actual   the entry to compare with
     public static void assertEquals(InputStream expected, BibEntry actual)
             throws IOException {
         assertEquals(expected, List.of(actual));
     }
 
-    /**
-     * Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is
-     * filtered through importer to convert to a list of BibEntries.
-     *
-     * @param expectedIs   A BibtexImporter InputStream.
-     * @param fileToImport The path to the file to be imported.
-     * @param importer     The fileformat you want to use to read the passed file to get the list of expected
-     *                     BibEntries
-     */
+    /// Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is
+    /// filtered through importer to convert to a list of BibEntries.
+    /// 
+    /// @param expectedIs   A BibtexImporter InputStream.
+    /// @param fileToImport The path to the file to be imported.
+    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected
+    /// BibEntries
     public static void assertEquals(InputStream expectedIs, Path fileToImport, Importer importer)
             throws IOException {
         assertEquals(getListFromInputStream(expectedIs), fileToImport, importer);
@@ -134,15 +122,13 @@ public class BibEntryAssert {
         assertEquals(expectedIs, Path.of(fileToImport.toURI()), importer);
     }
 
-    /**
-     * Compares a list of BibEntries to an InputStream. actualIs is filtered through importerForActualIs to convert to a
-     * list of BibEntries.
-     *
-     * @param expected     A BibtexImporter InputStream.
-     * @param fileToImport The path to the file to be imported.
-     * @param importer     The fileformat you want to use to read the passed file to get the list of expected
-     *                     BibEntries
-     */
+    /// Compares a list of BibEntries to an InputStream. actualIs is filtered through importerForActualIs to convert to a
+    /// list of BibEntries.
+    /// 
+    /// @param expected     A BibtexImporter InputStream.
+    /// @param fileToImport The path to the file to be imported.
+    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected
+    /// BibEntries
     public static void assertEquals(List<BibEntry> expected, Path fileToImport, Importer importer)
             throws IOException {
         List<BibEntry> actualEntries = importer.importDatabase(fileToImport)

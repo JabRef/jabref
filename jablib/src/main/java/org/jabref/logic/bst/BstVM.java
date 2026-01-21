@@ -59,13 +59,11 @@ public class BstVM {
         return parser.bstFile();
     }
 
-    /**
-     * Transforms the given list of BibEntries to a rendered list of references using the parsed bst program
-     *
-     * @param bibEntries  list of entries to convert
-     * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
-     * @return list of references in plain text form
-     */
+    /// Transforms the given list of BibEntries to a rendered list of references using the parsed bst program
+    /// 
+    /// @param bibEntries  list of entries to convert
+    /// @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
+    /// @return list of references in plain text form
     public String render(@NonNull Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
         // needs to be modifiable due to sort operations later
         List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).collect(Collectors.toList());

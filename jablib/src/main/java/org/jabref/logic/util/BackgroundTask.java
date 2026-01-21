@@ -159,25 +159,19 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    /**
-     * Sets the {@link Runnable} that is invoked after the task is started.
-     */
+    /// Sets the {@link Runnable} that is invoked after the task is started.
     public BackgroundTask<V> onRunning(Runnable onRunning) {
         this.onRunning = onRunning;
         return this;
     }
 
-    /**
-     * Carry a consumer to a running runnable and invoke it after the task is started.
-     */
+    /// Carry a consumer to a running runnable and invoke it after the task is started.
     public @NonNull BackgroundTask<V> consumeOnRunning(@NonNull Consumer<BackgroundTask<V>> onRunningConsumer) {
         return this.onRunning(() -> onRunningConsumer.accept(this));
     }
 
-    /**
-     * Sets the {@link Consumer} that is invoked after the task is successfully finished.
-     * The consumer always runs on the JavaFX thread.
-     */
+    /// Sets the {@link Consumer} that is invoked after the task is successfully finished.
+    /// The consumer always runs on the JavaFX thread.
     public BackgroundTask<V> onSuccess(Consumer<V> onSuccess) {
         this.onSuccess = onSuccess;
         return this;
@@ -197,10 +191,8 @@ public abstract class BackgroundTask<V> {
         return chain(onFinished, onException);
     }
 
-    /**
-     * Sets the {@link Consumer} that is invoked after the task has failed with an exception.
-     * The consumer always runs on the JavaFX thread.
-     */
+    /// Sets the {@link Consumer} that is invoked after the task has failed with an exception.
+    /// The consumer always runs on the JavaFX thread.
     public BackgroundTask<V> onFailure(Consumer<Exception> onException) {
         this.onException = onException;
         return this;
@@ -214,21 +206,17 @@ public abstract class BackgroundTask<V> {
         return taskExecutor.schedule(this, delay, unit);
     }
 
-    /**
-     * Sets the {@link Runnable} that is invoked after the task is finished, irrespectively if it was successful or
-     * failed with an error.
-     */
+    /// Sets the {@link Runnable} that is invoked after the task is finished, irrespectively if it was successful or
+    /// failed with an error.
     public BackgroundTask<V> onFinished(Runnable onFinished) {
         this.onFinished = onFinished;
         return this;
     }
 
-    /**
-     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
-     *
-     * @param nextTaskFactory the function that creates the new task
-     * @param <T>             type of the return value of the second task
-     */
+    /// Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+    /// 
+    /// @param nextTaskFactory the function that creates the new task
+    /// @param <T>             type of the return value of the second task
     public <T> BackgroundTask<T> then(Function<V, BackgroundTask<T>> nextTaskFactory) {
         return new BackgroundTask<>() {
             @Override
@@ -241,12 +229,10 @@ public abstract class BackgroundTask<V> {
         };
     }
 
-    /**
-     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
-     *
-     * @param nextOperation the function that performs the next operation
-     * @param <T>           type of the return value of the second task
-     */
+    /// Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+    /// 
+    /// @param nextOperation the function that performs the next operation
+    /// @param <T>           type of the return value of the second task
     public <T> BackgroundTask<T> thenRun(Function<V, T> nextOperation) {
         return new BackgroundTask<>() {
             @Override
@@ -259,11 +245,9 @@ public abstract class BackgroundTask<V> {
         };
     }
 
-    /**
-     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
-     *
-     * @param nextOperation the function that performs the next operation
-     */
+    /// Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+    /// 
+    /// @param nextOperation the function that performs the next operation
     public BackgroundTask<Void> thenRun(Consumer<V> nextOperation) {
         return new BackgroundTask<>() {
             @Override

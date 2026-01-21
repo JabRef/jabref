@@ -23,11 +23,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-/**
- * Microsoft Word bibliography.
- * The class is uesed both for import and export
- * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
- */
+/// Microsoft Word bibliography.
+/// The class is uesed both for import and export
+/// See http://www.ecma-international.org/publications/standards/Ecma-376.htm
 public class MSBibDatabase {
 
     public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
@@ -39,22 +37,18 @@ public class MSBibDatabase {
 
     private Set<MSBibEntry> entriesForExport;
 
-    /**
-     * Creates a {@link MSBibDatabase} for <b>import</b>
-     */
+    /// Creates a {@link MSBibDatabase} for **import**
     public MSBibDatabase() {
         entriesForExport = new HashSet<>();
         factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
     }
 
-    /**
-     * Creates a new {@link MSBibDatabase} for <b>export</b>.
-     * Directly converts the given entries.
-     *
-     * @param database The bib database
-     * @param entries  List of {@link BibEntry}
-     */
+    /// Creates a new {@link MSBibDatabase} for **export**.
+    /// Directly converts the given entries.
+    /// 
+    /// @param database The bib database
+    /// @param entries  List of {@link BibEntry}
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         this();
         List<BibEntry> resolvedEntries;
@@ -66,11 +60,9 @@ public class MSBibDatabase {
         setEntriesForExport(resolvedEntries);
     }
 
-    /**
-     * Imports entries from an office XML file
-     *
-     * @return List of {@link BibEntry}
-     */
+    /// Imports entries from an office XML file
+    /// 
+    /// @return List of {@link BibEntry}
     public List<BibEntry> importEntriesFromXml(BufferedReader reader) {
         entriesForExport = new HashSet<>();
         Document inputDocument;

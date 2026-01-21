@@ -24,11 +24,9 @@ import org.jabref.model.entry.identifier.DOI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Utility class for trying to resolve URLs to full-text PDF for articles.
- * <p>
- * Combines multiple {@link FulltextFetcher}s together. Each fetcher is invoked, the "best" result (sorted by the fetcher trust level) is returned.
- */
+/// Utility class for trying to resolve URLs to full-text PDF for articles.
+/// 
+/// Combines multiple {@link FulltextFetcher}s together. Each fetcher is invoked, the "best" result (sorted by the fetcher trust level) is returned.
 public class FulltextFetchers {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 

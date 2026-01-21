@@ -26,15 +26,13 @@ import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Main class for generating summaries of {@link BibEntry}ies.
- * Use this class in the logic and UI.
- * <p>
- * In order for summary to be stored and loaded, the {@link BibEntry} must satisfy the following requirements:
- * 1. There should exist an associated {@link BibDatabaseContext} for the {@link BibEntry}.
- * 2. The database path of the associated {@link BibDatabaseContext} must be set.
- * 3. The citation key of the {@link BibEntry} must be set and unique.
- */
+/// Main class for generating summaries of {@link BibEntry}ies.
+/// Use this class in the logic and UI.
+/// 
+/// In order for summary to be stored and loaded, the {@link BibEntry} must satisfy the following requirements:
+/// 1. There should exist an associated {@link BibDatabaseContext} for the {@link BibEntry}.
+/// 2. The database path of the associated {@link BibDatabaseContext} must be set.
+/// 3. The citation key of the {@link BibEntry} must be set and unique.
 public class SummariesService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummariesService.class);
 
@@ -96,12 +94,10 @@ public class SummariesService {
         }
     }
 
-    /**
-     * Start generating summary of a {@link BibEntry}, if it was already generated.
-     * This method returns a {@link ProcessingInfo} that can be used for tracking state of the summarization.
-     * Returned {@link ProcessingInfo} is related to the passed {@link BibEntry}, so if you call this method twice
-     * on the same {@link BibEntry}, the method will return the same {@link ProcessingInfo}.
-     */
+    /// Start generating summary of a {@link BibEntry}, if it was already generated.
+    /// This method returns a {@link ProcessingInfo} that can be used for tracking state of the summarization.
+    /// Returned {@link ProcessingInfo} is related to the passed {@link BibEntry}, so if you call this method twice
+    /// on the same {@link BibEntry}, the method will return the same {@link ProcessingInfo}.
     public ProcessingInfo<BibEntry, Summary> summarize(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
         ProcessingInfo<BibEntry, Summary> processingInfo = getProcessingInfo(bibEntry);
 
@@ -149,9 +145,7 @@ public class SummariesService {
                 .executeWith(taskExecutor);
     }
 
-    /**
-     * Method, similar to {@link #summarize(BibEntry, BibDatabaseContext)}, but it allows you to regenerate summary.
-     */
+    /// Method, similar to {@link #summarize(BibEntry, BibDatabaseContext)}, but it allows you to regenerate summary.
     public void regenerateSummary(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
         ProcessingInfo<BibEntry, Summary> processingInfo = summarize(bibEntry, bibDatabaseContext);
         processingInfo.setState(ProcessingState.PROCESSING);

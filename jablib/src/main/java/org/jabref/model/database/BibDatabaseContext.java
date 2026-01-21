@@ -37,16 +37,14 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Represents everything related to a BIB file.
- *
- * <p> The entries are stored in BibDatabase, the other data in MetaData
- * and the options relevant for this file in Defaults.
- * </p>
- * <p>
- * To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
- * </p>
- */
+/// Represents everything related to a BIB file.
+/// 
+/// The entries are stored in BibDatabase, the other data in MetaData
+/// and the options relevant for this file in Defaults.
+/// 
+/// 
+/// To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+/// 
 @AllowedToUseLogic("because it needs access to shared database features")
 @NullMarked
 public class BibDatabaseContext {
@@ -57,15 +55,11 @@ public class BibDatabaseContext {
 
     private MetaData metaData;
 
-    /**
-     * Generate a random UID for unique of the concrete context
-     * In contrast to hashCode this stays unique
-     */
+    /// Generate a random UID for unique of the concrete context
+    /// In contrast to hashCode this stays unique
     private final String uid = "bibdatabasecontext_" + UUID.randomUUID();
 
-    /**
-     * The path where this database was last saved to.
-     */
+    /// The path where this database was last saved to.
     @Nullable
     private Path path;
 
@@ -116,11 +110,9 @@ public class BibDatabaseContext {
         this.path = file;
     }
 
-    /**
-     * Get the path where this database was last saved to or loaded from, if any.
-     *
-     * @return Optional of the relevant Path, or Optional.empty() if none is defined.
-     */
+    /// Get the path where this database was last saved to or loaded from, if any.
+    /// 
+    /// @return Optional of the relevant Path, or Optional.empty() if none is defined.
     public Optional<Path> getDatabasePath() {
         return Optional.ofNullable(path);
     }
@@ -145,9 +137,7 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    /**
-     * Returns whether this .bib file belongs to a {@link Study}
-     */
+    /// Returns whether this .bib file belongs to a {@link Study}
     public boolean isStudy() {
         return this.getDatabasePath()
                    .map(path -> Crawler.FILENAME_STUDY_RESULT_BIB.equals(path.getFileName().toString()) &&
@@ -155,27 +145,25 @@ public class BibDatabaseContext {
                    .orElse(false);
     }
 
-    /**
-     * Look up the directories set up for this database.
-     * There can be up to four directories definitions for these files:
-     * <ol>
-     * <li>next to the .bib file.</li>
-     * <li>the preferences can specify a default one.</li>
-     * <li>the database's metadata can specify a library-specific directory.</li>
-     * <li>the database's metadata can specify a user-specific directory.</li>
-     * </ol>
-     * <p>
-     * The settings are prioritized in the following order, and the first defined setting is used:
-     * <ol>
-     *     <li>user-specific metadata directory</li>
-     *     <li>general metadata directory</li>
-     *     <li>BIB file directory (if configured in the preferences AND none of the two above directories are configured)</li>
-     *     <li>preferences directory (if .bib file directory should not be used according to the (global) preferences)</li>
-     * </ol>
-     *
-     * @param preferences The fileDirectory preferences
-     * @return List of existing absolute paths
-     */
+    /// Look up the directories set up for this database.
+    /// There can be up to four directories definitions for these files:
+    /// <ol>
+    /// - next to the .bib file.
+    /// - the preferences can specify a default one.
+    /// - the database's metadata can specify a library-specific directory.
+    /// - the database's metadata can specify a user-specific directory.
+    /// </ol>
+    /// 
+    /// The settings are prioritized in the following order, and the first defined setting is used:
+    /// <ol>
+    /// - user-specific metadata directory
+    /// - general metadata directory
+    /// - BIB file directory (if configured in the preferences AND none of the two above directories are configured)
+    /// - preferences directory (if .bib file directory should not be used according to the (global) preferences)
+    /// </ol>
+    /// 
+    /// @param preferences The fileDirectory preferences
+    /// @return List of existing absolute paths
     public List<Path> getFileDirectories(FilePreferences preferences) {
         // Paths are a) ordered and b) should be contained only once in the result
         SequencedSet<Path> fileDirs = new LinkedHashSet<>(3);
@@ -209,20 +197,16 @@ public class BibDatabaseContext {
         return new ArrayList<>(fileDirs);
     }
 
-    /**
-     * Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
-     *
-     * @return the path - or an empty optional, if none of the directories exists
-     */
+    /// Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
+    /// 
+    /// @return the path - or an empty optional, if none of the directories exists
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
         return getFileDirectories(preferences).stream()
                                               .filter(Files::exists)
                                               .findFirst();
     }
 
-    /**
-     * @return The absolute path for the given directory
-     */
+    /// @return The absolute path for the given directory
     private Path getFileDirectoryPath(String directory) {
         Path path = Path.of(directory);
         if (path.isAbsolute()) {
@@ -275,9 +259,7 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
-    /**
-     * @return The path to store the lucene index files. One directory for each library.
-     */
+    /// @return The path to store the lucene index files. One directory for each library.
     public Path getFulltextIndexPath() {
         Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
@@ -345,21 +327,17 @@ public class BibDatabaseContext {
         return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
     }
 
-    /**
-     * @implNote This implementation needs to be consistent with equals. That means, as soon as a new entry is added to the database, two different instances of BibDatabaseContext are not equal - and thus, the hashCode also needs to change. This has the drawback, that one cannot create HashMaps from the BiDatabaseContext anymore, as the hashCode changes as soon as a new entry is added.
-     */
+    /// @implNote This implementation needs to be consistent with equals. That means, as soon as a new entry is added to the database, two different instances of BibDatabaseContext are not equal - and thus, the hashCode also needs to change. This has the drawback, that one cannot create HashMaps from the BiDatabaseContext anymore, as the hashCode changes as soon as a new entry is added.
     @Override
     public int hashCode() {
         return Objects.hash(database, metaData, path, location);
     }
 
-    /**
-     * Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
-     * <p>
-     * This is required, because of {@link #hashCode()} implementation.
-     *
-     * @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
-     */
+    /// Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
+    /// 
+    /// This is required, because of {@link #hashCode()} implementation.
+    /// 
+    /// @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
     public String getUid() {
         return uid;
     }

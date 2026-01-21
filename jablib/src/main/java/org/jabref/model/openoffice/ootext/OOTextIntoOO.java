@@ -48,18 +48,14 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Interpret OOText into an OpenOffice or LibreOffice writer document.
- */
+/// Interpret OOText into an OpenOffice or LibreOffice writer document.
 @AllowedToUseLogic("Uses StringUtil temporarily")
 @AllowedToUseAwt("Requires AWT for changing document properties")
 public class OOTextIntoOO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOTextIntoOO.class);
 
-    /**
-     * "ParaStyleName" is an OpenOffice Property name.
-     */
+    /// "ParaStyleName" is an OpenOffice Property name.
     private static final String PARA_STYLE_NAME = "ParaStyleName";
 
     /*
@@ -102,36 +98,35 @@ public class OOTextIntoOO {
     private OOTextIntoOO() {
     }
 
-    /**
-     * Insert a text with formatting indicated by HTML-like tags, into a text at the position given by a cursor.
-     * <p>
-     * Limitation: understands no entities. It does not receive any either, unless the user provides it.
-     * <p>
-     * To limit the damage {@code TAG_NAME_REGEXP} and {@code ATTRIBUTE_NAME_REGEXP} explicitly lists the names we care about.
-     * <p>
-     * Notable changes w.r.t insertOOFormattedTextAtCurrentLocation:
-     * <p>
-     * - new tags:
-     * <p>
-     * - {@code <span lang="zxx">} - earlier was applied from code
-     * <p>
-     * - {@code <span oo:CharStyleName="CharStylename">} - earlier was applied from code, for "CitationCharacterFormat"
-     * <p>
-     * - {@code <p>} start new paragraph - earlier was applied from code
-     * <p>
-     * - {@code <p oo:ParaStyleName="ParStyleName">} : start new paragraph and apply ParStyleName - earlier was applied from code
-     * <p>
-     * - {@code <tt>} - earlier: known, but ignored - now: equivalent to {@code <span oo:CharStyleName="Example">} - {@code <oo:referenceToPageNumberOfReferenceMark>} (self-closing)
-     * <p>
-     * - closing tags try to properly restore state (in particular, the "not directly set" state) instead of dictating an "off" state. This makes a difference when the value inherited from another level (for example the paragraph) is not the "off" state.
-     * <p>
-     * An example: a style with {@code ReferenceParagraphFormat="JR_bibentry"} Assume JR_bibentry in LibreOffice is a paragraph style that prescribes "bold" font. LAYOUT only prescribes bold around year. Which parts of the bibliography entries should come out as bold?
-     * <p>
-     * - The user can format citation marks (it is enough to format their start) and the properties not (everywhere) dictated by the style are preserved (where they are not).
-     *
-     * @param position The cursor giving the insert location. Not modified.
-     * @param ootext   The marked-up text to insert.
-     */
+    /// Insert a text with formatting indicated by HTML-like tags, into a text at the position given by a cursor.
+    /// 
+    /// Limitation: understands no entities. It does not receive any either, unless the user provides it.
+    /// 
+    /// To limit the damage `TAG_NAME_REGEXP` and `ATTRIBUTE_NAME_REGEXP` explicitly lists the names we care about.
+    /// 
+    /// Notable changes w.r.t insertOOFormattedTextAtCurrentLocation:
+    /// 
+    /// - new tags:
+    /// 
+    /// - `<span lang="zxx">` - earlier was applied from code
+    /// 
+    /// - `<span oo:CharStyleName="CharStylename">` - earlier was applied from code, for "CitationCharacterFormat"
+    /// 
+    /// - `
+` start new paragraph - earlier was applied from code
+    /// 
+    /// - `<p oo:ParaStyleName="ParStyleName">` : start new paragraph and apply ParStyleName - earlier was applied from code
+    /// 
+    /// - `<tt>` - earlier: known, but ignored - now: equivalent to `<span oo:CharStyleName="Example">` - `<oo:referenceToPageNumberOfReferenceMark>` (self-closing)
+    /// 
+    /// - closing tags try to properly restore state (in particular, the "not directly set" state) instead of dictating an "off" state. This makes a difference when the value inherited from another level (for example the paragraph) is not the "off" state.
+    /// 
+    /// An example: a style with `ReferenceParagraphFormat="JR_bibentry"` Assume JR_bibentry in LibreOffice is a paragraph style that prescribes "bold" font. LAYOUT only prescribes bold around year. Which parts of the bibliography entries should come out as bold?
+    /// 
+    /// - The user can format citation marks (it is enough to format their start) and the properties not (everywhere) dictated by the style are preserved (where they are not).
+    /// 
+    /// @param position The cursor giving the insert location. Not modified.
+    /// @param ootext   The marked-up text to insert.
     public static void write(@NonNull XTextDocument doc,
                              @NonNull XTextCursor position,
                              @NonNull OOText ootext)
@@ -316,11 +311,9 @@ public class OOTextIntoOO {
         }
     }
 
-    /**
-     * Purpose: in some cases we do not want to inherit direct formatting from the context.
-     * <p>
-     * In particular, when filling the bibliography title and body.
-     */
+    /// Purpose: in some cases we do not want to inherit direct formatting from the context.
+    /// 
+    /// In particular, when filling the bibliography title and body.
     public static void removeDirectFormatting(XTextCursor cursor) {
         XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
 
@@ -425,24 +418,16 @@ public class OOTextIntoOO {
                 /* Used for <smallcaps> and <span style="font-variant: small-caps"> */
                 "CharCaseMap");
 
-        /**
-         * The number of properties actually controlled.
-         */
+        /// The number of properties actually controlled.
         final int goodSize;
 
-        /**
-         * From property name to index in goodNames.
-         */
+        /// From property name to index in goodNames.
         final Map<String, Integer> goodNameToIndex;
 
-        /**
-         * From index to property name.
-         */
+        /// From index to property name.
         final String[] goodNames;
 
-        /**
-         * Maintain a stack of layers, each containing a description of the desired state of properties. Each description is an ArrayList of property values, Optional.empty() encoding "not directly set".
-         */
+        /// Maintain a stack of layers, each containing a description of the desired state of properties. Each description is an ArrayList of property values, Optional.empty() encoding "not directly set".
         final Deque<ArrayList<Optional<Object>>> layers;
 
         MyPropertyStack(XTextCursor cursor) {
@@ -502,11 +487,9 @@ public class OOTextIntoOO {
             this.layers.push(initialValuesOpt);
         }
 
-        /**
-         * Given a list of property name, property value pairs, construct and push a new layer describing the intended state after these have been applied.
-         * <p>
-         * Opening tags usually call this.
-         */
+        /// Given a list of property name, property value pairs, construct and push a new layer describing the intended state after these have been applied.
+    /// 
+    /// Opening tags usually call this.
         void pushLayer(List<OOPair<String, Object>> settings) {
             ArrayList<Optional<Object>> oldLayer = layers.peek();
             ArrayList<Optional<Object>> newLayer = new ArrayList<>(oldLayer);
@@ -523,9 +506,7 @@ public class OOTextIntoOO {
             layers.push(newLayer);
         }
 
-        /**
-         * Closing tags just pop a layer.
-         */
+        /// Closing tags just pop a layer.
         void popLayer() {
             if (layers.size() <= 1) {
                 LOGGER.warn("popLayer: underflow");
@@ -534,11 +515,9 @@ public class OOTextIntoOO {
             layers.pop();
         }
 
-        /**
-         * Apply the current desired formatting state to a cursor.
-         * <p>
-         * The idea is to minimize the number of calls to OpenOffice.
-         */
+        /// Apply the current desired formatting state to a cursor.
+    /// 
+    /// The idea is to minimize the number of calls to OpenOffice.
         void apply(XTextCursor cursor) {
             XMultiPropertySet mps = UnoCast.cast(XMultiPropertySet.class, cursor).get();
             XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
@@ -582,9 +561,7 @@ public class OOTextIntoOO {
         }
     }
 
-    /**
-     * Parse HTML-like attributes to a list of (name,value) pairs.
-     */
+    /// Parse HTML-like attributes to a list of (name,value) pairs.
     private static List<OOPair<String, String>> parseAttributes(String attributes) {
         List<OOPair<String, String>> res = new ArrayList<>();
         if (attributes == null) {
@@ -599,9 +576,7 @@ public class OOTextIntoOO {
         return res;
     }
 
-    /**
-     * We rely on property values being either DIRECT_VALUE or DEFAULT_VALUE (not AMBIGUOUS_VALUE). If the cursor covers a homogeneous region, or is collapsed, then this is true.
-     */
+    /// We rely on property values being either DIRECT_VALUE or DEFAULT_VALUE (not AMBIGUOUS_VALUE). If the cursor covers a homogeneous region, or is collapsed, then this is true.
     private static boolean isPropertyDefault(XTextCursor cursor, String propertyName)
             throws
             UnknownPropertyException {
@@ -668,9 +643,7 @@ public class OOTextIntoOO {
         return settings;
     }
 
-    /**
-     * Locale from string encoding: language, language-country or language-country-variant
-     */
+    /// Locale from string encoding: language, language-country or language-country-variant
     private static List<OOPair<String, Object>> setCharLocale(String value) {
         if (StringUtil.isNullOrEmpty(value)) {
             throw new java.lang.IllegalArgumentException("setCharLocale \"\" or null");
@@ -739,9 +712,7 @@ public class OOTextIntoOO {
                 formatStack);
     }
 
-    /**
-     * @return true on failure
-     */
+    /// @return true on failure
     public static boolean setParagraphStyle(XTextCursor cursor, String paragraphStyle) {
         final boolean FAIL = true;
         final boolean PASS = false;

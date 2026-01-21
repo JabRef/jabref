@@ -7,24 +7,20 @@ import java.util.Optional;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
-/**
- * URL utilities for URLs in the JabRef GUI.
- * <p>
- * For logic-oriented URL utilities see {@link org.jabref.logic.util.URLUtil}.
- */
+/// URL utilities for URLs in the JabRef GUI.
+/// 
+/// For logic-oriented URL utilities see {@link org.jabref.logic.util.URLUtil}.
 public class URLUtil {
 
     private URLUtil() {
     }
 
-    /**
-     * Look for the last '.' in the link, and return the following characters.
-     * <p>
-     * This gives the extension for most reasonably named links.
-     *
-     * @param link The link
-     * @return The suffix, excluding the dot (e.g. "pdf")
-     */
+    /// Look for the last '.' in the link, and return the following characters.
+    /// 
+    /// This gives the extension for most reasonably named links.
+    /// 
+    /// @param link The link
+    /// @return The suffix, excluding the dot (e.g. "pdf")
     public static Optional<String> getSuffix(final String link, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String strippedLink = link;
         try {

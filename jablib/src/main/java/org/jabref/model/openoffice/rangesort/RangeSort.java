@@ -12,19 +12,15 @@ import org.jabref.model.openoffice.uno.UnoTextRange;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextRangeCompare;
 
-/**
- * RangeSort provides sorting based on XTextRangeCompare, which only provides comparison between XTextRange values within the same XText.
- */
+/// RangeSort provides sorting based on XTextRangeCompare, which only provides comparison between XTextRange values within the same XText.
 public class RangeSort {
 
     private RangeSort() {
     }
 
-    /**
-     * Compare two RangeHolders (using RangeHolder.getRange()) within an XText.
-     * <p>
-     * Note: since we only look at the ranges, this comparison is generally not consistent with `equals` on the RangeHolders. Probably should not be used for key comparison in {@code TreeMap<RangeHolder>} or {@code Set<RangeHolder>}
-     */
+    /// Compare two RangeHolders (using RangeHolder.getRange()) within an XText.
+    /// 
+    /// Note: since we only look at the ranges, this comparison is generally not consistent with `equals` on the RangeHolders. Probably should not be used for key comparison in `TreeMap<RangeHolder>` or `Set<RangeHolder>`
     private static class HolderComparatorWithinPartition implements Comparator<RangeHolder> {
 
         private final XTextRangeCompare cmp;
@@ -34,20 +30,16 @@ public class RangeSort {
                          .orElseThrow(java.lang.IllegalArgumentException::new);
         }
 
-        /**
-         * Assumes a and b belong to the same XText as cmp.
-         */
+        /// Assumes a and b belong to the same XText as cmp.
         @Override
         public int compare(RangeHolder a, RangeHolder b) {
             return UnoTextRange.compareStartsThenEndsUnsafe(cmp, a.getRange(), b.getRange());
         }
     }
 
-    /**
-     * Sort a list of RangeHolder values known to share the same getText().
-     * <p>
-     * Note: RangeHolder.getRange() is called many times.
-     */
+    /// Sort a list of RangeHolder values known to share the same getText().
+    /// 
+    /// Note: RangeHolder.getRange() is called many times.
     public static <V extends RangeHolder> void sortWithinPartition(List<V> rangeHolders) {
         if (rangeHolders.isEmpty()) {
             return;
@@ -56,9 +48,7 @@ public class RangeSort {
         rangeHolders.sort(new HolderComparatorWithinPartition(text));
     }
 
-    /**
-     * Represent a partitioning of RangeHolders by XText
-     */
+    /// Represent a partitioning of RangeHolders by XText
     public static class RangePartitions<V extends RangeHolder> {
         private final Map<XText, List<V>> partitions;
 
@@ -77,9 +67,7 @@ public class RangeSort {
         }
     }
 
-    /**
-     * Partition RangeHolders by the corresponding XText.
-     */
+    /// Partition RangeHolders by the corresponding XText.
     public static <V extends RangeHolder> RangePartitions<V> partitionRanges(List<V> holders) {
         RangePartitions<V> result = new RangePartitions<>();
         for (V holder : holders) {
@@ -88,9 +76,7 @@ public class RangeSort {
         return result;
     }
 
-    /**
-     * Note: RangeHolder.getRange() is called many times.
-     */
+    /// Note: RangeHolder.getRange() is called many times.
     public static <V extends RangeHolder> RangePartitions<V> partitionAndSortRanges(List<V> holders) {
         RangePartitions<V> result = partitionRanges(holders);
         for (List<V> partition : result.getPartitions()) {

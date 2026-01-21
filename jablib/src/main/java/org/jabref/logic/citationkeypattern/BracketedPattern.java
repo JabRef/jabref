@@ -40,48 +40,34 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class provides methods to expand bracketed expressions, such as
- * <code>[year]_[author]_[firstpage]</code>, using information from a provided BibEntry. The above-mentioned expression would yield
- * <code>2017_Kitsune_123</code> when expanded using the BibTeX entry <code>@Article{ authors = {O. Kitsune}, year = {2017},
- * pages={123-6}}</code>.
- * <p>
- * The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypatterns">Customize the citation key generator</a>.
- * </p>
- */
+/// This class provides methods to expand bracketed expressions, such as
+/// `[year]_[author]_[firstpage]`, using information from a provided BibEntry. The above-mentioned expression would yield
+/// `2017_Kitsune_123` when expanded using the BibTeX entry <code>@Article{ authors = {O. Kitsune}, year = {2017},
+/// pages={123-6}}</code>.
+/// 
+/// The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypatterns">Customize the citation key generator</a>.
+/// 
 public class BracketedPattern {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
-    /**
-     * The maximum number of characters in the first author's last name.
-     */
+    /// The maximum number of characters in the first author's last name.
     private static final int CHARS_OF_FIRST = 5;
 
-    /**
-     * The maximum number of name abbreviations that can be used. If there are more authors, {@code MAX_ALPHA_AUTHORS -
-     * 1} name abbreviations will be displayed, and a + sign will be appended at the end.
-     */
+    /// The maximum number of name abbreviations that can be used. If there are more authors, {@code MAX_ALPHA_AUTHORS -
+    /// 1} name abbreviations will be displayed, and a + sign will be appended at the end.
     private static final int MAX_ALPHA_AUTHORS = 4;
 
-    /**
-     * Matches everything that is not a unicode decimal digit.
-     */
+    /// Matches everything that is not a unicode decimal digit.
     private static final Pattern NOT_DECIMAL_DIGIT = Pattern.compile("\\P{Nd}");
 
-    /**
-     * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
-     */
+    /// Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
 
-    /**
-     * Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
-     */
+    /// Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
 
     private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
 
-    /**
-     * Matches with "dep"/"dip", case-insensitive
-     */
+    /// Matches with "dep"/"dip", case-insensitive
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
@@ -94,27 +80,19 @@ public class BracketedPattern {
         UNIVERSITY,
         TECHNOLOGY;
 
-        /**
-         * Matches "uni" followed by "v" or "b", at the start of a string or after a space, case insensitive
-         */
+        /// Matches "uni" followed by "v" or "b", at the start of a string or after a space, case insensitive
         private static final Pattern UNIVERSITIES = Pattern.compile("^uni(v|b|$).*", Pattern.CASE_INSENSITIVE);
 
-        /**
-         * Matches with "tech", case-insensitive
-         */
+        /// Matches with "tech", case-insensitive
         private static final Pattern TECHNOLOGICAL_INSTITUTES = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
 
-        /**
-         * Matches with "dep"/"dip"/"lab", case insensitive
-         */
+        /// Matches with "dep"/"dip"/"lab", case insensitive
         private static final Pattern DEPARTMENTS_OR_LABS = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
 
-        /**
-         * Find which types of institutions have words in common with the given name parts.
-         *
-         * @param nameParts a list of words that constitute parts of an institution's name.
-         * @return set containing all types that matches
-         */
+        /// Find which types of institutions have words in common with the given name parts.
+    /// 
+    /// @param nameParts a list of words that constitute parts of an institution's name.
+    /// @return set containing all types that matches
         public static EnumSet<Institution> findTypes(List<String> nameParts) {
             EnumSet<Institution> parts = EnumSet.noneOf(Institution.class);
             // Deciding about a part type…
@@ -157,52 +135,44 @@ public class BracketedPattern {
         return expand(bibentry, null);
     }
 
-    /**
-     * Expands the current pattern using the given bibentry and database. ";" is used as keyword delimiter.
-     *
-     * @param bibentry The bibentry to expand.
-     * @param database The database to use for string-lookups and cross-refs. May be null.
-     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
-     */
+    /// Expands the current pattern using the given bibentry and database. ";" is used as keyword delimiter.
+    /// 
+    /// @param bibentry The bibentry to expand.
+    /// @param database The database to use for string-lookups and cross-refs. May be null.
+    /// @return The expanded pattern. The empty string is returned, if it could not be expanded.
     public String expand(@NonNull BibEntry bibentry, BibDatabase database) {
         Character keywordDelimiter = ';';
         return expand(bibentry, keywordDelimiter, database);
     }
 
-    /**
-     * Expands the current pattern using the given bibentry, keyword delimiter, and database.
-     *
-     * @param bibentry         The bibentry to expand.
-     * @param keywordDelimiter The keyword delimiter to use.
-     * @param database         The database to use for string-lookups and cross-refs. May be null.
-     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
-     */
+    /// Expands the current pattern using the given bibentry, keyword delimiter, and database.
+    /// 
+    /// @param bibentry         The bibentry to expand.
+    /// @param keywordDelimiter The keyword delimiter to use.
+    /// @param database         The database to use for string-lookups and cross-refs. May be null.
+    /// @return The expanded pattern. The empty string is returned, if it could not be expanded.
     public String expand(@NonNull BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
-    /**
-     * Expands a pattern
-     *
-     * @param pattern          The pattern to expand
-     * @param keywordDelimiter The keyword delimiter to use
-     * @param entry            The bibEntry to use for expansion
-     * @param database         The database for field resolving. May be null.
-     * @return The expanded pattern. Not null.
-     */
+    /// Expands a pattern
+    /// 
+    /// @param pattern          The pattern to expand
+    /// @param keywordDelimiter The keyword delimiter to use
+    /// @param entry            The bibEntry to use for expansion
+    /// @param database         The database for field resolving. May be null.
+    /// @return The expanded pattern. Not null.
     public static String expandBrackets(@NonNull String pattern, Character keywordDelimiter, @NonNull BibEntry entry, BibDatabase database) {
         return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
     }
 
-    /**
-     * Utility method creating a function taking the string representation of the content of a bracketed expression and
-     * expanding it.
-     *
-     * @param keywordDelimiter The keyword delimiter to use
-     * @param entry            The {@link BibEntry} to use for expansion
-     * @param database         The {@link BibDatabase} for field resolving. May be null.
-     * @return a function accepting a bracketed expression and returning the result of expanding it
-     */
+    /// Utility method creating a function taking the string representation of the content of a bracketed expression and
+    /// expanding it.
+    /// 
+    /// @param keywordDelimiter The keyword delimiter to use
+    /// @param entry            The {@link BibEntry} to use for expansion
+    /// @param database         The {@link BibDatabase} for field resolving. May be null.
+    /// @return a function accepting a bracketed expression and returning the result of expanding it
     public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         return (String bracket) -> {
             List<String> fieldParts = parseFieldAndModifiers(bracket);
@@ -217,14 +187,12 @@ public class BracketedPattern {
         };
     }
 
-    /**
-     * Expands a pattern.
-     *
-     * @param pattern               The pattern to expand
-     * @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
-     *                              and expanding it
-     * @return The expanded pattern. Not null.
-     */
+    /// Expands a pattern.
+    /// 
+    /// @param pattern               The pattern to expand
+    /// @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
+    /// and expanding it
+    /// @return The expanded pattern. Not null.
     public static String expandBrackets(@NonNull String pattern, Function<String, String> bracketContentHandler) {
         StringBuilder expandedPattern = new StringBuilder();
         pattern = pattern.replace("\\\"", "\u0A17");
@@ -254,16 +222,14 @@ public class BracketedPattern {
         return expandedPattern.toString().replace("\u0A17", "\\\"");
     }
 
-    /**
-     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
-     * There may be brackets in it.
-     * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
-     * is encountered, and has been consumed, by the {@code StringTokenizer}.
-     *
-     * @param pattern   pattern used by {@code expandBrackets}, used for logging
-     * @param tokenizer the tokenizer producing the tokens
-     * @return the content enclosed by brackets
-     */
+    /// Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
+    /// There may be brackets in it.
+    /// Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
+    /// is encountered, and has been consumed, by the `StringTokenizer`.
+    /// 
+    /// @param pattern   pattern used by `expandBrackets`, used for logging
+    /// @param tokenizer the tokenizer producing the tokens
+    /// @return the content enclosed by brackets
     private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
         StringBuilder bracketContent = new StringBuilder();
         boolean foundClosingBracket = false;
@@ -300,14 +266,12 @@ public class BracketedPattern {
         return bracketContent.toString();
     }
 
-    /**
-     * Appends the content between, and including, two \" to the provided <code>StringBuilder</code>. Intended to be
-     * used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \" is
-     * encountered by the StringTokenizer.
-     *
-     * @param stringBuilder the <code>StringBuilder</code> to which tokens will be appended
-     * @param tokenizer     the tokenizer producing the tokens
-     */
+    /// Appends the content between, and including, two \" to the provided `StringBuilder`. Intended to be
+    /// used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \" is
+    /// encountered by the StringTokenizer.
+    /// 
+    /// @param stringBuilder the `StringBuilder` to which tokens will be appended
+    /// @param tokenizer     the tokenizer producing the tokens
     private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
         stringBuilder.append("\"");  // We know that the previous token was \"
         String token = "";
@@ -317,15 +281,13 @@ public class BracketedPattern {
         }
     }
 
-    /**
-     * Evaluates the given pattern to the given bibentry and database
-     *
-     * @param entry            The entry to get the field value from
-     * @param pattern          A pattern string (such as auth, pureauth, authorLast)
-     * @param keywordDelimiter The de
-     * @param database         The database to use for field resolving. May be null.
-     * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
-     */
+    /// Evaluates the given pattern to the given bibentry and database
+    /// 
+    /// @param entry            The entry to get the field value from
+    /// @param pattern          A pattern string (such as auth, pureauth, authorLast)
+    /// @param keywordDelimiter The de
+    /// @param database         The database to use for field resolving. May be null.
+    /// @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
     public static String getFieldValue(BibEntry entry, String pattern, Character keywordDelimiter, BibDatabase database) {
         try {
             if (pattern.startsWith("auth") || pattern.startsWith("pureauth")) {
@@ -520,13 +482,11 @@ public class BracketedPattern {
         }
     }
 
-    /**
-     * Parses the provided string to an {@link AuthorList}, which are then formatted by {@link LatexToUnicodeAdapter}.
-     * Afterward, any institutions are formatted into an institution key.
-     *
-     * @param unparsedAuthors a string representation of authors or editors
-     * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
-     */
+    /// Parses the provided string to an {@link AuthorList}, which are then formatted by {@link LatexToUnicodeAdapter}.
+    /// Afterward, any institutions are formatted into an institution key.
+    /// 
+    /// @param unparsedAuthors a string representation of authors or editors
+    /// @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
     private static AuthorList createAuthorList(String unparsedAuthors) {
         return AuthorList.parse(unparsedAuthors).getAuthors().stream()
                          .map(author -> {
@@ -546,27 +506,23 @@ public class BracketedPattern {
                          .collect(AuthorList.collect());
     }
 
-    /**
-     * Checks if an author is an institution which can get a citation key from {@link #generateInstitutionKey(String)}.
-     *
-     * @param author the checked author
-     * @return true if only the last name is present and it contains at least one whitespace character.
-     */
+    /// Checks if an author is an institution which can get a citation key from {@link #generateInstitutionKey(String)}.
+    /// 
+    /// @param author the checked author
+    /// @return true if only the last name is present and it contains at least one whitespace character.
     private static boolean isInstitution(Author author) {
         return author.getGivenName().isEmpty() && author.getGivenNameAbbreviated().isEmpty() && author.getNameSuffix().isEmpty()
                 && author.getNamePrefix().isEmpty() && author.getFamilyName().isPresent()
                 && WHITESPACE.matcher(author.getFamilyName().get()).find();
     }
 
-    /**
-     * Applies modifiers to a label generated based on a field marker.
-     *
-     * @param label                The generated label.
-     * @param parts                String array containing the modifiers.
-     * @param offset               The number of initial items in the modifiers array to skip.
-     * @param expandBracketContent a function to expand the content in the parentheses.
-     * @return The modified label.
-     */
+    /// Applies modifiers to a label generated based on a field marker.
+    /// 
+    /// @param label                The generated label.
+    /// @param parts                String array containing the modifiers.
+    /// @param offset               The number of initial items in the modifiers array to skip.
+    /// @param expandBracketContent a function to expand the content in the parentheses.
+    /// @return The modified label.
     static String applyModifiers(final String label, final List<String> parts, final int offset, Function<String, String> expandBracketContent) {
         String resultingLabel = label;
         for (int j = offset; j < parts.size(); j++) {
@@ -601,16 +557,12 @@ public class BracketedPattern {
         return resultingLabel;
     }
 
-    /**
-     * Determines "number" words out of the "title" field in the given BibTeX entry
-     */
+    /// Determines "number" words out of the "title" field in the given BibTeX entry
     public static String getTitleWords(int number, String title) {
         return getTitleWordsWithSpaces(number, title);
     }
 
-    /**
-     * Removes any '-', unnecessary whitespace and latex commands formatting
-     */
+    /// Removes any '-', unnecessary whitespace and latex commands formatting
     private static String formatTitle(String title) {
         String ss = new RemoveLatexCommandsFormatter().format(title);
         StringBuilder stringBuilder = new StringBuilder();
@@ -642,9 +594,7 @@ public class BracketedPattern {
         return stringBuilder.toString();
     }
 
-    /**
-     * Capitalises and concatenates the words out of the "title" field in the given BibTeX entry
-     */
+    /// Capitalises and concatenates the words out of the "title" field in the given BibTeX entry
     public static String getCamelizedTitle(String title) {
         return keepLettersAndDigitsOnly(camelizeTitle(title));
     }
@@ -670,9 +620,7 @@ public class BracketedPattern {
         return stringBuilder.toString();
     }
 
-    /**
-     * Capitalises and concatenates the words out of the "title" field in the given BibTeX entry, to a maximum of N words.
-     */
+    /// Capitalises and concatenates the words out of the "title" field in the given BibTeX entry, to a maximum of N words.
     public static String getCamelizedTitle_N(String title, int number) {
         return keepLettersAndDigitsOnly(camelizeTitle_N(title, number));
     }
@@ -700,9 +648,7 @@ public class BracketedPattern {
         return getSomeWords(number, camelString);
     }
 
-    /**
-     * Capitalises the significant words of the "title" field in the given BibTeX entry
-     */
+    /// Capitalises the significant words of the "title" field in the given BibTeX entry
     public static String camelizeSignificantWordsInTitle(String title) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
@@ -760,13 +706,11 @@ public class BracketedPattern {
                  .toString();
     }
 
-    /**
-     * Gets the last name of the first author/editor
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the surname of an author/editor or the von part if no lastname is prsent or ""  if no author was found or both firstname+lastname are empty
-     * This method is guaranteed to never return null.
-     */
+    /// Gets the last name of the first author/editor
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the surname of an author/editor or the von part if no lastname is prsent or ""  if no author was found or both firstname+lastname are empty
+    /// This method is guaranteed to never return null.
     private static String firstAuthor(AuthorList authorList) {
         return authorList.getAuthors().stream()
                          .findFirst()
@@ -774,13 +718,11 @@ public class BracketedPattern {
                          .orElse("");
     }
 
-    /**
-     * Gets the first name initials of the first author/editor
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to
-     * never return null.
-     */
+    /// Gets the first name initials of the first author/editor
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to
+    /// never return null.
     private static String firstAuthorForenameInitials(AuthorList authorList) {
         return authorList.getAuthors().stream()
                          .findFirst()
@@ -789,24 +731,20 @@ public class BracketedPattern {
                          .orElse("");
     }
 
-    /**
-     * Gets the von part and the last name of the first author/editor. No spaces are returned.
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to
-     * never return null.
-     */
+    /// Gets the von part and the last name of the first author/editor. No spaces are returned.
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to
+    /// never return null.
     private static String firstAuthorVonAndLast(AuthorList authorList) {
         return authorList.isEmpty() ? "" :
                authorList.getAuthor(0).getNamePrefixAndFamilyName().replace(" ", "");
     }
 
-    /**
-     * Gets the last name of the last author/editor
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the surname of an author/editor
-     */
+    /// Gets the last name of the last author/editor
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the surname of an author/editor
     @VisibleForTesting
     static String lastAuthor(AuthorList authorList) {
         if (authorList.isEmpty()) {
@@ -815,13 +753,11 @@ public class BracketedPattern {
         return authorList.getAuthors().get(authorList.getNumberOfAuthors() - 1).getFamilyName().orElse("");
     }
 
-    /**
-     * Gets the forename initials of the last author/editor
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never
-     * return null.
-     */
+    /// Gets the forename initials of the last author/editor
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never
+    /// return null.
     private static String lastAuthorForenameInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
@@ -830,26 +766,22 @@ public class BracketedPattern {
                          .orElse("");
     }
 
-    /**
-     * Gets the last name of all authors/editors.
-     * Pattern <code>[authors]</code>.
-     * <p>
-     * <code>and others</code> is converted to <code>EtAl</code>
-     * </p>
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the surname of all authors/editors
-     */
+    /// Gets the last name of all authors/editors.
+    /// Pattern `[authors]`.
+    /// 
+    /// `and others` is converted to `EtAl`
+    /// 
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the surname of all authors/editors
     static String allAuthors(AuthorList authorList) {
         return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), "", "EtAl");
     }
 
-    /**
-     * Returns the authors according to the BibTeX-alpha-Style
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the initials of all authors' names
-     */
+    /// Returns the authors according to the BibTeX-alpha-Style
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the initials of all authors' names
     public static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
         int maxAuthors;
@@ -897,14 +829,12 @@ public class BracketedPattern {
         return alphaStyle.toString();
     }
 
-    /**
-     * Returns the authors according to the <a href="https://github.com/michel-kraemer/citeproc-java">BibTeX LNI template</a>
-     * Examples: <a href="https://github.com/gi-ev/biblatex-lni/blob/main/basic-test-en.tex">Examples from the tmplate</a>
-     * Also see discussion at the <a href="https://github.com/JabRef/jabref/pull/11614">pull request that introduced this</a>.
-     *
-     * @param authorList an {@link AuthorList}
-     * @return the initials of all authors' names
-     */
+    /// Returns the authors according to the <a href="https://github.com/michel-kraemer/citeproc-java">BibTeX LNI template</a>
+    /// Examples: <a href="https://github.com/gi-ev/biblatex-lni/blob/main/basic-test-en.tex">Examples from the tmplate</a>
+    /// Also see discussion at the <a href="https://github.com/JabRef/jabref/pull/11614">pull request that introduced this</a>.
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @return the initials of all authors' names
     public static String authorsAlphaLNI(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
         int numberOfAuthors = authorList.getNumberOfAuthors();
@@ -945,17 +875,15 @@ public class BracketedPattern {
         return initials.toString();
     }
 
-    /**
-     * Creates a string with all last names separated by a `delimiter`. If the number of authors are larger than
-     * `maxAuthors`, replace all excess authors with `suffix`.
-     *
-     * @param authorList the list of authors
-     * @param maxAuthors the maximum number of authors in the string
-     * @param delimiter  delimiter separating the last names of the authors
-     * @param suffix     to replace excess authors with. Also used to replace <code>and others</code>.
-     * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
-     * `maxAuthors` replaced with `suffix`
-     */
+    /// Creates a string with all last names separated by a `delimiter`. If the number of authors are larger than
+    /// `maxAuthors`, replace all excess authors with `suffix`.
+    /// 
+    /// @param authorList the list of authors
+    /// @param maxAuthors the maximum number of authors in the string
+    /// @param delimiter  delimiter separating the last names of the authors
+    /// @param suffix     to replace excess authors with. Also used to replace `and others`.
+    /// @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
+    /// `maxAuthors` replaced with `suffix`
     public static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
         final String finalSuffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
         return authorList.getAuthors().stream()
@@ -975,24 +903,20 @@ public class BracketedPattern {
                          .collect(Collectors.joining(delimiter, "", finalSuffix));
     }
 
-    /**
-     * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
-     *
-     * @param authorList an {@link AuthorList}
-     * @param n          the number of desired authors
-     * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
-     */
+    /// Gets the surnames of the first N authors and appends EtAl if there are more than N authors
+    /// 
+    /// @param authorList an {@link AuthorList}
+    /// @param n          the number of desired authors
+    /// @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
     private static String nAuthors(AuthorList authorList, int n) {
         return joinAuthorsOnLastName(authorList, n, "", "EtAl");
     }
 
-    /**
-     * Gets the first part of the last name of the first author/editor, and appends the last name initial of the
-     * remaining authors/editors. Maximum 5 characters
-     *
-     * @param authorList an <{@link AuthorList}
-     * @return the surname of all authors/editors
-     */
+    /// Gets the first part of the last name of the first author/editor, and appends the last name initial of the
+    /// remaining authors/editors. Maximum 5 characters
+    /// 
+    /// @param authorList an <{@link AuthorList}
+    /// @return the surname of all authors/editors
     static String oneAuthorPlusInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
@@ -1011,9 +935,7 @@ public class BracketedPattern {
         return joinAuthorsOnLastName(authorList, 2, ".", ".ea");
     }
 
-    /**
-     * auth.etal, authEtAl, ... format
-     */
+    /// auth.etal, authEtAl, ... format
     static String authEtal(AuthorList authorList, String delim, String append) {
         if (authorList.isEmpty()) {
             return "";
@@ -1028,10 +950,8 @@ public class BracketedPattern {
         }
     }
 
-    /**
-     * The first N characters of the Mth author's or editor's last name. M starts counting from 1.
-     * In case the Mth author is {@link Author#OTHERS}, <code>+</code> is returned.
-     */
+    /// The first N characters of the Mth author's or editor's last name. M starts counting from 1.
+    /// In case the Mth author is {@link Author#OTHERS}, `+` is returned.
     private static String authNofMth(AuthorList authorList, int n, int m) {
         // have m counting from 0
         int mminusone = m - 1;
@@ -1049,16 +969,12 @@ public class BracketedPattern {
         return lastName.length() > n ? lastName.substring(0, n) : lastName;
     }
 
-    /**
-     * First N chars of the first author's last name.
-     */
+    /// First N chars of the first author's last name.
     private static String authN(AuthorList authorList, int num) {
         return authNofMth(authorList, num, 1);
     }
 
-    /**
-     * authshort format
-     */
+    /// authshort format
     static String authShort(AuthorList authorList) {
         StringBuilder author = new StringBuilder();
         final int numberOfAuthors = authorList.getNumberOfAuthors();
@@ -1077,13 +993,11 @@ public class BracketedPattern {
         return author.toString();
     }
 
-    /**
-     * authIniN format
-     *
-     * @param authorList The authors to format.
-     * @param n          The maximum number of characters this string will be long. A negative number or zero will lead
-     *                   to "" be returned.
-     */
+    /// authIniN format
+    /// 
+    /// @param authorList The authors to format.
+    /// @param n          The maximum number of characters this string will be long. A negative number or zero will lead
+    /// to "" be returned.
     static String authIniN(AuthorList authorList, int n) {
         if ((n <= 0) || authorList.isEmpty()) {
             return "";
@@ -1121,13 +1035,11 @@ public class BracketedPattern {
         }
     }
 
-    /**
-     * Split the pages field into separate numbers and return the lowest
-     *
-     * @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97 or 43+
-     * @return the first page number or "" if no number is found in the string
-     * @throws NullPointerException if pages is null
-     */
+    /// Split the pages field into separate numbers and return the lowest
+    /// 
+    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97 or 43+
+    /// @return the first page number or "" if no number is found in the string
+    /// @throws NullPointerException if pages is null
     public static String firstPage(String pages) {
         // FIXME: incorrectly exracts the first page when pages are
         // specified with ellipse, e.g. "213-6", which should stand
@@ -1140,13 +1052,11 @@ public class BracketedPattern {
                                 .orElse("");
     }
 
-    /**
-     * Return the non-digit prefix of pages
-     *
-     * @param pages a pages string such as L42--111 or L7,41,73--97 or L43+
-     * @return the non-digit prefix of pages (like "L" of L7) or "" if no non-digit prefix is found in the string
-     * @throws NullPointerException if pages is null.
-     */
+    /// Return the non-digit prefix of pages
+    /// 
+    /// @param pages a pages string such as L42--111 or L7,41,73--97 or L43+
+    /// @return the non-digit prefix of pages (like "L" of L7) or "" if no non-digit prefix is found in the string
+    /// @throws NullPointerException if pages is null.
     public static String pagePrefix(String pages) {
         if (pages.matches("^\\D+.*$")) {
             return (pages.split("\\d+"))[0];
@@ -1155,13 +1065,11 @@ public class BracketedPattern {
         }
     }
 
-    /**
-     * Split the pages field into separate numbers and return the highest
-     *
-     * @param pages a pages string such as 42--111 or 7,41,73--97 or 43+
-     * @return the first page number or "" if no number is found in the string
-     * @throws NullPointerException if pages is null.
-     */
+    /// Split the pages field into separate numbers and return the highest
+    /// 
+    /// @param pages a pages string such as 42--111 or 7,41,73--97 or 43+
+    /// @return the first page number or "" if no number is found in the string
+    /// @throws NullPointerException if pages is null.
     public static String lastPage(String pages) {
         return NOT_DECIMAL_DIGIT.splitAsStream(pages)
                                 .filter(Predicate.not(String::isBlank))
@@ -1171,13 +1079,11 @@ public class BracketedPattern {
                                 .orElse("");
     }
 
-    /**
-     * Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
-     * parentheses.
-     *
-     * @param arg The argument string.
-     * @return An array of strings representing the parts of the marker
-     */
+    /// Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
+    /// parentheses.
+    /// 
+    /// @param arg The argument string.
+    /// @return An array of strings representing the parts of the marker
     protected static List<String> parseFieldAndModifiers(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
@@ -1220,70 +1126,68 @@ public class BracketedPattern {
         return parts;
     }
 
-    /**
-     * <p>
-     * An author or editor may be an institution not a person. In that case the key generator builds very long keys,
-     * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
-     * </p>
-     *
-     * <p>
-     * An institution name should be inside <code>{}</code> brackets. If the institution name includes its abbreviation
-     * this abbreviation should be in <code>{}</code> brackets. For the previous example the value should look like:
-     * <code>{The Attributed Graph Grammar System ({AGG})}</code>.
-     * </p>
-     *
-     * <p>
-     * If an institution includes its abbreviation, i.e. "...({XYZ})", first such abbreviation should be used as the key
-     * value part of such author.
-     * </p>
-     *
-     * <p>
-     * If an institution does not include its abbreviation the key should be generated from its name in the following
-     * way:
-     * </p>
-     *
-     * <p>
-     * The institution value can contain: institution name, part of the institution, address, etc. These values should
-     * be comma separated. Institution name and possible part of the institution should be in the beginning, while
-     * address and secondary information should be in the end.
-     * </p>
-     * <p>
-     * Each part is examined separately:
-     * <ol>
-     * <li>We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
-     * (ltd., co., ...) and which first character is lowercase (of, on, di, ...).</li>
-     * <li>We detect the types of the part: university, technology institute,
-     * department, school, rest
-     * <ul>
-     * <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
-     * <li>Department: If the institution value contains more than one comma separated part, the department will be an
-     * abbreviation of all words beginning with the uppercase letter except of words:
-     * <code>d[ei]p.*</code>, school, faculty</li>
-     * <li>School: same as department</li>
-     * <li>Rest: If there are less than 3 tokens in such part than the result
-     * is a concatenation of those tokens. Otherwise, the result will be built
-     * from the first letter in each token.</li>
-     * </ul>
-     * </ol>
-     * <p>
-     * Parts are concatenated together in the following way:
-     * <ul>
-     * <li>If there is a university part use it otherwise use the rest part.</li>
-     * <li>If there is a school part append it.</li>
-     * <li>If there is a department part and it is not same as school part
-     * append it.</li>
-     * </ul>
-     * <p>
-     * Rest part is only the first part which do not match any other type. All
-     * other parts (address, ...) are ignored.
-     *
-     * @param content the institution to generate a Bibtex key for
-     * @return <ul>
-     *         <li>the institution key</li>
-     *         <li>"" in the case of a failure</li>
-     *         <li>null if content is null</li>
-     *         </ul>
-     */
+    /// 
+    /// An author or editor may be an institution not a person. In that case the key generator builds very long keys,
+    /// e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
+    /// 
+    /// 
+    /// 
+    /// An institution name should be inside `{}` brackets. If the institution name includes its abbreviation
+    /// this abbreviation should be in `{}` brackets. For the previous example the value should look like:
+    /// `{The Attributed Graph Grammar System ({AGG})}`.
+    /// 
+    /// 
+    /// 
+    /// If an institution includes its abbreviation, i.e. "...({XYZ})", first such abbreviation should be used as the key
+    /// value part of such author.
+    /// 
+    /// 
+    /// 
+    /// If an institution does not include its abbreviation the key should be generated from its name in the following
+    /// way:
+    /// 
+    /// 
+    /// 
+    /// The institution value can contain: institution name, part of the institution, address, etc. These values should
+    /// be comma separated. Institution name and possible part of the institution should be in the beginning, while
+    /// address and secondary information should be in the end.
+    /// 
+    /// 
+    /// Each part is examined separately:
+    /// <ol>
+    /// - We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
+    /// (ltd., co., ...) and which first character is lowercase (of, on, di, ...).
+    /// - We detect the types of the part: university, technology institute,
+    /// department, school, rest
+    /// 
+    /// - University: `"Uni[NameOfTheUniversity]"`
+    /// - Department: If the institution value contains more than one comma separated part, the department will be an
+    /// abbreviation of all words beginning with the uppercase letter except of words:
+    /// `d[ei]p.*`, school, faculty
+    /// - School: same as department
+    /// - Rest: If there are less than 3 tokens in such part than the result
+    /// is a concatenation of those tokens. Otherwise, the result will be built
+    /// from the first letter in each token.
+    /// 
+    /// </ol>
+    /// 
+    /// Parts are concatenated together in the following way:
+    /// 
+    /// - If there is a university part use it otherwise use the rest part.
+    /// - If there is a school part append it.
+    /// - If there is a department part and it is not same as school part
+    /// append it.
+    /// 
+    /// 
+    /// Rest part is only the first part which do not match any other type. All
+    /// other parts (address, ...) are ignored.
+    /// 
+    /// @param content the institution to generate a Bibtex key for
+    /// @return
+    /// - the institution key
+    /// - "" in the case of a failure
+    /// - null if content is null
+    /// 
     @VisibleForTesting
     static String generateInstitutionKey(String content) {
         if (content == null) {
@@ -1378,12 +1282,10 @@ public class BracketedPattern {
                 + ((department == null) || (department.equals(school)) ? "" : department);
     }
 
-    /**
-     * Helper method for {@link BracketedPattern#generateInstitutionKey(String)}. Checks that the word is not an
-     * institution keyword and has an uppercase first letter, except univ/tech key word.
-     *
-     * @param word to check
-     */
+    /// Helper method for {@link BracketedPattern#generateInstitutionKey(String)}. Checks that the word is not an
+    /// institution keyword and has an uppercase first letter, except univ/tech key word.
+    /// 
+    /// @param word to check
     private static boolean noOtherInstitutionKeyWord(String word) {
         return !DEPARTMENTS.matcher(word).matches()
                 && !StandardField.SCHOOL.getName().equalsIgnoreCase(word)

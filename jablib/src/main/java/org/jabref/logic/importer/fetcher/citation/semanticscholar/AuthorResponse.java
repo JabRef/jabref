@@ -1,8 +1,6 @@
 package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 
-/**
- * Used for GSON
- */
+/// Used for GSON
 public class AuthorResponse {
     private String authorId;
     private String name;

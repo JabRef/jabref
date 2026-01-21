@@ -23,11 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * Tests based on a BibEntry are contained in {@link CitationKeyGeneratorTest}
- * <p>
- * "Complete" entries are tested at {@link org.jabref.logic.citationkeypattern.MakeLabelWithDatabaseTest}
- */
+/// Tests based on a BibEntry are contained in {@link CitationKeyGeneratorTest}
+/// 
+/// "Complete" entries are tested at {@link org.jabref.logic.citationkeypattern.MakeLabelWithDatabaseTest}
 @Execution(ExecutionMode.CONCURRENT)
 class BracketedPatternTest {
 
@@ -144,9 +142,7 @@ class BracketedPatternTest {
         assertEquals(expected, BracketedPattern.authorsAlphaLNI(list));
     }
 
-    /**
-     * Tests [authorIni]
-     */
+    /// Tests [authorIni]
     static Stream<Arguments> oneAuthorPlusInitials() {
         return Stream.of(
                 Arguments.of("Aalst", "Wil van der Aalst"),
@@ -633,9 +629,7 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[year][]-[journal]", ';', dbentry, database));
     }
 
-    /**
-     * Test the [:truncate] modifier
-     */
+    /// Test the [:truncate] modifier
     @Test
     void expandBracketsChainsTwoTruncateModifiers() {
         assertEquals("Open",
@@ -648,9 +642,7 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
     }
 
-    /**
-     * Test the [:camel] modifier
-     */
+    /// Test the [:camel] modifier
     @ParameterizedTest
     @CsvSource({
             "'CamelTitleFormatter', 'Camel Title Formatter'",
@@ -666,9 +658,7 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[title:camel]", ';', bibEntry, null));
     }
 
-    /**
-     * Test the [:veryshorttitle] modifier
-     */
+    /// Test the [:veryshorttitle] modifier
     @ParameterizedTest
     @CsvSource({
             "'Very', 'A very short title'",
@@ -682,9 +672,7 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[title:veryshorttitle]", ';', bibEntry, null));
     }
 
-    /**
-     * Test the [:shorttitle] modifier
-     */
+    /// Test the [:shorttitle] modifier
     @ParameterizedTest
     @CsvSource({
             "'Very Short Title', 'A very short title'",
@@ -699,9 +687,7 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[title:shorttitle]", ';', bibEntry, null));
     }
 
-    /**
-     * Test the [:camelN] modifier
-     */
+    /// Test the [:camelN] modifier
     @Test
     void expandBracketsCamelNModifier() {
         BibEntry bibEntry = new BibEntry()
@@ -714,9 +700,7 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[title:camel10]", ';', bibEntry, null));
     }
 
-    /**
-     * Test the [camelN] title marker.
-     */
+    /// Test the [camelN] title marker.
     @Test
     void expandBracketsCamelNTitle() {
         assertEquals("Open",

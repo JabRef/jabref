@@ -61,9 +61,7 @@ import com.sun.star.text.XTextDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for manipulating the Bibliography of the currently started document in OpenOffice.
- */
+/// Class for manipulating the Bibliography of the currently started document in OpenOffice.
 public class OOBibBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBase.class);
@@ -119,32 +117,24 @@ public class OOBibBase {
         }
     }
 
-    /**
-     * A simple test for document availability.
-     * <p>
-     * See also `isDocumentConnectionMissing` for a test actually attempting to use the connection.
-     */
+    /// A simple test for document availability.
+    /// 
+    /// See also `isDocumentConnectionMissing` for a test actually attempting to use the connection.
     public boolean isConnectedToDocument() {
         return this.connection.isConnectedToDocument();
     }
 
-    /**
-     * @return true if we are connected to a document
-     */
+    /// @return true if we are connected to a document
     public boolean isDocumentConnectionMissing() {
         return this.connection.isDocumentConnectionMissing();
     }
 
-    /**
-     * Either return an XTextDocument or return JabRefException.
-     */
+    /// Either return an XTextDocument or return JabRefException.
     public OOResult<XTextDocument, OOError> getXTextDocument() {
         return this.connection.getXTextDocument();
     }
 
-    /**
-     * The title of the current document, or Optional.empty()
-     */
+    /// The title of the current document, or Optional.empty()
     public Optional<String> getCurrentDocumentTitle() {
         return this.connection.getCurrentDocumentTitle();
     }
@@ -193,9 +183,7 @@ public class OOBibBase {
         return testDialog(collectResults(errorTitle, resultList));
     }
 
-    /**
-     * Get the cursor positioned by the user for inserting text.
-     */
+    /// Get the cursor positioned by the user for inserting text.
     OOResult<XTextCursor, OOError> getUserCursorForTextInsertion(XTextDocument doc, String errorTitle) {
         // Get the cursor positioned by the user.
         XTextCursor cursor = UnoCursor.getViewCursor(doc).orElse(null);
@@ -214,9 +202,7 @@ public class OOBibBase {
         return OOResult.ok(cursor);
     }
 
-    /**
-     * This may move the view cursor.
-     */
+    /// This may move the view cursor.
     OOResult<FunctionalTextViewCursor, OOError> getFunctionalTextViewCursor(XTextDocument doc, String errorTitle) {
         String messageOnFailureToObtain =
                 Localization.lang("Please move the cursor into the document text.")
@@ -480,25 +466,23 @@ public class OOBibBase {
         }
     }
 
-    /**
-     * Apply editable parts of citationEntries to the document: store pageInfo.
-     * <p>
-     * Does not change presentation.
-     * <p>
-     * Note: we use no undo context here, because only DocumentConnection.setUserDefinedStringPropertyValue() is called, and Undo in LO will not undo that.
-     * <p>
-     * GUI: "Manage citations" dialog "OK" button. Called from: ManageCitationsDialogViewModel.storeSettings
-     *
-     * <p>
-     * Currently the only editable part is pageInfo.
-     * <p>
-     * Since the only call to applyCitationEntries() only changes pageInfo w.r.t those returned by getCitationEntries(), we can do with the following restrictions:
-     * <ul>
-     * <li> Missing pageInfo means no action.</li>
-     * <li> Missing CitationEntry means no action (no attempt to remove
-     *      citation from the text).</li>
-     * </ul>
-     */
+    /// Apply editable parts of citationEntries to the document: store pageInfo.
+    /// 
+    /// Does not change presentation.
+    /// 
+    /// Note: we use no undo context here, because only DocumentConnection.setUserDefinedStringPropertyValue() is called, and Undo in LO will not undo that.
+    /// 
+    /// GUI: "Manage citations" dialog "OK" button. Called from: ManageCitationsDialogViewModel.storeSettings
+    /// 
+    /// 
+    /// Currently the only editable part is pageInfo.
+    /// 
+    /// Since the only call to applyCitationEntries() only changes pageInfo w.r.t those returned by getCitationEntries(), we can do with the following restrictions:
+    /// 
+    /// -  Missing pageInfo means no action.
+    /// -  Missing CitationEntry means no action (no attempt to remove
+    /// citation from the text).
+    /// 
     public void guiActionApplyCitationEntries(List<CitationEntry> citationEntries) {
         final String errorTitle = Localization.lang("Problem modifying citation");
 
@@ -524,22 +508,20 @@ public class OOBibBase {
         }
     }
 
-    /**
-     * Creates a citation group from {@code entries} at the cursor.
-     * <p>
-     * Uses LO undo context "Insert citation".
-     * <p>
-     * Note: Undo does not remove or reestablish custom properties.
-     *
-     * @param entries            The entries to cite.
-     * @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
-     *                           <p>
-     *                           Consistency: for each entry in {@code entries}: looking it up in {@code syncOptions.get().databases} (if present) should yield {@code database}.
-     * @param style              The bibliography style we are using.
-     * @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
-     * @param pageInfo           A single page-info for these entries. Attributed to the last entry.
-     * @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
-     */
+    /// Creates a citation group from `entries` at the cursor.
+    /// 
+    /// Uses LO undo context "Insert citation".
+    /// 
+    /// Note: Undo does not remove or reestablish custom properties.
+    /// 
+    /// @param entries            The entries to cite.
+    /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
+    /// 
+    /// Consistency: for each entry in `entries`: looking it up in `syncOptions.get().databases` (if present) should yield `database`.
+    /// @param style              The bibliography style we are using.
+    /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
+    /// @param pageInfo           A single page-info for these entries. Attributed to the last entry.
+    /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
                                      BibEntryTypesManager bibEntryTypesManager,
@@ -658,9 +640,7 @@ public class OOBibBase {
         }
     }
 
-    /**
-     * GUI action "Merge citations"
-     */
+    /// GUI action "Merge citations"
     public void guiActionMergeCitationGroups(List<BibDatabase> databases, OOStyle style) {
         final String errorTitle = Localization.lang("Problem combining cite markers");
 
@@ -712,11 +692,9 @@ public class OOBibBase {
         }
     } // MergeCitationGroups
 
-    /**
-     * GUI action "Separate citations".
-     * <p>
-     * Do the opposite of MergeCitationGroups. Combined markers are split, with a space inserted between.
-     */
+    /// GUI action "Separate citations".
+    /// 
+    /// Do the opposite of MergeCitationGroups. Combined markers are split, with a space inserted between.
     public void guiActionSeparateCitations(List<BibDatabase> databases, OOStyle style) {
         final String errorTitle = Localization.lang("Problem during separating cite markers");
 
@@ -768,13 +746,11 @@ public class OOBibBase {
         }
     }
 
-    /**
-     * GUI action for "Export cited"
-     * <p>
-     * Does not refresh the bibliography.
-     *
-     * @param returnPartialResult If there are some unresolved keys, shall we return an otherwise nonempty result, or Optional.empty()?
-     */
+    /// GUI action for "Export cited"
+    /// 
+    /// Does not refresh the bibliography.
+    /// 
+    /// @param returnPartialResult If there are some unresolved keys, shall we return an otherwise nonempty result, or Optional.empty()?
     public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, boolean returnPartialResult) {
         final Optional<BibDatabase> FAIL = Optional.empty();
         final String errorTitle = Localization.lang("Unable to generate new library");
@@ -837,12 +813,10 @@ public class OOBibBase {
         return FAIL;
     }
 
-    /**
-     * GUI action, refreshes citation markers and bibliography.
-     *
-     * @param databases Must have at least one.
-     * @param style     Style.
-     */
+    /// GUI action, refreshes citation markers and bibliography.
+    /// 
+    /// @param databases Must have at least one.
+    /// @param style     Style.
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOStyle style) {
         final String errorTitle = Localization.lang("Unable to synchronize bibliography");
         if (style instanceof JStyle jStyle) {

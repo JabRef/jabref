@@ -155,12 +155,10 @@ public class SharedDatabaseUIManager {
         }
     }
 
-    /**
-     * Opens a new shared database tab with the given {@link DBMSConnectionProperties}.
-     *
-     * @param dbmsConnectionProperties Connection data
-     * @return BasePanel which also used by {@link SaveDatabaseAction}
-     */
+    /// Opens a new shared database tab with the given {@link DBMSConnectionProperties}.
+    /// 
+    /// @param dbmsConnectionProperties Connection data
+    /// @return BasePanel which also used by {@link SaveDatabaseAction}
     public LibraryTab openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 

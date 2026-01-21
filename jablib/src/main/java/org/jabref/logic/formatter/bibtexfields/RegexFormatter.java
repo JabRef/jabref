@@ -21,19 +21,15 @@ public class RegexFormatter extends Formatter {
     private static final Pattern ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
     private static final Pattern ESCAPED_CLOSING_CURLY_BRACE = Pattern.compile("\\\\\\}");
 
-    /**
-     * Matches text enclosed in curly brackets. The capturing group is used to prevent part of the input from being
-     * replaced.
-     */
+    /// Matches text enclosed in curly brackets. The capturing group is used to prevent part of the input from being
+    /// replaced.
     private static final Pattern ENCLOSED_IN_CURLY_BRACES = Pattern.compile("\\{.*?}");
 
     private static final String REGEX_CAPTURING_GROUP = "regex";
     private static final String REPLACEMENT_CAPTURING_GROUP = "replacement";
 
-    /**
-     * Matches a valid argument to the constructor. Two capturing groups are used to parse the {@link
-     * RegexFormatter#regex} and {@link RegexFormatter#replacement} used in {@link RegexFormatter#format(String)}
-     */
+    /// Matches a valid argument to the constructor. Two capturing groups are used to parse the {@link
+    /// RegexFormatter#regex} and {@link RegexFormatter#replacement} used in {@link RegexFormatter#format(String)}
     private static final Pattern CONSTRUCTOR_ARGUMENT = Pattern.compile(
             "^\\(\"(?<" + REGEX_CAPTURING_GROUP + ">.*?)\" *?, *?\"(?<" + REPLACEMENT_CAPTURING_GROUP + ">.*)\"\\)$");
 
@@ -46,12 +42,10 @@ public class RegexFormatter extends Formatter {
     private final String regex;
     private final String replacement;
 
-    /**
-     * Constructs a new regular expression-based formatter with the given RegEx.
-     *
-     * @param input the regular expressions for matching and replacing given in the form {@code ("<regex>",
-     *              "<replace>")}.
-     */
+    /// Constructs a new regular expression-based formatter with the given RegEx.
+    /// 
+    /// @param input the regular expressions for matching and replacing given in the form {@code ("<regex>",
+    /// "<replace>")}.
     public RegexFormatter(@NonNull String input) {
         input = input.trim().replace("\\\"", PLACEHOLDER_FOR_QUOTE_SIGN);
         Matcher constructorArgument = CONSTRUCTOR_ARGUMENT.matcher(input);

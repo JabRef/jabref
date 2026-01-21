@@ -13,11 +13,9 @@ import org.jabref.model.entry.field.Field;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-/**
- * Outputs the findings as CSV.
- * <p>
- * The symbols from {@link BibliographyConsistencyCheckResultWriter} are used.
- */
+/// Outputs the findings as CSV.
+/// 
+/// The symbols from {@link BibliographyConsistencyCheckResultWriter} are used.
 public class BibliographyConsistencyCheckResultCsvWriter extends BibliographyConsistencyCheckResultWriter {
 
     private CSVPrinter csvPrinter;

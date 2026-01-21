@@ -11,11 +11,9 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 
-/**
- * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
- * <p>
- * Background information on <a href="https://tex.stackexchange.com/questions/49757/what-should-an-entry-for-arxiv-entries-look-like-for-biblatex">tex.stackexchange</a>.
- */
+/// Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
+/// 
+/// Background information on <a href="https://tex.stackexchange.com/questions/49757/what-should-an-entry-for-arxiv-entries-look-like-for-biblatex">tex.stackexchange</a>.
 public class EprintCleanup implements CleanupJob {
 
     @Override

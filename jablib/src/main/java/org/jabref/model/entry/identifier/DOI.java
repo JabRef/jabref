@@ -21,9 +21,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
- */
+/// Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
 @AllowedToUseLogic("because we want to have this class 'smart' an be able to parse obscure DOIs, too. For this, we need the LatexToUnicodeformatter.")
 @NullMarked
 public class DOI implements Identifier {
@@ -106,13 +104,11 @@ public class DOI implements Identifier {
     // Short DOI
     private boolean isShortDoi = false;
 
-    /**
-     * Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.
-     *
-     * @param doi the DOI/Short DOI string
-     * @throws NullPointerException     if DOI/Short DOI is null
-     * @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
-     */
+    /// Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.
+    /// 
+    /// @param doi the DOI/Short DOI string
+    /// @throws NullPointerException     if DOI/Short DOI is null
+    /// @throws IllegalArgumentException if doi does not include a valid DOI/Short DOI
     public DOI(String doi) {
         // Remove whitespace
         String trimmedDoi = doi.trim();
@@ -147,15 +143,13 @@ public class DOI implements Identifier {
         }
     }
 
-    /**
-     * Creates an {@code Optional<DOI>} from various schemes including URL, URN, and plain DOIs.
-     * <p>
-     * Useful for suppressing the {@link java.lang.IllegalArgumentException IllegalArgumentException}
-     * of the constructor and checking for {@link java.util.Optional#isPresent} instead.
-     *
-     * @param doi the DOI/Short DOI string
-     * @return an Optional containing the DOI or an empty Optional
-     */
+    /// Creates an `Optional<DOI>` from various schemes including URL, URN, and plain DOIs.
+    /// 
+    /// Useful for suppressing the {@link java.lang.IllegalArgumentException IllegalArgumentException}
+    /// of the constructor and checking for {@link java.util.Optional#isPresent} instead.
+    /// 
+    /// @param doi the DOI/Short DOI string
+    /// @return an Optional containing the DOI or an empty Optional
     public static Optional<DOI> parse(String doi) {
         try {
             LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
@@ -179,22 +173,18 @@ public class DOI implements Identifier {
         }
     }
 
-    /**
-     * Determines whether a DOI/Short DOI is valid or not
-     *
-     * @param doi the DOI/Short DOI string
-     * @return true if DOI is valid, false otherwise
-     */
+    /// Determines whether a DOI/Short DOI is valid or not
+    /// 
+    /// @param doi the DOI/Short DOI string
+    /// @return true if DOI is valid, false otherwise
     public static boolean isValid(String doi) {
         return parse(doi).isPresent();
     }
 
-    /**
-     * Tries to find a DOI/Short DOI inside the given text.
-     *
-     * @param text the Text which might contain a DOI/Short DOI
-     * @return an Optional containing the DOI or an empty Optional
-     */
+    /// Tries to find a DOI/Short DOI inside the given text.
+    /// 
+    /// @param text the Text which might contain a DOI/Short DOI
+    /// @return an Optional containing the DOI or an empty Optional
     public static Optional<DOI> findInText(String text) {
         Optional<DOI> result = Optional.empty();
         text = text.replaceAll("[�]", "");
@@ -225,30 +215,24 @@ public class DOI implements Identifier {
                 '}';
     }
 
-    /**
-     * Return the plain DOI/Short DOI
-     *
-     * @return the plain DOI/Short DOI value.
-     */
+    /// Return the plain DOI/Short DOI
+    /// 
+    /// @return the plain DOI/Short DOI value.
     @Override
     public String asString() {
         return doi;
     }
 
-    /**
-     * Determines whether DOI is short DOI or not
-     *
-     * @return true if DOI is short DOI, false otherwise
-     */
+    /// Determines whether DOI is short DOI or not
+    /// 
+    /// @return true if DOI is short DOI, false otherwise
     public boolean isShortDoi() {
         return isShortDoi;
     }
 
-    /**
-     * Return a URI presentation for the DOI/Short DOI
-     *
-     * @return an encoded URI representation of the DOI/Short DOI
-     */
+    /// Return a URI presentation for the DOI/Short DOI
+    /// 
+    /// @return an encoded URI representation of the DOI/Short DOI
     @Override
     public Optional<URI> getExternalURI() {
         // TODO: We need dependency injection here. It should never happen that this method is called.
@@ -271,11 +255,9 @@ public class DOI implements Identifier {
         }
     }
 
-    /**
-     * Return an ASCII URL presentation for the DOI/Short DOI
-     *
-     * @return an encoded URL representation of the DOI/Short DOI
-     */
+    /// Return an ASCII URL presentation for the DOI/Short DOI
+    /// 
+    /// @return an encoded URL representation of the DOI/Short DOI
     public String getURIAsASCIIString() {
         return getExternalURI().map(URI::toASCIIString).orElse("");
     }
@@ -285,9 +267,7 @@ public class DOI implements Identifier {
         return StandardField.DOI;
     }
 
-    /**
-     * DOIs are case-insensitive. Thus, 10.1109/cloud.2017.89 equals 10.1109/CLOUD.2017.89
-     */
+    /// DOIs are case-insensitive. Thus, 10.1109/cloud.2017.89 equals 10.1109/CLOUD.2017.89
     @Override
     public boolean equals(@Nullable Object o) {
         if (this == o) {

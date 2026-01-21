@@ -11,17 +11,15 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Stores the save order config for a library
- * <p>
- * Format: &lt;choice> ({@link OrderType}, a pair of {@link Field} + descending (boolean)
- * </p>
- * <p>
- * Note that {@link OrderType#TABLE} can only be used as "intermediate" setting. When passing <code>SaveOrder</code>
- * to {@link org.jabref.logic.exporter.BibDatabaseWriter}, the orderType must be different. Reason: The writer
- * does not have access to the UI.
- * </p>
- */
+/// Stores the save order config for a library
+/// 
+/// Format: &lt;choice> ({@link OrderType}, a pair of {@link Field} + descending (boolean)
+/// 
+/// 
+/// Note that {@link OrderType#TABLE} can only be used as "intermediate" setting. When passing `SaveOrder`
+/// to {@link org.jabref.logic.exporter.BibDatabaseWriter}, the orderType must be different. Reason: The writer
+/// does not have access to the UI.
+/// 
 public class SaveOrder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrder.class);
@@ -102,9 +100,7 @@ public class SaveOrder {
                 '}';
     }
 
-    /**
-     * Outputs the current configuration to be consumed later by the constructor
-     */
+    /// Outputs the current configuration to be consumed later by the constructor
     public List<String> getAsStringList() {
         List<String> res = new ArrayList<>(7);
         res.add(orderType.toString());
@@ -123,17 +119,13 @@ public class SaveOrder {
 
         public final boolean descending;
 
-        /**
-         * Given field sorted ascending
-         */
+        /// Given field sorted ascending
         public SortCriterion(Field field) {
             this(field, false);
         }
 
-        /**
-         * @param field      The field
-         * @param descending Must be a boolean value as string, e.g. "true", "false"
-         */
+        /// @param field      The field
+    /// @param descending Must be a boolean value as string, e.g. "true", "false"
         public SortCriterion(Field field, String descending) {
             this.field = field;
             this.descending = Boolean.parseBoolean(descending);

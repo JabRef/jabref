@@ -9,14 +9,12 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class allows to throttle a list of tasks.
- * Use case: you have an event that occurs often, and every time you want to invoke the same task.
- * However, if a lot of events happen in a relatively short time span, then only one task should be invoked.
- *
- * @implNote Once {@link #schedule(Runnable)} is called, the task is delayed for a given time span.
- * If during this time, {@link #schedule(Runnable)} is called again, then the original task is canceled and the new one scheduled.
- */
+/// This class allows to throttle a list of tasks.
+/// Use case: you have an event that occurs often, and every time you want to invoke the same task.
+/// However, if a lot of events happen in a relatively short time span, then only one task should be invoked.
+/// 
+/// @implNote Once {@link #schedule(Runnable)} is called, the task is delayed for a given time span.
+/// If during this time, {@link #schedule(Runnable)} is called again, then the original task is canceled and the new one scheduled.
 public class DelayTaskThrottler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DelayTaskThrottler.class);
@@ -27,9 +25,7 @@ public class DelayTaskThrottler {
 
     private ScheduledFuture<?> scheduledTask;
 
-    /**
-     * @param delay delay in milliseconds
-     */
+    /// @param delay delay in milliseconds
     public DelayTaskThrottler(int delay) {
         this.delay = delay;
         this.executor = new ScheduledThreadPoolExecutor(1);
@@ -61,24 +57,18 @@ public class DelayTaskThrottler {
         return scheduledTask;
     }
 
-    /**
-     * Execute scheduled Runnable early
-     */
+    /// Execute scheduled Runnable early
     public void execute(Runnable command) {
         delay = 0;
         schedule(command);
     }
 
-    /**
-     * Cancel scheduled Runnable gracefully
-     */
+    /// Cancel scheduled Runnable gracefully
     public void cancel() {
         scheduledTask.cancel(false);
     }
 
-    /**
-     * Shuts everything down. Upon termination, this method returns.
-     */
+    /// Shuts everything down. Upon termination, this method returns.
     public void shutdown() {
         LOGGER.trace("Gracefully shutting down DelayTaskThrottler");
         HeadlessExecutorService.gracefullyShutdown("ScheduledThreadPoolExecutor of DelayTaskThrottler", executor, 15);

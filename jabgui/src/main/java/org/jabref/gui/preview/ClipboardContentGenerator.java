@@ -70,10 +70,8 @@ public record ClipboardContentGenerator(
         }
     }
 
-    /**
-     * Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link BstPreviewLayout})
-     * and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
-     */
+    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link BstPreviewLayout})
+    /// and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
     @VisibleForTesting
     static ClipboardContent processPreview(List<String> citations) {
         ClipboardContent content = new ClipboardContent();
@@ -82,9 +80,7 @@ public record ClipboardContentGenerator(
         return content;
     }
 
-    /**
-     * Joins every citation with a newline and returns it.
-     */
+    /// Joins every citation with a newline and returns it.
     @VisibleForTesting
     static ClipboardContent processText(List<String> citations) {
         ClipboardContent content = new ClipboardContent();
@@ -92,10 +88,8 @@ public record ClipboardContentGenerator(
         return content;
     }
 
-    /**
-     * Inserts each citation into a HTML body and copies it to the clipboard.
-     * The given preview is based on {@link CitationStylePreviewLayout}.
-     */
+    /// Inserts each citation into a HTML body and copies it to the clipboard.
+    /// The given preview is based on {@link CitationStylePreviewLayout}.
     @VisibleForTesting
     static ClipboardContent processHtml(List<String> citations) {
         String result = "<!DOCTYPE html>" + OS.NEWLINE +
@@ -116,15 +110,13 @@ public record ClipboardContentGenerator(
         return content;
     }
 
-    /**
-     * Joins each citation using the platform-specific newline into a single Markdown string (from citeproc) and copies it to the clipboard.
-     * <p>
-     * A trailing newline is appended if missing to keep the behavior consistent with other output formats
-     * and to satisfy tests expecting a newline-terminated string.
-     *
-     * @param citations the list of already-formatted citation strings to be combined as Markdown
-     * @return clipboard content containing the Markdown representation in its plain string flavor
-     */
+    /// Joins each citation using the platform-specific newline into a single Markdown string (from citeproc) and copies it to the clipboard.
+    /// 
+    /// A trailing newline is appended if missing to keep the behavior consistent with other output formats
+    /// and to satisfy tests expecting a newline-terminated string.
+    /// 
+    /// @param citations the list of already-formatted citation strings to be combined as Markdown
+    /// @return clipboard content containing the Markdown representation in its plain string flavor
     @VisibleForTesting
     static ClipboardContent processMarkdown(List<String> citations) {
         String markdown = String.join(OS.NEWLINE, citations);

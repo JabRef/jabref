@@ -26,9 +26,7 @@ public class OOFormatBibliography {
     private OOFormatBibliography() {
     }
 
-    /**
-     * @return The formatted bibliography, including its title.
-     */
+    /// @return The formatted bibliography, including its title.
     public static OOText formatBibliography(CitationGroups citationGroups,
                                             CitedKeys bibliography,
                                             JStyle style,
@@ -39,9 +37,7 @@ public class OOFormatBibliography {
         return OOText.fromString(title.toString() + body.toString());
     }
 
-    /**
-     * @return Formatted body of the bibliography. Excludes the title.
-     */
+    /// @return Formatted body of the bibliography. Excludes the title.
     public static OOText formatBibliographyBody(CitationGroups citationGroups,
                                                 CitedKeys bibliography,
                                                 JStyle style,
@@ -57,9 +53,7 @@ public class OOFormatBibliography {
         return OOText.fromString(stringBuilder.toString());
     }
 
-    /**
-     * @return A paragraph. Includes label and "Cited on pages".
-     */
+    /// @return A paragraph. Includes label and "Cited on pages".
     public static OOText formatBibliographyEntry(CitationGroups citationGroups,
                                                  CitedKey citedKey,
                                                  JStyle style,
@@ -88,9 +82,7 @@ public class OOFormatBibliography {
         return OOFormat.paragraph(entryText, parStyle);
     }
 
-    /**
-     * @return just the body of a bibliography entry. No label, "Cited on pages" or paragraph.
-     */
+    /// @return just the body of a bibliography entry. No label, "Cited on pages" or paragraph.
     public static OOText formatBibliographyEntryBody(CitedKey citedKey, JStyle style) {
         if (citedKey.getLookupResult().isEmpty()) {
             // Unresolved entry
@@ -108,15 +100,13 @@ public class OOFormatBibliography {
         }
     }
 
-    /**
-     * Format the reference part of a bibliography entry using a Layout.
-     *
-     * @param layout     The Layout to format the reference with.
-     * @param entry      The entry to insert.
-     * @param database   The database the entry belongs to.
-     * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
-     * @return OOText The reference part of a bibliography entry formatted as OOText
-     */
+    /// Format the reference part of a bibliography entry using a Layout.
+    /// 
+    /// @param layout     The Layout to format the reference with.
+    /// @param entry      The entry to insert.
+    /// @param database   The database the entry belongs to.
+    /// @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
+    /// @return OOText The reference part of a bibliography entry formatted as OOText
     private static OOText formatFullReferenceOfBibEntry(Layout layout,
                                                         BibEntry entry,
                                                         BibDatabase database,
@@ -145,14 +135,12 @@ public class OOFormatBibliography {
         return formattedText;
     }
 
-    /**
-     * Format links to citations of the source (citedKey).
-     * <p>
-     * Requires reference marks for the citation groups.
-     * <p>
-     * - The links are created as references that show page numbers of the reference marks.
-     * - We do not control the text shown, that is provided by OpenOffice.
-     */
+    /// Format links to citations of the source (citedKey).
+    /// 
+    /// Requires reference marks for the citation groups.
+    /// 
+    /// - The links are created as references that show page numbers of the reference marks.
+    /// - We do not control the text shown, that is provided by OpenOffice.
     private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedKey citedKey) {
         if (!citationGroups.citationGroupsProvideReferenceMarkNameForLinking()) {
             return OOText.fromString("");

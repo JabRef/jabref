@@ -15,16 +15,12 @@ public class UpdateField {
     private UpdateField() {
     }
 
-    /**
-     * Updating a field will result in the entry being reformatted on save
-     */
+    /// Updating a field will result in the entry being reformatted on save
     public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue) {
         return updateField(be, field, newValue, false);
     }
 
-    /**
-     * Updating a non-displayable field does not result in the entry being reformatted on save
-     */
+    /// Updating a non-displayable field does not result in the entry being reformatted on save
     public static Optional<FieldChange> updateNonDisplayableField(BibEntry be, Field field, String newValue) {
         boolean changed = be.hasChanged();
         Optional<FieldChange> fieldChange = updateField(be, field, newValue, false);
@@ -32,11 +28,9 @@ public class UpdateField {
         return fieldChange;
     }
 
-    /**
-     * Undoable change of field value
-     *
-     * @param nullFieldIfValueIsTheSame If true the field value is removed when the current value is equals to newValue
-     */
+    /// Undoable change of field value
+    /// 
+    /// @param nullFieldIfValueIsTheSame If true the field value is removed when the current value is equals to newValue
     public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue,
                                                     Boolean nullFieldIfValueIsTheSame) {
         String writtenValue = null;
@@ -81,10 +75,8 @@ public class UpdateField {
         }
     }
 
-    /**
-     * Sets empty or non-existing owner fields of bibtex entries inside a List to a specified default value. Timestamp
-     * field is also set. Preferences are checked to see if these options are enabled.
-     */
+    /// Sets empty or non-existing owner fields of bibtex entries inside a List to a specified default value. Timestamp
+    /// field is also set. Preferences are checked to see if these options are enabled.
     public static void setAutomaticFields(Collection<BibEntry> entries, OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         boolean globalSetOwner = ownerPreferences.isUseOwner();
         boolean setTimeStamp = timestampPreferences.shouldAddCreationDate();

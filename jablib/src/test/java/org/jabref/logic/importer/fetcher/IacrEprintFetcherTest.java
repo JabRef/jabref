@@ -169,13 +169,11 @@ class IacrEprintFetcherTest {
         assertNotEquals(Optional.empty(), fetchedEntry.get().getField(StandardField.ABSTRACT), "Expected non empty abstract field, entry is\n" + fetchedEntry.toString());
     }
 
-    /**
-     * Helper method for allNonWithdrawnIdsWithOldHtmlFormat.
-     *
-     * @param year  The year of the generated IDs (e.g. 1996)
-     * @param maxId The maximum ID to generate in the given year (e.g. 112)
-     * @return A list of IDs in the from yyyy/iii (e.g. [1996/001, 1996/002, ..., 1996/112]
-     */
+    /// Helper method for allNonWithdrawnIdsWithOldHtmlFormat.
+    /// 
+    /// @param year  The year of the generated IDs (e.g. 1996)
+    /// @param maxId The maximum ID to generate in the given year (e.g. 112)
+    /// @return A list of IDs in the from yyyy/iii (e.g. [1996/001, 1996/002, ..., 1996/112]
     private static List<String> getIdsFor(int year, int maxId) {
         List<String> result = new ArrayList<>();
         for (int i = 1; i <= maxId; i++) {

@@ -56,13 +56,11 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
                                                                          .collect(Collectors.toSet()));
     }
 
-    /**
-     * Converts a path relative to a base-path into a class name.
-     *
-     * @param basePath base path
-     * @param path     path that includes base-path as a prefix
-     * @return class name
-     */
+    /// Converts a path relative to a base-path into a class name.
+    /// 
+    /// @param basePath base path
+    /// @param path     path that includes base-path as a prefix
+    /// @return class name
     private static String pathToClass(String basePath, Path path) {
         String className = FileUtil.relativize(path, List.of(Path.of(basePath))).toString();
         if (className != null) {

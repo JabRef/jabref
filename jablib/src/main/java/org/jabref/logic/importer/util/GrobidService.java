@@ -17,16 +17,14 @@ import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Implements an API to a GROBID server, as described at
- * https://grobid.readthedocs.io/en/latest/Grobid-service/#grobid-web-services
- * <p>
- * Note: Currently a custom GROBID server is used...
- * https://github.com/NikodemKch/grobid
- * <p>
- * The methods are structured to match the GROBID server api.
- * Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
- */
+/// Implements an API to a GROBID server, as described at
+/// https://grobid.readthedocs.io/en/latest/Grobid-service/#grobid-web-services
+/// 
+/// Note: Currently a custom GROBID server is used...
+/// https://github.com/NikodemKch/grobid
+/// 
+/// The methods are structured to match the GROBID server api.
+/// Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
 public class GrobidService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidService.class);
@@ -53,12 +51,10 @@ public class GrobidService {
         }
     }
 
-    /**
-     * Calls the Grobid server for converting the citation into a BibEntry
-     *
-     * @return A BibEntry for the String
-     * @throws IOException if an I/O exception during the call occurred or no BibTeX entry could be determined
-     */
+    /// Calls the Grobid server for converting the citation into a BibEntry
+    /// 
+    /// @return A BibEntry for the String
+    /// @throws IOException if an I/O exception during the call occurred or no BibTeX entry could be determined
     public Optional<BibEntry> processCitation(String rawCitation, ImportFormatPreferences importFormatPreferences, ConsolidateCitations consolidateCitations) throws IOException, ParseException {
         Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processCitation")
                                             .header("Accept", MediaTypes.APPLICATION_BIBTEX)

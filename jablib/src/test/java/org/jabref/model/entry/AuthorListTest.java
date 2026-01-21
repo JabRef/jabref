@@ -17,10 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Other parsing tests are available in
- * {@link org.jabref.logic.importer.AuthorListParser AuthorListParser}.
- */
+/// Other parsing tests are available in
+/// {@link org.jabref.logic.importer.AuthorListParser AuthorListParser}.
 public class AuthorListTest {
 
     /*

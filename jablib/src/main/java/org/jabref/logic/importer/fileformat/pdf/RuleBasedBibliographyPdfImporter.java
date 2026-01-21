@@ -33,15 +33,13 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Parses the references from the "References" section from a PDF.
- * <p>
- * Currently, IEEE two column format is supported.
- * <p>
- * To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
- * <p>
- * TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
- */
+/// Parses the references from the "References" section from a PDF.
+/// 
+/// Currently, IEEE two column format is supported.
+/// 
+/// To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
+/// 
+/// TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
 @AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
 public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporter implements PlainCitationParser {
 
@@ -137,9 +135,7 @@ public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporte
         return Optional.of(parsePlainCitation("0", reference));
     }
 
-    /**
-     * Example: <code>J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a</code>
-     */
+    /// Example: `J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a`
     @VisibleForTesting
     BibEntry parsePlainCitation(String number, String reference) {
         reference = normalizeUnicodeFormatter.format(reference);
@@ -336,9 +332,7 @@ public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporte
         return result;
     }
 
-    /**
-     * @param pattern A pattern matching two groups: The first one to take, the second one to leave at the end of the string
-     */
+    /// @param pattern A pattern matching two groups: The first one to take, the second one to leave at the end of the string
     private static EntryUpdateResult updateEntryAndReferenceIfMatches(String reference, Pattern pattern, BibEntry result, Field
             field) {
         Matcher matcher;

@@ -73,9 +73,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Pane to manage the interaction between JabRef and OpenOffice.
- */
+/// Pane to manage the interaction between JabRef and OpenOffice.
 public class OpenOfficePanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
@@ -506,12 +504,10 @@ public class OpenOfficePanel {
         return new OOBibBase(loPath, dialogService, openOfficePreferences);
     }
 
-    /**
-     * Given the withText and inParenthesis options, return the corresponding citationType.
-     *
-     * @param withText      False means invisible citation (no text).
-     * @param inParenthesis True means "(Au and Thor 2000)". False means "Au and Thor (2000)".
-     */
+    /// Given the withText and inParenthesis options, return the corresponding citationType.
+    /// 
+    /// @param withText      False means invisible citation (no text).
+    /// @param inParenthesis True means "(Au and Thor 2000)". False means "Au and Thor (2000)".
     private static CitationType citationTypeFromOptions(boolean withText, boolean inParenthesis) {
         if (!withText) {
             return CitationType.INVISIBLE_CIT;
@@ -588,12 +584,10 @@ public class OpenOfficePanel {
                 syncOptions);
     }
 
-    /**
-     * Check that all entries in the list have citation keys, if not ask if they should be generated
-     *
-     * @param entries A list of entries to be checked
-     * @return true if all entries have citation keys, if it so may be after generating them
-     */
+    /// Check that all entries in the list have citation keys, if not ask if they should be generated
+    /// 
+    /// @param entries A list of entries to be checked
+    /// @return true if all entries have citation keys, if it so may be after generating them
     private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
         // Check if there are empty keys
         boolean emptyKeys = false;

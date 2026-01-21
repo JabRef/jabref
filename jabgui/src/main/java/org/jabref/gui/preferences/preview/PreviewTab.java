@@ -226,13 +226,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
     }
 
-    /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
-     * ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
-     *
-     * @param list       The ListView currently focused
-     * @param keypressed The pressed character
-     */
+    /// This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
+    /// ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+    /// 
+    /// @param list       The ListView currently focused
+    /// @param keypressed The pressed character
 
     private void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {

@@ -2,20 +2,18 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * <p>
- * LayoutFormatter that removes the space between abbreviated First names
- * </p>
- * <p>
- * What out that this regular expression might also remove other spaces that fit the pattern.
- * </p>
- * <p>
- * Example: J. R. R. Tolkien becomes J.R.R. Tolkien.
- * </p>
- * <p>
- * See Testcase for more examples.
- * <p>
- */
+/// 
+/// LayoutFormatter that removes the space between abbreviated First names
+/// 
+/// 
+/// What out that this regular expression might also remove other spaces that fit the pattern.
+/// 
+/// 
+/// Example: J. R. R. Tolkien becomes J.R.R. Tolkien.
+/// 
+/// 
+/// See Testcase for more examples.
+/// 
 public class NoSpaceBetweenAbbreviations implements LayoutFormatter {
 
     /*
