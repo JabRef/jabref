@@ -19,6 +19,7 @@ import javafx.collections.ObservableMap;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 
 import static org.jabref.logic.preferences.JabRefCliPreferences.STRINGLIST_DELIMITER;
 
@@ -82,7 +83,7 @@ public class EntryEditorPreferences {
         SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
         String defaultFields = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
         defaultTabsMap.put("General", FieldFactory.parseFieldList(defaultFields));
-        defaultTabsMap.put("Abstract", FieldFactory.parseFieldList("abstract"));
+        defaultTabsMap.put("Abstract", FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
 
         return defaultTabsMap;
     }

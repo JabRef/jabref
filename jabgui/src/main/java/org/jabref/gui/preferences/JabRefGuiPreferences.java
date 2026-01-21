@@ -528,7 +528,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
         purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
 
-        //getEntryEditorTabs();
+        getEntryEditorTabs();
     }
 
     /*private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
