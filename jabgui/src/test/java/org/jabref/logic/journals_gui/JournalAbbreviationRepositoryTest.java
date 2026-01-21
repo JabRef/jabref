@@ -281,9 +281,7 @@ class JournalAbbreviationRepositoryTest {
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
-    /**
-     * Tests <a href="https://github.com/JabRef/jabref/issues/9475">Issue 9475</a>
-     */
+    /// Tests <a href="https://github.com/JabRef/jabref/issues/9475">Issue 9475</a>
     @Test
     void titleEmbeddedWithCurlyBracesHavingNoChangesKeepsBraces() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InCollection)
@@ -296,9 +294,7 @@ class JournalAbbreviationRepositoryTest {
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
-    /**
-     * Tests <a href="https://github.com/JabRef/jabref/issues/9503">Issue 9503</a>
-     */
+    /// Tests <a href="https://github.com/JabRef/jabref/issues/9503">Issue 9503</a>
     @Test
     void titleWithNestedCurlyBracesHavingNoChangesKeepsBraces() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InProceedings)

@@ -18,9 +18,7 @@ class JStyleGetNumCitationMarker {
     private JStyleGetNumCitationMarker() {
     }
 
-    /**
-     * Defines sort order for CitationMarkerNumericEntry.
-     */
+    /// Defines sort order for CitationMarkerNumericEntry.
     private static int compareCitationMarkerNumericEntry(CitationMarkerNumericEntry a,
                                                          CitationMarkerNumericEntry b) {
         int na = a.getNumber().orElse(UNRESOLVED_ENTRY_NUMBER);
@@ -32,19 +30,17 @@ class JStyleGetNumCitationMarker {
         return res;
     }
 
-    /**
-     * Create a numeric marker for use in the bibliography as label for the entry.
-     * <p>
-     * To support for example numbers in superscript without brackets for the text,
-     * but "[1]" form for the bibliography, the style can provide
-     * the optional "BracketBeforeInList" and "BracketAfterInList" strings
-     * to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
-     *
-     * @return "[${number}]" where
-     * "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
-     * "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
-     * "${number}" stands for the formatted number.
-     */
+    /// Create a numeric marker for use in the bibliography as label for the entry.
+    ///
+    /// To support for example numbers in superscript without brackets for the text,
+    /// but "[1]" form for the bibliography, the style can provide
+    /// the optional "BracketBeforeInList" and "BracketAfterInList" strings
+    /// to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
+    ///
+    /// @return "[${number}]" where
+    /// "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
+    /// "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
+    /// "${number}" stands for the formatted number.
     public static OOText getNumCitationMarkerForBibliography(JStyle style,
                                                              CitationMarkerNumericBibEntry entry) {
         // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST
@@ -157,28 +153,25 @@ class JStyleGetNumCitationMarker {
         }
     }
 
-    /**
-     * Format a number-based citation marker for the given number or numbers.
-     *
-     * @param entries          Provide the citation numbers.
-     *                         <p>
-     *                         An Optional.empty() number means: could not look this up
-     *                         in the databases. Positive integers are the valid numbers.
-     *                         <p>
-     *                         Duplicate citation numbers are allowed:
-     *                         <p>
-     *                         - If their pageInfos are identical, only a
-     *                         single instance is emitted.
-     *                         <p>
-     *                         - If their pageInfos differ, the number is emitted with each
-     *                         distinct pageInfo.
-     *                         <p>
-     *                         pageInfos are expected to be normalized
-     * @param minGroupingCount Zero and negative means never group.
-     *                         Only used by tests to override the value in style.
-     * @return The text for the citation.
-     *
-     */
+    /// Format a number-based citation marker for the given number or numbers.
+    ///
+    /// An Optional.empty() number means: could not look this up
+    /// in the databases. Positive integers are the valid numbers.
+    ///
+    /// Duplicate citation numbers are allowed:
+    ///
+    /// - If their pageInfos are identical, only a
+    ///   single instance is emitted.
+    ///
+    /// - If their pageInfos differ, the number is emitted with each
+    ///   distinct pageInfo.
+    ///
+    /// pageInfos are expected to be normalized
+    ///
+    /// @param entries          Provide the citation numbers.
+    /// @param minGroupingCount Zero and negative means never group. Only used by tests to override the value in style.
+    /// @return The text for the citation.
+    ///
     public static OOText getNumCitationMarker2(JStyle style,
                                                List<CitationMarkerNumericEntry> entries,
                                                int minGroupingCount) {

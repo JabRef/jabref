@@ -10,9 +10,7 @@ import org.jabref.logic.xmp.XmpUtilReader;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-/**
- * Wraps the XMPUtility function to be used as an Importer.
- */
+/// Wraps the XMPUtility function to be used as an Importer.
 public class PdfXmpImporter extends PdfImporter {
 
     private final XmpPreferences xmpPreferences;

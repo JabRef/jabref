@@ -16,11 +16,9 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Model provider for OpenAI-compatible APIs.
- * Fetches available models from the /v1/models endpoint.
- * Mistral provides an OpenAI-compatible API, so this works for Mistral as well.
- */
+/// Model provider for OpenAI-compatible APIs.
+/// Fetches available models from the /v1/models endpoint.
+/// Mistral provides an OpenAI-compatible API, so this works for Mistral as well.
 @NullMarked
 public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
@@ -62,20 +60,17 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
                 || aiProvider == AiProvider.GPT4ALL;
     }
 
-    /**
-     * Builds the URL for the models endpoint from the given API base URL.
-     * <p>
-     * The OpenAI API specification defines the models endpoint at /v1/models.
-     * This method handles various URL formats:
-     * <ul>
-     *   <li>If the URL already ends with /v1, appends /models</li>
-     *   <li>If the URL doesn't end with /v1, appends /v1/models</li>
-     *   <li>Removes trailing slashes before building the path</li>
-     * </ul>
-     *
-     * @param apiBaseUrl the base URL of the API (e.g., "https://api.openai.com" or "https://api.openai.com/v1")
-     * @return the complete URL for the models endpoint
-     */
+    /// Builds the URL for the models endpoint from the given API base URL.
+    ///
+    /// The OpenAI API specification defines the models endpoint at /v1/models.
+    /// This method handles various URL formats:
+    ///
+    /// - If the URL already ends with /v1, appends /models
+    /// - If the URL doesn't end with /v1, appends /v1/models
+    /// - Removes trailing slashes before building the path
+    ///
+    /// @param apiBaseUrl the base URL of the API (e.g., "https://api.openai.com" or "https://api.openai.com/v1")
+    /// @return the complete URL for the models endpoint
     private String buildModelsEndpoint(String apiBaseUrl) {
         String baseUrl = apiBaseUrl.trim();
         if (baseUrl.endsWith("/")) {

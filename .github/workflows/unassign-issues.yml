@@ -20,27 +20,27 @@ jobs:
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           reminder_comment: |
-              ### ⏰ Assignment Reminder
+            ### ⏰ Assignment Reminder
 
-              Hi @{{ handle }}, this is a friendly reminder about your assignment to this issue.
+            Hi @{{ handle }}, this is a friendly reminder about your assignment to this issue.
 
-              > [!WARNING]
-              > This issue will be **automatically unassigned** in **{{ days_remaining }} days** if there's no activity.
+            > [!WARNING]
+            > This issue will be **automatically unassigned** in **{{ days_remaining }} days** if there's no activity.
 
-              Remember that you can ask the [JabRef Guru](https://gurubase.io/g/jabref) or [DeepWiki](https://deepwiki.com/JabRef/jabref) about anything regarding JabRef.
-              Additionally, our contributing guide has [hints on creating a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) and a link to our Gitter chat.
+            Remember that you can ask the [JabRef Guru](https://gurubase.io/g/jabref) or [DeepWiki](https://deepwiki.com/JabRef/jabref) about anything regarding JabRef.
+            Additionally, our contributing guide has [hints on creating a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) and a link to our Gitter chat.
 
-              <details open>
-              <summary>How to keep your assignment</summary>
+            <details open>
+            <summary>How to keep your assignment</summary>
 
-              \
-              If you are working on it, you can prevent automatic unassignment by:
+            \
+            If you are working on it, you can prevent automatic unassignment by:
 
-              - Submitting a [draft pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests) with your progress within {{ days_remaining }} days
-              - Asking for the **{{{ pin_label }}}** label if you need more time
-              </details>
+            - Submitting a [draft pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests) with your progress within {{ days_remaining }} days
+            - Asking for the **{{{ pin_label }}}** label if you need more time
+            </details>
 
-              We appreciate your contribution and are here to help if needed!
+            We appreciate your contribution and are here to help if needed!
           days_until_unassign: 14
           unassigned_comment: |
             ### 📋 Assignment Update
