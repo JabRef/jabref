@@ -22,9 +22,9 @@ public class UndoableUnabbreviator {
     /**
      * Unabbreviate the journal name of the given entry.
      *
-     * @param entry The entry to be treated.
-     * @param field The field
-     * @param compoundEdit    If the entry is changed, add an edit to this compound.
+     * @param entry        The entry to be treated.
+     * @param field        The field
+     * @param compoundEdit If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
     public boolean unabbreviate(BibDatabase database, BibEntry entry, Field field, CompoundEdit compoundEdit) {

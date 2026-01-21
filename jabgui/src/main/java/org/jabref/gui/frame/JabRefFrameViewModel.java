@@ -148,7 +148,7 @@ public class JabRefFrameViewModel {
     /**
      * Handles commands submitted by the command line or by the remote host to be executed in the ui
      * Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
-     *
+     * <p>
      * Does NOT handle focus - this is done in JabRefFrame
      *
      * @param uiCommands to be handled

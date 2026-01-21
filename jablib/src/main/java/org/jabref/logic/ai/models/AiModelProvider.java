@@ -18,7 +18,7 @@ public interface AiModelProvider {
      *
      * @param aiProvider The AI provider to fetch models from
      * @param apiBaseUrl The base URL for the API
-     * @param apiKey The API key for authentication (may be null for providers that don't require it)
+     * @param apiKey     The API key for authentication (may be null for providers that don't require it)
      * @return A list of available model names (never null, empty if fetch fails)
      */
     List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey);

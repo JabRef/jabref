@@ -580,11 +580,11 @@ public class GroupNodeViewModel {
     /**
      * Returns whether the given entry should be considered part of this group
      * for the purpose of the groups sidebar (hit counter, highlighting, etc.).
-     *
+     * <p>
      * We cannot simply use groupNode.matches(entry) here. That only checks
      * the rule of this single group and ignores the configured hierarchy type and
      * any child groups created in the view model (for example automatic subgroups)
-     *
+     * <p>
      * This method applies the hierarchy type:
      * INDEPENDENT: match this group only,
      * INCLUDING: match this group or any child group,
