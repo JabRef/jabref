@@ -8,13 +8,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.AiPreferences;
-import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiProvider;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
@@ -45,7 +43,7 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
 
     /// Update the underlying {@link dev.langchain4j.model.chat.ChatModel} by current {@link AiPreferences} parameters.
     /// When the model is updated, the chat messages are not lost.
-    /// See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
+    /// See {@link org.jabref.logic.ai.chatting.AiChatLogic}, where messages are stored in {@link dev.langchain4j.memory.ChatMemory},
     /// and see {@link org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage}.
     private void rebuild() {
         String apiKey = aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider());

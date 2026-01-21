@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.util.OptionalUtil;
@@ -215,7 +214,7 @@ public class FieldFactory {
         return fields;
     }
 
-    /// These are the fields JabRef always displays as default {@link JabRefCliPreferences#setLanguageDependentDefaultValues()}
+    /// These are the fields JabRef always displays as default {@link org.jabref.logic.preferences.JabRefCliPreferences#setLanguageDependentDefaultValues()}
     ///
     /// A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
     /// a separate preferences object

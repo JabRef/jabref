@@ -11,7 +11,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
@@ -20,15 +19,15 @@ import org.jabref.model.entry.BibEntry;
 
 public class PdfMergeDialog {
 
-    /// Constructs a merge dialog for a PDF file. This dialog calls various {@link PdfImporter}s, collects the results, and lets the user choose between them.
+    /// Constructs a merge dialog for a PDF file. This dialog calls various {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s, collects the results, and lets the user choose between them.
     ///
-    /// {@link PdfImporter}s try to extract a {@link BibEntry} out of a PDF file,
+    /// {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s try to extract a {@link BibEntry} out of a PDF file,
     /// but it does not perform this 100% perfectly, it is only a set of heuristics that in some cases might work, in others not.
-    /// Thus, JabRef provides this merge dialog that collects the results of all {@link PdfImporter}s
+    /// Thus, JabRef provides this merge dialog that collects the results of all {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s
     /// and gives user a choice between field values.
     ///
     /// @param entry        the entry to merge with
-    /// @param filePath     the path to the PDF file. This PDF is used as the source for the {@link PdfImporter}s.
+    /// @param filePath     the path to the PDF file. This PDF is used as the source for the {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s.
     /// @param preferences  the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
     /// @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {

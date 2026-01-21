@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -17,7 +16,7 @@ import org.jspecify.annotations.NonNull;
 
 /// Search class for files. <br>
 /// <br>
-/// This class provides some functionality to search in a {@link BibDatabase} for files. <br>
+/// This class provides some functionality to search in a {@link org.jabref.model.database.BibDatabase} for files. <br>
 public class DatabaseFileLookup {
 
     private final Set<Path> fileCache = new HashSet<>();
@@ -26,7 +25,7 @@ public class DatabaseFileLookup {
 
     private final Path pathOfDatabase;
 
-    /// Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
+    /// Creates an instance by passing a {@link org.jabref.model.database.BibDatabase} which will be used for the searches.
     public DatabaseFileLookup(@NonNull BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(filePreferences))
                                     .orElse(new ArrayList<>());

@@ -26,7 +26,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -100,7 +99,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     /// Creates an instance of {@link LinkedFile} based on the given file.
     /// We try to guess the file type and relativize the path against the given file directories.
     ///
-    /// TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
+    /// TODO: Move this method to {@link LinkedFile} as soon as {@link org.jabref.gui.externalfiletype.CustomExternalFileType} lives in model.
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String fileExtension = FileUtil.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)

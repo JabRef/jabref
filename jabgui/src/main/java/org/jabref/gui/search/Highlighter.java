@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.util.Range;
@@ -30,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class Highlighter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Highlighter.class);
 
-    /// Functions defined in {@link PostgreConstants#POSTGRES_FUNCTIONS}
+    /// Functions defined in {@link org.jabref.model.search.PostgreConstants#POSTGRES_FUNCTIONS}
     private static final String REGEXP_MARK = "SELECT regexp_mark(?, ?)";
     private static final String REGEXP_POSITIONS = "SELECT * FROM regexp_positions(?, ?)";
     private static Connection connection;

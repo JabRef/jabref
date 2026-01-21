@@ -30,13 +30,12 @@ import dev.langchain4j.store.embedding.RelevanceScore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
 import dev.langchain4j.store.embedding.filter.comparison.IsIn;
-import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.Nullable;
 
 import static java.util.Comparator.comparingDouble;
 import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_KEY;
 
-/// A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
+/// A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link org.h2.mvstore.MVStore} as an embedded database.
 ///
 /// Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
 /// string (the content).

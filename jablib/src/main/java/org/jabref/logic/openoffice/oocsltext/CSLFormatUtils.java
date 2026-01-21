@@ -7,11 +7,9 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -113,7 +111,7 @@ public final class CSLFormatUtils {
         return html;
     }
 
-    /// Alphanumeric citations are not natively supported by citeproc-java (see {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation}).
+    /// Alphanumeric citations are not natively supported by citeproc-java (see {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, org.jabref.logic.citationstyle.CitationStyleOutputFormat, BibDatabaseContext, org.jabref.model.entry.BibEntryTypesManager) generateCitation}).
     /// Thus, we manually format a citation to produce its alphanumeric form.
     ///
     /// @param entries the list of entries for which the alphanumeric citation is to be generated.
@@ -159,7 +157,7 @@ public final class CSLFormatUtils {
     }
 
     /// Method to update citation number of a bibliographic entry (to be inserted in the list of references).
-    /// By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography}) always starts the numbering of a list of references with "1".
+    /// By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, org.jabref.logic.citationstyle.CitationStyleOutputFormat, BibDatabaseContext, org.jabref.model.entry.BibEntryTypesManager) generateBibliography}) always starts the numbering of a list of references with "1".
     /// If a citation doesn't correspond to the first cited entry, the number should be changed to the appropriate current citation number.
     /// The numbers should be globally unique. If an entry has been cited before, the older citation number corresponding to it should be reused.
     /// The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".

@@ -36,7 +36,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
@@ -50,7 +49,7 @@ import org.slf4j.LoggerFactory;
 /// Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for save operations
 /// when closing a database or quitting the applications.
 ///
-/// The save operation is loaded off of the GUI thread using {@link BackgroundTask}. Callers can query whether the
+/// The save operation is loaded off of the GUI thread using {@link org.jabref.logic.util.BackgroundTask}. Callers can query whether the
 /// operation was canceled, or whether it was successful.
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);

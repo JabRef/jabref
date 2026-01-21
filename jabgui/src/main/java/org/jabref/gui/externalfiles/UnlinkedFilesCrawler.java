@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
@@ -61,7 +60,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     /// The result will be a tree structure of nodes of the type {@link javafx.scene.control.CheckBoxTreeItem}. <br>
     /// <br>
     /// The user objects that are attached to the nodes is the {@link FileNodeViewModel}, which wraps the {@link
-    /// File}-Object. <br>
+    /// java.io.File}-Object. <br>
     /// <br>
     /// For ensuring the capability to cancel the work of this recursive method, the first position in the integer array
     /// 'state' must be set to 1, to keep the recursion running. When the states value changes, the method will resolve

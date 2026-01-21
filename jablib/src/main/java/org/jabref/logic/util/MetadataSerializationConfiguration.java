@@ -1,8 +1,5 @@
 package org.jabref.logic.util;
 
-import org.jabref.model.groups.RegexKeywordGroup;
-import org.jabref.model.groups.WordKeywordGroup;
-
 /// Specifies how metadata is read and written.
 public class MetadataSerializationConfiguration {
     /// Character used for quoting in the string representation.
@@ -14,7 +11,7 @@ public class MetadataSerializationConfiguration {
     /// For separating units (e.g. name and hierarchic context) in the string representation
     public static final String GROUP_UNIT_SEPARATOR = ";";
 
-    /// Identifier for {@link WordKeywordGroup} and {@link RegexKeywordGroup}.
+    /// Identifier for {@link org.jabref.model.groups.WordKeywordGroup} and {@link org.jabref.model.groups.RegexKeywordGroup}.
     public static final String KEYWORD_GROUP_ID = "KeywordGroup:";
 
     /// Identifier for {@link org.jabref.model.groups.AllEntriesGroup}.

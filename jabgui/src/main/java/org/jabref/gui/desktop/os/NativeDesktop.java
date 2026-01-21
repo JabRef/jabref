@@ -1,7 +1,6 @@
 package org.jabref.gui.desktop.os;
 
 import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -350,7 +349,7 @@ public abstract class NativeDesktop {
     /// Moves the given file to the trash.
     ///
     /// @throws UnsupportedOperationException if the current platform does not support the {@link Desktop.Action#MOVE_TO_TRASH} action
-    /// @see Desktop#moveToTrash(File)
+    /// @see Desktop#moveToTrash(java.io.File)
     public void moveToTrash(Path path) {
         boolean success = Desktop.getDesktop().moveToTrash(path.toFile());
         if (!success) {

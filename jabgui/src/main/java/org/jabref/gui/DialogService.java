@@ -23,9 +23,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.NotificationService;
 
-import org.controlsfx.control.textfield.CustomPasswordField;
-import org.controlsfx.dialog.ProgressDialog;
-
 /// This interface provides methods to create dialogs and show them to the user.
 public interface DialogService extends NotificationService {
 
@@ -137,7 +134,7 @@ public interface DialogService extends NotificationService {
                                                     String okButtonLabel, String cancelButtonLabel,
                                                     String optOutMessage, Consumer<Boolean> optOutAction);
 
-    /// This will create and display new {@link CustomPasswordField} that doesn't show the text, and two buttons
+    /// This will create and display new {@link org.controlsfx.control.textfield.CustomPasswordField} that doesn't show the text, and two buttons
     /// one cancel and one ok.
     ///
     /// @return the entered password if pressed "OK", null otherwise
@@ -186,7 +183,7 @@ public interface DialogService extends NotificationService {
     /// @param <R>    type of result
     <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
-    /// Constructs and shows a cancelable {@link ProgressDialog}.
+    /// Constructs and shows a cancelable {@link org.controlsfx.dialog.ProgressDialog}.
     /// Clicking cancel will cancel the underlying service and close the dialog
     ///
     /// @param title   title of the dialog
@@ -194,7 +191,7 @@ public interface DialogService extends NotificationService {
     /// @param task    The {@link Task} which executes the work and for which to show the dialog
     <V> void showProgressDialog(String title, String content, Task<V> task);
 
-    /// Constructs and shows a cancelable {@link ProgressDialog}.
+    /// Constructs and shows a cancelable {@link org.controlsfx.dialog.ProgressDialog}.
     /// Clicking cancel will cancel the underlying service and close the dialog,
     /// otherwise will wait for the task to finish.
     ///
