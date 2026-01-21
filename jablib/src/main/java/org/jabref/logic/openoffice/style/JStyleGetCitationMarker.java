@@ -61,27 +61,16 @@ class JStyleGetCitationMarker {
                 + style.getAuthorNameMarkupAfter();
     }
 
-    /// @param authorList Parsed list of authors.
-    /// @param maxAuthors The maximum number of authors to write out.
-    /// If there are more authors, then ET_AL_STRING is emitted
-    /// to mark their omission.
-    /// Set to -1 to write out all authors.
-    ///
-    /// maxAuthors=0 is pointless, now throws IllegalArgumentException
-    /// (Earlier it behaved as maxAuthors=1)
-    ///
-    /// maxAuthors less than -1 : throw IllegalArgumentException
-    /// @param andString  For "A, B[ and ]C"
-    /// @return "Au[AS]Bu[AS]Cu[OXFORD_COMMA][andString]Du[yearSep]"
-    /// or "Au[etAlString][yearSep]"
-    ///
-    /// where AS = AUTHOR_SEPARATOR
-    /// Au, Bu, Cu, Du are last names of authors.
     ///
     /// Note:
     /// - The "Au[AS]Bu[AS]Cu" (or the "Au") part may be empty (maxAuthors==0 or nAuthors==0).
     /// - OXFORD_COMMA is only emitted if nAuthors is at least 3.
     /// - andString  is only emitted if nAuthors is at least 2.
+    ///
+    /// @param authorList Parsed list of authors.
+    /// @param maxAuthors The maximum number of authors to write out. If there are more authors, then ET_AL_STRING is emitted to mark their omission. Set to -1 to write out all authors. maxAuthors=0 is pointless, now throws IllegalArgumentException.  (Earlier it behaved as maxAuthors=1). maxAuthors less than -1 : throw IllegalArgumentException
+    /// @param andString  For "A, B[and]C"
+    /// @return "Au[AS]Bu[AS]Cu[OXFORD_COMMA][andString]Du[yearSep]" or "Au[etAlString][yearSep]",  where AS = AUTHOR_SEPARATOR, Au, Bu, Cu, Du are last names of authors.
     private static String formatAuthorList(JStyle style,
                                            @NonNull AuthorList authorList,
                                            int maxAuthors,
@@ -237,13 +226,13 @@ class JStyleGetCitationMarker {
     ///
     /// @param fields A list of fields, to look up, using first nonempty hit.
     ///
-    /// If backup fields are needed, separate field
-    /// names by /.
+    ///                                                         If backup fields are needed, separate field
+    ///                                                         names by /.
     ///
-    /// E.g. to use "author" with "editor" as backup,
-    /// specify
-    /// FieldFactory.serializeOrFields(StandardField.AUTHOR,
-    /// StandardField.EDITOR)
+    ///                                                         E.g. to use "author" with "editor" as backup,
+    ///                                                         specify
+    ///                                                         FieldFactory.serializeOrFields(StandardField.AUTHOR,
+    ///                                                         StandardField.EDITOR)
     /// @return The resolved field content, or an empty string if the
     /// field(s) were empty.
     ///
@@ -316,31 +305,31 @@ class JStyleGetCitationMarker {
     /// Produce (Author, year) or "Author (year)" style citation strings.
     ///
     /// @param purpose            IN_PARENTHESIS and NORMALIZED puts parentheses around the whole,
-    /// IN_TEXT around each (year,uniqueLetter,pageInfo) part.
+    ///                                                                                                         IN_TEXT around each (year,uniqueLetter,pageInfo) part.
     ///
-    /// NORMALIZED omits uniqueLetter and pageInfo,
-    /// ignores isFirstAppearanceOfSource (always
-    /// style.getMaxAuthors, not getMaxAuthorsFirst)
+    ///                                                                                                         NORMALIZED omits uniqueLetter and pageInfo,
+    ///                                                                                                         ignores isFirstAppearanceOfSource (always
+    ///                                                                                                         style.getMaxAuthors, not getMaxAuthorsFirst)
     /// @param entries            The list of CitationMarkerEntry values to process.
     ///
-    /// Here we do not check for duplicate entries: those
-    /// are handled by `getCitationMarker` by
-    /// omitting them from the list.
+    ///                                                                                                         Here we do not check for duplicate entries: those
+    ///                                                                                                         are handled by `getCitationMarker` by
+    ///                                                                                                         omitting them from the list.
     ///
-    /// Unresolved citations recognized by
-    /// entry.getBibEntry() and/or
-    /// entry.getDatabase() returning empty, and
-    /// emitted as "Unresolved${citationKey}".
+    ///                                                                                                         Unresolved citations recognized by
+    ///                                                                                                         entry.getBibEntry() and/or
+    ///                                                                                                         entry.getDatabase() returning empty, and
+    ///                                                                                                         emitted as "Unresolved${citationKey}".
     ///
-    /// Neither uniqueLetter nor pageInfo are emitted
-    /// for unresolved citations.
+    ///                                                                                                         Neither uniqueLetter nor pageInfo are emitted
+    ///                                                                                                         for unresolved citations.
     /// @param startsNewGroup     Should have the same length as `entries`, and
-    /// contain true for entries starting a new group,
-    /// false for those that only add a uniqueLetter to
-    /// the grouped presentation.
+    ///                                                                                                         contain true for entries starting a new group,
+    ///                                                                                                         false for those that only add a uniqueLetter to
+    ///                                                                                                         the grouped presentation.
     /// @param maxAuthorsOverride If not empty, always show this number of authors.
-    /// Added to allow NORMALIZED to use maxAuthors value that differs from
-    /// style.getMaxAuthors()
+    ///                                                                                                         Added to allow NORMALIZED to use maxAuthors value that differs from
+    ///                                                                                                         style.getMaxAuthors()
     /// @return The formatted citation.
     ///
     private static OOText getAuthorYearParenthesisMarker2(JStyle style,
@@ -556,13 +545,13 @@ class JStyleGetCitationMarker {
     ///
     /// @param citationMarkerEntries           A group of citations to process.
     /// @param inParenthesis                   If true, put parenthesis around the whole group,
-    /// otherwise around each (year,uniqueLetter,pageInfo) part.
+    ///                                                                                                                                                             otherwise around each (year,uniqueLetter,pageInfo) part.
     /// @param nonUniqueCitationMarkerHandling What should happen if we
-    /// stumble upon citations with identical normalized
-    /// citation markers which cite different sources and
-    /// are not distinguished by uniqueLetters.
+    ///                                                                                                                                                             stumble upon citations with identical normalized
+    ///                                                                                                                                                             citation markers which cite different sources and
+    ///                                                                                                                                                             are not distinguished by uniqueLetters.
     ///
-    /// Note: only consecutive citations are checked.
+    ///                                                                                                                                                             Note: only consecutive citations are checked.
     ///
     public static OOText
     createCitationMarker(JStyle style,

@@ -9,9 +9,7 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
     private final boolean considerRefs;
 
-    /// @param considerRefs Indicates whether the strings should be
-    /// sorted according to internal references in addition to
-    /// alphabetical sorting.
+    /// @param considerRefs Indicates whether the strings should be sorted according to internal references in addition to alphabetical sorting.
     public BibtexStringComparator(boolean considerRefs) {
         this.considerRefs = considerRefs;
     }

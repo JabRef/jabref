@@ -708,20 +708,14 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// each other, this method will perform a grouping of these
     /// entries.
     ///
-    /// @param citationMarkerEntries           The list of entries providing the
-    /// data.
-    /// @param inParenthesis                   Signals whether a parenthesized citation
-    /// or an in-text citation is wanted.
-    /// @param nonUniqueCitationMarkerHandling THROWS : Should throw if finds that uniqueLetters
-    /// provided do not make the entries unique.
-    ///
     /// FORGIVEN : is needed to allow preliminary markers
     /// for freshly inserted citations without
     /// going throw the uniquefication process.
-    /// @return The formatted citation. The result does not include
-    /// the standard wrappers:
-    /// OOFormat.setLocaleNone() and OOFormat.setCharStyle().
-    /// These are added by decorateCitationMarker()
+    ///
+    /// @param citationMarkerEntries           The list of entries providing the data.
+    /// @param inParenthesis                   Signals whether a parenthesized citation or an in-text citation is wanted.
+    /// @param nonUniqueCitationMarkerHandling THROWS : Should throw if finds that uniqueLetters provided do not make the entries unique.
+    /// @return The formatted citation. The result does not include the standard wrappers: OOFormat.setLocaleNone() and OOFormat.setCharStyle(). These are added by decorateCitationMarker()
     public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
                                        boolean inParenthesis,
                                        NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {

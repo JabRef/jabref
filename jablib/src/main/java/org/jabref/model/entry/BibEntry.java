@@ -641,8 +641,7 @@ public class BibEntry {
     /// entries linked by the "crossref" field, if any.
     ///
     /// @param fields   An array of field names to be checked.
-    /// @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning
-    /// that no attempt will be made to follow crossrefs.
+    /// @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning that no attempt will be made to follow crossrefs.
     /// @return true if all fields are set or could be resolved, false otherwise.
     public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
@@ -713,8 +712,7 @@ public class BibEntry {
     ///
     /// If `0` is passed as `maxCharacters`, the description is not truncated.
     ///
-    /// @param maxCharacters The maximum number of characters (additional
-    /// characters are replaced with "..."). Set to 0 to disable truncation.
+    /// @param maxCharacters The maximum number of characters (additional characters are replaced by "..."). Set to 0 to disable truncation.
     /// @return A short textual description of the entry in the format:
     /// Author1, Author2: Title (Year)
     public String getAuthorTitleYear(int maxCharacters) {

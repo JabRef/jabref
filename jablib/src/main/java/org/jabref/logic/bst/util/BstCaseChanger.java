@@ -49,8 +49,8 @@ public final class BstCaseChanger {
         }
 
         /// Convert bstFormat char into ENUM
-    ///
-    /// @throws IllegalArgumentException if char is not 't', 'l', 'u'
+        ///
+        /// @throws IllegalArgumentException if char is not 't', 'l', 'u'
         public static FormatMode of(final char bstFormat) {
             for (FormatMode mode : FormatMode.values()) {
                 if (mode.asChar == bstFormat) {

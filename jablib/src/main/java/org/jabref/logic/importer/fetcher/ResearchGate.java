@@ -179,7 +179,6 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     /// Constructs a URL based on the query, size and page number.
     /// Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
     ///
-    ///
     /// @param queryNode the search query.
     /// @return A URL that lets us download a .bib file
     private static URL getUrlForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {

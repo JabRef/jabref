@@ -397,13 +397,10 @@ public class AuthorListParser {
     /// Concatenates list of tokens from 'tokens' Vector. Tokens are separated by spaces or dashes, depending on stored
     /// in 'tokens'. Callers always ensure that start < end; thus, there exists at least one token to be concatenated.
     ///
-    /// @param start    index of the first token to be concatenated in 'tokens' Vector (always divisible by
-    /// TOKEN_GROUP_LENGTH).
-    /// @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by
-    /// TOKEN_GROUP_LENGTH).
+    /// @param start    index of the first token to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
+    /// @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
     /// @param offset   offset within token group (used to request concatenation of either full tokens or abbreviation).
-    /// @param dotAfter <CODE>true</CODE> -- add period after each token, <CODE>false</CODE> --
-    /// do not add.
+    /// @param dotAfter `true`` -- add period after each token, `false` do not add.
     /// @return the result of concatenation.
     private String concatTokens(List<Object> tokens, int start, int end, int offset, boolean dotAfter) {
         StringBuilder result = new StringBuilder();

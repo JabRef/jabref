@@ -100,7 +100,6 @@ public class ConferenceRepository {
     /// or `(ICSE 2022)`. If acronym lookup fails, the query is processed further and matched against the list
     /// of conference titles.
     ///
-    ///
     /// @param bookTitle the string to search, must not be `null`
     /// @return an `Optional` conference entry, if found
     /// or `Optional.empty()` if no conference entry is found
@@ -161,7 +160,6 @@ public class ConferenceRepository {
     ///
     /// The combined score is calculated as follows:
     /// `(0.6 * Levenshtein similarity) + (0.4 * LCS similarity)`
-    ///
     ///
     /// @param query The query string to be searched
     /// @return an `Optional` conference entry, if found

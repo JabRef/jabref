@@ -44,8 +44,7 @@ public class RegexFormatter extends Formatter {
 
     /// Constructs a new regular expression-based formatter with the given RegEx.
     ///
-    /// @param input the regular expressions for matching and replacing given in the form {@code ("<regex>",
-    /// "<replace>")}.
+    /// @param input the regular expressions for matching and replacing given in the form `("<regex>", "<replace>")`.
     public RegexFormatter(@NonNull String input) {
         input = input.trim().replace("\\\"", PLACEHOLDER_FOR_QUOTE_SIGN);
         Matcher constructorArgument = CONSTRUCTOR_ARGUMENT.matcher(input);

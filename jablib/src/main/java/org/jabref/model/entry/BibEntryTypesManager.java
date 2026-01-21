@@ -195,7 +195,7 @@ public class BibEntryTypesManager {
         }
 
         /// This method returns the BibtexEntryType for the name of a type,
-    /// or an empty optional if it does not exist.
+        /// or an empty optional if it does not exist.
         private Optional<BibEntryType> enrich(EntryType type) {
             Optional<BibEntryType> enrichedType = customOrModifiedType.stream()
                                                                       .filter(typeEquals(type))

@@ -22,9 +22,10 @@ public class UnoReferenceMark {
     private UnoReferenceMark() {
     }
 
+    /// Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
+    ///
     /// @throws NoDocumentException If cannot get reference marks
     ///
-    /// Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
     public static XNameAccess getNameAccess(XTextDocument doc)
             throws
             NoDocumentException {

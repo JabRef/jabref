@@ -35,8 +35,7 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, Par
 
     /// Extracts the identifier from the list of fetched entries.
     ///
-    /// @param inputEntry     the entry for which we are searching the identifier (can be used to find closest match in
-    /// the result)
+    /// @param inputEntry     the entry for which we are searching the identifier (can be used to find the closest match in the result)
     /// @param fetchedEntries list of entries returned by the web service
     Optional<T> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) throws FetcherException;
 

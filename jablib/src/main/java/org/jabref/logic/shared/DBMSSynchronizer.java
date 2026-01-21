@@ -133,8 +133,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Sets the table structure of shared database if needed and pulls all shared entries to the new local database.
     ///
-    /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current
-    /// shared database support ({@link DBMSProcessor}).
+    /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current shared database support ({@link DBMSProcessor}).
     public void initializeDatabases() throws DatabaseNotSupportedException {
         try {
             if (!dbmsProcessor.checkBaseIntegrity()) {

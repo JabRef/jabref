@@ -281,7 +281,6 @@ public class AuthorList implements Iterable<Author> {
     /// - "John von Neumann and John Smith and Black Brown, Peter" ==> "von
     /// Neumann et al."
     ///
-    ///
     /// @return formatted list of authors.
     public String getAsNatbib() {
         List<Author> authors = getAuthors();
@@ -305,7 +304,6 @@ public class AuthorList implements Iterable<Author> {
     /// -  "John von Neumann and John Smith and Black Brown, Peter" ==> "von
     /// Neumann, Smith and Black Brown".
     ///
-    ///
     /// @param oxfordComma Whether to put a comma before the and at the end.
     /// @return formatted list of authors.
     /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
@@ -323,7 +321,6 @@ public class AuthorList implements Iterable<Author> {
     /// -  "John von Neumann and John Smith and Black Brown, Peter" ==> "von
     /// Neumann, John, Smith, John and Black Brown, Peter" or "von Neumann, J.,
     /// Smith, J. and Black Brown, P.".
-    ///
     ///
     /// @param abbreviate  whether to abbreivate first names.
     /// @param oxfordComma Whether to put a comma before the and at the end.
@@ -347,7 +344,6 @@ public class AuthorList implements Iterable<Author> {
     /// Brown, Peter"
     /// - "John von Neumann and John Smith and Black Brown, Peter" ==> "von
     /// Neumann, John and Smith, John and Black Brown, Peter".
-    ///
     ///
     /// @return formatted list of authors.
     public String getAsLastFirstNamesWithAnd(boolean abbreviate) {
@@ -385,7 +381,6 @@ public class AuthorList implements Iterable<Author> {
     /// -  "John von Neumann and John Smith and Black Brown, Peter" ==> "John
     /// von Neumann, John Smith and Peter Black Brown" or "J. von Neumann, J.
     /// Smith and P. Black Brown"
-    ///
     ///
     /// @param abbreviate  whether to abbreivate first names.
     /// @param oxfordComma Whether to put a comma before the and at the end.
@@ -425,7 +420,6 @@ public class AuthorList implements Iterable<Author> {
     /// - "John von Neumann and John Smith and Black Brown, Peter" ==> "John
     /// von Neumann and John Smith and Peter Black Brown"
     ///
-    ///
     /// @return formatted list of authors.
     public String getAsFirstLastNamesWithAnd() {
         return getAuthors().stream()
@@ -437,7 +431,6 @@ public class AuthorList implements Iterable<Author> {
     ///
     ///
     /// - "John Smith" ==> "Smith, J.";
-    ///
     ///
     /// @return formatted list of authors
     public String getForAlphabetization() {

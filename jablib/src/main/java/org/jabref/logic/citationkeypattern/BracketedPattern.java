@@ -37,6 +37,7 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,9 +91,9 @@ public class BracketedPattern {
         private static final Pattern DEPARTMENTS_OR_LABS = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
 
         /// Find which types of institutions have words in common with the given name parts.
-    ///
-    /// @param nameParts a list of words that constitute parts of an institution's name.
-    /// @return set containing all types that matches
+        ///
+        /// @param nameParts a list of words that constitute parts of an institution's name.
+        /// @return set containing all types that matches
         public static EnumSet<Institution> findTypes(List<String> nameParts) {
             EnumSet<Institution> parts = EnumSet.noneOf(Institution.class);
             // Deciding about a part type…
@@ -190,8 +191,7 @@ public class BracketedPattern {
     /// Expands a pattern.
     ///
     /// @param pattern               The pattern to expand
-    /// @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
-    /// and expanding it
+    /// @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern and expanding it
     /// @return The expanded pattern. Not null.
     public static String expandBrackets(@NonNull String pattern, Function<String, String> bracketContentHandler) {
         StringBuilder expandedPattern = new StringBuilder();
@@ -771,7 +771,6 @@ public class BracketedPattern {
     ///
     /// `and others` is converted to `EtAl`
     ///
-    ///
     /// @param authorList an {@link AuthorList}
     /// @return the surname of all authors/editors
     static String allAuthors(AuthorList authorList) {
@@ -996,8 +995,7 @@ public class BracketedPattern {
     /// authIniN format
     ///
     /// @param authorList The authors to format.
-    /// @param n          The maximum number of characters this string will be long. A negative number or zero will lead
-    /// to "" be returned.
+    /// @param n          The maximum number of characters this string will be long. A negative number or zero will lead to "" be returned.
     static String authIniN(AuthorList authorList, int n) {
         if ((n <= 0) || authorList.isEmpty()) {
             return "";
@@ -1183,13 +1181,10 @@ public class BracketedPattern {
     /// other parts (address, ...) are ignored.
     ///
     /// @param content the institution to generate a Bibtex key for
-    /// @return
-    /// - the institution key
-    /// - "" in the case of a failure
-    /// - null if content is null
+    /// @return - the institution key, "" in the case of a failure, - null if content is null
     ///
     @VisibleForTesting
-    static String generateInstitutionKey(String content) {
+    static @Nullable String generateInstitutionKey(@Nullable String content) {
         if (content == null) {
             return null;
         }

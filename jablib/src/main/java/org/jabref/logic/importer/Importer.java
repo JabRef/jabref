@@ -185,7 +185,6 @@ public abstract class Importer implements Comparable<Importer> {
     /// -
     /// by what criteria it {@link #isRecognizedFormat(BufferedReader)} recognizes an import format
     ///
-    ///
     /// @return description of the import format
     public abstract String getDescription();
 

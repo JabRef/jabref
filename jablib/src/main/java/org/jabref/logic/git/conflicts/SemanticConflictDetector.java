@@ -63,7 +63,6 @@ public class SemanticConflictDetector {
 
     /// Detect entry-level conflicts among base, local, and remote versions of an entry.
     ///
-    ///
     /// @param base   the entry in the common ancestor
     /// @param local  the entry in the local version
     /// @param remote the entry in the remote version
@@ -265,7 +264,6 @@ public class SemanticConflictDetector {
     /// - Only entries with a citation key are included (entries without a key cannot be uniquely identified during merge).
     /// - Entries that represent additions (base == null) or deletions (new == null) are also included.
     /// - If multiple BibEntryDiffs share the same citation key (rare), the latter one will overwrite the former.
-    ///
     ///
     /// @param entryDiffs A list of entry diffs produced by BibDatabaseDiff
     /// @return A map from citation key to corresponding BibEntryDiff

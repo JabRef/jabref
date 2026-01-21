@@ -238,7 +238,6 @@ public class DublinCoreExtractor {
     ///
     /// The opposite method is {@link DublinCoreExtractor#fillDublinCoreSchema()}
     ///
-    ///
     /// @return The bibEntry extracted from the document information.
     public Optional<BibEntry> extractBibtexEntry() {
         // first extract "bibtex/" entries

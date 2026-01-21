@@ -56,7 +56,6 @@ public final class ConferenceUtils {
     /// - `"Input with empty (        ) whitespace in parens"` -> `Optional.empty()`
     /// - `""` -> `Optional.empty()`
     ///
-    ///
     /// @param input the string to search, must not be `null`
     /// @return an `Optional` containing the extracted and trimmed string from the first set of parentheses,
     /// or `Optional.empty()` if no string is found
@@ -91,7 +90,6 @@ public final class ConferenceUtils {
     /// For example, given the input string `"IEEE-IV'2022"` and a cutoff of `11`, this method generates the
     /// following candidates in order: `"IEEE-IV", "IV'2022", "2022", "IEEE", "IV"`. Notice that `"IEEE-IV"`
     /// is positioned ahead and retains the `-` in between.
-    ///
     ///
     /// @param input  the raw string to extract acronym candidates from, must not be `null`
     /// @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
@@ -182,7 +180,6 @@ public final class ConferenceUtils {
     /// An example:
     /// `"proceedings of the 3rd international conference on machine learning (icml 2018)"` ->
     /// `"internationalconferenceonmachinelearning"`
-    ///
     ///
     /// @param input the pre-lowercased raw string to normalize, must not be `null`
     /// @return a normalized string representation of the input

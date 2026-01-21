@@ -118,7 +118,6 @@ public class XmpUtilReader {
     ///
     /// Moreover, DomXmpParser does not handle unknown namespaces
     ///
-    ///
     /// @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
     private List<XMPMetadata> getXmpMetadata(PDDocument document) {
         PDDocumentCatalog catalog = document.getDocumentCatalog();

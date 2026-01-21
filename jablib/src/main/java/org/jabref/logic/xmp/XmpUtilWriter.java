@@ -66,8 +66,7 @@ public class XmpUtilWriter {
     ///
     /// @param file     The path to write to.
     /// @param entry    The entry to write.
-    /// @param database An optional database which the given bibtex entries belong to, which will be used to
-    /// resolve strings. If the database is null the strings will not be resolved.
+    /// @param database An optional database which the given bibtex entries belong to, which will be used to resolve strings. If the database is null the strings will not be resolved.
     /// @throws TransformerException If the entry was malformed or unsupported.
     /// @throws IOException          If the file could not be written to or could not be found.
     public void writeXmp(Path file,
@@ -93,8 +92,7 @@ public class XmpUtilWriter {
     ///
     /// @param document The pdf document to write to.
     /// @param entries  The BibTeX entries that are written as schemas
-    /// @param database An optional database which the given BibTeX entries belong to, which will be used to
-    /// resolve strings. If the database is null the strings will not be resolved.
+    /// @param database An optional database which the given BibTeX entries belong to, which will be used to esolve strings. If the database is null the strings will not be resolved.
     private void writeDublinCore(PDDocument document,
                                  List<BibEntry> entries,
                                  BibDatabase database)
@@ -144,8 +142,7 @@ public class XmpUtilWriter {
     /// This method generates an xmp metadata string in dublin core format.
     ///
     /// @param entries A list of entries, which are added to the dublin core metadata.
-    /// @return If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
-    /// otherwise it returns the xmp metadata as a string in dublin core format.
+    /// @return If something goes wrong (e.g. an exception is thrown), the method returns an empty string, otherwise it returns the xmp metadata as a string in dublin core format.
     private String generateXmpStringWithXmpDeclaration(List<BibEntry> entries) {
         XMPMetadata meta = XMPMetadata.createXMPMetadata();
         for (BibEntry entry : entries) {
@@ -195,7 +192,7 @@ public class XmpUtilWriter {
     /// @param document The pdf document to write to.
     /// @param entry    The BibEntry that is written into the PDF properties.
     /// @param database An optional database which the given bibtex entries belong to, which will be used to
-    /// resolve strings. If the database is null the strings will not be resolved.
+    ///                                                                                                 resolve strings. If the database is null the strings will not be resolved.
     private void writeDocumentInformation(PDDocument document,
                                           BibEntry entry,
                                           BibDatabase database) {
@@ -262,8 +259,7 @@ public class XmpUtilWriter {
     ///
     /// @param path          The file to write the entries to.
     /// @param bibtexEntries The entries to write to the file. *
-    /// @param database      An optional database which the given bibtex entries belong to, which will be used
-    /// to resolve strings. If the database is null the strings will not be resolved.
+    /// @param database      An optional database which the given bibtex entries belong to, which will be used to resolve strings. If the database is null the strings will not be resolved.
     /// @throws TransformerException If the entry was malformed or unsupported.
     /// @throws IOException          If the file could not be written to or could not be found.
     public void writeXmp(Path path,

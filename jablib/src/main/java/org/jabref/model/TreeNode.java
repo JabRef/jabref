@@ -75,9 +75,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// If the path could not be traversed completely (i.e. one of the child indices did not exist),
     /// an empty Optional will be returned.
     ///
-    /// @param indexedPath sequence of child indices that describe a path from this node to one of its descendants.
-    /// Be aware that if indexedPath was obtained by getIndexedPathFromRoot(), this node should
-    /// usually be the root node.
+    /// @param indexedPath sequence of child indices that describe a path from this node to one of its descendants. Be aware that if indexedPath was obtained by getIndexedPathFromRoot(), this node should usually be the root node.
     /// @return descendant found by evaluating indexedPath
     public Optional<T> getDescendant(List<Integer> indexedPath) {
         T cursor = (T) this;

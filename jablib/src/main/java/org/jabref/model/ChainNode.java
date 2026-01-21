@@ -10,15 +10,18 @@ import org.jspecify.annotations.Nullable;
 ///
 /// In usual implementations, nodes function as wrappers around a data object. Thus normally they have a value property
 /// which allows access to the value stored in the node.
-/// In contrast to this approach, the ChainNode&lt;T> class is designed to be used as a base class which provides the
+/// In contrast to this approach, the `ChainNode<T>` class is designed to be used as a base class which provides the
 /// tree traversing functionality via inheritance.
 ///
 /// Example usage:
+///
+/// ```java
 /// private class BasicChainNode extends ChainNode&lt;BasicChainNode> {
-/// public BasicChainNode() {
-/// super(BasicChainNode.class);
+///   public BasicChainNode() {
+///     super(BasicChainNode.class);
+///   }
 /// }
-/// }
+/// ```
 ///
 /// @param <T> the type of the class
 @SuppressWarnings("unchecked")
@@ -32,8 +35,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
 
     /// Constructs a chain node without parent and no child.
     ///
-    /// @param derivingClass class deriving from TreeNode&lt;T>. It should always be "T.class".
-    /// We need this parameter since it is hard to get this information by other means.
+    /// @param derivingClass class deriving from TreeNode&lt;T>. It should always be "T.class". We need this parameter since it is hard to get this information by other means.
     public ChainNode(Class<T> derivingClass) {
         parent = null;
         child = null;

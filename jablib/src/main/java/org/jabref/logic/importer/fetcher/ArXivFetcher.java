@@ -480,19 +480,19 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         /// Queries the API.
-    ///
-    /// If only `searchQuery` is given, then the API will return results for each article that matches the query.
-    /// If only `ids` is given, then the API will return results for each article in the list.
-    /// If both `searchQuery` and `ids` are given, then the API will return each article in
-    /// `ids` that matches `searchQuery`. This allows the API to act as a results filter.
-    ///
-    /// @param searchQuery the search query used to find articles;
-    /// <a href="http://arxiv.org/help/api/user-manual#query_details">details</a>
-    /// @param ids         a list of arXiv identifiers
-    /// @param start       the index of the first returned result (zero-based)
-    /// @param maxResults  the number of maximal results (has to be smaller than 2000)
-    /// @return the response from the API as a XML document (Atom 1.0)
-    /// @throws FetcherException if there was a problem while building the URL or the API was not accessible
+        ///
+        /// If only `searchQuery` is given, then the API will return results for each article that matches the query.
+        /// If only `ids` is given, then the API will return results for each article in the list.
+        /// If both `searchQuery` and `ids` are given, then the API will return each article in
+        /// `ids` that matches `searchQuery`. This allows the API to act as a results filter.
+        ///
+        /// @param searchQuery the search query used to find articles;
+        ///                                       <a href="http://arxiv.org/help/api/user-manual#query_details">details</a>
+        /// @param ids         a list of arXiv identifiers
+        /// @param start       the index of the first returned result (zero-based)
+        /// @param maxResults  the number of maximal results (has to be smaller than 2000)
+        /// @return the response from the API as a XML document (Atom 1.0)
+        /// @throws FetcherException if there was a problem while building the URL or the API was not accessible
         private Document callApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults) throws FetcherException {
             if (maxResults > 2000) {
                 throw new IllegalArgumentException("The arXiv API limits the number of maximal results to be 2000");
@@ -570,9 +570,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         /// Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
-    ///
-    /// @param queryNode the first search node
-    /// @return A list of entries matching the complex query
+        ///
+        /// @param queryNode the first search node
+        /// @return A list of entries matching the complex query
         @Override
         public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
             ArXivQueryTransformer transformer = new ArXivQueryTransformer();

@@ -101,12 +101,8 @@ class RegExpBasedFileFinder implements FileFinder {
     /// - [key] Key from BibTeX file and database
     /// - .* Anything else is taken to be a Regular expression.
     ///
-    ///
     /// @param entry non-null
-    /// @param dirs  A set of root directories to start the search from. Paths are
-    /// returned relative to these directories if relative is set to
-    /// true. These directories will not be expanded or anything. Use
-    /// the file attribute for this.
+    /// @param dirs  A set of root directories to start the search from. Paths are returned relative to these directories if relative is set to true. These directories will not be expanded or anything. Use the file attribute for this.
     /// @return Will return the first file found to match the given criteria or
     /// null if none was found.
     private List<Path> findFile(BibEntry entry, List<Path> dirs, String extensionRegExp) throws IOException {
