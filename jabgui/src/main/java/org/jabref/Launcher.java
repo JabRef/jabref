@@ -105,10 +105,8 @@ public class Launcher {
         }
     }
 
-    /**
-     * This needs to be called as early as possible. After the first log write, it
-     * is not possible to alter the log configuration programmatically anymore.
-     */
+    /// This needs to be called as early as possible. After the first log write, it
+    /// is not possible to alter the log configuration programmatically anymore.
     public static void initLogging(String[] args) {
         // routeLoggingToSlf4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -169,9 +167,7 @@ public class Launcher {
         System.exit(0);
     }
 
-    /**
-     * @return MultipleInstanceAction: CONTINUE if JabRef should continue starting up, SHUTDOWN if it should quit, FOCUS if it should focus the existing instance.
-     */
+    /// @return MultipleInstanceAction: CONTINUE if JabRef should continue starting up, SHUTDOWN if it should quit, FOCUS if it should focus the existing instance.
     private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         LOGGER.trace("Checking for remote handling...");
 

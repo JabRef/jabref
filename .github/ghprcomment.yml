@@ -46,6 +46,15 @@
     IntelliJ auto format covers some cases.
     There seem to be issues with your code style and autoformat configuration.
     Please reformat your code (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>) and commit, then push.
+- jobName: format-javadoc
+  workflowName: 'Source Code Tests'
+  message: >
+    You introcuded non-Markdown JavaDoc.
+    Please use Markdown JavaDoc (`///`).
+
+
+    Note: This is a strong indication that you heavily used AI to create your code.
+    Please re-check our [AI usage policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md).
 - jobName: Checkstyle
   workflowName: 'Source Code Tests'
   message: >

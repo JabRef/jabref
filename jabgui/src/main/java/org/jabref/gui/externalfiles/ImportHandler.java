@@ -261,15 +261,13 @@ public class ImportHandler {
         importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager));
     }
 
-    /**
-     * Imports an entry into the database with duplicate checking and handling.
-     * Creates a copy of the entry for processing - the original entry parameter is not modified.
-     * The copied entry may be modified during cleanup and duplicate handling.
-     *
-     * @param entry    the entry to import (original will not be modified)
-     * @param decision the duplicate resolution strategy to apply
-     * @param tracker  tracks the import status of the entry
-     */
+    /// Imports an entry into the database with duplicate checking and handling.
+    /// Creates a copy of the entry for processing - the original entry parameter is not modified.
+    /// The copied entry may be modified during cleanup and duplicate handling.
+    ///
+    /// @param entry    the entry to import (original will not be modified)
+    /// @param decision the duplicate resolution strategy to apply
+    /// @param tracker  tracks the import status of the entry
     private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
         // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
@@ -378,11 +376,9 @@ public class ImportHandler {
         }
     }
 
-    /**
-     * Generate keys for given entries.
-     *
-     * @param entries entries to generate keys for
-     */
+    /// Generate keys for given entries.
+    ///
+    /// @param entries entries to generate keys for
     private void generateKeys(List<BibEntry> entries) {
         if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
             return;

@@ -9,9 +9,7 @@ import org.jabref.model.ai.AiProvider;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Background task for fetching AI models from a provider's API.
- */
+/// Background task for fetching AI models from a provider's API.
 @NullMarked
 public class FetchAiModelsBackgroundTask extends BackgroundTask<List<String>> {
 

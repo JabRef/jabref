@@ -46,9 +46,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.html.HTMLAnchorElement;
 
-/**
- * Displays an BibEntry using the given layout format.
- */
+/// Displays an BibEntry using the given layout format.
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
