@@ -36,15 +36,13 @@ public class DateGroup extends AbstractGroup {
         }
     }
 
-    /**
-     * Returns a date group key from {@code d}.
-     * Format is inferred from {@code dateKeyFormat} by dash count: 0→YYYY, 1→YYYY-MM, 2→YYYY-MM-DD.
-     * If required parts are missing, returns {@link java.util.Optional#empty()}.
-     *
-     * @param d             the parsed date
-     * @param dateKeyFormat sample format used only for its number of dashes
-     * @return optional key string in the requested granularity
-     */
+    /// Returns a date group key from `d`.
+    /// Format is inferred from `dateKeyFormat` by dash count: 0→YYYY, 1→YYYY-MM, 2→YYYY-MM-DD.
+    /// If required parts are missing, returns {@link java.util.Optional#empty()}.
+    /// 
+    /// @param d             the parsed date
+    /// @param dateKeyFormat sample format used only for its number of dashes
+    /// @return optional key string in the requested granularity
     static Optional<String> getDateKey(Date d, String dateKeyFormat) {
         int numOfdashes = (int) dateKeyFormat.chars().filter(ch -> ch == '-').count();
         Optional<Integer> y = d.getYear();

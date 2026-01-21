@@ -16,15 +16,13 @@ public final class ConflictRules {
         throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
-    /**
-     * Detect entry-level conflicts among base, local, and remote versions of an entry.
-     * <p>
-     *
-     * @param base   the entry in the common ancestor
-     * @param local  the entry in the local version
-     * @param remote the entry in the remote version
-     * @return optional conflict (if detected)
-     */
+    /// Detect entry-level conflicts among base, local, and remote versions of an entry.
+    /// 
+    /// 
+    /// @param base   the entry in the common ancestor
+    /// @param local  the entry in the local version
+    /// @param remote the entry in the remote version
+    /// @return optional conflict (if detected)
     public static Optional<ThreeWayEntryConflict> detectEntryConflict(BibEntry base,
                                                                       BibEntry local,
                                                                       BibEntry remote) {
