@@ -217,9 +217,9 @@ public class GroupTreeView extends BorderPane {
         // for larger group structures.
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
             LOGGER.debug("Run group search {}", searchField.getText());
-            viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
 
             final List<GroupNodeViewModel> prevSelected = new ArrayList<>(viewModel.selectedGroupsProperty());
+            viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
             final String newFilter = searchField.getText();
             viewModel.filterTextProperty().setValue(newFilter);
 
