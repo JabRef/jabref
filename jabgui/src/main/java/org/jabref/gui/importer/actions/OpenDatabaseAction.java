@@ -45,7 +45,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// The action concerned with opening an existing database.
+/// The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);

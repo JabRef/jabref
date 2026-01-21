@@ -1,4 +1,4 @@
-package org.jabref.gui.importer;
+package org.jabref.gui.importer.actions;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +16,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.importer.GrobidUseDialogHelper;
+import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -35,6 +37,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,9 +119,7 @@ public class ImportCommand extends SimpleCommand {
             return;
         }
 
-        BackgroundTask<ParserResult> task;
         Optional<Importer> format;
-
         boolean isGeneralFilter = selectedExtensionFilter == FileFilterConverter.ANY_FILE
                 || "Available import formats".equals(selectedExtensionFilter.getDescription());
 
@@ -132,6 +134,7 @@ public class ImportCommand extends SimpleCommand {
             format = Optional.empty();
         }
 
+        BackgroundTask<ParserResult> task;
         task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null)));
 
         LibraryTab tab = tabContainer.getCurrentLibraryTab();
@@ -162,7 +165,8 @@ public class ImportCommand extends SimpleCommand {
     /**
      * @throws IOException of a specified importer
      */
-    private ParserResult doImport(List<Path> files, Importer importFormat) throws IOException {
+    @NullMarked
+    private ParserResult doImport(List<Path> files, @Nullable Importer importFormat) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
         // We import all files and collect their results
         List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
@@ -221,7 +225,7 @@ public class ImportCommand extends SimpleCommand {
     /**
      * TODO: Move this to logic package. Blocked by undo functionality.
      */
-    public ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
+    private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibDatabase resultDatabase = new BibDatabase();
         ParserResult result = new ParserResult(resultDatabase);
 
