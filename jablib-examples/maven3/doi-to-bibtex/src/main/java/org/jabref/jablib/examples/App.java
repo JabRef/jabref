@@ -32,9 +32,9 @@ public class App {
         // All `IdParserFetcher<DOI>` can do. In JabRef, there is currently only one implemented
 
         CrossRef fetcher = new CrossRef();
-        BibEntry entry = null; // will throw an exception if not found
+        BibEntry entry = null;
         try {
-            entry = fetcher.performSearchById(doi).get();
+            entry = fetcher.performSearchById(doi).get(); // will throw an exception if not found
         } catch (FetcherException e) {
             Logger.error("Could not fetch entry", e);
             return;
