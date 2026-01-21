@@ -46,9 +46,9 @@ public class LspRangeUtil {
 
     /**
      *
-     * @param line line starting at 1
+     * @param line     line starting at 1
      * @param colStart column starting at 1
-     * @param colEnd column starting at 1
+     * @param colEnd   column starting at 1
      * @return the LSP4J Range of the line and columns
      */
     public static Range convertToLspRange(int line, int colStart, int colEnd) {

@@ -82,11 +82,11 @@ public class ExternalLinkCreator {
     /**
      * Builds a search URL using either template replacement or query parameters
      *
-     * @param baseUrl The custom or default base URL
-     * @param defaultUrl The fallback default URL
-     * @param title The title to search for
-     * @param author Optional author to include in search (null if not present)
-     * @param serviceName Name of the service for logging
+     * @param baseUrl        The custom or default base URL
+     * @param defaultUrl     The fallback default URL
+     * @param title          The title to search for
+     * @param author         Optional author to include in search (null if not present)
+     * @param serviceName    Name of the service for logging
      * @param addAuthorIndex formats all authors as separate keys with indexing ("author[0]", "author[1]", etc.)
      * @return Optional containing the constructed URL, or empty if construction failed
      */
