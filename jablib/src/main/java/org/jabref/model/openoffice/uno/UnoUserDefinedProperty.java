@@ -18,14 +18,13 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
-import org.glassfish.jersey.internal.inject.Custom;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Document level user-defined properties.
 ///
-/// LibreOffice GUI: [File]/[Properties]/[Custom Properties]
+/// LibreOffice GUI: `[File]/[Properties]/[Custom Properties]`
 public class UnoUserDefinedProperty {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnoUserDefinedProperty.class);
