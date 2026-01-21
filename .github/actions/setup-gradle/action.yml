@@ -11,11 +11,6 @@ runs:
         check-latest: true
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
-    - name: Cache LTWA
-      uses: actions/cache@v5
-      with:
-        path: /tmp/ltwa_20210702.csv
-        key: ltwa_20210702.csv
     - name: Generate JBang cache key
       id: cache-key
       shell: bash

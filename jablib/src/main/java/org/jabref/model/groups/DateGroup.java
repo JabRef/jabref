@@ -43,7 +43,7 @@ public class DateGroup extends AbstractGroup {
      * Format is inferred from {@code dateKeyFormat} by dash count: 0→YYYY, 1→YYYY-MM, 2→YYYY-MM-DD.
      * If required parts are missing, returns {@link java.util.Optional#empty()}.
      *
-     * @param d the parsed date
+     * @param d             the parsed date
      * @param dateKeyFormat sample format used only for its number of dashes
      * @return optional key string in the requested granularity
      */
