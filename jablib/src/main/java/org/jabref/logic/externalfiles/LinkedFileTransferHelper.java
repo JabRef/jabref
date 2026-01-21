@@ -34,10 +34,10 @@ public class LinkedFileTransferHelper {
      * <p>
      * There is no need to know the source entry, because we are interested in the file paths only.
      *
-     * @param filePreferences File preferences for both contexts
-     * @param transferInformation   The source database context where files are currently located - and the transferMode
-     * @param targetContext   The target database context where files should be accessible
-     * @param targetEntry     The entry in the targetContext
+     * @param filePreferences     File preferences for both contexts
+     * @param transferInformation The source database context where files are currently located - and the transferMode
+     * @param targetContext       The target database context where files should be accessible
+     * @param targetEntry         The entry in the targetContext
      */
     public static void adjustLinkedFilesForTarget(
             FilePreferences filePreferences,
@@ -169,7 +169,7 @@ public class LinkedFileTransferHelper {
      * Gets the primary directory path for the given context.
      * This is a utility method extracted from the original implementation.
      *
-     * @param context The database context
+     * @param context         The database context
      * @param filePreferences File preferences for the context
      * @return Optional containing the primary directory path, or empty if none found
      */

@@ -77,7 +77,7 @@ public class FileUtil {
 
     /**
      * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
-     *
+     * <p>
      * In case the filename starts with a "." and only has one ".", the part after the dot is NOT the extension
      *
      * @return the extension (without leading dot), trimmed and in lowercase.
