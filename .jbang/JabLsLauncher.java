@@ -14,7 +14,7 @@
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabls
-//DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.apache.commons:commons-lang3:3.20.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
