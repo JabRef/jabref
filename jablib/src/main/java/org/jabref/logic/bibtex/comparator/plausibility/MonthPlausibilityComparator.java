@@ -24,13 +24,15 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
         if (leftM.isEmpty() && rightM.isEmpty()) {
             return ComparisonResult.UNDETERMINED;
         }
-
         if (!leftM.equals(rightM)) {
             return ComparisonResult.UNDETERMINED;
         }
 
-        boolean leftIsJabRef = left.equals(leftM.get().getJabRefFormat());
-        boolean rightIsJabRef = right.equals(rightM.get().getJabRefFormat());
+        Month leftMonth = leftM.get();
+        Month rightMonth = rightM.get();
+
+        boolean leftIsJabRef = left.equals(leftMonth.getJabRefFormat());
+        boolean rightIsJabRef = right.equals(rightMonth.getJabRefFormat());
         if (leftIsJabRef && !rightIsJabRef) {
             return ComparisonResult.LEFT_BETTER;
         }
@@ -38,8 +40,8 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             return ComparisonResult.RIGHT_BETTER;
         }
 
-        boolean leftIsShort = left.equalsIgnoreCase(leftM.get().getShortName());
-        boolean rightIsShort = right.equalsIgnoreCase(rightM.get().getShortName());
+        boolean leftIsShort = left.equalsIgnoreCase(leftMonth.getShortName());
+        boolean rightIsShort = right.equalsIgnoreCase(rightMonth.getShortName());
         if (leftIsShort && !rightIsShort) {
             return ComparisonResult.LEFT_BETTER;
         }
@@ -47,15 +49,24 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             return ComparisonResult.RIGHT_BETTER;
         }
 
-        boolean leftIsSimpleNum = left.matches("\\d+") && Integer.parseInt(left) == leftM.get().getNumber();
-        boolean rightIsSimpleNum = right.matches("\\d+") && Integer.parseInt(right) == rightM.get().getNumber();
+        boolean leftIsSimpleNum;
+        try {
+            leftIsSimpleNum = Integer.parseInt(left) == leftM.get().getNumber();
+        } catch (NumberFormatException e) {
+            leftIsSimpleNum = false;
+        }
+        boolean rightIsSimpleNum;
+        try {
+            rightIsSimpleNum = Integer.parseInt(right) == rightM.get().getNumber();
+        } catch (NumberFormatException e) {
+            rightIsSimpleNum = false;
+        }
         if (leftIsSimpleNum && !rightIsSimpleNum) {
             return ComparisonResult.LEFT_BETTER;
         }
         if (rightIsSimpleNum && !leftIsSimpleNum) {
             return ComparisonResult.RIGHT_BETTER;
         }
-
         if (left.length() < right.length()) {
             return ComparisonResult.LEFT_BETTER;
         }
