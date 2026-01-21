@@ -73,10 +73,8 @@ public class StudyRepository {
     ///
     /// @param pathToRepository Where the repository root is located.
     /// @param gitHandler       The git handler that manages any interaction with the remote repository
-    /// @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
-    /// contain the study definition file.
-    /// @throws IOException              Thrown if the given repository does not exist, or the study definition file
-    /// does not exist
+    /// @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not contain the study definition file.
+    /// @throws IOException              Thrown if the given repository does not exist, or the study definition file does not exist
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
                            CliPreferences preferences,

@@ -18,6 +18,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
+import org.glassfish.jersey.internal.inject.Custom;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +98,7 @@ public class UnoUserDefinedProperty {
         }
     }
 
-    /// @param property Name of a custom document property in the current document.
-    ///
-    /// Logs warning if does not exist.
+    /// @param property Name of a custom document property in the current document. Logs warning if does not exist.
     public static void remove(XTextDocument doc, @NonNull String property)
             throws
             NotRemoveableException {
@@ -116,9 +115,7 @@ public class UnoUserDefinedProperty {
         }
     }
 
-    /// @param property Name of a custom document property in the current document.
-    ///
-    /// Keep silent if property did not exist.
+    /// @param property Name of a custom document property in the current document. Keep silent if property did not exist.
     public static void removeIfExists(XTextDocument doc, @NonNull String property)
             throws
             NotRemoveableException {

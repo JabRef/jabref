@@ -128,8 +128,7 @@ public class SaveDatabaseAction {
         });
     }
 
-    /// @param file the new file name to save the database to. This is stored in the database context of the panel upon
-    /// successful save.
+    /// @param file the new file name to save the database to. This is stored in the database context of the panel upon successful save.
     /// @return true on successful save
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();

@@ -880,24 +880,28 @@ public class JabRefCliPreferences implements CliPreferences {
         return JabRefCliPreferences.singleton;
     }
 
-    //// **********************************************************************************************************
-/// // Common serializer logic
+    /// **********************************************************************************************************
+    /// Common serializer logic
     /// ************************************************************************************************************
-/// @VisibleForTesting
-/// static String convertListToString(List<String> value) {
-/// return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
-/// }
-/// @VisibleForTesting
-/// static List<String> convertStringToList(String toConvert) {
-/// if (StringUtil.isBlank(toConvert)) {
-/// return List.of();
-/// }
-/// return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
-/// }
+
+    @VisibleForTesting
+    static String convertListToString(List<String> value) {
+        return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
+    }
+
+    @VisibleForTesting
+    static List<String> convertStringToList(String toConvert) {
+        if (StringUtil.isBlank(toConvert)) {
+            return List.of();
+        }
+
+        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
+    }
+
     /// ************************************************************************************************************
-/// // Backingstore access logic
+    /// Backingstore access logic
     /// ************************************************************************************************************
-    /// *
+
     /// Check whether a key is set (differently from null).
     ///
     /// @param key The key to check.
@@ -1017,8 +1021,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// Clear all preferences.
     ///
-    /// @throws BackingStoreException if JabRef is unable to write to the registry/the
-    /// preferences storage
+    /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
     @Override
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
@@ -1152,8 +1155,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Imports Preferences from an XML file.
     ///
     /// @param path Path of file to import from
-    /// @throws JabRefException thrown if importing the preferences failed due to an
-    /// InvalidPreferencesFormatException or an IOException
+    /// @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
     @Override
     public void importPreferences(Path path) throws JabRefException {
         importPreferencesToBackingStore(path);

@@ -223,7 +223,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: [jablib, jabkit, jabsrv, jabgui]
+        module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -251,7 +251,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        module: [jablib]
+        module: [ jablib ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -378,7 +378,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        script: [.jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java]
+        script: [ .jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -446,7 +446,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [jablib-examples/maven3/doi-to-bibtex]
+        project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -473,7 +473,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [jablib-examples/maven3/doi-to-bibtex]
+        project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6

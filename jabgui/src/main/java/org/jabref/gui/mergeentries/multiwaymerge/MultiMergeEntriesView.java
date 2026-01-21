@@ -384,8 +384,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         }
 
         /// Adds a row that represents this field
-    ///
-    /// @param field the field to add to the view as a new row in the table
+        ///
+        /// @param field the field to add to the view as a new row in the table
         private void addRow(Field field) {
             VBox.setVgrow(fieldEditorCell, Priority.ALWAYS);
 

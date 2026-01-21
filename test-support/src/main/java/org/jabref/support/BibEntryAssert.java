@@ -110,8 +110,7 @@ public class BibEntryAssert {
     ///
     /// @param expectedIs   A BibtexImporter InputStream.
     /// @param fileToImport The path to the file to be imported.
-    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected
-    /// BibEntries
+    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected BibEntries
     public static void assertEquals(InputStream expectedIs, Path fileToImport, Importer importer)
             throws IOException {
         assertEquals(getListFromInputStream(expectedIs), fileToImport, importer);
@@ -127,8 +126,7 @@ public class BibEntryAssert {
     ///
     /// @param expected     A BibtexImporter InputStream.
     /// @param fileToImport The path to the file to be imported.
-    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected
-    /// BibEntries
+    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected BibEntries
     public static void assertEquals(List<BibEntry> expected, Path fileToImport, Importer importer)
             throws IOException {
         List<BibEntry> actualEntries = importer.importDatabase(fileToImport)

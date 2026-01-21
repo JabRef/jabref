@@ -171,10 +171,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Runnable autoCompleterChangedListener;
 
-    /// @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
     /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
     /// If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
     /// Closing the index takes time and will slow down opening the library.
+    ///
+    /// @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
     private LibraryTab(@NonNull BibDatabaseContext bibDatabaseContext,
                        @NonNull LibraryTabContainer tabContainer,
                        @NonNull DialogService dialogService,
