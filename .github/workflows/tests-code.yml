@@ -83,6 +83,28 @@ jobs:
       - name: Check if any files changed
         run: git diff --exit-code
 
+  format-javadoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: 'jabref'
+      - uses: actions/checkout@v6
+        with:
+          repository: 'rmuller/Convert2MarkdownJavadoc'
+          path: 'Convert2MarkdownJavadoc'
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '24'
+          distribution: 'corretto'
+          check-latest: true
+      - run: |
+          cd Convert2MarkdownJavadoc
+          java Convert2MarkdownJavadoc.java ../jabref
+      - name: Check if any files changed
+        run: git diff --exit-code
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
