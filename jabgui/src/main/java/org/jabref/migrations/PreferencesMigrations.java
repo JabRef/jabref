@@ -559,7 +559,6 @@ public class PreferencesMigrations {
     /// If the user current configuration matched with one of with known default field sets it gets updated to
     /// current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
     ///
-    ///
     /// @param preferences the user's current GUI preferences
     /// @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {

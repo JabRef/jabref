@@ -82,7 +82,6 @@ class PreferencesSearchHandler {
     /// - **ComboBox**: Matches if any item (converted to string) contains the query (case-insensitive).
     /// - **TextField**: Matches if its content contains the query (case-insensitive).
     ///
-    ///
     /// @param control The control to check.
     /// @param query   The search query.
     /// @return true if the control contains the query, otherwise false.

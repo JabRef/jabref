@@ -56,7 +56,6 @@ import org.slf4j.LoggerFactory;
 ///
 /// {@link PreviewTab} is the controller of Entry Preview tab
 ///
-///
 /// @see PreviewTab
 public class PreviewTabViewModel implements PreferenceTabViewModel {
 

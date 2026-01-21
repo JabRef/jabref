@@ -53,8 +53,8 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
             }
 
             /// As 'textfield' is a private member of TextFieldTableCell we need need to get to it through the backdoor.
-    ///
-    /// @return The TextField containing the editable content of the TableCell
+            ///
+            /// @return The TextField containing the editable content of the TableCell
             private Optional<TextField> lookupTextField() {
                 if (getGraphic() instanceof TextField textField) {
                     return Optional.of(textField);
