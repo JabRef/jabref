@@ -48,9 +48,9 @@ public class LtwaListMvGenerator {
 
     public static void main(String[] args) {
         try {
-            Path tempCsvFile = Path.of("jablib", "build", "tmp", "ltwa_20210702.csv");
-            if (!Files.exists(tempCsvFile)) {
-                LOGGER.error("LTWA CSV file not found at {}. Please execute gradle task downloadLtwaFile.", tempCsvFile);
+            Path csvFile = Path.of("jablib", "src", "main", "resources", "ltwa", "ltwa_20210702.csv");
+            if (!Files.exists(csvFile)) {
+                LOGGER.error("LTWA CSV file not found at {}. Please ensure that you checked out the submodules.", csvFile);
                 return;
             }
             Path outputDir = Path.of("jablib", "build", "generated", "resources", "journals");
@@ -58,7 +58,7 @@ public class LtwaListMvGenerator {
             Files.createDirectories(outputDir);
             Path outputFile = outputDir.resolve("ltwa-list.mv");
 
-            generateMvStore(tempCsvFile, outputFile);
+            generateMvStore(csvFile, outputFile);
 
             LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile.toAbsolutePath());
         } catch (IOException e) {
