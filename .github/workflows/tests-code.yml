@@ -79,6 +79,8 @@ jobs:
         with:
           file-mask: "*.java"
           settings-file: ".idea/codeStyles/Project.xml"
+      - name: Undo JBang changes # IntelliJ issue: https://youtrack.jetbrains.com/issue/IDEA-https://youtrack.jetbrains.com/issue/IDEA-384956/Skip-formatting-of-shebang-headers/Skip-formatting-of-shebang-headers
+        run: git checkout HEAD -- jablib-examples/jbang/*.java
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code

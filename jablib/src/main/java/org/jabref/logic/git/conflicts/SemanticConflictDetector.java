@@ -225,8 +225,8 @@ public class SemanticConflictDetector {
     /// - If both sides changed to the same value, no patch needed;
     /// - Fallback: if a divergence is still observed, do not override local; skip this field,
     ///
-    /// @param base base version
-    /// @param local local version
+    /// @param base   base version
+    /// @param local  local version
     /// @param remote remote version
     /// @return A map from field to new value
     private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry local, BibEntry remote) {

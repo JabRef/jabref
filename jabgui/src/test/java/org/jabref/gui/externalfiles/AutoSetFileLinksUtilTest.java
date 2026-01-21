@@ -195,7 +195,9 @@ class AutoSetFileLinksUtilTest {
             @DisplayName("configuredCitationKeyDependencyWithStart")
             class configuredCitationKeyDependencyWithStart {
 
-                /// └── citationKeyxxx.pdf
+                /// ```
+                /// └──citationKeyxxx.pdf
+                /// ```
                 @Test
                 void autoLinkByCitationKeyStartAtRootFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
@@ -224,9 +226,11 @@ class AutoSetFileLinksUtilTest {
                     assertEquals(expect, actual);
                 }
 
-                /// └── A
-    /// └── B
-    /// └── citationKeyxxx.pdf
+                /// ```
+                /// └──A
+                /// └──B
+                /// └──citationKeyxxx.pdf
+                /// ```
                 @Test
                 void autoLinkByCitationKeyStartAtSubFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
@@ -259,10 +263,12 @@ class AutoSetFileLinksUtilTest {
                     assertEquals(expect, actual);
                 }
 
-                /// └── A
-    /// └── B
-    /// ├── citationKey.pdf
-    /// └── citationKeyxxx.pdf
+                /// ```
+                /// └──A
+                ///    └── B
+                ///        ├── citationKey.pdf
+                ///        └── citationKeyxxx.pdf
+                /// ```
                 @Test
                 void autoLinkByCitationKeyStartMatchingTwoFilesAtSubFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
@@ -302,10 +308,12 @@ class AutoSetFileLinksUtilTest {
                     assertEquals(Set.copyOf(expect), Set.copyOf(actual));
                 }
 
+                /// ```
                 /// └── A
-    /// └── B
-    /// ├── citationKey.pdf
-    /// └── citationKeyxxx.pdf
+                ///    └── B
+                ///        ├── citationKey.pdf
+                ///        └── citationKeyxxx.pdf
+                /// ```
                 @Test
                 void autoLinkByCitationKeyStartMatchingTwoFilesAtSubFolderAndOneMatchABrokenLinkedFileName(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.START);
@@ -351,7 +359,9 @@ class AutoSetFileLinksUtilTest {
             @DisplayName("configuredCitationKeyDependencyWithExact")
             class configuredCitationKeyDependencyWithExact {
 
+                /// ```
                 /// └── citationKeyxxx.pdf
+                /// ```
                 @Test
                 void autoLinkByCitationKeyExactAtRootFolderDoesNotWorkWithNotExactName(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
@@ -380,7 +390,9 @@ class AutoSetFileLinksUtilTest {
                     assertEquals(expect, actual);
                 }
 
+                /// ```
                 /// └── citationKey.pdf
+                /// ```
                 @Test
                 void autoLinkByCitationKeyExactAtRootFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
@@ -409,9 +421,11 @@ class AutoSetFileLinksUtilTest {
                     assertEquals(expect, actual);
                 }
 
+                /// ```
                 /// └── A
-    /// └── B
-    /// └── citationKey.pdf
+                ///    └── B
+                ///        └── citationKey.pdf
+                /// ```
                 @Test
                 void autoLinkByCitationKeyExactAtSubFolder(@TempDir Path root) throws Exception {
                     when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
@@ -451,8 +465,10 @@ class AutoSetFileLinksUtilTest {
         @Nested
         @DisplayName("byBrokenLinkedFileNameOnly")
         class byBrokenLinkedFileNameOnly {
+            /// ```
             /// CK: WeDoNotCare
-    /// └── broken_file_name.doc
+            /// └── broken_file_name.doc
+            /// ```
             @Test
             void noAutoLinkByCitationKeyStartAtRootFolderWithSuffixMismatch(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
@@ -482,13 +498,15 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// CK: WeDoNotCare
-    /// From
-    /// ├── A
-    /// └── A.pdf
-    /// to
-    /// └── A
-    /// └── A.pdf
+            /// From
+            /// ├── A
+            /// └── A.pdf
+            /// to
+            /// └── A
+            ///     └── A.pdf
+            /// ```
             @Test
             void autoLinkMoveFileFromRootFolderToSubfolder(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
@@ -519,13 +537,15 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// CK: WeDoNotCare
-    /// From
-    /// └── A
-    /// └── A.pdf
-    /// to
-    /// ├── A
-    /// └── A.pdf
+            /// From
+            /// └── A
+            ///     └── A.pdf
+            /// to
+            /// ├── A
+            /// └── A.pdf
+            /// ```
             @Test
             void autoLinkMoveFileFromSubfolderToRootFolder(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
@@ -556,15 +576,17 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// From
-    /// CK: WeDoNotCare
-    /// ├── A
-    /// │   └── A.pdf
-    /// └── B
-    /// to
-    /// ├── A
-    /// └── B
-    /// └── A.pdf
+            /// CK: WeDoNotCare
+            /// ├── A
+            /// │   └── A.pdf
+            /// └── B
+            /// to
+            /// ├── A
+            /// └── B
+            ///     └── A.pdf
+            /// ```
             @Test
             void autoLinkMoveFileFromSubfolderToSubfolder(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
@@ -597,14 +619,16 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// CK: WeDoNotCare
-    /// From
-    /// ├── A.pdf
-    /// └── A
-    /// to
-    /// ├── A.pdf
-    /// └── A
-    /// └── A.pdf
+            /// From
+            /// ├── A.pdf
+            /// └── A
+            /// to
+            /// ├── A.pdf
+            /// └── A
+            ///     └── A.pdf
+            /// ```
             @Test
             void noAutoLinkCopyFileFromRootFolderToSubfolder(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
@@ -635,14 +659,16 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// CK: WeDoNotCare
-    /// From
-    /// └── A
-    /// └── A.pdf
-    /// to
-    /// ├── A.pdf
-    /// └── A
-    /// └── A.pdf
+            /// From
+            /// └── A
+            ///     └── A.pdf
+            /// to
+            /// ├── A.pdf
+            /// └── A
+            ///     └── A.pdf
+            /// ```
             @Test
             void noAutoLinkCopyFileFromSubfolderToRootFolder(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
@@ -673,16 +699,18 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// CK: WeDoNotCare
-    /// From
-    /// ├── A
-    /// │   └── A.pdf
-    /// └── B
-    /// to
-    /// ├── A
-    /// │   └── A.pdf
-    /// └── B
-    /// └── A.pdf
+            /// From
+            /// ├── A
+            /// │   └── A.pdf
+            /// └── B
+            /// to
+            /// ├── A
+            /// │   └── A.pdf
+            /// └── B
+            ///     └── A.pdf
+            /// ```
             @Test
             void noAutoLinkCopyFileFromSubfolderToSubfolder(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));
@@ -720,13 +748,15 @@ class AutoSetFileLinksUtilTest {
         @DisplayName("byCitationKeyAndBrokenLinkedFileName")
         class byCitationKeyAndBrokenLinkedFileName {
 
+            /// ```
             /// CK: AAA
-    /// From
-    /// ├── AAA.pdf
-    /// └── A
-    /// to
-    /// └── A
-    /// └── AAA.pdf
+            /// From
+            /// ├── AAA.pdf
+            /// └── A
+            /// to
+            /// └── A
+            ///     └── AAA.pdf
+            /// ```
             @Test
             void autoLinkMoveFileFromRootFolderToSubFolderByBothBrokenLinkedFileNameAndCitationKey(@TempDir Path root) throws Exception {
                 when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
@@ -757,13 +787,15 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// CK: AAA
-    /// From
-    /// └── A
-    /// └── AAA.pdf
-    /// to
-    /// ├── AAA.pdf
-    /// └── A
+            /// From
+            /// └── A
+            ///     └── AAA.pdf
+            /// to
+            /// ├── AAA.pdf
+            /// └── A
+            ///
             @Test
             void autoLinkMoveFileFromSubFolderToRootFolderByBothBrokenLinkedFileNameAndCitationKey(@TempDir Path root) throws Exception {
                 when(autoLinkPrefs.getCitationKeyDependency()).thenReturn(AutoLinkPreferences.CitationKeyDependency.EXACT);
@@ -794,16 +826,18 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
 
+            /// ```
             /// CK: AAA
-    /// From
-    /// ├── A
-    /// │   └── AAA.pdf
-    /// └── B
-    /// to
-    /// ├── A
-    /// │   └── A.pdf
-    /// └── B
-    /// └── AAA.pdf
+            /// From
+            /// ├── A
+            /// │   └── AAA.pdf
+            /// └── B
+            /// to
+            /// ├── A
+            /// │   └── A.pdf
+            /// └── B
+            ///     └── AAA.pdf
+            /// ```
             @Test
             void noAutoLinkCopyFileFromSubfolderToSubfolderByBothBrokenLinkedFileNameAndCitationKey(@TempDir Path root) throws Exception {
                 when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(root));

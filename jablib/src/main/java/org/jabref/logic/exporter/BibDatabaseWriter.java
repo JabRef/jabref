@@ -88,9 +88,9 @@ public class BibDatabaseWriter {
 
     /// Convenience constructor. One can directly call [#writeDatabase(BibDatabaseContext)] afterward.
     ///
-    /// @param writer the output to use
+    /// @param writer             the output to use
     /// @param bibDatabaseContext - used to get the newline
-    /// @param  preferences - used to read all the preferences
+    /// @param preferences        - used to read all the preferences
     public BibDatabaseWriter(@NonNull Writer writer,
                              @NonNull BibDatabaseContext bibDatabaseContext,
                              @NonNull CliPreferences preferences) {
