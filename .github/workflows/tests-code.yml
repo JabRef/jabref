@@ -103,7 +103,9 @@ jobs:
           cd Convert2MarkdownJavadoc
           java Convert2MarkdownJavadoc.java ../jabref
       - name: Check if any files changed
-        run: git diff --exit-code
+        run: |
+          cd jabref
+          git diff --exit-code
 
   modernizer:
     name: Modernizer
