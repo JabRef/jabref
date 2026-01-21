@@ -486,8 +486,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         /// If both `searchQuery` and `ids` are given, then the API will return each article in
         /// `ids` that matches `searchQuery`. This allows the API to act as a results filter.
         ///
-        /// @param searchQuery the search query used to find articles;
-        ///                                       <a href="http://arxiv.org/help/api/user-manual#query_details">details</a>
+        /// @param searchQuery the search query used to find articles; <a href="http://arxiv.org/help/api/user-manual#query_details">details</a>
         /// @param ids         a list of arXiv identifiers
         /// @param start       the index of the first returned result (zero-based)
         /// @param maxResults  the number of maximal results (has to be smaller than 2000)

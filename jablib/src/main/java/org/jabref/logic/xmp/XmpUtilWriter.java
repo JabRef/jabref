@@ -191,8 +191,7 @@ public class XmpUtilWriter {
     ///
     /// @param document The pdf document to write to.
     /// @param entry    The BibEntry that is written into the PDF properties.
-    /// @param database An optional database which the given bibtex entries belong to, which will be used to
-    ///                                                                                                 resolve strings. If the database is null the strings will not be resolved.
+    /// @param database An optional database which the given bibtex entries belong to, which will be used to resolve strings. If the database is null the strings will not be resolved.
     private void writeDocumentInformation(PDDocument document,
                                           BibEntry entry,
                                           BibDatabase database) {
