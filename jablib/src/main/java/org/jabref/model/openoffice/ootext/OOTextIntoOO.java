@@ -112,8 +112,7 @@ public class OOTextIntoOO {
     ///
     /// - `<span oo:CharStyleName="CharStylename">` - earlier was applied from code, for "CitationCharacterFormat"
     ///
-    /// - `
-` start new paragraph - earlier was applied from code
+    /// - `<p>` start new paragraph - earlier was applied from code
     ///
     /// - `<p oo:ParaStyleName="ParStyleName">` : start new paragraph and apply ParStyleName - earlier was applied from code
     ///
@@ -488,8 +487,8 @@ public class OOTextIntoOO {
         }
 
         /// Given a list of property name, property value pairs, construct and push a new layer describing the intended state after these have been applied.
-    ///
-    /// Opening tags usually call this.
+        ///
+        /// Opening tags usually call this.
         void pushLayer(List<OOPair<String, Object>> settings) {
             ArrayList<Optional<Object>> oldLayer = layers.peek();
             ArrayList<Optional<Object>> newLayer = new ArrayList<>(oldLayer);
@@ -516,8 +515,8 @@ public class OOTextIntoOO {
         }
 
         /// Apply the current desired formatting state to a cursor.
-    ///
-    /// The idea is to minimize the number of calls to OpenOffice.
+        ///
+        /// The idea is to minimize the number of calls to OpenOffice.
         void apply(XTextCursor cursor) {
             XMultiPropertySet mps = UnoCast.cast(XMultiPropertySet.class, cursor).get();
             XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
