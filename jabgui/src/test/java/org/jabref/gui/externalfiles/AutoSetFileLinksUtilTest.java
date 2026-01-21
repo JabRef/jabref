@@ -41,9 +41,7 @@ class AutoSetFileLinksUtilTest {
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
     private Path path = null;
 
-    /**
-     * Modified version of AutoLinkFilesAction.linkFilesTask.onLinkedFilesUpdated.
-     */
+    /// Modified version of AutoLinkFilesAction.linkFilesTask.onLinkedFilesUpdated.
     private final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
         // Undo manager related code is removed
 

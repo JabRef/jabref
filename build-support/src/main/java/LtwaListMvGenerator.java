@@ -66,13 +66,11 @@ public class LtwaListMvGenerator {
         }
     }
 
-    /**
-     * Generates an MVStore file from the LTWA CSV file.
-     *
-     * @param inputFile  Path to the LTWA CSV file
-     * @param outputFile Path where the MVStore file will be written
-     * @throws IOException If an I/O error occurs
-     */
+    /// Generates an MVStore file from the LTWA CSV file.
+    ///
+    /// @param inputFile  Path to the LTWA CSV file
+    /// @param outputFile Path where the MVStore file will be written
+    /// @throws IOException If an I/O error occurs
     private static void generateMvStore(Path inputFile, Path outputFile) throws IOException {
         LOGGER.info("Parsing LTWA file...");
         LtwaTsvParser parser = new LtwaTsvParser(inputFile);

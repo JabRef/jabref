@@ -40,9 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-/**
- * Perform an import action
- */
+/// Perform an import action
 public class ImportCommand extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportCommand.class);
 
@@ -159,9 +157,7 @@ public class ImportCommand extends SimpleCommand {
         preferences.getImporterPreferences().setImportWorkingDirectory(files.getLast().getParent());
     }
 
-    /**
-     * @throws IOException of a specified importer
-     */
+    /// @throws IOException of a specified importer
     private ParserResult doImport(List<Path> files, Importer importFormat) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
         // We import all files and collect their results
@@ -218,9 +214,7 @@ public class ImportCommand extends SimpleCommand {
         return mergeImportResults(imports);
     }
 
-    /**
-     * TODO: Move this to logic package. Blocked by undo functionality.
-     */
+    /// TODO: Move this to logic package. Blocked by undo functionality.
     public ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibDatabase resultDatabase = new BibDatabase();
         ParserResult result = new ParserResult(resultDatabase);
