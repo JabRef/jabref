@@ -26,7 +26,7 @@ public class UndoableAbbreviator {
     }
 
     /// Abbreviate the journal name of the given entry.
-    /// 
+    ///
     /// @param database     The database the entry belongs to, or null if no database.
     /// @param entry        The entry to be treated.
     /// @param fieldName    The field name (e.g. "journal")

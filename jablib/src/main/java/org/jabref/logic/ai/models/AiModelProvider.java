@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public interface AiModelProvider {
     /// Fetches the list of available models for the given AI provider.
-    /// 
+    ///
     /// @param aiProvider The AI provider to fetch models from
     /// @param apiBaseUrl The base URL for the API
     /// @param apiKey     The API key for authentication (may be null for providers that don't require it)

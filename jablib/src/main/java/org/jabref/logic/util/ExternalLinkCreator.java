@@ -74,7 +74,7 @@ public class ExternalLinkCreator {
     }
 
     /// Builds a search URL using either template replacement or query parameters
-    /// 
+    ///
     /// @param baseUrl        The custom or default base URL
     /// @param defaultUrl     The fallback default URL
     /// @param title          The title to search for

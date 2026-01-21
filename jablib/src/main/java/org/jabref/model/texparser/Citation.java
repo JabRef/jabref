@@ -4,7 +4,7 @@ import java.nio.file.Path;
 
 import org.jspecify.annotations.NonNull;
 
-/// 
+///
 /// @param path     the path to the file containing the citationkey
 /// @param line     the line number of the citationkey (starting at 1)
 /// @param colStart the column number of the start of the citation key (starting at 0)

@@ -44,7 +44,7 @@ public class LspRangeUtil {
         );
     }
 
-    /// 
+    ///
     /// @param line     line starting at 1
     /// @param colStart column starting at 1
     /// @param colEnd   column starting at 1
