@@ -10,8 +10,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
@@ -28,8 +26,8 @@ public class Pseudonymization {
     }
 
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
-
-        Map<String, String> groupNameMapping = new HashMap<>();
+        // TODO: Anonymize metadata
+        // TODO: Anonymize strings
 
         Map<Field, Map<String, Integer>> fieldToValueToIdMap = new HashMap<>();
         List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, fieldToValueToIdMap);
@@ -41,47 +39,19 @@ public class Pseudonymization {
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
 
+        MetaData originalMetaData = bibDatabaseContext.getMetaData();
         MetaData metaData = new MetaData();
+
         metaData.setMode(bibDatabaseContext.getMode());
-
-        bibDatabaseContext.getMetaData()
-                          .getGroups()
-                          .ifPresent(root ->
-                                  metaData.setGroups(
-                                          pseudonymizeGroupTree(root, groupNameMapping)
-                                  ));
-
-        // Add group mappings with explicit namespace
-        groupNameMapping.forEach((original, pseudonym) ->
-                valueMapping.put("group:" + pseudonym, original));
+        originalMetaData.getEncoding().ifPresent(metaData::setEncoding);
+        originalMetaData.getSaveOrder().ifPresent(metaData::setSaveOrder);
+        originalMetaData.getSaveActions().ifPresent(metaData::setSaveActions);
+        if (originalMetaData.isProtected()) {
+            metaData.markAsProtected();
+        }
 
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase, metaData);
         return new Result(result, valueMapping);
-    }
-
-    private static GroupTreeNode pseudonymizeGroupTree(
-            GroupTreeNode original,
-            Map<String, String> groupNameMapping) {
-
-        AbstractGroup copiedGroup = original.getGroup().deepCopy();
-
-        // Do not pseudonymize the root group
-        if (!original.isRoot()) {
-            String originalName = copiedGroup.getName();
-            String pseudonym = groupNameMapping.computeIfAbsent(
-                    originalName,
-                    name -> "group-" + (groupNameMapping.size() + 1)
-            );
-            copiedGroup.nameProperty().set(pseudonym);
-        }
-
-        GroupTreeNode newNode = new GroupTreeNode(copiedGroup);
-
-        for (GroupTreeNode child : original.getChildren()) {
-            newNode.addChild(pseudonymizeGroupTree(child, groupNameMapping));
-        }
-
-        return newNode;
     }
 
     /**
@@ -97,14 +67,20 @@ public class Pseudonymization {
         for (BibEntry entry : entries) {
             BibEntry newEntry = new BibEntry(entry.getType());
             newEntries.add(newEntry);
+
             for (Field field : entry.getFields()) {
                 Map<String, Integer> valueToIdMap =
                         fieldToValueToIdMap.computeIfAbsent(field, k -> new HashMap<>());
-                String fieldContent = entry.getField(field).get();
+
+                // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
+                //       See {@link org.jabref.model.entry.field.StandardField} for usages.
+                String fieldContent = entry.getField(field).orElse("");
                 Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
+
                 newEntry.setField(field, field.getName() + "-" + id);
             }
         }
+
         return newEntries;
     }
 }
