@@ -11,7 +11,7 @@ javaPlatform {
 // Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
-val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
+val javafx = "25.0.2"
 
 val lucene = "10.3.2"
 
