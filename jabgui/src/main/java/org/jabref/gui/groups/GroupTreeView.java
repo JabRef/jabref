@@ -218,6 +218,16 @@ public class GroupTreeView extends BorderPane {
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
             LOGGER.debug("Run group search {}", searchField.getText());
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
+
+            final List<GroupNodeViewModel> prevSelected = new ArrayList<>(viewModel.selectedGroupsProperty());
+            final String newFilter = searchField.getText();
+            viewModel.filterTextProperty().setValue(newFilter);
+
+            if (newFilter == null || newFilter.isEmpty()) {
+                Platform.runLater(() -> {
+                    viewModel.selectedGroupsProperty().setAll(prevSelected);
+                });
+            }
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
