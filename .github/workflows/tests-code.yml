@@ -190,6 +190,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - run: ./gradlew javadoc
 
