@@ -75,8 +75,6 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.logic.importer.fetcher.citation.CitationFetcherType.SEMANTIC_SCHOLAR;
-
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
 
     // Public because needed for pref migration
