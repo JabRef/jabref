@@ -117,9 +117,7 @@ public class GroupTreeView extends BorderPane {
     private double lowerBorder;
     private double baseFactor;
 
-    /**
-     * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
-     */
+    /// Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
     public GroupTreeView(StateManager stateManager,
                          BibEntryTypesManager entryTypesManager,
                          GuiPreferences preferences,
@@ -674,9 +672,7 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
-    /**
-     * Creates an observable boolean value that is true if no database is open
-     */
+    /// Creates an observable boolean value that is true if no database is open
     private ObservableBooleanValue groupsDisabledProperty() {
         return Bindings.createBooleanBinding(
                 () -> stateManager.getOpenDatabases().isEmpty(),
@@ -786,9 +782,7 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
-    /**
-     * Focus on GroupTree
-     */
+    /// Focus on GroupTree
     public void requestFocusGroupTree() {
         groupTree.requestFocus();
     }

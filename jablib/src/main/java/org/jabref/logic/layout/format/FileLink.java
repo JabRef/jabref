@@ -7,10 +7,8 @@ import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.model.entry.LinkedFile;
 
-/**
- * Export formatter that handles the file link list of JabRef 2.3 and later, by
- * selecting the first file link, if any, specified by the field.
- */
+/// Export formatter that handles the file link list of JabRef 2.3 and later, by
+/// selecting the first file link, if any, specified by the field.
 public class FileLink implements ParamLayoutFormatter {
 
     private final List<Path> fileDirectories;
@@ -62,12 +60,10 @@ public class FileLink implements ParamLayoutFormatter {
                    .orElse(link.getLink());
     }
 
-    /**
-     * This method is called if the layout file specifies an argument for this
-     * formatter. We use it as an indicator of which file type we should look for.
-     *
-     * @param arg The file type.
-     */
+    /// This method is called if the layout file specifies an argument for this
+    /// formatter. We use it as an indicator of which file type we should look for.
+    ///
+    /// @param arg The file type.
     @Override
     public void setArgument(String arg) {
         fileType = arg;

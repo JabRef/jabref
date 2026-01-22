@@ -18,20 +18,16 @@ public class UnoCrossRef {
     private UnoCrossRef() {
     }
 
-    /**
-     * Update TextFields, etc. We use it to refresh cross-references in the document.
-     */
+    /// Update TextFields, etc. We use it to refresh cross-references in the document.
     public static void refresh(XTextDocument doc) {
         // Refresh the document
         XRefreshable xRefresh = UnoCast.cast(XRefreshable.class, doc).get();
         xRefresh.refresh();
     }
 
-    /**
-     * Insert a clickable cross-reference to a reference mark, with a label containing the target's page number.
-     * <p>
-     * May need a documentConnection.refresh() after, to update the text shown.
-     */
+    /// Insert a clickable cross-reference to a reference mark, with a label containing the target's page number.
+    ///
+    /// May need a documentConnection.refresh() after, to update the text shown.
     public static void insertReferenceToPageNumberOfReferenceMark(XTextDocument doc,
                                                                   String referenceMarkName,
                                                                   XTextRange cursor)

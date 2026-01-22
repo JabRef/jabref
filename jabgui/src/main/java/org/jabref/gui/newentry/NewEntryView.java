@@ -668,12 +668,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         return PlainCitationParserChoice.RULE_BASED_GENERAL;
     }
 
-    /**
-     * Updates the fetcher based on the identifier text.
-     * Detects the identifier type and sets the appropriate fetcher if a valid identifier is found.
-     *
-     * @param text the identifier text to parse
-     */
+    /// Updates the fetcher based on the identifier text.
+    /// Detects the identifier type and sets the appropriate fetcher if a valid identifier is found.
+    ///
+    /// @param text the identifier text to parse
     private void updateFetcherFromIdentifierText(@Nullable String text) {
         Identifier.from(text)
                   .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences))

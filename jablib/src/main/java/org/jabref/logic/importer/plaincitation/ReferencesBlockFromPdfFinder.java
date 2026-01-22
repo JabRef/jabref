@@ -15,9 +15,7 @@ public class ReferencesBlockFromPdfFinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferencesBlockFromPdfFinder.class);
     private static final Pattern REFERENCES = Pattern.compile("References", Pattern.CASE_INSENSITIVE);
 
-    /**
-     * Extracts the text from all pages containing references. It simply goes from the last page backwards until there is probably no reference anymore.
-     */
+    /// Extracts the text from all pages containing references. It simply goes from the last page backwards until there is probably no reference anymore.
     public static String getReferencesPagesText(PDDocument document) throws IOException {
         int lastPage = document.getNumberOfPages();
         String result = prependToResult("", document, lastPage);

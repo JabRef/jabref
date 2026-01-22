@@ -110,11 +110,9 @@ public class CitationsRelationsTabViewModel {
         importHandler.importEntries(entries);
     }
 
-    /**
-     * "cited by" is the opposite of "cites", but not stored in field `CITED_BY`, but in the `CITES` field of the citing entry.
-     * <p>
-     * Therefore, some special handling is needed
-     */
+    /// "cited by" is the opposite of "cites", but not stored in field `CITED_BY`, but in the `CITES` field of the citing entry.
+    ///
+    /// Therefore, some special handling is needed
     private void importCitedBy(List<BibEntry> entries, BibEntry existingEntry, ImportHandler importHandler, CitationKeyGenerator generator, boolean generateNewKeyOnImport) {
         if (existingEntry.getCitationKey().isEmpty()) {
             if (!generateNewKeyOnImport) {

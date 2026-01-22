@@ -25,9 +25,7 @@ import kong.unirest.core.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetches journal information from the JabRef Web API
- */
+/// Fetches journal information from the JabRef Web API
 public class JournalInformationFetcher implements WebFetcher {
     public static final String NAME = "Journal Information";
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
