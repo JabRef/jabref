@@ -219,7 +219,7 @@ if (project.findProperty("eaJdkBuild")?.toString() == "true") {
         tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach { modulePath.from("/tmp/javafx-jmods-26") }
     }
     tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach {
-        addModules.addAll("jdk.jsobject.jmod")
+        addModules.addAll("jdk.jsobject")
     }
 } else {
     logger.lifecycle("eaJdkBuild not set to true → skipping EA JDK build")
