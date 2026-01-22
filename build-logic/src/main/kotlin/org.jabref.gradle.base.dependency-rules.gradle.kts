@@ -539,6 +539,18 @@ extraJavaModuleInfo {
         exports("com.sun.javafx.scene.control")
     }
 
+    module("org.openjfx:javafx-web", "javafx.web") {
+        patchRealModule()
+
+        // Source: https://openjfx.io/javadoc/25/javafx.web/module-summary.html
+        requiresTransitive("javafx.base");
+        requiresTransitive("javafx.controls");
+        requiresTransitive("javafx.graphics");
+        // NO requires to jdk.jsobject
+
+        exports("javafx.scene.web")
+    }
+
     module("org.hamcrest:hamcrest", "org.hamcrest") {
         exportAllPackages()
     }
