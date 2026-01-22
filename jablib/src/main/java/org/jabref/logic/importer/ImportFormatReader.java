@@ -218,7 +218,7 @@ public class ImportFormatReader {
             CheckedSupplier<ParserResult> importUsingBibtex) throws ImportException {
         // stores ref to best result, gets updated at the next loop
         List<BibEntry> bestResult = null;
-        int bestResultCount = 0;
+        int bestResultFieldCount = 0;
         String bestFormatName = null;
 
         // Cycle through all importers:
@@ -237,10 +237,15 @@ public class ImportFormatReader {
                 ParserResult parserResult = importDatabase.apply(importer);
                 List<BibEntry> entries = parserResult.getDatabase().getEntries();
                 BibDatabases.purgeEmptyEntries(entries);
-                int entryCount = entries.size();
-                if (entryCount > bestResultCount) {
+
+                // Sometimes, an importer detects garbage as valid entries. Thus, a simple count of entries is not sufficient.
+                // Instead, we count the number of fields in all entries as heuristic.
+                // Alternatively, we could also consider the number of characters in all entries.
+                int fieldCount = entries.stream().mapToInt(entry -> entry.getFields().size()).sum();
+
+                if (fieldCount > bestResultFieldCount) {
                     bestResult = entries;
-                    bestResultCount = entryCount;
+                    bestResultFieldCount = fieldCount;
                     bestFormatName = importer.getName();
                 }
             } catch (Throwable ex) {

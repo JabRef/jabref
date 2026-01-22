@@ -39,22 +39,22 @@ class ImportFormatReaderIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importWithAutoDetection(String resource, String format, int count) throws ImportException, URISyntaxException {
+    void importFromFileWithAutoDetection(String resource, String format, int count) throws ImportException, URISyntaxException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
-        ImportFormatReader.ImportResult unknownFormat = reader.importWithAutoDetection(file);
-        assertEquals(count, unknownFormat.parserResult().getDatabase().getEntryCount());
+        ImportFormatReader.ImportResult importResult = reader.importWithAutoDetection(file);
+        assertEquals(count, importResult.parserResult().getDatabase().getEntryCount());
     }
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importFormatFromFile(String resource, String format, int count) throws ImportException, URISyntaxException {
+    void importFromFileWithGivenFormat(String resource, String format, int count) throws ImportException, URISyntaxException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         assertEquals(count, reader.importFromFile(format, file).getDatabase().getEntries().size());
     }
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importWithAutoDetectionFromString(String resource, String format, int count) throws URISyntaxException, IOException, ImportException {
+    void importFromStringWithAutoDetection(String resource, String format, int count) throws URISyntaxException, IOException, ImportException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         String data = Files.readString(file);
         assertEquals(count, reader.importWithAutoDetection(data).parserResult().getDatabase().getEntries().size());

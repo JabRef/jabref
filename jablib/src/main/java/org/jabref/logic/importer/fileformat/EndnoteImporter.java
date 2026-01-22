@@ -64,7 +64,7 @@ public class EndnoteImporter extends Importer {
         String str;
         while ((str = bufferedReader.readLine()) != null) {
             if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
-                reader.reset();
+                return true;
             }
         }
         return false;
