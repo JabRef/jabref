@@ -348,7 +348,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
-        getEntryEditorPreferences().setAll(getEntryEditorPreferencesBackingStore(getEntryEditorPreferences()));
+        getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
         getGroupsPreferences().setAll(getGroupsPreferencesfromBackingStore(getGroupsPreferences()));
         getCopyToPreferences().setAll(getCopyToPreferencesFromBackingStore(getCopyToPreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
@@ -370,7 +370,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (entryEditorPreferences != null) {
             return entryEditorPreferences;
         }
-        entryEditorPreferences = getEntryEditorPreferencesBackingStore(EntryEditorPreferences.getDefaultEntryEditorPreferences());
+        entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefaultEntryEditorPreferences());
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
@@ -391,7 +391,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return entryEditorPreferences;
     }
 
-    private EntryEditorPreferences getEntryEditorPreferencesBackingStore(EntryEditorPreferences defaults){
+    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults){
         return new EntryEditorPreferences(
                 getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
@@ -405,6 +405,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
                 getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
                 defaults.shouldEnableJournalPopup(),
+                defaults.getCitationFetcherType(),
                 getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())

@@ -73,6 +73,7 @@ public class EntryEditorPreferences {
                 true,
                 true,
                 JournalPopupEnabled.DISABLED,
+                CitationFetcherType.SEMANTIC_SCHOLAR,
                 true,
                 true,
                 0.5
