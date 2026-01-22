@@ -4,9 +4,7 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * Create DocBook authors formatter.
- */
+/// Create DocBook authors formatter.
 public class CreateDocBook4Authors implements LayoutFormatter {
 
     @Override

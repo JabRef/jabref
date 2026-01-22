@@ -15,11 +15,9 @@ import org.jabref.model.entry.types.EntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Helper class for merging bibliography entries with undo support.
- * Source entry data is merged into the library entry, with longer field values preferred
- * and obsolete fields removed.
- */
+/// Helper class for merging bibliography entries with undo support.
+/// Source entry data is merged into the library entry, with longer field values preferred
+/// and obsolete fields removed.
 public final class MergeEntriesHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeEntriesHelper.class);
