@@ -21,20 +21,18 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.util.ImportResultsMerger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NullMarked;
@@ -215,35 +213,6 @@ public class ImportCommand extends SimpleCommand {
             return new ParserResult();
         }
 
-        return mergeImportResults(imports);
-    }
-
-    /// TODO: Move this to logic package. Blocked by undo functionality.
-    private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
-        BibDatabase resultDatabase = new BibDatabase();
-        ParserResult result = new ParserResult(resultDatabase);
-
-        for (ImportFormatReader.UnknownFormatImport importResult : imports) {
-            if (importResult == null) {
-                continue;
-            }
-            ParserResult parserResult = importResult.parserResult();
-            resultDatabase.insertEntries(parserResult.getDatabase().getEntries());
-
-            if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format())) {
-                // additional treatment of BibTeX
-                new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
-                        result.getMetaData(),
-                        parserResult.getMetaData(),
-                        importResult.parserResult().getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
-                        parserResult.getDatabase().getEntries());
-            }
-            // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)
-        }
-
-        // set timestamp and owner
-        UpdateField.setAutomaticFields(resultDatabase.getEntries(), preferences.getOwnerPreferences(), preferences.getTimestampPreferences()); // set timestamp and owner
-
-        return result;
+        return ImportResultsMerger.mergeImportResults(imports, preferences.getBibEntryPreferences().getKeywordSeparator(), preferences.getOwnerPreferences(), preferences.getTimestampPreferences());
     }
 }
