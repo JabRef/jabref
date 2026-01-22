@@ -150,10 +150,10 @@ tasks.register<Copy>("copyLinuxIcon") {
     from(layout.projectDirectory.file("buildres/linux/JabRef.png"))
     into(layout.projectDirectory)
 }
-tasks.named("jPackageUbuntu-22.04") {
+tasks.named("jpackageUbuntu-22.04") {
     dependsOn("copyLinuxIcon")
 }
-tasks.named("jPackageUbuntu-22.04-arm") {
+tasks.named("jpackageUbuntu-22.04-arm") {
     dependsOn("copyLinuxIcon")
 }
 
@@ -161,10 +161,10 @@ tasks.register<Copy>("copyMacOsIcon") {
     from(layout.projectDirectory.file("buildres/macos/JabRef.icns"))
     into(layout.projectDirectory)
 }
-tasks.named("jPackageMacos-15") {
+tasks.named("jpackageMacos-15") {
     dependsOn("copyMacOsIcon")
 }
-tasks.named("jPackageMacos-15-intel") {
+tasks.named("jpackageMacos-15-intel") {
     dependsOn("copyMacOsIcon")
 }
 
@@ -172,7 +172,7 @@ tasks.register<Copy>("copyWindowsIcon") {
     from(layout.projectDirectory.file("buildres/windows/JabRef.ico"))
     into(layout.projectDirectory)
 }
-tasks.named("jPackageWindows-latest") {
+tasks.named("jpackageWindows-latest") {
     dependsOn("copyWindowsIcon")
 }
 
