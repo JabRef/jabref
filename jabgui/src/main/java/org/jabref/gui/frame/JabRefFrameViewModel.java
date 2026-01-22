@@ -1,7 +1,7 @@
 package org.jabref.gui.frame;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -349,7 +349,7 @@ public class JabRefFrameViewModel {
     /// Imports a single library, BibTeX and non-BibTeX
     ///
     /// Similar code as [org.jabref.gui.importer.actions.ImportCommand]
-    private void appendToCurrentLibrary(BufferedReader library) {
+    private void appendToCurrentLibrary(Reader library) {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
@@ -360,7 +360,8 @@ public class JabRefFrameViewModel {
         try {
             // TODO: Think of wrapping in BackgroundTask - similar to org.jabref.gui.importer.actions.ImportCommand.importMultipleFiles
             importResult = importFormatReader.importWithAutoDetection(library);
-        } catch (ImportException ex) {
+        } catch (Throwable ex) {
+            LOGGER.debug("Could not import", ex);
             UiTaskExecutor.runAndWaitInJavaFXThread(
                     () -> dialogService.showWarningDialogAndWait(
                             Localization.lang("Import error"),

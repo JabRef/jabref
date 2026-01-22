@@ -1,6 +1,6 @@
 package org.jabref.logic;
 
-import java.io.BufferedReader;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public sealed interface UiCommand {
     }
 
     /// Supports both BibTeX and non-BibTeX
-    record AppendStreamToCurrentLibrary(BufferedReader toAppend) implements UiCommand {
+    record AppendStreamToCurrentLibrary(Reader toAppend) implements UiCommand {
     }
 
     /// "Twin" to [#AppendToCurrentLibrary]. Accepts BibTeX as text instead stored in a file.

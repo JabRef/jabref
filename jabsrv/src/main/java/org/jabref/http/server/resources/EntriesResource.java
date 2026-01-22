@@ -1,6 +1,5 @@
 package org.jabref.http.server.resources;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -66,14 +65,13 @@ public class EntriesResource {
     @POST
     @Consumes("*/*")
     public void addUnknown(@PathParam("id") String id, Reader body) {
-        BufferedReader reader = new BufferedReader(body);
         if (uiMessageHandler == null) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
         if (!"current".equals(id)) {
             throw new BadRequestException("Only currently selected library possible");
         }
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendStreamToCurrentLibrary(reader)));
+        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendStreamToCurrentLibrary(body)));
     }
 
     /// Loops through all entries in the specified library and adds attached files of type "PDF" to

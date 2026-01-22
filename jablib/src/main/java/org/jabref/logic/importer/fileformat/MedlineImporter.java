@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,17 +88,25 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     @Override
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        return isRecognizedFormat(new BufferedReader(reader));
+    }
+
+    @Override
     public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+        reader.mark(5_000);
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
             if (str.toLowerCase(ENGLISH).contains("<pubmedarticle>")
                     || str.toLowerCase(ENGLISH).contains("<pubmedbookarticle>")) {
+                reader.reset();
                 return true;
             }
 
             i++;
         }
+        reader.reset();
         return false;
     }
 

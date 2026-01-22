@@ -1,7 +1,10 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,12 +167,24 @@ public class ImportFormatReader {
     /// and keeping the import that seems most promising.
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public ImportResult importWithAutoDetection(BufferedReader bufferedReader) throws ImportException {
-        ImportResult importResult = importWithAutoDetection(
-                importer -> importer.importDatabase(bufferedReader),
-                importer -> importer.isRecognizedFormat(bufferedReader),
-                () -> bibtexImporter.importDatabase(bufferedReader)
-        );
+    public ImportResult importWithAutoDetection(Reader reader) throws ImportException {
+        // We try out multiple readers - therefore, streaming does not help to save resources
+        Path tempFile;
+        try {
+            tempFile = Files.createTempFile("JabRef-import", "data");
+        } catch (IOException e) {
+            throw new ImportException("Could not create temp file", e);
+        }
+
+        try (BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8)) {
+            reader.transferTo(writer);
+        } catch (IOException e) {
+            throw new ImportException("Could not add content to temp file", e);
+        }
+
+        ImportResult importResult = importWithAutoDetection(tempFile);
+        // There is no explicit path at this point - but the called method to Path import set one --> reset
+        importResult.parserResult().setPath(null);
         return importResult;
     }
 
