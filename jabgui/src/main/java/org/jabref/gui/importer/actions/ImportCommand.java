@@ -83,7 +83,7 @@ public class ImportCommand extends SimpleCommand {
                 preferences.getCitationKeyPatternPreferences(),
                 fileUpdateMonitor
         );
-        SortedSet<Importer> importers = importFormatReader.getImportFormats();
+        SortedSet<Importer> importers = importFormatReader.getImporters();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.ANY_FILE)

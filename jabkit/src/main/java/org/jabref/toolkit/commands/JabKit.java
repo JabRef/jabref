@@ -237,7 +237,7 @@ public class JabKit implements Runnable {
                 new DummyFileUpdateMonitor()
         );
         return importFormatReader
-                .getImportFormats().stream()
+                .getImporters().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
     }

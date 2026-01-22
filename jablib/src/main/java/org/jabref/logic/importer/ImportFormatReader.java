@@ -38,14 +38,16 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ImportFormatReader {
 
     public static final String BIBTEX_FORMAT = "BibTeX";
 
     /// All import formats.
     /// Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
-    private final List<Importer> formats = new ArrayList<>();
+    private final List<Importer> importers = new ArrayList<>(30);
 
     private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
@@ -64,34 +66,34 @@ public class ImportFormatReader {
     }
 
     public void reset() {
-        formats.add(new CopacImporter());
-        formats.add(new EndnoteImporter());
-        formats.add(new EndnoteXmlImporter(importFormatPreferences));
-        formats.add(new InspecImporter());
-        formats.add(new IsiImporter());
-        formats.add(new MedlineImporter());
-        formats.add(new MedlinePlainImporter(importFormatPreferences));
-        formats.add(new ModsImporter(importFormatPreferences));
-        formats.add(new MsBibImporter());
-        formats.add(new OvidImporter());
-        formats.add(new PdfMergeMetadataImporter(importFormatPreferences));
-        formats.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
-        formats.add(new PdfContentImporter());
-        formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
+        importers.add(new CopacImporter());
+        importers.add(new EndnoteImporter());
+        importers.add(new EndnoteXmlImporter(importFormatPreferences));
+        importers.add(new InspecImporter());
+        importers.add(new IsiImporter());
+        importers.add(new MedlineImporter());
+        importers.add(new MedlinePlainImporter(importFormatPreferences));
+        importers.add(new ModsImporter(importFormatPreferences));
+        importers.add(new MsBibImporter());
+        importers.add(new OvidImporter());
+        importers.add(new PdfMergeMetadataImporter(importFormatPreferences));
+        importers.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
+        importers.add(new PdfContentImporter());
+        importers.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            formats.add(new PdfGrobidImporter(importFormatPreferences));
+            importers.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
-        formats.add(new RepecNepImporter(importFormatPreferences));
-        formats.add(new ReferImporter());
-        formats.add(new RisImporter());
-        formats.add(new CffImporter(citationKeyPatternPreferences));
-        formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
-        formats.add(new CitaviXmlImporter());
+        importers.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
+        importers.add(new RepecNepImporter(importFormatPreferences));
+        importers.add(new ReferImporter());
+        importers.add(new RisImporter());
+        importers.add(new CffImporter(citationKeyPatternPreferences));
+        importers.add(new BiblioscapeImporter());
+        importers.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
+        importers.add(new CitaviXmlImporter());
 
         // Get custom import formats
-        formats.addAll(importerPreferences.getCustomImporters());
+        importers.addAll(importerPreferences.getCustomImporters());
     }
 
     /// Format for a given CLI-ID.
@@ -102,7 +104,7 @@ public class ImportFormatReader {
     /// @param cliId CLI-Id
     /// @return Import Format or `null` if none matches
     private Optional<Importer> getByCliId(String cliId) {
-        for (Importer format : formats) {
+        for (Importer format : importers) {
             if (format.getId().equals(cliId)) {
                 return Optional.of(format);
             }
@@ -129,8 +131,8 @@ public class ImportFormatReader {
     /// Elements are sorted by name.
     ///
     /// @return all custom importers, elements are of type InputFormat
-    public SortedSet<Importer> getImportFormats() {
-        return new TreeSet<>(this.formats);
+    public SortedSet<Importer> getImporters() {
+        return new TreeSet<>(this.importers);
     }
 
     public record UnknownFormatImport(String format, ParserResult parserResult) {
@@ -144,49 +146,44 @@ public class ImportFormatReader {
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     public UnknownFormatImport importUnknownFormat(@NonNull Path filePath,
                                                    FileUpdateMonitor fileMonitor) throws ImportException {
-        try {
-            UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath), importer -> importer.isRecognizedFormat(filePath));
-            unknownFormatImport.parserResult.setPath(filePath);
-            return unknownFormatImport;
-        } catch (ImportException e) {
-            // If all importers fail, try to read the file as BibTeX
-            try {
-                ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);
-                if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
-                    parserResult.setPath(filePath);
-                    return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
-                } else {
-                    throw new ImportException(parserResult.getErrorMessage());
-                }
-            } catch (IOException ignore) {
-                // Ignored
-                throw new ImportException(Localization.lang("Could not find a suitable import format."));
-            }
-        }
+        UnknownFormatImport unknownFormatImport = importUnknownFormat(
+                importer -> importer.importDatabase(filePath),
+                importer -> importer.isRecognizedFormat(filePath),
+                () -> OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor)
+        );
+        unknownFormatImport.parserResult.setPath(filePath);
+        return unknownFormatImport;
     }
 
     /// Tries to import entries by iterating through the available import filters,
     /// and keeping the import that seems the most promising
     ///
+    /// The implementation idea is to be independent of BufferedInputStream vs. File.
+    /// Therefore, functions are passed.
+    ///
     /// @param importDatabase     the function to import the entries with a formatter
     /// @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
+    /// @param bibtexImporter     used as fallback when the importers did not match
     /// @return an UnknownFormatImport with the imported entries and metadata
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    private UnknownFormatImport importUnknownFormat(CheckedFunction<Importer, ParserResult> importDatabase, CheckedFunction<Importer, Boolean> isRecognizedFormat) throws ImportException {
+    private UnknownFormatImport importUnknownFormat(
+            CheckedFunction<Importer, ParserResult> importDatabase,
+            CheckedFunction<Importer, Boolean> isRecognizedFormat,
+            CheckedSupplier<ParserResult> bibtexImporter) throws ImportException {
         // stores ref to best result, gets updated at the next loop
         List<BibEntry> bestResult = null;
         int bestResultCount = 0;
         String bestFormatName = null;
 
         // Cycle through all importers:
-        for (Importer imFo : formats) {
+        for (Importer importer : importers) {
             try {
-                if (!isRecognizedFormat.apply(imFo) || imFo.equals(new ReferImporter())) {
+                if (!isRecognizedFormat.apply(importer) || importer.equals(new ReferImporter())) {
                     // Refer/BibIX should be explicitly chosen by user
                     continue;
                 }
 
-                ParserResult parserResult = importDatabase.apply(imFo);
+                ParserResult parserResult = importDatabase.apply(importer);
                 List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
                 BibDatabases.purgeEmptyEntries(entries);
@@ -195,7 +192,7 @@ public class ImportFormatReader {
                 if (entryCount > bestResultCount) {
                     bestResult = entries;
                     bestResultCount = entryCount;
-                    bestFormatName = imFo.getName();
+                    bestFormatName = importer.getName();
                 }
             } catch (IOException ex) {
                 // The import did not succeed. Go on.
@@ -208,12 +205,26 @@ public class ImportFormatReader {
             return new UnknownFormatImport(bestFormatName, parserResult);
         }
 
-        throw new ImportException(Localization.lang("Could not find a suitable import format."));
+        // If all importers fail, try to read the file as BibTeX
+        try {
+            ParserResult parserResult = bibtexImporter.apply();
+            if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
+                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
+            } else {
+                throw new ImportException(parserResult.getErrorMessage());
+            }
+        } catch (IOException ignore) {
+            throw new ImportException(Localization.lang("Could not find a suitable import format."));
+        }
+    }
+
+    @FunctionalInterface
+    public interface CheckedSupplier<R> {
+        R apply() throws IOException;
     }
 
     @FunctionalInterface
     public interface CheckedFunction<T, R> {
-
         R apply(T t) throws IOException;
     }
 
