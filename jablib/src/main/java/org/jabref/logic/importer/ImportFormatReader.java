@@ -172,6 +172,19 @@ public class ImportFormatReader {
         return importResult;
     }
 
+    /// Tries to import a String by iterating through the available import filters,
+    /// and keeping the import that seems the most promising
+    ///
+    /// @param data the string to import
+    /// @return an UnknownFormatImport with the imported entries and metadata
+    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
+    public ImportResult importWithAutoDetection(@NonNull String data) throws ImportException {
+        return importWithAutoDetection(
+                importer -> importer.importDatabase(data),
+                importer -> importer.isRecognizedFormat(data),
+                () -> bibtexImporter.importDatabase(data));
+    }
+
     /// Tries to import entries by iterating through the available import filters,
     /// and keeping the import that seems the most promising
     ///
@@ -246,18 +259,5 @@ public class ImportFormatReader {
     @FunctionalInterface
     public interface CheckedFunction<T, R> {
         R apply(T t) throws IOException;
-    }
-
-    /// Tries to import a String by iterating through the available import filters,
-    /// and keeping the import that seems the most promising
-    ///
-    /// @param data the string to import
-    /// @return an UnknownFormatImport with the imported entries and metadata
-    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public ImportResult importWithAutoDetection(@NonNull String data) throws ImportException {
-        return importWithAutoDetection(
-                importer -> importer.importDatabase(data),
-                importer -> importer.isRecognizedFormat(data),
-                () -> bibtexImporter.importDatabase(data));
     }
 }
