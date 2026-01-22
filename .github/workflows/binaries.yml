@@ -174,7 +174,7 @@ jobs:
             exit 0
           fi
 
-          echo "☁️ Target does not exist: $TARGET"
+          echo "🤔 Target does not exist: $TARGET"
 
           USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
             "df --output=pcent /var/www/builds.jabref.org | tail -n1 | tr -dc '0-9'")
