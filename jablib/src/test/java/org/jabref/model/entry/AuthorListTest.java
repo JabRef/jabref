@@ -17,10 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Other parsing tests are available in
- * {@link org.jabref.logic.importer.AuthorListParser AuthorListParser}.
- */
+/// Other parsing tests are available in
+/// {@link org.jabref.logic.importer.AuthorListParser AuthorListParser}.
 public class AuthorListTest {
 
     /*
@@ -760,7 +758,7 @@ public class AuthorListTest {
 
     /// This tests an unreachable key issue addressed in
     /// [#6552](https://github.com/JabRef/jabref/pull/6552). The test is incorrect BibTeX but is
-    ///handled by the parser and common in practice.
+    /// handled by the parser and common in practice.
     @Test
     void parseCacheAuthorsWithTwoOrMoreCommasAndWithSpaceInAllParts() {
         final String uniqueAuthorsNames = "Basil Dankworth, Gianna Birdwhistle, Cosmo Berrycloth";

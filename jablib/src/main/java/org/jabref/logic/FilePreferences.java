@@ -12,9 +12,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Preferences for the linked files
- */
+/// Preferences for the linked files
 public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};

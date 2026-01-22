@@ -95,9 +95,7 @@ class XmpUtilReaderTest {
         assertEquals(List.of(), entries);
     }
 
-    /**
-     * Test non XMP metadata. Metadata are included in the PDInformation
-     */
+    /// Test non XMP metadata. Metadata are included in the PDInformation
     @Test
     void readPDMetadataNonXmp() throws IOException, URISyntaxException {
         Path pathPdf = Path.of(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI());
@@ -113,9 +111,7 @@ class XmpUtilReaderTest {
         assertEquals(expected, entries);
     }
 
-    /**
-     * Tests an pdf file with metadata which has no description section.
-     */
+    /// Tests an pdf file with metadata which has no description section.
     @Test
     void readNoDescriptionMetadata() throws IOException, URISyntaxException {
         List<BibEntry> entries = xmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("no_description_metadata.pdf").toURI()), xmpPreferences);

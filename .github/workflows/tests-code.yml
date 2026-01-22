@@ -49,34 +49,7 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Run checkstyle reporter
-        uses: dbelyaev/action-checkstyle@v3
-        with:
-          reporter: github-pr-review
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
@@ -89,34 +62,7 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 25
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
@@ -133,9 +79,35 @@ jobs:
         with:
           file-mask: "*.java"
           settings-file: ".idea/codeStyles/Project.xml"
+      - name: Undo JBang changes # IntelliJ issue: https://youtrack.jetbrains.com/issue/IDEA-https://youtrack.jetbrains.com/issue/IDEA-384956/Skip-formatting-of-shebang-headers/Skip-formatting-of-shebang-headers
+        run: git checkout HEAD -- jablib-examples/jbang/*.java
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
+
+  format-javadoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: 'jabref'
+      - uses: actions/checkout@v6
+        with:
+          repository: 'rmuller/Convert2MarkdownJavadoc'
+          path: 'Convert2MarkdownJavadoc'
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '24'
+          distribution: 'corretto'
+          check-latest: true
+      - run: |
+          cd Convert2MarkdownJavadoc
+          java Convert2MarkdownJavadoc.java ../jabref
+      - name: Check if any files changed
+        run: |
+          cd jabref
+          git diff --exit-code
 
   modernizer:
     name: Modernizer
@@ -146,28 +118,7 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -261,28 +212,10 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
-      - name: Set up JDK
-        uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - run: ./gradlew javadoc
 
   tests:
@@ -290,35 +223,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: [jablib, jabkit, jabsrv, jabgui]
+        module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      # the only place in all workflows where the JBang cache is updated
-      # placed here as this updates the cache for all operating systems - these are different according to https://github.com/actions/cache/tree/main?tab=readme-ov-file#cache-version
-      - name: Update cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+      - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -339,35 +251,14 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        module: [jablib]
+        module: [ jablib ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
         run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -382,26 +273,7 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Update cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+      - uses: ./.github/actions/setup-gradle
       - run: ./gradlew :jabkit:runJabKitPortableSmokeTest
 
   databasetests:
@@ -427,28 +299,7 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
       - name: Run tests on PostgreSQL
         run: ./gradlew :jablib:databaseTest --rerun-tasks
         env:
@@ -486,30 +337,16 @@ jobs:
             jablib-examples/jbang/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
-      - name: Set up JDK
+
+      - uses: ./.github/actions/setup-gradle
+        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - name: Setup JDK
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: '25'
           distribution: 'corretto'
           check-latest: true
-      - name: Generate JBang cache key
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-        uses: jbangdev/setup-jbang@main
 
       # Build all JBang scripts
       - run: |
@@ -541,7 +378,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        script: [.jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java]
+        script: [ .jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -559,26 +396,13 @@ jobs:
             jablib-examples/jbang/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
-      - name: Set up JDK
+      - uses: ./.github/actions/setup-gradle
+      - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 25
+          java-version: '25'
           distribution: 'corretto'
           check-latest: true
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
       - name: Modify ${{ matrix.script }} to include changed classes
         shell: bash
         # We always run, because changes in jabls, jabsrv also could cause JBang to fail
@@ -622,7 +446,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [jablib-examples/maven3/doi-to-bibtex]
+        project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -649,7 +473,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [jablib-examples/maven3/doi-to-bibtex]
+        project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6

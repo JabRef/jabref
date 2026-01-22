@@ -24,14 +24,12 @@ public class MonthChecker implements ValueChecker {
         this.bibDatabaseContextMonth = bibDatabaseContext;
     }
 
-    /**
-     * biblatex package documentation (Section 2.3.9):
-     * The month field is an integer field.
-     * The bibliography style converts the month to a language-dependent string as required.
-     * For backwards compatibility, you may also use the following three-letter abbreviations in the month field:
-     * jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec.
-     * Note that these abbreviations are BibTeX strings which must be given without any braces or quotes.
-     */
+    /// biblatex package documentation (Section 2.3.9):
+    /// The month field is an integer field.
+    /// The bibliography style converts the month to a language-dependent string as required.
+    /// For backwards compatibility, you may also use the following three-letter abbreviations in the month field:
+    /// jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec.
+    /// Note that these abbreviations are BibTeX strings which must be given without any braces or quotes.
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {

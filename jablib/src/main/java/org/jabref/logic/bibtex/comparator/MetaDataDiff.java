@@ -56,9 +56,7 @@ public class MetaDataDiff {
         }
     }
 
-    /**
-     * Checks if given content selectors are empty or default
-     */
+    /// Checks if given content selectors are empty or default
     private static boolean isDefaultContentSelectors(ContentSelectors contentSelectors) {
         if (contentSelectors.getContentSelectors().isEmpty()) {
             return true;
@@ -97,9 +95,7 @@ public class MetaDataDiff {
         return groupRoot.getGroup().equals(GroupsFactory.createAllEntriesGroup());
     }
 
-    /**
-     * Should be kept in sync with {@link MetaData#equals(Object)}
-     */
+    /// Should be kept in sync with {@link MetaData#equals(Object)}
     public List<Difference> getDifferences(GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         List<Difference> changes = new ArrayList<>();
         addToListIfDiff(changes, DifferenceType.PROTECTED, originalMetaData.isProtected(), newMetaData.isProtected());
@@ -127,9 +123,7 @@ public class MetaDataDiff {
         return originalMetaData;
     }
 
-    /**
-     * Currently, the groups diff is contained here - and as entry in {@link #getDifferences(GlobalCitationKeyPatterns)}
-     */
+    /// Currently, the groups diff is contained here - and as entry in {@link #getDifferences(GlobalCitationKeyPatterns)}
     public Optional<GroupDiff> getGroupDifferences() {
         return groupDiff;
     }
