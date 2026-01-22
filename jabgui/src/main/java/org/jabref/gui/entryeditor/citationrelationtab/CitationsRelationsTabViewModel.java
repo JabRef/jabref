@@ -29,7 +29,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CitationsRelationsTabViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationsRelationsTabViewModel.class);
 
     public enum SciteStatus {
         IN_PROGRESS,
@@ -161,9 +165,11 @@ public class CitationsRelationsTabViewModel {
                                        status.set(SciteStatus.FOUND);
                                    })
                                    .onFailure(error -> {
-                                       searchError.set(error.getMessage());
+                                       LOGGER.error("Error while fetching citation relations from scite.ai", error);
+                                       searchError.set(Localization.lang("Could not load citation relations."));
                                        status.set(SciteStatus.ERROR);
                                    })
+
                                    .executeWith(taskExecutor);
     }
 
