@@ -79,9 +79,35 @@ jobs:
         with:
           file-mask: "*.java"
           settings-file: ".idea/codeStyles/Project.xml"
+      - name: Undo JBang changes # IntelliJ issue: https://youtrack.jetbrains.com/issue/IDEA-https://youtrack.jetbrains.com/issue/IDEA-384956/Skip-formatting-of-shebang-headers/Skip-formatting-of-shebang-headers
+        run: git checkout HEAD -- jablib-examples/jbang/*.java
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
+
+  format-javadoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: 'jabref'
+      - uses: actions/checkout@v6
+        with:
+          repository: 'rmuller/Convert2MarkdownJavadoc'
+          path: 'Convert2MarkdownJavadoc'
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '24'
+          distribution: 'corretto'
+          check-latest: true
+      - run: |
+          cd Convert2MarkdownJavadoc
+          java Convert2MarkdownJavadoc.java ../jabref
+      - name: Check if any files changed
+        run: |
+          cd jabref
+          git diff --exit-code
 
   modernizer:
     name: Modernizer
@@ -188,6 +214,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - run: ./gradlew javadoc
 
@@ -196,7 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: [jablib, jabkit, jabsrv, jabgui]
+        module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -224,7 +253,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        module: [jablib]
+        module: [ jablib ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -351,7 +380,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        script: [.jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java]
+        script: [ .jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -419,7 +448,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [jablib-examples/maven3/doi-to-bibtex]
+        project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -446,7 +475,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [jablib-examples/maven3/doi-to-bibtex]
+        project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6

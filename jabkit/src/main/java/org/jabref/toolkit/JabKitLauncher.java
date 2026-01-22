@@ -107,10 +107,8 @@ public class JabKitLauncher {
         }
     }
 
-    /**
-     * Applies appropriate usage footers to each subcommand based on their supported options.
-     * Distinguishes between input formats, output formats, and export formats.
-     */
+    /// Applies appropriate usage footers to each subcommand based on their supported options.
+    /// Distinguishes between input formats, output formats, and export formats.
     private static void applyUsageFooters(CommandLine commandLine,
                                           List<Pair<String, String>> inputFormats,
                                           List<Pair<String, String>> outputFormats,

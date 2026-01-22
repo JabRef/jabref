@@ -66,17 +66,15 @@ public abstract class AbstractJabKitTest {
         errWriter = new ByteArrayOutputStream();
     }
 
-    /**
-     * Executes the configured {@link picocli.CommandLine} command while capturing its
-     * standard output and error streams.
-     *
-     * <p>This method temporarily redirects {@code System.out} and {@code System.err} to
-     * internal buffers during the command execution, allowing the captured output to be
-     * retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.</p>
-     *
-     * @param args the command line arguments to parse
-     * @return the error code
-     */
+    /// Executes the configured {@link picocli.CommandLine} command while capturing its
+    /// standard output and error streams.
+    ///
+    /// This method temporarily redirects `System.out` and `System.err` to
+    /// internal buffers during the command execution, allowing the captured output to be
+    /// retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.
+    ///
+    /// @param args the command line arguments to parse
+    /// @return the error code
     int executeToLog(String... args) {
         PrintStream or = System.out;
         PrintStream orErr = System.err;
@@ -92,45 +90,37 @@ public abstract class AbstractJabKitTest {
         return result;
     }
 
-    /**
-     * Returns the captured standard output from the command line execution.
-     *
-     * @return The captured stdout string.
-     */
+    /// Returns the captured standard output from the command line execution.
+    ///
+    /// @return The captured stdout string.
     protected String getStandardOutput() {
         return outWriter.toString().replace("\r\n", "\n");
     }
 
-    /**
-     * Returns the captured error output from the command line execution.
-     *
-     * @return The captured stderr string.
-     */
+    /// Returns the captured error output from the command line execution.
+    ///
+    /// @return The captured stderr string.
     protected String getErrorOutput() {
         return errWriter.toString().replace("\r\n", "\n");
     }
 
-    /**
-     * Gets class resource as fully qualified string.
-     * Useful for scenarios where you want a resource as a command line argument
-     * <p>
-     * Throws a runtime exception if the resource URL cannot be turned into a URI.
-     *
-     * @param resourceName the resource name
-     * @return the class resource as fully qualified string
-     */
+    /// Gets class resource as fully qualified string.
+    /// Useful for scenarios where you want a resource as a command line argument
+    ///
+    /// Throws a runtime exception if the resource URL cannot be turned into a URI.
+    ///
+    /// @param resourceName the resource name
+    /// @return the class resource as fully qualified string
     String getClassResourceAsFullyQualifiedString(String resourceName) {
         return getClassResourceAsPath(resourceName).toAbsolutePath().toString();
     }
 
-    /**
-     * Gets class resource as a path.
-     * <p>
-     * Throws a runtime exception if the resource URL cannot be turned into a URI.
-     *
-     * @param resourceName the resource name
-     * @return the class resource as path
-     */
+    /// Gets class resource as a path.
+    ///
+    /// Throws a runtime exception if the resource URL cannot be turned into a URI.
+    ///
+    /// @param resourceName the resource name
+    /// @return the class resource as path
     Path getClassResourceAsPath(String resourceName) {
         try {
             return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())

@@ -5,9 +5,7 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Converts all characters of the given string to upper case, but does not change words starting with "{"
- */
+/// Converts all characters of the given string to upper case, but does not change words starting with "{"
 public class UpperCaseFormatter extends Formatter {
 
     @Override

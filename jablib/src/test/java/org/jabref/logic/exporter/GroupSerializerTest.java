@@ -37,9 +37,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Loading of groups is tested in the GroupsParserTest class.
- */
+/// Loading of groups is tested in the GroupsParserTest class.
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("exporter")
 class GroupSerializerTest {

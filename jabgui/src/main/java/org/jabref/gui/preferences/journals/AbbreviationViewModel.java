@@ -10,10 +10,8 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.journals.Abbreviation;
 
-/**
- * This class provides a view model for abbreviation objects which can also define placeholder objects of abbreviations.
- * This is indicated by using the {@code pseudoAbbreviation} property.
- */
+/// This class provides a view model for abbreviation objects which can also define placeholder objects of abbreviations.
+/// This is indicated by using the `pseudoAbbreviation` property.
 public class AbbreviationViewModel {
 
     private final StringProperty name = new SimpleStringProperty("");
