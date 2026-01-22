@@ -22,9 +22,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * INSPEC format importer.
- */
+/// INSPEC format importer.
 public class InspecImporter extends Importer {
 
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");

@@ -174,9 +174,7 @@ class LatexToUnicodeFormatterTest {
         assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
     }
 
-    /**
-     * <a href="https://github.com/JabRef/jabref/issues/5547">Issue 5547</a>
-     */
+    /// <a href="https://github.com/JabRef/jabref/issues/5547">Issue 5547</a>
     @Test
     void twoDifferentMacrons() {
         assertEquals("Puṇya-pattana-vidyā-pı̄ṭhādhi-kṛtaiḥ prā-kaśyaṃ nı̄taḥ", formatter.format("Pu{\\d{n}}ya-pattana-vidy{\\={a}}-p{\\={\\i}}{\\d{t}}h{\\={a}}dhi-k{\\d{r}}tai{\\d{h}} pr{\\={a}}-ka{{\\'{s}}}ya{\\d{m}} n{\\={\\i}}ta{\\d{h}}"));

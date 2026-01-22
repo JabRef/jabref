@@ -18,32 +18,30 @@ import org.slf4j.LoggerFactory;
 
 final class StyleSheetFile extends StyleSheet {
 
-    /**
-     * A size limit above which Theme will not attempt to keep a data-embedded URL in memory for the CSS.
-     * <p>
-     * It's tolerable for CSS to exceed this limit; the functional benefit of the encoded CSS is in some edge
-     * case error handling. Specifically, having a reference to a data-embedded URL means that the Preview Viewer
-     * isn't impacted if the source CSS file is removed while the application is running.
-     * <p>
-     * If the CSS is over this limit, then the user won't see any functional impact, as long as the file exists. Only if
-     * it becomes unavailable, might there be some impact. First, the Preview Viewer when created might not be themed.
-     * Second, there is a very small chance of uncaught exceptions. Theme makes a best effort to avoid this:
-     * it checks for CSS file existence before passing it to the Preview Viewer for theming. Still, as file existence
-     * checks are immediately out of date, it can't be perfectly ruled out.
-     * <p>
-     * At the time of writing this comment:
-     *
-     * <ul>
-     * <li>src/main/java/org/jabref/gui/Base.css is 33k</li>
-     * <li>src/main/java/org/jabref/gui/Dark.css is 4k</li>
-     * <li>The dark custom theme in the Jabref documentation is 2k, see
-     * <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a></li>
-     * </ul>
-     * <p>
-     * So realistic custom themes will fit comfortably within 48k, even if they are modified copies of the base theme.
-     * <p>
-     * Note that Base-64 encoding will increase the memory footprint of the URL by a third.
-     */
+    /// A size limit above which Theme will not attempt to keep a data-embedded URL in memory for the CSS.
+    ///
+    /// It's tolerable for CSS to exceed this limit; the functional benefit of the encoded CSS is in some edge
+    /// case error handling. Specifically, having a reference to a data-embedded URL means that the Preview Viewer
+    /// isn't impacted if the source CSS file is removed while the application is running.
+    ///
+    /// If the CSS is over this limit, then the user won't see any functional impact, as long as the file exists. Only if
+    /// it becomes unavailable, might there be some impact. First, the Preview Viewer when created might not be themed.
+    /// Second, there is a very small chance of uncaught exceptions. Theme makes a best effort to avoid this:
+    /// it checks for CSS file existence before passing it to the Preview Viewer for theming. Still, as file existence
+    /// checks are immediately out of date, it can't be perfectly ruled out.
+    ///
+    /// At the time of writing this comment:
+    ///
+    ///
+    /// - src/main/java/org/jabref/gui/Base.css is 33k
+    /// - src/main/java/org/jabref/gui/Dark.css is 4k
+    /// - The dark custom theme in the Jabref documentation is 2k, see
+    /// <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a>
+    ///
+    ///
+    /// So realistic custom themes will fit comfortably within 48k, even if they are modified copies of the base theme.
+    ///
+    /// Note that Base-64 encoding will increase the memory footprint of the URL by a third.
     static final int MAX_IN_MEMORY_CSS_LENGTH = 48000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheetFile.class);
@@ -84,13 +82,11 @@ final class StyleSheetFile extends StyleSheet {
         return url;
     }
 
-    /**
-     * This method allows callers to obtain the theme's additional stylesheet.
-     *
-     * @return the stylesheet location if there is an additional stylesheet present and available. The
-     * location will be a local URL. Typically, it will be a {@code 'data:'} URL where the CSS is embedded. However, for
-     * large themes it can be {@code 'file:'}.
-     */
+    /// This method allows callers to obtain the theme's additional stylesheet.
+    ///
+    /// @return the stylesheet location if there is an additional stylesheet present and available. The
+    /// location will be a local URL. Typically, it will be a `'data:'` URL where the CSS is embedded. However, for
+    /// large themes it can be `'file:'`.
     @Override
     public String getWebEngineStylesheet() {
         if (Strings.isNullOrEmpty(dataUrl.get())) {
