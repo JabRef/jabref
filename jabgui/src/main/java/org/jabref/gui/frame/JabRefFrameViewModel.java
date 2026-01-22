@@ -425,7 +425,7 @@ public class JabRefFrameViewModel {
         LOGGER.trace("Waiting for state changes...");
 
         future.thenRun(() -> {
-            LOGGER.debug("All tabs loaded. Jumping to entry.");
+            LOGGER.debug("All tabs loaded.");
             for (ObservableBooleanValue obs : loadings) {
                 obs.removeListener(listener);
             }

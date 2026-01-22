@@ -40,11 +40,14 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NullMarked
 public class ImportFormatReader {
-
     public static final String BIBTEX_FORMAT = "BibTeX";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportFormatReader.class);
 
     /// All import formats.
     /// Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
@@ -225,7 +228,9 @@ public class ImportFormatReader {
                     bestResultCount = entryCount;
                     bestFormatName = importer.getName();
                 }
-            } catch (IOException ex) {
+            } catch (Throwable ex) {
+                // We also want to catch NPEs and continue
+                LOGGER.trace("Exception during import. Trying next importer.", ex);
                 // The import did not succeed. Go on.
             }
         }
