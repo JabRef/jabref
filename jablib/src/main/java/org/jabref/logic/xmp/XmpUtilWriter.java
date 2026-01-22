@@ -300,10 +300,8 @@ public class XmpUtilWriter {
 
     /// Removes all XMP metadata associated with the given PDF file.
     ///
-    /// This method removes ALL XMP metadata.
-    ///
     /// @param path The file from which metadata has to be removed.
-    /// @throws IOException If the file could not be read from or written to.
+    /// @throws IOException          If the file could not be read from or written to.
     /// @throws TransformerException If the XMP metadata could not be removed.
     public static void removeXmpMetadata(Path path) throws IOException, TransformerException {
         // Read from another file
