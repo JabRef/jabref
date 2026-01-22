@@ -83,6 +83,7 @@ public class ImportCommand extends SimpleCommand {
                 preferences.getCitationKeyPatternPreferences(),
                 fileUpdateMonitor
         );
+
         SortedSet<Importer> importers = importFormatReader.getImporters();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -162,14 +163,17 @@ public class ImportCommand extends SimpleCommand {
     @NullMarked
     private ParserResult doImport(List<Path> files, @Nullable Importer importFormat) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
-        // We import all files and collect their results
-        List<ImportFormatReader.ImportResult> imports = new ArrayList<>();
+
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getCitationKeyPatternPreferences(),
                 fileUpdateMonitor
         );
+
+        List<ImportFormatReader.ImportResult> imports = new ArrayList<>();
+
+        // We import all files and collect their results
         for (Path filename : files) {
             try {
                 if (importer.isEmpty()) {
@@ -181,7 +185,7 @@ public class ImportCommand extends SimpleCommand {
                         dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
                     });
                     // This import method never throws an IOException
-                    imports.add(importFormatReader.importWithAutoDetection(filename, fileUpdateMonitor));
+                    imports.add(importFormatReader.importWithAutoDetection(filename));
                 } else {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter) || (importer.get() instanceof PdfMergeMetadataImporter))

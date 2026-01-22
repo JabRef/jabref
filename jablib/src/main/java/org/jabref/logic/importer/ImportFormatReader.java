@@ -147,12 +147,11 @@ public class ImportFormatReader {
     /// This method last attempts to read this file as bibtex.
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public ImportResult importWithAutoDetection(Path filePath,
-                                                FileUpdateMonitor fileMonitor) throws ImportException {
+    public ImportResult importWithAutoDetection(Path filePath) throws ImportException {
         ImportResult importResult = importWithAutoDetection(
                 importer -> importer.importDatabase(filePath),
                 importer -> importer.isRecognizedFormat(filePath),
-                () -> OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor)
+                () -> OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileUpdateMonitor)
         );
         importResult.parserResult.setPath(filePath);
         return importResult;
@@ -162,8 +161,7 @@ public class ImportFormatReader {
     /// and keeping the import that seems most promising.
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public ImportResult importWithAutoDetection(BufferedReader bufferedReader,
-                                                FileUpdateMonitor fileMonitor) throws ImportException {
+    public ImportResult importWithAutoDetection(BufferedReader bufferedReader) throws ImportException {
         ImportResult importResult = importWithAutoDetection(
                 importer -> importer.importDatabase(bufferedReader),
                 importer -> importer.isRecognizedFormat(bufferedReader),

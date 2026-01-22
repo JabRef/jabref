@@ -33,7 +33,7 @@ class ImportFormatReaderParameterlessTest {
     @Test
     void importWithAutoDetectionThrowsExceptionIfNoMatchingImporterWasFound() throws URISyntaxException {
         Path file = Path.of(ImportFormatReaderParameterlessTest.class.getResource("fileformat/emptyFile.xml").toURI());
-        assertThrows(ImportException.class, () -> reader.importWithAutoDetection(file, fileMonitor));
+        assertThrows(ImportException.class, () -> reader.importWithAutoDetection(file));
     }
 
     @Test

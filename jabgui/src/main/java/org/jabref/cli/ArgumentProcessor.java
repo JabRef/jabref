@@ -82,7 +82,7 @@ public class ArgumentProcessor {
 
         if (guiCli.libraries != null && !guiCli.libraries.isEmpty()) {
             if (guiCli.append) {
-                uiCommands.add(new UiCommand.AppendToCurrentLibrary(guiCli.libraries));
+                uiCommands.add(new UiCommand.AppendStreamToCurentLibrary(guiCli.libraries));
             } else {
                 uiCommands.add(new UiCommand.OpenLibraries(guiCli.libraries));
             }

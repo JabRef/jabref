@@ -41,7 +41,7 @@ class ImportFormatReaderIntegrationTest {
     @MethodSource("importFormats")
     void importWithAutoDetection(String resource, String format, int count) throws ImportException, URISyntaxException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
-        ImportFormatReader.ImportResult unknownFormat = reader.importWithAutoDetection(file, new DummyFileUpdateMonitor());
+        ImportFormatReader.ImportResult unknownFormat = reader.importWithAutoDetection(file);
         assertEquals(count, unknownFormat.parserResult().getDatabase().getEntryCount());
     }
 

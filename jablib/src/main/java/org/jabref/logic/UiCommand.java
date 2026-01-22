@@ -1,5 +1,6 @@
 package org.jabref.logic;
 
+import java.io.BufferedReader;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -16,7 +17,12 @@ public sealed interface UiCommand {
     record OpenLibraries(List<Path> toImport) implements UiCommand {
     }
 
-    record AppendToCurrentLibrary(List<Path> toAppend) implements UiCommand {
+    /// Supports both BibTeX and non-BibTeX
+    record AppendFilesToCurrentLibrary(List<Path> toAppend) implements UiCommand {
+    }
+
+    /// Supports both BibTeX and non-BibTeX
+    record AppendStreamToCurrentLibrary(BufferedReader toAppend) implements UiCommand {
     }
 
     /// "Twin" to [#AppendToCurrentLibrary]. Accepts BibTeX as text instead stored in a file.
