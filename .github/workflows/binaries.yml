@@ -164,8 +164,8 @@ jobs:
         id: diskspace
         shell: bash
         run: |
-          BRANCH_NAME="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          TARGET="/var/www/builds.jabref.org/www/$BRANCH_NAME"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          TARGET="/var/www/builds.jabref.org/www/pull/$PR_NUMBER"
           SSH_OPTS="-p 9922 -i sshkey -o StrictHostKeyChecking=no"
           HOST="jrrsync@build-upload.jabref.org"
           if ssh $SSH_OPTS "$HOST" "[ -d \"$TARGET\" ]"; then
@@ -173,6 +173,8 @@ jobs:
             echo "available=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          echo "☁️ Target does not exist: $TARGET"
 
           USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
             "df --output=pcent /var/www/builds.jabref.org | tail -n1 | tr -dc '0-9'")
