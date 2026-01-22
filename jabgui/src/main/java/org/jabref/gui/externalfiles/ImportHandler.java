@@ -464,7 +464,7 @@ public class ImportHandler {
                     preferences.getCitationKeyPatternPreferences(),
                     fileUpdateMonitor
             );
-            ImportResult importResult = importFormatReader.importUnknownFormat(data);
+            ImportResult importResult = importFormatReader.importWithAutoDetection(data);
             return importResult.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);

@@ -39,9 +39,9 @@ class ImportFormatReaderIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importUnknownFormat(String resource, String format, int count) throws ImportException, URISyntaxException {
+    void importWithAutoDetection(String resource, String format, int count) throws ImportException, URISyntaxException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
-        ImportFormatReader.ImportResult unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
+        ImportFormatReader.ImportResult unknownFormat = reader.importWithAutoDetection(file, new DummyFileUpdateMonitor());
         assertEquals(count, unknownFormat.parserResult().getDatabase().getEntryCount());
     }
 
@@ -54,10 +54,10 @@ class ImportFormatReaderIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importUnknownFormatFromString(String resource, String format, int count) throws URISyntaxException, IOException, ImportException {
+    void importWithAutoDetectionFromString(String resource, String format, int count) throws URISyntaxException, IOException, ImportException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         String data = Files.readString(file);
-        assertEquals(count, reader.importUnknownFormat(data).parserResult().getDatabase().getEntries().size());
+        assertEquals(count, reader.importWithAutoDetection(data).parserResult().getDatabase().getEntries().size());
     }
 
     private static Stream<Object[]> importFormats() {

@@ -145,7 +145,7 @@ public class JabKit implements Runnable {
                 }
 
                 ImportFormatReader.ImportResult importResult =
-                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                        importFormatReader.importWithAutoDetection(file, new DummyFileUpdateMonitor());
 
                 if (!porcelain) {
                     System.out.println(Localization.lang("Format used: %0", importResult.format()));

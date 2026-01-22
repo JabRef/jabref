@@ -181,7 +181,7 @@ public class ImportCommand extends SimpleCommand {
                         dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
                     });
                     // This import method never throws an IOException
-                    imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor));
+                    imports.add(importFormatReader.importWithAutoDetection(filename, fileUpdateMonitor));
                 } else {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter) || (importer.get() instanceof PdfMergeMetadataImporter))
