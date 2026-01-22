@@ -174,7 +174,7 @@ javaModulePackaging {
     targetsWithOs("linux") {
         options.addAll(
             "--linux-menu-group", "Office;",
-            "--linux-rpm-license-type", "MIT",
+            // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
             "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
             "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
             "--linux-shortcut",
