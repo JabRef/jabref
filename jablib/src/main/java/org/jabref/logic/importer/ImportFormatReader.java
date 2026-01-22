@@ -136,7 +136,9 @@ public class ImportFormatReader {
         return new TreeSet<>(this.importers);
     }
 
-    public record UnknownFormatImport(String format, ParserResult parserResult) {
+    /// @param format       The name of the format used
+    /// @param parserResult The resulting data
+    public record ImportResult(String format, ParserResult parserResult) {
     }
 
     /// Tries to import a file by iterating through the available import filters,
@@ -145,29 +147,29 @@ public class ImportFormatReader {
     /// This method last attempts to read this file as bibtex.
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public UnknownFormatImport importUnknownFormat(Path filePath,
-                                                   FileUpdateMonitor fileMonitor) throws ImportException {
-        UnknownFormatImport unknownFormatImport = importUnknownFormat(
+    public ImportResult importUnknownFormat(Path filePath,
+                                            FileUpdateMonitor fileMonitor) throws ImportException {
+        ImportResult importResult = importUnknownFormat(
                 importer -> importer.importDatabase(filePath),
                 importer -> importer.isRecognizedFormat(filePath),
                 () -> OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor)
         );
-        unknownFormatImport.parserResult.setPath(filePath);
-        return unknownFormatImport;
+        importResult.parserResult.setPath(filePath);
+        return importResult;
     }
 
     /// Tries to import a stream by iterating through the available import filters,
     /// and keeping the import that seems most promising.
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public UnknownFormatImport importUnknownFormat(BufferedReader bufferedReader,
-                                                   FileUpdateMonitor fileMonitor) throws ImportException {
-        UnknownFormatImport unknownFormatImport = importUnknownFormat(
+    public ImportResult importUnknownFormat(BufferedReader bufferedReader,
+                                            FileUpdateMonitor fileMonitor) throws ImportException {
+        ImportResult importResult = importUnknownFormat(
                 importer -> importer.importDatabase(bufferedReader),
                 importer -> importer.isRecognizedFormat(bufferedReader),
                 () -> bibtexImporter.importDatabase(bufferedReader)
         );
-        return unknownFormatImport;
+        return importResult;
     }
 
     /// Tries to import entries by iterating through the available import filters,
@@ -181,7 +183,7 @@ public class ImportFormatReader {
     /// @param importUsingBibtex  used as fallback when the importers did not match
     /// @return an UnknownFormatImport with the imported entries and metadata
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    private UnknownFormatImport importUnknownFormat(
+    private ImportResult importUnknownFormat(
             CheckedFunction<Importer, ParserResult> importDatabase,
             CheckedFunction<Importer, Boolean> isRecognizedFormat,
             CheckedSupplier<ParserResult> importUsingBibtex) throws ImportException {
@@ -220,14 +222,14 @@ public class ImportFormatReader {
         if (bestResult != null) {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
-            return new UnknownFormatImport(bestFormatName, parserResult);
+            return new ImportResult(bestFormatName, parserResult);
         }
 
         // If all other importers fail, try to read the file as BibTeX
         try {
             ParserResult parserResult = importUsingBibtex.apply();
             if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
-                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
+                return new ImportResult(ImportFormatReader.BIBTEX_FORMAT, parserResult);
             } else {
                 throw new ImportException(parserResult.getErrorMessage());
             }
@@ -252,7 +254,7 @@ public class ImportFormatReader {
     /// @param data the string to import
     /// @return an UnknownFormatImport with the imported entries and metadata
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public UnknownFormatImport importUnknownFormat(@NonNull String data) throws ImportException {
+    public ImportResult importUnknownFormat(@NonNull String data) throws ImportException {
         return importUnknownFormat(
                 importer -> importer.importDatabase(data),
                 importer -> importer.isRecognizedFormat(data));

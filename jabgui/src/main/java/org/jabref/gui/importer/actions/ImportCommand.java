@@ -163,7 +163,7 @@ public class ImportCommand extends SimpleCommand {
     private ParserResult doImport(List<Path> files, @Nullable Importer importFormat) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
         // We import all files and collect their results
-        List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
+        List<ImportFormatReader.ImportResult> imports = new ArrayList<>();
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
@@ -192,7 +192,7 @@ public class ImportCommand extends SimpleCommand {
                     });
                     // Specific importer
                     ParserResult pr = importer.get().importDatabase(filename);
-                    imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
+                    imports.add(new ImportFormatReader.ImportResult(importer.get().getName(), pr));
                 }
             } catch (ImportException ex) {
                 UiTaskExecutor.runAndWaitInJavaFXThread(

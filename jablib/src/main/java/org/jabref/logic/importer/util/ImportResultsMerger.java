@@ -17,14 +17,14 @@ public class ImportResultsMerger {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportResultsMerger.class);
 
     public static ParserResult mergeImportResults(
-            List<ImportFormatReader.UnknownFormatImport> imports,
+            List<ImportFormatReader.ImportResult> imports,
             Character keyWordSeparator,
             OwnerPreferences ownerPreferences,
             TimestampPreferences timestampPreferences) {
         BibDatabase resultDatabase = new BibDatabase();
         ParserResult result = new ParserResult(resultDatabase);
 
-        for (ImportFormatReader.UnknownFormatImport importResult : imports) {
+        for (ImportFormatReader.ImportResult importResult : imports) {
             if (importResult == null) {
                 continue;
             }
