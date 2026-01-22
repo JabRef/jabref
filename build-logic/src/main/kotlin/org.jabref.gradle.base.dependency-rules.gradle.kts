@@ -548,7 +548,7 @@ extraJavaModuleInfo {
         requiresTransitive("javafx.graphics");
         // NO requires to jdk.jsobject
 
-        exports("javafx.scene.web")
+        exportAllPackages()
     }
 
     module("org.hamcrest:hamcrest", "org.hamcrest") {
