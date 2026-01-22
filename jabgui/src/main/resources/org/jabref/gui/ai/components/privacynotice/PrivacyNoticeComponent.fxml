@@ -13,7 +13,7 @@
          fx:controller="org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent">
     <VBox spacing="20.0" styleClass="gdpr-notice" fx:id="text">
         <Label wrapText="true" text="%Privacy notice" styleClass="heading" />
-        <Text text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). At present, all supported AI providers are external services. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider. As soon as you send a message or start summarizing, the text content of all PDFs attached to the entry are sent to the external service. By using this service, you agree to the privacy policy of the selected AI provider."/>
+        <Text text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). At present, all supported AI providers are external services. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider. As soon as you send a message or start summarizing, the text content of all PDFs attached to the entry is sent to the external service. By using this service, you agree to the privacy policy of the selected AI provider."/>
         <Text text="%AI functionality can be switched on and off in the preferences by the user at any time."/>
         <GridPane fx:id="aiPolicies" hgap="4" vgap="4" />
         <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. The default embedding model will automatically be downloaded in the background (size: %0) from Deep Java Library servers anonymously." />
