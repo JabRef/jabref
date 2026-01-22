@@ -361,7 +361,7 @@ public class JabRefFrameViewModel {
             // TODO: Think of wrapping in BackgroundTask - similar to org.jabref.gui.importer.actions.ImportCommand.importMultipleFiles
             importResult = importFormatReader.importWithAutoDetection(library);
         } catch (Throwable ex) {
-            LOGGER.debug("Could not import", ex);
+            LOGGER.warn("Could not import", ex);
             UiTaskExecutor.runAndWaitInJavaFXThread(
                     () -> dialogService.showWarningDialogAndWait(
                             Localization.lang("Import error"),
