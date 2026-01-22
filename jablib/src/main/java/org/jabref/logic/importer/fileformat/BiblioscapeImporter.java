@@ -20,12 +20,10 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Imports a Biblioscape Tag File. The format is described on
- * http://www.biblioscape.com/download/Biblioscape8.pdf Several
- * Biblioscape field types are ignored. Others are only included in the BibTeX
- * field "comment".
- */
+/// Imports a Biblioscape Tag File. The format is described on
+/// http://www.biblioscape.com/download/Biblioscape8.pdf Several
+/// Biblioscape field types are ignored. Others are only included in the BibTeX
+/// field "comment".
 public class BiblioscapeImporter extends Importer {
 
     @Override

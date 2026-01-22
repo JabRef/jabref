@@ -24,9 +24,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Test class for the keybindings dialog view model
- */
+/// Test class for the keybindings dialog view model
 class KeyBindingsTabModelTest {
 
     private KeyBindingsTabViewModel model;

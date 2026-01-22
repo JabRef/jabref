@@ -17,9 +17,7 @@ import com.google.common.base.Equivalence;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Delivers possible completions as a list of {@link Author}s.
- */
+/// Delivers possible completions as a list of {@link Author}s.
 public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
 
     private final Collection<Field> fields;

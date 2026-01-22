@@ -72,27 +72,19 @@ public class CleanupPreferences {
     }
 
     public enum CleanupStep {
-        /**
-         * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
-         */
+        /// Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
         CLEAN_UP_DOI,
         CLEANUP_EPRINT,
         CLEAN_UP_URL,
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
         RENAME_PDF_ONLY_RELATIVE_PATHS,
-        /**
-         * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
-         */
+        /// Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
         CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
         CLEAN_UP_DELETED_LINKED_FILES,
-        /**
-         * Converts to biblatex format
-         */
+        /// Converts to biblatex format
         CONVERT_TO_BIBLATEX,
-        /**
-         * Converts to bibtex format
-         */
+        /// Converts to bibtex format
         CONVERT_TO_BIBTEX,
         CONVERT_TIMESTAMP_TO_CREATIONDATE,
         CONVERT_TIMESTAMP_TO_MODIFICATIONDATE,

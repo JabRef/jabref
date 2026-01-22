@@ -135,11 +135,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Runs the cleanup on the entry and records the change.
-     *
-     * @return true if entry was modified
-     */
+    /// Runs the cleanup on the entry and records the change.
+    ///
+    /// @return true iff entry was modified
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
                               NamedCompoundEdit compoundEdit,

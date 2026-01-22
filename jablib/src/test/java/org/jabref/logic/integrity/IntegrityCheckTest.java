@@ -36,11 +36,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * This class tests the Integrity Checker as a whole.
- * Aspects are: selected fields, issues arising in a complete BibTeX entry, ... When testing a checker works with a certain input,
- * this test has to go to a test belonging to the respective checker. See PersonNamesCheckerTest for an example test.
- */
+/// This class tests the Integrity Checker as a whole.
+/// Aspects are: selected fields, issues arising in a complete BibTeX entry, ... When testing a checker works with a certain input,
+/// this test has to go to a test belonging to the respective checker. See PersonNamesCheckerTest for an example test.
 @ResourceLock("Localization.lang")
 class IntegrityCheckTest {
 

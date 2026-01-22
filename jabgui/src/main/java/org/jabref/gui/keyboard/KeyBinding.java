@@ -141,9 +141,7 @@ public enum KeyBinding {
         this.category = category;
     }
 
-    /**
-     * This method returns the enum constant value
-     */
+    /// This method returns the enum constant value
     public String getConstant() {
         return constant;
     }
@@ -152,11 +150,9 @@ public enum KeyBinding {
         return localization;
     }
 
-    /**
-     * This method returns the default key binding, the key(s) which are assigned
-     *
-     * @return The default key binding
-     */
+    /// This method returns the default key binding, the key(s) which are assigned
+    ///
+    /// @return The default key binding
     public String getDefaultKeyBinding() {
         return defaultBinding;
     }

@@ -24,9 +24,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * An Action class representing the process of invoking a PushToApplication operation.
- */
+/// An Action class representing the process of invoking a PushToApplication operation.
 public class GuiPushToApplicationCommand extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuiPushToApplicationCommand.class);

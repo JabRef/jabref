@@ -63,9 +63,7 @@ import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Represents the outer stage and the scene of the JabRef window.
- */
+/// Represents the outer stage and the scene of the JabRef window.
 public class JabRefGUI extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
@@ -380,11 +378,9 @@ public class JabRefGUI extends Application {
         debugLogWindowState(mainStage);
     }
 
-    /**
-     * prints the data from the screen (only in debug mode)
-     *
-     * @param mainStage JabRef's stage
-     */
+    /// prints the data from the screen (only in debug mode)
+    ///
+    /// @param mainStage JabRef's stage
     private void debugLogWindowState(Stage mainStage) {
         LOGGER.debug("""
                         screen data:
@@ -397,9 +393,7 @@ public class JabRefGUI extends Application {
                 mainStage.isMaximized(), mainStage.getX(), mainStage.getY(), mainStage.getWidth(), mainStage.getHeight());
     }
 
-    /**
-     * Tests if the window coordinates are inside any screen
-     */
+    /// Tests if the window coordinates are inside any screen
     private boolean isWindowPositionInBounds() {
         CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();
 

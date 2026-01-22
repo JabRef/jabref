@@ -21,9 +21,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 
-/**
- * A wizard dialog for generating a new sub database from existing TeX AUX file
- */
+/// A wizard dialog for generating a new sub database from existing TeX AUX file
 public class FromAuxDialog extends BaseDialog<Void> {
     @FXML private ButtonType generateButtonType;
     @FXML private TextField auxFileField;

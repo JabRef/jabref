@@ -20,12 +20,10 @@ public class NoteChecker implements ValueChecker {
         this.bibDatabaseContextEdition = bibDatabaseContext;
     }
 
-    /**
-     * biblatex package documentation (Section 4.9.1):
-     * The biblatex package will automatically capitalize the first word when required at the beginning of a sentence.
-     * Official BibTeX specification:
-     * note: Any additional information that can help the reader. The first word should be capitalized.
-     */
+    /// biblatex package documentation (Section 4.9.1):
+    /// The biblatex package will automatically capitalize the first word when required at the beginning of a sentence.
+    /// Official BibTeX specification:
+    /// note: Any additional information that can help the reader. The first word should be capitalized.
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {

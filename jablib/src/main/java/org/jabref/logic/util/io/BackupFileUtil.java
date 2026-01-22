@@ -81,17 +81,15 @@ public class BackupFileUtil {
         return mostRecentFile;
     }
 
-    /**
-     * <p>
-     * Determines a unique file prefix.
-     * </p>
-     * <p>
-     * When creating a backup file, the backup file should belong to the original file.
-     * Just adding ".bak" suffix to the filename, does not work in all cases:
-     * It may be possible that the user has opened "paper.bib" twice.
-     * Thus, we need to create a unique prefix to distinguish these files.
-     * </p>
-     */
+    ///
+    /// Determines a unique file prefix.
+    ///
+    ///
+    /// When creating a backup file, the backup file should belong to the original file.
+    /// Just adding ".bak" suffix to the filename, does not work in all cases:
+    /// It may be possible that the user has opened "paper.bib" twice.
+    /// Thus, we need to create a unique prefix to distinguish these files.
+    ///
     public static String getUniqueFilePrefix(Path targetFile) {
         // Idea: use the hash code and convert it to hex
         // Thereby, use positive values only and use length 4

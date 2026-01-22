@@ -7,9 +7,7 @@ import java.util.stream.Collectors;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * Converts Entry models from BibTeX to biblatex and back.
- */
+/// Converts Entry models from BibTeX to biblatex and back.
 public class EntryConverter {
 
     public static Map<Field, Field> FIELD_ALIASES_BIBTEX_TO_BIBLATEX;
