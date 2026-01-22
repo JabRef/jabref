@@ -298,16 +298,13 @@ public class XmpUtilWriter {
         Files.delete(newFile);
     }
 
-    /**
-     * Removes all XMP Metadata associated with the given PDF-file
-     * <p>
-     * This method removes ALL XMP metadata
-     *
-     * @param path is the file from which metadata has to be removed
-     *
-     * @throws IOException if File could not be written to or read from
-     * @throws TransformerException if XMP metadata could not be removed
-     */
+    /// Removes all XMP metadata associated with the given PDF file.
+    ///
+    /// This method removes ALL XMP metadata.
+    ///
+    /// @param path The file from which metadata has to be removed.
+    /// @throws IOException If the file could not be read from or written to.
+    /// @throws TransformerException If the XMP metadata could not be removed.
     public static void removeXmpMetadata(Path path) throws IOException, TransformerException {
         // Read from another file
         // Reason: Apache PDFBox does not support writing while the file is opened
