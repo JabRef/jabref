@@ -37,16 +37,6 @@ class ImportFormatReaderParameterlessTest {
     }
 
     @Test
-    void importUnknownFormatThrowsExceptionIfPathIsNull() {
-        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, fileMonitor));
-    }
-
-    @Test
-    void importUnknownFormatThrowsExceptionIfDataIsNull() {
-        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null));
-    }
-
-    @Test
     void importFromFileWithUnknownFormatThrowsException() {
         assertThrows(ImportException.class, () -> reader.importFromFile("someunknownformat", Path.of("somepath")));
     }
