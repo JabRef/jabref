@@ -92,13 +92,9 @@ public class CleanupPreferences {
         MOVE_PDF,
         FIX_FILE_LINKS,
         CLEAN_UP_ISSN,
-        /*
-         * Converts Math Subject Classification Codes presented in Keywords into their Descriptions
-         */
+        /// Converts Math Subject Classification Codes presented in Keywords into their Descriptions
         CONVERT_MSC_CODES,
-        /**
-         * Abbreviate or unabbreviate journal titles
-         */
+        /// Abbreviate or unabbreviate journal titles
         ABBREVIATE_DEFAULT,
         ABBREVIATE_DOTLESS,
         ABBREVIATE_SHORTEST_UNIQUE,
