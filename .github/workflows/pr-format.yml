@@ -1,8 +1,9 @@
 name: Check PR Format
 
 on:
-  pull_request:
-    types: [opened, reopened, edited]
+  # _target to run even in the case of merge conflicts
+  pull_request_target:
+    types: [ opened, reopened, edited ]
 
 permissions:
   pull-requests: write
@@ -139,7 +140,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: pr_number
           path: pr_number.txt

@@ -34,13 +34,11 @@ import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This task generates a new summary for an entry.
- * It will check if summary was already generated.
- * And it also will store the summary.
- * <p>
- * This task is created in the {@link SummariesService}, and stored then in a {@link SummariesStorage}.
- */
+/// This task generates a new summary for an entry.
+/// It will check if summary was already generated.
+/// And it also will store the summary.
+///
+/// This task is created in the {@link SummariesService}, and stored then in a {@link SummariesStorage}.
 public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryTask.class);
 
@@ -83,7 +81,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
     private void configure() {
         showToUser(true);
-        titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
+        titleProperty().set(Localization.lang("Summarizing %0...", citationKey));
 
         progressCounter.listenToAllProperties(this::updateProgress);
     }

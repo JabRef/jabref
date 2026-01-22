@@ -63,7 +63,7 @@
             <HBox spacing="10.0" alignment="BASELINE_LEFT">
                 <VBox spacing="5.0">
                     <HBox spacing="10.0" alignment="BASELINE_CENTER">
-                        <SearchableComboBox fx:id="addNewField" editable="true" prefWidth="150.0"/>
+                        <TextField fx:id="addNewField" prefWidth="150.0" promptText="%Field..."/>
                         <Button fx:id="addNewFieldButton"
                                 prefHeight="20.0" prefWidth="20.0"
                                 styleClass="icon-button,narrow" onAction="#addNewField">
@@ -72,20 +72,6 @@
                             </graphic>
                             <tooltip>
                                 <Tooltip text="%Add new Field"/>
-                            </tooltip>
-                        </Button>
-                    </HBox>
-
-                    <HBox spacing="10.0" alignment="BASELINE_CENTER">
-                        <TextField fx:id="addNewCustomFieldText" prefWidth="150.0" promptText="%Type new custom field..."/>
-                        <Button fx:id="addNewCustomFieldButton"
-                                prefHeight="20.0" prefWidth="20.0"
-                                styleClass="icon-button,narrow" onAction="#addNewCustomField">
-                            <graphic>
-                                <JabRefIconView glyph="ADD_NOBOX"/>
-                            </graphic>
-                            <tooltip>
-                                <Tooltip text="%Add new custom field"/>
                             </tooltip>
                         </Button>
                     </HBox>

@@ -56,7 +56,7 @@ Please make use of this functionality.
 
 Go to **File > Settings... > Tools > Actions on Save**.
 
-1. Check "Reformat on code"
+1. Check "Reformat code"
 2. Click on "All file types" (on the right)
 3. Uncheck "All file types"
 4. Check "Java"

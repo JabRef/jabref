@@ -2,11 +2,11 @@ name: Adapt PR status labels (Move)
 
 on:
   workflow_run:
-    workflows: ["Adapt PR status labels (Check)"]
-    types: [completed]
+    workflows: [ "Adapt PR status labels (Check)" ]
+    types: [ completed ]
 
 jobs:
-   apply-labels:
+  apply-labels:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
@@ -15,7 +15,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Download artifact from triggering run
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           run-id: ${{ github.event.workflow_run.id }}
           name: pr_number

@@ -30,7 +30,7 @@ import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.StandardFileType;
@@ -276,12 +276,10 @@ public class GroupDialogViewModel {
                 sameNameValidator);
     }
 
-    /**
-     * Gets the absolute path relative to the LatexFileDirectory, if given a relative path
-     *
-     * @param input the user input path
-     * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
-     */
+    /// Gets the absolute path relative to the LatexFileDirectory, if given a relative path
+    ///
+    /// @param input the user input path
+    /// @return an absolute path if LatexFileDirectory exists; otherwise, returns input
     private Path getAbsoluteTexGroupPath(String input) {
         Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
@@ -416,14 +414,14 @@ public class GroupDialogViewModel {
 
         if (editedGroup == null) {
             // creating new group -> defaults!
-            // TODO: Create default group (via org.jabref.logic.groups.DefaultGroupsFactory) and use values
+            // TODO: Create default group (via org.jabref.logic.groups.GroupsFactory) and use values
 
             colorUseProperty.setValue(false);
             colorProperty.setValue(determineColor());
             if (parentNode != null) {
                 parentNode.getGroup()
                           .getIconName()
-                          .filter(iconName -> !DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON.equals(iconName))
+                          .filter(iconName -> !GroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON.equals(iconName))
                           .ifPresent(iconProperty::setValue);
                 parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }

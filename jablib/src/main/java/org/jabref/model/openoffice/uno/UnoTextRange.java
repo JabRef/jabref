@@ -12,11 +12,9 @@ public class UnoTextRange {
     private UnoTextRange() {
     }
 
-    /**
-     * If original is in a footnote, return a range containing the corresponding footnote marker.
-     * <p>
-     * Returns Optional.empty if not in a footnote.
-     */
+    /// If original is in a footnote, return a range containing the corresponding footnote marker.
+    ///
+    /// Returns Optional.empty if not in a footnote.
     public static Optional<XTextRange> getFootnoteMarkRange(XTextRange original) {
         Optional<XFootnote> footer = UnoCast.cast(XFootnote.class, original.getText());
         // If we are inside a footnote,
@@ -25,17 +23,13 @@ public class UnoTextRange {
         return footer.map(XTextContent::getAnchor);
     }
 
-    /**
-     * Test if two XTextRange values are comparable (i.e. they share the same getText()).
-     */
+    /// Test if two XTextRange values are comparable (i.e. they share the same getText()).
     public static boolean comparables(XTextRange a, XTextRange b) {
         return a.getText() == b.getText();
     }
 
-    /**
-     * @return follows java conventions
-     * 1 if  (a &gt; b); (-1) if (a &lt; b)
-     */
+    /// @return follows java conventions
+    /// 1 if  (a &gt; b); (-1) if (a &lt; b)
     public static int compareStartsUnsafe(XTextRangeCompare compare, XTextRange a, XTextRange b) {
         return -1 * compare.compareRegionStarts(a, b);
     }
@@ -48,10 +42,8 @@ public class UnoTextRange {
         return compareStartsUnsafe(compare, a, b);
     }
 
-    /**
-     * @return follows java conventions
-     * 1 if  (a &gt; b); (-1) if (a &lt; b)
-     */
+    /// @return follows java conventions
+    /// 1 if  (a &gt; b); (-1) if (a &lt; b)
     public static int compareEnds(XTextRange a, XTextRange b) {
         if (!comparables(a, b)) {
             throw new java.lang.IllegalArgumentException("compareEnds: got incomparable regions");

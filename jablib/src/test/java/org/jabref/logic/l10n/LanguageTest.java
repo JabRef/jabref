@@ -4,10 +4,12 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ResourceLock("Localization.lang")
 class LanguageTest {
 
     @Test

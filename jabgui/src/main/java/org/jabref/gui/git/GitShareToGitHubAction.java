@@ -4,9 +4,10 @@ import javafx.beans.binding.BooleanExpression;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+import static javafx.beans.binding.Bindings.not;
 
 public class GitShareToGitHubAction extends SimpleCommand {
     private final DialogService dialogService;
@@ -33,6 +34,8 @@ public class GitShareToGitHubAction extends SimpleCommand {
         //  - etc.
         // Can be called independent if a remote is configured or not -- it will be done in the dialog
         // HowTo: Inject the observables (or maybe the stateManager) containing these constraints
-        return needsDatabase(stateManager);
+        return ActionHelper
+                .needsSavedLocalDatabase(stateManager)
+                .and(not(ActionHelper.needsGitRemoteConfigured(stateManager)));
     }
 }

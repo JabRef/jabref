@@ -2,6 +2,27 @@
 
 This directory contains [`JBang`](https://www.jbang.dev/) examples to show how to use some `jablib` features.
 
+## Running the examples
+
+In case you have [Node.js](https://nodejs.org/) installed:
+
+```terminal
+npx @jbangdev/jbang doi_to_bibtex.java
+```
+
+In case, you don't have node installed, you can [download gg.cmd](https://github.com/eirikb/gg/releases/latest/download/gg.cmd) and then run `sh -x gg.cmd jbang doi_to_bibtex.java` on Linux.
+On Windows, it is:
+
+```cmd
+.\gg.cmd jbang doi_to_bibtex.java
+```
+
+You can also [download and install JBang](https://www.jbang.dev/download/) and then just run:
+
+```terminal
+jbang doi_to_bibtex.java
+```
+
 ## Development
 
 In case you need to modify `jablib`, you can do it while working on your script.

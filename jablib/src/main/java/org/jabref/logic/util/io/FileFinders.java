@@ -1,9 +1,7 @@
 package org.jabref.logic.util.io;
 
 public class FileFinders {
-    /**
-     * Creates a preconfigured file finder based on the given AutoLink preferences.
-     */
+    /// Creates a preconfigured file finder based on the given AutoLink preferences.
     public static FileFinder constructFromConfiguration(AutoLinkPreferences autoLinkPreferences) {
         return switch (autoLinkPreferences.getCitationKeyDependency()) {
             case START ->
@@ -13,5 +11,10 @@ public class FileFinders {
             case REGEX ->
                     new RegExpBasedFileFinder(autoLinkPreferences.getRegularExpression(), autoLinkPreferences.getKeywordSeparator());
         };
+    }
+
+    /// The constructed file finder is based on broken linked file names.
+    public static FileFinder constructBrokenLinkedFileNameBasedFileFinder() {
+        return new BrokenLinkedFileNameBasedFileFinder();
     }
 }

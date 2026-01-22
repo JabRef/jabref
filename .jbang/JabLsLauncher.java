@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabls - start a bibtex languageserver
 
-//JAVA 24
+//JAVA 24+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // raw is for https://github.com/unicode-org/icu/pull/2127
@@ -14,9 +14,10 @@
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabls
-//DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
 //DEPS info.picocli:picocli:4.7.7
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
+//DEPS org.apache.commons:commons-lang3:3.20.0
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
 //DEPS org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
 //DEPS org.slf4j:slf4j-api:2.0.17

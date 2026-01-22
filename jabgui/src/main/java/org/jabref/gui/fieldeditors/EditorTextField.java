@@ -21,6 +21,7 @@ import org.jspecify.annotations.NonNull;
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
+
     private Runnable additionalPasteActionHandler = () -> {
         // No additional paste behavior
     };

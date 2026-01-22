@@ -23,6 +23,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
@@ -30,6 +33,8 @@ import org.xmlunit.matchers.CompareMatcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 public class OpenOfficeDocumentCreatorTest {
     public BibDatabaseContext databaseContext;
     public Charset charset;

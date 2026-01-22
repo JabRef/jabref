@@ -94,9 +94,7 @@ public class ThreeWayMergeViewModel extends AbstractViewModel {
         return visibleFields;
     }
 
-    /**
-     * Convince method to determine the total number of fields in the union of the left and right fields.
-     */
+    /// Convince method to determine the total number of fields in the union of the left and right fields.
     public int numberOfVisibleFields() {
         return visibleFields.size();
     }

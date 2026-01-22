@@ -12,9 +12,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 
-/**
- * This checker checks whether the entry does not contain any field appearing only in biblatex (and not in BibTeX)
- */
+/// This checker checks whether the entry does not contain any field appearing only in biblatex (and not in BibTeX)
 public class NoBibtexFieldChecker implements EntryChecker {
 
     private Set<Field> getAllBiblatexOnlyFields() {

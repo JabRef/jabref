@@ -56,10 +56,14 @@ dependencies {
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.jabref.testsupport")
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
-    requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
+}
+
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "4g"
 }
 
 application {
@@ -85,6 +89,7 @@ application {
 javaModulePackaging {
     applicationName = "jabkit"
     addModules.add("jdk.incubator.vector")
+    jlinkOptions.addAll("--generate-cds-archive")
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {
@@ -100,4 +105,16 @@ javaModulePackaging {
     targetsWithOs("macos") {
         packageTypes = listOf("app-image")
     }
+}
+
+val app = the<JavaApplication>()
+tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
+    group = "test"
+    description = "Runs JabKit from test resources dir"
+    mainClass = "org.jabref.toolkit.JabKitLauncher"
+    mainModule.set("org.jabref.jabkit")
+    classpath = sourceSets.main.get().runtimeClasspath
+    jvmArgs(app.applicationDefaultJvmArgs)
+    workingDir = file("src/test/resources")
+    args("--debug", "check-consistency", "--input=empty.bib")
 }

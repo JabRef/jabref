@@ -28,6 +28,4 @@
         <CheckBox fx:id="cleanupDeletedFiles" text="Remove links to non existent files" />
     </VBox>
 
-    <Button text="%Apply" onAction="#onApply" />
-
 </fx:root>

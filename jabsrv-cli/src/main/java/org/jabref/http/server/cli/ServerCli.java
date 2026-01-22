@@ -32,10 +32,8 @@ public class ServerCli implements Callable<Void> {
     @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
     private Integer port = 23119;
 
-    /**
-     * Starts an http server serving the last files opened in JabRef<br>
-     * More files can be provided as args.
-     */
+    /// Starts an http server serving the last files opened in JabRef<br>
+    /// More files can be provided as args.
     public static void main(final String[] args) throws InterruptedException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
@@ -76,7 +74,7 @@ public class ServerCli implements Callable<Void> {
             return null;
         }
 
-        Server server = new Server();
+        Server server = new Server(JabRefCliPreferences.getInstance());
         HttpServer httpServer = server.run(filesToServe, uri);
 
         // Keep the http server running until user kills the process (e.g., presses Ctrl+C)

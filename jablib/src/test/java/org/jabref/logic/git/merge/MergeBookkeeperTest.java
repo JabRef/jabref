@@ -11,6 +11,7 @@ import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.merge.execution.MergeBookkeeper;
 import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -31,6 +32,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +46,8 @@ import static org.mockito.Mockito.when;
 /// - The final merged content has been written to disk on the GUI layer;
 /// - Then call DefaultMergeBookkeeper.resultRecord(...) to perform "bookkeeping";
 /// - Use JGit to verify the commit shape.
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("git")
 public class MergeBookkeeperTest {
 
     private Path remoteDir;
@@ -70,7 +76,10 @@ public class MergeBookkeeperTest {
         importPrefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importPrefs.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        handlerRegistry = new GitHandlerRegistry();
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
+        handlerRegistry = new GitHandlerRegistry(gitPreferences);
 
         // 1) Remote bare repository
         remoteDir = tempDir.resolve("remote.git");

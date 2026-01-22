@@ -92,6 +92,8 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -108,9 +110,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 
-/**
- * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
- */
+/// Represents the ui area where the notifier pane, the library table and the entry editor are shown.
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
@@ -171,12 +171,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Runnable autoCompleterChangedListener;
 
-    /**
-     * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
-     *                       If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
-     *                       If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
-     *                       Closing the index takes time and will slow down opening the library.
-     */
+    /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
+    /// If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
+    /// Closing the index takes time and will slow down opening the library.
+    ///
+    /// @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
     private LibraryTab(@NonNull BibDatabaseContext bibDatabaseContext,
                        @NonNull LibraryTabContainer tabContainer,
                        @NonNull DialogService dialogService,
@@ -295,9 +294,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.dataLoadingTask = dataLoadingTask;
     }
 
-    /**
-     * The layout to display in the tab when it is loading
-     */
+    /// The layout to display in the tab when it is loading
     private Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();
@@ -394,13 +391,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabasePath().isPresent();
     }
 
-    /**
-     * Sets the title of the tab modification-asterisk filename – path-fragment
-     * <p>
-     * The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
-     * <p>
-     * Example: *jabref-authors.bib – testbib
-     */
+    /// Sets the title of the tab modification-asterisk filename – path-fragment
+    ///
+    /// The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
+    ///
+    /// Example: *jabref-authors.bib – testbib
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();
 
@@ -461,9 +456,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.changedProperty.setValue(true);
     }
 
-    /**
-     * Returns a collection of suggestion providers, which are populated from the current library.
-     */
+    /// Returns a collection of suggestion providers, which are populated from the current library.
     public SuggestionProviders getSuggestionProviders() {
         return suggestionProviders;
     }
@@ -531,9 +524,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    /**
-     * Set up autocompletion for this database
-     */
+    /// Set up autocompletion for this database
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
@@ -557,9 +548,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.getEditorShowing().setValue(true);
     }
 
-    /**
-     * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
-     */
+    /// This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
     public void clearAndSelect(final BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
     }
@@ -577,9 +566,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() + 1);
     }
 
-    /**
-     * Put an asterisk behind the filename to indicate the database has changed.
-     */
+    /// Put an asterisk behind the filename to indicate the database has changed.
     public synchronized void markChangedOrUnChanged() {
         if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
@@ -592,14 +579,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return bibDatabaseContext.getDatabase();
     }
 
-    /**
-     * Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
-     * Keep track of user preference:
-     * if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
-     *
-     * @param numberOfEntries number of entries user is selecting
-     * @return true if user confirm to delete entry
-     */
+    /// Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
+    /// Keep track of user preference:
+    /// if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
+    ///
+    /// @param numberOfEntries number of entries user is selecting
+    /// @return true if user confirm to delete entry
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (preferences.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
@@ -634,12 +619,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return true;
     }
 
-    /**
-     * Ask if the user really wants to close the given database.
-     * Offers to save or discard the changes -- or return to the library
-     *
-     * @return <code>true</code> if the user chooses to close the database
-     */
+    /// Ask if the user really wants to close the given database.
+    /// Offers to save or discard the changes -- or return to the library
+    ///
+    /// @return `true` if the user chooses to close the database
     private boolean confirmClose() {
         // Database could not have been changed, since it is still loading
         if (dataLoadingTask != null) {
@@ -703,9 +686,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    /**
-     * Perform necessary cleanup when this Library is closed.
-     */
+    /// Perform necessary cleanup when this Library is closed.
     private void onClosed(Event event) {
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
@@ -753,11 +734,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
 
-    /**
-     * Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
-     *
-     * @return A list containing the selected entries. Is never null.
-     */
+    /// Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
+    ///
+    /// @return A list containing the selected entries. Is never null.
     public List<BibEntry> getSelectedEntries() {
         return mainTable.getSelectedEntries();
     }
@@ -894,7 +873,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             } else {
                 dialogService.showErrorDialogAndWait(exception);
             }
-            return List.of();
+            BibEntry fallBack = new BibEntry(StandardEntryType.Misc)
+                    .withField(StandardField.COMMENT, data)
+                    .withChanged(true);
+            return List.of(fallBack);
         }
     }
 
@@ -924,9 +906,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    /**
-     * Removes the selected entries and files linked to selected entries from the database
-     */
+    /// Removes the selected entries and files linked to selected entries from the database
     public void deleteEntry() {
         int entriesDeleted = doDeleteEntry(StandardActions.DELETE_ENTRY, mainTable.getSelectedEntries());
         if (entriesDeleted > 0) {
@@ -938,11 +918,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         doDeleteEntry(StandardActions.DELETE_ENTRY, List.of(entry));
     }
 
-    /**
-     * Removes the selected entries and files linked to selected entries from the database
-     *
-     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
-     */
+    /// Removes the selected entries and files linked to selected entries from the database
+    ///
+    /// @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
     private int doDeleteEntry(StandardActions mode, List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return 0;
@@ -1029,21 +1007,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         updateNavigationState();
     }
 
-    /**
-     * Updates the StateManager with current navigation state
-     * Only update if this is the active tab
-     */
+    /// Updates the StateManager with current navigation state
+    /// Only update if this is the active tab
     public void updateNavigationState() {
         canGoBackProperty.set(canGoBack());
         canGoForwardProperty.set(canGoForward());
     }
 
-    /**
-     * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
-     *
-     * @param dataLoadingTask The task to execute to load the data asynchronously.
-     * @param file            the path to the file (loaded by the dataLoadingTask)
-     */
+    /// Creates a new library tab. Contents are loaded by the `dataLoadingTask`. Most of the other parameters are required by `resetChangeMonitor()`.
+    ///
+    /// @param dataLoadingTask The task to execute to load the data asynchronously.
+    /// @param file            the path to the file (loaded by the dataLoadingTask)
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
                                               DialogService dialogService,

@@ -2,7 +2,7 @@ name: Check PR Modifications
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [ opened, reopened, synchronize ]
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -106,14 +106,14 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-              core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
+            core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
 
   upload-pr-number:
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: pr_number
           path: pr_number.txt

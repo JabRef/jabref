@@ -35,23 +35,21 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Installs and manages style files and provides live reloading. JabRef provides two
- * inbuilt themes and a user customizable one: Light, Dark and Custom. The Light theme
- * is basically the base.css theme. Every other theme is loaded as an addition to
- * base.css.
- * <p>
- * For type Custom, Theme will protect against removal of the CSS file, degrading as
- * gracefully as possible. If the file becomes unavailable while the application is
- * running, some Scenes that have not yet had the CSS installed may not be themed. The
- * PreviewViewer, which uses WebEngine, supports data URLs and so generally is not
- * affected by removal of the file; however Theme package will not attempt to URL-encode
- * large style sheets so as to protect memory usage (see
- * {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
- *
- * @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
- * the Jabref documentation.
- */
+/// Installs and manages style files and provides live reloading. JabRef provides two
+/// inbuilt themes and a user customizable one: Light, Dark and Custom. The Light theme
+/// is basically the base.css theme. Every other theme is loaded as an addition to
+/// base.css.
+///
+/// For type Custom, Theme will protect against removal of the CSS file, degrading as
+/// gracefully as possible. If the file becomes unavailable while the application is
+/// running, some Scenes that have not yet had the CSS installed may not be themed. The
+/// PreviewViewer, which uses WebEngine, supports data URLs and so generally is not
+/// affected by removal of the file; however Theme package will not attempt to URL-encode
+/// large style sheets so as to protect memory usage (see
+/// {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
+///
+/// @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
+/// the Jabref documentation.
 public class ThemeManager {
     public static Map<String, Node> getDownloadIconTitleMap = Map.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
@@ -147,8 +145,10 @@ public class ThemeManager {
     /// @param scene is the scene, the font size should be applied to
     private void updateFontStyle(@NonNull Scene scene) {
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
+            LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
         } else {
+            LOGGER.debug("Using default font size of {}pt", workspacePreferences.getDefaultFontSize());
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getDefaultFontSize() + "pt;");
         }
     }
@@ -305,9 +305,7 @@ public class ThemeManager {
               });
     }
 
-    /**
-     * @return the currently active theme
-     */
+    /// @return the currently active theme
     @VisibleForTesting
     Theme getActiveTheme() {
         return this.theme;

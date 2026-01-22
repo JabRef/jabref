@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
@@ -67,8 +66,8 @@ class StudyCatalogToFetcherConverterTest {
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         assertEquals(
-                List.of("Springer", "ArXiv", "Medline/PubMed"),
-                result.stream().map(SearchBasedFetcher::getName).collect(Collectors.toList())
+                List.of("Springer", "arXiv", "Medline/PubMed"),
+                result.stream().map(SearchBasedFetcher::getName).toList()
         );
     }
 

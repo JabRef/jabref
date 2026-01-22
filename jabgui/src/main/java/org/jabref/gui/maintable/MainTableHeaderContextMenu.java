@@ -41,9 +41,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         constructItems();
     }
 
-    /**
-     * Handles showing the menu in the cursors position when right-clicked.
-     */
+    /// Handles showing the menu in the cursors position when right-clicked.
     public void show(boolean show) {
         // TODO: 20/10/2022 unknown bug where issue does not show unless parameter is passed through this method.
         mainTable.setOnContextMenuRequested(event -> {
@@ -57,9 +55,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         });
     }
 
-    /**
-     * Constructs the items for the list and places them in the menu.
-     */
+    /// Constructs the items for the list and places them in the menu.
     private void constructItems() {
         // Reset the right-click menu
         this.getItems().clear();
@@ -99,9 +95,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         this.getItems().add(showMoreItem);
     }
 
-    /**
-     * Creates an item for the menu constructed with the name/visibility of the table column.
-     */
+    /// Creates an item for the menu constructed with the name/visibility of the table column.
     private RightClickMenuItem createMenuItem(TableColumn<BibEntryTableViewModel, ?> column, boolean isDisplaying) {
         // Gets display name and constructs Radio Menu Item.
         MainTableColumn<?> tableColumn = (MainTableColumn<?>) column;
@@ -109,9 +103,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         return new RightClickMenuItem(displayName, tableColumn, isDisplaying);
     }
 
-    /**
-     * Returns the current position of the inputted column in the table (index).
-     */
+    /// Returns the current position of the inputted column in the table (index).
     private int obtainIndexOfColumn(MainTableColumn<?> searchColumn) {
         ObservableList<TableColumn<BibEntryTableViewModel, ?>> columns = mainTable.getColumns();
         for (int i = 0; i < columns.size(); i++) {
@@ -124,9 +116,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         return OUT_OF_BOUNDS;
     }
 
-    /**
-     * Adds the column into the MainTable for display.
-     */
+    /// Adds the column into the MainTable for display.
     private void addColumn(MainTableColumn<?> tableColumn, int index) {
         if ((index <= OUT_OF_BOUNDS) || (index >= mainTable.getColumns().size())) {
             mainTable.getColumns().add(tableColumn);
@@ -135,23 +125,17 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         }
     }
 
-    /**
-     * Removes the column from the MainTable to remove visibility.
-     */
+    /// Removes the column from the MainTable to remove visibility.
     private void removeColumn(MainTableColumn<?> tableColumn) {
         mainTable.getColumns().removeIf(tableCol -> ((MainTableColumn<?>) tableCol).getModel().equals(tableColumn.getModel()));
     }
 
-    /**
-     * Checks if a column is one of the commonly used columns.
-     */
+    /// Checks if a column is one of the commonly used columns.
     private boolean isACommonColumn(MainTableColumn<?> tableColumn) {
         return isColumnInList(tableColumn, commonColumns());
     }
 
-    /**
-     * Determines if a list of TableColumns contains the searched column.
-     */
+    /// Determines if a list of TableColumns contains the searched column.
     private boolean isColumnInList(MainTableColumn<?> searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
         for (TableColumn<BibEntryTableViewModel, ?> column : tableColumns) {
             MainTableColumnModel model = ((MainTableColumn<?>) column).getModel();
@@ -162,9 +146,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         return false;
     }
 
-    /**
-     * Creates the list of the "commonly used" columns (currently based on the default preferences).
-     */
+    /// Creates the list of the "commonly used" columns (currently based on the default preferences).
     private List<TableColumn<BibEntryTableViewModel, ?>> commonColumns() {
         // Qualifier strings
         String entryTypeQualifier = "entrytype";
@@ -200,9 +182,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         return commonTableColumns;
     }
 
-    /**
-     * RightClickMenuItem: RadioMenuItem holding position in MainTable and its visibility.
-     */
+    /// RightClickMenuItem: RadioMenuItem holding position in MainTable and its visibility.
     private class RightClickMenuItem extends RadioMenuItem {
         private int index;
         private boolean visibleInTable;

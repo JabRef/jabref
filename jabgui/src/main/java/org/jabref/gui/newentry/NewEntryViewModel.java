@@ -22,6 +22,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -58,6 +59,8 @@ public class NewEntryViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryViewModel.class);
 
+    private static final LayoutFormatter DOI_STRIP = new DOIStrip();
+
     private final GuiPreferences preferences;
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -65,6 +68,8 @@ public class NewEntryViewModel {
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
+
+    private final BookCoverFetcher bookCoverFetcher;
 
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
@@ -104,6 +109,8 @@ public class NewEntryViewModel {
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
+
         executing = new SimpleBooleanProperty(false);
         executedSuccessfully = new SimpleBooleanProperty(false);
         doiCache = new HashMap<>();
@@ -113,9 +120,11 @@ public class NewEntryViewModel {
                 idText,
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("You must specify an identifier.")));
+
         duplicateDoiValidator = new FunctionBasedValidator<>(
                 idText,
                 input -> checkDOI(input).orElse(null));
+
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -145,27 +154,22 @@ public class NewEntryViewModel {
 
     public void populateDOICache() {
         doiCache.clear();
-        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
-
-        activeDatabase.map(BibDatabaseContext::getEntries)
-                      .ifPresent(entries -> {
-                          entries.forEach(entry -> {
-                              entry.getField(StandardField.DOI)
-                                   .ifPresent(doi -> {
-                                       doiCache.put(doi, entry);
-                                   });
-                          });
-                      });
+        stateManager.getActiveDatabase()
+                    .map(BibDatabaseContext::getEntries)
+                    .stream().flatMap(List::stream)
+                    .forEach(entry -> {
+                        entry.getField(StandardField.DOI)
+                             .ifPresent(doi -> {
+                                 doiCache.put(doi, entry);
+                             });
+                    });
     }
 
     public Optional<ValidationMessage> checkDOI(String doiInput) {
-        if (doiInput == null || doiInput.isBlank()) {
+        if (StringUtil.isBlank(doiInput)) {
             return Optional.empty();
         }
-
-        LayoutFormatter doiStrip = new DOIStrip();
-        String normalized = doiStrip.format(doiInput.toLowerCase());
-
+        String normalized = DOI_STRIP.format(doiInput.toLowerCase());
         if (doiCache.containsKey(normalized)) {
             duplicateEntry = doiCache.get(normalized);
             return Optional.of(ValidationMessage.warning(Localization.lang("Entry already exists in a library")));
@@ -234,32 +238,47 @@ public class NewEntryViewModel {
         return bibtexTextValidator.getValidationStatus().validProperty();
     }
 
+    private BibEntry withCoversDownloaded(BibEntry entry) {
+        if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
+            bookCoverFetcher.downloadCoversForEntry(entry);
+        }
+        return entry;
+    }
+
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
-            final String text = idText.getValue();
-            final CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
-
-            if (text == null || text.isEmpty()) {
+            String text = idText.getValue();
+            if (StringUtil.isBlank(text)) {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text);
+            CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
+            return fetcher.performSearchById(text)
+                          .map(entry -> withCoversDownloaded(entry));
         }
     }
 
     private class WorkerLookupTypedId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
-            final String text = idText.getValue();
-            final boolean textValid = idTextValidator.getValidationStatus().isValid();
-            final IdBasedFetcher fetcher = idFetcher.getValue();
-
-            if (text == null || !textValid || fetcher == null) {
+            String text = idText.getValue();
+            if (StringUtil.isBlank(text)) {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text);
+            boolean textValid = idTextValidator.getValidationStatus().isValid();
+            if (!textValid) {
+                return Optional.empty();
+            }
+
+            IdBasedFetcher fetcher = idFetcher.getValue();
+            if (fetcher == null) {
+                return Optional.empty();
+            }
+
+            return fetcher.performSearchById(text)
+                          .map(entry -> withCoversDownloaded(entry));
         }
     }
 
@@ -314,7 +333,7 @@ public class NewEntryViewModel {
             executing.set(false);
         });
 
-        idLookupWorker.setOnSucceeded(event -> {
+        idLookupWorker.setOnSucceeded(_ -> {
             final Optional<BibEntry> result = idLookupWorker.getValue();
 
             if (result.isEmpty()) {
@@ -460,7 +479,7 @@ public class NewEntryViewModel {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
 
-            final String dialogTitle = Localization.lang("Failed to parse Bib(La)Tex");
+            final String dialogTitle = Localization.lang("Failed to parse Bib(La)TeX");
 
             if (exception instanceof ParseException) {
                 dialogService.showInformationDialogAndWait(
@@ -479,7 +498,7 @@ public class NewEntryViewModel {
                                 exceptionMessage));
             }
 
-            LOGGER.error("An exception occurred when parsing Bib(La)Tex entries.", exception);
+            LOGGER.error("An exception occurred when parsing Bib(La)TeX entries.", exception);
 
             executing.set(false);
         });
@@ -493,7 +512,7 @@ public class NewEntryViewModel {
                         Localization.lang(
                                 "An unknown error has occurred.\n" +
                                         "Entries may need to be added manually."));
-                LOGGER.error("An invalid result was returned when parsing Bib(La)Tex entries.");
+                LOGGER.error("An invalid result was returned when parsing Bib(La)TeX entries.");
                 executing.set(false);
                 return;
             }

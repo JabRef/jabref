@@ -26,10 +26,12 @@ import javafx.fxml.FXMLLoader;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jooq.lambda.Unchecked;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+@ResourceLock("Localization.lang")
 public class LocalizationParser {
 
     public static SortedSet<LocalizationEntry> findMissingKeys(LocalizationBundleForTest type) throws IOException {
@@ -117,9 +119,7 @@ public class LocalizationParser {
         }
     }
 
-    /**
-     * Returns the trimmed key set of the given property file. Each key is already unescaped.
-     */
+    /// Returns the trimmed key set of the given property file. Each key is already unescaped.
     public static SortedSet<String> getKeysInPropertiesFile(String path) {
         Properties properties = getProperties(path);
         return properties.keySet().stream()
@@ -178,11 +178,9 @@ public class LocalizationParser {
                                           .collect(Collectors.toList());
     }
 
-    /**
-     * Loads the fxml file and returns all used language resources.
-     * <p>
-     * Note: FXML prefixes localization keys with <code>%</code>.
-     */
+    /// Loads the fxml file and returns all used language resources.
+    ///
+    /// Note: FXML prefixes localization keys with `%`.
     private static Collection<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
         Collection<String> result = new ArrayList<>();
 

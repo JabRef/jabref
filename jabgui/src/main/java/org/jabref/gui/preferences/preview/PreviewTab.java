@@ -12,6 +12,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.input.DragEvent;
@@ -33,6 +34,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
@@ -62,6 +64,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
     @FXML private CustomTextField searchBox;
+    @FXML private CheckBox bookCoverDownload;
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
@@ -128,6 +131,8 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
         showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
 
+        bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
+
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
@@ -145,6 +150,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
+                .withContextMenu(this::createContextMenu)
                 .install(availableListView);
         availableListView.setOnDragOver(this::dragOver);
         availableListView.setOnDragDetected(this::dragDetectedInAvailable);
@@ -160,6 +166,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
                 .setOnDragDropped(this::dragDroppedInChosenCell)
+                .withContextMenu(this::createContextMenu)
                 .install(chosenListView);
         chosenListView.setOnDragOver(this::dragOver);
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
@@ -219,13 +226,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
     }
 
-    /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
-     * ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
-     *
-     * @param list       The ListView currently focused
-     * @param keypressed The pressed character
-     */
+    /// This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
+    /// ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+    ///
+    /// @param list       The ListView currently focused
+    /// @param keypressed The pressed character
 
     private void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {
@@ -310,5 +315,16 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             viewModel.removeFromChosen();
             event.consume();
         }
+    }
+
+    private ContextMenu createContextMenu(PreviewLayout layout) {
+        if (layout instanceof BstPreviewLayout) {
+            ContextMenu menu = new ContextMenu();
+            MenuItem deleteItem = new MenuItem(Localization.lang("Remove"));
+            deleteItem.setOnAction(event -> viewModel.removeCustomStyle(layout));
+            menu.getItems().add(deleteItem);
+            return menu;
+        }
+        return null;
     }
 }

@@ -1,15 +1,9 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
@@ -25,11 +19,8 @@ import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
@@ -37,7 +28,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FieldFormatterCleanups {
+public class FieldFormatterCleanupActions {
 
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     public static final List<FieldFormatterCleanup> RECOMMEND_BIBTEX_ACTIONS;
@@ -46,20 +37,7 @@ public class FieldFormatterCleanups {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FieldFormatterCleanups.class);
-
-    /**
-     * This parses the key/list map of fields and clean up actions for the field.
-     * <p>
-     * General format for one key/list map: <code>...[...]</code> - <code>field[formatter1,formatter2,...]</code>
-     * Multiple are written as <code>...[...]...[...]...[...]</code>
-     * <code>field1[formatter1,formatter2,...]field2[formatter3,formatter4,...]</code>
-     * <p>
-     * The idea is that characters are field names until <code>[</code> is reached and that formatter lists are terminated by <code>]</code>
-     * <p>
-     * Example: <code>pages[normalize_page_numbers]title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]</code>
-     */
-    private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^]]+)]");
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldFormatterCleanupActions.class);
 
     static {
         DEFAULT_SAVE_ACTIONS = List.of(
@@ -88,41 +66,14 @@ public class FieldFormatterCleanups {
     private final boolean enabled;
     private final List<FieldFormatterCleanup> actions;
 
-    public FieldFormatterCleanups(boolean enabled, @NonNull List<FieldFormatterCleanup> actions) {
+    public FieldFormatterCleanupActions(boolean enabled, @NonNull List<FieldFormatterCleanup> actions) {
         this.enabled = enabled;
         this.actions = actions;
     }
 
-    /**
-     * Note: String parsing is done at {@link FieldFormatterCleanups#parse(String)}
-     */
+    /// Note: String parsing is done at [FieldFormatterCleanupMapper#parseActions(String)]
     public static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
-        // First, group all formatters by the field for which they apply
-        // Order of the list should be kept
-        Map<Field, List<String>> groupedByField = new LinkedHashMap<>();
-        for (FieldFormatterCleanup cleanup : actionList) {
-            Field key = cleanup.getField();
-            // add new list into the hashmap if needed
-            groupedByField.computeIfAbsent(key, k -> new ArrayList<>());
-
-            // add the formatter to the map if it is not already there
-            List<String> formattersForKey = groupedByField.get(key);
-            if (!formattersForKey.contains(cleanup.getFormatter().getKey())) {
-                formattersForKey.add(cleanup.getFormatter().getKey());
-            }
-        }
-
-        // convert the contents of the hashmap into the correct serialization
-        StringBuilder result = new StringBuilder();
-        for (Map.Entry<Field, List<String>> entry : groupedByField.entrySet()) {
-            result.append(entry.getKey().getName());
-
-            StringJoiner joiner = new StringJoiner(",", "[", "]" + newLineSeparator);
-            entry.getValue().forEach(joiner::add);
-            result.append(joiner);
-        }
-
-        return result.toString();
+        return FieldFormatterCleanupMapper.serializeActions(actionList, newLineSeparator);
     }
 
     public boolean isEnabled() {
@@ -151,33 +102,6 @@ public class FieldFormatterCleanups {
         return result;
     }
 
-    public static List<FieldFormatterCleanup> parse(String formatterString) {
-        if ((formatterString == null) || formatterString.isEmpty()) {
-            // no save actions defined in the meta data
-            return List.of();
-        }
-
-        List<FieldFormatterCleanup> result = new ArrayList<>();
-
-        // first remove all newlines for easier parsing
-        String formatterStringWithoutLineBreaks = StringUtil.unifyLineBreaks(formatterString, "");
-
-        Matcher matcher = FIELD_FORMATTER_CLEANUP_PATTERN.matcher(formatterStringWithoutLineBreaks);
-        while (matcher.find()) {
-            String fieldKey = matcher.group(1);
-            Field field = FieldFactory.parseField(fieldKey);
-
-            String fieldString = matcher.group(2);
-
-            List<FieldFormatterCleanup> fieldFormatterCleanups = Arrays.stream(fieldString.split(","))
-                                                                       .map(FieldFormatterCleanups::getFormatterFromString)
-                                                                       .map(formatter -> new FieldFormatterCleanup(field, formatter))
-                                                                       .toList();
-            result.addAll(fieldFormatterCleanups);
-        }
-        return result;
-    }
-
     static Formatter getFormatterFromString(String formatterName) {
         return Formatters
                 .getFormatterForKey(formatterName)
@@ -201,7 +125,7 @@ public class FieldFormatterCleanups {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof FieldFormatterCleanups other) {
+        if (obj instanceof FieldFormatterCleanupActions other) {
             return Objects.equals(actions, other.actions) && (enabled == other.enabled);
         }
         return false;
@@ -209,7 +133,7 @@ public class FieldFormatterCleanups {
 
     @Override
     public String toString() {
-        return "FieldFormatterCleanups{" +
+        return "FieldFormatterCleanupActions{" +
                 "enabled=" + enabled + "," +
                 "actions=" + actions +
                 "}";

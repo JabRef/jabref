@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -32,8 +33,8 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints />
-         <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
         </rowConstraints>
         <CheckBox fx:id="proxyUse" text="%Use custom proxy configuration" GridPane.columnSpan="3" GridPane.rowIndex="0" />
         <Label fx:id="proxyHostnameLabel" text="%Hostname" GridPane.rowIndex="1" />
@@ -50,7 +51,32 @@
         </SplitPane>
         <Button fx:id="checkConnectionButton" onAction="#checkConnection" prefWidth="200.0" text="%Check connection" GridPane.columnIndex="1" GridPane.rowIndex="6" />
     </GridPane>
-   <Label styleClass="sectionHeader" text="%SSL Configuration" />
+
+    <Label styleClass="sectionHeader" text="%Git configuration" />
+    <GridPane hgap="10.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+
+        <Label fx:id="gitUsernameLabel" text="%Username" GridPane.rowIndex="0" />
+        <TextField fx:id="gitUsername" prefWidth="200.0" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+        <Label fx:id="gitPatLabel" text="%PAT" GridPane.rowIndex="1">
+            <tooltip><Tooltip text="%Personal Access Token"/></tooltip>
+        </Label>
+        <CustomPasswordField fx:id="gitPat" prefWidth="200.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        <SplitPane fx:id="persistGitPatTooltipWrapper" GridPane.rowIndex="1" GridPane.columnIndex="2">
+            <CheckBox fx:id="gitPersistPat" text="%Persist PAT between sessions"/>
+        </SplitPane>
+    </GridPane>
+
+    <Label styleClass="sectionHeader" text="%SSL configuration" />
     <GridPane
             hgap="10.0"
             vgap="10.0">
@@ -129,10 +155,10 @@
                         editable="false" resizable="false" reorderable="false"
                 />
             </columns>
-           <columnResizePolicy>
-               <TableView
-                       fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-           </columnResizePolicy>
+            <columnResizePolicy>
+                <TableView
+                        fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
         </TableView>
         <Button fx:id="addCertificate"
                 mnemonicParsing="false"
@@ -143,9 +169,9 @@
                 GridPane.halignment="RIGHT"
                 GridPane.rowIndex="1"
                 GridPane.valignment="TOP">
-           <GridPane.margin>
-               <Insets right="16.0"/>
-           </GridPane.margin>
+            <GridPane.margin>
+                <Insets right="16.0"/>
+            </GridPane.margin>
             <graphic>
                 <JabRefIconView glyph="ADD_NOBOX"/>
             </graphic>

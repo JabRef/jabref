@@ -20,6 +20,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -39,10 +40,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class provides a model for managing study definitions.
- * To visualize the model one can bind the properties to UI elements.
- */
+/// This class provides a model for managing study definitions.
+/// To visualize the model one can bind the properties to UI elements.
 public class ManageStudyDefinitionViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionViewModel.class);
 
@@ -64,6 +63,7 @@ public class ManageStudyDefinitionViewModel {
     private final DialogService dialogService;
 
     private final WorkspacePreferences workspacePreferences;
+    private final GitPreferences gitPreferences;
 
     private final StringProperty titleValidationMessage = new SimpleStringProperty();
     private final StringProperty authorsValidationMessage = new SimpleStringProperty();
@@ -72,12 +72,11 @@ public class ManageStudyDefinitionViewModel {
     private final StringProperty catalogsValidationMessage = new SimpleStringProperty();
     private final StringProperty validationHeaderMessage = new SimpleStringProperty();
 
-    /**
-     * Constructor for a new study
-     */
+    /// Constructor for a new study
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
                                           @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull GitPreferences gitPreferences,
                                           @NonNull DialogService dialogService) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
@@ -92,22 +91,23 @@ public class ManageStudyDefinitionViewModel {
                                     .toList());
         this.dialogService = dialogService;
         this.workspacePreferences = workspacePreferences;
+        this.gitPreferences = gitPreferences;
 
         initializeValidationBindings();
     }
 
-    /**
-     * Constructor for an existing study
-     *
-     * @param study          The study to initialize the UI from
-     * @param studyDirectory The path where the study resides
-     */
+    /// Constructor for an existing study
+    ///
+    /// @param study          The study to initialize the UI from
+    /// @param studyDirectory The path where the study resides
     public ManageStudyDefinitionViewModel(@NonNull Study study,
                                           @NonNull Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
                                           @NonNull WorkspacePreferences workspacePreferences,
+                                          @NonNull GitPreferences gitPreferences,
                                           @NonNull DialogService dialogService) {
+        this.gitPreferences = gitPreferences;
         // copy the content of the study object into the UI fields
         authors.addAll(study.getAuthors());
         title.setValue(study.getTitle());
@@ -246,7 +246,7 @@ public class ManageStudyDefinitionViewModel {
         }
 
         try {
-            new GitHandler(studyDirectory).createCommitOnCurrentBranch("Update study definition", false);
+            new GitHandler(studyDirectory, gitPreferences).createCommitOnCurrentBranch("Update study definition", false);
         } catch (IOException | GitAPIException e) {
             LOGGER.error("Could not commit study definition file in directory {}", studyDirectory, e);
             dialogService.notify(Localization.lang("Please enter a valid file path.") +

@@ -1,7 +1,6 @@
 package org.jabref.gui.commonfxcontrols;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -105,7 +104,7 @@ public class SaveOrderConfigPanel extends VBox {
         descending.selectedProperty().bindBidirectional(criterionViewModel.descendingProperty());
         sortCriterionList.add(descending, 2, row);
 
-        HBox hBox = new HBox();
+        HBox hBox = new HBox(10);
         hBox.getChildren().addAll(createRowButtons(criterionViewModel));
         sortCriterionList.add(hBox, 3, row);
     }
@@ -115,19 +114,19 @@ public class SaveOrderConfigPanel extends VBox {
         remove.getStyleClass().addAll("icon-button", "narrow");
         remove.setPrefHeight(20.0);
         remove.setPrefWidth(20.0);
-        remove.setOnAction(event -> removeCriterion(criterionViewModel));
+        remove.setOnAction(_ -> removeCriterion(criterionViewModel));
 
         Button moveUp = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_UP));
         moveUp.getStyleClass().addAll("icon-button", "narrow");
         moveUp.setPrefHeight(20.0);
         moveUp.setPrefWidth(20.0);
-        moveUp.setOnAction(event -> moveCriterionUp(criterionViewModel));
+        moveUp.setOnAction(_ -> moveCriterionUp(criterionViewModel));
 
         Button moveDown = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_DOWN));
         moveDown.getStyleClass().addAll("icon-button", "narrow");
         moveDown.setPrefHeight(20.0);
         moveDown.setPrefWidth(20.0);
-        moveDown.setOnAction(event -> moveCriterionDown(criterionViewModel));
+        moveDown.setOnAction(_ -> moveCriterionDown(criterionViewModel));
 
         return List.of(moveUp, moveDown, remove);
     }
@@ -135,7 +134,7 @@ public class SaveOrderConfigPanel extends VBox {
     private void clearCriterionRow(int row) {
         List<Node> criterionRow = sortCriterionList.getChildren().stream()
                                                    .filter(item -> GridPane.getRowIndex(item) == row)
-                                                   .collect(Collectors.toList());
+                                                   .toList();
         sortCriterionList.getChildren().removeAll(criterionRow);
 
         sortCriterionList.getChildren().stream()

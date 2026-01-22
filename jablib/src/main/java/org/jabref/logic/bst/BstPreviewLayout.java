@@ -33,8 +33,10 @@ public final class BstPreviewLayout implements PreviewLayout {
     private String source;
     private BstVM bstVM;
     private String error;
+    private final Path path;
 
     public BstPreviewLayout(Path path) {
+        this.path = path;
         try {
             this.source = String.join("\n", Files.readAllLines(path));
         } catch (IOException e) {
@@ -111,10 +113,12 @@ public final class BstPreviewLayout implements PreviewLayout {
         return source;
     }
 
-    /**
-     * Checks if the given style file is a BST file by checking the extension
-     */
+    /// Checks if the given style file is a BST file by checking the extension
     public static boolean isBstStyleFile(String styleFile) {
         return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);
+    }
+
+    public Path getFilePath() {
+        return path;
     }
 }

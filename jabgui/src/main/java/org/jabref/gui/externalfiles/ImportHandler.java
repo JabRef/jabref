@@ -56,14 +56,15 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +75,9 @@ import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.Duplicate
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
+
+    private static final String FILENAME_FALLBACK = "downloaded.pdf";
+
     private final BibDatabaseContext targetBibDatabaseContext;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -257,15 +261,13 @@ public class ImportHandler {
         importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager));
     }
 
-    /**
-     * Imports an entry into the database with duplicate checking and handling.
-     * Creates a copy of the entry for processing - the original entry parameter is not modified.
-     * The copied entry may be modified during cleanup and duplicate handling.
-     *
-     * @param entry the entry to import (original will not be modified)
-     * @param decision the duplicate resolution strategy to apply
-     * @param tracker tracks the import status of the entry
-     */
+    /// Imports an entry into the database with duplicate checking and handling.
+    /// Creates a copy of the entry for processing - the original entry parameter is not modified.
+    /// The copied entry may be modified during cleanup and duplicate handling.
+    ///
+    /// @param entry    the entry to import (original will not be modified)
+    /// @param decision the duplicate resolution strategy to apply
+    /// @param tracker  tracks the import status of the entry
     private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
         // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
@@ -374,11 +376,9 @@ public class ImportHandler {
         }
     }
 
-    /**
-     * Generate keys for given entries.
-     *
-     * @param entries entries to generate keys for
-     */
+    /// Generate keys for given entries.
+    ///
+    /// @param entries entries to generate keys for
     private void generateKeys(List<BibEntry> entries) {
         if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
             return;
@@ -391,7 +391,11 @@ public class ImportHandler {
         entries.forEach(keyGenerator::generateAndSetKey);
     }
 
-    public List<BibEntry> handleBibTeXData(String entries) {
+    public @NonNull List<@NonNull BibEntry> handleBibTeXData(@NonNull String entries) {
+        if (!entries.contains("@")) {
+            LOGGER.debug("Seems not to be BibTeX data: {}", entries);
+            return List.of();
+        }
         BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
         try {
             List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
@@ -399,7 +403,8 @@ public class ImportHandler {
             importStringConstantsWithDuplicateCheck(stringConstants);
             return result;
         } catch (ParseException ex) {
-            LOGGER.error("Could not paste", ex);
+            LOGGER.info("Data could not be interpreted as Bib(La)TeX", ex);
+            dialogService.notify(Localization.lang("Failed to parse Bib(La)TeX: %0", ex.getLocalizedMessage()));
             return List.of();
         }
     }
@@ -431,7 +436,7 @@ public class ImportHandler {
         LOGGER.trace("Checking if URL is a PDF: {}", data);
 
         if (URLUtil.isURL(data)) {
-            String fileName = data.substring(data.lastIndexOf('/') + 1);
+            String fileName = FileUtil.getFileNameFromUrl(data).orElse(FILENAME_FALLBACK);
             if (FileUtil.isPDFFile(Path.of(fileName))) {
                 try {
                     return handlePdfUrl(data);
@@ -498,7 +503,7 @@ public class ImportHandler {
             return List.of();
         }
         URLDownload urlDownload = new URLDownload(pdfUrl);
-        String filename = URLUtil.getFileNameFromUrl(pdfUrl);
+        String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse(FILENAME_FALLBACK);
         Path targetFile = targetDirectory.get().resolve(filename);
         try {
             urlDownload.toFile(targetFile);
@@ -533,14 +538,17 @@ public class ImportHandler {
 
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
-            // Only one SmartGroup
+            String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+            // We cannot add the new group here directly because we don't have access to the group node viewmoel stuff here
+            // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
                                                             .stream()
-                                                            .filter(node -> node.getGroup() instanceof SmartGroup)
+                                                            .filter(node -> node.getGroup() instanceof ExplicitGroup
+                                                                    && node.getGroup().getName().equals(groupName))
                                                             .findFirst())
-                                         .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entriesToInsert));
+                                         .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
     }
 }

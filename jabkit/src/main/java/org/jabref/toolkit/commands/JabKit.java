@@ -40,17 +40,18 @@ import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 
-@Command(name = "jabkit",
+@Command(
+        name = "jabkit",
         mixinStandardHelpOptions = true,
         // sorted alphabetically
         subcommands = {
                 CheckConsistency.class,
                 CheckIntegrity.class,
+                CitationKeys.class,
                 Convert.class,
                 DoiToBibtex.class,
                 Fetch.class,
                 GenerateBibFromAux.class,
-                GenerateCitationKeys.class,
                 GetCitedWorks.class,
                 GetCitingWorks.class,
                 Pdf.class,
@@ -84,9 +85,7 @@ public class JabKit implements Runnable {
         System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
     }
 
-    /**
-     * Reads URIs as input
-     */
+    /// Reads URIs as input
     protected static Optional<ParserResult> importFile(String importArguments,
                                                        String importFormat,
                                                        CliPreferences cliPreferences,
@@ -257,7 +256,7 @@ public class JabKit implements Runnable {
         @Option(names = {"-p", "--porcelain"}, description = "Enable script-friendly output")
         boolean porcelain;
 
-        @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
+        @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message")
         private boolean usageHelpRequested = true;
     }
 }

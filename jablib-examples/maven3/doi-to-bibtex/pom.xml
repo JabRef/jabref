@@ -50,7 +50,7 @@
     <dependency>
       <groupId>com.ibm.icu</groupId>
       <artifactId>icu4j</artifactId>
-      <version>78.1</version>
+      <version>78.2</version>
     </dependency>
 
     <dependency>
@@ -75,7 +75,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>3.4.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
