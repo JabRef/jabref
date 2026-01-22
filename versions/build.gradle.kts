@@ -58,7 +58,6 @@ dependencies.constraints {
     api("org.openjfx:javafx-graphics:${javafx}")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
-    // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
     api("cc.jilt:jilt:1.9")

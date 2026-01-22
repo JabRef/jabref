@@ -25,6 +25,7 @@ dependencies {
 
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
+    implementation("org.openjfx:jdk-jsobject") // See https://bugs.openjdk.org/browse/JDK-8342623
 
     implementation("com.pixelduke:fxthemes")
 
@@ -217,9 +218,6 @@ if (project.findProperty("eaJdkBuild")?.toString() == "true") {
 
         // Note that ".from" adds to the path and does not replace (https://docs.gradle.org/current/javadoc/org/gradle/api/file/ConfigurableFileCollection.html#from(java.lang.Object...))
         tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach { modulePath.from("/tmp/javafx-jmods-26") }
-    }
-    tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach {
-        addModules.addAll("jdk.jsobject")
     }
 } else {
     logger.lifecycle("eaJdkBuild not set to true → skipping EA JDK build")

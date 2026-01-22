@@ -477,10 +477,16 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
+
     module("org.openjfx:javafx-base", "javafx.base") {
         patchRealModule()
         // jabgui requires at least "javafx.collections"
         exportAllPackages()
+    }
+
+    module("org.openjfx:jdk-jsobject", "jdk.jsobject") {
+        exportAllPackages()
+        overrideModuleName()
     }
 
     // required for testing of jablib
