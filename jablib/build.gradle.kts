@@ -252,7 +252,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
@@ -266,7 +266,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateJournalListMV)
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
 
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
     val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
@@ -281,7 +281,7 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateCitationStyleCatalog)
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath + '"'
 
     inputs.file(layout.buildDirectory.file("../src/main/resources/ltwa/ltwa_20210702.csv"))
     val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv")
