@@ -134,15 +134,6 @@
     <!-- added by JabRef -->
     <DirectoryRef Id="TARGETDIR">
       <Component Id="RegistryJabRefBrowserEntries" Guid="b6bc55ad-905c-4258-89b1-8b37abbe559c" Win64="yes">
-        <RegistryKey Root="HKMU" Key="SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
-          <RegistryValue Type="string" Value="[INSTALLDIR]jabref-firefox.json"/>
-        </RegistryKey>
-        <RegistryKey Root="HKMU" Key="Software\Google\Chrome\NativeMessagingHosts\org.jabref.jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
-          <RegistryValue Type="string" Value="[INSTALLDIR]jabref-chrome.json"/>
-        </RegistryKey>
-        <RegistryKey Root="HKMU" Key="Software\Microsoft\Edge\NativeMessagingHosts\org.jabref.jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
-          <RegistryValue Type="string" Value="[INSTALLDIR]jabref-chrome.json"/>
-        </RegistryKey>
         <RegistryKey Root="HKMU" Key="Software\Google\Chrome\Extensions\bifehkofibaamoeaopjglfkddgkijdlh" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
           <RegistryValue Type="string" Name="update_url" Value="https://clients2.google.com/service/update2/crx" />
         </RegistryKey>
