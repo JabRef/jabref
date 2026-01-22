@@ -7,9 +7,7 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Replaces any tab with a space
- */
+/// Replaces any tab with a space
 public class ReplaceTabsBySpaceFormater extends Formatter {
 
     private static final Pattern TAB = Pattern.compile("\t+");

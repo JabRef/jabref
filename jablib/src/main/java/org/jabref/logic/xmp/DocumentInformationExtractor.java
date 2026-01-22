@@ -17,9 +17,7 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-/**
- * Related class: {@link org.jabref.logic.xmp.DublinCoreExtractor}
- */
+/// Related class: {@link org.jabref.logic.xmp.DublinCoreExtractor}
 public class DocumentInformationExtractor {
 
     private static final Map<COSName, Field> FIELD_MAPPING = Map.ofEntries(
@@ -80,18 +78,16 @@ public class DocumentInformationExtractor {
         }
     }
 
-    /**
-     * Function for retrieving a BibEntry from the
-     * PDDocumentInformation in a PDF file.
-     * <p>
-     * To understand how to get hold of a PDDocumentInformation have a look in
-     * the test cases for XMPUtilTest.
-     * <p>
-     * The BibEntry is build by mapping individual fields in the document
-     * information (like author, title, keywords) to fields in a bibtex entry.
-     *
-     * @return The bibtex entry found in the document information.
-     */
+    /// Function for retrieving a BibEntry from the
+    /// PDDocumentInformation in a PDF file.
+    ///
+    /// To understand how to get hold of a PDDocumentInformation have a look in
+    /// the test cases for XMPUtilTest.
+    ///
+    /// The BibEntry is build by mapping individual fields in the document
+    /// information (like author, title, keywords) to fields in a bibtex entry.
+    ///
+    /// @return The bibtex entry found in the document information.
     public Optional<BibEntry> extractBibtexEntry() {
         this.extractAuthor();
         this.extractOtherFields();

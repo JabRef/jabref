@@ -24,14 +24,12 @@ public sealed abstract class DatabaseChangeDetailsView extends AnchorPane permit
         BibTexStringRenameDetailsView,
         EntryChangeDetailsView {
 
-    /**
-     * Set left, top, right, bottom anchors based on common offset parameter for the given child
-     * and attach it to children.
-     *
-     * @param child the child node of the implementation
-     * @see AnchorPane#getChildren()
-     * @see javafx.collections.ObservableList#setAll(Object[])
-     */
+    /// Set left, top, right, bottom anchors based on common offset parameter for the given child
+    /// and attach it to children.
+    ///
+    /// @param child the child node of the implementation
+    /// @see AnchorPane#getChildren()
+    /// @see javafx.collections.ObservableList#setAll(Object[])
     protected void setAllAnchorsAndAttachChild(Node child) {
         double ANCHOR_PANE_OFFSET = 8D;
         setLeftAnchor(child, ANCHOR_PANE_OFFSET);

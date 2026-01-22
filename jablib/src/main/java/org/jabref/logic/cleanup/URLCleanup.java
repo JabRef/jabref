@@ -12,9 +12,7 @@ import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * Checks whether URL exists in note field, and stores it under url field.
- */
+/// Checks whether URL exists in note field, and stores it under url field.
 public class URLCleanup implements CleanupJob {
 
     /*

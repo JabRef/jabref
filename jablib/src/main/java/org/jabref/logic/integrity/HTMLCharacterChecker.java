@@ -7,9 +7,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldProperty;
 
-/**
- * Checks, if there are any HTML encoded characters in non-verbatim fields.
- */
+/// Checks, if there are any HTML encoded characters in non-verbatim fields.
 public class HTMLCharacterChecker implements EntryChecker {
     // Detect any HTML encoded character
     private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
