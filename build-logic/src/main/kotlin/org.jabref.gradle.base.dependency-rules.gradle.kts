@@ -546,6 +546,10 @@ extraJavaModuleInfo {
         requiresTransitive("javafx.base");
         requiresTransitive("javafx.controls");
         requiresTransitive("javafx.graphics");
+
+        // Required by WebEngine
+        requiresTransitive("javafx.media");
+
         // NO requires to jdk.jsobject
 
         exportAllPackages()
