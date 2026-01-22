@@ -54,6 +54,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
@@ -73,6 +74,8 @@ import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.logic.importer.fetcher.citation.CitationFetcherType.SEMANTIC_SCHOLAR;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
 
@@ -401,8 +404,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
                 getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
-                defaults.shouldEnableJournalPopup(),
-                defaults.getCitationFetcherType(),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
+                CitationFetcherType.SEMANTIC_SCHOLAR,
                 getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
@@ -411,7 +414,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     /// Get a Map of defined tab names to default tab fields.
     ///
-    /// @return A map of the currently defined tabs in the entry editor from scratch to cache
+    /// @return A map of the currently defined tabs in the entry editor
     private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);

@@ -141,6 +141,7 @@ public class EntryEditorPreferences {
         this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
         this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
         this.enablementStatus.set(preferences.shouldEnableJournalPopup());
+        this.citationFetcherType.set(preferences.getCitationFetcherType());
         this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
         this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
         this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
