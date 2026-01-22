@@ -23,13 +23,13 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.ReferImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
@@ -43,10 +43,8 @@ public class ImportFormatReader {
 
     public static final String BIBTEX_FORMAT = "BibTeX";
 
-    /**
-     * All import formats.
-     * Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
-     */
+    /// All import formats.
+    /// Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
     private final List<Importer> formats = new ArrayList<>();
 
     private final ImporterPreferences importerPreferences;
@@ -96,15 +94,13 @@ public class ImportFormatReader {
         formats.addAll(importerPreferences.getCustomImporters());
     }
 
-    /**
-     * Format for a given CLI-ID.
-     * <p>
-     * <p>Will return the first format according to the default-order of
-     * format that matches the given ID.</p>
-     *
-     * @param cliId CLI-Id
-     * @return Import Format or <code>null</code> if none matches
-     */
+    /// Format for a given CLI-ID.
+    ///
+    /// Will return the first format according to the default-order of
+    /// format that matches the given ID.
+    ///
+    /// @param cliId CLI-Id
+    /// @return Import Format or `null` if none matches
     private Optional<Importer> getByCliId(String cliId) {
         for (Importer format : formats) {
             if (format.getId().equals(cliId)) {
@@ -169,15 +165,13 @@ public class ImportFormatReader {
         }
     }
 
-    /**
-     * Tries to import entries by iterating through the available import filters,
-     * and keeping the import that seems the most promising
-     *
-     * @param importDatabase     the function to import the entries with a formatter
-     * @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
-     * @return an UnknownFormatImport with the imported entries and metadata
-     * @throws ImportException if the import fails (for example, if no suitable importer is found)
-     */
+    /// Tries to import entries by iterating through the available import filters,
+    /// and keeping the import that seems the most promising
+    ///
+    /// @param importDatabase     the function to import the entries with a formatter
+    /// @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
+    /// @return an UnknownFormatImport with the imported entries and metadata
+    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     private UnknownFormatImport importUnknownFormat(CheckedFunction<Importer, ParserResult> importDatabase, CheckedFunction<Importer, Boolean> isRecognizedFormat) throws ImportException {
         // stores ref to best result, gets updated at the next loop
         List<BibEntry> bestResult = null;
@@ -223,14 +217,12 @@ public class ImportFormatReader {
         R apply(T t) throws IOException;
     }
 
-    /**
-     * Tries to import a String by iterating through the available import filters,
-     * and keeping the import that seems the most promising
-     *
-     * @param data the string to import
-     * @return an UnknownFormatImport with the imported entries and metadata
-     * @throws ImportException if the import fails (for example, if no suitable importer is found)
-     */
+    /// Tries to import a String by iterating through the available import filters,
+    /// and keeping the import that seems the most promising
+    ///
+    /// @param data the string to import
+    /// @return an UnknownFormatImport with the imported entries and metadata
+    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     public UnknownFormatImport importUnknownFormat(@NonNull String data) throws ImportException {
         return importUnknownFormat(importer -> importer.importDatabase(data), importer -> importer.isRecognizedFormat(data));
     }

@@ -17,10 +17,8 @@ import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
- * Globals.focusListener, and we call the action stored under the relevant name in its action map.
- */
+/// Class for handling general actions; cut, copy and paste. The focused component is kept track of by
+/// Globals.focusListener, and we call the action stored under the relevant name in its action map.
 public class EditAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
@@ -30,7 +28,8 @@ public class EditAction extends SimpleCommand {
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager, UndoManager undoManager) {
+    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager,
+                      UndoManager undoManager) {
         this.action = action;
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;

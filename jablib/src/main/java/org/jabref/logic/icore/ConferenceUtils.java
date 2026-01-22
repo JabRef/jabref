@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NonNull;
 
-public class ConferenceUtils {
+public final class ConferenceUtils {
     // Regex that'll extract the string within the first deepest set of parentheses
     // A slight modification of: https://stackoverflow.com/a/17759264
     private static final Pattern PARENTHESES_PATTERN = Pattern.compile("\\(([^()]*)\\)");
@@ -32,32 +32,33 @@ public class ConferenceUtils {
     private static final int MAX_CANDIDATES_THRESHOLD = 50;
     private static final int DELIMITER_START = -1;
 
-    /**
-     * Attempts to extract the string enclosed in the first deepest set of parentheses from the given input string.
-     * <p>
-     * This method uses a regular expression {@code \(([^()]*)\)} to find the innermost parenthesized substring.
-     * Only the <strong>first match</strong> is considered; any additional matching substrings in the input are ignored.
-     * </p>
-     *
-     * <p>
-     * If a match is found, leading and trailing whitespace around the string is stripped. If the resulting string is not
-     * empty, it is returned wrapped in an {@code Optional}. Otherwise, an empty {@code Optional} is returned.
-     * </p>
-     *
-     * <p>Examples:</p>
-     * <ul>
-     *   <li>{@code "(SERA)"} -> {@code Optional.of("SERA")}</li>
-     *   <li>{@code "Conference ( ABC )"} -> {@code Optional.of("ABC")}</li>
-     *   <li>{@code "This (SERA) has multiple (CONF) acronyms"} -> {@code Optional.of("SERA")}</li>
-     *   <li>{@code "Input with empty () parentheses"} -> {@code Optional.empty()}</li>
-     *   <li>{@code "Input with empty (        ) whitespace in parens"} -> {@code Optional.empty()}</li>
-     *   <li>{@code ""} -> {@code Optional.empty()}</li>
-     * </ul>
-     *
-     * @param input the string to search, must not be {@code null}
-     * @return an {@code Optional} containing the extracted and trimmed string from the first set of parentheses,
-     * or {@code Optional.empty()} if no string is found
-     */
+    private ConferenceUtils() {
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
+    }
+
+    /// Attempts to extract the string enclosed in the first deepest set of parentheses from the given input string.
+    ///
+    /// This method uses a regular expression `\(([^()]*)\)` to find the innermost parenthesized substring.
+    /// Only the **first match** is considered; any additional matching substrings in the input are ignored.
+    ///
+    ///
+    ///
+    /// If a match is found, leading and trailing whitespace around the string is stripped. If the resulting string is not
+    /// empty, it is returned wrapped in an `Optional`. Otherwise, an empty `Optional` is returned.
+    ///
+    ///
+    /// Examples:
+    ///
+    /// - `"(SERA)"` -> `Optional.of("SERA")`
+    /// - `"Conference ( ABC )"` -> `Optional.of("ABC")`
+    /// - `"This (SERA) has multiple (CONF) acronyms"` -> `Optional.of("SERA")`
+    /// - `"Input with empty () parentheses"` -> `Optional.empty()`
+    /// - `"Input with empty (        ) whitespace in parens"` -> `Optional.empty()`
+    /// - `""` -> `Optional.empty()`
+    ///
+    /// @param input the string to search, must not be `null`
+    /// @return an `Optional` containing the extracted and trimmed string from the first set of parentheses,
+    /// or `Optional.empty()` if no string is found
     public static Optional<String> extractStringFromParentheses(@NonNull String input) {
         if (input.indexOf('(') < 0) {
             return Optional.empty();
@@ -75,28 +76,25 @@ public class ConferenceUtils {
         return Optional.empty();
     }
 
-    /**
-     * Generates possible acronym candidates from the given input string by splitting on common delimiters and extracting
-     * substrings within the specified cutoff length.
-     * <p>
-     * Candidates are ordered in a {@link TreeSet} such that longer strings are positioned before shorter ones, with
-     * lexicographical ordering used to break ties. This prevents overfitting on composite acronyms during lookup (like
-     * between {@code IEEE-IV} and {@code IV}) by pushing the shorter substrings to the end.
-     * A maximum of 50 candidates are generated to avoid excessive expansion.
-     * The splitting delimiters are {@code whitespace}, {@code ,}, {@code '}, {@code _}, {@code :}, {@code .}, and {@code -}.
-     * Delimiters between acronyms are kept, if the cutoff length allows.
-     * </p>
-     * <p>
-     * For example, given the input string {@code "IEEE-IV'2022"} and a cutoff of {@code 11}, this method generates the
-     * following candidates in order: {@code "IEEE-IV", "IV'2022", "2022", "IEEE", "IV"}. Notice that {@code "IEEE-IV"}
-     * is positioned ahead and retains the {@code -} in between.
-     * </p>
-     *
-     * @param input  the raw string to extract acronym candidates from, must not be {@code null}
-     * @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
-     * @return a set of acronym candidates ordered by descending length and then lexicographically,
-     * or an empty set if no valid candidates are found
-     */
+    /// Generates possible acronym candidates from the given input string by splitting on common delimiters and extracting
+    /// substrings within the specified cutoff length.
+    ///
+    /// Candidates are ordered in a {@link TreeSet} such that longer strings are positioned before shorter ones, with
+    /// lexicographical ordering used to break ties. This prevents overfitting on composite acronyms during lookup (like
+    /// between `IEEE-IV` and `IV`) by pushing the shorter substrings to the end.
+    /// A maximum of 50 candidates are generated to avoid excessive expansion.
+    /// The splitting delimiters are `whitespace`, `,`, `'`, `_`, `:`, `.`, and `-`.
+    /// Delimiters between acronyms are kept, if the cutoff length allows.
+    ///
+    ///
+    /// For example, given the input string `"IEEE-IV'2022"` and a cutoff of `11`, this method generates the
+    /// following candidates in order: `"IEEE-IV", "IV'2022", "2022", "IEEE", "IV"`. Notice that `"IEEE-IV"`
+    /// is positioned ahead and retains the `-` in between.
+    ///
+    /// @param input  the raw string to extract acronym candidates from, must not be `null`
+    /// @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
+    /// @return a set of acronym candidates ordered by descending length and then lexicographically,
+    /// or an empty set if no valid candidates are found
     public static Set<String> generateAcronymCandidates(@NonNull String input, int cutoff) {
         if (input.isEmpty() || cutoff <= 0) {
             return Set.of();
@@ -161,33 +159,30 @@ public class ConferenceUtils {
                 c == ':' || c == '.' || c == '-';
     }
 
-    /**
-     * Normalizes a raw conference title query string into a simplified form suitable for fuzzy matching.
-     * <p>
-     * The normalization process performs the following steps:
-     * </p>
-     * <ol>
-     *     <li>Removes all substrings enclosed in parentheses, e.g., {@code "proceedings (ICSE 2022)"} -> {@code "Proceedings"}.</li>
-     *     <li>Removes all years of form {@code 19XX} or {@code 20xx} (e.g., {@code 1999}, {@code 2022}) and ordinals in
-     *         regular form (e.g., {@code 1st}, {@code 2nd}, {@code 3rd}) as well as in LaTeX syntax (e.g.,
-     *         {@code 3\textsuperscript{rd}} or {@code 17\textsuperscript{th}}).</li>
-     *     <li>Splits the input into alphanumeric tokens, discarding stopwords found in the {@code TITLE_STOPWORDS} set
-     *          (which includes months, or other common stopwords like {@code proceedings}, {@code papers}, etc.)</li>
-     *     <li>Concatenates the remaining tokens into a normalized string without delimiters.</li>
-     *     <li>Removes leading false-start tokens like {@code "ofthe"}, {@code "of"}, or {@code "the"}.</li>
-     * </ol>
-     * <p>
-     * Note that the input is expected to already be lowercased before calling this method.
-     * </p>
-     * <p>
-     * An example:
-     * {@code "proceedings of the 3rd international conference on machine learning (icml 2018)"} ->
-     * {@code "internationalconferenceonmachinelearning"}
-     * </p>
-     *
-     * @param input the pre-lowercased raw string to normalize, must not be {@code null}
-     * @return a normalized string representation of the input
-     */
+    /// Normalizes a raw conference title query string into a simplified form suitable for fuzzy matching.
+    ///
+    /// The normalization process performs the following steps:
+    ///
+    /// <ol>
+    /// - Removes all substrings enclosed in parentheses, e.g., `"proceedings (ICSE 2022)"` -> `"Proceedings"`.
+    /// - Removes all years of form `19XX` or `20xx` (e.g., `1999`, `2022`) and ordinals in
+    /// regular form (e.g., `1st`, `2nd`, `3rd`) as well as in LaTeX syntax (e.g.,
+    /// `3\textsuperscript{rd`} or `17\textsuperscript{th`}).
+    /// - Splits the input into alphanumeric tokens, discarding stopwords found in the `TITLE_STOPWORDS` set
+    /// (which includes months, or other common stopwords like `proceedings`, `papers`, etc.)
+    /// - Concatenates the remaining tokens into a normalized string without delimiters.
+    /// - Removes leading false-start tokens like `"ofthe"`, `"of"`, or `"the"`.
+    /// </ol>
+    ///
+    /// Note that the input is expected to already be lowercased before calling this method.
+    ///
+    ///
+    /// An example:
+    /// `"proceedings of the 3rd international conference on machine learning (icml 2018)"` ->
+    /// `"internationalconferenceonmachinelearning"`
+    ///
+    /// @param input the pre-lowercased raw string to normalize, must not be `null`
+    /// @return a normalized string representation of the input
     public static String normalize(@NonNull String input) {
         StringBuilder normalized = new StringBuilder();
         StringBuilder currentToken = new StringBuilder();

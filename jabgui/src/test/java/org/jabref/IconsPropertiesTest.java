@@ -30,7 +30,7 @@ class IconsPropertiesTest {
         try (Reader reader = Files.newBufferedReader(Path.of(iconsPropertiesPath))) {
             properties.load(reader);
         }
-        assertFalse(properties.entrySet().isEmpty(), "There must be loaded properties after loading " + iconsPropertiesPath);
+        assertFalse(properties.isEmpty(), "There must be loaded properties after loading " + iconsPropertiesPath);
 
         // check that each key references an existing file
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {

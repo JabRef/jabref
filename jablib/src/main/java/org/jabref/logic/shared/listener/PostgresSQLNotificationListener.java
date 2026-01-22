@@ -10,9 +10,7 @@ import org.postgresql.PGNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A listener for PostgreSQL database notifications.
- */
+/// A listener for PostgreSQL database notifications.
 public class PostgresSQLNotificationListener implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresSQLNotificationListener.class);

@@ -1,9 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.help.HelpFile;
@@ -13,31 +13,26 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.BaseQueryNode;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Implements "search-pre configured"
 public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
-    public static final String FETCHER_NAME = "Search pre-configured";
+    public static final String FETCHER_NAME = "Search pre-selected";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
-    private final Set<SearchBasedFetcher> fetchers;
+    private final Set<SearchBasedFetcher> searchBasedFetchers;
+    private final ImporterPreferences importerPreferences;
     private final int maximumNumberOfReturnedResults;
 
-    public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers, ImporterPreferences importerPreferences, int maximumNumberOfReturnedResults)
-            throws IllegalArgumentException {
-        if (searchBasedFetchers == null) {
-            throw new IllegalArgumentException("The set of searchBasedFetchers must not be null!");
-        }
-
-        fetchers = searchBasedFetchers.stream()
-                                      // Remove the Composite Fetcher instance from its own fetcher set to prevent a StackOverflow
-                                      .filter(searchBasedFetcher -> searchBasedFetcher != this)
-                                      // Remove any unselected Fetcher instance
-                                      .filter(searchBasedFetcher -> importerPreferences.getCatalogs().stream()
-                                                                                       .anyMatch(name -> name.equals(searchBasedFetcher.getName())))
-                                      .collect(Collectors.toSet());
+    /// @param searchBasedFetchers all available search-based fetchers
+    @NullMarked
+    public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers, ImporterPreferences importerPreferences, int maximumNumberOfReturnedResults) {
+        this.searchBasedFetchers = Set.copyOf(searchBasedFetchers);
+        this.importerPreferences = importerPreferences;
         this.maximumNumberOfReturnedResults = maximumNumberOfReturnedResults;
     }
 
@@ -53,17 +48,23 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BaseQueryNode queryList) throws FetcherException {
-        // All entries have to be converted into one format, this is necessary for the format conversion
-        return fetchers.parallelStream()
-                       .flatMap(searchBasedFetcher -> {
-                           try {
-                               return searchBasedFetcher.performSearch(queryList).stream();
-                           } catch (FetcherException e) {
-                               LOGGER.warn("{} API request failed", searchBasedFetcher.getName(), e);
-                               return Stream.empty();
-                           }
-                       })
-                       .limit(maximumNumberOfReturnedResults)
-                       .toList();
+        Collection<String> catalogs = importerPreferences.getCatalogs();
+        return searchBasedFetchers.parallelStream()
+                                  // Removal the Composite Fetcher instance from its own fetcher set is not required any more as the constructor stores a copy of the set.
+                                  // .filter(searchBasedFetcher -> searchBasedFetcher != this)
+                                  // Remove any unselected Fetcher instance
+                                  .filter(searchBasedFetcher -> catalogs.stream()
+                                                                        .anyMatch(name -> name.equals(searchBasedFetcher.getName())))
+                                  .flatMap(searchBasedFetcher -> {
+                                      try {
+                                          // All entries have to be converted before into one format, this is necessary for the format conversion
+                                          return searchBasedFetcher.performSearch(queryList).stream();
+                                      } catch (FetcherException e) {
+                                          LOGGER.warn("{} API request failed", searchBasedFetcher.getName(), e);
+                                          return Stream.empty();
+                                      }
+                                  })
+                                  .limit(maximumNumberOfReturnedResults)
+                                  .toList();
     }
 }

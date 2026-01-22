@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.ConvertMSCCodesFormatter;
@@ -29,6 +28,7 @@ import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
+import org.jabref.logic.formatter.bibtexfields.TransliterateFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.CamelFormatter;
@@ -66,7 +66,8 @@ public class Formatters {
                 new HtmlToUnicodeFormatter(),
                 new LatexToUnicodeFormatter(),
                 new UnicodeToLatexFormatter(),
-                new ConvertMSCCodesFormatter()
+                new ConvertMSCCodesFormatter(),
+                new TransliterateFormatter()
         );
     }
 

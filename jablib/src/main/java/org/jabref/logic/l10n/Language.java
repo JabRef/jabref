@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Contains all supported languages.
- */
+/// Contains all supported languages.
 public enum Language {
     ARABIC("العربية (Arabic)", "ar"),
     BAHASA_INDONESIA("Bahasa Indonesia", "id"),
@@ -31,7 +30,7 @@ public enum Language {
     POLISH("Polish", "pl"),
     PORTUGUESE("Português", "pt"),
     RUSSIAN("Russian", "ru"),
-    SIMPLIFIED_CHINESE("Chinese (Simplified)", "zh_CN"),
+    SIMPLIFIED_CHINESE("简体中文 (Chinese Simplified)", "zh_CN"),
     SPANISH("Español", "es"),
     SWEDISH("Svenska", "sv"),
     TAGALOG("Tagalog/Filipino", "tl"),
@@ -44,9 +43,7 @@ public enum Language {
     private final String displayName;
     private final String id;
 
-    /**
-     * @param id Typically as 639-1 code
-     */
+    /// @param id Typically as 639-1 code
     Language(String displayName, String id) {
         this.displayName = displayName;
         this.id = id;
@@ -65,6 +62,13 @@ public enum Language {
         }
 
         return Optional.of(locale);
+    }
+
+    public static Language getLanguageFor(String languageString) {
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(languageString))
+                     .findFirst()
+                     .orElse(Language.ENGLISH);
     }
 
     public String getDisplayName() {

@@ -21,6 +21,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 
@@ -106,7 +107,8 @@ public class FrameDndHandler {
             if (hasEntries(dragboard)) {
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
-                destinationLibraryTab.dropEntry(entryCopies);
+                BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
+                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies);
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
             }
@@ -213,7 +215,7 @@ public class FrameDndHandler {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.addSubgroup(groupTreeNodeToCopy.copyNode().getGroup());
         // add all entries of a groupTreeNode to the new library.
-        destinationLibraryTab.dropEntry(groupTreeNodeToCopy.getEntriesInGroup(allEntries));
+        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries));
         // List of all children of groupTreeNodeToCopy
         List<GroupTreeNode> children = groupTreeNodeToCopy.getChildren();
 

@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -207,11 +207,9 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
-    /**
-     * This method will copy each selected entry's citation key as a hyperlink to its url to the clipboard. In case an
-     * entry doesn't have a citation key it will not be copied. In case an entry doesn't have an url this will only copy
-     * the citation key.
-     */
+    /// This method will copy each selected entry's citation key as a hyperlink to its url to the clipboard. In case an
+    /// entry doesn't have a citation key it will not be copied. In case an entry doesn't have an url this will only copy
+    /// the citation key.
     private void copyKeyAndLink() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 

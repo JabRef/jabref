@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
@@ -21,6 +21,7 @@ import org.jspecify.annotations.NonNull;
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
+
     private Runnable additionalPasteActionHandler = () -> {
         // No additional paste behavior
     };

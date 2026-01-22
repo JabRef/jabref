@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
@@ -81,6 +82,10 @@ class CitationsRelationsTabViewModelTest {
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
         bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(bibDatabaseContext));
+
+        LibraryPreferences libraryPreferences = mock(LibraryPreferences.class);
+        when(libraryPreferences.isAddImportedEntriesEnabled()).thenReturn(false);
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
 
         viewModel = new CitationsRelationsTabViewModel(
                 preferences,

@@ -1,6 +1,7 @@
 package org.jabref.model.entry.identifier;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -30,8 +31,8 @@ class RFCTest {
     }
 
     @Test
-    void getExternalUri() {
+    void getExternalUri() throws URISyntaxException {
         RFC rfc = new RFC("rfc7276");
-        assertEquals(Optional.of(URI.create("https://www.rfc-editor.org/rfc/rfc7276")), rfc.getExternalURI());
+        assertEquals(Optional.of(new URI("https://www.rfc-editor.org/rfc/rfc7276")), rfc.getExternalURI());
     }
 }

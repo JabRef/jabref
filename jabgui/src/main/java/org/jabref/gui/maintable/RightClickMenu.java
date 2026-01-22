@@ -7,13 +7,13 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
@@ -99,7 +99,8 @@ public class RightClickMenu {
                 extractFileReferencesOffline,
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),
+
+                createSearchSubMenu(factory, dialogService, stateManager, preferences),
 
                 new SeparatorMenuItem(),
 
@@ -152,7 +153,7 @@ public class RightClickMenu {
                     factory.createCustomMenuItem(
                             StandardActions.COPY_TO,
                             new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
-                                    importHandler, sourceDatabaseContext, targetDatabaseContext),
+                                    preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext),
                             targetDatabaseName
                     )
             );
@@ -236,5 +237,18 @@ public class RightClickMenu {
         );
 
         return sendMenu;
+    }
+
+    private static Menu createSearchSubMenu(ActionFactory factory,
+                                            DialogService dialogService,
+                                            StateManager stateManager,
+                                            GuiPreferences preferences) {
+        Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
+        searchMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.SEARCH_SEMANTIC_SCHOLAR, new SearchSemanticScholarAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences))
+        );
+        return searchMenu;
     }
 }

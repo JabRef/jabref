@@ -5,7 +5,6 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -14,11 +13,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
@@ -27,6 +26,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.SearchableComboBox;
 
 public class WebSearchPaneView extends VBox {
 
@@ -57,9 +57,7 @@ public class WebSearchPaneView extends VBox {
         this.disableProperty().bind(searchDisabledProperty());
     }
 
-    /**
-     * Allows triggering search on pressing enter
-     */
+    /// Allows triggering search on pressing enter
     private void enableEnterToTriggerSearch(TextField query) {
         query.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -81,11 +79,9 @@ public class WebSearchPaneView extends VBox {
                 });
     }
 
-    /**
-     * Create combo box for selecting fetcher
-     */
-    private ComboBox<SearchBasedFetcher> createFetcherComboBox() {
-        ComboBox<SearchBasedFetcher> fetchers = new ComboBox<>();
+    /// Create combo box for selecting fetcher
+    private SearchableComboBox<SearchBasedFetcher> createFetcherComboBox() {
+        SearchableComboBox<SearchBasedFetcher> fetchers = new SearchableComboBox<>();
         new ViewModelListCellFactory<SearchBasedFetcher>()
                 .withText(SearchBasedFetcher::getName)
                 .install(fetchers);
@@ -96,9 +92,7 @@ public class WebSearchPaneView extends VBox {
         return fetchers;
     }
 
-    /**
-     * Create text field for search query
-     */
+    /// Create text field for search query
     private TextField createQueryField() {
         TextField query = SearchTextField.create(preferences.getKeyBindingRepository());
         viewModel.queryProperty().bind(query.textProperty());
@@ -108,9 +102,7 @@ public class WebSearchPaneView extends VBox {
         return query;
     }
 
-    /**
-     * Create button that triggers search
-     */
+    /// Create button that triggers search
     private Button createSearchButton() {
         BooleanExpression importerEnabled = preferences.getImporterPreferences().importerEnabledProperty();
         Button search = new Button(Localization.lang("Search"));
@@ -121,9 +113,7 @@ public class WebSearchPaneView extends VBox {
         return search;
     }
 
-    /**
-     * Creatse help button for currently selected fetcher
-     */
+    /// Creatse help button for currently selected fetcher
     private StackPane createHelpButtonContainer() {
         StackPane helpButtonContainer = new StackPane();
         ActionFactory factory = new ActionFactory();
@@ -138,9 +128,7 @@ public class WebSearchPaneView extends VBox {
         return helpButtonContainer;
     }
 
-    /**
-     * Creates an observable boolean value that is true if no database is open
-     */
+    /// Creates an observable boolean value that is true if no database is open
     private ObservableBooleanValue searchDisabledProperty() {
         return Bindings.createBooleanBinding(
                 () -> stateManager.getOpenDatabases().isEmpty(),

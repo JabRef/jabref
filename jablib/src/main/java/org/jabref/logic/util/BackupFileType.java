@@ -2,6 +2,9 @@ package org.jabref.logic.util;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum BackupFileType implements FileType {
 
     // Used at BackupManager
@@ -11,12 +14,13 @@ public enum BackupFileType implements FileType {
     // Used for copying the .bib away before overwriting on save.
     SAVE("AutoSaveFile", "sav");
 
-    private final List<String> extensions;
     private final String name;
 
+    private final List<String> extensions;
+
     BackupFileType(String name, String extension) {
-        this.extensions = List.of(extension);
         this.name = name;
+        this.extensions = List.of(extension);
     }
 
     @Override

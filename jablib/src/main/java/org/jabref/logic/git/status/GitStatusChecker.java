@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.io.GitRevisionLocator;
+import org.jabref.logic.git.preferences.GitPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -18,11 +19,9 @@ import org.eclipse.jgit.lib.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is used to determine the status of a Git repository from any given path inside it.
- * If no repository is found, it returns a {@link GitStatusSnapshot} with tracking = false.
- * Otherwise, it returns a full snapshot including tracking status, sync status, and conflict state.
- */
+/// This class is used to determine the status of a Git repository from any given path inside it.
+/// If no repository is found, it returns a {@link GitStatusSnapshot} with tracking = false.
+/// Otherwise, it returns a full snapshot including tracking status, sync status, and conflict state.
 public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
 
@@ -71,8 +70,8 @@ public class GitStatusChecker {
         }
     }
 
-    public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
-        return GitHandler.fromAnyPath(anyPathInsideRepo)
+    public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo, GitPreferences gitPreferences) {
+        return GitHandler.fromAnyPath(anyPathInsideRepo, gitPreferences)
                          .map(GitStatusChecker::checkStatus)
                          .orElse(new GitStatusSnapshot(
                                  !GitStatusSnapshot.TRACKING,

@@ -22,11 +22,9 @@ import org.jabref.model.entry.LinkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This task generates embeddings for several {@link LinkedFile} (typically used for groups).
- * It will check if embeddings were already generated.
- * And it also will store the embeddings.
- */
+/// This task generates embeddings for several {@link LinkedFile} (typically used for groups).
+/// It will check if embeddings were already generated.
+/// And it also will store the embeddings.
 public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsForSeveralTask.class);
 

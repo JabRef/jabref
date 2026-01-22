@@ -88,9 +88,7 @@ public class CommentsTab extends FieldsEditorTab {
         return comments;
     }
 
-    /**
-     * Comment editors: three times size of button
-     */
+    /// Comment editors: three times size of button
     private void setCompressedRowLayout() {
         int numberOfComments = gridPane.getRowCount() - 1;
         double totalWeight = numberOfComments * 3 + 1;
@@ -136,6 +134,7 @@ public class CommentsTab extends FieldsEditorTab {
             if (!entry.hasField(userSpecificCommentField)) {
                 if (shouldShowHideButton) {
                     Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user-specific comments field"));
+                    hideDefaultOwnerCommentButton.setId("HIDE_COMMENTS_BUTTON");
                     hideDefaultOwnerCommentButton.setOnAction(e -> {
                         gridPane.getChildren().removeIf(node ->
                                 (node instanceof FieldNameLabel fieldNameLabel && fieldNameLabel.getText().equals(userSpecificCommentField.getName()))
@@ -152,6 +151,7 @@ public class CommentsTab extends FieldsEditorTab {
                 } else {
                     // Show "Show" button when user comments field is hidden
                     Button showDefaultOwnerCommentButton = new Button(Localization.lang("Show user-specific comments field"));
+                    showDefaultOwnerCommentButton.setId("SHOW_COMMENTS_BUTTON");
                     showDefaultOwnerCommentButton.setOnAction(e -> {
                         shouldShowHideButton = true;
                         setupPanel(bibDatabaseContext, entry, false);

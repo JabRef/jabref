@@ -28,6 +28,7 @@ class MakeLabelWithoutDatabaseTest {
                 false,
                 false,
                 false,
+                false,
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",

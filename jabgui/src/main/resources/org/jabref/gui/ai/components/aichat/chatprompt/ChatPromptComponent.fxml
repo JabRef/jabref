@@ -18,4 +18,8 @@
             mnemonicParsing="false"
             onAction="#onSendMessage"
             text="%Submit"/>
+    <Button fx:id="regenerateButton"
+            mnemonicParsing="false"
+            onAction="#onRegenerateMessage"
+            text="%Regenerate"/>
 </fx:root>

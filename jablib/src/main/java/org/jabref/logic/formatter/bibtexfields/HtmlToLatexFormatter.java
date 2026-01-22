@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
@@ -13,9 +13,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * The inverse operation is "somehow" contained in {@link org.jabref.logic.openoffice.style.OOPreFormatter}
- */
+/// The inverse operation is "somehow" contained in {@link org.jabref.logic.openoffice.style.OOPreFormatter}
 public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);

@@ -12,21 +12,21 @@ import javafx.collections.ObservableSet;
 public class CleanupPreferences {
 
     private final ObservableSet<CleanupStep> activeJobs;
-    private final ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanups;
+    private final ObjectProperty<FieldFormatterCleanupActions> fieldFormatterCleanups;
 
     public CleanupPreferences(EnumSet<CleanupStep> activeJobs) {
-        this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()));
+        this(activeJobs, new FieldFormatterCleanupActions(false, new ArrayList<>()));
     }
 
     public CleanupPreferences(CleanupStep activeJob) {
         this(EnumSet.of(activeJob));
     }
 
-    public CleanupPreferences(FieldFormatterCleanups formatterCleanups) {
+    public CleanupPreferences(FieldFormatterCleanupActions formatterCleanups) {
         this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);
     }
 
-    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
+    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanupActions formatterCleanups) {
         this.activeJobs = FXCollections.observableSet(activeJobs);
         this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
     }
@@ -60,40 +60,32 @@ public class CleanupPreferences {
         return activeJobs.contains(step);
     }
 
-    public FieldFormatterCleanups getFieldFormatterCleanups() {
+    public FieldFormatterCleanupActions getFieldFormatterCleanups() {
         return fieldFormatterCleanups.get();
     }
 
-    public ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanupsProperty() {
+    public ObjectProperty<FieldFormatterCleanupActions> fieldFormatterCleanupsProperty() {
         return fieldFormatterCleanups;
     }
 
-    public void setFieldFormatterCleanups(FieldFormatterCleanups fieldFormatters) {
+    public void setFieldFormatterCleanups(FieldFormatterCleanupActions fieldFormatters) {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
     public enum CleanupStep {
-        /**
-         * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
-         */
+        /// Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
         CLEAN_UP_DOI,
         CLEANUP_EPRINT,
         CLEAN_UP_URL,
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
         RENAME_PDF_ONLY_RELATIVE_PATHS,
-        /**
-         * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
-         */
+        /// Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
         CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
         CLEAN_UP_DELETED_LINKED_FILES,
-        /**
-         * Converts to biblatex format
-         */
+        /// Converts to biblatex format
         CONVERT_TO_BIBLATEX,
-        /**
-         * Converts to bibtex format
-         */
+        /// Converts to bibtex format
         CONVERT_TO_BIBTEX,
         CONVERT_TIMESTAMP_TO_CREATIONDATE,
         CONVERT_TIMESTAMP_TO_MODIFICATIONDATE,

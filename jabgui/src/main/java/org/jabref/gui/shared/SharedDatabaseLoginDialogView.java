@@ -12,10 +12,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -32,10 +32,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
-/**
- * This offers the user to connect to a remove SQL database.
- * Moreover, it directly opens the shared database after successful connection.
- */
+/// This offers the user to connect to a remove SQL database.
+/// Moreover, it directly opens the shared database after successful connection.
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<DBMSType> databaseType;
     @FXML private TextField host;

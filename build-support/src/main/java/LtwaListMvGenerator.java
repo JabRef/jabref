@@ -1,15 +1,15 @@
 //JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//DEPS com.h2database:h2:2.2.224
+//DEPS com.h2database:h2:2.4.240
 //DEPS org.antlr:antlr4-runtime:4.13.2
-//DEPS org.apache.commons:commons-csv:1.14.0
+//DEPS org.apache.commons:commons-csv:1.14.1
 //DEPS info.debatty:java-string-similarity:2.0.0
-//DEPS org.jooq:jool:0.9.14
-//DEPS org.openjfx:javafx-base:24.0.1
+//DEPS org.jooq:jool:0.9.15
 //DEPS org.jspecify:jspecify:1.0.0
-//DEPS org.slf4j:slf4j-api:2.0.13
-//DEPS org.slf4j:slf4j-simple:2.0.13
+//DEPS org.openjfx:javafx-base:24.0.2
+//DEPS org.slf4j:slf4j-api:2.0.17
+//DEPS org.slf4j:slf4j-simple:2.0.17
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
@@ -48,9 +48,9 @@ public class LtwaListMvGenerator {
 
     static void main(String[] args) {
         try {
-            Path tempCsvFile = Path.of("jablib", "build", "tmp", "ltwa_20210702.csv");
-            if (!Files.exists(tempCsvFile)) {
-                LOGGER.error("LTWA CSV file not found at {}. Please execute gradle task downloadLtwaFile.", tempCsvFile);
+            Path csvFile = Path.of("jablib", "src", "main", "resources", "ltwa", "ltwa_20210702.csv");
+            if (!Files.exists(csvFile)) {
+                LOGGER.error("LTWA CSV file not found at {}. Please ensure that you checked out the submodules.", csvFile);
                 return;
             }
             Path outputDir = Path.of("jablib", "build", "generated", "resources", "journals");
@@ -58,7 +58,7 @@ public class LtwaListMvGenerator {
             Files.createDirectories(outputDir);
             Path outputFile = outputDir.resolve("ltwa-list.mv");
 
-            generateMvStore(tempCsvFile, outputFile);
+            generateMvStore(csvFile, outputFile);
 
             LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile.toAbsolutePath());
         } catch (IOException e) {
@@ -66,13 +66,11 @@ public class LtwaListMvGenerator {
         }
     }
 
-    /**
-     * Generates an MVStore file from the LTWA CSV file.
-     *
-     * @param inputFile  Path to the LTWA CSV file
-     * @param outputFile Path where the MVStore file will be written
-     * @throws IOException If an I/O error occurs
-     */
+    /// Generates an MVStore file from the LTWA CSV file.
+    ///
+    /// @param inputFile  Path to the LTWA CSV file
+    /// @param outputFile Path where the MVStore file will be written
+    /// @throws IOException If an I/O error occurs
     private static void generateMvStore(Path inputFile, Path outputFile) throws IOException {
         LOGGER.info("Parsing LTWA file...");
         LtwaTsvParser parser = new LtwaTsvParser(inputFile);

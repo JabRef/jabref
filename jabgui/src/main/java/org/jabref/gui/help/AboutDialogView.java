@@ -4,8 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
@@ -48,7 +48,6 @@ public class AboutDialogView extends BaseDialog<Void> {
         viewModel = new AboutDialogViewModel(dialogService, preferences, clipBoardManager, buildInfo);
 
         textAreaVersions.setText(viewModel.getVersionInfo());
-        this.setResizable(false);
     }
 
     @FXML

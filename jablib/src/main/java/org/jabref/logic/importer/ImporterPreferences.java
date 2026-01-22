@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class ImporterPreferences {
     private final ObservableList<String> catalogs;
     private final ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParser;
     private final IntegerProperty citationsRelationsStoreTTL;
+    private final Map<String, String> searchEngineUrlTemplates;
 
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
@@ -43,7 +45,8 @@ public class ImporterPreferences {
                                boolean persistCustomKeys,
                                List<String> catalogs,
                                PlainCitationParserChoice defaultPlainCitationParser,
-                               int citationsRelationsStoreTTL
+                               int citationsRelationsStoreTTL,
+                               Map<String, String> searchEngineUrlTemplates
     ) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
@@ -56,6 +59,7 @@ public class ImporterPreferences {
         this.catalogs = FXCollections.observableArrayList(catalogs);
         this.defaultPlainCitationParser = new SimpleObjectProperty<>(defaultPlainCitationParser);
         this.citationsRelationsStoreTTL = new SimpleIntegerProperty(citationsRelationsStoreTTL);
+        this.searchEngineUrlTemplates = new HashMap<>(searchEngineUrlTemplates);
     }
 
     public boolean areImporterEnabled() {
@@ -131,10 +135,9 @@ public class ImporterPreferences {
         this.persistCustomKeys.set(persistCustomKeys);
     }
 
-    /**
-     * @param name of the fetcher
-     * @return either a customized API key if configured or the default key
-     */
+    /// @param name of the fetcher
+    /// @return either a customized API key if configured or the default key
+    /// @implNote See `fetchers.md` for general information on fetchers.
     public Optional<String> getApiKey(String name) {
         return apiKeys.stream()
                       .filter(key -> key.getName().equalsIgnoreCase(name))
@@ -175,5 +178,14 @@ public class ImporterPreferences {
 
     public void setCitationsRelationsStoreTTL(int citationsRelationsStoreTTL) {
         this.citationsRelationsStoreTTL.set(citationsRelationsStoreTTL);
+    }
+
+    public Map<String, String> getSearchEngineUrlTemplates() {
+        return searchEngineUrlTemplates;
+    }
+
+    public void setSearchEngineUrlTemplates(Map<String, String> templates) {
+        searchEngineUrlTemplates.clear();
+        searchEngineUrlTemplates.putAll(templates);
     }
 }

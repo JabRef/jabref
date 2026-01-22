@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -17,11 +18,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("git")
 class SlrGitHandlerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlrGitHandlerTest.class);
 
@@ -33,7 +41,12 @@ class SlrGitHandlerTest {
     @BeforeEach
     void setUpGitHandler() {
         SystemReader.setInstance(new NoopGitSystemReader());
-        gitHandler = new SlrGitHandler(repositoryPath);
+
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
+
+        gitHandler = new SlrGitHandler(repositoryPath, gitPreferences);
         gitHandler.initIfNeeded();
     }
 

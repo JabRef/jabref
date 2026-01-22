@@ -52,16 +52,14 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         this.formatPreferences = importFormatPreferences;
     }
 
-    /**
-     * Tries to find a fulltext URL for a given BibTex entry.
-     * <p>
-     * Search by title first, as DOI is not searchable directly. When the title is not present, the search is made with DOI via google.com with site:researchgate.net
-     *
-     * @param entry The Bibtex entry
-     * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-     * @throws IOException      if an IO operation has failed
-     * @throws FetcherException if the ResearchGate refuses to serve the page
-     */
+    /// Tries to find a fulltext URL for a given BibTex entry.
+    ///
+    /// Search by title first, as DOI is not searchable directly. When the title is not present, the search is made with DOI via google.com with site:researchgate.net
+    ///
+    /// @param entry The Bibtex entry
+    /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+    /// @throws IOException      if an IO operation has failed
+    /// @throws FetcherException if the ResearchGate refuses to serve the page
     @Override
     public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         Document html;
@@ -178,14 +176,11 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
                     .get();
     }
 
-    /**
-     * Constructs a URL based on the query, size and page number.
-     * Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
-     * <p>
-     *
-     * @param queryNode the search query.
-     * @return A URL that lets us download a .bib file
-     */
+    /// Constructs a URL based on the query, size and page number.
+    /// Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
+    ///
+    /// @param queryNode the search query.
+    /// @return A URL that lets us download a .bib file
     private static URL getUrlForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         String query = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
         URIBuilder source = new URIBuilder(SEARCH);
@@ -199,13 +194,11 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return TrustLevel.META_SEARCH;
     }
 
-    /**
-     * This method is used to send complex queries using fielded search.
-     *
-     * @param queryNode the first node from the search parser
-     * @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
-     * @throws FetcherException if the ResearchGate refuses to serve the page
-     */
+    /// This method is used to send complex queries using fielded search.
+    ///
+    /// @param queryNode the first node from the search parser
+    /// @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
+    /// @throws FetcherException if the ResearchGate refuses to serve the page
     @Override
     public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         Document html;
@@ -221,7 +214,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
             html = getPage(url);
             // ResearchGate's server blocks when too many request are made
             if (!html.getElementsByClass("nova-legacy-v-publication-item__title").hasText()) {
-                throw new FetcherException(url, "Required HTML element not found", null);
+                throw new FetcherException(url, "Required HTML element not found", new IllegalStateException("Missing element"));
             }
         } catch (IOException e) {
             throw new FetcherException(url, e);
@@ -230,11 +223,13 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         Elements sol = html.getElementsByClass("nova-legacy-v-publication-item__title");
         List<String> urls = sol.select("a").eachAttr("href").stream()
                                .filter(stream -> stream.contains("publication/"))
-                               .map(resultStream -> resultStream.substring(resultStream.indexOf("publication/") + 12, resultStream.indexOf("_")))
+                               .map(resultStream -> resultStream.substring(
+                                       resultStream.indexOf("publication/") + 12,
+                                       resultStream.indexOf("_")))
                                .map(idStream -> SEARCH_FOR_BIB_ENTRY + idStream)
                                .map(this::getInputStream)
-                               .filter(Objects::nonNull)
-                               .map(stream -> stream.lines().collect(Collectors.joining(OS.NEWLINE)))
+                               .flatMap(Optional::stream)
+                               .map(reader -> reader.lines().collect(Collectors.joining(OS.NEWLINE)))
                                .toList();
 
         List<BibEntry> list = new ArrayList<>();
@@ -251,14 +246,14 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return list;
     }
 
-    private BufferedReader getInputStream(String urlString) {
+    private Optional<BufferedReader> getInputStream(String urlString) {
         try {
             URL url = URLUtil.create(urlString);
-            return new BufferedReader(new InputStreamReader(url.openStream()));
+            return Optional.of(new BufferedReader(new InputStreamReader(url.openStream())));
         } catch (IOException e) {
             LOGGER.debug("Wrong URL", e);
+            return Optional.empty();
         }
-        return null;
     }
 
     @Override
@@ -266,13 +261,11 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return "ResearchGate";
     }
 
-    /**
-     * Looks for hits which are matched by the given {@link BibEntry}.
-     *
-     * @param entry entry to search bibliographic information for
-     * @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
-     * @throws FetcherException if the ResearchGate refuses to serve the page
-     */
+    /// Looks for hits which are matched by the given {@link BibEntry}.
+    ///
+    /// @param entry entry to search bibliographic information for
+    /// @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
+    /// @throws FetcherException if the ResearchGate refuses to serve the page
     @Override
     public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();

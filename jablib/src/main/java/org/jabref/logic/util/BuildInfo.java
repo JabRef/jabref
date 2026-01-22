@@ -8,8 +8,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
-import textFormatter.TextFormatter;
-import textFormatter.color.SimpleColor;
+import io.github.darvil.terminal.textformatter.TextFormatter;
+import io.github.darvil.terminal.textformatter.color.SimpleColor;
 
 public final class BuildInfo {
     public static final String JABREF_BANNER = TextFormatter.of("""
@@ -40,10 +40,11 @@ public final class BuildInfo {
     public final String astrophysicsDataSystemAPIKey;
     public final String biodiversityHeritageApiKey;
     public final String ieeeAPIKey;
+    public final String medlineApiKey;
     public final String scienceDirectApiKey;
     public final String semanticScholarApiKey;
     public final String springerNatureAPIKey;
-    public final String medlineApiKey;
+    public final String unpaywallEmail;
 
     public BuildInfo() {
         this("/build.properties");
@@ -69,10 +70,11 @@ public final class BuildInfo {
         astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
         biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
+        medlineApiKey = BuildInfo.getValue(properties, "medlineApiKey", "");
         scienceDirectApiKey = BuildInfo.getValue(properties, "scienceDirectApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
-        medlineApiKey = BuildInfo.getValue(properties, "medlineApiKey", "");
+        unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {

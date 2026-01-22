@@ -26,8 +26,9 @@ module org.jabref.jabsrv.cli {
     requires jakarta.validation;
     requires jakarta.ws.rs;
 
-    requires jersey.common;
-
+    requires org.glassfish.jersey.core.common;
+    requires org.glassfish.jersey.container.grizzly2.http;
+    requires org.glassfish.jersey.core.server;
     requires info.picocli;
 
     requires net.harawata.appdirs;
@@ -39,6 +40,5 @@ module org.jabref.jabsrv.cli {
 
     requires transitive org.jspecify;
     requires java.logging;
-    requires jersey.container.grizzly2.http;
-    requires jersey.server;
+
 }

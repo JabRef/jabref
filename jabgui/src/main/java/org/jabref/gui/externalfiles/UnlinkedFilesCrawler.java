@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
@@ -12,8 +11,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import javafx.scene.control.CheckBoxTreeItem;
 
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
@@ -56,27 +53,25 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         return searchDirectory(directory, unlinkedPDFFileFilter);
     }
 
-    /**
-     * Searches recursively all files in the specified directory. <br>
-     * <br>
-     * All files matched by the given {@link UnlinkedPDFFileFilter} are taken into the resulting tree. <br>
-     * <br>
-     * The result will be a tree structure of nodes of the type {@link CheckBoxTreeItem}. <br>
-     * <br>
-     * The user objects that are attached to the nodes is the {@link FileNodeViewModel}, which wraps the {@link
-     * File}-Object. <br>
-     * <br>
-     * For ensuring the capability to cancel the work of this recursive method, the first position in the integer array
-     * 'state' must be set to 1, to keep the recursion running. When the states value changes, the method will resolve
-     * its recursion and return what it has saved so far.
-     * <br>
-     * The files are filtered according to the {@link DateRange} filter value
-     * and then sorted according to the {@link ExternalFileSorter} value.
-     *
-     * @param unlinkedPDFFileFilter contains a BibDatabaseContext which is used to determine whether the file is linked
-     * @return FileNodeViewModel containing the data of the current directory and all subdirectories
-     * @throws IOException if directory is not a directory or empty
-     */
+    /// Searches recursively all files in the specified directory. <br>
+    /// <br>
+    /// All files matched by the given {@link UnlinkedPDFFileFilter} are taken into the resulting tree. <br>
+    /// <br>
+    /// The result will be a tree structure of nodes of the type {@link javafx.scene.control.CheckBoxTreeItem}. <br>
+    /// <br>
+    /// The user objects that are attached to the nodes is the {@link FileNodeViewModel}, which wraps the {@link
+    /// java.io.File}-Object. <br>
+    /// <br>
+    /// For ensuring the capability to cancel the work of this recursive method, the first position in the integer array
+    /// 'state' must be set to 1, to keep the recursion running. When the states value changes, the method will resolve
+    /// its recursion and return what it has saved so far.
+    /// <br>
+    /// The files are filtered according to the {@link DateRange} filter value
+    /// and then sorted according to the {@link ExternalFileSorter} value.
+    ///
+    /// @param unlinkedPDFFileFilter contains a BibDatabaseContext which is used to determine whether the file is linked
+    /// @return FileNodeViewModel containing the data of the current directory and all subdirectories
+    /// @throws IOException if directory is not a directory or empty
     FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter) throws IOException {
         // Return null if the directory is not valid.
         if ((directory == null) || !Files.isDirectory(directory)) {

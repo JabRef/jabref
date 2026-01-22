@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.logic.formatter.bibtexfields.TransliterateFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.model.entry.BibEntry;
@@ -90,5 +91,13 @@ class FieldFormatterCleanupTest {
         cleanup.cleanup(entry);
 
         assertEquals("Fran{\\c{c}}ois-Marie Arouet", entry.getField(InternalField.KEY_FIELD).get());
+    }
+
+    @Test
+    void cleanupTransliterateField() {
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(StandardField.TITLE, new TransliterateFormatter());
+        entry.setField(StandardField.TITLE, "Тiло Е");
+        cleanup.cleanup(entry);
+        assertEquals("Tilo E", entry.getField(StandardField.TITLE).get());
     }
 }

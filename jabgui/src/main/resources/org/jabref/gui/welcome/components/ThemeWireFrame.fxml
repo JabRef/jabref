@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/17.0.2-ea"
          xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.welcome.components.ThemeWireFrame" maxHeight="96.0"
          maxWidth="160.0" minHeight="96.0" minWidth="160.0" prefHeight="96.0" prefWidth="160.0"
-              styleClass="wireframe-container">
+         styleClass="wireframe-container">
     <!-- Menu Bar -->
     <HBox prefHeight="8.0" spacing="1.5" styleClass="wireframe-menubar">
         <HBox prefHeight="2.0" prefWidth="8.0" styleClass="wireframe-menu-item" />

@@ -19,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -35,9 +36,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A readonly, selectable field cell that contains the value of some field
- */
+/// A readonly, selectable field cell that contains the value of some field
 public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueCell.class);
 
@@ -47,6 +46,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
 
     private final GuiPreferences preferences;
+    private final StateManager stateManager;
 
     private final ActionFactory factory;
 
@@ -58,10 +58,11 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     private final HBox actionsContainer = new HBox();
     private final FieldValueCellViewModel viewModel;
 
-    public FieldValueCell(String text, int rowIndex, GuiPreferences preferences) {
+    public FieldValueCell(String text, int rowIndex, GuiPreferences preferences, StateManager stateManager) {
         super(text, rowIndex);
 
         this.preferences = preferences;
+        this.stateManager = stateManager;
         this.factory = new ActionFactory();
         this.viewModel = new FieldValueCellViewModel(text);
 
@@ -130,7 +131,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
         copyIcon.getStyleClass().add("action-icon");
 
-        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(getText()));
+        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(getText(), stateManager));
         copyButton.setGraphic(copyIcon);
         copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         copyButton.setMaxHeight(Double.MAX_VALUE);

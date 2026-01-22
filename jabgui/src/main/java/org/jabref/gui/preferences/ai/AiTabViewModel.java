@@ -18,15 +18,19 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.models.AiModelService;
+import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
 import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbers;
 import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
@@ -35,8 +39,13 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class AiTabViewModel implements PreferenceTabViewModel {
+    protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
+
     private final Locale oldLocale;
 
     private final BooleanProperty enableAi = new SimpleBooleanProperty();
@@ -44,6 +53,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableAutoGenerateEmbeddings = new SimpleBooleanProperty();
     private final BooleanProperty autoGenerateSummaries = new SimpleBooleanProperty();
     private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();
+    private final BooleanProperty generateFollowUpQuestions = new SimpleBooleanProperty();
+    private final IntegerProperty followUpQuestionsCount = new SimpleIntegerProperty();
 
     private final ListProperty<AiProvider> aiProvidersList =
             new SimpleListProperty<>(FXCollections.observableArrayList(AiProvider.values()));
@@ -91,7 +102,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(),
             AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(),
             AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty()
+            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty()
     );
 
     private final OptionalObjectProperty<AiTemplate> selectedTemplate = OptionalObjectProperty.empty();
@@ -107,6 +119,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
+    private final AiModelService aiModelService;
+    private final TaskExecutor taskExecutor;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -121,10 +135,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMinScoreTypeValidator;
     private final Validator ragMinScoreRangeValidator;
 
-    public AiTabViewModel(CliPreferences preferences) {
+    public AiTabViewModel(CliPreferences preferences, TaskExecutor taskExecutor) {
         this.oldLocale = Locale.getDefault();
 
         this.aiPreferences = preferences.getAiPreferences();
+        this.aiModelService = new AiModelService();
+        this.taskExecutor = taskExecutor;
 
         this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -341,6 +357,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         enableAi.setValue(aiPreferences.getEnableAi());
         autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
+        generateFollowUpQuestions.setValue(aiPreferences.getGenerateFollowUpQuestions());
+        followUpQuestionsCount.setValue(aiPreferences.getFollowUpQuestionsCount());
 
         selectedAiProvider.setValue(aiPreferences.getAiProvider());
 
@@ -364,6 +382,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setEnableAi(enableAi.get());
         aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
+        aiPreferences.setGenerateFollowUpQuestions(generateFollowUpQuestions.get());
+        aiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
 
@@ -414,6 +434,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         documentSplitterOverlapSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         ragMaxResultsCount.set(AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         ragMinScore.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.RAG_MIN_SCORE));
+        followUpQuestionsCount.set(AiDefaultPreferences.FOLLOW_UP_QUESTIONS_COUNT);
     }
 
     public void resetTemplates() {
@@ -426,6 +447,54 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             String defaultTemplate = AiDefaultPreferences.TEMPLATES.get(template);
             templateSources.get(template).set(defaultTemplate);
         });
+    }
+
+    /// Fetches available models for the currently selected AI provider.
+    /// Attempts to fetch models dynamically from the API, falling back to hardcoded models if fetch fails.
+    /// This method runs asynchronously using a BackgroundTask and updates the chatModelsList when complete.
+    public void refreshAvailableModels() {
+        AiProvider provider = selectedAiProvider.get();
+        if (provider == null) {
+            return;
+        }
+
+        String apiKey = currentApiKey.get();
+
+        // Get API base URL, defaulting to provider's default URL if not customized
+        String apiBaseUrl;
+        if (customizeExpertSettings.get()) {
+            String customUrl = currentApiBaseUrl.get();
+            apiBaseUrl = (customUrl != null && !customUrl.isBlank()) ? customUrl : provider.getApiUrl();
+        } else {
+            apiBaseUrl = provider.getApiUrl();
+        }
+
+        List<String> staticModels = aiModelService.getStaticModels(provider);
+        chatModelsList.setAll(staticModels);
+
+        FetchAiModelsBackgroundTask fetchTask = getAiModelsBackgroundTask(provider, apiBaseUrl, apiKey);
+
+        fetchTask.executeWith(taskExecutor);
+    }
+
+    private FetchAiModelsBackgroundTask getAiModelsBackgroundTask(AiProvider provider, String apiBaseUrl, @Nullable String apiKey) {
+        FetchAiModelsBackgroundTask fetchTask = new FetchAiModelsBackgroundTask(
+                aiModelService,
+                provider,
+                apiBaseUrl,
+                apiKey
+        );
+
+        fetchTask.onSuccess(dynamicModels -> {
+            if (!dynamicModels.isEmpty()) {
+                String currentModel = currentChatModel.get();
+                chatModelsList.setAll(dynamicModels);
+                if (currentModel != null && !currentModel.isBlank()) {
+                    currentChatModel.set(currentModel);
+                }
+            }
+        });
+        return fetchTask;
     }
 
     @Override
@@ -485,6 +554,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty disableAutoGenerateSummaries() {
         return disableAutoGenerateSummaries;
+    }
+
+    public BooleanProperty generateFollowUpQuestions() {
+        return generateFollowUpQuestions;
+    }
+
+    public IntegerProperty followUpQuestionsCountProperty() {
+        return followUpQuestionsCount;
+    }
+
+    public StringProperty followUpQuestionsTemplateProperty() {
+        return aiPreferences.templateProperty(AiTemplate.FOLLOW_UP_QUESTIONS);
     }
 
     public ReadOnlyListProperty<AiProvider> aiProvidersProperty() {

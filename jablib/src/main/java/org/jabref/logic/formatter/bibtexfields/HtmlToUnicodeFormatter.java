@@ -3,7 +3,7 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 

@@ -51,9 +51,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         keyBindingPresets.add(new NewEntryBindingPreset());
     }
 
-    /**
-     * Read all keybindings from the keybinding repository and create table keybinding models for them
-     */
+    /// Read all keybindings from the keybinding repository and create table keybinding models for them
     @Override
     public void setValues() {
         KeyBindingViewModel root = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
@@ -82,13 +80,11 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    /**
-     * Searches for the term in the keybinding's localization, category, or key combination
-     *
-     * @param keyBinding keybinding to search in
-     * @param searchTerm term to search for
-     * @return true if the term is found in the keybinding
-     */
+    /// Searches for the term in the keybinding's localization, category, or key combination
+    ///
+    /// @param keyBinding keybinding to search in
+    /// @param searchTerm term to search for
+    /// @return true if the term is found in the keybinding
     private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {
         if (keyBinding.getLocalization().toLowerCase().contains(searchTerm) ||
                 keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {
@@ -116,11 +112,20 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
     }
 
+    @Override
     public void storeSettings() {
-        if (!keyBindingRepository.equals(preferences.getKeyBindingRepository())) {
-            preferences.getKeyBindingRepository().getBindingsProperty().set(keyBindingRepository.getBindingsProperty());
-            restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
+        KeyBindingRepository prefsRepo = preferences.getKeyBindingRepository();
+
+        if (prefsRepo.equals(keyBindingRepository)) {
+            return;
         }
+
+        prefsRepo.getBindingsProperty().clear();
+        keyBindingRepository.getKeyBindings().forEach((key, value) -> {
+            prefsRepo.getBindingsProperty().put(key, value);
+        });
+
+        restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
     }
 
     public void resetToDefault() {

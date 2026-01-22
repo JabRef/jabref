@@ -14,8 +14,8 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGeneratorTestUtils;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.SaveException;
@@ -41,7 +41,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,31 +64,19 @@ class StudyRepositoryTest {
     String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
     String hashCodeSoftwareEngineering = String.valueOf("\"Software Engineering\"".hashCode());
 
-    /**
-     * Set up mocks
-     */
+    /// Set up mocks
     @BeforeEach
     void setUpMocks() throws IOException, URISyntaxException, JabRefException {
         libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
-                "",
-                ',');
+        citationKeyPatternPreferences = CitationKeyGeneratorTestUtils.getInstanceForTesting();
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferences.getTimestampPreferences().getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
+        when(preferences.getTimestampPreferences().getTimestampField()).then(_ -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
     }
@@ -106,9 +93,7 @@ class StudyRepositoryTest {
                 entryTypesManager));
     }
 
-    /**
-     * Tests whether the file structure of the repository is created correctly from the study definitions file.
-     */
+    /// Tests whether the file structure of the repository is created correctly from the study definitions file.
     @Test
     void quantumRepositoryStructureCorrectlyCreated() {
         // When repository is instantiated the directory structure is created
@@ -126,19 +111,19 @@ class StudyRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
     void quantumFilesCreated(String fileName) {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
     void cloudComputingFilesCreated(String fileName) {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ArXiv.bib", "Springer.bib"})
+    @ValueSource(strings = {"arXiv.bib", "Springer.bib"})
     void softwareEngineeringFilesCreated(String fileName) {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", fileName)));
     }
@@ -158,9 +143,7 @@ class StudyRepositoryTest {
         assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
     }
 
-    /**
-     * This tests whether the repository returns the stored bib entries correctly.
-     */
+    /// This tests whether the repository returns the stored bib entries correctly.
     @Test
     void bibEntriesCorrectlyStored() throws IOException, URISyntaxException {
         setUpTestResultFile();
@@ -212,19 +195,15 @@ class StudyRepositoryTest {
         return studyRepository;
     }
 
-    /**
-     * Copies the study definition file into the test repository
-     */
+    /// Copies the study definition file into the test repository
     private void setUpTestStudyDefinitionFile() throws URISyntaxException {
         Path destination = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 
-    /**
-     * This overwrites the existing result file in the repository with a result file containing multiple BibEntries.
-     * The repository has to exist before this method is called.
-     */
+    /// This overwrites the existing result file in the repository with a result file containing multiple BibEntries.
+    /// The repository has to exist before this method is called.
     private void setUpTestResultFile() throws URISyntaxException {
         Path queryDirectory = Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum");
         Path resultFileLocation = Path.of(queryDirectory.toString(), "ArXiv" + ".bib");
@@ -252,9 +231,7 @@ class StudyRepositoryTest {
         return List.of(resultQuantum, resultCloudComputing);
     }
 
-    /**
-     * Strips the citation key from fetched entries as these normally do not have a citation key
-     */
+    /// Strips the citation key from fetched entries as these normally do not have a citation key
     private List<BibEntry> stripCitationKeys(List<BibEntry> entries) {
         entries.forEach(bibEntry -> bibEntry.setCitationKey(""));
         return entries;

@@ -59,7 +59,7 @@ Allow also access for both cases and click "Allow access".
 
 ## Wait for IntelliJ IDEA to import the gradle project
 
-IntelliJ shows "Importing 'jabref' Gradle Project" at the lower right corner.
+IntelliJ shows "Importing 'jabref' Gradle Project" in the lower right corner.
 This will take several minutes.
 Wait until this disappears.
 
@@ -71,9 +71,9 @@ Wait until this disappears.
 
 You can disregard notifications
 
-* offering to reopen the project in a container
-* announcing the project JDK
-* suggesting that you install the plugin WireMock
+- offering to reopen the project in a container
+- announcing the project JDK
+- suggesting that you install the plugin WireMock
 
 ## IntelliJ IDEA may report low memory
 

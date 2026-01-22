@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -25,11 +25,9 @@ import org.jabref.model.search.query.BaseQueryNode;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Fetches BibTeX data from DBLP (dblp.org)
- *
- * @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
- */
+/// Fetches BibTeX data from DBLP (dblp.org)
+///
+/// @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
 public class DBLPFetcher implements SearchBasedParserFetcher {
     public static final String FETCHER_NAME = "DBLP";
 
@@ -63,7 +61,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         DoiCleanup doiCleaner = new DoiCleanup();
         doiCleaner.cleanup(entry);
 
-        FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,
+        FieldFormatterCleanupActions cleanups = new FieldFormatterCleanupActions(true,
                 List.of(
                         new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
                         // unescape the contents of the URL field, e.g., some\_url\_part becomes some_url_part

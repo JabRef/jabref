@@ -52,12 +52,9 @@ tasks.test {
 }
 
 tasks.named<JavaExec>("run") {
-    doFirst {
-        application.applicationDefaultJvmArgs =
-            listOf(
-                "--enable-native-access=com.sun.jna"
-            )
-    }
+    // "assert" statements in the code should activated when running using gradle
+    enableAssertions = true
+    jvmArgs("--enable-native-access=com.sun.jna")
 }
 
 javaModulePackaging {

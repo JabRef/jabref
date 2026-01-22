@@ -10,7 +10,10 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
+@Execution(ExecutionMode.SAME_THREAD)
 class BibEntryCitationsAndReferencesRepositoryShellTest {
 
     private static BibEntry createBibEntry() {

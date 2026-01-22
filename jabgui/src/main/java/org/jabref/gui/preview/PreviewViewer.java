@@ -1,11 +1,10 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -17,11 +16,12 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
@@ -46,9 +46,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.html.HTMLAnchorElement;
 
-/**
- * Displays an BibEntry using the given layout format.
- */
+/// Displays an BibEntry using the given layout format.
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
@@ -76,12 +74,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             getSelectionHtml();
             """;
 
+    private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
+
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
+
+    private final BookCoverFetcher bookCoverFetcher;
 
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
@@ -106,6 +108,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
+
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -210,25 +214,58 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private String formatError(BibEntry entry, Throwable exception) {
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return "%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s".formatted(
+        LOGGER.error("Error generating preview for entry: {}", entry.getCitationKey(), exception);
+
+        return """
+                <div class="error">
+                    <h3>%s</h3>
+                    <p>%s</p>
+                    <p><small>Check the event logs for details.</small></p>
+                </div>
+                """.formatted(
                 Localization.lang("Error while generating citation style"),
-                exception.getLocalizedMessage(),
-                entry,
-                sw);
+                exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
     }
 
     private void setPreviewText(String text) {
-        layoutText = """
-                <html>
-                    <body id="previewBody">
-                        <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(text);
+        String baseURL = getBaseURL().orElse("");
+        String coverIfAny = getCoverImageURL().map(COVER_IMAGE_FORMAT_HTML::formatted).orElse("");
+        layoutText = formatPreviewText(baseURL, coverIfAny, text);
         highlightLayoutText();
         setHvalue(0);
+    }
+
+    private Optional<String> getBaseURL() {
+        if (databaseContext == null) {
+            return Optional.empty();
+        }
+        return databaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(path -> {
+            String url = path.toUri().toString();
+            if (!url.endsWith("/")) {
+                url += "/";
+            }
+            return url;
+        });
+    }
+
+    private Optional<String> getCoverImageURL() {
+        if (entry != null) {
+            return bookCoverFetcher.getDownloadedCoverForEntry(entry).map(path -> path.toUri().toString());
+        }
+        return Optional.empty();
+    }
+
+    private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
+        return """
+                <html>
+                    <head>
+                        <base href="%s">
+                    </head>
+                    <body id="previewBody">
+                        %s <div id="content"> %s </div>
+                    </body>
+                </html>
+                """.formatted(baseUrl, coverIfAny, text);
     }
 
     private void highlightLayoutText() {

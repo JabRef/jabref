@@ -14,13 +14,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.model.entry.field.Field;
 
 public class EntryEditorPreferences {
 
-    /**
-     * Specifies the different possible enablement states for online services
-     */
+    /// Specifies the different possible enablement states for online services
     public enum JournalPopupEnabled {
         FIRST_START, // The first time a user uses this service
         ENABLED,
@@ -49,6 +48,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty allowIntegerEditionBibtex;
     private final BooleanProperty autoLinkFiles;
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
+    private final ObjectProperty<CitationFetcherType> citationFetcherType;
     private final BooleanProperty shouldShowSciteTab;
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
@@ -66,6 +66,7 @@ public class EntryEditorPreferences {
                                   boolean allowIntegerEditionBibtex,
                                   boolean autolinkFilesEnabled,
                                   JournalPopupEnabled journalPopupEnabled,
+                                  CitationFetcherType citationFetcherType,
                                   boolean showSciteTab,
                                   boolean showUserCommentsFields,
                                   double previewWidthDividerPosition) {
@@ -83,6 +84,7 @@ public class EntryEditorPreferences {
         this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
+        this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
@@ -236,6 +238,18 @@ public class EntryEditorPreferences {
         this.enablementStatus.set(journalPopupEnabled);
     }
 
+    public CitationFetcherType getCitationFetcherType() {
+        return citationFetcherType.get();
+    }
+
+    public void setCitationFetcherType(CitationFetcherType citationFetcherType) {
+        this.citationFetcherType.set(citationFetcherType);
+    }
+
+    public ObjectProperty<CitationFetcherType> citationFetcherTypeProperty() {
+        return citationFetcherType;
+    }
+
     public boolean shouldShowSciteTab() {
         return this.shouldShowSciteTab.get();
     }
@@ -264,9 +278,7 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition.set(previewWidthDividerPosition);
     }
 
-    /**
-     * Holds the horizontal divider position when the Preview is shown in the entry editor
-     */
+    /// Holds the horizontal divider position when the Preview is shown in the entry editor
     public DoubleProperty previewWidthDividerPositionProperty() {
         return previewWidthDividerPosition;
     }

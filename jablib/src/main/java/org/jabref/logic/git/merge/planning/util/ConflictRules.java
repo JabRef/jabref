@@ -10,16 +10,18 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-public class ConflictRules {
-    /**
-     * Detect entry-level conflicts among base, local, and remote versions of an entry.
-     * <p>
-     *
-     * @param base the entry in the common ancestor
-     * @param local the entry in the local version
-     * @param remote the entry in the remote version
-     * @return optional conflict (if detected)
-     */
+public final class ConflictRules {
+
+    private ConflictRules() {
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
+    }
+
+    /// Detect entry-level conflicts among base, local, and remote versions of an entry.
+    ///
+    /// @param base   the entry in the common ancestor
+    /// @param local  the entry in the local version
+    /// @param remote the entry in the remote version
+    /// @return optional conflict (if detected)
     public static Optional<ThreeWayEntryConflict> detectEntryConflict(BibEntry base,
                                                                       BibEntry local,
                                                                       BibEntry remote) {

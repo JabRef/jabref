@@ -18,10 +18,13 @@ dependencies {
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     testImplementation("org.slf4j:jul-to-slf4j")
+
+    testImplementation("org.mockito:mockito-core")
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.api")
+    requires.add("org.mockito")
 }
 
 tasks.test {

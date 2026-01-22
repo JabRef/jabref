@@ -2,15 +2,13 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Optional;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.Date;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * This class transforms date to the format yyyy-mm-dd or yyyy-mm..
- */
+/// This class transforms date to the format yyyy-mm-dd or yyyy-mm..
 public class NormalizeDateFormatter extends Formatter {
     @Override
     public String getName() {
@@ -22,14 +20,12 @@ public class NormalizeDateFormatter extends Formatter {
         return "normalize_date";
     }
 
-    /**
-     * Format date string to yyyy-mm-dd or yyyy-mm. Keeps the existing String if it does not match one of the following
-     * formats:
-     * "M/y" (covers 9/15, 9/2015, and 09/2015)
-     * "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
-     * "yyyy-MM-dd" (covers 2009-1-15)
-     * "d.M.uuuu" (covers 15.1.2015)
-     */
+    /// Format date string to yyyy-mm-dd or yyyy-mm. Keeps the existing String if it does not match one of the following
+    /// formats:
+    /// "M/y" (covers 9/15, 9/2015, and 09/2015)
+    /// "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
+    /// "yyyy-MM-dd" (covers 2009-1-15)
+    /// "d.M.uuuu" (covers 15.1.2015)
     @Override
     public String format(@NonNull String value) {
         Optional<Date> parsedDate = Date.parse(value);

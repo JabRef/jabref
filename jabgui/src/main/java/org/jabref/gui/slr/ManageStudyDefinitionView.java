@@ -37,10 +37,8 @@ import org.jabref.model.study.Study;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-/**
- * This class controls the user interface of the study definition management dialog. The UI elements and their layout
- * are defined in the FXML file.
- */
+/// This class controls the user interface of the study definition management dialog. The UI elements and their layout
+/// are defined in the FXML file.
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
     @FXML private TextField studyTitle;
     @FXML private TextField addAuthor;
@@ -70,6 +68,13 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML private Label directoryWarning;
 
+    @FXML private Label validationHeaderLabel;
+    @FXML private Label titleValidationLabel;
+    @FXML private Label authorsValidationLabel;
+    @FXML private Label questionsValidationLabel;
+    @FXML private Label queriesValidationLabel;
+    @FXML private Label catalogsValidationLabel;
+
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
 
@@ -83,11 +88,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     // or the "real" directory of the study
     private final Path pathToStudyDataDirectory;
 
-    /**
-     * This is used to create a new study
-     *
-     * @param pathToStudyDataDirectory This directory is proposed in the file chooser
-     */
+    /// This is used to create a new study
+    ///
+    /// @param pathToStudyDataDirectory This directory is proposed in the file chooser
     public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
         this.pathToStudyDataDirectory = pathToStudyDataDirectory;
         this.setTitle(Localization.lang("Define study parameters"));
@@ -100,12 +103,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         setupSaveSurveyButton(false);
     }
 
-    /**
-     * This is used to edit an existing study.
-     *
-     * @param study          the study to edit
-     * @param studyDirectory the directory of the study
-     */
+    /// This is used to edit an existing study.
+    ///
+    /// @param study          the study to edit
+    /// @param studyDirectory the directory of the study
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
         this.pathToStudyDataDirectory = studyDirectory;
         this.setTitle(Localization.lang("Manage study definition"));
@@ -150,6 +151,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     preferences.getImportFormatPreferences(),
                     preferences.getImporterPreferences(),
                     preferences.getWorkspacePreferences(),
+                    preferences.getGitPreferences(),
                     dialogService);
         } else {
             viewModel = new ManageStudyDefinitionViewModel(
@@ -158,6 +160,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     preferences.getImportFormatPreferences(),
                     preferences.getImporterPreferences(),
                     preferences.getWorkspacePreferences(),
+                    preferences.getGitPreferences(),
                     dialogService);
 
             // The directory of the study cannot be changed
@@ -173,6 +176,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         initQuestionsTab();
         initQueriesTab();
         initCatalogsTab();
+        initValidationBindings();
     }
 
     private void updateDirectoryWarning(Path directory) {
@@ -245,6 +249,34 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
         catalogTable.setItems(viewModel.getCatalogs());
+    }
+
+    private void initValidationBindings() {
+        // Header label
+        validationHeaderLabel.textProperty().bind(viewModel.validationHeaderMessageProperty());
+        validationHeaderLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.validationHeaderMessageProperty()));
+        validationHeaderLabel.managedProperty().bind(validationHeaderLabel.visibleProperty());
+
+        // Specific validation messages
+        titleValidationLabel.textProperty().bind(viewModel.titleValidationMessageProperty());
+        titleValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.titleValidationMessageProperty()));
+        titleValidationLabel.managedProperty().bind(titleValidationLabel.visibleProperty());
+
+        authorsValidationLabel.textProperty().bind(viewModel.authorsValidationMessageProperty());
+        authorsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.authorsValidationMessageProperty()));
+        authorsValidationLabel.managedProperty().bind(authorsValidationLabel.visibleProperty());
+
+        questionsValidationLabel.textProperty().bind(viewModel.questionsValidationMessageProperty());
+        questionsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.questionsValidationMessageProperty()));
+        questionsValidationLabel.managedProperty().bind(questionsValidationLabel.visibleProperty());
+
+        queriesValidationLabel.textProperty().bind(viewModel.queriesValidationMessageProperty());
+        queriesValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.queriesValidationMessageProperty()));
+        queriesValidationLabel.managedProperty().bind(queriesValidationLabel.visibleProperty());
+
+        catalogsValidationLabel.textProperty().bind(viewModel.catalogsValidationMessageProperty());
+        catalogsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.catalogsValidationMessageProperty()));
+        catalogsValidationLabel.managedProperty().bind(catalogsValidationLabel.visibleProperty());
     }
 
     private void setupCommonPropertiesForTables(Node addControl,

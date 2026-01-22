@@ -8,9 +8,9 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.exporter.Exporter;

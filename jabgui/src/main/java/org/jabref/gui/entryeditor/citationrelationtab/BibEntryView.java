@@ -16,20 +16,16 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-/**
- * Class to unify the display method of BibEntries in ListViews.
- */
+/// Class to unify the display method of BibEntries in ListViews.
 public class BibEntryView {
 
     public static final EnumSet<StandardEntryType> CROSS_REF_TYPES = EnumSet.of(StandardEntryType.InBook,
             StandardEntryType.InProceedings, StandardEntryType.InCollection);
 
-    /**
-     * Creates a layout for a given {@link BibEntry} to be displayed in a List
-     *
-     * @param entry {@link BibEntry} to display
-     * @return layout container displaying the entry
-     */
+    /// Creates a layout for a given {@link BibEntry} to be displayed in a List
+    ///
+    /// @param entry {@link BibEntry} to display
+    /// @return layout container displaying the entry
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
@@ -61,12 +57,10 @@ public class BibEntryView {
         return entryContainer;
     }
 
-    /**
-     * Gets the correct Icon for a given {@link EntryType}
-     *
-     * @param type {@link EntryType} to get Icon for
-     * @return Icon corresponding to {@link EntryType}
-     */
+    /// Gets the correct Icon for a given {@link EntryType}
+    ///
+    /// @param type {@link EntryType} to get Icon for
+    /// @return Icon corresponding to {@link EntryType}
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
         if (type instanceof StandardEntryType standardEntry) {
             if (standardEntry == StandardEntryType.Book) {
@@ -78,12 +72,10 @@ public class BibEntryView {
         return IconTheme.JabRefIcons.ARTICLE;
     }
 
-    /**
-     * Checks if text contains right-to-left characters
-     *
-     * @param text Text to check
-     * @return true if text contains RTL characters
-     */
+    /// Checks if text contains right-to-left characters
+    ///
+    /// @param text Text to check
+    /// @return true if text contains RTL characters
     private static boolean isRTL(String text) {
         for (char c : text.toCharArray()) {
             if (Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
@@ -94,15 +86,13 @@ public class BibEntryView {
         return false;
     }
 
-    /**
-     * Creates a text node for the summary with horizontal scrolling for RTL text,
-     * avoiding JavaFX bug related to RTL text wrapping
-     *
-     * @param text The summary text content
-     * @return Node with either:
-     * - ScrollPane (for RTL text)
-     * - TextFlowLimited (for LTR text)
-     */
+    /// Creates a text node for the summary with horizontal scrolling for RTL text,
+    /// avoiding JavaFX bug related to RTL text wrapping
+    ///
+    /// @param text The summary text content
+    /// @return Node with either:
+    /// - ScrollPane (for RTL text)
+    /// - TextFlowLimited (for LTR text)
     private static Node createSummary(String text) {
         if (isRTL(text)) {
             Text textNode = new Text(text);
@@ -115,15 +105,13 @@ public class BibEntryView {
         }
     }
 
-    /**
-     * Creates a label with horizontal scrolling for RTL text,
-     * avoiding JavaFX bug related to RTL text wrapping
-     *
-     * @param text The label text content
-     * @return Node with either:
-     * - ScrollPane (for RTL text)
-     * - Wrapped Label (for LTR text)
-     */
+    /// Creates a label with horizontal scrolling for RTL text,
+    /// avoiding JavaFX bug related to RTL text wrapping
+    ///
+    /// @param text The label text content
+    /// @return Node with either:
+    /// - ScrollPane (for RTL text)
+    /// - Wrapped Label (for LTR text)
     private static Node createLabel(String text) {
         if (isRTL(text)) {
             Label label = new Label(text);

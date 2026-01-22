@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -22,10 +22,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Converts legacy explicit groups, where the group contained a list of assigned entries, to the new format,
- * where the entry stores a list of groups it belongs to.
- */
+/// Converts legacy explicit groups, where the group contained a list of assigned entries, to the new format,
+/// where the entry stores a list of groups it belongs to.
 public class ConvertMarkingToGroups implements PostOpenMigration {
 
     private static final Pattern MARKING_PATTERN = Pattern.compile("\\[(.*):(\\d+)\\]");
@@ -48,7 +46,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             }
 
             if (parserResult.getMetaData().getGroups().isEmpty()) {
-                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
+                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
             }
             GroupTreeNode root = parserResult.getMetaData().getGroups().get();
             root.addChild(markingRoot, 0);
@@ -58,9 +56,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
         }
     }
 
-    /**
-     * Looks for markings (such as __markedentry = {[Nicolas:6]}) in the given list of entries.
-     */
+    /// Looks for markings (such as __markedentry = {[Nicolas:6]}) in the given list of entries.
     private Multimap<String, BibEntry> getMarkingWithEntries(List<BibEntry> entries) {
         Multimap<String, BibEntry> markings = MultimapBuilder.treeKeys().linkedListValues().build();
 

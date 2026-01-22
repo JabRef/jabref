@@ -65,9 +65,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
         if ("bibtex".equals(textDocument.getLanguageId())) {
             diagnosticHandler.computeAndPublishDiagnostics(client, textDocument.getUri(), textDocument.getText(), textDocument.getVersion());
-        } else {
-            contentCache.put(textDocument.getUri(), textDocument.getText());
         }
+        contentCache.put(textDocument.getUri(), textDocument.getText());
     }
 
     @Override
@@ -79,9 +78,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
         if ("bibtex".equalsIgnoreCase(languageId)) {
             diagnosticHandler.computeAndPublishDiagnostics(client, textDocument.getUri(), contentChange.getText(), textDocument.getVersion());
-        } else {
-            contentCache.put(textDocument.getUri(), contentChange.getText());
         }
+        contentCache.put(textDocument.getUri(), contentChange.getText());
     }
 
     @Override
@@ -96,9 +94,6 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> definition(DefinitionParams params) {
-        if (!clientHandler.isStandalone()) {
-            return CompletableFuture.completedFuture(Either.forLeft(List.of()));
-        }
         if (fileUriToLanguageId.containsKey(params.getTextDocument().getUri())) {
             String fileUri = params.getTextDocument().getUri();
             return linkHandler.provideDefinition(fileUriToLanguageId.get(fileUri), fileUri, contentCache.get(fileUri), params.getPosition());
@@ -108,11 +103,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public CompletableFuture<List<DocumentLink>> documentLink(DocumentLinkParams params) {
-        if (clientHandler.isStandalone()) {
-            return CompletableFuture.completedFuture(List.of());
-        }
         String fileUri = params.getTextDocument().getUri();
-        return linkHandler.provideDocumentLinks(fileUriToLanguageId.get(fileUri), contentCache.get(fileUri));
+        return linkHandler.provideDocumentLinks(fileUri, fileUriToLanguageId.get(fileUri), contentCache.get(fileUri));
     }
 
     @Override

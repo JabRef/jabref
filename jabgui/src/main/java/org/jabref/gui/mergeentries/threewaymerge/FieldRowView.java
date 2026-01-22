@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.mergeentries.threewaymerge.FieldRowViewModel.Selection;
 import org.jabref.gui.mergeentries.threewaymerge.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.threewaymerge.cell.FieldValueCell;
@@ -26,9 +27,7 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A controller class to control left, right and merged field values
- */
+/// A controller class to control left, right and merged field values
 public class FieldRowView {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);
 
@@ -44,12 +43,12 @@ public class FieldRowView {
 
     private GridPane parent;
 
-    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, int rowIndex) {
+    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, StateManager stateManager, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
         fieldNameCell = new FieldNameCell(FieldTextMapper.getDisplayName(field), rowIndex);
-        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences);
-        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences);
+        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences, stateManager);
+        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences, stateManager);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
         // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.

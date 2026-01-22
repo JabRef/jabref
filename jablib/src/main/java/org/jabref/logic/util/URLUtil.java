@@ -8,8 +8,9 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
+import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
 
 /// URL utilities for URLs in the JabRef logic.
@@ -19,26 +20,22 @@ public class URLUtil {
 
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
 
-    /**
-     * Pattern matches a string containing a URL with a protocol
-     */
+    /// Pattern matches a string containing a URL with a protocol
     public static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
 
     private static final String URL_EXP = "^(https?|ftp)://.+";
     // Detect Google search URL
     private static final String GOOGLE_SEARCH_EXP = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
 
-    /**
-     * Cleans URLs returned by Google search.
-     * <h4>Example</h4>
-     * <pre>{@code
-     * If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
-     * https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&&url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&ei=DifeVYHkDYWqU5W0j6gD&usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&sig2=0hSSMw9XZXL3HJWwEcJtOg
-     * }</pre>
-     *
-     * @param url the Google search URL string
-     * @return the cleaned Google URL or @code{url} if no search URL was detected
-     */
+    /// Cleans URLs returned by Google search.
+    /// <h4>Example</h4>
+    /// <pre>{@code
+    /// If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
+    /// https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&&url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&ei=DifeVYHkDYWqU5W0j6gD&usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&sig2=0hSSMw9XZXL3HJWwEcJtOg
+    /// }</pre>
+    ///
+    /// @param url the Google search URL string
+    /// @return the cleaned Google URL or @code{url} if no search URL was detected
     public static String cleanGoogleSearchURL(@NonNull String url) {
         if (!url.matches(GOOGLE_SEARCH_EXP)) {
             return url;
@@ -97,19 +94,16 @@ public class URLUtil {
         }
     }
 
-    /**
-     * Creates a {@link URL} object from the given string URL.
-     *
-     * @param url the URL string to be converted into a {@link URL}.
-     * @return the {@link URL} object created from the string URL.
-     * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
-     */
-    public static URL create(String url) throws MalformedURLException {
-        if (url == null || url.trim().isEmpty()) {
-            throw new IllegalArgumentException("URL must not be null or empty.");
-        }
-
+    /// Creates a {@link URL} object from the given string URL.
+    ///
+    /// @param url the URL string to be converted into a {@link URL}.
+    /// @return the {@link URL} object created from the string URL.
+    /// @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
+    public static @NonNull URL create(@NonNull String url) throws MalformedURLException {
         String trimmedUrl = url.trim();
+        if (trimmedUrl.isEmpty()) {
+            throw new IllegalArgumentException("URL must not be empty.");
+        }
 
         // Add https:// prefix to URLs starting with www. to make them absolute
         if (trimmedUrl.startsWith("www.")) {
@@ -130,17 +124,14 @@ public class URLUtil {
         }
     }
 
-    /**
-     * Creates a {@link URI} object from the given string URL.
-     * This method attempts to convert the given URL string into a {@link URI} object.
-     * The pipe character ('|') is replaced with its percent-encoded equivalent ("%7C") because the pipe character
-     * is only a valid character according to RFC3986. However, JDK's URI implementation is implementing RFC2396 and RFC2732, but not RFC3986.
-     *
-     * @param url the URL string to be converted into a {@link URI}.
-     * @return the {@link URI} object created from the string URL.
-     * @throws IllegalArgumentException if the string URL is not a valid URI or if the URI format is incorrect.
-     * @throws URISyntaxException       if the string URL has an invalid syntax and cannot be converted into a {@link URI}.
-     */
+    /// Creates a {@link URI} object from the given string URL.
+    /// This method attempts to convert the given URL string into a {@link URI} object.
+    /// The pipe character ('|') is replaced with its percent-encoded equivalent ("%7C") because the pipe character
+    /// is only a valid character according to RFC3986. However, JDK's URI implementation is implementing RFC2396 and RFC2732, but not RFC3986.
+    ///
+    /// @param url the URL string to be converted into a {@link URI}.
+    /// @return the {@link URI} object created from the string URL.
+    /// @throws IllegalArgumentException if the string URL is not a valid URI or if the URI format is incorrect.
     public static URI createUri(String url) {
         try {
             // Replace '|' character with its percent-encoded representation '%7C'.
@@ -151,18 +142,20 @@ public class URLUtil {
         }
     }
 
-    /**
-     * Extracts the filename from a URL.
-     * If the URL doesn't have a filename (ends with '/'), returns a default name.
-     *
-     * @param url the URL string to extract the filename from
-     * @return the extracted filename or a default name if none found
-     */
-    public static String getFileNameFromUrl(String url) {
-        String fileName = url.substring(url.lastIndexOf('/') + 1);
-        if (fileName.isBlank()) {
-            fileName = "downloaded.pdf";
+    /// Validates that a constructed URL is valid  and conforms to RFC 3986 URI syntax (updated RFC 2396).
+    /// And also validates that it has an HTTP or HTTPS scheme to prevent injection attacks.
+    /// Does not perform complex checks such as opening connections.
+    public static boolean isValidHttpUrl(String url) {
+        try {
+            if (StringUtil.isBlank(url)) {
+                return false;
+            }
+
+            new URIBuilder(url);
+            String lowerUrl = url.toLowerCase().trim();
+            return lowerUrl.startsWith("http://") || lowerUrl.startsWith("https://");
+        } catch (URISyntaxException ex) {
+            return false;
         }
-        return FileUtil.getValidFileName(fileName);
     }
 }

@@ -38,6 +38,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
         this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers, undoManager);
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
+        textInput.setId(field.getName());
         decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
         establishBinding(textInput, decoratedStringProperty, keyBindingRepository, undoAction, redoAction);
         ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput), keyBindingRepository);

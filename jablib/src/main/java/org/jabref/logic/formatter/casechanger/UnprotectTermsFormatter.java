@@ -1,15 +1,13 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Remove {} braces around words in case they appear balanced
- * <p>
- * Related formatter: {@link ProtectTermsFormatter}
- */
+/// Remove {} braces around words in case they appear balanced
+///
+/// Related formatter: {@link ProtectTermsFormatter}
 public class UnprotectTermsFormatter extends Formatter {
 
     @Override

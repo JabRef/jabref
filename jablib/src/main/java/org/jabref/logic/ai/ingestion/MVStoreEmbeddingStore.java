@@ -30,20 +30,20 @@ import dev.langchain4j.store.embedding.RelevanceScore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
 import dev.langchain4j.store.embedding.filter.comparison.IsIn;
-import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.Nullable;
 
 import static java.util.Comparator.comparingDouble;
 import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_KEY;
 
-/**
- * A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
- * <p>
- * Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
- * string (the content).
- * <p>
- */
+/// A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link org.h2.mvstore.MVStore} as an embedded database.
+///
+/// Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
+/// string (the content).
+///
 public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore<TextSegment> {
+
+    private static final EmbeddingRecord EMPTY_EMBEDDING_RECORD = new EmbeddingRecord(null, "", new float[0]);
+
     // `file` field is nullable, because {@link Optional} can't be serialized.
     private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable {
     }
@@ -125,7 +125,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         PriorityQueue<EmbeddingMatch<TextSegment>> matches = new PriorityQueue<>(comparator);
 
         applyFilter(request.filter()).forEach(id -> {
-            EmbeddingRecord eRecord = embeddingsMap.get(id);
+            EmbeddingRecord eRecord = embeddingsMap.getOrDefault(id, EMPTY_EMBEDDING_RECORD);
 
             double cosineSimilarity = CosineSimilarity.between(Embedding.from(eRecord.embeddingVector), request.queryEmbedding());
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);

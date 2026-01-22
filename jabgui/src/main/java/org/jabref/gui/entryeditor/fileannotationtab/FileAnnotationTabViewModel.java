@@ -17,7 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -114,9 +114,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * Copies the meta and content information of the pdf annotation to the clipboard
-     */
+    /// Copies the meta and content information of the pdf annotation to the clipboard
     public void copyCurrentAnnotation() {
         if (null == getCurrentAnnotation()) {
             return;

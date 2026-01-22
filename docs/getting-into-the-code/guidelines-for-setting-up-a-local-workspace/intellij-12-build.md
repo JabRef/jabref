@@ -39,9 +39,9 @@ Click on "Project" on the left side. Then, select **temurin-25** as the project 
 ![Project Structure - Project SDK](12-03-project-sdk.png)
 {% endfigure %}
 
-If you do not have the access to this JDK, download it by clicking on "Download JDK..." In the dialog that opens, select version 25, vendor "Eclipse Temurin (AdoptOpenJDK HotSpot)", and click "Download".
+If you do not have access to this JDK, download it by clicking on "Download JDK..." In the dialog that opens, select version 25, vendor "Eclipse Temurin (AdoptOpenJDK HotSpot)", and click "Download".
 
-{% figure caption:"Dropdown to select Download JDK" %}
+{% figure caption: "Dropdown to select Download JDK" %}
 ![Dropdown to select Download JDK](12-04-download-jdk.png)
 {% endfigure %}
 
@@ -49,7 +49,7 @@ If you do not have the access to this JDK, download it by clicking on "Download 
 ![Download JDK dialog](12-05-download-jdk-dialog.png)
 {% endfigure %}
 
-Finally enable the JDK:
+Finally, enable the JDK:
 
 1. Click "OK" to close the dialog "Project Structure".
 2. Wait for IntelliJ to index the new JDK.

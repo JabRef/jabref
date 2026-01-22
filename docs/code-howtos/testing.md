@@ -36,12 +36,12 @@ Example for a nicely formatted `@CsvSource`
 
 ```java
 @ParameterizedTest
-@CsvSource(delimiterString = "->", textBlock = """
+@CsvSource(textBlock = """
     # underscore removed
-    junit_jupiter -> JunitJupiter
+    junit_jupiter, JunitJupiter
     # camel case kept
-    fooBar        -> FooBar
-    CsvSource     -> CsvSource
+    fooBar,        FooBar
+    CsvSource,     CsvSource
 """)
 void convertsToUpperCamelCase(String input, String expected) {
     String converted = caseConverter.toUpperCamelCase(input);
@@ -137,6 +137,14 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 ```
 
 To test that a preferences migration works successfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
+
+## Localization in tests
+
+In case you or your called code uses `Localization.lang`, annotate your test with following annotation:
+
+```java
+@ResourceLock("Localization.lang")
+```
 
 ## Testing different kinds of components
 

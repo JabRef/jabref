@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors.identifier;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
@@ -24,6 +25,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
+import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -32,6 +34,7 @@ import jakarta.inject.Inject;
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
+import static org.jabref.model.entry.field.StandardField.ISSN;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
@@ -61,8 +64,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                     this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case ISBN ->
                     this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+            case ISSN ->
+                    this.viewModel = new ISSNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case EPRINT ->
-                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
+                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
 
             // TODO: Add support for PMID
             case null,
@@ -88,6 +93,20 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+
+        Stream.of(fetchInformationByIdentifierButton, lookupIdentifierButton)
+              .forEach(button -> {
+                  button.visibleProperty().bind(viewModel.textProperty().isNotEmpty());
+                  button.managedProperty().bind(button.visibleProperty());
+              });
+
+        shortenDOIButton.managedProperty().bind(shortenDOIButton.visibleProperty());
+        if (StandardField.DOI.equals(field)) {
+            shortenDOIButton.visibleProperty().bind(viewModel.textProperty().isNotEmpty());
+        } else {
+            shortenDOIButton.visibleProperty().unbind();
+            shortenDOIButton.setVisible(false);
+        }
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {

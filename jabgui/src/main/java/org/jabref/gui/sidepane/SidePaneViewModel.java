@@ -14,11 +14,11 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -109,10 +109,8 @@ public class SidePaneViewModel extends AbstractViewModel {
         return sidePaneComponent;
     }
 
-    /**
-     * Stores the current configuration of visible panes in the preferences, so that we show panes at the preferred
-     * position next time.
-     */
+    /// Stores the current configuration of visible panes in the preferences, so that we show panes at the preferred
+    /// position next time.
     private void updatePreferredPositions() {
         Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferences.getSidePanePreferences()
                                                                                  .getPreferredPositions());
@@ -169,9 +167,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         observableList.sort(Comparator.comparingInt(placeholder::indexOf));
     }
 
-    /**
-     * Helper class for sorting visible side panes based on their preferred position.
-     */
+    /// Helper class for sorting visible side panes based on their preferred position.
     protected static class PreferredIndexSort implements Comparator<SidePaneType> {
 
         private final Map<SidePaneType, Integer> preferredPositions;

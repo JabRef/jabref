@@ -9,13 +9,16 @@ import java.util.List;
 import javafx.scene.paint.Color;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.exporter.GroupSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -31,6 +34,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GroupsParserTest {
     private FileUpdateMonitor fileMonitor;
@@ -140,5 +144,68 @@ class GroupsParserTest {
         SearchGroup expected = new SearchGroup("Data", GroupHierarchyType.INCLUDING, "project=data|number|quant*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         AbstractGroup parsed = GroupsParser.fromString("SearchGroup:Data;2;project=data|number|quant*;0;1;1;;;;;", ',', fileMonitor, metaData, "userAndHost");
         assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesAutomaticDateGroupWithYearGranularity() throws ParseException {
+        AutomaticDateGroup expected = new AutomaticDateGroup("By Year", GroupHierarchyType.INDEPENDENT, StandardField.DATE, DateGranularity.YEAR);
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticDateGroup:By Year;0;date;YEAR;1;;;;", ',', fileMonitor, metaData, "userAndHost");
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesAutomaticDateGroupWithMonthGranularity() throws ParseException {
+        AutomaticDateGroup expected = new AutomaticDateGroup("By Month", GroupHierarchyType.INCLUDING, StandardField.YEAR, DateGranularity.MONTH);
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticDateGroup:By Month;2;year;MONTH;1;;;;", ',', fileMonitor, metaData, "userAndHost");
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesAutomaticDateGroupWithFullDateGranularity() throws ParseException {
+        AutomaticDateGroup expected = new AutomaticDateGroup("By Date", GroupHierarchyType.REFINING, StandardField.DATE, DateGranularity.FULL_DATE);
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticDateGroup:By Date;1;date;FULL_DATE;1;;;;", ',', fileMonitor, metaData, "userAndHost");
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesAutomaticDateGroupWithColorAndIcon() throws ParseException {
+        AutomaticDateGroup expected = new AutomaticDateGroup("Publications", GroupHierarchyType.INDEPENDENT, StandardField.YEAR, DateGranularity.YEAR);
+        expected.setColor(Color.BLUE.toString());
+        expected.setIconName("calendar");
+        expected.setDescription("Group by publication year");
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticDateGroup:Publications;0;year;YEAR;1;0x0000ffff;calendar;Group by publication year;", ',', fileMonitor, metaData, "userAndHost");
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesSmartGroupAndMigratesToExplicitGroup() throws ParseException {
+        ExplicitGroup expected = new ExplicitGroup("MySmartGroup", GroupHierarchyType.INDEPENDENT, ',');
+        AbstractGroup parsed = GroupsParser.fromString("SmartGroup:MySmartGroup;0;", ',', fileMonitor, metaData, "userAndHost");
+
+        assertEquals(ExplicitGroup.class, parsed.getClass());
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void roundtripSmartGroupToExplicitGroup() throws ParseException {
+        // Read old SmartGroup format
+        String smartGroupString = "SmartGroup:MyGroup;0;1;0xf0f8ffff;icon-name;Group description;";
+        AbstractGroup parsed = GroupsParser.fromString(smartGroupString, ',', fileMonitor, metaData, "userAndHost");
+        assertEquals(ExplicitGroup.class, parsed.getClass());
+
+        // Store in new format (serialize)
+        GroupSerializer serializer = new GroupSerializer();
+        List<String> serialized = serializer.serializeTree(GroupTreeNode.fromGroup(parsed));
+        String serializedString = serialized.getFirst().substring(2); // Remove level prefix "0 "
+
+        // Verify it's stored as StaticGroup (ExplicitGroup format), not SmartGroup
+        assertTrue(serializedString.startsWith("StaticGroup:"));
+
+        // Read the new format
+        AbstractGroup roundtripParsed = GroupsParser.fromString(serializedString, ',', fileMonitor, metaData, "userAndHost");
+
+        // Verify it's still ExplicitGroup and properties are preserved
+        assertEquals(ExplicitGroup.class, roundtripParsed.getClass());
+        assertEquals(parsed, roundtripParsed);
     }
 }

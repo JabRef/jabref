@@ -3,7 +3,7 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.importer.util.ShortDOIService;
 import org.jabref.logic.importer.util.ShortDOIServiceException;
 import org.jabref.logic.l10n.Localization;

@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
@@ -11,7 +12,8 @@
 <?import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent?>
 <?import org.jabref.gui.ai.components.util.Loadable?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <fx:root type="javafx.scene.layout.VBox"
          spacing="10"
          xmlns="http://javafx.com/javafx/17.0.2-ea"
@@ -25,10 +27,14 @@
     </Loadable>
 
     <HBox spacing="10" alignment="CENTER" fx:id="exQuestionBox">
-        <Label text="%Try with examples" BorderPane.alignment="CENTER"/>
+        <Label text="%Try with examples:" BorderPane.alignment="CENTER"/>
         <Hyperlink fx:id="exQuestion1" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
         <Hyperlink fx:id="exQuestion2" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
         <Hyperlink fx:id="exQuestion3" BorderPane.alignment="CENTER" styleClass="exampleQuestionStyle"/>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER" fx:id="followUpQuestionsBox" managed="false" visible="false">
+        <Label text="%Follow-up questions:" BorderPane.alignment="CENTER"/>
     </HBox>
 
     <HBox spacing="10">
@@ -41,6 +47,18 @@
             </tooltip>
         </Button>
         <ChatPromptComponent fx:id="chatPrompt" HBox.hgrow="ALWAYS"/>
+        <MenuButton fx:id="exportButton" text="%Export" styleClass="icon-button,narrow">
+            <graphic>
+                <JabRefIconView glyph="SAVE"/>
+            </graphic>
+            <items>
+                <MenuItem text="%Export to Markdown" onAction="#exportMarkdown"/>
+                <MenuItem text="%Export to JSON" onAction="#exportJson"/>
+            </items>
+            <tooltip>
+                <Tooltip text="%Export chat history"/>
+            </tooltip>
+        </MenuButton>
     </HBox>
     <HBox alignment="CENTER" spacing="50">
         <Label fx:id="noticeText"

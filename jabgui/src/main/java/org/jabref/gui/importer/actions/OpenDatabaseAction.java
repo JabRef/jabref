@@ -11,13 +11,13 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -125,13 +125,11 @@ public class OpenDatabaseAction extends SimpleCommand {
         return filesToOpen;
     }
 
-    /**
-     * Builds a new FileDialogConfiguration using the given path as the initial directory for use in
-     * dialogService.showFileOpenDialogAndGetMultipleFiles().
-     *
-     * @param initialDirectory Path to use as the initial directory
-     * @return new FileDialogConfig with given initial directory
-     */
+    /// Builds a new FileDialogConfiguration using the given path as the initial directory for use in
+    /// dialogService.showFileOpenDialogAndGetMultipleFiles().
+    ///
+    /// @param initialDirectory Path to use as the initial directory
+    /// @return new FileDialogConfig with given initial directory
     public FileDialogConfiguration getFileDialogConfiguration(Path initialDirectory) {
         return new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
@@ -140,9 +138,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 .build();
     }
 
-    /**
-     * @return Path of current panel database directory or the working directory
-     */
+    /// @return Path of current panel database directory or the working directory
     @VisibleForTesting
     Path getInitialDirectory() {
         if (tabContainer.getLibraryTabs().isEmpty() || tabContainer.getCurrentLibraryTab() == null) {
@@ -154,22 +150,18 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
     }
 
-    /**
-     * Opens the given file. If null or 404, nothing happens.
-     * In case the file is already opened, that panel is raised.
-     *
-     * @param file the file, may be null or not existing
-     */
+    /// Opens the given file. If null or 404, nothing happens.
+    /// In case the file is already opened, that panel is raised.
+    ///
+    /// @param file the file, may be null or not existing
     public void openFile(Path file) {
         openFiles(new ArrayList<>(List.of(file)));
     }
 
-    /**
-     * Opens the given files. If one of it is null or 404, nothing happens.
-     * In case the file is already opened, that panel is raised.
-     *
-     * @param filesToOpen the filesToOpen, may be null or not existing
-     */
+    /// Opens the given files. If one of it is null or 404, nothing happens.
+    /// In case the file is already opened, that panel is raised.
+    ///
+    /// @param filesToOpen the filesToOpen, may be null or not existing
     public void openFiles(List<Path> filesToOpen) {
         LibraryTab toRaise = null;
         int initialCount = filesToOpen.size();
@@ -212,13 +204,11 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
     }
 
-    /**
-     * This is the real file opening. Should be called via {@link #openFile(Path)}
-     * <p>
-     * Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
-     *
-     * @param file the file, may be NOT null, but may not be existing
-     */
+    /// This is the real file opening. Should be called via {@link #openFile(Path)}
+    ///
+    /// Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
+    ///
+    /// @param file the file, may be NOT null, but may not be existing
     private void openTheFile(@NonNull Path file) {
         if (!Files.exists(file)) {
             return;

@@ -10,7 +10,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -39,8 +38,7 @@ public class GitPushAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = handlerRegistry;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager)
-                                         .and(ActionHelper.needsGitRemoteConfigured(stateManager)));
+        this.executable.bind(ActionHelper.needsGitRemoteConfigured(stateManager));
     }
 
     @Override
@@ -92,13 +90,7 @@ public class GitPushAction extends SimpleCommand {
                               Path bibPath,
                               GitStatusViewModel gitStatusViewModel,
                               GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
-
         GitSyncService syncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
-        GitHandler handler = registry.get(bibPath.getParent());
-        String user = guiPreferences.getGitPreferences().getUsername();
-        String pat = guiPreferences.getGitPreferences().getPat();
-        handler.setCredentials(user, pat);
-
         PushResult result = syncService.push(databaseContext, bibPath);
 
         if (result.successful()) {

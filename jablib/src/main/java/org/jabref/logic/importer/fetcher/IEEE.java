@@ -1,7 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -31,6 +33,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
 
+import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
@@ -38,13 +41,11 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for finding PDF URLs for entries on IEEE.
- * Will first look for URLs of the type <code>https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&amp;]arnumber=...</code>.
- * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page.
- *
- * @see <a href="https://developer.ieee.org/docs">API documentation</a>
- */
+/// Class for finding PDF URLs for entries on IEEE.
+/// Will first look for URLs of the type `https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&amp;]arnumber=...`.
+/// If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page.
+///
+/// @see <a href="https://developer.ieee.org/docs">API documentation</a>
 public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
     public static final String FETCHER_NAME = "IEEEXplore";
@@ -71,9 +72,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         this.importerPreferences = importerPreferences;
     }
 
-    /**
-     * @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
-     */
+    /// @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
     private static BibEntry parseJsonResponse(JSONObject jsonEntry, Character keywordSeparator) {
         BibEntry entry = new BibEntry();
 
@@ -266,8 +265,23 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     @Override
-    public String getTestUrl() {
-        return TEST_URL_WITHOUT_API_KEY;
+    public boolean isValidKey(String apiKey) {
+        try {
+            URL testUrl = getURLForQuery("JabRef API key test", apiKey);
+            URLDownload urlDownload = new URLDownload(testUrl);
+            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException | URISyntaxException e) {
+            return false;
+        }
+    }
+
+    private URL getURLForQuery(String query, String apiKey) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", apiKey);
+        uriBuilder.addParameter("querytext", query);
+        uriBuilder.addParameter("max_records", "1");
+        return uriBuilder.build().toURL();
     }
 
     @Override

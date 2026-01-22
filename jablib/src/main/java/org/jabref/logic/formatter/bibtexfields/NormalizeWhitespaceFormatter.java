@@ -8,12 +8,10 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Replaces two subsequent whitespaces (and tabs) to one space in case of single-line fields. In case of multine fields,
- * the field content is kept as is.
- * <p>
- * Due to the distinction between single line and multiline fields, this formatter does not implement the interface {@link org.jabref.logic.cleanup.Formatter}.
- */
+/// Replaces two subsequent whitespaces (and tabs) to one space in case of single-line fields. In case of multine fields,
+/// the field content is kept as is.
+///
+/// Due to the distinction between single line and multiline fields, this formatter does not implement the interface {@link org.jabref.logic.formatter.Formatter}.
 public class NormalizeWhitespaceFormatter {
 
     // 's' matches a space, tab, new line, carriage return.
@@ -25,16 +23,14 @@ public class NormalizeWhitespaceFormatter {
         this.preferences = preferences;
     }
 
-    /**
-     * Performs the reformatting of a field content. Note that "field content" is either with enclosing {}.
-     * When outputting something which is using strings, the parts of the plain string are passed (without enclosing {}).
-     * For instance, for <code>#kopp# and #breit#"</code>, <code> and </code> is passed.
-     * Also depends on the caller whether strings have been resolved.
-     *
-     * @param fieldContent the content to format.
-     * @param field        the name of the bibtex field
-     * @return the formatted field content.
-     */
+    /// Performs the reformatting of a field content. Note that "field content" is either with enclosing {}.
+    /// When outputting something which is using strings, the parts of the plain string are passed (without enclosing {}).
+    /// For instance, for `#kopp# and #breit#"`, ` and ` is passed.
+    /// Also depends on the caller whether strings have been resolved.
+    ///
+    /// @param fieldContent the content to format.
+    /// @param field        the name of the bibtex field
+    /// @return the formatted field content.
     public String format(String fieldContent, Field field) {
         if (FieldFactory.isMultiLineField(field, preferences.getNonWrappableFields())) {
             // In general, keep the field as is.
@@ -47,15 +43,13 @@ public class NormalizeWhitespaceFormatter {
         return WHITESPACE.matcher(fieldContent).replaceAll(" ");
     }
 
-    /**
-     * Performs the reformatting of a field content. Note that "field content" is understood as
-     * the value in BibTeX's key/value pairs of content. For instance, <code>{author}</code> is passed as
-     * content. This allows for things like <code>jan { - } feb</code> to be passed.
-     *
-     * @param fieldContent the content to format.
-     * @param field        the name of the bibtex field
-     * @return the formatted field content.
-     */
+    /// Performs the reformatting of a field content. Note that "field content" is understood as
+    /// the value in BibTeX's key/value pairs of content. For instance, `{author}` is passed as
+    /// content. This allows for things like `jan { - } feb` to be passed.
+    ///
+    /// @param fieldContent the content to format.
+    /// @param field        the name of the bibtex field
+    /// @return the formatted field content.
     public String format(StringBuilder fieldContent, Field field) {
         return format(fieldContent.toString(), field);
     }

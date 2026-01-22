@@ -2,6 +2,9 @@ package org.jabref.languageserver.util;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,8 +25,18 @@ public class LspParserHandler {
     }
 
     public ParserResult parserResultFromString(String fileUri, String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
+        // We use BibtexParser directly, because we do not want to add an extra DummyFileMonitor
+        // Otherwise, we could use `OpenDatabase.loadDatabase(path, importFormatPreferences, new DummyFileUpdateMonitor())`
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult parserResult = parser.parse(Reader.of(content));
+        URI uri;
+        try {
+            uri = new URI(fileUri);
+        } catch (URISyntaxException e) {
+            return ParserResult.fromError(e);
+        }
+        Path path = Path.of(uri);
+        parserResult.getDatabaseContext().setDatabasePath(path);
         parserResults.put(fileUri, parserResult);
         return parserResult;
     }
@@ -41,10 +54,5 @@ public class LspParserHandler {
             }
         });
         return result;
-    }
-
-    public boolean citationKeyExists(String citationKey) {
-        return parserResults.values().stream()
-                            .anyMatch(parserResult -> !parserResult.getDatabase().getEntriesByCitationKey(citationKey).isEmpty());
     }
 }

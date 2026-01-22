@@ -6,7 +6,7 @@ module org.jabref.jabls {
 
     requires org.jabref.jablib;
 
-    requires com.fasterxml.jackson.databind;
+    requires tools.jackson.databind;
 
     requires com.google.common;
     requires com.google.gson;
