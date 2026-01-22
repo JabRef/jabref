@@ -430,23 +430,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return entryEditorPreferences;
         }
         entryEditorPreferences = getEntryEditorPreferencesBackingStore(EntryEditorPreferences.getDefaultEntryEditorPreferences());
-        /*entryEditorPreferences = new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(SHOW_AI_SUMMARY),
-                getBoolean(SHOW_AI_CHAT),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(SMART_FILE_ANNOTATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                getBoolean(SHOW_SCITE_TAB),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));*/
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
@@ -531,24 +514,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getEntryEditorTabs();
     }
 
-    /*private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
-
-        int defNumber = 0;
-        while (true) {
-            // Saved as 'CUSTOMTABNAME_def{number}' and seperated by ';'
-            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-
-            customTabsMap.put(name, FieldFactory.parseFieldList((String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber)));
-            defNumber++;
-        }
-        return customTabsMap;
-    }*/
     // endregion
 
     @Override
