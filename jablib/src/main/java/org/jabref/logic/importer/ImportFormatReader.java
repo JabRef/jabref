@@ -255,8 +255,9 @@ public class ImportFormatReader {
     /// @return an UnknownFormatImport with the imported entries and metadata
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     public ImportResult importWithAutoDetection(@NonNull String data) throws ImportException {
-        return importUnknownFormat(
+        return importWithAutoDetection(
                 importer -> importer.importDatabase(data),
-                importer -> importer.isRecognizedFormat(data));
+                importer -> importer.isRecognizedFormat(data),
+                () -> bibtexImporter.importDatabase(data));
     }
 }
