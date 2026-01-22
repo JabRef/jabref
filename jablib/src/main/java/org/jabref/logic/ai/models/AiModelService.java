@@ -27,7 +27,7 @@ public class AiModelService {
      *
      * @param aiProvider The AI provider
      * @param apiBaseUrl The base URL for the API
-     * @param apiKey The API key for authentication (may be null)
+     * @param apiKey     The API key for authentication (may be null)
      * @return A list of available model names
      */
     public List<String> getAvailableModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
@@ -59,7 +59,7 @@ public class AiModelService {
      *
      * @param aiProvider The AI provider
      * @param apiBaseUrl The base URL for the API
-     * @param apiKey The API key for authentication (may be null)
+     * @param apiKey     The API key for authentication (may be null)
      * @return A list of model names, or an empty list if the fetch fails
      */
     public List<String> fetchModelsSynchronously(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
