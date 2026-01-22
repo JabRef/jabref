@@ -53,7 +53,6 @@ public class CopacImporter extends Importer {
         String str;
         while ((str = bufferedReader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
-                reader.reset();
                 return true;
             }
         }
