@@ -409,11 +409,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         );
     }
 
-    /**
-     * Get a Map of defined tab names to default tab fields.
-     *
-     * @return A map of the currently defined tabs in the entry editor from scratch to cache
-     */
+    /// Get a Map of defined tab names to default tab fields.
+    ///
+    /// @return A map of the currently defined tabs in the entry editor from scratch to cache
     private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
