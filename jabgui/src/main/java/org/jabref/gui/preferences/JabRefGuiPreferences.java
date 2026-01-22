@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SequencedMap;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
@@ -55,14 +54,12 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
-import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -391,7 +388,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return entryEditorPreferences;
     }
 
-    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults){
+    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
         return new EntryEditorPreferences(
                 getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),

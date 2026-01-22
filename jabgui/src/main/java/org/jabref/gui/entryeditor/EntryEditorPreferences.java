@@ -59,7 +59,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
 
-    private EntryEditorPreferences(){
+    private EntryEditorPreferences() {
         this(
                 getDefaultEntryEditorTabs(),
                 true,
@@ -78,15 +78,6 @@ public class EntryEditorPreferences {
                 true,
                 0.5
         );
-    }
-
-   public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
-        String defaultFields = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
-        defaultTabsMap.put("General", FieldFactory.parseFieldList(defaultFields));
-        defaultTabsMap.put("Abstract", FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
-
-        return defaultTabsMap;
     }
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
@@ -124,11 +115,20 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
-    public static EntryEditorPreferences getDefaultEntryEditorPreferences(){
+    public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
+        SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
+        String defaultFields = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
+        defaultTabsMap.put("General", FieldFactory.parseFieldList(defaultFields));
+        defaultTabsMap.put("Abstract", FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
+
+        return defaultTabsMap;
+    }
+
+    public static EntryEditorPreferences getDefaultEntryEditorPreferences() {
         return new EntryEditorPreferences();
     }
 
-    public void setAll(EntryEditorPreferences preferences){
+    public void setAll(EntryEditorPreferences preferences) {
         this.entryEditorTabList.set(preferences.entryEditorTabs());
         this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
         this.shouldShowRecommendationsTab.set(preferences.shouldShowRecommendationsTab());
