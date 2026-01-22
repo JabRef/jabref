@@ -1,5 +1,6 @@
 package org.jabref.gui.frame;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -313,6 +314,13 @@ public class JabRefFrameViewModel {
                     parserResult.getErrorMessage();
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
+    }
+
+    /// Imports a single library, BibTeX and non-BibTeX
+    ///
+    /// Similar code as [org.jabref.gui.importer.actions.ImportCommand]
+    private void appendToCurrentLibrary(BufferedReader library) {
+
     }
 
     private void addParserResult(ParserResult parserResult) {
