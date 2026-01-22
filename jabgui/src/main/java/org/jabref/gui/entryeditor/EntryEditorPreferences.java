@@ -16,7 +16,7 @@ import javafx.collections.ObservableMap;
 
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.model.entry.field.Field;
-
+//Test commit
 public class EntryEditorPreferences {
 
     /// Specifies the different possible enablement states for online services
