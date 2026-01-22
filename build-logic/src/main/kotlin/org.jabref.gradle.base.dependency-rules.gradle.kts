@@ -484,9 +484,8 @@ extraJavaModuleInfo {
         exportAllPackages()
     }
 
-    module("org.openjfx:jdk-jsobject", "jdk.jsobject") {
+    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty") {
         exportAllPackages()
-        overrideModuleName()
     }
 
     // required for testing of jablib
