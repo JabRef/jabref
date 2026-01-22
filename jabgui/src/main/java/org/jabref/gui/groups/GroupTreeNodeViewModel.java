@@ -186,9 +186,7 @@ public class GroupTreeNodeViewModel {
         undoManager.addEdit(undo);
     }
 
-    /**
-     * Adds the given entries to this node's group.
-     */
+    /// Adds the given entries to this node's group.
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
         return node.addEntriesToGroup(entries);
     }

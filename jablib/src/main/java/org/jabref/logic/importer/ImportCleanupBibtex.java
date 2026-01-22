@@ -12,12 +12,10 @@ public class ImportCleanupBibtex extends ImportCleanup {
         super(fieldPreferences);
     }
 
-    /**
-     * Performs a format conversion of the given entry into the targeted format.
-     * Modifies the given entry and also returns it to enable usage of doPostCleanup in streams.
-     *
-     * @return Cleaned up BibEntry
-     */
+    /// Performs a format conversion of the given entry into the targeted format.
+    /// Modifies the given entry and also returns it to enable usage of doPostCleanup in streams.
+    ///
+    /// @return Cleaned up BibEntry
     @Override
     public BibEntry doPostCleanup(BibEntry entry) {
         entry = super.doPostCleanup(entry);

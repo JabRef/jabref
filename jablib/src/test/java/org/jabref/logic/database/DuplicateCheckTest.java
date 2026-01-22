@@ -555,9 +555,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
-    /**
-     * Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
-     */
+    /// Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)

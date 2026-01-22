@@ -10,20 +10,16 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 
-/**
- * Converts an {@link InputStream} into a {@link JSONObject}.
- */
+/// Converts an {@link InputStream} into a {@link JSONObject}.
 public final class JsonReader {
 
     private JsonReader() {
         throw new UnsupportedOperationException("Cannot instantiate a utility class");
     }
 
-    /**
-     * Converts the given input stream into a {@link JSONObject}.
-     *
-     * @return A {@link JSONObject}. An empty JSON object is returned in the case an empty stream is passed.
-     */
+    /// Converts the given input stream into a {@link JSONObject}.
+    ///
+    /// @return A {@link JSONObject}. An empty JSON object is returned in the case an empty stream is passed.
     public static JSONObject toJsonObject(InputStream inputStream) throws ParseException {
         try {
             String inputStr = new String((inputStream.readAllBytes()), StandardCharsets.UTF_8);

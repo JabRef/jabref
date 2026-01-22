@@ -9,37 +9,37 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 
-/**
- * All implementing classes should additionally offer
- *
- * <ul>
- *     <li><code>public static Optional&lt;Class> parse(String value)</code></li>
- *     <li><code>public static boolean isValid(String value)</code></li>
- * </ul>
- */
+/// All implementing classes should additionally offer
+///
+///
+/// - `public static Optional&lt;Class> parse(String value)`
+/// - `public static boolean isValid(String value)`
+///
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public interface Identifier {
 
-    /**
-     * Returns the identifier as String
-     */
+    /// Returns the identifier as String
+    ///
+    /// @return the identifier as String
     String asString();
 
     Field getDefaultField();
 
     Optional<URI> getExternalURI();
 
-    public static Optional<Identifier> from(String identifier) {
+    /// @implNote Should be consistent with [org.jabref.logic.importer.WebFetchers#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences)
+    static Optional<Identifier> from(String identifier) {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
-
+        String trimmedIdentifier = identifier.trim();
         return Stream.<Supplier<Optional<? extends Identifier>>>of(
-                             () -> DOI.findInText(identifier),
-                             () -> ArXivIdentifier.parse(identifier),
-                             () -> ISBN.parse(identifier),
-                             () -> SSRN.parse(identifier),
-                             () -> RFC.parse(identifier)
+                             () -> DOI.findInText(trimmedIdentifier),
+                             () -> ArXivIdentifier.findInText(trimmedIdentifier),
+                             () -> ISBN.parse(trimmedIdentifier),
+                             () -> SSRN.parse(trimmedIdentifier),
+                             () -> RFC.parse(trimmedIdentifier),
+                             () -> IacrEprint.parse(trimmedIdentifier)
                      )
                      .map(Supplier::get)
                      .filter(Optional::isPresent)

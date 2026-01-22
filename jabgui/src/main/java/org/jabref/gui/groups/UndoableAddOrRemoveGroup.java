@@ -8,58 +8,35 @@ import org.jabref.model.groups.GroupTreeNode;
 
 public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
 
-    /**
-     * Adding of a single node (group).
-     */
+    /// Adding of a single node (group).
     public static final int ADD_NODE = 0;
 
-    /**
-     * Removal of a single node. Children, if any, are kept.
-     */
+    /// Removal of a single node. Children, if any, are kept.
     public static final int REMOVE_NODE_KEEP_CHILDREN = 1;
 
-    /**
-     * Removal of a node and all of its children.
-     */
+    /// Removal of a node and all of its children.
     public static final int REMOVE_NODE_AND_CHILDREN = 2;
 
-    /**
-     * The root of the global groups tree
-     */
+    /// The root of the global groups tree
     private final GroupTreeNodeViewModel m_groupsRootHandle;
 
-    /**
-     * The subtree that was added or removed
-     */
+    /// The subtree that was added or removed
     private final GroupTreeNode m_subtreeBackup;
 
-    /**
-     * In case of removing a node but keeping all of its children, the number of children has to be stored.
-     */
+    /// In case of removing a node but keeping all of its children, the number of children has to be stored.
     private final int m_subtreeRootChildCount;
 
-    /**
-     * The path to the edited subtree's root node
-     */
+    /// The path to the edited subtree's root node
     private final List<Integer> m_pathToNode;
 
-    /**
-     * The type of the editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN, REMOVE_NODE_AND_CHILDREN)
-     */
+    /// The type of the editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN, REMOVE_NODE_AND_CHILDREN)
     private final int m_editType;
 
-    /**
-     * Creates an object that can undo/redo an edit event.
-     *
-     * @param groupsRoot The global groups root.
-     * @param editType   The type of editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN,
-     *                   REMOVE_NODE_AND_CHILDREN)
-     * @param editedNode The edited node (which was added or will be removed). The node
-     *                   must be a descendant of node <b>groupsRoot</b>! This means
-     *                   that, in case of adding, you first have to add it to the tree,
-     *                   then call this constructor. When removing, you first have to
-     *                   call this constructor, then remove the node.
-     */
+    /// Creates an object that can undo/redo an edit event.
+    ///
+    /// @param groupsRoot The global groups root.
+    /// @param editType   The type of editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN, REMOVE_NODE_AND_CHILDREN)
+    /// @param editedNode The edited node (which was added or will be removed). The node must be a descendant of node **groupsRoot**! This means that, in case of adding, you first have to add it to the tree, then call this constructor. When removing, you first have to call this constructor, then remove the node.
     public UndoableAddOrRemoveGroup(GroupTreeNodeViewModel groupsRoot,
                                     GroupTreeNodeViewModel editedNode, int editType) {
         m_groupsRootHandle = groupsRoot;

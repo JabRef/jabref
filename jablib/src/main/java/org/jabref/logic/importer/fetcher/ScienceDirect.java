@@ -29,10 +29,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>.
- * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
- */
+/// FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>.
+/// See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
 public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "ScienceDirect";
 

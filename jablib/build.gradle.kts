@@ -8,7 +8,6 @@ import java.util.*
 
 plugins {
     id("org.jabref.gradle.module")
-    id("org.jabref.gradle.feature.download")
     id("java-library")
 
     id("antlr")
@@ -17,11 +16,9 @@ plugins {
 
     id("com.vanniktech.maven.publish") version "0.35.0"
 
-    // id("dev.jbang") version "0.3.0"
-    // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    id("com.github.koppor.jbang-gradle-plugin")
+    id("dev.jbang") version "0.4.0"
 
-    id("net.ltgt.errorprone") version "4.3.0"
+    id("net.ltgt.errorprone") version "4.4.0"
     id("net.ltgt.nullaway") version "2.3.0"
 }
 
@@ -278,28 +275,18 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     onlyIf { !cslCatalogJsonProv.get().asFile.exists() }
 }
 
-val ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
-
-tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadLtwaFile") {
-    src("https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv")
-    dest(ltwaCsvFile)
-    onlyIfModified(true)
-}
-
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
-    dependsOn("downloadLtwaFile", tasks.named("generateGrammarSource"))
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateCitationStyleCatalog)
 
     script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
 
-    inputs.file(ltwaCsvFile)
-    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv");
+    inputs.file(layout.buildDirectory.file("../src/main/resources/ltwa/ltwa_20210702.csv"))
+    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv")
     outputs.file(ltwaListMv)
     val ltwaListMvProv = ltwaListMv
-    onlyIf { !ltwaListMvProv.get().asFile.exists() }
 }
 
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory

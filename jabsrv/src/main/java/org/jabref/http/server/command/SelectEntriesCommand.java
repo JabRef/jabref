@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.http.JabRefSrvStateManager;
+import org.jabref.http.SrvStateManager;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -18,15 +20,17 @@ import jakarta.ws.rs.core.Response;
 import org.glassfish.hk2.api.ServiceLocator;
 
 @JsonTypeName("selectentries")
-public class SelectEntriesCommand implements Command {
+public class SelectEntriesCommand extends Command {
 
     @JsonIgnore
     private ServiceLocator serviceLocator;
 
     @JsonProperty
-    private String libraryId = "";
-    @JsonProperty
     private List<String> citationKeys = new ArrayList<>();
+
+    @JsonProperty
+    private String libraryId = "";
+
     @JsonProperty
     private List<String> entryIds = new ArrayList<>();
 
@@ -35,13 +39,20 @@ public class SelectEntriesCommand implements Command {
 
     @Override
     public Response execute() {
-        if (getSrvStateManager() instanceof JabRefSrvStateManager) {
+        if (!citationKeys.isEmpty()) {
+            return execute(new UiCommand.SelectEntryKeys(citationKeys));
+        }
+
+        // Required for JabMap
+
+        SrvStateManager srvStateManager = serviceLocator.getService(SrvStateManager.class);
+        if (srvStateManager instanceof JabRefSrvStateManager) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("This command is not supported in CLI mode.")
                            .build();
         }
 
-        Optional<CommandSelectionTab> activeTab = getSrvStateManager().getActiveSelectionTabProperty().getValue();
+        Optional<CommandSelectionTab> activeTab = srvStateManager.getActiveSelectionTabProperty().getValue();
         if (activeTab.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("This command cannot be executed because no library is opened.")
@@ -69,39 +80,5 @@ public class SelectEntriesCommand implements Command {
         return bibDatabaseContext.getDatabasePath()
                                  .map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
                                  .orElse("");
-    }
-
-    @Override
-    public void setServiceLocator(ServiceLocator serviceLocator) {
-        this.serviceLocator = serviceLocator;
-    }
-
-    @Override
-    public ServiceLocator getServiceLocator() {
-        return this.serviceLocator;
-    }
-
-    public String getLibraryId() {
-        return libraryId;
-    }
-
-    public List<String> getCitationKeys() {
-        return citationKeys;
-    }
-
-    public List<String> getEntryIds() {
-        return entryIds;
-    }
-
-    public void setLibraryId(String libraryId) {
-        this.libraryId = libraryId;
-    }
-
-    public void setCitationKeys(List<String> citationKeys) {
-        this.citationKeys = citationKeys;
-    }
-
-    public void setEntryIds(List<String> entryIds) {
-        this.entryIds = entryIds;
     }
 }

@@ -11,8 +11,8 @@ on:
       - '**/*.tex'
   pull_request:
     paths:
-        - '**/*.bib'
-        - '**/*.tex'
+      - '**/*.bib'
+      - '**/*.tex'
   schedule:
     - cron: '1 2 5 * *'
   workflow_dispatch:
@@ -31,9 +31,9 @@ jobs:
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4
         with:
-           package_file: jablib/src/test/latex/Texlivefile
+          package_file: jablib/src/test/latex/Texlivefile
   check-latex:
-    needs: [cache]
+    needs: [ cache ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

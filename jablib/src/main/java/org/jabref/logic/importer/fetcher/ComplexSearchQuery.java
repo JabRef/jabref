@@ -190,9 +190,7 @@ public class ComplexSearchQuery {
             return this;
         }
 
-        /**
-         * Adds author and wraps it in quotes
-         */
+        /// Adds author and wraps it in quotes
         public ComplexSearchQueryBuilder author(@NonNull String author) {
             if (author.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
@@ -202,9 +200,7 @@ public class ComplexSearchQuery {
             return this;
         }
 
-        /**
-         * Adds title phrase and wraps it in quotes
-         */
+        /// Adds title phrase and wraps it in quotes
         public ComplexSearchQueryBuilder titlePhrase(@NonNull String titlePhrase) {
             if (titlePhrase.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
@@ -214,9 +210,7 @@ public class ComplexSearchQuery {
             return this;
         }
 
-        /**
-         * Adds abstract phrase and wraps it in quotes
-         */
+        /// Adds abstract phrase and wraps it in quotes
         public ComplexSearchQueryBuilder abstractPhrase(@NonNull String abstractPhrase) {
             if (abstractPhrase.isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
@@ -284,14 +278,13 @@ public class ComplexSearchQuery {
             return this;
         }
 
-        /**
-         * Instantiates the AdvancesSearchConfig from the provided Builder parameters
-         * If all text fields are empty an empty optional is returned
-         *
-         * @return ComplexSearchQuery instance with the fields set to the values defined in the building instance.
-         * @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
-         *                               See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
-         */
+        /// Instantiates the AdvancesSearchConfig from the provided Builder parameters
+        /// If all text fields are empty an empty optional is returned
+        ///
+        /// See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
+        ///
+        /// @return ComplexSearchQuery instance with the fields set to the values defined in the building instance.
+        /// @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
         public ComplexSearchQuery build() throws IllegalStateException {
             if (textSearchFieldsAndYearFieldsAreEmpty()) {
                 throw new IllegalStateException("At least one text field has to be set");
