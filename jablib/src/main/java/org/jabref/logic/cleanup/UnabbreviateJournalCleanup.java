@@ -12,9 +12,7 @@ import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * Unabbreviates journal field.
- */
+/// Unabbreviates journal field.
 public class UnabbreviateJournalCleanup implements CleanupJob {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final BibDatabase database;
