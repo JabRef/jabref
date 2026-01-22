@@ -146,6 +146,36 @@ tasks.named<JavaExec>("run") {
     enableAssertions = true
 }
 
+tasks.register<Copy>("copyLinuxIcon") {
+    from(layout.projectDirectory.file("buildres/linux/JabRef.png"))
+    into(layout.projectDirectory)
+}
+tasks.named("jPackageUbuntu-22.04") {
+    dependsOn("copyLinuxIcon")
+}
+tasks.named("jPackageUbuntu-22.04-arm") {
+    dependsOn("copyLinuxIcon")
+}
+
+tasks.register<Copy>("copyMacOsIcon") {
+    from(layout.projectDirectory.file("buildres/macos/JabRef.icns"))
+    into(layout.projectDirectory)
+}
+tasks.named("jPackageMacos-15") {
+    dependsOn("copyMacOsIcon")
+}
+tasks.named("jPackageMacos-15-intel") {
+    dependsOn("copyMacOsIcon")
+}
+
+tasks.register<Copy>("copyWindowsIcon") {
+    from(layout.projectDirectory.file("buildres/windows/JabRef.ico"))
+    into(layout.projectDirectory)
+}
+tasks.named("jPackageWindows-latest") {
+    dependsOn("copyWindowsIcon")
+}
+
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     applicationName = "JabRef"
