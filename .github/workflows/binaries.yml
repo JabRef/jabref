@@ -112,7 +112,7 @@ jobs:
           else
             echo "🛡️ JDK stable version used"
             echo "🛡️ JDK stable version used" >> "$GITHUB_STEP_SUMMARY"
-            echo "useEaJdk=true" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
           fi
           # Enable testing of EA JDKs later even if not triggered by workflow dispatch
           echo "jdkVersion=${{ inputs.jdkVersion || 26 }}" >> "$GITHUB_OUTPUT"
