@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.undo.UndoManager;
 
@@ -124,7 +125,11 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         String keywordSeparator = String.valueOf(viewModel.getKeywordSeparator());
         keywordTagsField.getEditor().setOnKeyReleased(event -> {
             if (event.getText().equals(keywordSeparator)) {
-                keywordTagsField.commit();
+                String editorText = keywordTagsField.getEditor().getText();
+
+                if (isSeparatedKeyword(editorText, keywordSeparator)) {
+                    keywordTagsField.commit();
+                }
                 event.consume();
             }
         });
@@ -153,6 +158,21 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         });
 
         Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
+    }
+
+    private boolean isSeparatedKeyword(String keywordString, String keywordSeparator) {
+        if (keywordString.isEmpty()) {
+            return false;
+        }
+
+        int separatorFirstOccurrence = keywordString.lastIndexOf(keywordSeparator);
+        String substringWithSeparator = new StringBuilder(keywordString.substring(0, separatorFirstOccurrence)).reverse().toString();
+
+        AtomicBoolean isSeparatedKeyword = new AtomicBoolean(true);
+        substringWithSeparator.chars().takeWhile(symbol -> symbol == Keyword.DEFAULT_ESCAPE_SYMBOL)
+                              .forEachOrdered(_ -> isSeparatedKeyword.set(!isSeparatedKeyword.get()));
+
+        return isSeparatedKeyword.get();
     }
 
     private Node createTag(Keyword keyword) {
