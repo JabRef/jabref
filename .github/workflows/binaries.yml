@@ -35,6 +35,16 @@ on:
         type: number
         required: false
         default: 26
+      jdkVersionBranch:
+        description: "JDK version branch"
+        type: choice
+        required: false
+        default: stable
+        options:
+          # use the next JDK
+          - stable
+          # use the next-next JDK
+          - latest
       javafxVersion:
         description: "JavaFX version"
         type: string
@@ -71,6 +81,7 @@ jobs:
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
       useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
       jdkVersion: ${{ steps.binary.outputs.jdkVersion }}
+      jdkVersionBranch: ${{ steps.binary.outputs.jdkVersionBranch }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
       - name: Determine conditions
@@ -105,6 +116,7 @@ jobs:
           fi
           # Enable testing of EA JDKs later even if not triggered by workflow dispatch
           echo "jdkVersion=${{ inputs.jdkVersion || 26 }}" >> "$GITHUB_OUTPUT"
+          echo "jdkVersionBranch=${{ inputs.jdkVersionStable || stable }}" >> "$GITHUB_OUTPUT"
           echo "javafxVersion=${{ inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
@@ -294,8 +306,7 @@ jobs:
         with:
           website: jdk.java.net
           release: EA
-          # use the next JDK, not the next-next
-          version: stable
+          version: ${{ needs.conditions.outputs.jdkVersionBranch }}
       - name: Tell gradle to use JDK EA and JavaFX EA (macOS)
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' && (startsWith(matrix.os, 'macos')) }}
         run: |
