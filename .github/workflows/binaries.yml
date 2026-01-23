@@ -26,12 +26,12 @@ on:
         required: false
         default: false
       jdkVersion:
-        description: "JDK EA version"
+        description: "JDK EA version (used for gradle)"
         type: number
         required: false
         default: 26
-      jdkVersionBranch:
-        description: "JDK EA version branch"
+      jdkVersionFlavour:
+        description: "JDK EA flavour (used for oracle-actions/setup-java)"
         type: choice
         required: false
         default: stable
@@ -41,7 +41,7 @@ on:
           # use the next-next JDK
           - latest
       javafxVersion:
-        description: "JavaFX EA version"
+        description: "JavaFX EA"
         type: string
         required: false
         default: "26-ea+22"
@@ -76,7 +76,7 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionBranch }}-${{ github.event.inputs.javafxVersion }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
   cancel-in-progress: true
 
 jobs:
@@ -91,7 +91,7 @@ jobs:
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
       useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
       jdkVersion: ${{ steps.binary.outputs.jdkVersion }}
-      jdkVersionBranch: ${{ steps.binary.outputs.jdkVersionBranch }}
+      jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
       - name: Determine conditions
@@ -119,11 +119,11 @@ jobs:
             echo "🚀 JDK EA build enabled"
             echo "🚀 JDK EA build enabled" >> "$GITHUB_STEP_SUMMARY"
 
-            echo "JDK version:    ${{ github.event.inputs.jdkVersion }}"
-            echo "JDK version:    ${{ github.event.inputs.jdkVersion }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "JDK EA version: ${{ github.event.inputs.jdkVersion }}"
+            echo "JDK EA version: ${{ github.event.inputs.jdkVersion }}" >> "$GITHUB_STEP_SUMMARY"
 
-            echo "JDK branch:     ${{ github.event.inputs.jdkVersionBranch }}"
-            echo "JDK branch:     ${{ github.event.inputs.jdkVersionBranch }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "JDK EA flavour: ${{ github.event.inputs.jdkVersionFlavour }}"
+            echo "JDK EA flavour: ${{ github.event.inputs.jdkVersionFlavour }}" >> "$GITHUB_STEP_SUMMARY"
 
             echo "JavaFX version: ${{ github.event.inputs.javafxVersion }}"
             echo "JavaFX version: ${{ github.event.inputs.javafxVersion }}" >> "$GITHUB_STEP_SUMMARY"
@@ -136,7 +136,7 @@ jobs:
           fi
           # Enable testing of EA JDKs later even if not triggered by workflow dispatch
           echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
-          echo "jdkVersionBranch=${{ github.event.inputs.jdkVersionBranch || 'stable' }}" >> "$GITHUB_OUTPUT"
+          echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
           echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
@@ -332,7 +332,7 @@ jobs:
         with:
           website: jdk.java.net
           release: EA
-          version: ${{ needs.conditions.outputs.jdkVersionBranch }}
+          version: ${{ needs.conditions.outputs.jdkVersionFlavour }}
       - name: Tell gradle to use JDK EA and JavaFX EA
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         shell: bash
