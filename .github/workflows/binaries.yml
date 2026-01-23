@@ -498,7 +498,7 @@ jobs:
         with:
           name: JabLs (${{ matrix.displayName }})
           path: |
-            jabls/build/packages/${{ matrix.os }}
+            jabls-cli/build/packages/${{ matrix.os }}
 
       # Currently not packaged, but we build and smoke test it to detect errors early
       - name: Smoke test jabsrv-cli
