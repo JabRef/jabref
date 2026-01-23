@@ -109,11 +109,11 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         keywordTagsField.setTagViewFactory(this::createTag);
 
         keywordTagsField.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
-        keywordTagsField.setConverter(KeywordsEditorViewModel.getStringConverter());
+        keywordTagsField.setConverter(viewModel.getStringConverter());
         keywordTagsField.setMatcher((keyword, searchText) -> keyword.get().toLowerCase().startsWith(searchText.toLowerCase()));
         keywordTagsField.setComparator(Comparator.comparing(Keyword::get));
 
-        keywordTagsField.setNewItemProducer(searchText -> KeywordsEditorViewModel.getStringConverter().fromString(searchText));
+        keywordTagsField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
 
         keywordTagsField.setShowSearchIcon(false);
         keywordTagsField.setOnMouseClicked(_ -> keywordTagsField.getEditor().requestFocus());
