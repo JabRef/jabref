@@ -316,12 +316,12 @@ jobs:
         if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os != 'windows-latest') }}
         run: |
           cd /tmp
-          unzip jmods.zip "javafx-jmods-26"
+          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
       - name: Extract JavaFX JMODs (Windows)
         if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os == 'windows-latest') }}
         run: |
           cd C:\temp
-          unzip jmods.zip "javafx-jmods-26"
+          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
       # endregion
 
       - uses: ./.github/actions/setup-gradle
