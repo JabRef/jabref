@@ -22,6 +22,7 @@ class MonthPlausibilityComparatorTest {
             "June, July, UNDETERMINED",
             "#jun#, #jul#, UNDETERMINED",
             "June, #Apr#, UNDETERMINED",
+            "#Apr#, June, UNDETERMINED",
 
             "NotAMonth, #jun#, RIGHT_BETTER",
             "NotAMonth, June, RIGHT_BETTER",

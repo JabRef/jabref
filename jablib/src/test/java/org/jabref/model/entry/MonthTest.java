@@ -9,6 +9,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class MonthTest {
@@ -365,20 +367,25 @@ class MonthTest {
 
     @ParameterizedTest
     @CsvSource({
-            "6, true",
-            "12, true",
-            "#jun#, true",
-            "#jul#, true",
-            "June, false",
-            "July, false",
-            "jun, false",
-            "NotAMonth, false",
-            ", false"
+            "6",
+            "12",
+            "#jun#",
+            "#jul#",
     })
-    void isStrictFormatIdentifyCorrectFormats(String input, boolean expected) {
-        if (input == null) {
-            input = "";
-        }
-        assertEquals(expected, Month.isStrictFormat(input));
+    void isStrictFormat(String input) {
+        assertTrue(Month.isStrictFormat(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "June",
+            "July",
+            "jun",
+            "NotAMonth",
+            "#not#strict#format#",
+            "''"
+    })
+    void isNotStrictFormat(String input) {
+        assertFalse(Month.isStrictFormat(input));
     }
 }

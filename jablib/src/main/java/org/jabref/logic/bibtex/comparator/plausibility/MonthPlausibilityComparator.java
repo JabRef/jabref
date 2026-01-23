@@ -34,11 +34,11 @@ public class MonthPlausibilityComparator implements FieldValuePlausibilityCompar
             }
 
             if (leftStrict && rightStrict) {
-                boolean leftIsMacro = left.trim().startsWith("#");
-                boolean rightIsMacro = right.trim().startsWith("#");
+                boolean leftIsBibtexConstant = left.trim().startsWith("#");
+                boolean rightIsBibtexConstant = right.trim().startsWith("#");
 
-                if (leftIsMacro != rightIsMacro) {
-                    return leftIsMacro ? ComparisonResult.LEFT_BETTER : ComparisonResult.RIGHT_BETTER;
+                if (leftIsBibtexConstant != rightIsBibtexConstant) {
+                    return leftIsBibtexConstant ? ComparisonResult.LEFT_BETTER : ComparisonResult.RIGHT_BETTER;
                 }
             }
         }
