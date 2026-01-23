@@ -5,10 +5,8 @@ import javafx.collections.ObservableList;
 
 import org.tinylog.core.LogEntry;
 
-/**
- * This class is used for storing and archiving all message output of JabRef as log events.
- * To listen to changes on the stored logs one can bind to the {@code messagesProperty}.
- */
+/// This class is used for storing and archiving all message output of JabRef as log events.
+/// To listen to changes on the stored logs one can bind to the `messagesProperty`.
 public class LogMessages {
 
     private static LogMessages instance = new LogMessages();

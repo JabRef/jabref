@@ -76,11 +76,9 @@ public class GuiPushToApplicationSettings {
         settingsPane.getColumnConstraints().addAll(textConstraints, pathConstraints, browseConstraints);
     }
 
-    /**
-     * This method is called to indicate that the settings panel returned from the getSettingsPanel() method has been
-     * shown to the user and that the user has indicated that the settings should be stored. This method must store the
-     * state of the widgets in the settings panel to Globals.prefs.
-     */
+    /// This method is called to indicate that the settings panel returned from the getSettingsPanel() method has been
+    /// shown to the user and that the user has indicated that the settings should be stored. This method must store the
+    /// state of the widgets in the settings panel to Globals.prefs.
     public void storeSettings() {
         Map<String, String> commandPaths = new HashMap<>(preferences.getCommandPaths());
         commandPaths.put(application.getDisplayName(), path.getText());

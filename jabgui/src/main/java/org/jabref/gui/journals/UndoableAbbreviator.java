@@ -13,7 +13,7 @@ import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-// Undo redo stuff
+/// Undo redo stuff
 public class UndoableAbbreviator {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final AbbreviationType abbreviationType;
@@ -25,15 +25,13 @@ public class UndoableAbbreviator {
         this.useFJournalField = useFJournalField;
     }
 
-    /**
-     * Abbreviate the journal name of the given entry.
-     *
-     * @param database  The database the entry belongs to, or null if no database.
-     * @param entry     The entry to be treated.
-     * @param fieldName The field name (e.g. "journal")
-     * @param compoundEdit        If the entry is changed, add an edit to this compound.
-     * @return true if the entry was changed, false otherwise.
-     */
+    /// Abbreviate the journal name of the given entry.
+    ///
+    /// @param database     The database the entry belongs to, or null if no database.
+    /// @param entry        The entry to be treated.
+    /// @param fieldName    The field name (e.g. "journal")
+    /// @param compoundEdit If the entry is changed, add an edit to this compound.
+    /// @return true if the entry was changed, false otherwise.
     public boolean abbreviate(BibDatabase database, BibEntry entry, Field fieldName, CompoundEdit compoundEdit) {
         if (!entry.hasField(fieldName)) {
             return false;

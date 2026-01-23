@@ -27,9 +27,7 @@ public class DatabaseSearcher {
         this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgreServer);
     }
 
-    /**
-     * @return The matches in the order they appear in the library.
-     */
+    /// @return The matches in the order they appear in the library.
     public List<BibEntry> getMatches(SearchQuery query) {
         LOGGER.debug("Search term: {}", query);
 
