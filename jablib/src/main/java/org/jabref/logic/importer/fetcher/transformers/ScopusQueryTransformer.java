@@ -2,22 +2,19 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
-/**
- * Query transformer for the Scopus Search API.
- * <p>
- * Scopus uses specific field codes for advanced search:
- * <ul>
- * <li>TITLE-ABS-KEY-AUTH() for searching in title, abstract, author and keywords</li>
- * <li>AUTH() for author search</li>
- * <li>SRCTITLE() for journal/source title search</li>
- * <li>PUBYEAR for publication year</li>
- * <li>DOI() for DOI search</li>
- * </ul>
- * <p>
- * Scopus supports AND, OR, AND NOT as boolean operators.
- * <p>
- * See: <a href="https://dev.elsevier.com/sc_search_tips.html">https://dev.elsevier.com/sc_search_tips.html</a>
- */
+/// Query transformer for the Scopus Search API.
+///
+/// Scopus uses specific field codes for advanced search:
+///
+/// - `TITLE-ABS-KEY-AUTH()` for searching in title, abstract, author and keywords
+/// - `AUTH()` for author search
+/// - `SRCTITLE()` for journal/source title search
+/// - `PUBYEAR` for publication year
+/// - `DOI()` for DOI search
+///
+/// Scopus supports AND, OR, AND NOT as boolean operators.
+///
+/// See: <https://dev.elsevier.com/sc_search_tips.html>.
 public class ScopusQueryTransformer extends YearRangeByFilteringQueryTransformer {
 
     @Override
