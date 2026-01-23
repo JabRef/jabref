@@ -643,6 +643,6 @@ jobs:
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v6
         with:
-          name: $${ matrix.displayName }} notarized
+          name: ${{ matrix.displayName }} notarized
           path: |
             ${{ matrix.path }}/build/packages/${{ matrix.os }}
