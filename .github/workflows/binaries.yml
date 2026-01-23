@@ -118,6 +118,16 @@ jobs:
           if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
             echo "🚀 JDK EA build enabled"
             echo "🚀 JDK EA build enabled" >> "$GITHUB_STEP_SUMMARY"
+
+            echo "JDK version:    ${{ github.event.inputs.jdkVersion }}"
+            echo "JDK version:    ${{ github.event.inputs.jdkVersion }}" >> "$GITHUB_STEP_SUMMARY"
+
+            echo "JDK branch:     ${{ github.event.inputs.jdkVersionBranch }}"
+            echo "JDK branch:     ${{ github.event.inputs.jdkVersionBranch }}" >> "$GITHUB_STEP_SUMMARY"
+
+            echo "JavaFX version: ${{ github.event.inputs.javafxVersion }}"
+            echo "JavaFX version: ${{ github.event.inputs.javafxVersion }}" >> "$GITHUB_STEP_SUMMARY"
+
             echo "useEaJdk=true" >> "$GITHUB_OUTPUT"
           else
             echo "🛡️ JDK stable version used"
