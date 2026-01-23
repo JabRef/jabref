@@ -12,6 +12,14 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 val mockitoAgent = configurations.create("mockitoAgent")
 
+// See https://bugs.openjdk.org/browse/JDK-8342623
+val target = java.toolchain.languageVersion.get().asInt()
+if (target >= 26) {
+    dependencies {
+        implementation("org.openjfx:jdk-jsobject")
+    }
+}
+
 dependencies {
     implementation(project(":jablib"))
     // Following already provided by jablib
@@ -25,7 +33,6 @@ dependencies {
 
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
-    implementation("org.openjfx:jdk-jsobject") // See https://bugs.openjdk.org/browse/JDK-8342623
 
     implementation("com.pixelduke:fxthemes")
 
