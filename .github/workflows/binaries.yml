@@ -55,6 +55,11 @@ on:
         type: boolean
         required: false
         default: false
+      upload-as-artifact:
+        description: "Upload to GitHub artifacts store"
+        type: boolean
+        required: false
+        default: true
 
 permissions:
   actions: write
@@ -472,6 +477,16 @@ jobs:
             jabgui/build/packages/${{ matrix.os }}
             jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
+
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: packages-${{ matrix.os }}
+          path: |
+            jabgui/build/packages/${{ matrix.os }}
+            jabkit/build/packages/${{ matrix.os }}
+            jabls-cli/build/packages/${{ matrix.os }}
 
       # Currently not packaged, but we build and smoke test it to detect errors early
       - name: Smoke test jabsrv-cli
