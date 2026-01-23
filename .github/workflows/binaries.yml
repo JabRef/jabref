@@ -471,7 +471,7 @@ jobs:
         shell: bash
         run: |
           ./gradlew :jabls-cli:run --args="--help"
-      - name: Smoke test JabSrv-CLI
+      - name: Smoke test jabsrv-cli
         shell: bash
         run: |
           ./gradlew :jabsrv-cli:run --args="--help"
