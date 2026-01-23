@@ -162,11 +162,10 @@ jobs:
              echo "☁️ will upload" >> $GITHUB_STEP_SUMMARY
              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
              exit 0;
-          else
-            echo "⊘ no macOS notarization"
-            echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
-            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "⊘ no macOS notarization"
+          echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
+          echo "should-notarize=false" >> "$GITHUB_OUTPUT"
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}"
