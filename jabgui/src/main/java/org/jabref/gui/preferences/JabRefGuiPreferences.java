@@ -240,8 +240,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private JabRefGuiPreferences() {
         super();
 
-        defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
-
         defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
         // endregion
 
