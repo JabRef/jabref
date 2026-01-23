@@ -76,7 +76,7 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionBranch }}-${{ github.event.inputs.javafxVersion }}"
   cancel-in-progress: true
 
 jobs:
@@ -115,7 +115,7 @@ jobs:
             exit 0
           fi
 
-          if [[ "${{ inputs.useEaJdk }}" == "true" ]]; then
+          if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
             echo "🚀 JDK EA build enabled"
             echo "🚀 JDK EA build enabled" >> "$GITHUB_STEP_SUMMARY"
             echo "useEaJdk=true" >> "$GITHUB_OUTPUT"
