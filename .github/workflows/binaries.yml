@@ -25,11 +25,21 @@ on:
         type: boolean
         required: false
         default: false
-      eaJdk:
+      useEaJdk:
         description: "Use Early-Access JDK?"
         type: boolean
         required: false
         default: false
+      jdkVersion:
+        description: "JDK version"
+        type: number
+        required: false
+        default: 26
+      javafxVersion:
+        description: "JavaFX version"
+        type: string
+        required: false
+        default: "26-ea+22"
 
 permissions:
   actions: write
@@ -59,8 +69,9 @@ jobs:
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
-      eaJdk:  ${{ steps.binary.outputs.eaJdk }}
-
+      useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
+      jdkVersion: ${{ steps.binary.outputs.jdkVersion }}
+      javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
       - name: Determine conditions
         id: binary
@@ -83,15 +94,18 @@ jobs:
             exit 0
           fi
 
-          if [[ "${{ inputs.eaJdk }}" == "true" ]]; then
+          if [[ "${{ inputs.useEaJdk }}" == "true" ]]; then
             echo "🚀 JDK EA build enabled"
             echo "🚀 JDK EA build enabled" >> "$GITHUB_STEP_SUMMARY"
-            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=true" >> "$GITHUB_OUTPUT"
           else
             echo "🛡️ JDK stable version used"
             echo "🛡️ JDK stable version used" >> "$GITHUB_STEP_SUMMARY"
-            echo "eaJdk=true" >> "$GITHUB_OUTPUT"
+            echo "useEaJdk=true" >> "$GITHUB_OUTPUT"
           fi
+          # Enable testing of EA JDKs later even if not triggered by workflow dispatch
+          echo "jdkVersion=${{ inputs.jdkVersion || 26 }}" >> "$GITHUB_OUTPUT"
+          echo "javafxVersion=${{ inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "⊘ Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
@@ -275,26 +289,26 @@ jobs:
 
       # region setup JDK EA and JavaFX EA
       - name: 'Set up latest JDK EA from jdk.java.net'
-        if: ${{ needs.conditions.outputs.eaJdk == 'true' }}
+        if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         uses: oracle-actions/setup-java@v1
         with:
           website: jdk.java.net
           release: EA
           # use the next JDK, not the next-next
           version: stable
-      - name: Tell gradle to use JDK 26 and JavaFX 26 (macOS)
-        if: ${{ needs.conditions.outputs.eaJdk == 'true' && (startsWith(matrix.os, 'macos')) }}
+      - name: Tell gradle to use JDK EA and JavaFX EA (macOS)
+        if: ${{ needs.conditions.outputs.useEaJdk == 'true' && (startsWith(matrix.os, 'macos')) }}
         run: |
-          sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i '' "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i '' "s/val javafx = .*/val javafx = \"26-ea+22\"/" versions/build.gradle.kts
-      - name: Tell gradle to use JDK 26 and JavaFX 26 (Linux, Windows)
-        if: ${{ needs.conditions.outputs.eaJdk == 'true' && (!startsWith(matrix.os, 'macos')) }}
+          sed -i '' "s/val javafx = .*/val javafx = \"${{ needs.conditions.outputs.javafxVersion }}\"/" versions/build.gradle.kts
+      - name: Tell gradle to use JDK EA and JavaFX EA (Linux, Windows)
+        if: ${{ needs.conditions.outputs.useEaJdk == 'true' && (!startsWith(matrix.os, 'macos')) }}
         shell: bash
         run: |
-          sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i 's/val javafx = .*/val javafx = "26-ea+22"' versions/build.gradle.kts
+          sed -i 's/val javafx = .*/val javafx = "${{ needs.conditions.outputs.javafxVersion }}"' versions/build.gradle.kts
       # endregion
 
       - uses: ./.github/actions/setup-gradle
@@ -323,7 +337,7 @@ jobs:
 
       - name: jpackage JabGui
         shell: bash
-        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.eaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
+        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
 
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
