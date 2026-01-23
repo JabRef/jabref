@@ -575,12 +575,12 @@ jobs:
             suffix: '_intel'
           - os: macos-15
             displayName: jabls macOS (ARM64)
-            path: 'jabls'
+            path: 'jabls-cli'
             prefix: 'jabls'
             suffix: '_silicon'
           - os: macos-15-intel
             displayName: jabls macOS (intel)
-            path: 'jabls'
+            path: 'jabls-cli'
             prefix: 'jabls'
             suffix: '_intel'
     runs-on: ${{ matrix.os }}
