@@ -310,7 +310,7 @@ jobs:
           PS4='+$LINENO: '
           sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i 's/val javafx = .*/val javafx = "${{ needs.conditions.outputs.javafxVersion }}"' versions/build.gradle.kts
+          sed -i 's/val javafx = .*/val javafx = "${{ needs.conditions.outputs.javafxVersion }}"/' versions/build.gradle.kts
       # endregion
 
       - uses: ./.github/actions/setup-gradle
