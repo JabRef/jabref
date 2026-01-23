@@ -314,7 +314,8 @@ jobs:
           set -ex
           PS4='+$LINENO: '
           SED_EXT=''
-          if [[ "${{ matrix.os }}" == "macos-13" || "${{ matrix.os }}" == "macos-14" || "${{ matrix.os }}" == "macos-latest" ]]; then
+          IS_MACOS=${{ startsWith(matrix.os, 'macos') }}
+          if [[ "$IS_MACOS" == "true" ]]; then
             SED_EXT="''"
           fi
           sed -i $SED_EXT "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
