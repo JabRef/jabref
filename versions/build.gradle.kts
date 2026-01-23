@@ -55,7 +55,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-base:$javafx")
     api("org.openjfx:javafx-controls:$javafx")
     api("org.openjfx:javafx-fxml:$javafx")
-    api("org.openjfx:javafx-graphics:${javafx}")
+    api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
     api("org.openjfx:jdk-jsobject:$javafx")
