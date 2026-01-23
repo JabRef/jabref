@@ -7,8 +7,8 @@ In short, please keep these [two principles](https://roe.dev/blog/using-ai-in-op
 > 1. Never let an LLM speak for you.
 > 2. Never let an LLM think for you.
 
-This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
-We reserve the right to reject pull requests that contain little or no genuine and original contribution from the contributor.
+This project does not accept fully AI-generated pull requests. AI tools may be used only for assistance (e.g. understanding existing code, writing out well-known algorithms). You must understand and take responsibility for every change you submit.
+We reserve the right to reject pull requests that contain little or no genuine contribution from the contributor (with regards to code as well as the thought behind changes).
 
 ## Our Rule
 
