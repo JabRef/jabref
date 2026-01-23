@@ -37,9 +37,9 @@
 //DEPS org.glassfish.hk2:hk2-api:3.1.1
 //DEPS org.glassfish.hk2:hk2-locator:3.1.1
 //DEPS org.glassfish.hk2:hk2-utils:3.1.1
-//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.0
-//DEPS org.glassfish.jersey.core:jersey-server:4.0.0
-//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.0
+//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.1
+//DEPS org.glassfish.jersey.core:jersey-server:4.0.1
+//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.1
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS tools.jackson.core:jackson-core:3.0.4
