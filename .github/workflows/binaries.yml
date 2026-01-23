@@ -21,12 +21,12 @@ on:
   workflow_dispatch:
     inputs:
       notarization:
-        description: "Notarize macOS DMG and PKG?"
+        description: "Notarize macOS DMG and PKG"
         type: boolean
         required: false
         default: false
       useEaJdk:
-        description: "Use Early-Access JDK?"
+        description: "Use Early-Access JDK"
         type: boolean
         required: false
         default: false
@@ -50,6 +50,11 @@ on:
         type: string
         required: false
         default: "26-ea+22"
+      upload:
+        description: "Upload to builds.jabref.org"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   actions: write
@@ -159,9 +164,9 @@ jobs:
           fi
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "☁️ Non-PR event – will upload"
-            echo "☁️ Non-PR event – will upload" >> $GITHUB_STEP_SUMMARY
-            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}"
+            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
+            echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
