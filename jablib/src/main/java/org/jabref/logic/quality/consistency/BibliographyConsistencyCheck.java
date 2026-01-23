@@ -27,8 +27,6 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
-import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
-import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -100,7 +98,7 @@ public class BibliographyConsistencyCheck {
     /// Computation takes place grouped by each entryType.
     /// Computes the fields set in all entries. In case entries of the same type has more fields defined, it is output.
     ///
-    ///  This class **does** check if required fields are set for an entry type but **does not** check if the fields are valid for the entry type.
+    /// This class **does** check if required fields are set for an entry type but **does not** check if the fields are valid for the entry type.
     ///
     /// That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
     ///
