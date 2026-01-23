@@ -288,7 +288,7 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.2.1
 
       # region setup JDK EA and JavaFX EA
-      - name: 'Set up latest JDK EA from jdk.java.net'
+      - name: Set up latest JDK EA from jdk.java.net
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         uses: oracle-actions/setup-java@v1
         with:
