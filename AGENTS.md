@@ -94,6 +94,7 @@ Agents **must not**:
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
 - Use specific exceptions, `catch (Exception e)` is a no-go
 - At exception, always `LOGGER.debug` (or higher level)
+- Use Markdown Javadoc comments (`///`) for multi-line comments
 
 ### Comments
 
