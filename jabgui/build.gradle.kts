@@ -18,6 +18,10 @@ if (target >= 26) {
     dependencies {
         implementation("org.openjfx:jdk-jsobject")
     }
+} else {
+    configurations.all {
+        exclude(group = "org.openjfx", module = "jdk-jsobject")
+    }
 }
 
 dependencies {
