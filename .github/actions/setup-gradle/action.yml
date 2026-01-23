@@ -6,16 +6,11 @@ runs:
     - name: Setup JDK
       uses: actions/setup-java@v5
       with:
-        java-version: '24'
+        java-version: '25'
         distribution: 'corretto'
         check-latest: true
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
-    - name: Cache LTWA
-      uses: actions/cache@v5
-      with:
-        path: /tmp/ltwa_20210702.csv
-        key: ltwa_20210702.csv
     - name: Generate JBang cache key
       id: cache-key
       shell: bash

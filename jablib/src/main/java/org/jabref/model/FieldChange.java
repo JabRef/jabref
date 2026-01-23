@@ -8,9 +8,7 @@ import org.jabref.model.entry.field.Field;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * This class is used in the instance of a field being modified, removed or added.
- */
+/// This class is used in the instance of a field being modified, removed or added.
 @NullMarked
 public class FieldChange {
 

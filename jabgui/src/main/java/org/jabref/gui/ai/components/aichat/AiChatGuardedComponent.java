@@ -18,9 +18,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import dev.langchain4j.data.message.ChatMessage;
 
-/**
- * Main class for AI chatting. It checks if the AI features are enabled and if the embedding model is properly set up.
- */
+/// Main class for AI chatting. It checks if the AI features are enabled and if the embedding model is properly set up.
 public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     /// This field is used for two purposes:
     /// 1. Logging

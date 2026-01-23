@@ -102,11 +102,9 @@ class CompositeSearchBasedFetcherTest {
         }
     }
 
-    /**
-     * This method provides other methods with different sized sets of search-based fetchers wrapped in arguments.
-     *
-     * @return A stream of Arguments wrapping set of fetchers.
-     */
+    /// This method provides other methods with different sized sets of search-based fetchers wrapped in arguments.
+    ///
+    /// @return A stream of Arguments wrapping set of fetchers.
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
@@ -115,7 +113,7 @@ class CompositeSearchBasedFetcherTest {
         when(importerPreferences.getApiKey(eq(AstrophysicsDataSystem.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.astrophysicsDataSystemAPIKey));
         when(importerPreferences.getApiKey(eq(SemanticScholarCitationFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.semanticScholarApiKey));
         when(importerPreferences.getApiKey(eq(BiodiversityLibrary.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.biodiversityHeritageApiKey));
-        when(importerPreferences.getApiKey(eq(ScienceDirect.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.scienceDirectApiKey));
+        when(importerPreferences.getApiKey(eq(Scopus.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.scopusApiKey));
         when(importerPreferences.getApiKey(eq(SpringerNatureWebFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.springerNatureAPIKey));
         when(importerPreferences.getApiKey(eq(IEEE.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.ieeeAPIKey));
 
@@ -134,7 +132,8 @@ class CompositeSearchBasedFetcherTest {
                 new CrossRef(),
                 new CiteSeer(),
                 new DOAJFetcher(importFormatPreferences),
-                new IEEE(importFormatPreferences, importerPreferences));
+                new IEEE(importFormatPreferences, importerPreferences),
+                new Scopus(importerPreferences));
 
         /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.

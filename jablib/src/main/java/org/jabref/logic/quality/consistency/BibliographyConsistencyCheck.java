@@ -27,6 +27,8 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -74,6 +76,7 @@ public class BibliographyConsistencyCheck {
     List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<OrFields> requiredFields) {
         return entries.stream()
                       .filter(entry -> {
+                          // This removes entries that have all differing fields set (could be confusing to the user)
                           boolean hasDifferingFields = !Collections.disjoint(filterExcludedFields(entry.getFields()), differingFields);
                           boolean hasMissingRequiredFields = requiredFields.stream()
                                                                            .anyMatch(orFields -> Collections.disjoint(orFields.getFields(), entry.getFields()));
@@ -92,17 +95,16 @@ public class BibliographyConsistencyCheck {
     public record EntryTypeResult(Collection<Field> fields, SequencedCollection<BibEntry> sortedEntries) {
     }
 
-    /**
-     * Checks the consistency of the given entries by looking at the present and absent fields.
-     * <p>
-     * Computation takes place grouped by each entryType.
-     * Computes the fields set in all entries. In case entries of the same type has more fields defined, it is output.
-     * <p>
-     * This class <em>does</em> check if required fields are set for an entry type but <em>does not</em> check if the fields are valid for the entry type.
-     * That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
-     *
-     * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
-     */
+    /// Checks the consistency of the given entries by looking at the present and absent fields.
+    ///
+    /// Computation takes place grouped by each entryType.
+    /// Computes the fields set in all entries. In case entries of the same type has more fields defined, it is output.
+    ///
+    ///  This class **does** check if required fields are set for an entry type but **does not** check if the fields are valid for the entry type.
+    ///
+    /// That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
+    ///
+    /// @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
     public Result check(BibDatabaseContext bibContext, BibEntryTypesManager bibEntryTypesManager, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();

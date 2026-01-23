@@ -7,9 +7,7 @@ import java.util.regex.Pattern;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-/**
- * Matches entries if the content of a given field is matched by a regular expression.
- */
+/// Matches entries if the content of a given field is matched by a regular expression.
 public class RegexKeywordGroup extends KeywordGroup {
     private final Pattern pattern;
 

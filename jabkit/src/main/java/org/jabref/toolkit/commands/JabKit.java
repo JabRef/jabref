@@ -85,9 +85,7 @@ public class JabKit implements Runnable {
         System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
     }
 
-    /**
-     * Reads URIs as input
-     */
+    /// Reads URIs as input
     protected static Optional<ParserResult> importFile(String importArguments,
                                                        String importFormat,
                                                        CliPreferences cliPreferences,

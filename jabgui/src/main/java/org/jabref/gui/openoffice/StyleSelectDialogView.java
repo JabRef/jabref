@@ -92,9 +92,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
 
-    /**
-     * ViewModel for the CitationStyle entries in the TableView
-     */
+    /// ViewModel for the CitationStyle entries in the TableView
 
     public StyleSelectDialogView(CSLStyleLoader cslStyleLoader, JStyleLoader jStyleLoader) {
         this.cslStyleLoader = cslStyleLoader;
@@ -288,10 +286,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         viewModel.addJStyleFile();
     }
 
-    /**
-     * When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.
-     * This function scrolls to the last selected style, while taking care of the delay.
-     */
+    /// When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.
+    /// This function scrolls to the last selected style, while taking care of the delay.
     private void onDialogShown(DialogEvent event) {
         if (!cslStylesTable.getItems().isEmpty()) {
             Platform.runLater(this::scrollToCurrentStyle);

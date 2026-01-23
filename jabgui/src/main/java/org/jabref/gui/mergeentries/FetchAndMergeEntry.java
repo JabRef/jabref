@@ -1,6 +1,5 @@
 package org.jabref.gui.mergeentries;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -37,15 +36,20 @@ import org.jabref.model.entry.types.EntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for fetching and merging bibliographic information
- */
+/// Class for fetching and merging bibliographic information
 public class FetchAndMergeEntry {
 
-    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.CompositeIdFetcher#performSearchById}
-    public static List<Field> SUPPORTED_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
+    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.WebFetchers#getIdBasedFetcherFoIdentifier}
+    public static List<Field> SUPPORTED_FIELDS =
+            List.of(
+                    StandardField.EPRINT, // arXiv
+                    StandardField.DOI,
+                    StandardField.ISBN,
+                    StandardField.ISSN
+            );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
+
     private final DialogService dialogService;
     private final UndoManager undoManager;
     private final StateManager stateManager;
