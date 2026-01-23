@@ -214,7 +214,6 @@ if (project.findProperty("eaJdkBuild")?.toString() == "true") {
     if (os.isWindows()) {
         tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach {
             modulePath.from("c:\\temp\\javafx-jmods-26")
-            addModules.addAll("jdk.jsobject")
         }
     } else {
         // dependencies { runtimeOnly(files("/tmp/javafx-jmods-26")) } // probably not required
@@ -222,7 +221,6 @@ if (project.findProperty("eaJdkBuild")?.toString() == "true") {
         // Note that ".from" adds to the path and does not replace (https://docs.gradle.org/current/javadoc/org/gradle/api/file/ConfigurableFileCollection.html#from(java.lang.Object...))
         tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach {
             modulePath.from("/tmp/javafx-jmods-26")
-            addModules.addAll("jdk.jsobject")
         }
     }
 } else {
