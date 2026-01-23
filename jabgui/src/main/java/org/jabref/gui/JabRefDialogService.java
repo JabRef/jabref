@@ -570,7 +570,7 @@ public class JabRefDialogService implements DialogService {
         }
     }
 
-    public List<NotificationGroup<?, ? extends Notification<Object>>> getNotifications() {
+    public List<NotificationGroup<?, ? extends Notification<Object>>> getNotificationGroups() {
         return List.of(fileNotifications, undefinedNotifications, previewNotifications);
     }
 }

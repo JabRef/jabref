@@ -300,7 +300,7 @@ public class JabRefGUI extends Application {
         debugLogWindowState(mainStage);
 
         PowerPane powerpane = new PowerPane();
-        powerpane.getInfoCenterPane().getInfoCenterView().getGroups().addAll(dialogService.getNotifications());
+        powerpane.getInfoCenterPane().getInfoCenterView().getGroups().addAll(dialogService.getNotificationGroups());
         Injector.setModelOrService(InfoCenterPane.class, powerpane.getInfoCenterPane());
         powerpane.setContent(JabRefGUI.mainFrame);
 
