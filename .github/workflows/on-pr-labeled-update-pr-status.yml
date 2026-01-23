@@ -2,11 +2,11 @@ name: Adapt PR status
 
 on:
   workflow_run:
-    workflows: ["On PR labeled"]
-    types: [completed]
+    workflows: [ "On PR labeled" ]
+    types: [ completed ]
 
 jobs:
-   mark-pr-ready-for-review:
+  mark-pr-ready-for-review:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:

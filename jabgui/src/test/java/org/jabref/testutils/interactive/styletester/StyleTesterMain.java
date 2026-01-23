@@ -10,12 +10,10 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.util.HeadlessExecutorService;
 
-/**
- * Useful for checking the display of different controls. Not needed inside of JabRef.
- */
+/// Useful for checking the display of different controls. Not needed inside of JabRef.
 public class StyleTesterMain extends Application {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         launch(args);
     }
 

@@ -37,13 +37,11 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
 
     private static final String API_URL = "https://scholar.archive.org/search";
 
-    /**
-     * Gets the query URL by luceneQuery and pageNumber.
-     *
-     * @param queryNode  the first node from the parsed query
-     * @param pageNumber the number of the page indexed from 0
-     * @return URL
-     */
+    /// Gets the query URL by luceneQuery and pageNumber.
+    ///
+    /// @param queryNode  the first node from the parsed query
+    /// @param pageNumber the number of the page indexed from 0
+    /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
@@ -63,11 +61,9 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
         return download;
     }
 
-    /**
-     * Gets the list of BibEntry by given Json response from scholar archive fetcher API
-     *
-     * @return Parser, list of BibEntry
-     */
+    /// Gets the list of BibEntry by given Json response from scholar archive fetcher API
+    ///
+    /// @return Parser, list of BibEntry
     @Override
     public Parser getParser() {
         return inputStream -> {

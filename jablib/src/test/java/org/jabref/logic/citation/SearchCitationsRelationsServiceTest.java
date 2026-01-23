@@ -20,9 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SearchCitationsRelationsServiceTest {
 
-    /**
-     * Creates a mock CitationFetcher that returns specific results for citations and references
-     */
+    /// Creates a mock CitationFetcher that returns specific results for citations and references
     private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn, Integer citationCount) {
         return CitationFetcherHelpersForTest.Mocks.from(
                 entry -> {
@@ -46,9 +44,7 @@ class SearchCitationsRelationsServiceTest {
         );
     }
 
-    /**
-     * Creates a mock CitationFetcher that returns empty lists for all entries
-     */
+    /// Creates a mock CitationFetcher that returns empty lists for all entries
     private CitationFetcher createEmptyMockFetcher() {
         return CitationFetcherHelpersForTest.Mocks.from(
                 _ -> List.of(),
