@@ -288,7 +288,7 @@ jobs:
           sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i '' "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i '' "s/val javafx = .*/val javafx = \"26-ea+22\"/" versions/build.gradle.kts
-      - name: Tell gradle to use JDK 26 and JavaFX 26 (linux, Windows)
+      - name: Tell gradle to use JDK 26 and JavaFX 26 (Linux, Windows)
         if: ${{ needs.conditions.outputs.eaJdk == 'true' && (!startsWith(matrix.os, 'macos')) }}
         shell: bash
         run: |
@@ -325,7 +325,7 @@ jobs:
         shell: bash
         run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.eaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
 
-      - name: Install pigz and cache (linux)
+      - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
@@ -371,7 +371,7 @@ jobs:
         # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
         run: choco install rsync --version=6.4.4
 
-      - name: Upload jabgui to builds.jabref.org (linux, macOS)
+      - name: Upload jabgui to builds.jabref.org (Linux, macOS)
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && ((startsWith(matrix.os, 'macos') && (needs.conditions.outputs.should-notarize != 'true')) || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
@@ -391,7 +391,7 @@ jobs:
         run: |
           set -e
           ${{ matrix.archivePortableJabKit }}
-      - name: Upload jabkit to builds.jabref.org (linux, macOS)
+      - name: Upload jabkit to builds.jabref.org (Linux, macOS)
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
@@ -410,7 +410,7 @@ jobs:
         run: |
           set -e
           ${{ matrix.archivePortableJabLS }}
-      - name: Upload jabls-cli to builds.jabref.org (linux, macOS)
+      - name: Upload jabls-cli to builds.jabref.org (Linux, macOS)
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
