@@ -165,14 +165,21 @@ jobs:
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
             # This workflow runs on ubuntu-latest even for notarization for macOS; need to check later if really on macOS
-             echo "🧾 macOS notarization"
-             echo "🧾 macOS notarization" >> $GITHUB_STEP_SUMMARY
-             echo "should-notarize=true" >> "$GITHUB_OUTPUT"
-             echo "☁️ will upload"
-             echo "☁️ will upload" >> $GITHUB_STEP_SUMMARY
-             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-             exit 0;
+            echo "🧾 macOS notarization"
+            echo "🧾 macOS notarization" >> $GITHUB_STEP_SUMMARY
+            echo "should-notarize=true" >> "$GITHUB_OUTPUT"
+            if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+              echo "☁️ will upload"
+              echo "☁️ will upload" >> $GITHUB_STEP_SUMMARY
+              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              exit 0;
+            fi;
+            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}"
+            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
+            echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+
           echo "⊘ no macOS notarization"
           echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
           echo "should-notarize=false" >> "$GITHUB_OUTPUT"
