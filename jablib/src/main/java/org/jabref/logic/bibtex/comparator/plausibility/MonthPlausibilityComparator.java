@@ -5,10 +5,8 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.model.entry.Month;
 
-/**
- * Compares two month values based on their format.
- * Prefers normalized months (e.g. #jun#) and integers over unnormalized strings.
- */
+/// Compares two month values based on their format.
+///  Prefers normalized months (e.g. `#jun#`) and integers over unnormalized strings.
 public class MonthPlausibilityComparator implements FieldValuePlausibilityComparator {
     @Override
     public ComparisonResult compare(String left, String right) {

@@ -196,7 +196,7 @@ public enum Month {
     /// @param value the string value to check
     /// @return true if the value matches the strict format criteria
     public static boolean isStrictFormat(String value) {
-        if(value == null) {
+        if (value == null) {
             return false;
         }
 
