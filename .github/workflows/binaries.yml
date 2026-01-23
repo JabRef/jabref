@@ -116,7 +116,7 @@ jobs:
           fi
           # Enable testing of EA JDKs later even if not triggered by workflow dispatch
           echo "jdkVersion=${{ inputs.jdkVersion || 26 }}" >> "$GITHUB_OUTPUT"
-          echo "jdkVersionBranch=${{ inputs.jdkVersionStable || stable }}" >> "$GITHUB_OUTPUT"
+          echo "jdkVersionBranch=${{ inputs.jdkVersionBranch || 'stable' }}" >> "$GITHUB_OUTPUT"
           echo "javafxVersion=${{ inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
