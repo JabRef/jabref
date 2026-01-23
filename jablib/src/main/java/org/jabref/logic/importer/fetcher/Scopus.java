@@ -26,10 +26,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * SearchBasedFetcher implementation using <a href="https://dev.elsevier.com/">Elsevier's Scopus Search API</a>.
- * API Documentation: <a href="https://dev.elsevier.com/documentation/ScopusSearchAPI.wadl">Scopus Search API</a>
- */
+/// SearchBasedFetcher implementation using <a href="https://dev.elsevier.com/">Elsevier's Scopus Search API</a>.
+/// API Documentation: <a href="https://dev.elsevier.com/documentation/ScopusSearchAPI.wadl">Scopus Search API</a>
 @NullMarked
 public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Scopus";
@@ -51,13 +49,11 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
         return API_URL + "?query=test&count=1&apiKey=";
     }
 
-    /**
-     * Constructs a URL for querying the Scopus Search API.
-     *
-     * @param queryNode  the search query node
-     * @param pageNumber the page number (0-indexed)
-     * @return URL for the Scopus API request
-     */
+    /// Constructs a URL for querying the Scopus Search API.
+    ///
+    /// @param queryNode  the search query node
+    /// @param pageNumber the page number (0-indexed)
+    /// @return URL for the Scopus API request
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         transformer = new ScopusQueryTransformer();
@@ -138,9 +134,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
         };
     }
 
-    /**
-     * Checks if the entry should be included based on year filtering.
-     */
+    /// Checks if the entry should be included based on year filtering.
     private boolean shouldIncludeEntry(BibEntry entry) {
         if (transformer == null) {
             return true;
@@ -168,12 +162,10 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
         }
     }
 
-    /**
-     * Parses a single Scopus JSON entry into a BibEntry.
-     *
-     * @param jsonEntry the JSON object representing a Scopus search result
-     * @return Optional containing the BibEntry, or empty if parsing fails
-     */
+    /// Parses a single Scopus JSON entry into a BibEntry.
+    ///
+    /// @param jsonEntry the JSON object representing a Scopus search result
+    /// @return Optional containing the BibEntry, or empty if parsing fails
     private Optional<BibEntry> parseScopusEntry(JSONObject jsonEntry) {
         try {
             BibEntry entry = new BibEntry();
@@ -314,13 +306,11 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
         }
     }
 
-    /**
-     * Determines the BibTeX entry type based on Scopus aggregationType and subtype.
-     *
-     * @param aggregationType the aggregation type (Journal, Book, Conference Proceeding, etc.)
-     * @param subtype the document subtype (ar, cp, re, etc.)
-     * @return appropriate StandardEntryType
-     */
+    /// Determines the BibTeX entry type based on Scopus aggregationType and subtype.
+    ///
+    /// @param aggregationType the aggregation type (Journal, Book, Conference Proceeding, etc.)
+    /// @param subtype         the document subtype (ar, cp, re, etc.)
+    /// @return appropriate StandardEntryType
     private StandardEntryType determineEntryType(String aggregationType, String subtype) {
         return switch (subtype.toLowerCase()) {
             case "cp" ->
