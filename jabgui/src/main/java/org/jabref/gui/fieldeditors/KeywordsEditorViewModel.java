@@ -82,7 +82,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                 if (parsedKeywords.isEmpty()) {
                     return new Keyword("");
                 } else {
-                    resultKeyword = new Keyword(parsedKeywords.get(0).get().toString());
+                    resultKeyword = parsedKeywords.get(0);
                 }
                 return resultKeyword;
             }
