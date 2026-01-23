@@ -20,23 +20,18 @@ on:
   merge_group:
   workflow_dispatch:
     inputs:
-      notarization:
-        description: "Notarize macOS DMG and PKG"
-        type: boolean
-        required: false
-        default: false
       useEaJdk:
-        description: "Use Early-Access JDK"
+        description: "Use early-access JDK and JavaFX"
         type: boolean
         required: false
         default: false
       jdkVersion:
-        description: "JDK version"
+        description: "JDK EA version"
         type: number
         required: false
         default: 26
       jdkVersionBranch:
-        description: "JDK version branch"
+        description: "JDK EA version branch"
         type: choice
         required: false
         default: stable
@@ -46,10 +41,15 @@ on:
           # use the next-next JDK
           - latest
       javafxVersion:
-        description: "JavaFX version"
+        description: "JavaFX EA version"
         type: string
         required: false
         default: "26-ea+22"
+      notarization:
+        description: "Notarize macOS DMG and PKG"
+        type: boolean
+        required: false
+        default: false
       upload:
         description: "Upload to builds.jabref.org"
         type: boolean
