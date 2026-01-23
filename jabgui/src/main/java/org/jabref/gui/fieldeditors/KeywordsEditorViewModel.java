@@ -60,7 +60,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
         return keywordListProperty;
     }
 
-    static StringConverter<Keyword> getStringConverter() {
+    StringConverter<Keyword> getStringConverter() {
         return new StringConverter<>() {
             @Override
             public String toString(Keyword keyword) {
@@ -73,7 +73,18 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
             @Override
             public Keyword fromString(String keywordString) {
-                return Keyword.ofHierarchical(keywordString);
+                if (keywordString.isEmpty()) {
+                    return null;
+                }
+
+                KeywordList parsedKeywords = KeywordList.parse(keywordString, keywordSeparator);
+                Keyword resultKeyword = null;
+                if (parsedKeywords.isEmpty()) {
+                    return new Keyword("");
+                } else {
+                    resultKeyword = new Keyword(parsedKeywords.get(0).get().toString());
+                }
+                return resultKeyword;
             }
         };
     }
@@ -86,7 +97,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                                                       .distinct()
                                                       .collect(Collectors.toList());
 
-        Keyword requestedKeyword = new Keyword(request);
+        Keyword requestedKeyword = getStringConverter().fromString(request);
         if (!suggestions.contains(requestedKeyword)) {
             suggestions.addFirst(requestedKeyword);
         }
