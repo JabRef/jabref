@@ -354,6 +354,9 @@ jobs:
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
 
+      - run: ./gradlew :jabgui:dependencies
+        shell: bash
+
       - name: jpackage JabGui
         shell: bash
         run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
