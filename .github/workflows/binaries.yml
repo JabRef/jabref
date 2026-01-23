@@ -620,3 +620,10 @@ jobs:
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: $${ matrix.displayName }} notarized
+          path: |
+            ${{ matrix.path }}/build/packages/${{ matrix.os }}
