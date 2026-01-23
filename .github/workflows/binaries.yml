@@ -467,7 +467,7 @@ jobs:
         shell: bash
         run: |
           ./gradlew :jabkit:run --args="--help"
-      - name: Smoke test JabLs-CLI
+      - name: Smoke test jabls-cli
         shell: bash
         run: |
           ./gradlew :jabls-cli:run --args="--help"
