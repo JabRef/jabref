@@ -35,9 +35,7 @@ import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Performs an export action
- */
+/// Performs an export action
 public class ExportCommand extends SimpleCommand {
 
     public enum ExportMethod { EXPORT_ALL, EXPORT_SELECTED }

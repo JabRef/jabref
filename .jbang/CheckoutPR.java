@@ -24,7 +24,7 @@ import org.kohsuke.github.PagedIterator;
 //DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.5.0.202512021534-r
 
 public class CheckoutPR {
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
         GitHub github = new GitHubBuilder().build();
         GHRepository repo = github.getRepository("JabRef/jabref");
 

@@ -66,22 +66,18 @@ public class HeadlessExecutorService implements Executor {
         }
     }
 
-    /**
-     * Executes a callable task that provides a return value after the calculation is done.
-     *
-     * @param command The task to execute.
-     * @return A Future object that provides the returning value.
-     */
+    /// Executes a callable task that provides a return value after the calculation is done.
+    ///
+    /// @param command The task to execute.
+    /// @return A Future object that provides the returning value.
     public <T> Future<T> execute(@NonNull Callable<T> command) {
         return executorService.submit(command);
     }
 
-    /**
-     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done.
-     *
-     * @param tasks The tasks to execute
-     * @return A List of Future objects that provide the returning values.
-     */
+    /// Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done.
+    ///
+    /// @param tasks The tasks to execute
+    /// @return A List of Future objects that provide the returning values.
     public <T> List<Future<T>> executeAll(@NonNull Collection<Callable<T>> tasks) {
         try {
             return executorService.invokeAll(tasks);
@@ -119,9 +115,7 @@ public class HeadlessExecutorService implements Executor {
         timer.schedule(timerTask, millisecondsDelay);
     }
 
-    /**
-     * Shuts everything down. After termination, this method returns.
-     */
+    /// Shuts everything down. After termination, this method returns.
     public void shutdownEverything() {
         LOGGER.trace("Gracefully shut down executor service");
         gracefullyShutdown(EXECUTOR_NAME, this.executorService, 15);
@@ -158,10 +152,8 @@ public class HeadlessExecutorService implements Executor {
         }
     }
 
-    /**
-     * Shuts down the provided executor service by first trying a normal shutdown, then waiting for the shutdown and then forcibly shutting it down.
-     * Returns if the status of the shut down is known.
-     */
+    /// Shuts down the provided executor service by first trying a normal shutdown, then waiting for the shutdown and then forcibly shutting it down.
+    /// Returns if the status of the shut down is known.
     public static void gracefullyShutdown(String name, ExecutorService executorService, int timeoutInSeconds) {
         try {
             // This is non-blocking. See https://stackoverflow.com/a/57383461/873282.

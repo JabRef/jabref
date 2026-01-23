@@ -2,9 +2,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Default query transformer without any boolean operators
- */
+/// Default query transformer without any boolean operators
 public class DefaultQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
 
     @Override

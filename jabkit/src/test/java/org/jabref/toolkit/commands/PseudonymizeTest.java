@@ -19,8 +19,8 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path output = tempDir.resolve("new.pseudo.bib");
         Path key = tempDir.resolve("new.pseudo.csv");
         commandLine.execute("pseudonymize", "--input=" + origin, "--output=" + output, "--key=" + key);
-        assertTrue(output.toFile().exists());
-        assertTrue(key.toFile().exists());
+        assertFileExists(output);
+        assertFileExists(key);
         assertFalse(Files.readLines(output.toFile(), Charset.defaultCharset()).stream().anyMatch((s) -> s.contains("Newton1999")));
     }
 
@@ -32,8 +32,8 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         commandLine.execute("pseudonymize", "--input=" + copy);
         Path output = tempDir.resolve("origin.pseudo.bib");
         Path key = tempDir.resolve("origin.pseudo.csv");
-        assertTrue(output.toFile().exists());
-        assertTrue(key.toFile().exists());
+        assertFileExists(output);
+        assertFileExists(key);
     }
 
     @Test
@@ -43,8 +43,8 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path key = tempDir.resolve("new.pseudo.csv");
         Files.write("some".getBytes(StandardCharsets.UTF_8), output.toFile());
         commandLine.execute("pseudonymize", "-f", "--input=" + origin, "--output=" + output, "--key=" + key);
-        assertTrue(output.toFile().exists());
-        assertTrue(key.toFile().exists());
+        assertFileExists(output);
+        assertFileExists(key);
         assertTrue(Files.readLines(output.toFile(), Charset.defaultCharset()).size() > 1);
     }
 
@@ -55,9 +55,8 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path key = tempDir.resolve("new.pseudo.csv");
         Files.write("some".getBytes(StandardCharsets.UTF_8), key.toFile());
         commandLine.execute("pseudonymize", "--input=" + origin, "--output=" + output, "--key=" + key);
-        java.nio.file.Files.list(tempDir).forEach(System.out::println);
-        assertTrue(output.toFile().exists());
-        assertTrue(key.toFile().exists());
+        assertFileExists(output);
+        assertFileExists(key);
         assertFalse(Files.readLines(key.toFile(), Charset.defaultCharset()).size() > 1);
     }
 }

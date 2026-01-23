@@ -18,9 +18,7 @@ public class OOResult<R, E> {
     private final Optional<R> result;
     private final Optional<E> error;
 
-    /**
-     * Exactly one of the arguments should be Optional.empty()
-     */
+    /// Exactly one of the arguments should be Optional.empty()
     private OOResult(Optional<R> result, Optional<E> error) {
         this.result = result;
         this.error = error;
@@ -91,16 +89,12 @@ public class OOResult<R, E> {
         }
     }
 
-    /**
-     * Throw away the error part.
-     */
+    /// Throw away the error part.
     public Optional<R> getOptional() {
         return result;
     }
 
-    /**
-     * Throw away the result part.
-     */
+    /// Throw away the result part.
     public OOVoidResult<E> asVoidResult() {
         if (isError()) {
             return OOVoidResult.error(getError());
