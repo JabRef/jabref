@@ -61,22 +61,22 @@ public class EntryEditorPreferences {
 
     private EntryEditorPreferences() {
         this(
-                getDefaultEntryEditorTabs(), //Default Entry Editor Tabs
-                true, //Open editor when a new entry is created
-                true, //Show tab 'Related articles'
-                true, //Show tab 'AI Summary'
-                true, //Show tab 'AI Chat'
-                true, //Show tab 'LaTeX citations'
-                true, //Show tab 'File annotations' only if its contains highlights or comments
-                true, //Show BibTeX source by default
-                true, //Show validation messages
-                true, //Allow integers in 'edition' filed in BibTeX mode
-                true, //Automatically search and show unlinked files in the entry editor
-                JournalPopupEnabled.DISABLED, //Fetch journal information online to show
-                CitationFetcherType.SEMANTIC_SCHOLAR, //Citation Fetcher Type
-                true, //Show tab 'Citation information'
-                true, //Show user comments field
-                0.5 //Preview Width Divider Position
+                getDefaultEntryEditorTabs(), // Default Entry Editor Tabs
+                true, // Open editor when a new entry is created
+                true, // Show tab 'Related articles'
+                true, // Show tab 'AI Summary'
+                true, // Show tab 'AI Chat'
+                true, // Show tab 'LaTeX citations'
+                true, // Show tab 'File annotations' only if its contains highlights or comments
+                true, // Show BibTeX source by default
+                true, // Show validation messages
+                true, // Allow integers in 'edition' filed in BibTeX mode
+                true, // Automatically search and show unlinked files in the entry editor
+                JournalPopupEnabled.DISABLED, // Fetch journal information online to show
+                CitationFetcherType.SEMANTIC_SCHOLAR, // Citation Fetcher Type
+                true, // Show tab 'Citation information'
+                true, // Show user comments field
+                0.5 // Preview Width Divider Position
         );
     }
 
