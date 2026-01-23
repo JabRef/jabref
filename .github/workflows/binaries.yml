@@ -115,9 +115,9 @@ jobs:
             echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
           fi
           # Enable testing of EA JDKs later even if not triggered by workflow dispatch
-          echo "jdkVersion=${{ inputs.jdkVersion || 26 }}" >> "$GITHUB_OUTPUT"
-          echo "jdkVersionBranch=${{ inputs.jdkVersionBranch || 'stable' }}" >> "$GITHUB_OUTPUT"
-          echo "javafxVersion=${{ inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
+          echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
+          echo "jdkVersionBranch=${{ github.event.inputs.jdkVersionBranch || 'stable' }}" >> "$GITHUB_OUTPUT"
+          echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "⊘ Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
@@ -307,21 +307,19 @@ jobs:
           website: jdk.java.net
           release: EA
           version: ${{ needs.conditions.outputs.jdkVersionBranch }}
-      - name: Tell gradle to use JDK EA and JavaFX EA (macOS)
-        if: ${{ needs.conditions.outputs.useEaJdk == 'true' && (startsWith(matrix.os, 'macos')) }}
-        run: |
-          sed -i '' "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i '' "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i '' "s/val javafx = .*/val javafx = \"${{ needs.conditions.outputs.javafxVersion }}\"/" versions/build.gradle.kts
-      - name: Tell gradle to use JDK EA and JavaFX EA (Linux, Windows)
-        if: ${{ needs.conditions.outputs.useEaJdk == 'true' && (!startsWith(matrix.os, 'macos')) }}
+      - name: Tell gradle to use JDK EA and JavaFX EA
+        if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         shell: bash
         run: |
           set -ex
           PS4='+$LINENO: '
-          sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i 's/val javafx = .*/val javafx = "${{ needs.conditions.outputs.javafxVersion }}"/' versions/build.gradle.kts
+          SED_EXT=''
+          if [[ "${{ matrix.os }}" == "macos-13" || "${{ matrix.os }}" == "macos-14" || "${{ matrix.os }}" == "macos-latest" ]]; then
+            SED_EXT="''"
+          fi
+          sed -i $SED_EXT "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i $SED_EXT "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i $SED_EXT 's/val javafx = .*/val javafx = "${{ needs.conditions.outputs.javafxVersion }}"/' versions/build.gradle.kts
       # endregion
 
       - uses: ./.github/actions/setup-gradle
