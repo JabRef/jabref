@@ -11,7 +11,7 @@ javaPlatform {
 // Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
-// in case this is updated, also .github/workflows/binaries.yml (look for "eaJdkJmodsUrl" and its use)
+
 val javafx = "25.0.2"
 
 val lucene = "10.3.2"
