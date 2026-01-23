@@ -224,8 +224,6 @@ jobs:
             archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls
             suffix: ''
             archForDebianRepack: '_amd64'
-            # Browse at https://gluonhq.com/products/javafx/ for latest version
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+22_linux-x64_bin-jmods.zip
           - os: ubuntu-22.04-arm # if this is adapted, also the next lines need to be adapted
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
@@ -233,7 +231,6 @@ jobs:
             archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+22_linux-aarch64_bin-jmods.zip
           - os: windows-latest
             displayName: windows-amd64
             archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
@@ -241,7 +238,6 @@ jobs:
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls
             suffix: ''
             archForDebianRepack: ''
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+22_windows-x64_bin-jmods.zip
           - os: macos-15-intel
             displayName: macOS-intel
             archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
@@ -249,7 +245,6 @@ jobs:
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
             suffix: '_intel'
             archForDebianRepack: ''
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+22_osx-x64_bin-jmods.zip
           - os: macos-15
             displayName: macOS-silicon
             archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
@@ -257,7 +252,6 @@ jobs:
             archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
             suffix: '_silicon'
             archForDebianRepack: ''
-            eaJdkJmodsUrl: https://download2.gluonhq.com/openjfx/26/openjfx-26-ea+22_osx-aarch64_bin-jmods.zip
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
@@ -300,28 +294,6 @@ jobs:
           sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(26)/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed -i "s/val javafx = .*/val javafx = '26-ea+22'/" versions/build.gradle.kts
-      - name: Download JavaFX JMODs (linux, macOS)
-        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os != 'windows-latest') }}
-        uses: ethanjli/cached-download-action@v0.1.3
-        with:
-          url: ${{ matrix.eaJdkJmodsUrl }}
-          destination: /tmp/jmods.zip
-      - name: Download JavaFX JMODs (Windows)
-        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os == 'windows-latest') }}
-        uses: ethanjli/cached-download-action@v0.1.3
-        with:
-          url: ${{ matrix.eaJdkJmodsUrl }}
-          destination: "C:\\temp\\jmods.zip"
-      - name: Extract JavaFX JMODs (linux, macOS)
-        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os != 'windows-latest') }}
-        run: |
-          cd /tmp
-          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
-      - name: Extract JavaFX JMODs (Windows)
-        if: ${{ (needs.conditions.outputs.eaJdk == 'true') && (matrix.os == 'windows-latest') }}
-        run: |
-          cd C:\temp
-          unzip jmods.zip "javafx-jmods-26/jdk.jsobject.jmod"
       # endregion
 
       - uses: ./.github/actions/setup-gradle

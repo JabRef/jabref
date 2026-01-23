@@ -206,27 +206,6 @@ javaModulePackaging {
     }
 }
 
-if (project.findProperty("eaJdkBuild")?.toString() == "true") {
-    logger.lifecycle("eaJdkBuild=true → enabling EA JDK build")
-    // Required by https://github.com/openjdk/jfx/blob/jfx24/doc-files/release-notes-24.md#applications-using-jlink-to-create-a-custom-java-runtime-image
-    // Hint from https://github.com/gradlex-org/java-module-packaging/issues/77#issuecomment-3388409856
-    val os = org.gradle.internal.os.OperatingSystem.current();
-    if (os.isWindows()) {
-        tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach {
-            modulePath.from("c:\\temp\\javafx-jmods-26")
-        }
-    } else {
-        // dependencies { runtimeOnly(files("/tmp/javafx-jmods-26")) } // probably not required
-
-        // Note that ".from" adds to the path and does not replace (https://docs.gradle.org/current/javadoc/org/gradle/api/file/ConfigurableFileCollection.html#from(java.lang.Object...))
-        tasks.withType<org.gradlex.javamodule.packaging.tasks.Jpackage>().configureEach {
-            modulePath.from("/tmp/javafx-jmods-26")
-        }
-    }
-} else {
-    logger.lifecycle("eaJdkBuild not set to true → skipping EA JDK build")
-}
-
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.jabref.testsupport")
 
