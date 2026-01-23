@@ -24,16 +24,14 @@ jvmDependencyConflicts {
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
 jvmDependencyConflicts.patch {
-    listOf("base", "controls", "fxml", "graphics", "swing", "web", "media").forEach { jfxModule ->
-        module("org.openjfx:javafx-$jfxModule") {
+    listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
+        module("org.openjfx:$jfxModule") {
             addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
             addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
             addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
             addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
             addTargetPlatformVariant("mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
             addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
-            // Since JDK26 delivered as JMOD
-            removeDependency("org.openjfx:jdk-jsobject")
         }
     }
     // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L9
@@ -484,10 +482,6 @@ extraJavaModuleInfo {
         exportAllPackages()
     }
 
-    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty") {
-        exportAllPackages()
-    }
-
     // required for testing of jablib
     module("org.openjfx:javafx-fxml", "javafx.fxml") {
         patchRealModule()
@@ -537,22 +531,6 @@ extraJavaModuleInfo {
 
         // PATCH REASON:
         exports("com.sun.javafx.scene.control")
-    }
-
-    module("org.openjfx:javafx-web", "javafx.web") {
-        patchRealModule()
-
-        // Source: https://openjfx.io/javadoc/25/javafx.web/module-summary.html
-        requiresTransitive("javafx.base");
-        requiresTransitive("javafx.controls");
-        requiresTransitive("javafx.graphics");
-
-        // Required by WebEngine
-        requiresTransitive("javafx.media");
-
-        // NO requires to jdk.jsobject
-
-        exportAllPackages()
     }
 
     module("org.hamcrest:hamcrest", "org.hamcrest") {
