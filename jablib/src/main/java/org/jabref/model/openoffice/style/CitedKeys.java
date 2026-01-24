@@ -11,18 +11,14 @@ import org.jabref.model.entry.BibEntry;
 
 public class CitedKeys {
 
-    /**
-     * Order-preserving map from citation keys to associated data.
-     */
+    /// Order-preserving map from citation keys to associated data.
     private LinkedHashMap<String, CitedKey> data;
 
     CitedKeys(LinkedHashMap<String, CitedKey> data) {
         this.data = data;
     }
 
-    /**
-     * The cited keys in their current order.
-     */
+    /// The cited keys in their current order.
     public List<CitedKey> values() {
         return new ArrayList<>(data.values());
     }
@@ -31,9 +27,7 @@ public class CitedKeys {
         return data.get(citationKey);
     }
 
-    /**
-     * Sort entries for the bibliography.
-     */
+    /// Sort entries for the bibliography.
     void sortByComparator(Comparator<BibEntry> entryComparator) {
         List<CitedKey> cks = new ArrayList<>(data.values());
         cks.sort(new CompareCitedKey(entryComparator, true));

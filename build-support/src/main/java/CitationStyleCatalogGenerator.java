@@ -1,10 +1,10 @@
-//JAVA 24+
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS org.jspecify:jspecify:1.0.0
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.slf4j:slf4j-simple:2.0.17
-//DEPS tools.jackson.core:jackson-databind:3.0.3
+//DEPS tools.jackson.core:jackson-databind:3.0.4
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/architecture/AllowedToUseClassGetResource.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
@@ -45,7 +45,7 @@ public class CitationStyleCatalogGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         generateCitationStyleCatalog();
     }
 

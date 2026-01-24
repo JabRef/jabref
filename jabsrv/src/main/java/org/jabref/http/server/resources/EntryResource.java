@@ -1,4 +1,4 @@
-package org.jabref.http.server;
+package org.jabref.http.server.resources;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,17 +34,13 @@ public class EntryResource {
     @Inject
     FilesToServe filesToServe;
 
-    /**
-     * At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
-     * <p>
-     * Combines attributes of a given BibEntry into a basic entry preview for as plain text.
-     *
-     * @param id      The name of the library
-     * @param entryId The CitationKey of the BibEntry
-     * @return a basic entry preview as plain text
-     * @throws IOException
-     * @throws NotFoundException
-     */
+    /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
+    ///
+    /// Combines attributes of a given BibEntry into a basic entry preview for as plain text.
+    ///
+    /// @param id      The name of the library
+    /// @param entryId The CitationKey of the BibEntry
+    /// @return a basic entry preview as plain text
     @GET
     @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
     public String getPlainRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
@@ -82,16 +78,14 @@ public class EntryResource {
         return preview;
     }
 
-    /**
-     * At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
-     * <p>
-     * Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
-     *
-     * @param id      The name of the library
-     * @param entryId The CitationKey of the BibEntry
-     * @return a basic entry preview as HTML text
-     * @throws IOException
-     */
+    /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
+    ///
+    /// Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
+    ///
+    /// @param id      The name of the library
+    /// @param entryId The CitationKey of the BibEntry
+    /// @return a basic entry preview as HTML text
+    /// @throws IOException
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")

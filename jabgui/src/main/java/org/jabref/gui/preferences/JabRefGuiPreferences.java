@@ -89,6 +89,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String PREVIEW_AS_TAB = "previewAsTab";
     public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
     public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
+    public static final String COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
 
     // region column names
@@ -161,9 +162,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
     // endregion
 
-    /**
-     * Holds the horizontal divider position of the preview view when it is shown inside the entry editor
-     */
+    /// Holds the horizontal divider position of the preview view when it is shown inside the entry editor
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
 
     private static final String JOURNAL_POPUP = "journalPopup";
@@ -286,13 +285,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
+
+        // Disabled per default - similar to Mr. DLib; see [org.jabref.logic.preferences.JabRefCliPreferences.ACCEPT_RECOMMENDATIONS].
+        defaults.put(COVER_IMAGE_DOWNLOAD, Boolean.FALSE);
     }
 
-    /**
-     * @deprecated Never ever add a call to this method. There should be only one caller.
-     * All other usages should get the preferences passed (or injected).
-     * The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
-     */
+    /// @deprecated Never ever add a call to this method. There should be only one caller.
+    /// All other usages should get the preferences passed (or injected).
+    /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
         if (JabRefGuiPreferences.singleton == null) {
@@ -407,11 +407,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return entryEditorPreferences;
     }
 
-    /**
-     * Get a Map of defined tab names to default tab fields.
-     *
-     * @return A map of the currently defined tabs in the entry editor from scratch to cache
-     */
+    /// Get a Map of defined tab names to default tab fields.
+    ///
+    /// @return A map of the currently defined tabs in the entry editor from scratch to cache
     private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
@@ -429,11 +427,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return tabs;
     }
 
-    /**
-     * Stores the defined tabs and corresponding fields in the preferences.
-     *
-     * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
-     */
+    /// Stores the defined tabs and corresponding fields in the preferences.
+    ///
+    /// @param customTabs a map of tab names and the corresponding set of fields to be displayed in
     private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
         String[] names = customTabs.keySet().toArray(String[]::new);
         String[] fields = customTabs.values().stream()
@@ -683,8 +679,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes(defaults.visiblePanes());
         Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions(defaults);
         return new SidePanePreferences(
-                backingStoreVisiblePanes.isEmpty() ? defaults.visiblePanes() : backingStoreVisiblePanes,
-                backingStorePreferredPositions.isEmpty() ? defaults.getPreferredPositions() : backingStorePreferredPositions,
+                backingStoreVisiblePanes,
+                backingStorePreferredPositions,
                 getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
         );
     }
@@ -712,7 +708,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private Map<SidePaneType, Integer> getSidePanePreferredPositions(SidePanePreferences defaults) {
         // If either one is missing the preferences are corrupt or empty, thus fall back to default
         if (!hasKey(SIDE_PANE_COMPONENT_NAMES) || !hasKey(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS)) {
-            LOGGER.debug("SidePane preferred positions corrupt, falling back to default");
+            LOGGER.debug("SidePane preferred positions corrupt or empty, falling back to default");
             return defaults.getPreferredPositions();
         }
 
@@ -863,7 +859,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
                 getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
                                                        .map(Path::of)
-                                                       .collect(Collectors.toList())
+                                                       .collect(Collectors.toList()),
+                getBoolean(COVER_IMAGE_DOWNLOAD)
         );
 
         previewPreferences.getLayoutCycle().addListener((InvalidationListener) c -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
@@ -872,6 +869,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
         EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
         previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) c -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
+        EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(COVER_IMAGE_DOWNLOAD, newValue));
         return this.previewPreferences;
     }
 
@@ -1132,9 +1130,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
     // endregion
 
-    /**
-     * For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
-     */
+    /// For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
     private SelfContainedSaveOrder getSelfContainedTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = getMainTableColumnPreferences().getColumnSortOrder();
         return new SelfContainedSaveOrder(
@@ -1242,9 +1238,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
     // endregion
 
-    /**
-     * In GUI mode, we can look up the directory better
-     */
+    /// In GUI mode, we can look up the directory better
     @Override
     protected Path getDefaultPath() {
         return NativeDesktop.get().getDefaultFileChooserDirectory();

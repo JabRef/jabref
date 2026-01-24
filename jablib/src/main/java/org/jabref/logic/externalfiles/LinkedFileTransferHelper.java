@@ -27,18 +27,16 @@ public class LinkedFileTransferHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileTransferHelper.class);
 
-    /**
-     * Adjusts linked files when copying entries from source to target context.
-     * Files that are not reachable from the target context will be copied.
-     * Files in the target context whose relative paths differ from the source will have their paths adjusted.
-     * <p>
-     * There is no need to know the source entry, because we are interested in the file paths only.
-     *
-     * @param filePreferences File preferences for both contexts
-     * @param transferInformation   The source database context where files are currently located - and the transferMode
-     * @param targetContext   The target database context where files should be accessible
-     * @param targetEntry     The entry in the targetContext
-     */
+    /// Adjusts linked files when copying entries from source to target context.
+    /// Files that are not reachable from the target context will be copied.
+    /// Files in the target context whose relative paths differ from the source will have their paths adjusted.
+    ///
+    /// There is no need to know the source entry, because we are interested in the file paths only.
+    ///
+    /// @param filePreferences     File preferences for both contexts
+    /// @param transferInformation The source database context where files are currently located - and the transferMode
+    /// @param targetContext       The target database context where files should be accessible
+    /// @param targetEntry         The entry in the targetContext
     public static void adjustLinkedFilesForTarget(
             FilePreferences filePreferences,
             TransferInformation transferInformation,
@@ -165,14 +163,12 @@ public class LinkedFileTransferHelper {
         }
     }
 
-    /**
-     * Gets the primary directory path for the given context.
-     * This is a utility method extracted from the original implementation.
-     *
-     * @param context The database context
-     * @param filePreferences File preferences for the context
-     * @return Optional containing the primary directory path, or empty if none found
-     */
+    /// Gets the primary directory path for the given context.
+    /// This is a utility method extracted from the original implementation.
+    ///
+    /// @param context         The database context
+    /// @param filePreferences File preferences for the context
+    /// @return Optional containing the primary directory path, or empty if none found
     static Optional<Path> getPrimaryPath(BibDatabaseContext context, FilePreferences filePreferences) {
         return context.getFileDirectories(filePreferences).stream().findFirst();
     }

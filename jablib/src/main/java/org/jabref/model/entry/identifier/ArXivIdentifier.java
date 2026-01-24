@@ -13,9 +13,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
- */
+/// Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public class ArXivIdentifier extends EprintIdentifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivIdentifier.class);

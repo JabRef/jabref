@@ -111,9 +111,7 @@ public class ContentSelectors {
                 '}';
     }
 
-    /**
-     * Checks whether the given map is the default map, i.e. contains only the default field names and no associated keywords.
-     */
+    /// Checks whether the given map is the default map, i.e. contains only the default field names and no associated keywords.
     public static boolean isDefaultMap(Map<Field, List<String>> fieldKeywordsMap) {
         if (fieldKeywordsMap.size() != ContentSelectors.DEFAULT_FIELD_NAMES.size()) {
             return false;

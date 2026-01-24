@@ -24,9 +24,7 @@ import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachment;
 
-/**
- * Imports an embedded Bib-File from the PDF.
- */
+/// Imports an embedded Bib-File from the PDF.
 public class PdfEmbeddedBibFileImporter extends PdfImporter {
 
     private final BibtexParser bibtexParser;
@@ -35,10 +33,8 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
         bibtexParser = new BibtexParser(importFormatPreferences);
     }
 
-    /**
-     * Extraction of embedded files in pdfs adapted from:
-     * <a href="https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj">...</a>
-     */
+    /// Extraction of embedded files in pdfs adapted from:
+    /// <a href="https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj">...</a>
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();
