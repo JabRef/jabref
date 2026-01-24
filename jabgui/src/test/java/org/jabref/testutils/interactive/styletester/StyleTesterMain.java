@@ -13,7 +13,7 @@ import org.jabref.logic.util.HeadlessExecutorService;
 /// Useful for checking the display of different controls. Not needed inside of JabRef.
 public class StyleTesterMain extends Application {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         launch(args);
     }
 

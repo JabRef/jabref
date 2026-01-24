@@ -1,4 +1,4 @@
-//JAVA 24+
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.h2database:h2:2.4.240
@@ -46,7 +46,7 @@ public class LtwaListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaListMvGenerator.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         try {
             Path csvFile = Path.of("jablib", "src", "main", "resources", "ltwa", "ltwa_20210702.csv");
             if (!Files.exists(csvFile)) {
