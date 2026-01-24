@@ -5,17 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
 
-/// This class is used to anonymize a library. It is required to make private libraries available for public use.
-///
-/// For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
 @NullMarked
 public class Pseudonymization {
 
@@ -23,37 +25,77 @@ public class Pseudonymization {
     }
 
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
-        // TODO: Anonymize metadata
-        // TODO: Anonymize strings
+        // This map tracks the ID assignment for every field value (e.g., "Smith" -> 1)
+        Map<Field, Map<String, Integer>> privacyMap = new HashMap<>();
 
-        Map<Field, Map<String, Integer>> fieldToValueToIdMap = new HashMap<>();
-        List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, fieldToValueToIdMap);
+        // First, anonymize the Group Tree (Metadata). 
+        // We do this before entries to ensure that if a group is renamed to "groups-1",
+        // the entries belonging to it also get updated to "groups-1".
+        Optional<GroupTreeNode> rootGroup = bibDatabaseContext.getMetaData().getGroups();
+        if (rootGroup.isPresent()) {
+            Map<String, Integer> groupNameMap = new HashMap<>();
+            
+            GroupTreeNode newRoot = pseudonymizeGroupRecursively(rootGroup.get(), groupNameMap);
+            bibDatabaseContext.getMetaData().setGroups(newRoot);
+            
+            // Pre-fill the main privacy map with the group IDs we just generated
+            privacyMap.put(StandardField.GROUPS, groupNameMap);
+        }
 
+        // Now process the actual bibliography entries
+        List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, privacyMap);
+
+        // Generate the "decoder" mapping for the user (e.g., "author-1" -> "Smith")
         Map<String, String> valueMapping = new HashMap<>();
-        fieldToValueToIdMap.forEach((field, stringToIntMap) ->
-                stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
+        privacyMap.forEach((field, valueToId) ->
+                valueToId.forEach((value, id) -> 
+                    valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value))
+        );
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
+        result.setMetaData(bibDatabaseContext.getMetaData());
 
         return new Result(result, valueMapping);
     }
 
-    /// @param fieldToValueToIdMap map containing the mapping from field to value to id, will be filled by this method
-    private static List<BibEntry> pseudonymizeEntries(BibDatabaseContext bibDatabaseContext, Map<Field, Map<String, Integer>> fieldToValueToIdMap) {
+    private GroupTreeNode pseudonymizeGroupRecursively(GroupTreeNode node, Map<String, Integer> groupNameMap) {
+        AbstractGroup oldGroup = node.getGroup();
+        String oldName = oldGroup.getName();
+
+        // reuse existing ID if we've seen this name, otherwise create a new one
+        Integer id = groupNameMap.computeIfAbsent(oldName, k -> groupNameMap.size() + 1);
+        String newName = "groups-" + id;
+
+        // We use ',' as the delimiter character for the ExplicitGroup constructor
+        AbstractGroup newGroup = new ExplicitGroup(
+                newName,
+                oldGroup.getHierarchicalContext(),
+                ',' 
+        );
+        GroupTreeNode newNode = new GroupTreeNode(newGroup);
+
+        for (GroupTreeNode child : node.getChildren()) {
+            newNode.addChild(pseudonymizeGroupRecursively(child, groupNameMap));
+        }
+
+        return newNode;
+    }
+
+    private static List<BibEntry> pseudonymizeEntries(BibDatabaseContext bibDatabaseContext, Map<Field, Map<String, Integer>> privacyMap) {
         List<BibEntry> entries = bibDatabaseContext.getEntries();
         List<BibEntry> newEntries = new ArrayList<>(entries.size());
 
         for (BibEntry entry : entries) {
             BibEntry newEntry = new BibEntry(entry.getType());
             newEntries.add(newEntry);
+            
             for (Field field : entry.getFields()) {
-                Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, k -> new HashMap<>());
-                // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
-                //       See {@link org.jabref.model.entry.field.StandardField} for usages.
-                String fieldContent = entry.getField(field).get();
-                Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
+                Map<String, Integer> valueToId = privacyMap.computeIfAbsent(field, k -> new HashMap<>());
+                String content = entry.getField(field).get();
+                
+                Integer id = valueToId.computeIfAbsent(content, k -> valueToId.size() + 1);
                 newEntry.setField(field, field.getName() + "-" + id);
             }
         }
