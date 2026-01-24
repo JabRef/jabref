@@ -583,7 +583,7 @@ jobs:
 
   notarize:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
-    name: macOS notarization
+    name: macOS notarization - ${{ matrix.displayName }}
     needs: [ conditions, build ]
     if: ${{ needs.conditions.outputs.should-notarize == 'true' }}
     strategy:
@@ -592,22 +592,22 @@ jobs:
       matrix:
         include:
           - os: macos-15
-            displayName: JabGui macOS (ARM64)
+            displayName: JabGui (macOS-silicon, notarized)
             path: 'jabgui'
             prefix: 'JabRef'
             suffix: '_silicon'
           - os: macos-15-intel
-            displayName: JabGui macOS (intel)
+            displayName: JabGui (macOS-intel, notarized)
             path: 'jabgui'
             prefix: 'JabRef'
             suffix: '_intel'
           # - os: macos-15
-          #   displayName: jabls macOS (ARM64)
+          #   displayName: jabls (macOS-silicon, notarized)
           #   path: 'jabls-cli'
           #   prefix: 'jabls'
           #   suffix: '_silicon'
           # - os: macos-15-intel
-          #   displayName: jabls macOS (intel)
+          #   displayName: jabls (macOS-intel, notarized)
           #   path: 'jabls-cli'
           #   prefix: 'jabls'
           #   suffix: '_intel'
@@ -643,6 +643,6 @@ jobs:
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ matrix.displayName }} notarized
+          name: ${{ matrix.displayName }}
           path: |
             ${{ matrix.path }}/build/packages/${{ matrix.os }}
