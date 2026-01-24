@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -192,7 +193,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         tagLabel.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 keywordTagsField.removeTags(keyword);
-                keywordTagsField.getEditor().setText(keyword.get());
+                keywordTagsField.getEditor().setText(KeywordList.serialize(List.of(keyword), viewModel.getKeywordSeparator()));
                 keywordTagsField.getEditor().positionCaret(keyword.get().length());
             }
         });
