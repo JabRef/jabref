@@ -1,3 +1,6 @@
+/// This class is used to anonymize a library. It is required to make private libraries available for testing.
+///
+/// For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
 package org.jabref.logic.pseudonymization;
 
 import java.util.ArrayList;
