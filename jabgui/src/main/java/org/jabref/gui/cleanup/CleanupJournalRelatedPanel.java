@@ -3,9 +3,9 @@ package org.jabref.gui.cleanup;
 import java.util.EnumSet;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
@@ -15,7 +15,13 @@ import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
 public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
-    @FXML private ComboBox<CleanupPreferences.CleanupStep> cleanupJournalBox;
+    @FXML private ToggleGroup journalAbbreviationsToggleGroup;
+
+    @FXML private RadioButton abbreviateDefault;
+    @FXML private RadioButton abbreviateDottles;
+    @FXML private RadioButton abbreviateShortestUnique;
+    @FXML private RadioButton abbreviateLTWA;
+    @FXML private RadioButton unabbreviate;
 
     private final CleanupJournalRelatedViewModel viewModel;
     private final CleanupDialogViewModel dialogViewModel;
@@ -34,39 +40,30 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
     }
 
     private void initializeComboBox() {
-        cleanupJournalBox.getItems().setAll(CleanupJournalRelatedViewModel.CLEANUP_JOURNAL_METHODS);
+        abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
+        abbreviateDottles.setText(Localization.lang("Abbreviate (dotless)"));
+        abbreviateShortestUnique.setText(Localization.lang("Abbreviate (shortest unique)"));
+        abbreviateLTWA.setText(Localization.lang("Abbreviate (LTWA)"));
+        unabbreviate.setText(Localization.lang("Unabbreviate"));
 
-        cleanupJournalBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CleanupPreferences.CleanupStep object) {
-                return switch (object) {
-                    case null ->
-                            "";
-                    case ABBREVIATE_DEFAULT ->
-                            Localization.lang("Abbreviate (default)");
-                    case ABBREVIATE_DOTLESS ->
-                            Localization.lang("Abbreviate (dotless)");
-                    case ABBREVIATE_SHORTEST_UNIQUE ->
-                            Localization.lang("Abbreviate (shortest unique)");
-                    case ABBREVIATE_LTWA ->
-                            Localization.lang("Abbreviate (LTWA)");
-                    case UNABBREVIATE ->
-                            Localization.lang("Unabbreviate");
-                    default ->
-                            object.toString();
-                };
-            }
-
-            @Override
-            public CleanupPreferences.CleanupStep fromString(String string) {
-                // Not needed for a non-editable ComboBox
-                return null;
-            }
-        });
+        abbreviateDefault.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
+        abbreviateDottles.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
+        abbreviateShortestUnique.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
+        abbreviateLTWA.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA);
+        unabbreviate.setUserData(CleanupPreferences.CleanupStep.UNABBREVIATE);
     }
 
     private void bindProperties() {
-        cleanupJournalBox.valueProperty().bindBidirectional(viewModel.selectedJournalCleanupOption);
+        journalAbbreviationsToggleGroup.selectToggle(journalAbbreviationsToggleGroup.getToggles().stream()
+                                                                                    .filter(toggle -> toggle.getUserData().equals(viewModel.selectedJournalCleanupOption.get()))
+                                                                                    .findFirst().orElse(null));
+
+        journalAbbreviationsToggleGroup.selectedToggleProperty().addListener((_, _, newToggle) -> {
+            if (newToggle != null) {
+                CleanupPreferences.CleanupStep step = (CleanupPreferences.CleanupStep) newToggle.getUserData();
+                viewModel.selectedJournalCleanupOption.set(step);
+            }
+        });
     }
 
     @Override
