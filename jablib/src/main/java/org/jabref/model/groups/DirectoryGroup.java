@@ -16,11 +16,9 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A group that mirrors a directory structure from the file system.
- * Entries belong to this group if they have a linked file within the specified directory.
- * Sub-groups are automatically created for subdirectories.
- */
+/// A group that mirrors a directory structure from the file system.
+/// Entries belong to this group if they have a linked file within the specified directory.
+/// Sub-groups are automatically created for subdirectories.
 public class DirectoryGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryGroup.class);
@@ -28,41 +26,33 @@ public class DirectoryGroup extends AbstractGroup {
     private final Path directoryPath;
     private final Set<String> matchedEntries = new HashSet<>();
 
-    /**
-     * Creates a new DirectoryGroup.
-     *
-     * @param name          The name of the group (typically the directory name)
-     * @param context       The hierarchical context
-     * @param directoryPath The path to the directory this group mirrors
-     */
+    /// Creates a new DirectoryGroup.
+    ///
+    /// @param name          The name of the group (typically the directory name)
+    /// @param context       The hierarchical context
+    /// @param directoryPath The path to the directory this group mirrors
     public DirectoryGroup(@NonNull String name, @NonNull GroupHierarchyType context, @NonNull Path directoryPath) {
         super(name, context);
         this.directoryPath = directoryPath.toAbsolutePath().normalize();
     }
 
-    /**
-     * Returns the directory path this group mirrors.
-     */
+    /// Returns the directory path this group mirrors.
     public Path getDirectoryPath() {
         return directoryPath;
     }
 
-    /**
-     * Checks if a BibEntry belongs to this group.
-     * An entry belongs to this group if it has a linked file within the directory.
-     */
+    /// Checks if a BibEntry belongs to this group.
+    /// An entry belongs to this group if it has a linked file within the directory.
     @Override
     public boolean contains(BibEntry entry) {
         return matchedEntries.contains(entry.getId());
     }
 
-    /**
-     * Updates the matched entries based on file links.
-     * Called when the directory content changes or when entries are modified.
-     *
-     * @param entry   The entry to check
-     * @param matched Whether the entry should be in this group
-     */
+    /// Updates the matched entries based on file links.
+    /// Called when the directory content changes or when entries are modified.
+    ///
+    /// @param entry   The entry to check
+    /// @param matched Whether the entry should be in this group
     public void updateMatches(BibEntry entry, boolean matched) {
         if (matched) {
             matchedEntries.add(entry.getId());
@@ -71,12 +61,10 @@ public class DirectoryGroup extends AbstractGroup {
         }
     }
 
-    /**
-     * Checks if an entry has a file linked within this directory.
-     *
-     * @param entry The entry to check
-     * @return true if the entry has a file in this directory
-     */
+    /// Checks if an entry has a file linked within this directory.
+    ///
+    /// @param entry The entry to check
+    /// @return true if the entry has a file in this directory
     public boolean hasFileInDirectory(BibEntry entry) {
         return entry.getFiles().stream()
                     .map(LinkedFile::getLink)
@@ -84,9 +72,7 @@ public class DirectoryGroup extends AbstractGroup {
                     .anyMatch(this::isFileInDirectory);
     }
 
-    /**
-     * Checks if a file path is within this group's directory.
-     */
+    /// Checks if a file path is within this group's directory.
     private boolean isFileInDirectory(Path filePath) {
         try {
             Path normalizedFile = filePath.toAbsolutePath().normalize();
@@ -102,12 +88,10 @@ public class DirectoryGroup extends AbstractGroup {
         return true;
     }
 
-    /**
-     * Scans the directory and returns a list of DirectoryGroups for each subdirectory.
-     * This is used to automatically create the group tree structure mirroring the file system.
-     *
-     * @return List of DirectoryGroup objects for immediate subdirectories
-     */
+    /// Scans the directory and returns a list of DirectoryGroups for each subdirectory.
+    /// This is used to automatically create the group tree structure mirroring the file system.
+    ///
+    /// @return List of DirectoryGroup objects for immediate subdirectories
     public List<DirectoryGroup> scanSubdirectories() {
         if (!Files.isDirectory(directoryPath)) {
             LOGGER.warn("Cannot scan subdirectories: {} is not a directory", directoryPath);
@@ -128,12 +112,10 @@ public class DirectoryGroup extends AbstractGroup {
         }
     }
 
-    /**
-     * Recursively builds the complete group tree structure from the directory.
-     * Each subdirectory becomes a subgroup, and this process continues recursively.
-     *
-     * @param parentNode The parent GroupTreeNode to add subgroups to
-     */
+    /// Recursively builds the complete group tree structure from the directory.
+    /// Each subdirectory becomes a subgroup, and this process continues recursively.
+    ///
+    /// @param parentNode The parent GroupTreeNode to add subgroups to
     public void buildGroupTree(GroupTreeNode parentNode) {
         List<DirectoryGroup> subgroups = scanSubdirectories();
 
