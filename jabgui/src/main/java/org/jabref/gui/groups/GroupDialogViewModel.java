@@ -560,9 +560,7 @@ public class GroupDialogViewModel {
                      ));
     }
 
-    /**
-     * Opens a directory chooser dialog for selecting the directory path for DirectoryGroup.
-     */
+    /// Opens a directory chooser dialog for selecting the directory path for DirectoryGroup.
     public void directoryGroupBrowse() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank() ?

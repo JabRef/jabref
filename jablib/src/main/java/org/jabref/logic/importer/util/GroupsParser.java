@@ -334,13 +334,11 @@ public class GroupsParser {
         }
     }
 
-    /**
-     * Parses a DirectoryGroup from its string representation.
-     *
-     * @param input The string representation of the DirectoryGroup
-     * @return The parsed DirectoryGroup
-     * @throws ParseException If the input cannot be parsed
-     */
+    /// Parses a DirectoryGroup from its string representation.
+    ///
+    /// @param input The string representation of the DirectoryGroup
+    /// @return The parsed DirectoryGroup
+    /// @throws ParseException If the input cannot be parsed
     private static DirectoryGroup directoryGroupFromString(String input) throws ParseException {
         assert input.startsWith(MetadataSerializationConfiguration.DIRECTORY_GROUP_ID);
 

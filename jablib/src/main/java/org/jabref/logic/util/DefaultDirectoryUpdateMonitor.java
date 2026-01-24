@@ -27,15 +27,12 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Monitors directories for file system changes using Java's WatchService.
- * Notifies registered listeners when files or directories are created, modified, or deleted.
- * <p>
- * This is separate from {@link org.jabref.gui.util.DefaultFileUpdateMonitor} because directory monitoring requires
- * different semantics: it monitors directory contents (files and subdirectories) rather than
- * individual file changes, and supports recursive monitoring of directory trees.
- * </p>
- */
+/// Monitors directories for file system changes using Java's WatchService.
+/// Notifies registered listeners when files or directories are created, modified, or deleted.
+///
+/// This is separate from {@link org.jabref.gui.util.DefaultFileUpdateMonitor} because directory monitoring requires
+/// different semantics: it monitors directory contents (files and subdirectories) rather than
+/// individual file changes, and supports recursive monitoring of directory trees.
 public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateMonitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDirectoryUpdateMonitor.class);
@@ -146,14 +143,12 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
         return null;
     }
 
-    /**
-     * Adds a listener for directory changes.
-     *
-     * @param directory the directory to monitor
-     * @param listener the listener to notify when changes occur
-     * @param recursive if true, also monitors all subdirectories
-     * @throws IOException if the directory cannot be registered for monitoring
-     */
+    /// Adds a listener for directory changes.
+    ///
+    /// @param directory the directory to monitor
+    /// @param listener the listener to notify when changes occur
+    /// @param recursive if true, also monitors all subdirectories
+    /// @throws IOException if the directory cannot be registered for monitoring
     @Override
     public void addListenerForDirectory(Path directory, DirectoryUpdateListener listener, boolean recursive) throws IOException {
         if (!isActive()) {
