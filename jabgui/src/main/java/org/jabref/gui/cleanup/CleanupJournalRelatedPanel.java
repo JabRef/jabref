@@ -3,6 +3,7 @@ package org.jabref.gui.cleanup;
 import java.util.EnumSet;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
@@ -15,6 +16,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
 public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
+    @FXML public Label cleanupJournalAbbreviationsLabel;
     @FXML private ToggleGroup journalAbbreviationsToggleGroup;
 
     @FXML private RadioButton abbreviateDefault;
@@ -35,11 +37,11 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
                   .root(this)
                   .load();
 
-        initializeComboBox();
+        initialize();
         bindProperties();
     }
 
-    private void initializeComboBox() {
+    private void initialize() {
         abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
         abbreviateDottles.setText(Localization.lang("Abbreviate (dotless)"));
         abbreviateShortestUnique.setText(Localization.lang("Abbreviate (shortest unique)"));
@@ -51,6 +53,8 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
         abbreviateShortestUnique.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
         abbreviateLTWA.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA);
         unabbreviate.setUserData(CleanupPreferences.CleanupStep.UNABBREVIATE);
+
+        cleanupJournalAbbreviationsLabel.setText(Localization.lang("Manage journal abbreviations"));
     }
 
     private void bindProperties() {
