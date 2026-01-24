@@ -82,7 +82,8 @@ public class AbbreviateJournalCleanup implements CleanupJob {
 
     private String getAbbreviatedName(Abbreviation text) {
         return switch (abbreviationType) {
-            case DEFAULT ->
+            case DEFAULT,
+                 LTWA ->
                     text.getAbbreviation();
             case DOTLESS ->
                     text.getDotlessAbbreviation();

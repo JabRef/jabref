@@ -12,8 +12,8 @@ public class CleanupJournalRelatedViewModel {
             CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT,
             CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
             CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
-            CleanupPreferences.CleanupStep.UNABBREVIATE,
-            CleanupPreferences.CleanupStep.ABBREVIATION_NO_CHANGES
+            CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
+            CleanupPreferences.CleanupStep.UNABBREVIATE
     );
 
     public final ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleObjectProperty<>();
@@ -28,6 +28,6 @@ public class CleanupJournalRelatedViewModel {
         return CLEANUP_JOURNAL_METHODS.stream()
                                       .filter(preferences::isActive)
                                       .findFirst()
-                                      .orElse(CleanupPreferences.CleanupStep.ABBREVIATION_NO_CHANGES);
+                                      .orElse(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
     }
 }

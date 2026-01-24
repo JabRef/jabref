@@ -48,10 +48,10 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
                             Localization.lang("Abbreviate (dotless)");
                     case ABBREVIATE_SHORTEST_UNIQUE ->
                             Localization.lang("Abbreviate (shortest unique)");
+                    case ABBREVIATE_LTWA ->
+                            Localization.lang("Abbreviate (LTWA)");
                     case UNABBREVIATE ->
                             Localization.lang("Unabbreviate");
-                    case ABBREVIATION_NO_CHANGES ->
-                            Localization.lang("No changes");
                     default ->
                             object.toString();
                 };
@@ -74,9 +74,7 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
         EnumSet<CleanupPreferences.CleanupStep> selectedMethods = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
         CleanupPreferences.CleanupStep selected = viewModel.selectedJournalCleanupOption.get();
-        if (!selected.equals(CleanupPreferences.CleanupStep.ABBREVIATION_NO_CHANGES)) {
-            selectedMethods.add(selected);
-        }
+        selectedMethods.add(selected);
 
         return CleanupTabSelection.ofJobs(CleanupJournalRelatedViewModel.CLEANUP_JOURNAL_METHODS, selectedMethods);
     }

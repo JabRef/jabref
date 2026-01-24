@@ -99,6 +99,8 @@ public class CleanupWorker {
                     new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DOTLESS, useFJournalField);
             case ABBREVIATE_SHORTEST_UNIQUE ->
                     new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.SHORTEST_UNIQUE, useFJournalField);
+            case ABBREVIATE_LTWA ->
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.LTWA, useFJournalField);
             case UNABBREVIATE ->
                     new UnabbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository);
             default ->
