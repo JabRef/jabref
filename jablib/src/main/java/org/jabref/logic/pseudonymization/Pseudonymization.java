@@ -25,7 +25,7 @@ public class Pseudonymization {
     }
 
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
-        // This map tracks the ID assignment for every field value (e.g., "Smith" -> 1)
+        // Every ID assignment for a specific field is stored here
         Map<Field, Map<String, Integer>> privacyMap = new HashMap<>();
 
         // First, anonymize the Group Tree (Metadata). 
@@ -38,14 +38,14 @@ public class Pseudonymization {
             GroupTreeNode newRoot = pseudonymizeGroupRecursively(rootGroup.get(), groupNameMap);
             bibDatabaseContext.getMetaData().setGroups(newRoot);
             
-            // Pre-fill the main privacy map with the group IDs we just generated
+            // Here we are filling the IDs generated for group names into the privacy map
             privacyMap.put(StandardField.GROUPS, groupNameMap);
         }
 
-        // Now process the actual bibliography entries
+        // Here we process the actual bibliography entries
         List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, privacyMap);
 
-        // Generate the "decoder" mapping for the user (e.g., "author-1" -> "Smith")
+        // This is the Decoder Mapping that maps pseudonymized values back to original values
         Map<String, String> valueMapping = new HashMap<>();
         privacyMap.forEach((field, valueToId) ->
                 valueToId.forEach((value, id) -> 
@@ -68,7 +68,7 @@ public class Pseudonymization {
         Integer id = groupNameMap.computeIfAbsent(oldName, k -> groupNameMap.size() + 1);
         String newName = "groups-" + id;
 
-        // We use ',' as the delimiter character for the ExplicitGroup constructor
+        // We use ',' as the separating character for the ExplicitGroup constructor
         AbstractGroup newGroup = new ExplicitGroup(
                 newName,
                 oldGroup.getHierarchicalContext(),
