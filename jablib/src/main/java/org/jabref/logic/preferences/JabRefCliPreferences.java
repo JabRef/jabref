@@ -1957,6 +1957,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT,
                 CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
                 CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
+                CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
                 CleanupPreferences.CleanupStep.UNABBREVIATE));
         return activeJobs;
     }
