@@ -44,6 +44,7 @@ import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
+import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
@@ -178,6 +179,7 @@ public class WebFetchers {
         searchBasedFetchers.add(new LOBIDFetcher());
         searchBasedFetchers.add(new ScholarArchiveFetcher());
         searchBasedFetchers.add(new EuropePmcFetcher());
+        searchBasedFetchers.add(new Scopus(importerPreferences));
         // Even though Unpaywall is used differently, adding it here enables "smooth" setting of the email (as fetcher key) in the preferences UI
         searchBasedFetchers.add(new UnpaywallFetcher(importerPreferences));
 
@@ -289,7 +291,7 @@ public class WebFetchers {
         Set<CustomizableKeyFetcher> fetchers = new HashSet<>();
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new SpringerNatureWebFetcher(importerPreferences));
-        fetchers.add(new ScienceDirect(importerPreferences));
+        fetchers.add(new Scopus(importerPreferences));
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
         fetchers.add(new MedlineFetcher(importerPreferences));

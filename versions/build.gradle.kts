@@ -11,9 +11,11 @@ javaPlatform {
 // Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
-val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
+
+val javafx = "25.0.2"
 
 val lucene = "10.3.2"
+
 val pdfbox = "3.0.6"
 
 dependencies {
@@ -53,10 +55,9 @@ dependencies.constraints {
     api("org.openjfx:javafx-base:$javafx")
     api("org.openjfx:javafx-controls:$javafx")
     api("org.openjfx:javafx-fxml:$javafx")
-    api("org.openjfx:javafx-graphics:${javafx}")
+    api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
-    // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
     api("cc.jilt:jilt:1.9")

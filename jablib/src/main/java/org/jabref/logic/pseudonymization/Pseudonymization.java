@@ -28,16 +28,16 @@ public class Pseudonymization {
         // Every ID assignment for a specific field is stored here
         Map<Field, Map<String, Integer>> privacyMap = new HashMap<>();
 
-        // First, anonymize the Group Tree (Metadata). 
+        // First, anonymize the Group Tree (Metadata).
         // We do this before entries to ensure that if a group is renamed to "groups-1",
         // the entries belonging to it also get updated to "groups-1".
         Optional<GroupTreeNode> rootGroup = bibDatabaseContext.getMetaData().getGroups();
         if (rootGroup.isPresent()) {
             Map<String, Integer> groupNameMap = new HashMap<>();
-            
+
             GroupTreeNode newRoot = pseudonymizeGroupRecursively(rootGroup.get(), groupNameMap);
             bibDatabaseContext.getMetaData().setGroups(newRoot);
-            
+
             // Here we are filling the IDs generated for group names into the privacy map
             privacyMap.put(StandardField.GROUPS, groupNameMap);
         }
@@ -48,8 +48,8 @@ public class Pseudonymization {
         // This is the Decoder Mapping that maps pseudonymized values back to original values
         Map<String, String> valueMapping = new HashMap<>();
         privacyMap.forEach((field, valueToId) ->
-                valueToId.forEach((value, id) -> 
-                    valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value))
+                valueToId.forEach((value, id) ->
+                        valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value))
         );
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
@@ -72,7 +72,7 @@ public class Pseudonymization {
         AbstractGroup newGroup = new ExplicitGroup(
                 newName,
                 oldGroup.getHierarchicalContext(),
-                ',' 
+                ','
         );
         GroupTreeNode newNode = new GroupTreeNode(newGroup);
 
@@ -90,11 +90,11 @@ public class Pseudonymization {
         for (BibEntry entry : entries) {
             BibEntry newEntry = new BibEntry(entry.getType());
             newEntries.add(newEntry);
-            
+
             for (Field field : entry.getFields()) {
                 Map<String, Integer> valueToId = privacyMap.computeIfAbsent(field, k -> new HashMap<>());
                 String content = entry.getField(field).get();
-                
+
                 Integer id = valueToId.computeIfAbsent(content, k -> valueToId.size() + 1);
                 newEntry.setField(field, field.getName() + "-" + id);
             }

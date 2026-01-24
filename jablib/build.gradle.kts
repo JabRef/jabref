@@ -252,7 +252,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
@@ -266,7 +266,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateJournalListMV)
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
 
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
     val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
@@ -281,7 +281,7 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateCitationStyleCatalog)
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath + '"'
 
     inputs.file(layout.buildDirectory.file("../src/main/resources/ltwa/ltwa_20210702.csv"))
     val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv")
@@ -332,7 +332,7 @@ val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDa
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
-val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
+val scopusApiKey = providers.environmentVariable("ScopusApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
@@ -354,7 +354,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("ieeeAPIKey", ieeeAPIKey)
     inputs.property("medlineApiKey", medlineApiKey)
     inputs.property("springerNatureAPIKey", springerNatureAPIKey)
-    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
+    inputs.property("scopusApiKey", scopusApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
     inputs.property("unpaywallEmail", unpaywallEmail)
 
@@ -370,7 +370,7 @@ tasks.named<ProcessResources>("processResources") {
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "medlineApiKey" to inputs.properties["medlineApiKey"],
-                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
+                "scopusApiKey" to inputs.properties["scopusApiKey"],
                 "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
                 "unpaywallEmail" to inputs.properties["unpaywallEmail"],
