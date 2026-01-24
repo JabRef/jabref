@@ -163,8 +163,8 @@
     For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
 
 
-    We really mean it serious that the command line should be used.
-    `git merge upstream/main` causes much less trouble with `CHANGELOG.md` and git submodules than any IDE-based tooling.
+    We strongly recommend using the command line for this process.
+    Using `git merge upstream/main` causes fewer issues with `CHANGELOG.md` and git submodules than most IDE-based tools.
 - jobName: 'Source branch is other than "main"'
   workflowName: 'Check PR Modifications'
   message: >
