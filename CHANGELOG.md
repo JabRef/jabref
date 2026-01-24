@@ -12,17 +12,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added the ability to remove XMP metadata from linked files. [#8277](https://github.com/JabRef/jabref/issues/8277)
+- Improved merge dialog decisions for the `month` field by using a new plausibility comparator. JabRef now prefers normalized months (e.g., `#jun#`) or integers over unnormalized strings. [#14457](https://github.com/JabRef/jabref/issues/14457)
+- We added web search capability to ScienceDirect using the [Scopus](https://www.scopus.com/) Search API, enabling users to search for academic literature directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
 - We fixed an issue where a redundant validation listener was causing duplicate error dialogs when invalid BibTeX source was detected in the SourceTab. [#14805](https://github.com/JabRef/jabref/issues/14805)
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
+- Consistency check is now aware of custom entry types, custom fields, and reports missing required fields. [#14257](https://github.com/JabRef/jabref/pull/14257)
 - We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
-- REST-API: Added more commands (`selectentries`, `open`, `focus`).
-- REST-API: Added the possibility to trigger the import dialog
+- REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
+- REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
 
 ### Changed
 
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
+- macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 
 ### Fixed
 
