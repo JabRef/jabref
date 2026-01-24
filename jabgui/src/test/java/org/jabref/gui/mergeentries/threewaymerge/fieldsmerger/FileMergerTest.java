@@ -8,17 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class FileMergerTest {
     FileMerger fileMerger = new FileMerger();
 
-    /**
-     * Test the following cases
-     * nullvalues
-     * emptyString for FileB
-     * emptyString for FileA
-     * FileA and FileB are valid strings and are separated by semicolon
-     *
-     * @param expect Expected value
-     * @param fileA  File string a
-     * @param fileB  File String b
-     */
+    /// Test the following cases
+    /// nullvalues
+    /// emptyString for FileB
+    /// emptyString for FileA
+    /// FileA and FileB are valid strings and are separated by semicolon
+    ///
+    /// @param expect Expected value
+    /// @param fileA  File string a
+    /// @param fileB  File String b
     @ParameterizedTest
     @CsvSource(textBlock = """
                 ,,,

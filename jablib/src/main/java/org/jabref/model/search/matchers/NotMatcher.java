@@ -5,13 +5,11 @@ import org.jabref.model.search.SearchMatcher;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Inverts the search result.
- * <p>
- * Example:
- * false --> true
- * true --> false
- */
+/// Inverts the search result.
+///
+/// Example:
+/// false --> true
+/// true --> false
 public class NotMatcher implements SearchMatcher {
 
     private final SearchMatcher otherMatcher;

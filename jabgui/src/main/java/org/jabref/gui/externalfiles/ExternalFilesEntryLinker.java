@@ -32,9 +32,7 @@ public class ExternalFilesEntryLinker {
     private final NotificationService notificationService;
     private final Supplier<BibDatabaseContext> bibDatabaseContextSupplier;
 
-    /**
-     * @param stateManager required for currently active BibDatabaseContext
-     */
+    /// @param stateManager required for currently active BibDatabaseContext
     public ExternalFilesEntryLinker(ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, NotificationService notificationService, StateManager stateManager) {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.filePreferences = filePreferences;
@@ -63,14 +61,12 @@ public class ExternalFilesEntryLinker {
         entry.addFiles(linkedFiles);
     }
 
-    /**
-     * <ul>
-     *     <li>Move files to file directory</li>
-     *     <li>Use configured file directory pattern</li>
-     *     <li>Rename file to configured pattern (and skip renaming if file already exists)</li>
-     *     <li>Avoid overwriting files - by adding " {number}" after the file name</li>
-     * </ul>
-     */
+    ///
+    /// - Move files to file directory
+    /// - Use configured file directory pattern
+    /// - Rename file to configured pattern (and skip renaming if file already exists)
+    /// - Avoid overwriting files - by adding " {number}" after the file name
+    ///
     public void coveOrMoveFilesSteps(BibEntry entry, List<Path> files, boolean shouldMove) {
         List<LinkedFile> existingFiles = entry.getFiles();
         List<LinkedFile> linkedFiles = new ArrayList<>(files.size());

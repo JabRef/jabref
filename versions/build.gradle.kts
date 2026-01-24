@@ -11,14 +11,15 @@ javaPlatform {
 // Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
-val javafx = if (os.isLinux && arch.name.equals("aarch64", ignoreCase = true)) "25" else "25.0.1"
+val javafx = "25.0.2"
 
 val lucene = "10.3.2"
+
 val pdfbox = "3.0.6"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.7.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.10.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
@@ -26,7 +27,7 @@ dependencies {
     api("dev.langchain4j:langchain4j-open-ai")
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.1.0"))
 
-    api(platform("org.junit:junit-bom:6.0.1"))
+    api(platform("org.junit:junit-bom:6.0.2"))
     api("org.junit.jupiter:junit-jupiter-api")
     api("org.junit.jupiter:junit-jupiter-params")
     api("org.junit.jupiter:junit-jupiter")
@@ -61,7 +62,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9")
 
-    api("com.dlsc.gemsfx:gemsfx:3.6.2")
+    api("com.dlsc.gemsfx:gemsfx:3.8.2")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")
@@ -69,16 +70,16 @@ dependencies.constraints {
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket:0.24.0")
     api("com.github.ben-manes.caffeine:caffeine:3.2.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
-    api("com.github.javaparser:javaparser-symbol-solver-core:3.27.1")
+    api("com.github.javaparser:javaparser-symbol-solver-core:3.28.0")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
     api("com.google.errorprone:error_prone_core:2.44.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
-    api("com.h2database:h2-mvstore:2.3.232")
-    api("com.konghq:unirest-java-core:4.7.0")
-    api("com.konghq:unirest-modules-gson:4.7.0")
+    api("com.h2database:h2-mvstore:2.4.240")
+    api("com.konghq:unirest-java-core:4.7.1")
+    api("com.konghq:unirest-modules-gson:4.7.1")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.3.2")
     api("com.squareup.okio:okio-jvm:3.16.4")
@@ -93,7 +94,7 @@ dependencies.constraints {
     api("commons-logging:commons-logging:1.3.5")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
-    api("de.undercouch:citeproc-java:3.4.0")
+    api("de.undercouch:citeproc-java:3.4.1")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
@@ -102,15 +103,15 @@ dependencies.constraints {
     api("io.github.classgraph:classgraph:4.8.184")
     api("io.github.java-diff-utils:java-diff-utils:4.16")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
-    api("io.github.thibaultmeyer:cuid:2.0.4")
+    api("io.github.thibaultmeyer:cuid:2.0.5")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
-    api("io.zonky.test:embedded-postgres:2.1.1")
+    api("io.zonky.test:embedded-postgres:2.2.0")
     api("jakarta.annotation:jakarta.annotation-api:3.0.0")
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.2")
+    api("net.bytebuddy:byte-buddy:1.18.4")
     api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.18.1")
     api("net.java.dev.jna:jna-platform:5.18.1")
@@ -119,7 +120,7 @@ dependencies.constraints {
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.1")
-    api("org.apache.commons:commons-lang3:3.19.0")
+    api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.client5:httpclient5:5.5")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.3")
@@ -149,7 +150,7 @@ dependencies.constraints {
     api("org.jetbrains:annotations:26.0.2-1")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
     api("org.jooq:jool:0.9.15")
-    api("org.jsoup:jsoup:1.21.2")
+    api("org.jsoup:jsoup:1.22.1")
     api("org.jspecify:jspecify:1.0.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
@@ -165,8 +166,8 @@ dependencies.constraints {
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
-    api("org.xmlunit:xmlunit-core:2.10.4")
-    api("org.xmlunit:xmlunit-matchers:2.10.4")
+    api("org.xmlunit:xmlunit-core:2.11.0")
+    api("org.xmlunit:xmlunit-matchers:2.11.0")
     api("org.yaml:snakeyaml:2.5")
     api("tech.units:indriya:2.2.3")
 }

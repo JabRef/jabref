@@ -26,19 +26,22 @@ jobs:
           stale-pr-label: "status: stale"
           remove-pr-stale-when-updated: false
 
-          days-before-pr-stale: 14
+          days-before-pr-stale: 10
           stale-pr-message: >
-            The requested changes were not addressed for 14 days.
-            Please follow-up in the next 7 days or your PR will be automatically closed.
+            The requested changes were not addressed for 10 days.
+            Please follow-up in the next 10 days or your PR will be automatically closed.
             You can check the [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for hints on the pull request process.
 
-          days-before-pr-close: 7
+          days-before-pr-close: 10
           close-pr-message: >
             This PR is being closed due to continued inactivity.
+      - uses: actions/checkout@v6
+        if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
       - name: Process closed issues/PRs
         if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
         env:
           CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "Raw payload:"
           cat <<EOF

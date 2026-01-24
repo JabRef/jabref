@@ -21,9 +21,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Handles importing of recommended articles to be displayed in the Related Articles tab.
- */
+/// Handles importing of recommended articles to be displayed in the Related Articles tab.
 public class MrDLibImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
@@ -72,12 +70,10 @@ public class MrDLibImporter extends Importer {
         return "Takes valid JSON documents from the Mr. DLib API and parses them into a BibEntry.";
     }
 
-    /**
-     * Convert Buffered Reader response to string for JSON parsing.
-     *
-     * @param input Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
-     * @return Returns an String containing the JSON document.
-     */
+    /// Convert Buffered Reader response to string for JSON parsing.
+    ///
+    /// @param input Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
+    /// @return Returns an String containing the JSON document.
     private String convertToString(BufferedReader input) {
         String line;
         StringBuilder stringBuilder = new StringBuilder();
@@ -91,17 +87,13 @@ public class MrDLibImporter extends Importer {
         return stringBuilder.toString();
     }
 
-    /**
-     * Small pair-class to ensure the right order of the recommendations.
-     */
+    /// Small pair-class to ensure the right order of the recommendations.
     private record RankedBibEntry(BibEntry entry, Integer rank) {
     }
 
-    /**
-     * Parses the input from the server to a ParserResult
-     *
-     * @param input A BufferedReader with a reference to a string with the server's response
-     */
+    /// Parses the input from the server to a ParserResult
+    ///
+    /// @param input A BufferedReader with a reference to a string with the server's response
     private void parse(BufferedReader input) {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
@@ -133,12 +125,10 @@ public class MrDLibImporter extends Importer {
         recommendationSetId = recommendationSetJson.getBigInteger("recommendation_set_id").toString();
     }
 
-    /**
-     * Parses the JSON recommendations into bib entries
-     *
-     * @param recommendation JSON object of a single recommendation returned by Mr. DLib
-     * @return A ranked bib entry created from the recommendation input
-     */
+    /// Parses the JSON recommendations into bib entries
+    ///
+    /// @param recommendation JSON object of a single recommendation returned by Mr. DLib
+    /// @return A ranked bib entry created from the recommendation input
     private RankedBibEntry populateBibEntry(JSONObject recommendation) {
         BibEntry current = new BibEntry();
 

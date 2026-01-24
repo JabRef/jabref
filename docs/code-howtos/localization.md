@@ -7,7 +7,7 @@ More information about this topic from the translator side is provided at [Trans
 
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
-[JabRef uses ResourceBundles](https://github.com/JabRef/jabref/blob/4b41108107fb92cc0a8acfcb834ccbb0b6e79ae5/src/main/resources/l10n/JabRef_en.properties) ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized.
+[JabRef uses ResourceBundles](https://github.com/JabRef/jabref/blob/main/jablib/src/main/resources/l10n/JabRef_en.properties) ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized.
 
 ## Localization in Java code
 
@@ -63,7 +63,7 @@ The tests in `org.jabref.logic.l10n.LocalizationConsistencyTest` check whether t
 
 ## Adding a new Language
 
-1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java)
+1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/l10n/Language.java)
 2. Create an empty \<locale code>.properties file
 3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
 

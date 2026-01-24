@@ -33,9 +33,7 @@ public class ExternalFileTypeItemViewModel {
         return icon;
     }
 
-    /**
-     * Used for sorting in the table
-     */
+    /// Used for sorting in the table
     public String getName() {
         return name.get();
     }

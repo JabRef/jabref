@@ -30,10 +30,8 @@ import org.jbibtex.BibTeXEntry;
 import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
 
-/**
- * Custom {@link ItemDataProvider} that allows to set the data so that we don't have to instantiate a new CSL object
- * every time.
- */
+/// Custom {@link ItemDataProvider} that allows to set the data so that we don't have to instantiate a new CSL object
+/// every time.
 public class JabRefItemDataProvider implements ItemDataProvider {
 
     private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
@@ -50,53 +48,51 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         stringJsonBuilderFactory = new StringJsonBuilderFactory();
     }
 
-    /**
-     * Converts the {@link BibEntry} into {@link CSLItemData}.
-     *
-     * <br>
-     * <table>
-     * <thead>
-     * <tr>
-     * <th style="text-align:left">BibTeX</th>
-     * <th style="text-align:left">BibLaTeX</th>
-     * <th style="text-align:left">EntryPreview/CSL</th>
-     * <th style="text-align:left">proposed logic, conditions and info</th>
-     * </tr>
-     * </thead>
-     * <tbody>
-     * <tr>
-     * <td style="text-align:left">volume</td>
-     * <td style="text-align:left">volume</td>
-     * <td style="text-align:left">volume</td>
-     * <td style="text-align:left"></td>
-     * </tr>
-     * <tr>
-     * <td style="text-align:left">number</td>
-     * <td style="text-align:left">issue</td>
-     * <td style="text-align:left">issue</td>
-     * <td style="text-align:left">For conversion to CSL or BibTeX: BibLaTeX <code>number</code> takes priority and supersedes BibLaTeX <code>issue</code></td>
-     * </tr>
-     * <tr>
-     * <td style="text-align:left">number</td>
-     * <td style="text-align:left">number</td>
-     * <td style="text-align:left">issue</td>
-     * <td style="text-align:left">same as above</td>
-     * </tr>
-     * <tr>
-     * <td style="text-align:left">pages</td>
-     * <td style="text-align:left">eid</td>
-     * <td style="text-align:left">number</td>
-     * <td style="text-align:left">Some journals put the article-number (= eid) into the pages field. If BibLaTeX <code>eid</code> exists, provide csl <code>number</code> to the style. If <code>pages</code> exists, provide csl <code>page</code>.  If <code>eid</code> WITHIN the <code>pages</code> field exists, detect the eid and provide csl <code>number</code>. If both <code>eid</code> and <code>pages</code> exists, ideally provide both csl <code>number</code> and csl <code>page</code>. Ideally the citationstyle should be able to flexibly choose the rendering.</td>
-     * </tr>
-     * <tr>
-     * <td style="text-align:left">pages</td>
-     * <td style="text-align:left">pages</td>
-     * <td style="text-align:left">page</td>
-     * <td style="text-align:left">same as above</td>
-     * </tr>
-     * </tbody>
-     * </table>
-     */
+    /// Converts the {@link BibEntry} into {@link CSLItemData}.
+    ///
+    /// <br>
+    /// <table>
+    /// <thead>
+    /// <tr>
+    /// <th style="text-align:left">BibTeX</th>
+    /// <th style="text-align:left">BibLaTeX</th>
+    /// <th style="text-align:left">EntryPreview/CSL</th>
+    /// <th style="text-align:left">proposed logic, conditions and info</th>
+    /// </tr>
+    /// </thead>
+    /// <tbody>
+    /// <tr>
+    /// <td style="text-align:left">volume</td>
+    /// <td style="text-align:left">volume</td>
+    /// <td style="text-align:left">volume</td>
+    /// <td style="text-align:left"></td>
+    /// </tr>
+    /// <tr>
+    /// <td style="text-align:left">number</td>
+    /// <td style="text-align:left">issue</td>
+    /// <td style="text-align:left">issue</td>
+    /// <td style="text-align:left">For conversion to CSL or BibTeX: BibLaTeX `number` takes priority and supersedes BibLaTeX `issue`</td>
+    /// </tr>
+    /// <tr>
+    /// <td style="text-align:left">number</td>
+    /// <td style="text-align:left">number</td>
+    /// <td style="text-align:left">issue</td>
+    /// <td style="text-align:left">same as above</td>
+    /// </tr>
+    /// <tr>
+    /// <td style="text-align:left">pages</td>
+    /// <td style="text-align:left">eid</td>
+    /// <td style="text-align:left">number</td>
+    /// <td style="text-align:left">Some journals put the article-number (= eid) into the pages field. If BibLaTeX `eid` exists, provide csl `number` to the style. If `pages` exists, provide csl `page`.  If `eid` WITHIN the `pages` field exists, detect the eid and provide csl `number`. If both `eid` and `pages` exists, ideally provide both csl `number` and csl `page`. Ideally the citationstyle should be able to flexibly choose the rendering.</td>
+    /// </tr>
+    /// <tr>
+    /// <td style="text-align:left">pages</td>
+    /// <td style="text-align:left">pages</td>
+    /// <td style="text-align:left">page</td>
+    /// <td style="text-align:left">same as above</td>
+    /// </tr>
+    /// </tbody>
+    /// </table>
     private CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
         // We need to make a deep copy, because we modify the entry according to the logic presented at
         // https://github.com/JabRef/jabref/issues/8372#issuecomment-1014941935
@@ -171,9 +167,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
     }
 
-    /**
-     * Fills the data with all entries in given bibDatabaseContext
-     */
+    /// Fills the data with all entries in given bibDatabaseContext
     public void setData(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
         this.setData(bibDatabaseContext.getEntries(), bibDatabaseContext, entryTypesManager);
     }

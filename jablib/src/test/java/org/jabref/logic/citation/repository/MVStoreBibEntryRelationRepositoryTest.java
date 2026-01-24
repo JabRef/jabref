@@ -19,7 +19,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
@@ -87,14 +86,12 @@ class MVStoreBibEntryRelationRepositoryTest {
                 .withField(StandardField.DOI, "10.1234/5678" + i);
     }
 
-    /**
-     * Create a fake list of relations for a bibEntry based on the {@link PaperDetails#toBibEntry()} logic
-     * that corresponds to this use case: we want to make sure that relations coming from SemanticScholar
-     * and mapped as BibEntry will be serializable by the MVStore.
-     *
-     * @param entry should not be null
-     * @return never empty
-     */
+    /// Create a fake list of relations for a bibEntry based on the {@link org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails#toBibEntry()} logic
+    /// that corresponds to this use case: we want to make sure that relations coming from SemanticScholar
+    /// and mapped as BibEntry will be serializable by the MVStore.
+    ///
+    /// @param entry should not be null
+    /// @return never empty
     private List<BibEntry> createRelations(BibEntry entry) {
         return entry
                 .getCitationKey()

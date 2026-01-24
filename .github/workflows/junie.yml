@@ -1,22 +1,35 @@
 name: Junie
-run-name: Junie run ${{ inputs.run_id }}
-
-permissions:
-  contents: write
-  pull-requests: write
 
 on:
-  workflow_dispatch:
-    inputs:
-      run_id:
-        description: "id of workflow process"
-        required: true
-      workflow_params:
-        description: "stringified params"
-        required: true
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
-  call-workflow-passing-data:
-    uses: jetbrains-junie/junie-workflows/.github/workflows/ej-issue.yml@main
-    with:
-      workflow_params: ${{ inputs.workflow_params }}
+  junie:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@junie-agent')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@junie-agent')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@junie-agent')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@junie-agent') || contains(github.event.issue.title, '@junie-agent')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Junie
+        id: junie
+        uses: JetBrains/junie-github-action@v0
+        with:
+          junie_api_key: ${{ secrets.JUNIE_API_KEY }}

@@ -37,9 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.logic.openoffice.backend.NamedRangeReferenceMark.safeInsertSpacesBetweenReferenceMarks;
 
-/**
- * Class for generation, insertion and management of all reference marks in the document.
- */
+/// Class for generation, insertion and management of all reference marks in the document.
 public class CSLReferenceMarkManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLReferenceMarkManager.class);
 
