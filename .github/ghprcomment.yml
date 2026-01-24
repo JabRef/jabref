@@ -49,7 +49,7 @@
 - jobName: format-javadoc
   workflowName: 'Source Code Tests'
   message: >
-    You introcuded non-Markdown JavaDoc.
+    You introduced non-Markdown JavaDoc.
     Please use Markdown JavaDoc (`///`).
 
 
