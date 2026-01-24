@@ -146,7 +146,7 @@ public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateM
     /// Adds a listener for directory changes.
     ///
     /// @param directory the directory to monitor
-    /// @param listener the listener to notify when changes occur
+    /// @param listener  the listener to notify when changes occur
     /// @param recursive if true, also monitors all subdirectories
     /// @throws IOException if the directory cannot be registered for monitoring
     @Override
