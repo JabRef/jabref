@@ -416,6 +416,14 @@ jobs:
           java-version: '25'
           distribution: ${{ needs.conditions.outputs.jvmDistribution }}
           check-latest: true
+      - name: Debug
+        run:
+          set -e
+          java -version
+          javac -version
+          gradle --version
+          echo $PATH
+          echo $JAVA_HOME
 
       - name: Workaround for jpackage issue
         run: |
