@@ -42,26 +42,29 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
     }
 
     private void initialize() {
-        abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
-        abbreviateDottles.setText(Localization.lang("Abbreviate (dotless)"));
-        abbreviateShortestUnique.setText(Localization.lang("Abbreviate (shortest unique)"));
-        abbreviateLTWA.setText(Localization.lang("Abbreviate (LTWA)"));
-        unabbreviate.setText(Localization.lang("Unabbreviate"));
-
-        abbreviateDefault.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
-        abbreviateDottles.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
-        abbreviateShortestUnique.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
-        abbreviateLTWA.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA);
-        unabbreviate.setUserData(CleanupPreferences.CleanupStep.UNABBREVIATE);
-
         cleanupJournalAbbreviationsLabel.setText(Localization.lang("Manage journal abbreviations"));
+
+        abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
+        abbreviateDefault.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
+
+        abbreviateDottles.setText(Localization.lang("Abbreviate (dotless)"));
+        abbreviateDottles.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
+
+        abbreviateShortestUnique.setText(Localization.lang("Abbreviate (shortest unique)"));
+        abbreviateShortestUnique.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
+
+        abbreviateLTWA.setText(Localization.lang("Abbreviate (LTWA)"));
+        abbreviateLTWA.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA);
+
+        unabbreviate.setText(Localization.lang("Unabbreviate"));
+        unabbreviate.setUserData(CleanupPreferences.CleanupStep.UNABBREVIATE);
     }
 
     private void bindProperties() {
-        journalAbbreviationsToggleGroup.selectToggle(journalAbbreviationsToggleGroup.getToggles().stream()
-                                                                                    .filter(toggle -> toggle.getUserData().equals(viewModel.selectedJournalCleanupOption.get()))
-                                                                                    .findFirst().orElse(null));
-
+        journalAbbreviationsToggleGroup.selectToggle(
+                journalAbbreviationsToggleGroup.getToggles().stream()
+                                               .filter(toggle -> toggle.getUserData().equals(viewModel.selectedJournalCleanupOption.get()))
+                                               .findFirst().orElse(null));
         journalAbbreviationsToggleGroup.selectedToggleProperty().addListener((_, _, newToggle) -> {
             if (newToggle != null) {
                 CleanupPreferences.CleanupStep step = (CleanupPreferences.CleanupStep) newToggle.getUserData();

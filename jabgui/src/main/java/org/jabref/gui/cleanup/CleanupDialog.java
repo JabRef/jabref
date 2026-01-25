@@ -34,7 +34,7 @@ public class CleanupDialog extends BaseDialog<Void> {
 
     private final CleanupDialogViewModel viewModel;
 
-    // Constructor for multiple-entry cleanup
+    /// Constructor for multiple-entry cleanup
     public CleanupDialog(BibDatabaseContext databaseContext,
                          CliPreferences preferences,
                          DialogService dialogService,
@@ -52,7 +52,7 @@ public class CleanupDialog extends BaseDialog<Void> {
         init(databaseContext, preferences);
     }
 
-    // Constructor for single-entry cleanup
+    /// Constructor for single-entry cleanup
     public CleanupDialog(BibEntry targetEntry,
                          BibDatabaseContext databaseContext,
                          CliPreferences preferences,

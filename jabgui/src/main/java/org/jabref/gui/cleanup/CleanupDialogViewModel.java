@@ -32,40 +32,51 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 public class CleanupDialogViewModel extends AbstractViewModel {
 
     private final BibDatabaseContext databaseContext;
+
     private final CliPreferences preferences;
+
     private final DialogService dialogService;
+
     private final StateManager stateManager;
+
     private final UndoManager undoManager;
+
+    @Nullable
     private final Supplier<LibraryTab> tabSupplier;
+
+    @Nullable
     private final TaskExecutor taskExecutor;
+
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
 
+    @NullMarked
     public CleanupDialogViewModel(
-            @NonNull BibDatabaseContext databaseContext,
-            @NonNull CliPreferences preferences,
-            @NonNull DialogService dialogService,
-            @NonNull StateManager stateManager,
-            @NonNull UndoManager undoManager,
-            Supplier<LibraryTab> tabSupplier,
-            TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository
+            BibDatabaseContext databaseContext,
+            CliPreferences preferences,
+            DialogService dialogService,
+            StateManager stateManager,
+            UndoManager undoManager,
+            @Nullable Supplier<LibraryTab> tabSupplier,
+            @Nullable TaskExecutor taskExecutor,
+            JournalAbbreviationRepository journalAbbreviationRepository
     ) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.tabSupplier = tabSupplier;
+        this.taskExecutor = taskExecutor;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
-
-        this.tabSupplier = tabSupplier; // can be null
-        this.taskExecutor = taskExecutor; // can be null
     }
 
     public void setTargetEntries(List<BibEntry> entries) {
