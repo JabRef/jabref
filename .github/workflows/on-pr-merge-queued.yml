@@ -9,6 +9,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - uses: actions/checkout@v6
       - name: 'Add label "status: to-be-merged"'
         run: |
           gh pr edit ${{ github.event.merge_group.pull_request.number }} --add-label "status: to-be-merged"
