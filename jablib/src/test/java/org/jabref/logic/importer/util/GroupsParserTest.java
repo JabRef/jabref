@@ -33,8 +33,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class GroupsParserTest {
     private FileUpdateMonitor fileMonitor;
@@ -208,4 +210,58 @@ class GroupsParserTest {
         assertEquals(ExplicitGroup.class, roundtripParsed.getClass());
         assertEquals(parsed, roundtripParsed);
     }
+
+
+@Test
+void unknownGroupTypeReturnsNull() throws ParseException {
+    String unknownGroup = "UnknownGroupType:TestGroup\\;0\\;1\\;0x000000ff\\;\\;\\;;";
+    
+    AbstractGroup result = GroupsParser.fromString(
+        unknownGroup, 
+        ',', 
+        mock(FileUpdateMonitor.class), 
+        mock(MetaData.class), 
+        "test"
+    );
+    
+    assertNull(result);
+}
+
+@Test
+void directoryGroupReturnsNull() throws ParseException {
+    String directoryGroup = "DirectoryGroup:fs-mirror\\;0\\;C:/TEMP/jabref/fs-mirror\\;1\\;\\;\\;;";
+    
+    AbstractGroup result = GroupsParser.fromString(
+        directoryGroup,
+        ',',
+        mock(FileUpdateMonitor.class),
+        mock(MetaData.class),
+        "test"
+    );
+    
+    assertNull(result);
+}
+
+@Test
+void importGroupsSkipsUnknownGroups() throws ParseException {
+    List<String> orderedData = Arrays.asList(
+        "0 AllEntriesGroup:;",
+        "1 StaticGroup:KnownGroup\\;0\\;1\\;0x000000ff\\;\\;\\;;",
+        "1 DirectoryGroup:UnknownGroup\\;0\\;C:/path\\;1\\;\\;\\;;",
+        "1 StaticGroup:AnotherKnown\\;0\\;1\\;0x000000ff\\;\\;\\;;"
+    );
+    
+    GroupTreeNode root = GroupsParser.importGroups(
+        orderedData,
+        ',',
+        mock(FileUpdateMonitor.class),
+        mock(MetaData.class),
+        "test"
+    );
+    
+    // Should have root + 2 StaticGroups (DirectoryGroup skipped)
+    assertEquals(2, root.getNumberOfChildren());
+    assertEquals("KnownGroup", root.getChildren().get(0).getGroup().getName());
+    assertEquals("AnotherKnown", root.getChildren().get(1).getGroup().getName());
+}
 }

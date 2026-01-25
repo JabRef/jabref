@@ -72,6 +72,10 @@ public class GroupsParser {
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
                 AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData, userAndHost);
+                if (group == null) {
+                // Skip unknown group types (e.g., DirectoryGroup from future versions)
+                continue;
+                }
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
                     // create new root
@@ -133,7 +137,8 @@ public class GroupsParser {
             return texGroupFromString(input, fileMonitor, metaData, userAndHost);
         }
 
-        throw new ParseException("Unknown group: " + input);
+        LOGGER.warn("Skipping unknown group: {}", input);
+        return null;
     }
 
     private static AbstractGroup texGroupFromString(String input, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost) throws ParseException {
