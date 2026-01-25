@@ -89,20 +89,11 @@ application {
     )
 }
 
-val javaExt = extensions.getByType<JavaPluginExtension>()
-val toolchains = extensions.getByType<JavaToolchainService>()
-val isIbm = toolchains.launcherFor(javaExt.toolchain)
-    .map { it.metadata.vendor.contains("IBM", ignoreCase = true) }
-
 javaModulePackaging {
     applicationName = "jabkit"
     addModules.add("jdk.incubator.vector")
-    jlinkOptions.addAll(
-        isIbm.map { ibm ->
-            // See https://github.com/eclipse-openj9/openj9/issues/23240 for the reasoning
-            if (ibm) emptyList() else listOf("--generate-cds-archive")
-        }
-    )
+
+    // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {

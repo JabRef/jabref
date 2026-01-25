@@ -161,25 +161,15 @@ tasks.named<JavaExec>("run") {
     enableAssertions = true
 }
 
-val javaExt = extensions.getByType<JavaPluginExtension>()
-val toolchains = extensions.getByType<JavaToolchainService>()
-val isIbm = toolchains.launcherFor(javaExt.toolchain)
-    .map { it.metadata.vendor.contains("IBM", ignoreCase = true) }
-
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     applicationName = "JabRef"
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
+
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
-    jlinkOptions.addAll(
-        isIbm.map { ibm ->
-            // See https://github.com/eclipse-openj9/openj9/issues/23240 for the reasoning
-            if (ibm) emptyList() else listOf("--generate-cds-archive")
-        }
-    )
     targetsWithOs("windows") {
         options.addAll(
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
@@ -197,6 +187,7 @@ javaModulePackaging {
             include("JabRefHost.ps1")
         })
     }
+
     targetsWithOs("linux") {
         options.addAll(
             "--linux-menu-group", "Office;",
