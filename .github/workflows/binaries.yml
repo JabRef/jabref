@@ -418,12 +418,13 @@ jobs:
           check-latest: true
       - name: Debug
         run:
-          set -e
+          set -x
           java -version
           javac -version
           gradle --version
           echo $PATH
           echo $JAVA_HOME
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
 
       - name: Workaround for jpackage issue
         run: |
