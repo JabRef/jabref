@@ -162,7 +162,8 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     }
 
     private boolean isSeparatedKeyword(String keywordString, String keywordSeparator) {
-        if (keywordString.isEmpty()) {
+        int separatorLastOccurrence = keywordString.lastIndexOf(keywordSeparator);
+        if (separatorLastOccurrence == -1) {
             return false;
         }
 
