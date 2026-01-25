@@ -73,18 +73,14 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
             @Override
             public Keyword fromString(String keywordString) {
-                if (keywordString.isEmpty()) {
+                if (keywordString == null || keywordString.isEmpty()) {
                     return null;
                 }
 
-                KeywordList parsedKeywords = KeywordList.parse(keywordString, keywordSeparator);
-                Keyword resultKeyword = null;
-                if (parsedKeywords.isEmpty()) {
-                    return new Keyword("");
-                } else {
-                    resultKeyword = parsedKeywords.get(0);
-                }
-                return resultKeyword;
+                return KeywordList.parse(keywordString, keywordSeparator)
+                                  .stream()
+                                  .findFirst()
+                                  .orElse(null);
             }
         };
     }
