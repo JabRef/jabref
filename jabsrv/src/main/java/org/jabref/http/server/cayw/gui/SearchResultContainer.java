@@ -18,7 +18,7 @@ public class SearchResultContainer extends ListView<CAYWEntry> {
     private final static int MAX_LINES = 3;
     private final static int ESTIMATED_CHARS_PER_LINE = 80;
     private final static int TOOLTIP_WIDTH = 400;
-    private final static double PREF_WIDTH = 300;
+    private final static double PREF_WIDTH = 420;
 
     private ObservableList<CAYWEntry> selectedEntries = javafx.collections.FXCollections.observableArrayList();
 
