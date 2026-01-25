@@ -173,7 +173,11 @@ jobs:
 
           # We have three acceptable errors
           if ! grep -q "3 problems" heylogs.txt; then
-            cat heylogs.txt >> $GITHUB_OUTPUT
+            {
+              echo "heylogs<<EOF"
+              cat heylogs.txt
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
