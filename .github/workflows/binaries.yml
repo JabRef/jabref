@@ -416,6 +416,7 @@ jobs:
           echo $PATH
           echo $JAVA_HOME
           java -version
+          java -version >> $GITHUB_STEP_SUMMARY
           javac -version
           which jlink
           jlink --version
