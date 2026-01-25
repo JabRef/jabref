@@ -6,7 +6,7 @@ public class KeyCollisionException extends RuntimeException {
 
     public KeyCollisionException() {
         super();
-        this.id="";
+        this.id = "";
     }
 
     public KeyCollisionException(String msg, String id) {
