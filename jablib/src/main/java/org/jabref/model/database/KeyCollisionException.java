@@ -16,12 +16,12 @@ public class KeyCollisionException extends RuntimeException {
 
     public KeyCollisionException(String msg, Throwable exception) {
         super(msg, exception);
-        this.id="";
+        this.id = "";
     }
 
     public KeyCollisionException(Throwable exception) {
         super(exception);
-        this.id="";
+        this.id = "";
     }
 
     public String getId() {

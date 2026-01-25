@@ -98,41 +98,4 @@ class PseudonymizationTest {
         );
         assertEquals(expectedMap, result.valueMapping());
     }
-
-    /*
-    // Commented out to prevent build failures due to metadata timestamps
-    @Test
-    void pseudonymizeLibrary() throws URISyntaxException, IOException {
-        Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
-        BibDatabaseContext databaseContext = importer.importDatabase(path).getDatabaseContext();
-
-        Pseudonymization pseudonymization = new Pseudonymization();
-        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
-        databaseWriter.writeDatabase(result.bibDatabaseContext());
-
-        Path expectedPath = Path.of(PseudonymizationTest.class.getResource("Chocolate-pseudnomyized.bib").toURI());
-        assertEquals(Files.readString(expectedPath), stringWriter.toString());
-    }
-
-    @Test
-    void pseudonymizeLibraryFile(@TempDir Path tempDir) throws URISyntaxException, IOException {
-        // modify path to the file to be anonymized
-        Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
-        // modify target to the files to be created
-        Path target = tempDir.resolve("pseudo.bib");
-        Path mappingInfoTarget = target.resolveSibling("pseudo.bib.mapping.csv");
-
-        BibDatabaseContext databaseContext = importer.importDatabase(path).getDatabaseContext();
-
-        Pseudonymization pseudonymization = new Pseudonymization();
-        Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
-        databaseWriter.writeDatabase(result.bibDatabaseContext());
-
-        Files.writeString(target, stringWriter.toString());
-
-        PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(mappingInfoTarget, result);
-
-        assertTrue(Files.exists(target));
-    }
-    */
 }
