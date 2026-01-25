@@ -409,7 +409,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
         with:
           distribution: ${{ needs.conditions.outputs.jvmDistribution }}
-      - name: Debug
+      - name: Output current Java environment
         shell: bash
         run: |
           set -x
