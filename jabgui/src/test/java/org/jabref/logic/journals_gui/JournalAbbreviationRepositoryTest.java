@@ -199,7 +199,7 @@ class JournalAbbreviationRepositoryTest {
         new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
@@ -223,7 +223,7 @@ class JournalAbbreviationRepositoryTest {
 
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
-                .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(AMSField.FJOURNAL, "ACS Applied Materials \\& Interfaces");
 
         assertEquals(expected, entry);
     }
@@ -236,7 +236,7 @@ class JournalAbbreviationRepositoryTest {
         new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
@@ -244,12 +244,12 @@ class JournalAbbreviationRepositoryTest {
     void unabbreviateWithJournalExistsAndFJournalExists() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
-                .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(AMSField.FJOURNAL, "ACS Applied Materials \\& Interfaces");
 
         new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
@@ -261,7 +261,7 @@ class JournalAbbreviationRepositoryTest {
         new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
@@ -273,7 +273,7 @@ class JournalAbbreviationRepositoryTest {
         new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 
