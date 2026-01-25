@@ -1953,7 +1953,12 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
                 CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
                 CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
-                CleanupPreferences.CleanupStep.CONVERT_MSC_CODES));
+                CleanupPreferences.CleanupStep.CONVERT_MSC_CODES,
+                CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT,
+                CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
+                CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
+                CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
+                CleanupPreferences.CleanupStep.UNABBREVIATE));
         return activeJobs;
     }
 

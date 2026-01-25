@@ -101,6 +101,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -125,7 +126,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
-                       GitHandlerRegistry gitHandlerRegistry) {
+                       GitHandlerRegistry gitHandlerRegistry,
+                       JournalAbbreviationRepository journalAbbreviationRepository) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -137,6 +139,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         setId("frame");
 
@@ -229,7 +232,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager);
+                undoManager,
+                journalAbbreviationRepository);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -248,7 +252,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this::getOpenDatabaseAction,
                 aiService,
                 entryEditor,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                journalAbbreviationRepository
+        );
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
