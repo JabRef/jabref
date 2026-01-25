@@ -356,6 +356,7 @@ jobs:
           SED_I=(-i)
           [[ '${{ startsWith(matrix.os, 'macos') }}' == 'true' ]] && SED_I=(-i '')
           sed "${SED_I[@]}" "s/AMAZON/${{ inputs.jvmVendor }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
 
       # region setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
