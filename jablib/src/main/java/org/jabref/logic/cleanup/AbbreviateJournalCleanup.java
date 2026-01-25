@@ -46,8 +46,6 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         String origText = entry.getField(fieldName).orElse("");
         String text = database != null ? database.resolveForStrings(origText) : origText;
 
-        List<FieldChange> changes = new ArrayList<>();
-
         Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
 
         if (foundAbbreviation.isEmpty() && abbreviationType != AbbreviationType.LTWA) {
@@ -64,6 +62,8 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         }
 
         String newText = newTextOptional.get();
+
+        List<FieldChange> changes = new ArrayList<>();
 
         // Store full name into fjournal but only if it exists
         foundAbbreviation.ifPresent(abbr -> {
