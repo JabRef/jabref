@@ -131,7 +131,8 @@ public class MainMenu extends MenuBar {
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,
                     PreviewControls previewControls,
-                    GitHandlerRegistry gitHandlerRegistry, JournalAbbreviationRepository journalAbbreviationRepository
+                    GitHandlerRegistry gitHandlerRegistry,
+                    JournalAbbreviationRepository journalAbbreviationRepository
     ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;

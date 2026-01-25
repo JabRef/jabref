@@ -38,14 +38,6 @@ public class CleanupPreferences {
         return EnumSet.copyOf(activeJobs);
     }
 
-    public void setActive(CleanupStep job, boolean value) {
-        if (activeJobs.contains(job) && !value) {
-            activeJobs.remove(job);
-        } else if (!activeJobs.contains(job) && value) {
-            activeJobs.add(job);
-        }
-    }
-
     public ObservableSet<CleanupStep> getObservableActiveJobs() {
         return activeJobs;
     }

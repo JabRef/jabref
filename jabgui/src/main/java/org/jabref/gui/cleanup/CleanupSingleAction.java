@@ -23,7 +23,8 @@ public class CleanupSingleAction extends SimpleCommand {
                                CliPreferences preferences,
                                DialogService dialogService,
                                StateManager stateManager,
-                               UndoManager undoManager, JournalAbbreviationRepository journalAbbreviationRepository) {
+                               UndoManager undoManager,
+                               JournalAbbreviationRepository journalAbbreviationRepository) {
         this.entry = entry;
         this.preferences = preferences;
         this.dialogService = dialogService;
