@@ -134,15 +134,15 @@ public class UnabbreviateJournalCleanupTest {
                 .withField(AMSField.FJOURNAL, "Journal of Foo");
 
         List<FieldChange> changes = cleanup.cleanup(entry);
-
         List<FieldChange> expected = List.of(
-                new FieldChange(entry, AMSField.FJOURNAL, "Journal of Foo", ""),
+                new FieldChange(entry, AMSField.FJOURNAL, "Journal of Foo", null),
                 new FieldChange(entry, StandardField.JOURNAL, "J. Foo", "Journal of Foo")
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.empty(), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Journal of Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
