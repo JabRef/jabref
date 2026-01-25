@@ -25,6 +25,4 @@
         <RadioButton fx:id="abbreviateLTWA" toggleGroup="$journalAbbreviationsToggleGroup"/>
         <RadioButton fx:id="unabbreviate" toggleGroup="$journalAbbreviationsToggleGroup"/>
     </VBox>
-
-
 </fx:root>
