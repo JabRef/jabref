@@ -3,9 +3,8 @@
 /// For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
 package org.jabref.logic.pseudonymization;
 
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
