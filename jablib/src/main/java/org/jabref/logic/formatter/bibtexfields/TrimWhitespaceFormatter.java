@@ -7,9 +7,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Trim all whitespace characters (as defined in Java) in the beginning and at the end of the string.
- */
+/// Trim all whitespace characters (as defined in Java) in the beginning and at the end of the string.
 public class TrimWhitespaceFormatter extends Formatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrimWhitespaceFormatter.class);

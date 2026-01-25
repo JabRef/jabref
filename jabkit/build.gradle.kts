@@ -1,3 +1,6 @@
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.jvm.toolchain.JavaToolchainService
+
 plugins {
     id("org.jabref.gradle.module")
     id("application")
@@ -89,7 +92,8 @@ application {
 javaModulePackaging {
     applicationName = "jabkit"
     addModules.add("jdk.incubator.vector")
-    jlinkOptions.addAll("--generate-cds-archive")
+
+    // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {

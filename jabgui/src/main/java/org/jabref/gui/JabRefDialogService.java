@@ -64,15 +64,13 @@ import org.controlsfx.dialog.ProgressDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class provides methods to create default
- * JavaFX dialogs which will also work on top of Swing
- * windows. The created dialogs are instances of the
- * {@link FXDialog} class. The available dialogs in this class
- * are useful for displaying small information graphic dialogs
- * rather than complex windows. For more complex dialogs it is
- * advised to rather create a new sub class of {@link FXDialog}.
- */
+/// This class provides methods to create default
+/// JavaFX dialogs which will also work on top of Swing
+/// windows. The created dialogs are instances of the
+/// {@link FXDialog} class. The available dialogs in this class
+/// are useful for displaying small information graphic dialogs
+/// rather than complex windows. For more complex dialogs it is
+/// advised to rather create a new sub class of {@link FXDialog}.
 public class JabRefDialogService implements DialogService {
     // Snackbar dialog maximum size
     public static final int DIALOG_SIZE_LIMIT = 300;

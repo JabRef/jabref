@@ -25,11 +25,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * This is BibIX variant of Refer.
- * There is hardly any official document so fields are added taking standard refer type.
- * Originally number of fields were less and overtime some of these modified or added by various management systems.
- */
+/// This is BibIX variant of Refer.
+/// There is hardly any official document so fields are added taking standard refer type.
+/// Originally number of fields were less and overtime some of these modified or added by various management systems.
 public class ReferImporter extends Importer {
 
     private static final Pattern Z_PATTERN = Pattern.compile("%0 .*");
@@ -272,16 +270,14 @@ public class ReferImporter extends Importer {
         }
     }
 
-    /**
-     * We must be careful about the author names, since they can be presented differently
-     * by different sources. Normally each %A tag brings one name, and we get the authors
-     * separated by " and ". This is the correct behaviour.
-     * One source lists the names separated by comma, with a comma at the end. We can detect
-     * this format and fix it.
-     *
-     * @param s The author string
-     * @return The fixed author string
-     */
+    /// We must be careful about the author names, since they can be presented differently
+    /// by different sources. Normally each %A tag brings one name, and we get the authors
+    /// separated by " and ". This is the correct behaviour.
+    /// One source lists the names separated by comma, with a comma at the end. We can detect
+    /// this format and fix it.
+    ///
+    /// @param s The author string
+    /// @return The fixed author string
     private static String fixAuthor(String s) {
         int index = s.indexOf(" and ");
         if (index >= 0) {

@@ -31,9 +31,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class contains utility method for duplicate checking of entries.
- */
+/// This class contains utility method for duplicate checking of entries.
 public class DuplicateCheck {
     private static final double DUPLICATE_THRESHOLD = 0.75; // The overall threshold to signal a duplicate pair
 
@@ -192,11 +190,9 @@ public class DuplicateCheck {
         return NOT_EQUAL;
     }
 
-    /**
-     * Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
-     * We do a replace to harmonize these to a simple "-"
-     * After this, a simple test for equality should be enough
-     */
+    /// Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
+    /// We do a replace to harmonize these to a simple "-"
+    /// After this, a simple test for equality should be enough
     private static int comparePagesField(final String stringOne, final String stringTwo) {
         final String processedStringOne = stringOne.replaceAll("[- ]+", "-");
         final String processedStringTwo = stringTwo.replaceAll("[- ]+", "-");
@@ -206,10 +202,8 @@ public class DuplicateCheck {
         return NOT_EQUAL;
     }
 
-    /**
-     * We do not attempt to harmonize abbreviation state of the journal names,
-     * but we remove periods from the names in case they are abbreviated with and without dots:
-     */
+    /// We do not attempt to harmonize abbreviation state of the journal names,
+    /// but we remove periods from the names in case they are abbreviated with and without dots:
     private static int compareJournalField(final String stringOne, final String stringTwo) {
         final String processedStringOne = stringOne.replace(".", "").toLowerCase(Locale.ROOT);
         final String processedStringTwo = stringTwo.replace(".", "").toLowerCase(Locale.ROOT);
@@ -278,9 +272,7 @@ public class DuplicateCheck {
         return StringUtil.equalsUnifiedLineBreak(one.getField(field), two.getField(field));
     }
 
-    /**
-     * Checks if the two entries represent the same publication.
-     */
+    /// Checks if the two entries represent the same publication.
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
         // Checks DOI and other identifiers
         if (haveSameIdentifier(one, two)) {
@@ -325,16 +317,14 @@ public class DuplicateCheck {
         return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
     }
 
-    /**
-     * Goes through all entries in the given database, and if at least one of
-     * them is a duplicate of the given entry, as per
-     * Util.isDuplicate(BibEntry, BibEntry), the duplicate is returned.
-     * The search is terminated when the first duplicate is found.
-     *
-     * @param database The database to search.
-     * @param entry    The entry of which we are looking for duplicates.
-     * @return The first duplicate entry found. Empty Optional if no duplicates are found.
-     */
+    /// Goes through all entries in the given database, and if at least one of
+    /// them is a duplicate of the given entry, as per
+    /// Util.isDuplicate(BibEntry, BibEntry), the duplicate is returned.
+    /// The search is terminated when the first duplicate is found.
+    ///
+    /// @param database The database to search.
+    /// @param entry    The entry of which we are looking for duplicates.
+    /// @return The first duplicate entry found. Empty Optional if no duplicates are found.
     public Optional<BibEntry> containsDuplicate(final BibDatabase database,
                                                 final BibEntry entry,
                                                 final BibDatabaseMode bibDatabaseMode) {

@@ -49,7 +49,7 @@ import com.google.common.eventbus.EventBus;
 public class Main {
    private static EventBus eventBus = new EventBus();
 
-   public static void main(String[] args) {
+   static void main(String[] args) {
       Main main = new Main();
       Listener listener = new Listener();
       eventBus.register(listener);
