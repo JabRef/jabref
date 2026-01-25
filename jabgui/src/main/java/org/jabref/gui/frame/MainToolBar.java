@@ -79,7 +79,8 @@ public class MainToolBar extends ToolBar {
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       CountingUndoManager undoManager, JournalAbbreviationRepository journalAbbreviationRepository) {
+                       CountingUndoManager undoManager,
+                       JournalAbbreviationRepository journalAbbreviationRepository) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
