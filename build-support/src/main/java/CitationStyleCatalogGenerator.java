@@ -1,4 +1,4 @@
-//JAVA 24+
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS org.jspecify:jspecify:1.0.0
@@ -45,7 +45,7 @@ public class CitationStyleCatalogGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         generateCitationStyleCatalog();
     }
 
