@@ -82,14 +82,13 @@ public class AbbreviateJournalCleanup implements CleanupJob {
 
     private String getAbbreviatedName(Abbreviation text) {
         return switch (abbreviationType) {
-            case DEFAULT,
-                 LTWA ->
+            case DEFAULT ->
                     text.getAbbreviation();
             case DOTLESS ->
                     text.getDotlessAbbreviation();
             case SHORTEST_UNIQUE ->
                     text.getShortestUniqueAbbreviation();
-            default ->
+            case LTWA ->
                     throw new IllegalStateException("Unexpected value: %s".formatted(abbreviationType));
         };
     }
