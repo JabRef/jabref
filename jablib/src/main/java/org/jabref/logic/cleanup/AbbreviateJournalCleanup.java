@@ -65,15 +65,15 @@ public class AbbreviateJournalCleanup implements CleanupJob {
             return List.of();
         }
 
-        String newText = newTextOptional.get();
+        // TODO: Currently FieldWriter does not do escaping. We also don't want the UI for editing journal abbreviations to deal with escapings. Thus, we need to do it here.
+        String newText = newTextOptional.get().replaceAll("(?<!\\\\)&", "\\\\&");
 
-        List<FieldChange> changes = new ArrayList<>();
+        List<FieldChange> changes = new ArrayList<>(2);
 
-        // Store full name into fjournal but only if it exists
         foundAbbreviation.ifPresent(abbr -> {
             if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
                 String oldFjournalValue = entry.getField(AMSField.FJOURNAL).orElse(null);
-                String newFjournalValue = abbr.getName();
+                String newFjournalValue = abbr.getName().replaceAll("(?<!\\\\)&", "\\\\&");
                 entry.setField(AMSField.FJOURNAL, newFjournalValue);
                 changes.add(new FieldChange(entry, AMSField.FJOURNAL, oldFjournalValue, newFjournalValue));
             }

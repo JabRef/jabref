@@ -304,4 +304,19 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(Optional.of("PRL"), entry.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("Physical Review Letters"), entry.getField(AMSField.FJOURNAL));
     }
+
+    @Test
+    void ampersandStaysEscaped() {
+        Abbreviation abbr = new Abbreviation("Aachen & Berlin", "A & B", "AB");
+        Mockito.when(repositoryMock.get("A & B")).thenReturn(Optional.of(abbr));
+        Mockito.when(repositoryMock.get("A \\& B")).thenReturn(Optional.of(abbr));
+        Mockito.when(repositoryMock.get("Aachen & Berlin")).thenReturn(Optional.of(abbr));
+        Mockito.when(repositoryMock.get("Aachen \\& Berlin")).thenReturn(Optional.of(abbr));
+
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "A \\& B");
+        BibEntry expected = new BibEntry(entry).withField(AMSField.FJOURNAL, "Aachen \\& Berlin");
+        new UnabbreviateJournalCleanup(databaseMock, repositoryMock).cleanup(entry);
+        new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT, true).cleanup(entry);
+        assertEquals(expected, entry);
+    }
 }
