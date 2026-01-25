@@ -417,6 +417,7 @@ jobs:
           distribution: ${{ needs.conditions.outputs.jvmDistribution }}
           check-latest: true
       - name: Debug
+        shell: bash
         run: |
           set -x
           echo $PATH
