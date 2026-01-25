@@ -136,15 +136,20 @@ class GenerateCitationKeys implements Runnable {
     }
 
     private GlobalCitationKeyPatterns buildKeyPatterns(CitationKeyPatternPreferences existingPreferences) {
-        String defaultPatternToUse = pattern != null ? pattern : existingPreferences.getDefaultPattern();
-        GlobalCitationKeyPatterns patternsToUse = GlobalCitationKeyPatterns.fromPattern(defaultPatternToUse);
+        GlobalCitationKeyPatterns patternsToUse = existingPreferences.getKeyPatterns().copy();
 
-        for (Map.Entry<EntryType, ?> entry : existingPreferences.getKeyPatterns().getPatterns().entrySet()) {
-            patternsToUse.addCitationKeyPattern(entry.getKey(), entry.getValue().toString());
+        if (pattern != null) {
+            patternsToUse.setDefaultPattern(pattern);
         }
 
         if (typePatterns != null) {
             for (Map.Entry<String, String> entry : typePatterns.entrySet()) {
+                if (entry.getKey() == null || entry.getKey().isBlank()) {
+                    throw new IllegalArgumentException("Entry type name must not be empty");
+                }
+                if (entry.getValue() == null || entry.getValue().isBlank()) {
+                    throw new IllegalArgumentException("Citation key pattern must not be empty for type: " + entry.getKey());
+                }
                 EntryType entryType = EntryTypeFactory.parse(entry.getKey());
                 patternsToUse.addCitationKeyPattern(entryType, entry.getValue());
             }
