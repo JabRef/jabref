@@ -45,8 +45,27 @@ on:
         type: string
         required: false
         default: "26-ea+22"
+      jvmDistribution:
+        description: "JDK distribution (setup-java)"
+        type: choice
+        default: corretto
+        options:
+          # These are the distributions listed at https://github.com/actions/setup-java/blob/main/README.md#supported-distributions
+          - adopt
+          - adopt-openj9
+          - corretto
+          - dragonwell
+          - graalvm
+          - jetbrains
+          - liberica
+          - microsoft
+          - oracle
+          - sapmachine
+          - semeru
+          - temurin
+          - zulu
       jvmVendor:
-        description: "JDK Vendor"
+        description: "JDK vendor (gradle toolchain)"
         type: choice
         default: AMAZON
         options:
@@ -109,6 +128,7 @@ jobs:
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
+      jvmDistribution:  ${{ steps.binary.outputs.jvmDistribution }}
       useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
       jdkVersion: ${{ steps.binary.outputs.jdkVersion }}
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
@@ -156,7 +176,13 @@ jobs:
             echo "JVM vendor: ${{ github.event.inputs.jvmVendor || '(unset)' }}"
             echo "JVM vendor: ${{ github.event.inputs.jvmVendor || '(unset)' }}" >> "$GITHUB_STEP_SUMMARY"
           fi
-          # Enable testing of EA JDKs later even if not triggered by workflow dispatch
+
+          # The distribution to use at setup-java
+          echo "JVM distribution: ${{ github.event.inputs.jvmDistribution || 'corretto' }}"
+          echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+
+          # Enable testing of EA JDKs later even if not triggered by workflow dispatch.
+          # One needs to set "useEaJdk=true" above even at the stable case to enable this.
           echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
           echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
           echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
@@ -381,6 +407,8 @@ jobs:
       # endregion
 
       - uses: ./.github/actions/setup-gradle
+        with:
+          distribution: ${{ needs.conditions.outputs.jvmDistribution }}
 
       - name: Workaround for jpackage issue
         run: |
