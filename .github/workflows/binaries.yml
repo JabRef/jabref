@@ -153,6 +153,8 @@ jobs:
             echo "🛡️ JDK stable version used"
             echo "🛡️ JDK stable version used" >> "$GITHUB_STEP_SUMMARY"
             echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "JDK vendor: ${{ github.event.inputs.jdkVendor || '(unset)' }}"
+            echo "JDK vendor: ${{ github.event.inputs.jdkVendor || '(unset)' }}" >> "$GITHUB_STEP_SUMMARY"
           fi
           # Enable testing of EA JDKs later even if not triggered by workflow dispatch
           echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
