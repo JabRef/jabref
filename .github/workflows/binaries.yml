@@ -349,6 +349,7 @@ jobs:
 
       - name: Patch used JDK
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
+        shell: bash
         run: |
           set -ex
           PS4='+$LINENO: '
