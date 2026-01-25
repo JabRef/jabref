@@ -1,14 +1,18 @@
 package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.jspecify.annotations.NonNull;
@@ -43,10 +47,13 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--transliterate", description = "Transliterate fields for citation key generation")
     private Boolean transliterate;
 
+    @Option(names = "--type-pattern", description = "Citation key pattern for a specific entry type (--type-pattern article=[auth][year])")
+    private Map<String, String> typePatterns;
+
     @Option(names = "--warn-before-overwrite", description = "Warn before overwriting existing citation keys")
     private Boolean warnBeforeOverwrite;
 
-    @Option(names = "--suffix", description = "Key suffix strategy: ALWAYS, SECOND_WITH_A, SECOND_WITH_B")
+    @Option(names = "--suffix", description = "Key suffix strategy: ${COMPLETION-CANDIDATES}")
     private CitationKeyPatternPreferences.KeySuffix keySuffix;
 
     @Option(names = "--regex", description = "Regular expression for key pattern matching")
@@ -110,6 +117,8 @@ class GenerateCitationKeys implements Runnable {
     private @NonNull CitationKeyGenerator getCitationKeyGenerator(BibDatabaseContext databaseContext) {
         CitationKeyPatternPreferences existingPreferences = parentCommand.getParent().cliPreferences.getCitationKeyPatternPreferences();
 
+        GlobalCitationKeyPatterns patternsToUse = buildKeyPatterns(existingPreferences);
+
         CitationKeyPatternPreferences preferencesToUse = new CitationKeyPatternPreferences(
                 transliterate != null ? transliterate : existingPreferences.shouldTransliterateFieldsForCitationKey(),
                 avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
@@ -119,10 +128,28 @@ class GenerateCitationKeys implements Runnable {
                 keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
-                existingPreferences.getKeyPatterns(),
+                patternsToUse,
                 pattern != null ? pattern : existingPreferences.getDefaultPattern(),
                 keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
         );
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
+    }
+
+    private GlobalCitationKeyPatterns buildKeyPatterns(CitationKeyPatternPreferences existingPreferences) {
+        String defaultPatternToUse = pattern != null ? pattern : existingPreferences.getDefaultPattern();
+        GlobalCitationKeyPatterns patternsToUse = GlobalCitationKeyPatterns.fromPattern(defaultPatternToUse);
+        
+        for (Map.Entry<EntryType, ?> entry : existingPreferences.getKeyPatterns().getPatterns().entrySet()) {
+            patternsToUse.addCitationKeyPattern(entry.getKey(), entry.getValue().toString());
+        }
+
+        if (typePatterns != null) {
+            for (Map.Entry<String, String> entry : typePatterns.entrySet()) {
+                EntryType entryType = EntryTypeFactory.parse(entry.getKey());
+                patternsToUse.addCitationKeyPattern(entryType, entry.getValue());
+            }
+        }
+
+        return patternsToUse;
     }
 }
