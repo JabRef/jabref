@@ -138,7 +138,7 @@ class GenerateCitationKeys implements Runnable {
     private GlobalCitationKeyPatterns buildKeyPatterns(CitationKeyPatternPreferences existingPreferences) {
         String defaultPatternToUse = pattern != null ? pattern : existingPreferences.getDefaultPattern();
         GlobalCitationKeyPatterns patternsToUse = GlobalCitationKeyPatterns.fromPattern(defaultPatternToUse);
-        
+
         for (Map.Entry<EntryType, ?> entry : existingPreferences.getKeyPatterns().getPatterns().entrySet()) {
             patternsToUse.addCitationKeyPattern(entry.getKey(), entry.getValue().toString());
         }
