@@ -12,13 +12,15 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CleanupWorker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanupWorker.class);
+
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
@@ -35,7 +37,7 @@ public class CleanupWorker {
         this.failures = new ArrayList<>();
     }
 
-    public List<FieldChange> cleanup(@NonNull CleanupPreferences preset, @NonNull BibEntry entry) {
+    public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
         List<CleanupJob> jobs = determineCleanupActions(preset);
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
@@ -44,7 +46,6 @@ public class CleanupWorker {
                 failures.addAll(cleanup.getIoExceptions());
             }
         }
-
         return changes;
     }
 
