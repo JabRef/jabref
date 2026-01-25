@@ -1,6 +1,7 @@
 package org.jabref.logic.journals_gui;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -315,20 +316,20 @@ class JournalAbbreviationRepositoryTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideAbbreviationTestCases")
-    void fuzzyMatch(List<Abbreviation> abbreviationList, String input, String expectedAbbreviation, String expectedDotless, String expectedShortest, String ambiguousInput) {
+    @MethodSource
+    void fuzzyMatch(List<Abbreviation> abbreviationList,
+                    String input,
+                    String expectedAbbreviation, String expectedDotless, String expectedShortest,
+                    String ambiguousInput) {
         repository.addCustomAbbreviations(abbreviationList);
 
-        assertEquals(expectedAbbreviation, repository.getDefaultAbbreviation(input).orElse("WRONG"));
-
-        assertEquals(expectedDotless, repository.getDotless(input).orElse("WRONG"));
-
-        assertEquals(expectedShortest, repository.getShortestUniqueAbbreviation(input).orElse("WRONG"));
-
-        assertTrue(repository.getDefaultAbbreviation(ambiguousInput).isEmpty());
+        assertEquals(Optional.of(expectedAbbreviation), repository.getDefaultAbbreviation(input));
+        assertEquals(Optional.of(expectedDotless), repository.getDotless(input));
+        assertEquals(Optional.of(expectedShortest), repository.getShortestUniqueAbbreviation(input));
+        assertEquals(Optional.empty(), repository.getDefaultAbbreviation(ambiguousInput));
     }
 
-    static Stream<Arguments> provideAbbreviationTestCases() {
+    static Stream<Arguments> fuzzyMatch() {
         return Stream.of(
                 Arguments.of(
                         List.of(
@@ -366,5 +367,11 @@ class JournalAbbreviationRepositoryTest {
                         "Zeitschrift für C"
                 )
         );
+    }
+
+    @Test
+    void fuzzyMatchSkippingCloseButDifferentWords() {
+        repository.addCustomAbbreviations(List.of(new Abbreviation("Nutrition", "Nutrition", "")));
+        assertEquals(Optional.empty(), repository.getDefaultAbbreviation("Nutrients"));
     }
 }
