@@ -12,7 +12,10 @@ import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-/// Unabbreviates journal field.
+import org.jspecify.annotations.NullMarked;
+
+/// Unabbreviates journal field
+@NullMarked
 public class UnabbreviateJournalCleanup implements CleanupJob {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final BibDatabase database;
@@ -37,15 +40,14 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
             return List.of();
         }
 
-        List<FieldChange> changes = new ArrayList<>(restoreFromFJournal(entry, field));
-
+        List<FieldChange> changes = new ArrayList<>(restoreUnabbreviatedJournalTitleFromFJournal(entry, field));
         if (!changes.isEmpty()) {
             return changes;
         }
 
         String text = entry.getFieldLatexFree(field).orElse("");
         String origText = text;
-        text = database != null ? database.resolveForStrings(origText) : origText;
+        text = database.resolveForStrings(origText);
 
         if (!journalAbbreviationRepository.isKnownName(text)) {
             return List.of(); // Cannot do anything if it is not known.
@@ -62,12 +64,12 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
         return changes;
     }
 
-    private List<FieldChange> restoreFromFJournal(BibEntry entry, Field field) {
+    private List<FieldChange> restoreUnabbreviatedJournalTitleFromFJournal(BibEntry entry, Field field) {
         if ((StandardField.JOURNAL != field && StandardField.JOURNALTITLE != field) || !entry.hasField(AMSField.FJOURNAL)) {
             return List.of();
         }
 
-        String newText = entry.getField(AMSField.FJOURNAL).orElse("");
+        String newText = entry.getField(AMSField.FJOURNAL).orElse("").trim();
         if (newText.isBlank()) {
             return List.of();
         }
@@ -75,7 +77,6 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         String origText = entry.getField(field).orElse("");
-
         entry.clearField(AMSField.FJOURNAL);
         changes.add(new FieldChange(entry, AMSField.FJOURNAL, newText, null));
 

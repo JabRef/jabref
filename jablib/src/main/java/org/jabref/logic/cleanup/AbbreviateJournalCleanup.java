@@ -14,7 +14,10 @@ import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-/// Abbreviates journal field.
+import org.jspecify.annotations.NullMarked;
+
+/// Abbreviates journal field
+@NullMarked
 public class AbbreviateJournalCleanup implements CleanupJob {
     private final BibDatabase database;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -31,10 +34,9 @@ public class AbbreviateJournalCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> allChanges = new ArrayList<>();
-
+        // Journal is BibTeX, JournalTitle is BibLaTeX. See also org/jabref/model/entry/EntryConverter.java:20
         allChanges.addAll(abbreviateField(entry, StandardField.JOURNAL));
         allChanges.addAll(abbreviateField(entry, StandardField.JOURNALTITLE));
-
         return allChanges;
     }
 
@@ -44,12 +46,14 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         }
 
         String origText = entry.getField(fieldName).orElse("");
-        String text = database != null ? database.resolveForStrings(origText) : origText;
+        String text = database.resolveForStrings(origText);
 
         Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
 
         if (foundAbbreviation.isEmpty() && abbreviationType != AbbreviationType.LTWA) {
-            return List.of(); // Unknown, cannot abbreviate anything.
+            // Not found abbreviation -> cannot abbreviate anything.
+            // LTWA mode -> handled differently
+            return List.of();
         }
 
         Optional<String> newTextOptional = abbreviationType == AbbreviationType.LTWA

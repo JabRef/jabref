@@ -128,7 +128,7 @@ public class UnabbreviateJournalCleanupTest {
     }
 
     @Test
-    void restoreFromFJournal() {
+    void restoreUnabbreviatedJournalTitleFromFJournal() {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.JOURNAL, "J. Foo")
                 .withField(AMSField.FJOURNAL, "Journal of Foo");
