@@ -409,13 +409,6 @@ jobs:
       - uses: ./.github/actions/setup-gradle
         with:
           distribution: ${{ needs.conditions.outputs.jvmDistribution }}
-      # PATH adjustment works only if setup-java is called in the main workflow
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: ${{ needs.conditions.outputs.jvmDistribution }}
-          check-latest: true
       - name: Debug
         shell: bash
         run: |
