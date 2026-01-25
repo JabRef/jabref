@@ -20,31 +20,6 @@ on:
   merge_group:
   workflow_dispatch:
     inputs:
-      useEaJdk:
-        description: "Use early-access JDK and JavaFX"
-        type: boolean
-        required: false
-        default: false
-      jdkVersion:
-        description: "JDK EA version (used for gradle)"
-        type: number
-        required: false
-        default: 26
-      jdkVersionFlavour:
-        description: "JDK EA flavour (used for oracle-actions/setup-java)"
-        type: choice
-        required: false
-        default: stable
-        options:
-          # use the next JDK
-          - stable
-          # use the next-next JDK
-          - latest
-      javafxVersion:
-        description: "JavaFX EA"
-        type: string
-        required: false
-        default: "26-ea+22"
       jvmDistribution:
         description: "JDK distribution (setup-java)"
         type: choice
@@ -84,6 +59,31 @@ on:
           - ORACLE
           - SAP
           - TENCENT
+      useEaJdk:
+        description: "Use early-access JDK and JavaFX"
+        type: boolean
+        required: false
+        default: false
+      jdkVersion:
+        description: "JDK EA version (used for gradle)"
+        type: number
+        required: false
+        default: 26
+      jdkVersionFlavour:
+        description: "JDK EA flavour (used for oracle-actions/setup-java)"
+        type: choice
+        required: false
+        default: stable
+        options:
+          # use the next JDK
+          - stable
+          # use the next-next JDK
+          - latest
+      javafxVersion:
+        description: "JavaFX EA"
+        type: string
+        required: false
+        default: "26-ea+22"
       notarization:
         description: "Notarize macOS DMG and PKG"
         type: boolean
