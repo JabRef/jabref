@@ -76,8 +76,8 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
 
         String origText = entry.getField(field).orElse("");
 
-        entry.setField(AMSField.FJOURNAL, "");
-        changes.add(new FieldChange(entry, AMSField.FJOURNAL, newText, ""));
+        entry.clearField(AMSField.FJOURNAL);
+        changes.add(new FieldChange(entry, AMSField.FJOURNAL, newText, null));
 
         entry.setField(field, newText);
         changes.add(new FieldChange(entry, field, origText, newText));
