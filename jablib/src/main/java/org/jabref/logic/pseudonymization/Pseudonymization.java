@@ -28,10 +28,12 @@ public class Pseudonymization {
     }
 
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
-        // Use LinkedHashMap to ensure deterministic ID assignment (fix for unit tests)
+        // Every ID assignment for a specific field is stored here
         Map<Field, Map<String, Integer>> privacyMap = new LinkedHashMap<>();
 
         // First, anonymize the Group Tree (Metadata).
+        // We do this before entries to ensure that if a group is renamed to "groups-1",
+        // the entries belonging to it also get updated to "groups-1".
         Optional<GroupTreeNode> rootGroup = bibDatabaseContext.getMetaData().getGroups();
         if (rootGroup.isPresent()) {
             Map<String, Integer> groupNameMap = new LinkedHashMap<>();
@@ -39,11 +41,14 @@ public class Pseudonymization {
             GroupTreeNode newRoot = pseudonymizeGroupRecursively(rootGroup.get(), groupNameMap);
             bibDatabaseContext.getMetaData().setGroups(newRoot);
 
+            // Here we are filling the IDs generated for group names into the privacy map
             privacyMap.put(StandardField.GROUPS, groupNameMap);
         }
 
+        // Here we process the actual bibliography entries
         List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, privacyMap);
 
+        // This is the Decoder Mapping that maps pseudonymized values back to original values
         Map<String, String> valueMapping = new LinkedHashMap<>();
         privacyMap.forEach((field, valueToId) ->
                 valueToId.forEach((value, id) ->
@@ -62,9 +67,11 @@ public class Pseudonymization {
         AbstractGroup oldGroup = node.getGroup();
         String oldName = oldGroup.getName();
 
+        // reuse existing ID if we've seen this name, otherwise create a new one
         Integer id = groupNameMap.computeIfAbsent(oldName, k -> groupNameMap.size() + 1);
         String newName = "groups-" + id;
 
+        // We use ',' as the separating character for the ExplicitGroup constructor
         AbstractGroup newGroup = new ExplicitGroup(
                 newName,
                 oldGroup.getHierarchicalContext(),

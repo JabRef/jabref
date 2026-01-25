@@ -1,10 +1,6 @@
 package org.jabref.logic.pseudonymization;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +21,10 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import org.mockito.Answers;
 
 class PseudonymizationTest {
 
@@ -84,16 +78,16 @@ class PseudonymizationTest {
         BibEntry secondPseudo = new BibEntry("citationkey-2")
                 .withField(StandardField.AUTHOR, "author-2")
                 .withField(StandardField.PAGES, "pages-1");
-        
+
         // 1. Check that the entries match (BibEntry.equals compares content, not UUIDs)
         assertEquals(List.of(firstPseudo, secondPseudo), result.bibDatabaseContext().getEntries());
 
         // 2. Check that the value mapping matches (Map.equals ignores order, so Map.of is safe)
         Map<String, String> expectedMap = Map.of(
-                "author-1", "Author One", 
-                "author-2", "Author Two", 
-                "pages-1", "some pages", 
-                "citationkey-1", "first", 
+                "author-1", "Author One",
+                "author-2", "Author Two",
+                "pages-1", "some pages",
+                "citationkey-1", "first",
                 "citationkey-2", "second"
         );
         assertEquals(expectedMap, result.valueMapping());
