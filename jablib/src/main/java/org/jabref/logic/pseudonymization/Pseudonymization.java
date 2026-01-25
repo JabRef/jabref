@@ -3,6 +3,7 @@
 /// For "just" generating large .bib files, scripts/bib-file-generator.py can be used.
 package org.jabref.logic.pseudonymization;
 
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,14 +30,14 @@ public class Pseudonymization {
 
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
         // Every ID assignment for a specific field is stored here
-        Map<Field, Map<String, Integer>> privacyMap = new HashMap<>();
+        Map<Field, Map<String, Integer>> privacyMap = new java.util.LinkedHashMap<>();
 
         // First, anonymize the Group Tree (Metadata).
         // We do this before entries to ensure that if a group is renamed to "groups-1",
         // the entries belonging to it also get updated to "groups-1".
         Optional<GroupTreeNode> rootGroup = bibDatabaseContext.getMetaData().getGroups();
         if (rootGroup.isPresent()) {
-            Map<String, Integer> groupNameMap = new HashMap<>();
+            Map<String, Integer> groupNameMap = new java.util.LinkedHashMap<>();
 
             GroupTreeNode newRoot = pseudonymizeGroupRecursively(rootGroup.get(), groupNameMap);
             bibDatabaseContext.getMetaData().setGroups(newRoot);
@@ -49,7 +50,7 @@ public class Pseudonymization {
         List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, privacyMap);
 
         // This is the Decoder Mapping that maps pseudonymized values back to original values
-        Map<String, String> valueMapping = new HashMap<>();
+        Map<String, String> valueMapping = new java.util.LinkedHashMap<>();
         privacyMap.forEach((field, valueToId) ->
                 valueToId.forEach((value, id) ->
                         valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value))
@@ -95,7 +96,7 @@ public class Pseudonymization {
             newEntries.add(newEntry);
 
             for (Field field : entry.getFields()) {
-                Map<String, Integer> valueToId = privacyMap.computeIfAbsent(field, k -> new HashMap<>());
+                Map<String, Integer> valueToId = privacyMap.computeIfAbsent(field, k -> new java.util.LinkedHashMap<>());
                 String content = entry.getField(field).get();
 
                 Integer id = valueToId.computeIfAbsent(content, k -> valueToId.size() + 1);

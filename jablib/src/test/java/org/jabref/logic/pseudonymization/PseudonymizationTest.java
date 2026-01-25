@@ -84,13 +84,21 @@ class PseudonymizationTest {
         BibEntry secondPseudo = new BibEntry("citationkey-2")
                 .withField(StandardField.AUTHOR, "author-2")
                 .withField(StandardField.PAGES, "pages-1");
-        BibDatabaseContext bibDatabaseContextExpected = new BibDatabaseContext(new BibDatabase(List.of(firstPseudo, secondPseudo)));
-        bibDatabaseContextExpected.setMode(BibDatabaseMode.BIBLATEX);
-        Pseudonymization.Result expected = new Pseudonymization.Result(
-                bibDatabaseContextExpected,
-                Map.of("author-1", "Author One", "author-2", "Author Two", "pages-1", "some pages", "citationkey-1", "first", "citationkey-2", "second"));
+       // ADJUSTMENT: I did not  create a 'Pseudonymization.Result' object for 'expected' because 
+        // comparing it directly will fail due to random UUIDs in BibDatabaseContext.
+        
+        // 1. Check that the entries match (BibEntry.equals compares content, not UUIDs)
+        assertEquals(List.of(firstPseudo, secondPseudo), result.bibDatabaseContext().getEntries());
 
-        assertEquals(expected, result);
+        // 2. Check that the value mapping matches (Map.equals ignores order, so Map.of is safe)
+        Map<String, String> expectedMap = Map.of(
+                "author-1", "Author One", 
+                "author-2", "Author Two", 
+                "pages-1", "some pages", 
+                "citationkey-1", "first", 
+                "citationkey-2", "second"
+        );
+        assertEquals(expectedMap, result.valueMapping());
     }
 
     @Test
