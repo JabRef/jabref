@@ -45,6 +45,26 @@ on:
         type: string
         required: false
         default: "26-ea+22"
+      jvmVendor:
+        description: "JDK Vendor"
+        type: choice
+        default: AMAZON
+        options:
+          # These are the vendors listed at https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html
+          - ADOPTIUM
+          - ADOPTOPENJDK
+          - AMAZON
+          - APPLE
+          - AZUL
+          - BELLSOFT
+          - GRAAL_VM
+          - HEWLETT_PACKARD
+          - IBM
+          - JETBRAINS
+          - MICROSOFT
+          - ORACLE
+          - SAP
+          - TENCENT
       notarization:
         description: "Notarize macOS DMG and PKG"
         type: boolean
@@ -324,6 +344,15 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
+
+      - name: Patch used JDK
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
+        run: |
+          set -ex
+          PS4='+$LINENO: '
+          SED_I=(-i)
+          [[ '${{ startsWith(matrix.os, 'macos') }}' == 'true' ]] && SED_I=(-i '')
+          sed "${SED_I[@]}" "s/AMAZON/${{ inputs.jvmVendor }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
 
       # region setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
