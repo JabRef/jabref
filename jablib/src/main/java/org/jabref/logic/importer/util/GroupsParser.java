@@ -56,15 +56,15 @@ public class GroupsParser {
                                              MetaData metaData,
                                              String userAndHost)
             throws ParseException {
-        try {
-            GroupTreeNode cursor = null;
-            GroupTreeNode root = null;
-            for (String string : orderedData) {
-                // This allows reading databases that have been modified by, e.g., BibDesk
-                string = string.trim();
-                if (string.isEmpty()) {
-                    continue;
-                }
+        GroupTreeNode cursor = null;
+        GroupTreeNode root = null;
+        for (String string : orderedData) {
+            // This allows reading databases that have been modified by, e.g., BibDesk
+            string = string.trim();
+            if (string.isEmpty()) {
+                continue;
+            }
+            try {
 
                 int spaceIndex = string.indexOf(' ');
                 if (spaceIndex <= 0) {
@@ -85,13 +85,12 @@ public class GroupsParser {
                     cursor.addChild(newNode);
                     cursor = newNode;
                 }
+            } catch (ParseException e) {
+                LOGGER.warn("Skipping unknown or corrupt group: {}", string, e);
             }
-            return root;
-        } catch (ParseException e) {
-            throw new ParseException(Localization
-                    .lang("Group tree could not be parsed. If you save the BibTeX library, all groups will be lost."),
-                    e);
         }
+
+        return root;
     }
 
     /// Re-create a group instance from a textual representation.

@@ -33,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -207,5 +208,23 @@ class GroupsParserTest {
         // Verify it's still ExplicitGroup and properties are preserved
         assertEquals(ExplicitGroup.class, roundtripParsed.getClass());
         assertEquals(parsed, roundtripParsed);
+    }
+
+    @Test
+    void importGroupsSkipsUnknownGroup() throws Exception {
+        List<String> data = List.of(
+                "0 AllEntriesGroup:",
+                "1 ExplicitGroup:ValidGroup;0;",
+                "1 UnknownGroupType:BrokenGroup;0;",
+                "1 ExplicitGroup:AnotherValidGroup;0;"
+        );
+
+        GroupTreeNode root = GroupsParser
+                .importGroups(data, ';', null, null, null);
+
+        assertNotNull(root);
+        assertEquals(2, root.getChildren().size());
+        assertEquals("ValidGroup", root.getChildren().get(0).getName());
+        assertEquals("AnotherValidGroup", root.getChildren().get(1).getName());
     }
 }
