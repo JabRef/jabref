@@ -135,12 +135,8 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         return identifierLookupInProgress;
     }
 
-    public BooleanBinding identifierLookupNotInProgressProperty() {
-        return identifierLookupInProgress.not();
-    }
-
     public boolean getIdentifierLookupNotInProgress() {
-        return identifierLookupNotInProgressProperty().get();
+        return identifierLookupInProgress.not().get();
     }
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {
