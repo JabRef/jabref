@@ -2,6 +2,7 @@ package org.jabref.model.metadata;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +85,7 @@ public class MetaData {
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     @Nullable private String versionDBStructure;
+    private final List<String> groupParsingErrors = new ArrayList<>();
 
     /// Constructs an empty metadata.
     public MetaData() {
@@ -408,5 +410,13 @@ public class MetaData {
 
     public Map<String, Path> getBlgFilePaths() {
         return blgFilePathMap;
+    }
+
+    public void addGroupParsingErrors(List<String> errors) {
+        this.groupParsingErrors.addAll(errors);
+    }
+
+    public List<String> getGroupParsingErrors() {
+        return groupParsingErrors;
     }
 }

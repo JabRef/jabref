@@ -22,6 +22,7 @@ import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.GroupsParsingResult;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.metadata.MetaData;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -76,7 +78,7 @@ class GroupsParserTest {
     }
 
     @Test
-    void importSubGroups() throws ParseException {
+    void importSubGroups() {
 
         List<String> orderedData = Arrays.asList("0 AllEntriesGroup:", "1 ExplicitGroup:1;0;",
                 "2 ExplicitGroup:2;0;", "0 ExplicitGroup:3;0;");
@@ -98,7 +100,8 @@ class GroupsParserTest {
         AbstractGroup thirdSubGrpLvl1 = new ExplicitGroup("3", GroupHierarchyType.INDEPENDENT, ',');
         rootNode.addSubgroup(thirdSubGrpLvl1);
 
-        GroupTreeNode parsedNode = GroupsParser.importGroups(orderedData, ',', fileMonitor, metaData, "userAndHost");
+        GroupTreeNode parsedNode = GroupsParser
+                .importGroups(orderedData, ',', fileMonitor, metaData, "userAndHost").root();
         assertEquals(rootNode.getChildren(), parsedNode.getChildren());
     }
 
@@ -211,7 +214,7 @@ class GroupsParserTest {
     }
 
     @Test
-    void importGroupsSkipsUnknownGroup() throws Exception {
+    void importGroupsCollectsErrorsForUnknownGroup() {
         List<String> data = List.of(
                 "0 AllEntriesGroup:",
                 "1 ExplicitGroup:ValidGroup;0;",
@@ -219,12 +222,14 @@ class GroupsParserTest {
                 "1 ExplicitGroup:AnotherValidGroup;0;"
         );
 
-        GroupTreeNode root = GroupsParser
+        GroupsParsingResult result = GroupsParser
                 .importGroups(data, ';', null, null, null);
 
-        assertNotNull(root);
-        assertEquals(2, root.getChildren().size());
-        assertEquals("ValidGroup", root.getChildren().get(0).getName());
-        assertEquals("AnotherValidGroup", root.getChildren().get(1).getName());
+        assertNotNull(result.root());
+        assertEquals(2, result.root().getChildren().size());
+
+        assertFalse(result.errors().isEmpty(), "Errors list should not be empty when unknown groups exist");
+        assertEquals(1, result.errors().size(), "There should be exactly one parsing error");
+        assertTrue(result.errors().get(0).contains("UnknownGroupType"), "Error message should mention the problematic group type");
     }
 }

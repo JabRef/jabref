@@ -31,6 +31,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.groups.GroupsParsingResult;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
@@ -141,7 +142,11 @@ public class MetaDataParser {
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
-                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost));
+                GroupsParsingResult parsingResult = GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost);
+                metaData.setGroups(parsingResult.root());
+                if (!parsingResult.errors().isEmpty()) {
+                    metaData.addGroupParsingErrors(parsingResult.errors());
+                }
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);
