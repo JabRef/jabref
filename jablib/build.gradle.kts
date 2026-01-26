@@ -14,12 +14,12 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.35.0"
+    id("com.vanniktech.maven.publish") version "0.36.0"
 
     id("dev.jbang") version "0.4.0"
 
     id("net.ltgt.errorprone") version "4.4.0"
-    id("net.ltgt.nullaway") version "2.3.0"
+    id("net.ltgt.nullaway") version "2.4.0"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"

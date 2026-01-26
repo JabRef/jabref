@@ -25,12 +25,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog. [#11791](https://github.com/JabRef/jabref/issues/11791)
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 
 ### Fixed
 
-- Fixed redundant action icons showing in empty identifier fields (DOI, Eprint, ISBN) [#14821](https://github.com/JabRef/jabref/pull/14821)
+- We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
 - We fixed an issue where exporting group chat to JSON resulted in empty entries array. [#14647](https://github.com/JabRef/jabref/issues/14647)
@@ -38,10 +39,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue when warning for duplicate entries in the "New Entry" dialog. [#14662](https://github.com/JabRef/jabref/pull/14662)
 - We fixed the Quality > Automatically set file links button. Now if a file is moved, the button can relink the moved file to the broken linked file. [#9798](https://github.com/JabRef/jabref/issues/9798)
 - We fixed an issue where JabRef would not start on Linux ARM due to missing binaries for postgres-embedded [#14783](https://github.com/JabRef/jabref/issues/14783)
+- We fixed an issue when importing an entry to a library without groups, but group "Imported Entries" was automatically created.
+- We fixed an issue where journal abbreviations chose the wrong abbreviation when fuzzy matching. [#14850](https://github.com/JabRef/jabref/pull/14850)
 - We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
+- Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
 
 ### Removed
+
+- We removed keyboard shortcuts for toggling journal abbreviation (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>). [#14850](https://github.com/JabRef/jabref/pull/14850)
 
 ## [6.0-alpha.4] – 2025-12-25
 
