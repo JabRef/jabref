@@ -135,6 +135,10 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         return identifierLookupInProgress;
     }
 
+    public boolean getIdentifierLookupNotInProgress() {
+        return identifierLookupInProgress.not().get();
+    }
+
     public void fetchBibliographyInformation(BibEntry bibEntry) {
         stateManager.getActiveDatabase().ifPresentOrElse(
                 databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager)
