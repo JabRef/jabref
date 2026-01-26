@@ -30,7 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- Fixed redundant action icons showing in empty identifier fields (DOI, Eprint, ISBN) [#14821](https://github.com/JabRef/jabref/pull/14821)
+- Buttons in empty identifier fields (DOI, Eprint, ISBN) are now disabled if they cannot be used. [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
 - We fixed an issue where exporting group chat to JSON resulted in empty entries array. [#14647](https://github.com/JabRef/jabref/issues/14647)
