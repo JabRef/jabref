@@ -735,6 +735,7 @@ public class GroupDialogViewModel {
         return directoryGroupPathValidator.getValidationStatus();
     }
 
+    // region Date Group Property Getters
     public BooleanProperty dateRadioButtonSelectedProperty() {
         return dateRadioButtonSelectedProperty;
     }
@@ -750,6 +751,7 @@ public class GroupDialogViewModel {
     public BooleanProperty dateGroupIncludeEmptyProperty() {
         return dateGroupIncludeEmptyProperty;
     }
+    // endregion
 
     private boolean groupOrSubgroupIsSearchGroup(GroupTreeNode groupTreeNode) {
         if (groupTreeNode.getGroup() instanceof SearchGroup) {
