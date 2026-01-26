@@ -47,6 +47,7 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
         cleanupTimestampToModificationDate.selectedProperty().bindBidirectional(viewModel.timestampToModificationSelected);
     }
 
+    @Override
     public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
         return CleanupTabSelection.ofJobs(CleanupMultiFieldViewModel.MULTI_FIELD_JOBS, selectedJobs);
