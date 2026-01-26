@@ -79,7 +79,6 @@ class GroupsParserTest {
 
     @Test
     void importSubGroups() {
-
         List<String> orderedData = Arrays.asList("0 AllEntriesGroup:", "1 ExplicitGroup:1;0;",
                 "2 ExplicitGroup:2;0;", "0 ExplicitGroup:3;0;");
         // Create group hierarchy:
