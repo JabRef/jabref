@@ -24,14 +24,12 @@ public class MainTableFieldValueFormatter {
         this.bibDatabase = bibDatabaseContext.getDatabase();
     }
 
-    /**
-     * Format fields for {@link BibEntryTableViewModel}, according to user preferences and with latex translated to
-     * unicode if possible.
-     *
-     * @param fields the fields argument of {@link BibEntryTableViewModel#getFields(OrFields)}.
-     * @param entry  the BibEntry of {@link BibEntryTableViewModel}.
-     * @return The formatted name field.
-     */
+    /// Format fields for {@link BibEntryTableViewModel}, according to user preferences and with latex translated to
+    /// unicode if possible.
+    ///
+    /// @param fields the fields argument of {@link BibEntryTableViewModel#getFields(OrFields)}.
+    /// @param entry  the BibEntry of {@link BibEntryTableViewModel}.
+    /// @return The formatted name field.
     public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
         for (Field field : fields.getFields()) {
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES) && (displayStyle != DisplayStyle.AS_IS)) {
@@ -51,13 +49,11 @@ public class MainTableFieldValueFormatter {
         return "";
     }
 
-    /**
-     * Format a name field for the table, according to user preferences and with latex expressions translated if
-     * possible.
-     *
-     * @param nameToFormat The contents of the name field.
-     * @return The formatted name field.
-     */
+    /// Format a name field for the table, according to user preferences and with latex expressions translated if
+    /// possible.
+    ///
+    /// @param nameToFormat The contents of the name field.
+    /// @return The formatted name field.
     private String formatFieldWithAuthorValue(final String nameToFormat) {
         if (nameToFormat == null) {
             return null;

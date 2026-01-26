@@ -18,7 +18,6 @@ import javafx.concurrent.Task;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
-import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -26,12 +25,10 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A very simple implementation of the {@link TaskExecutor} interface.
- * Every submitted task is invoked in a separate thread.
- * <p>
- * In case something does not interact well with JavaFX, you can use the {@link HeadlessExecutorService}
- */
+/// A very simple implementation of the {@link TaskExecutor} interface.
+/// Every submitted task is invoked in a separate thread.
+///
+/// In case something does not interact well with JavaFX, you can use the {@link org.jabref.logic.util.HeadlessExecutorService}
 public class UiTaskExecutor implements TaskExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UiTaskExecutor.class);
@@ -62,12 +59,10 @@ public class UiTaskExecutor implements TaskExecutor {
         }
     }
 
-    /**
-     * Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
-     *
-     * @param action the {@link Runnable} to run
-     * @throws NullPointerException if {@code action} is {@code null}
-     */
+    /// Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
+    ///
+    /// @param action the {@link Runnable} to run
+    /// @throws NullPointerException if `action` is `null`
     public static void runAndWaitInJavaFXThread(@NonNull Runnable action) {
         // Run synchronously on JavaFX thread
         if (Platform.isFxApplicationThread()) {
@@ -96,14 +91,12 @@ public class UiTaskExecutor implements TaskExecutor {
         Platform.runLater(runnable);
     }
 
-    /**
-     * This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
-     * The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
-     *
-     * @param task the BackgroundTask to run
-     * @param <V>  The background task type
-     * @return Future of a JavaFX Task which will execute the call method a background thread
-     */
+    /// This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
+    /// The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
+    ///
+    /// @param task the BackgroundTask to run
+    /// @param <V>  The background task type
+    /// @return Future of a JavaFX Task which will execute the call method a background thread
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
@@ -121,13 +114,11 @@ public class UiTaskExecutor implements TaskExecutor {
         return execute(javafxTask);
     }
 
-    /**
-     * Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
-     * #execute(BackgroundTask)}.
-     *
-     * @param <V>  type of return value of the task
-     * @param task the task to run
-     */
+    /// Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
+    /// #execute(BackgroundTask)}.
+    ///
+    /// @param <V>  type of return value of the task
+    /// @param task the task to run
     public <V> Future<V> execute(Task<V> task) {
         executor.submit(task);
         return task;
@@ -138,9 +129,7 @@ public class UiTaskExecutor implements TaskExecutor {
         return scheduledExecutor.schedule(getJavaFXTask(task), delay, unit);
     }
 
-    /**
-     * Shuts everything down. After termination, this method returns.
-     */
+    /// Shuts everything down. After termination, this method returns.
     @Override
     public void shutdown() {
         StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
@@ -159,13 +148,11 @@ public class UiTaskExecutor implements TaskExecutor {
         return throttler;
     }
 
-    /**
-     * Generates a wrapper with a JavaFX {@link Task} for our BackgroundTask monitoring the progress based on the data given from the task.
-     * <code>call</code> is routed to the given task object.
-     *
-     * @param task the BackgroundTask to wrap
-     * @return a new Javafx Task object
-     */
+    /// Generates a wrapper with a JavaFX {@link Task} for our BackgroundTask monitoring the progress based on the data given from the task.
+    /// `call` is routed to the given task object.
+    ///
+    /// @param task the BackgroundTask to wrap
+    /// @return a new Javafx Task object
     public static <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<>() {
             {

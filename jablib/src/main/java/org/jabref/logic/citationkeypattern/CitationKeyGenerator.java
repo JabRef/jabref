@@ -19,14 +19,10 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This is the utility class of the LabelPattern package.
- */
+/// This is the utility class of the LabelPattern package.
 public class CitationKeyGenerator extends BracketedPattern {
 
-    /**
-     * All single characters that we can use for extending a key to make it unique.
-     */
+    /// All single characters that we can use for extending a key to make it unique.
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
 
     /// List of unwanted characters. These will be removed at the end.
@@ -62,12 +58,10 @@ public class CitationKeyGenerator extends BracketedPattern {
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
-    /**
-     * Computes an appendix to a citation key that could make it unique. We use a-z for numbers 0-25, and then aa-az, ba-bz, etc.
-     *
-     * @param number The appendix number.
-     * @return The String to append.
-     */
+    /// Computes an appendix to a citation key that could make it unique. We use a-z for numbers 0-25, and then aa-az, ba-bz, etc.
+    ///
+    /// @param number The appendix number.
+    /// @return The String to append.
     private static String getAppendix(int number) {
         if (number >= APPENDIX_CHARACTERS.length()) {
             int lastChar = number % APPENDIX_CHARACTERS.length();
@@ -98,12 +92,10 @@ public class CitationKeyGenerator extends BracketedPattern {
         return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
     }
 
-    /**
-     * Generate a citation key for the given {@link BibEntry}.
-     *
-     * @param entry a {@link BibEntry}
-     * @return a citation key based on the user's preferences
-     */
+    /// Generate a citation key for the given {@link BibEntry}.
+    ///
+    /// @param entry a {@link BibEntry}
+    /// @return a citation key based on the user's preferences
     public String generateKey(@NonNull BibEntry entry) {
         String currentKey = entry.getCitationKey().orElse(null);
 
@@ -114,13 +106,11 @@ public class CitationKeyGenerator extends BracketedPattern {
         return transliterateIfNeeded(newKey);
     }
 
-    /**
-     * A letter will be appended to the key based on the user's preferences, either always or to prevent duplicated keys.
-     *
-     * @param key    the new key
-     * @param oldKey the old key
-     * @return a key, if needed, with an appended letter
-     */
+    /// A letter will be appended to the key based on the user's preferences, either always or to prevent duplicated keys.
+    ///
+    /// @param key    the new key
+    /// @param oldKey the old key
+    /// @return a key, if needed, with an appended letter
     private String appendLettersToKey(String key, String oldKey) {
         long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
@@ -166,12 +156,10 @@ public class CitationKeyGenerator extends BracketedPattern {
         return result.replace(" ", "");
     }
 
-    /**
-     * Using preferences, replace matches to the provided regex with a string.
-     *
-     * @param key the citation key
-     * @return the citation key where matches to the regex are replaced
-     */
+    /// Using preferences, replace matches to the provided regex with a string.
+    ///
+    /// @param key the citation key
+    /// @return the citation key where matches to the regex are replaced
     private String replaceWithRegex(String key) {
         // Remove Regular Expressions while generating Keys
         String regex = citationKeyPatternPreferences.getKeyPatternRegex();
@@ -196,12 +184,10 @@ public class CitationKeyGenerator extends BracketedPattern {
         return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
     }
 
-    /**
-     * A helper method to create a {@link Function} that takes a single bracketed expression, expands it, and cleans the key.
-     *
-     * @param entry the {@link BibEntry} that a citation key is generated for
-     * @return a cleaned citation key for the given {@link BibEntry}
-     */
+    /// A helper method to create a {@link Function} that takes a single bracketed expression, expands it, and cleans the key.
+    ///
+    /// @param entry the {@link BibEntry} that a citation key is generated for
+    /// @return a cleaned citation key for the given {@link BibEntry}
     private Function<String, String> expandBracketContent(BibEntry entry) {
         Character keywordDelimiter = citationKeyPatternPreferences.getKeywordDelimiter();
 
@@ -220,12 +206,10 @@ public class CitationKeyGenerator extends BracketedPattern {
         };
     }
 
-    /**
-     * Generates a citation key for the given entry, and sets the key.
-     *
-     * @param entry the entry to generate the key for
-     * @return the change to the key (or an empty optional if the key was not changed)
-     */
+    /// Generates a citation key for the given entry, and sets the key.
+    ///
+    /// @param entry the entry to generate the key for
+    /// @return the change to the key (or an empty optional if the key was not changed)
     public Optional<FieldChange> generateAndSetKey(BibEntry entry) {
         String newKey = generateKey(entry);
         return entry.setCitationKey(newKey);

@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabsrv - serve BibTeX files using JabRef
 
-//JAVA 24+
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // raw is for https://github.com/unicode-org/icu/pull/2127
@@ -14,36 +14,37 @@
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabsrv
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
+//DEPS com.google.guava:guava:33.5.0-jre
+//DEPS com.konghq:unirest-modules-gson:4.7.4
+//DEPS de.undercouch:citeproc-java:3.4.1
+//DEPS info.picocli:picocli:4.7.7
+//DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
+//DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
+//DEPS jakarta.validation:jakarta.validation-api:3.1.1
+//DEPS net.harawata:appdirs:1.5.0
+//DEPS org.apache.commons:commons-lang3:3.20.0
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
+//DEPS org.bouncycastle:bcprov-jdk18on:1.83
+//DEPS org.postgresql:postgresql:42.7.9
 //DEPS org.slf4j:slf4j-api:2.0.17
+//DEPS org.slf4j:jul-to-slf4j:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
-//DEPS org.slf4j:jul-to-slf4j:2.0.17
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
-//DEPS info.picocli:picocli:4.7.7
-//DEPS org.postgresql:postgresql:42.7.8
-//DEPS org.bouncycastle:bcprov-jdk18on:1.83
-//DEPS com.konghq:unirest-modules-gson:4.7.1
-//DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
-//DEPS org.glassfish.jersey.core:jersey-server:4.0.0
-//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.0
+//DEPS org.glassfish.grizzly:grizzly-framework:5.0.0
+//DEPS org.glassfish.grizzly:grizzly-http-server:5.0.0
 //DEPS org.glassfish.hk2:hk2-api:3.1.1
-//DEPS org.glassfish.hk2:hk2-utils:3.1.1
 //DEPS org.glassfish.hk2:hk2-locator:3.1.1
-//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.0
-//DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
-//DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
-//DEPS jakarta.validation:jakarta.validation-api:3.1.1
+//DEPS org.glassfish.hk2:hk2-utils:3.1.1
+//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.1
+//DEPS org.glassfish.jersey.core:jersey-server:4.0.1
+//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.1
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
-//DEPS com.konghq:unirest-modules-gson:4.7.1
-//DEPS com.google.guava:guava:33.5.0-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS net.harawata:appdirs:1.5.0
-//DEPS de.undercouch:citeproc-java:3.4.1
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
-//DEPS tools.jackson.core:jackson-core:3.0.3
-//DEPS tools.jackson.core:jackson-databind:3.0.3
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.3
-//DEPS org.apache.commons:commons-lang3:3.20.0
+//DEPS tools.jackson.core:jackson-core:3.0.4
+//DEPS tools.jackson.core:jackson-databind:3.0.4
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.4
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
@@ -70,9 +71,13 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/Command.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/FocusCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/OpenLibrariesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntriesResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java

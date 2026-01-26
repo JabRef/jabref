@@ -14,9 +14,7 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Parses the contents of a .blg (BibTeX log) file to extract warning messages.
- */
+/// Parses the contents of a .blg (BibTeX log) file to extract warning messages.
 public class BibtexLogParser {
     private static final Pattern BIBTEX_WARNING_PATTERN = Pattern.compile("^Warning--(?<message>[a-zA-Z ]+) in (?<entryKey>[^\\s]+)$");
     private static final Pattern BIBLATEX_WARNING_PATTERN = Pattern.compile(

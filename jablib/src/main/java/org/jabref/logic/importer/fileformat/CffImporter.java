@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -264,7 +265,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
         ObjectMapper mapper = new YAMLMapper(new YAMLFactory());
         CffFormat citation;
 
