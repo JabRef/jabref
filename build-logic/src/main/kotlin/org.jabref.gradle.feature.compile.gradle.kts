@@ -21,6 +21,7 @@ java {
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
         // We also need a JDK without JavaFX, because we patch JavaFX due to modularity issues
+        // If this is changed, binaries.yml needs to be adapted (e.g., sed'ing to another JDK)
         vendor = JvmVendorSpec.AMAZON
     }
 }

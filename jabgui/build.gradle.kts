@@ -1,3 +1,6 @@
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.jvm.toolchain.JavaToolchainService
+
 plugins {
     id("org.jabref.gradle.module")
     id("application")
@@ -11,6 +14,18 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 
 // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 val mockitoAgent = configurations.create("mockitoAgent")
+
+// See https://bugs.openjdk.org/browse/JDK-8342623
+val target = java.toolchain.languageVersion.get().asInt()
+if (target >= 26) {
+    dependencies {
+        implementation("org.openjfx:jdk-jsobject")
+    }
+} else {
+    configurations.all {
+        exclude(group = "org.openjfx", module = "jdk-jsobject")
+    }
+}
 
 dependencies {
     implementation(project(":jablib"))
@@ -27,9 +42,6 @@ dependencies {
     implementation("org.openjfx:javafx-web")
 
     implementation("com.pixelduke:fxthemes")
-
-    // From JavaFX25 onwards
-    implementation("org.openjfx:jdk-jsobject")
 
     implementation("org.slf4j:slf4j-api")
     implementation("org.tinylog:tinylog-api")
@@ -155,6 +167,7 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
+
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
@@ -174,10 +187,11 @@ javaModulePackaging {
             include("JabRefHost.ps1")
         })
     }
+
     targetsWithOs("linux") {
         options.addAll(
             "--linux-menu-group", "Office;",
-            "--linux-rpm-license-type", "MIT",
+            // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
             "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
             "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
             "--linux-shortcut",
