@@ -448,6 +448,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 importCitedByButton,
                 citedByProgress);
 
+        // click refresh button will trigger refresh from the remote
         refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingComponents, citedByComponents, true));
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents, true));
 
@@ -464,6 +465,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 citingTask.cancel();
             }
             entryEditorPreferences.setCitationFetcherType(newValue);
+            // switch the fetcher will not trigger refresh from the remote
             searchForRelations(citingComponents, citedByComponents, false);
         });
 
@@ -472,6 +474,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citedByListView);
         styleFetchedListView(citingListView);
 
+        // switch to the tab will not trigger refresh from the remote
         searchForRelations(citingComponents, citedByComponents, false);
         searchForRelations(citedByComponents, citingComponents, false);
 
@@ -690,6 +693,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                           .onSuccess(identifier -> {
                               if (identifier.isPresent()) {
                                   citationComponents.entry().setField(StandardField.DOI, identifier.get().asString());
+                                  // if the DOI is successfully looked up (requested by the user), trigger refresh from the remote
                                   executeSearch(citationComponents, true);
                                   executeSearch(otherCitationComponents, true);
                               } else {
