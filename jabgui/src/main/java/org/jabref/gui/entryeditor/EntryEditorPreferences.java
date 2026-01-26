@@ -72,7 +72,7 @@ public class EntryEditorPreferences {
                 true,                                 // Show tab 'AI Chat'
                 true,                                 // Show tab 'LaTeX citations'
                 true,                                 // Show tab 'File annotations' only if its contains highlights or comments
-                true,                                 // Show BibTeX source by default
+                false,                                // Show BibTeX source by default
                 true,                                 // Show validation messages
                 true,                                 // Allow integers in 'edition' filed in BibTeX mode
                 true,                                 // Automatically search and show unlinked files in the entry editor
