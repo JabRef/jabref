@@ -799,25 +799,22 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         insertEntries(List.of(bibEntry));
     }
 
-    /**
-     * Inserts the given entries into the database and updates the UI accordingly.
-     * <p>
-     * For single-entry imports, the entry is selected and optionally opened in the editor
-     * (based on user preferences), which adds it to the navigation history.
-     * </p>
-     * <p>
-     * For bulk imports (multiple entries), all entries remain selected but individual
-     * entry focus is skipped. This prevents pollution of the navigation history with
-     * entries the user never explicitly clicked on.
-     * </p>
-     * <p>
-     * This behavior addresses issue #13878 where bulk imports were creating "ghost"
-     * navigation history entries.
-     * </p>
-     *
-     * @param entries the list of entries to insert; must not be empty
-     * @see <a href="https://github.com/JabRef/jabref/issues/13878">Issue #13878</a>
-     */
+    /// Inserts the given entries into the database and updates the UI accordingly.
+    /// <p>
+    /// For single-entry imports, the entry is selected and optionally opened in the editor
+    /// (based on user preferences), which adds it to the navigation history.
+    /// </p>
+    /// <p>
+    /// For bulk imports (multiple entries), individual entry focus is skipped.
+    ///  This prevents pollution of the navigation history with
+    /// entries the user never explicitly clicked on.
+    /// </p>
+    /// <p>
+    /// This behavior addresses an issue where bulk imports were creating "ghost"
+    /// navigation history entries.
+    /// </p>
+    /// @param entries the list of entries to insert; must not be empty
+    /// @see <a href="https://github.com/JabRef/jabref/issues/13878">Issue #13878</a>
     public void insertEntries(final List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return;
