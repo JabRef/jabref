@@ -25,7 +25,6 @@ public enum KeyBinding {
     EDITOR_KILL_WORD("Remove characters until next word", Localization.lang("Remove characters until next word"), "", KeyBindingCategory.EDITOR),
     EDITOR_KILL_WORD_BACKWARD("Characters until previous word", Localization.lang("Remove the current word backwards"), "", KeyBindingCategory.EDITOR),
 
-    ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "shortcut+alt+A", KeyBindingCategory.TOOLS),
     AUTOGENERATE_CITATION_KEYS("Autogenerate citation keys", Localization.lang("Autogenerate citation keys"), "shortcut+G", KeyBindingCategory.QUALITY),
     ACCEPT("Accept", Localization.lang("Accept"), "shortcut+ENTER", KeyBindingCategory.EDIT),
     AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
@@ -119,7 +118,6 @@ public enum KeyBinding {
     STRING_DIALOG_REMOVE_STRING("String dialog, remove string", Localization.lang("String dialog, remove string"), "shift+DELETE", KeyBindingCategory.FILE),
     SYNCHRONIZE_FILES("Synchronize files", Localization.lang("Synchronize files"), "shortcut+shift+F7", KeyBindingCategory.QUALITY),
     TOGGLE_GROUPS_INTERFACE("Toggle groups interface", Localization.lang("Toggle groups interface"), "alt+3", KeyBindingCategory.VIEW),
-    UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "shortcut+alt+shift+A", KeyBindingCategory.TOOLS),
     UNDO("Undo", Localization.lang("Undo"), "shortcut+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
     WRITE_METADATA_TO_PDF("Write metadata to PDF file(s)", Localization.lang("Write metadata to PDF file(s)"), "F6", KeyBindingCategory.TOOLS),
