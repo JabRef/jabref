@@ -211,21 +211,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     // region EntryEditorPreferences
-    public static final String CUSTOM_TAB_NAME = "customTabName_";
-    public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
-    public static final String AUTO_OPEN_FORM = "autoOpenForm";
-    public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
-    public static final String SHOW_AI_SUMMARY = "showAiSummary";
-    public static final String SHOW_AI_CHAT = "showAiChat";
-    public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
-    public static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
-    public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
-    public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
-    public static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
-    public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
+    private static final String CUSTOM_TAB_NAME = "customTabName_";
+    private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
+    private static final String AUTO_OPEN_FORM = "autoOpenForm";
+    private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    private static final String SHOW_AI_SUMMARY = "showAiSummary";
+    private static final String SHOW_AI_CHAT = "showAiChat";
+    private static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
+    private static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
+    private static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
+    private static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
+    private static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
+    private static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
     private static final String JOURNAL_POPUP = "journalPopup";
-    public static final String SHOW_SCITE_TAB = "showSciteTab";
-    public static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
+    private static final String SHOW_SCITE_TAB = "showSciteTab";
+    private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
     // endregion
 
