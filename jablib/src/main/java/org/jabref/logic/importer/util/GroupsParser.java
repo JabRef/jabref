@@ -9,7 +9,6 @@ import java.util.List;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.strings.QuotedStringTokenizer;
 import org.jabref.logic.util.strings.StringUtil;
