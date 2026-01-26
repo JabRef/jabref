@@ -11,7 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class PagesChecker implements ValueChecker {
 
-    private static final String SINGLE_PAGE_PATTERN = "[A-Za-z]?\\d+[A-Za-z]?(\\+)?"; //updated regex
+    private static final String SINGLE_PAGE_PATTERN = "[A-Za-z]?\\d+[A-Za-z]?(\\+)?"; // updated regex
     private static final String BIBTEX_RANGE_SEPARATOR = "(\\+|-{2}|\u2013)";      // separator, must contain exactly two dashes
     private static final String BIBLATEX_RANGE_SEPARATOR = "(\\+|-{1,2}|\u2013)";  // separator
 
