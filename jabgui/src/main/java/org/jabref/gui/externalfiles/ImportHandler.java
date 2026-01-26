@@ -34,7 +34,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
+import org.jabref.logic.importer.ImportFormatReader.ImportResult;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -464,8 +464,8 @@ public class ImportHandler {
                     preferences.getCitationKeyPatternPreferences(),
                     fileUpdateMonitor
             );
-            UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
-            return unknownFormatImport.parserResult().getDatabase().getEntries();
+            ImportResult importResult = importFormatReader.importWithAutoDetection(data);
+            return importResult.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return List.of();
@@ -539,7 +539,7 @@ public class ImportHandler {
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-            // We cannot add the new group here directly because we don't have access to the group node viewmoel stuff here
+            // We cannot add the new group here directly because we don't have access to the group node ViewModel stuff here
             // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()

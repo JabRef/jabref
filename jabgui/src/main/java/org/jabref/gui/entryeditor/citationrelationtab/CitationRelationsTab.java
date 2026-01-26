@@ -448,8 +448,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                 importCitedByButton,
                 citedByProgress);
 
-        refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingComponents, citedByComponents));
-        refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
+        // click refresh button will trigger refresh from the remote
+        refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingComponents, citedByComponents, true));
+        refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents, true));
 
         fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             if (citingComponents.entry().getDOI().isEmpty()) {
@@ -464,7 +465,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                 citingTask.cancel();
             }
             entryEditorPreferences.setCitationFetcherType(newValue);
-            searchForRelations(citingComponents, citedByComponents);
+            // switch the fetcher will not trigger refresh from the remote
+            searchForRelations(citingComponents, citedByComponents, false);
         });
 
         // Create SplitPane to hold all nodes above
@@ -472,8 +474,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citedByListView);
         styleFetchedListView(citingListView);
 
-        searchForRelations(citingComponents, citedByComponents);
-        searchForRelations(citedByComponents, citingComponents);
+        // switch to the tab will not trigger refresh from the remote
+        searchForRelations(citingComponents, citedByComponents, false);
+        searchForRelations(citedByComponents, citingComponents, false);
 
         return container;
     }
@@ -660,12 +663,13 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void searchForRelations(CitationComponents citationComponents,
-                                    CitationComponents otherCitationComponents) {
+                                    CitationComponents otherCitationComponents,
+                                    boolean bypassCache) {
         if (citationComponents.entry().getDOI().isEmpty()) {
             setUpEmptyPanel(citationComponents, otherCitationComponents);
             return;
         }
-        executeSearch(citationComponents);
+        executeSearch(citationComponents, bypassCache);
     }
 
     private void setUpEmptyPanel(CitationComponents citationComponents,
@@ -689,8 +693,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                           .onSuccess(identifier -> {
                               if (identifier.isPresent()) {
                                   citationComponents.entry().setField(StandardField.DOI, identifier.get().asString());
-                                  executeSearch(citationComponents);
-                                  executeSearch(otherCitationComponents);
+                                  // if the DOI is successfully looked up (requested by the user), trigger refresh from the remote
+                                  executeSearch(citationComponents, true);
+                                  executeSearch(otherCitationComponents, true);
                               } else {
                                   dialogService.notify(Localization.lang("No DOI found."));
                                   setUpEmptyPanel(citationComponents, otherCitationComponents);
@@ -719,7 +724,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         listView.setPlaceholder(lookingUpDoiLabel);
     }
 
-    private void executeSearch(CitationComponents citationComponents) {
+    private void executeSearch(CitationComponents citationComponents, boolean bypassCache) {
         ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
         citationComponents.listView().setItems(observableList);
 
@@ -730,7 +735,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             citedByTask.cancel();
         }
 
-        this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType())
+        this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache)
             .consumeOnRunning(task -> prepareToSearchForRelations(citationComponents, task))
             .onSuccess(fetchedList -> onSearchForRelationsSucceed(citationComponents,
                     fetchedList,
@@ -756,18 +761,18 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     /// TODO: Make the method return a callable and let the calling method create the background task.
     private BackgroundTask<List<BibEntry>> createBackgroundTask(
-            BibEntry entry, CitationFetcher.SearchType searchType
+            BibEntry entry, CitationFetcher.SearchType searchType, boolean bypassCache
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
                 citingTask = BackgroundTask.wrap(
-                        () -> this.searchCitationsRelationsService.searchCites(entry)
+                        () -> this.searchCitationsRelationsService.searchCites(entry, bypassCache)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
                 citedByTask = BackgroundTask.wrap(
-                        () -> this.searchCitationsRelationsService.searchCitedBy(entry)
+                        () -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache)
                 );
                 yield citedByTask;
             }

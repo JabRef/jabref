@@ -1,3 +1,6 @@
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.jvm.toolchain.JavaToolchainService
+
 plugins {
     id("org.jabref.gradle.module")
     id("application")
@@ -164,6 +167,7 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
+
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
@@ -183,6 +187,7 @@ javaModulePackaging {
             include("JabRefHost.ps1")
         })
     }
+
     targetsWithOs("linux") {
         options.addAll(
             "--linux-menu-group", "Office;",
