@@ -29,6 +29,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
+
 public class CitationsRelationsTabViewModel {
 
     public enum SciteStatus {
@@ -53,6 +56,8 @@ public class CitationsRelationsTabViewModel {
     private final StringProperty searchError;
     private Optional<TalliesResponse> currentResult = Optional.empty();
     private Future<?> searchTask;
+
+    private Subscription doiSubscription;
 
     public CitationsRelationsTabViewModel(GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
         this.preferences = preferences;
@@ -145,6 +150,21 @@ public class CitationsRelationsTabViewModel {
             status.set(SciteStatus.ERROR);
             return;
         }
+
+        // The scite.ai api requires a DOI
+        if (entry.getDOI().isEmpty()) {
+            status.set(SciteStatus.DOI_MISSING);
+            return;
+        }
+
+        doiSubscription = EasyBind.subscribe(entry.getFieldBinding(StandardField.DOI), doi -> {
+            fetchSciteData(entry);
+        });
+    }
+
+    private void fetchSciteData(BibEntry entry) {
+        // If a search is already running, cancel it
+        cancelSearch();
 
         // The scite.ai api requires a DOI
         if (entry.getDOI().isEmpty()) {

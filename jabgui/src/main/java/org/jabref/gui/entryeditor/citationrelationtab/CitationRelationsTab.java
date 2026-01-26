@@ -85,6 +85,7 @@ import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.CheckListView;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -472,8 +473,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citedByListView);
         styleFetchedListView(citingListView);
 
-        searchForRelations(citingComponents, citedByComponents);
-        searchForRelations(citedByComponents, citingComponents);
+        EasyBind.subscribe(entry.getFieldBinding(StandardField.DOI), newValue -> {
+            searchForRelations(citingComponents, citedByComponents);
+            searchForRelations(citedByComponents, citingComponents);
+        });
 
         return container;
     }
