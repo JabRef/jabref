@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -174,7 +175,13 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        return isRecognizedFormat(new BufferedReader(reader));
+    }
+
+    @Override
     public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+        reader.mark(5_000);
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
@@ -184,6 +191,7 @@ public class RepecNepImporter extends Importer {
             startOfMessage.append(tmpLine);
             tmpLine = reader.readLine();
         }
+        reader.reset();
         return startOfMessage.toString().contains("NEP: New Economics Papers") || startOfMessage.toString().contains(
                 "nep.repec.org");
     }

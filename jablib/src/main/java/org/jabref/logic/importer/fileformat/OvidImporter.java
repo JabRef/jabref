@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,10 +70,11 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         String str;
         int i = 0;
-        while (((str = reader.readLine()) != null) && (i < MAX_ITEMS)) {
+        while (((str = bufferedReader.readLine()) != null) && (i < MAX_ITEMS)) {
             if (OvidImporter.OVID_PATTERN.matcher(str).find()) {
                 return true;
             }
