@@ -160,9 +160,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
-    public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
 
-    public static final String AUTO_OPEN_FORM = "autoOpenForm";
+
+
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
@@ -205,8 +205,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
 
-    public static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
-
     public static final String MERGE_APPLY_TO_ALL_ENTRIES = "mergeApplyToAllEntries";
 
     public static final String DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES = "duplicateResolverDecisionResult";
@@ -248,20 +246,19 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
-    public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
+
 
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-    public static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
+
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
 
     public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
-    public static final String CUSTOM_TAB_NAME = "customTabName_";
-    public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
+
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_JOBS = "CleanUpJobs";
     public static final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
@@ -271,17 +268,15 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
-    public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
-    public static final String SHOW_AI_SUMMARY = "showAiSummary";
-    public static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
-    public static final String SHOW_AI_CHAT = "showAiChat";
+
+
+
+
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
-    public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
+
     public static final String SEND_LANGUAGE_DATA = "sendLanguageData";
     public static final String SEND_OS_DATA = "sendOSData";
     public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
-    public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
-    public static final String SHOW_SCITE_TAB = "showSciteTab";
 
     /// The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for
     /// OO/LO installation, used to detect location on Win/macOS when using manual
@@ -696,7 +691,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // will never be translated.
         Localization.setLanguage(getLanguage());
-        setLanguageDependentDefaultValues();
 
         // region last files opened
         defaults.put(RECENT_DATABASES, "");
@@ -778,19 +772,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
     }
 
-    public void setLanguageDependentDefaultValues() {
-        // Entry editor tab 0:
-        defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
-        defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
-
-        // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS + "_def1", StandardField.ABSTRACT.getName());
-        defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
-    }
-
     // region PushToApplicationPreferences
-
     public PushToApplicationPreferences getPushToApplicationPreferences() {
         if (pushToApplicationPreferences != null) {
             return pushToApplicationPreferences;

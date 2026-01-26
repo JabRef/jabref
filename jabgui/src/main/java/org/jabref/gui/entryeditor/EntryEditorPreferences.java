@@ -1,6 +1,9 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SequencedMap;
 import java.util.Set;
@@ -18,11 +21,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-
-import static org.jabref.logic.preferences.JabRefCliPreferences.STRINGLIST_DELIMITER;
 
 public class EntryEditorPreferences {
 
@@ -117,14 +121,35 @@ public class EntryEditorPreferences {
 
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
         SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
-        String defaultFields = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
-        defaultTabsMap.put("General", FieldFactory.parseFieldList(defaultFields));
-        defaultTabsMap.put("Abstract", FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
+        String defaultFields = getDefaultGeneralFields().stream()
+                                                        .map(Field::getName)
+                                                        .collect(Collectors.joining(JabRefCliPreferences.STRINGLIST_DELIMITER.toString()));
+        defaultTabsMap.put(Localization.lang("General"), FieldFactory.parseFieldList(defaultFields));
+        defaultTabsMap.put(Localization.lang("Abstract"), FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
 
         return defaultTabsMap;
     }
 
-    public static EntryEditorPreferences getDefaultEntryEditorPreferences() {
+    public static List<Field> getDefaultGeneralFields() {
+        List<Field> defaultGeneralFields = new ArrayList<>(List.of(
+                StandardField.DOI,
+                StandardField.ICORERANKING,
+                StandardField.CITATIONCOUNT,
+                StandardField.CROSSREF,
+                StandardField.KEYWORDS,
+                StandardField.EPRINT,
+                StandardField.EPRINTTYPE,
+                StandardField.URL,
+                StandardField.FILE,
+                StandardField.GROUPS,
+                StandardField.OWNER,
+                StandardField.TIMESTAMP
+        ));
+        defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
+        return defaultGeneralFields;
+    }
+
+    public static EntryEditorPreferences getDefault() {
         return new EntryEditorPreferences();
     }
 
