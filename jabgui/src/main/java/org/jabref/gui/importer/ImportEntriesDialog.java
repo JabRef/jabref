@@ -10,6 +10,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -249,7 +250,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             allGroups.sort((g1, g2) -> g1.getName().compareToIgnoreCase(g2.getName()));
 
             groupListView.getItems().addAll(allGroups);
-            groupListView.getSelectionModel().select(stateManager.getSelectedGroups(selectedDb).getFirst());
+
+            // If the group "Imported Entries" was created on the fly, there is no selected group yet.
+            ObservableList<GroupTreeNode> selectedGroups = stateManager.getSelectedGroups(selectedDb);
+            if (!selectedGroups.isEmpty()) {
+                groupListView.getSelectionModel().select(selectedGroups.getFirst());
+            }
         } else {
             // No groups defined -> only "All entries"
             GroupTreeNode noGroup = new GroupTreeNode(new AllEntriesGroup(Localization.lang("All entries")));
