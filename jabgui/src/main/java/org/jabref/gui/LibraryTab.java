@@ -813,6 +813,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// This behavior addresses an issue where bulk imports were creating "ghost"
     /// navigation history entries.
     /// </p>
+    ///
     /// @param entries the list of entries to insert; must not be empty
     /// @see <a href="https://github.com/JabRef/jabref/issues/13878">Issue #13878</a>
     public void insertEntries(final List<BibEntry> entries) {
