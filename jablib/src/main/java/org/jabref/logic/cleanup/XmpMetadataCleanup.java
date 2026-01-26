@@ -65,7 +65,7 @@ public class XmpMetadataCleanup implements CleanupJob {
                     entry.getField(StandardField.FILE).orElse(StandardFileType.PDF.toString()),
                     entry.getField(StandardField.FILE).orElse(StandardFileType.PDF.toString())));
         }
-        return new ArrayList<>();
+        return List.of();
     }
 
     public List<JabRefException> getFailures() {
