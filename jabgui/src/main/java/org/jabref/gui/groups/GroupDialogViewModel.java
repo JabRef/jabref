@@ -104,6 +104,7 @@ public class GroupDialogViewModel {
 
     private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
 
+    // Directory Group Properties - for groups that mirror a file system directory structure
     private final BooleanProperty typeDirectoryProperty = new SimpleBooleanProperty();
     private final StringProperty directoryGroupPathProperty = new SimpleStringProperty("");
 
@@ -386,7 +387,7 @@ public class GroupDialogViewModel {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
                     char delimiter = ',';
                     char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
-                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
+                    autoGroupKeywordsOptionProperty.setValue(true);
                     // Modify values for delimiters if user provided customized values
                     if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
                         delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
@@ -459,7 +460,7 @@ public class GroupDialogViewModel {
             }
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferences.getGroupsPreferences().getDefaultHierarchicalContext());
-            autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
+            autoGroupKeywordsOptionProperty.setValue(true);
 
             // Initialize Date Group defaults
             dateGroupFieldProperty.setValue(StandardField.DATE);
@@ -502,17 +503,17 @@ public class GroupDialogViewModel {
 
                 if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
-                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
+                    autoGroupKeywordsOptionProperty.setValue(true);
                     autoGroupKeywordsDelimiterProperty.setValue(group.getKeywordDelimiter().toString());
                     autoGroupKeywordsHierarchicalDelimiterProperty.setValue(group.getKeywordHierarchicalDelimiter().toString());
                     autoGroupKeywordsFieldProperty.setValue(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
-                    autoGroupPersonsOptionProperty.setValue(Boolean.TRUE);
+                    autoGroupPersonsOptionProperty.setValue(true);
                     autoGroupPersonsFieldProperty.setValue(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticDateGroup.class) {
                     AutomaticDateGroup group = (AutomaticDateGroup) editedGroup;
-                    dateRadioButtonSelectedProperty.setValue(Boolean.TRUE);
+                    dateRadioButtonSelectedProperty.setValue(true);
                     dateGroupFieldProperty.setValue(group.getField());
                     dateGroupOptionProperty.setValue(group.getGranularity());
                     dateGroupIncludeEmptyProperty.setValue(false);
@@ -562,13 +563,21 @@ public class GroupDialogViewModel {
 
     /// Opens a directory chooser dialog for selecting the directory path for DirectoryGroup.
     public void directoryGroupBrowse() {
+        Path initialDirectory;
+        if (directoryGroupPathProperty.getValue().isBlank()) {
+            initialDirectory = FileUtil.getInitialDirectory(
+                    currentDatabase,
+                    preferences.getFilePreferences().getWorkingDirectory());
+        } else {
+            initialDirectory = Path.of(directoryGroupPathProperty.getValue());
+        }
+
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(directoryGroupPathProperty.getValue().isBlank() ?
-                                      FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()) :
-                                      Path.of(directoryGroupPathProperty.getValue()))
+                .withInitialDirectory(initialDirectory)
                 .build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(directory -> directoryGroupPathProperty.setValue(directory.toAbsolutePath().toString()));
+                     .ifPresent(directory ->
+                             directoryGroupPathProperty.setValue(directory.toAbsolutePath().toString()));
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

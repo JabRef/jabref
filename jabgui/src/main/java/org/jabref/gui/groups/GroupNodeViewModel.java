@@ -80,7 +80,13 @@ public class GroupNodeViewModel {
     @SuppressWarnings("FieldCanBeLocal") private final ObservableList<BibEntry> entriesList;
     @SuppressWarnings("FieldCanBeLocal") private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
 
-    public GroupNodeViewModel(@NonNull BibDatabaseContext databaseContext, @NonNull StateManager stateManager, @NonNull TaskExecutor taskExecutor, @NonNull GroupTreeNode groupNode, @NonNull CustomLocalDragboard localDragBoard, @NonNull GuiPreferences preferences) {
+    public GroupNodeViewModel(
+            @NonNull BibDatabaseContext databaseContext,
+            @NonNull StateManager stateManager,
+            @NonNull TaskExecutor taskExecutor,
+            @NonNull GroupTreeNode groupNode,
+            @NonNull CustomLocalDragboard localDragBoard,
+            @NonNull GuiPreferences preferences) {
         this.databaseContext = databaseContext;
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
@@ -91,7 +97,12 @@ public class GroupNodeViewModel {
         displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
-            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries()).stream().map(this::toViewModel).sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName())).collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = automaticGroup
+                    .createSubgroups(this.databaseContext.getDatabase().getEntries())
+                    .stream()
+                    .map(this::toViewModel)
+                    .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }

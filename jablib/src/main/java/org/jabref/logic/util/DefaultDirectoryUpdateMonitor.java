@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /// Monitors directories for file system changes using Java's WatchService.
 /// Notifies registered listeners when files or directories are created, modified, or deleted.
 ///
-/// This is separate from {@link org.jabref.gui.util.DefaultFileUpdateMonitor} because directory monitoring requires
+/// This is separate from DefaultFileUpdateMonitor (in jabgui) because directory monitoring requires
 /// different semantics: it monitors directory contents (files and subdirectories) rather than
 /// individual file changes, and supports recursive monitoring of directory trees.
 public class DefaultDirectoryUpdateMonitor implements Runnable, DirectoryUpdateMonitor {
