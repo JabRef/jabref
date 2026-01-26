@@ -161,8 +161,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
 
-
-
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
@@ -247,7 +245,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
 
-
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
@@ -268,9 +265,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
-
-
-
 
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
 
