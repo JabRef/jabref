@@ -57,7 +57,6 @@ import org.jabref.model.util.Range;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -220,18 +219,6 @@ public class SourceTab extends EntryEditorTab {
 
         sourceValidator.addRule(validationMessage);
 
-        sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
-            ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
-            if (!sourceValidationStatus.isValid()) {
-                sourceValidationStatus.getHighestMessage().ifPresent(message -> {
-                    String content = Localization.lang("User input via entry-editor in `{}bibtex source` tab led to failure.")
-                            + "\n" + Localization.lang("Please check your library file for wrong syntax.")
-                            + "\n\n" + message.getMessage();
-                    dialogService.showWarningDialogAndWait(Localization.lang("SourceTab error"), content);
-                });
-            }
-        });
-
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
             if (!onFocus && (currentEntry != null)) {
                 storeSource(currentEntry, codeArea.textProperty().getValue());
@@ -295,7 +282,10 @@ public class SourceTab extends EntryEditorTab {
             if (database.getEntryCount() > 1) {
                 LOGGER.error("More than one entry found.");
                 // We use the error dialog as the notification is hidden
-                dialogService.showErrorDialogAndWait(Localization.lang("More than one entry found."));
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Problem with parsing entry"),
+                        Localization.lang("Parsing failed because more than one entry was found. Please check your BibTeX syntax.")
+                );
                 return;
             }
 
@@ -372,9 +362,9 @@ public class SourceTab extends EntryEditorTab {
     private void listenForSaveKeybinding(KeyEvent event) {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
-                case SAVE_DATABASE,
+                case SAVE_LIBRARY,
                      SAVE_ALL,
-                     SAVE_DATABASE_AS ->
+                     SAVE_LIBRARY_AS ->
                         storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });

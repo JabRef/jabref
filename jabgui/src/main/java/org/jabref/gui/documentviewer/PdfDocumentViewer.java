@@ -1,6 +1,7 @@
 package org.jabref.gui.documentviewer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -19,9 +20,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A document viewer that wraps the PDFView control for displaying PDF documents.
- */
+/// A document viewer that wraps the PDFView control for displaying PDF documents.
 public class PdfDocumentViewer extends StackPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfDocumentViewer.class);
@@ -61,7 +60,7 @@ public class PdfDocumentViewer extends StackPane {
             placeholderLabel.setText(Localization.lang("Loading PDF..."));
             placeholderLabel.setVisible(true);
 
-            try (var inputStream = Files.newInputStream(document)) {
+            try (InputStream inputStream = Files.newInputStream(document)) {
                 pdfView.load(inputStream);
                 pdfView.setPage(currentPage.get());
                 pdfView.setVisible(true);

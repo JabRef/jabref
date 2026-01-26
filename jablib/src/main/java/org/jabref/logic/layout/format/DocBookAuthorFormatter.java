@@ -3,16 +3,12 @@ package org.jabref.logic.layout.format;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
-/**
- * DocBook author formatter for both version 4 and 5
- */
+/// DocBook author formatter for both version 4 and 5
 public class DocBookAuthorFormatter {
 
     private static final XMLChars XML_CHARS = new XMLChars();
 
-    /**
-     * @param tagName Editor or author field/tag
-     */
+    /// @param tagName Editor or author field/tag
     public void addBody(StringBuilder sb, AuthorList al, String tagName, DocBookVersion version) {
         for (int i = 0; i < al.getNumberOfAuthors(); i++) {
             sb.append('<').append(tagName).append('>');

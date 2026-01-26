@@ -75,9 +75,7 @@ public class AiChatTab extends EntryEditorTab {
         return entryEditorPreferences.shouldShowAiChatTab();
     }
 
-    /**
-     * @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}
-     */
+    /// @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}
     @Override
     protected void bindToEntry(BibEntry entry) {
         previousBibEntry.ifPresent(previousBibEntry -> aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry));
@@ -143,7 +141,6 @@ public class AiChatTab extends EntryEditorTab {
                 aiService,
                 chatName,
                 aiService.getChatHistoryService().getChatHistoryForEntry(bibDatabaseContext, entry),
-                stateManager,
                 bibDatabaseContext,
                 FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
                 entryTypesManager,

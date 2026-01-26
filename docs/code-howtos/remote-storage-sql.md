@@ -26,7 +26,7 @@ Remaining changes that have not been synchronized yet are saved at closing the d
 The following examples base on PostgreSQL.
 Other databases work similar.
 
-The database structure is created at [org.jabref.logic.shared.PostgreSQLProcessor#setUp](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/logic/shared/PostgreSQLProcessor.java#L37-L37).
+The database structure is created at [org.jabref.logic.shared.PostgreSQLProcessor#setUp](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/shared/PostgreSQLProcessor.java#L37-L37).
 
 ```mermaid
 erDiagram
@@ -52,12 +52,12 @@ This version is used as version in the sense of an [Optimistic Offline Lock](htt
 It assumes that the chance of conflict is low.
 Implementation details are found at <https://www.baeldung.com/cs/offline-concurrency-control>.
 
-The `shared_id` and `version` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
+The `shared_id` and `version` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
 
 ## Synchronization
 
 PostgreSQL supports to register listeners on the database on changes.
 (MySQL does not).
-The listening is implemented at [`org.jabref.logic.shared.listener.PostgresSQLNotificationListener`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/logic/shared/listener/PostgresSQLNotificationListener.java#L16).
+The listening is implemented at [`org.jabref.logic.shared.listener.PostgresSQLNotificationListener`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/shared/listener/PostgresSQLNotificationListener.java#L16).
 It "just" fetches updates from the server when a change occurred there.
 Thus, the changes are not actively pushed from the server, but still need to be fetched by the client.

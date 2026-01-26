@@ -1,7 +1,7 @@
 ## Our policy
 
 > [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
+> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
 
 This `AGENTS.md` file acts as a set of instructions that some AI coding tools can read. For more information please read our [AI policy](./CONTRIBUTING.md#ai-usage-policy).
 
@@ -54,33 +54,36 @@ Agents **must not**:
 
 - Target the configured **Gradle toolchain**
 - Use **Java 24+ features**
-- Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
-   Using JavaFX Obersvable lists is considered best practice, too.
-- Use modern Java data structures
-   BAD: new HashSet<>(Arrays.asList(...))
-   GOOD: Set.of(...)
-- Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
-- To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
-- Correctly spelled variable names (meaning: no typos in variable names).
-- Use StringJoiner instead of StringBuilder (if possible)
-- Prefer immutability and explicit nullability (JSpecify)
-- New methods (and new classes) should follow the Single-responsibility principle (SRP).
+  - Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
+    Using JavaFX Obersvable lists is considered best practice, too.
+  - Use modern Java data structures
+    BAD: new HashSet<>(Arrays.asList(...))
+    GOOD: Set.of(...)
+  - Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
+  - To create an empty list or map we use `List.of()` and `Map.of()` instead of `Collections.emptyList()` and `Collections.emptyMap()`.
+  - Use Java Text blocks (\"\"\") for multiline string constants
 
-### Style
+### General Java style
 
 - Follow existing formatting; do not reformat unrelated code
 - Match naming conventions exactly
 - Keep methods small and focused
+- New methods (and new classes) should follow the Single-responsibility principle (SRP).
 - Avoid code duplication
 - Avoid premature abstractions
 - Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
+- Follow the principles of "Effective Java"
+- Follow the principles of "Clean Code"
 - Ensure that tests are green before committing
+
+### Java code style
+
+- Correctly spelled variable names (meaning: no typos in variable names).
+- Use StringJoiner instead of StringBuilder (if possible)
+- Prefer immutability and explicit nullability (JSpecify - see below)
 - Code should not be reformatted only because of syntax. There need to be new statements added if reformatting.
-- Follow the principles of \"Effective Java\"
-- Follow the principles of \"Clean Code\"
 - Remove commented code. (To keep a history of changes git was made for.)
 - No \"new Thread()\", use \"org.jabref.logic.util.BackgroundTask\" and its \"executeWith\"
-- Use Java Text blocks (\"\"\") for multiline string constants
 - Use compiled patterns (Pattern.compile)
    Examples:
    NOT: x.matches(\".*\\\\s{2,}.*\")
@@ -89,28 +92,24 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
+- Use specific exceptions, `catch (Exception e)` is a no-go
+- At exception, always `LOGGER.debug` (or higher level)
+- Use Markdown Javadoc comments (`///`) for multi-line comments
 
 ### Comments
 
-- In case Java comments are added, they should match the code following. They should be a high-level summary or guidance of the following code (and not some random text or just re-stating the obvious)
-- Comments should add new information (e.g. reasoning of the code). It should not be plainly derived from the code itself.
+- Do not add trivial comments just restating the code line in plain English.
+- When commenting, focus on the "why" and general idea.
 
-   Example for trivial comments:
+Example for trivial comments (to be avoided):
 
-   ```java
-   // Commit the staged changes
-   RevCommit commit = git.commit()
-   fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
-   ```
+```java
+// Commit the staged changes
+RevCommit commit = git.commit()
+fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
+```
 
-   Write without comments:
-
-   ```java
-   RevCommit commit = git.commit()
-   fieldName = fieldName.trim().toLowerCase();
-   ```
-
-   Note: This rule does not apply to fixes of spelling mistakes
+Both comments must not be added.
 
 ### Favor Optionals over nulls
 
@@ -127,14 +126,19 @@ Agents **must not**:
    Following is fine:
 
    ```java
-   Optional<String> resolved = bibEntry.getResolvedFieldOrAlias(...);
-   resolved.ifPresent(value -> doSomething(value));
+   bibEntry.getResolvedFieldOrAlias(...)
+           .ifPresent(value -> doSomething(value));
    ```
 
-- If the java.util.Optional is really present, use use `get()` (and not `orElse(\"\")`)
+- If the `java.util.Optional` is really present, use use `get()` (and not `orElse(\"\")`)
+- Use `ifPresentOrElse` instead of `if ...isPresent() { ... }  else { ... }`
+
+### Dealing with `null`
+
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
-- Use JSpecify annotations instead of `null` checks
+- Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
 - `null` should never be passed to a method (except it has the same name).
+- DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
 
 ### Exceptions
 
@@ -148,8 +152,8 @@ Agents **must not**:
    ```java
    try {
        // do some actions
-   } catch (Exception e) {
-       LOGGER.info(\"Failed to push: \".concat(e.toString()));
+   } catch (IOException e) {
+       LOGGER.info("Failed to push: ".concat(e.toString()));
    }
    ```
 
@@ -160,8 +164,8 @@ Agents **must not**:
    ```java
    try {
        // do some actions
-   } catch (Exception e) {
-       LOGGER.info(\"Failed to push\", e);
+   } catch (IOException e) {
+       LOGGER.info("Failed to push", e);
    }
    ```
 
@@ -174,6 +178,11 @@ Agents **must not**:
   Note: This rule does not apply for import statements.
 - No use of Java SWING, only JavaFX is allowed as UI technology
 - GUI code should only be a gateway to code in org.jabref.logic. More complex code regarding non-GUI operations should go into org.jabref.logic. Think of layerd archicture.
+- Labels should not end with \":\"
+
+   BAD: `<Label text="%Git Username:"/>`
+
+   GOOD: `<Label text="%Git Username"/>`
 
 #### Localization
 
@@ -210,7 +219,7 @@ Agents **must not**:
    and with FileDialogConfiguration offers the Builder pattern.
    (see e.g NewLibraryFromPdfAction)
 
-#### Testing
+#### Testing / JUnit
 
 - In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
 - Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
@@ -263,11 +272,6 @@ Agents **must not**:
    <Label text=\"%Want to help?\"/>
    ```
 
-- Labels should not end with \":\"
-
-   BAD: `<Label text="%Git Username:"/>`
-
-   GOOD: `<Label text="%Git Username"/>`
 - Plain JUnit assert should be used instead of org.assertj (if possible)
 
    BAD: assertThat(gitPreferences.getAutoPushEnabled()).isFalse();

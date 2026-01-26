@@ -14,9 +14,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.apache.hc.core5.net.URIBuilder;
 
-/**
- * Fetcher for ISBN using <a href="https://www.ebook.de">https://www.ebook.de</a>.
- */
+/// Fetcher for ISBN using <a href="https://www.ebook.de">https://www.ebook.de</a>.
 public class EbookDeIsbnFetcher extends AbstractIsbnFetcher {
     private static final String BASE_URL = "https://www.ebook.de/de/tools/isbn2bibtex";
 
