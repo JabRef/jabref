@@ -253,9 +253,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
             // If the group "Imported Entries" was created on the fly, there is no selected group yet.
             ObservableList<GroupTreeNode> selectedGroups = stateManager.getSelectedGroups(selectedDb);
-            if (!selectedGroups.isEmpty()) {
-                groupListView.getSelectionModel().select(selectedGroups.getFirst());
-            }
+            selectedGroups.stream()
+                          .findFirst()
+                          .ifPresent(groupListView.getSelectionModel()::select);
         } else {
             // No groups defined -> only "All entries"
             GroupTreeNode noGroup = new GroupTreeNode(new AllEntriesGroup(Localization.lang("All entries")));
