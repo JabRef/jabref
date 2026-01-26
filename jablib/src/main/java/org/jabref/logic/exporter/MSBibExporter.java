@@ -20,9 +20,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * TemplateExporter for exporting in MSBIB XML format.
- */
+/// TemplateExporter for exporting in MSBIB XML format.
 class MSBibExporter extends Exporter {
 
     private final TransformerFactory transformerFactory;

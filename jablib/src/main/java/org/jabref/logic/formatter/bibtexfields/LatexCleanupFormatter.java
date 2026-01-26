@@ -7,9 +7,7 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Simplifies LaTeX syntax. See {@link org.jabref.logic.layout.format.RemoveLatexCommandsFormatter} for a formatter removing LaTeX commands completely.
- */
+/// Simplifies LaTeX syntax. See {@link org.jabref.logic.layout.format.RemoveLatexCommandsFormatter} for a formatter removing LaTeX commands completely.
 public class LatexCleanupFormatter extends Formatter {
 
     private static final Pattern REMOVE_REDUNDANT = Pattern

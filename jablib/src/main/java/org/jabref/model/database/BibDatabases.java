@@ -11,11 +11,9 @@ public class BibDatabases {
     private BibDatabases() {
     }
 
-    /**
-     * Receives a Collection of BibEntry instances, iterates through them, and
-     * removes all entries that have no fields set. This is useful for rooting out
-     * an unsuccessful import (wrong format) that returns a number of empty entries.
-     */
+    /// Receives a Collection of BibEntry instances, iterates through them, and
+    /// removes all entries that have no fields set. This is useful for rooting out
+    /// an unsuccessful import (wrong format) that returns a number of empty entries.
     public static List<BibEntry> purgeEmptyEntries(Collection<BibEntry> entries) {
         return entries.stream()
                       .filter(entry -> !entry.getFields().isEmpty())

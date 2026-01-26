@@ -4,9 +4,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 
-/**
- * This is what we need to sort bibliography entries.
- */
+/// This is what we need to sort bibliography entries.
 public interface ComparableCitedKey {
 
     String getCitationKey();

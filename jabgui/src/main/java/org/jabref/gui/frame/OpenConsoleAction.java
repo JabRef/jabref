@@ -23,12 +23,10 @@ public class OpenConsoleAction extends SimpleCommand {
     private final GuiPreferences preferences;
     private final DialogService dialogService;
 
-    /**
-     * Creates a command that opens the console at the path of the supplied database,
-     * or defaults to the active database. Use
-     * {@link #OpenConsoleAction(StateManager, GuiPreferences, DialogService)} if not supplying
-     * another database.
-     */
+    /// Creates a command that opens the console at the path of the supplied database,
+    /// or defaults to the active database. Use
+    /// {@link #OpenConsoleAction(StateManager, GuiPreferences, DialogService)} if not supplying
+    /// another database.
     public OpenConsoleAction(Supplier<BibDatabaseContext> databaseContext, StateManager stateManager, GuiPreferences preferences, DialogService dialogService) {
         this.databaseContext = databaseContext;
         this.stateManager = stateManager;
@@ -38,9 +36,7 @@ public class OpenConsoleAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
     }
 
-    /**
-     * Using this constructor will result in executing the command on the active database.
-     */
+    /// Using this constructor will result in executing the command on the active database.
     public OpenConsoleAction(StateManager stateManager, GuiPreferences preferences, DialogService dialogService) {
         this(() -> null, stateManager, preferences, dialogService);
     }

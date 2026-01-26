@@ -44,6 +44,7 @@ import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
+import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
@@ -142,9 +143,7 @@ public class WebFetchers {
         return Optional.empty();
     }
 
-    /**
-     * @return sorted set containing search based fetchers
-     */
+    /// @return sorted set containing search based fetchers
     public static synchronized SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         // Caching is allowed as the properties work with observables -> any update of the preferences will be used by the fetchers at the next call
         if (searchBasedFetchers != null) {
@@ -180,6 +179,7 @@ public class WebFetchers {
         searchBasedFetchers.add(new LOBIDFetcher());
         searchBasedFetchers.add(new ScholarArchiveFetcher());
         searchBasedFetchers.add(new EuropePmcFetcher());
+        searchBasedFetchers.add(new Scopus(importerPreferences));
         // Even though Unpaywall is used differently, adding it here enables "smooth" setting of the email (as fetcher key) in the preferences UI
         searchBasedFetchers.add(new UnpaywallFetcher(importerPreferences));
 
@@ -189,9 +189,7 @@ public class WebFetchers {
         return searchBasedFetchers;
     }
 
-    /**
-     * @return sorted set containing id based fetchers
-     */
+    /// @return sorted set containing id based fetchers
     public static SortedSet<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences,
                                                                ImporterPreferences importerPreferences) {
         SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
@@ -248,9 +246,7 @@ public class WebFetchers {
         return set;
     }
 
-    /**
-     * @return sorted set containing id fetchers
-     */
+    /// @return sorted set containing id fetchers
     public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
         SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
 
@@ -260,9 +256,7 @@ public class WebFetchers {
         return set;
     }
 
-    /**
-     * @return set containing fulltext fetchers
-     */
+    /// @return set containing fulltext fetchers
     public static Set<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         Set<FulltextFetcher> fetchers = new HashSet<>();
 
@@ -292,14 +286,12 @@ public class WebFetchers {
         return fetchers;
     }
 
-    /**
-     * @return set containing customizable api key fetchers
-     */
+    /// @return set containing customizable api key fetchers
     public static Set<CustomizableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         Set<CustomizableKeyFetcher> fetchers = new HashSet<>();
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new SpringerNatureWebFetcher(importerPreferences));
-        fetchers.add(new ScienceDirect(importerPreferences));
+        fetchers.add(new Scopus(importerPreferences));
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
         fetchers.add(new MedlineFetcher(importerPreferences));
@@ -308,9 +300,7 @@ public class WebFetchers {
     }
 }
 
-/**
- * Places "Search pre-configured" to the first of the set
- */
+/// Places "Search pre-configured" to the first of the set
 class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
     @Override
     public int compare(SearchBasedFetcher s1, SearchBasedFetcher s2) {

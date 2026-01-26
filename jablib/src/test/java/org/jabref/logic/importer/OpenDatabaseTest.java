@@ -102,9 +102,7 @@ class OpenDatabaseTest {
         assertEquals(Optional.of("2014"), db.getEntryByCitationKey("1").get().getField(StandardField.YEAR));
     }
 
-    /**
-     * Test for #669
-     */
+    /// Test for #669
     @Test
     void correctlyParseEncodingWithoutNewline() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibEncodingWithoutNewline, importFormatPreferences, fileMonitor);

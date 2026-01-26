@@ -19,9 +19,7 @@ import org.jabref.model.entry.field.Field;
 
 public class EntryEditorPreferences {
 
-    /**
-     * Specifies the different possible enablement states for online services
-     */
+    /// Specifies the different possible enablement states for online services
     public enum JournalPopupEnabled {
         FIRST_START, // The first time a user uses this service
         ENABLED,
@@ -280,9 +278,7 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition.set(previewWidthDividerPosition);
     }
 
-    /**
-     * Holds the horizontal divider position when the Preview is shown in the entry editor
-     */
+    /// Holds the horizontal divider position when the Preview is shown in the entry editor
     public DoubleProperty previewWidthDividerPositionProperty() {
         return previewWidthDividerPosition;
     }
