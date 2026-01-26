@@ -66,7 +66,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitedBy(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited, false);
 
             // THEN
             assertEquals(citationsToReturn, citations);
@@ -92,7 +92,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitedBy(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited, false);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -111,7 +111,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitedBy(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited, false);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -128,7 +128,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitedBy(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited, false);
 
             // THEN
             assertTrue(citations.isEmpty());
@@ -150,7 +150,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
-            List<BibEntry> references = searchService.searchCites(referencer);
+            List<BibEntry> references = searchService.searchCites(referencer, false);
 
             // THEN
             assertEquals(referencesToReturn, references);
@@ -176,7 +176,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> references = searchService.searchCites(referencer);
+            List<BibEntry> references = searchService.searchCites(referencer, false);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(referencer));
@@ -197,7 +197,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> references = searchService.searchCites(reference);
+            List<BibEntry> references = searchService.searchCites(reference, false);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(reference));
@@ -216,7 +216,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCites(referencer);
+            List<BibEntry> citations = searchService.searchCites(referencer, false);
 
             // THEN
             assertTrue(citations.isEmpty());

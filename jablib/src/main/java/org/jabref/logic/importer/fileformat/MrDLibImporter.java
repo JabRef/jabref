@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -31,10 +32,10 @@ public class MrDLibImporter extends Importer {
     private String recommendationSetId;
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
-        String recommendationsAsString = convertToString(input);
+    public boolean isRecognizedFormat(@NonNull Reader input) throws IOException {
         try {
-            JSONObject jsonObject = new JSONObject(recommendationsAsString);
+            String body = new BufferedReader(input).lines().collect(Collectors.joining("\n"));
+            JSONObject jsonObject = new JSONObject(body);
             if (!jsonObject.has("recommendations")) {
                 return false;
             }
@@ -70,23 +71,6 @@ public class MrDLibImporter extends Importer {
         return "Takes valid JSON documents from the Mr. DLib API and parses them into a BibEntry.";
     }
 
-    /// Convert Buffered Reader response to string for JSON parsing.
-    ///
-    /// @param input Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
-    /// @return Returns an String containing the JSON document.
-    private String convertToString(BufferedReader input) {
-        String line;
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            while ((line = input.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-        } catch (IOException e) {
-            LOGGER.error("", e);
-        }
-        return stringBuilder.toString();
-    }
-
     /// Small pair-class to ensure the right order of the recommendations.
     private record RankedBibEntry(BibEntry entry, Integer rank) {
     }
@@ -98,8 +82,8 @@ public class MrDLibImporter extends Importer {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
         // The document to parse
-        String recommendationSet = convertToString(input);
-        JSONObject recommendationSetJson = new JSONObject(recommendationSet);
+        String body = input.lines().collect(Collectors.joining("\n"));
+        JSONObject recommendationSetJson = new JSONObject(body);
         // The sorted BibEntries gets stored here later
         List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
 
@@ -150,7 +134,8 @@ public class MrDLibImporter extends Importer {
         return new RankedBibEntry(current, rank);
     }
 
-    private Boolean isRecommendationFieldPresent(JSONObject recommendation, String field) {
+    private Boolean isRecommendationFieldPresent(JSONObject recommendation, String
+            field) {
         return recommendation.has(field) && !recommendation.isNull(field);
     }
 

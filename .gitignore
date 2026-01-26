@@ -585,6 +585,8 @@ lib/ojdbc.jar
 
 !**/autosaveandbackup/*.bak
 
+!.idea/dictionaries
+
 # generated during release process
 CHANGELOG.html
 
