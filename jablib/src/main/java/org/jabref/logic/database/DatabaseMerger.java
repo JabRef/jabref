@@ -105,13 +105,16 @@ public class DatabaseMerger {
     /**
      * Merges groups from the imported metadata into the target metadata.
      *
-     * @param target the metadata merge target
-     * @param other the metadata to merge from
-     * @param otherFilename the filename of the imported library
+     * @param target          the metadata merge target
+     * @param other           the metadata to merge from
+     * @param otherFilename   the filename of the imported library
      * @param allOtherEntries all entries from the imported library
      */
+    private void mergeGroups(@NonNull MetaData target,
+                             @NonNull MetaData other,
+                             @NonNull String otherFilename,
+                             @NonNull List<BibEntry> allOtherEntries) {
 
-    private void mergeGroups(@NonNull MetaData target, @NonNull MetaData other, @NonNull String otherFilename, @NonNull List<BibEntry> allOtherEntries) {
         // Adds the specified node as a child of the current root. The group contained in <b>newGroups</b> must not be of
         // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups</b> are
         // inserted directly, i.e. they are not deepCopy()'d.
@@ -142,9 +145,8 @@ public class DatabaseMerger {
      * Merges content selectors from the imported metadata into the target metadata.
      *
      * @param target the metadata merge target
-     * @param other the metadata to merge from
+     * @param other  the metadata to merge from
      */
-
     private void mergeContentSelectors(MetaData target, MetaData other) {
         for (ContentSelector selector : other.getContentSelectorsSorted()) {
             target.addContentSelector(selector);
