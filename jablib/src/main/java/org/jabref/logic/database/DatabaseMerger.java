@@ -124,6 +124,10 @@ public class DatabaseMerger {
         });
     }
 
+    /**
+     * @param target
+     * @param other
+     */
     private void mergeContentSelectors(MetaData target, MetaData other) {
         for (ContentSelector selector : other.getContentSelectorsSorted()) {
             target.addContentSelector(selector);
