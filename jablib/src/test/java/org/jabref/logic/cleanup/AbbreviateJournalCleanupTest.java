@@ -46,7 +46,10 @@ public class AbbreviateJournalCleanupTest {
         List<FieldChange> changes = cleanupWithoutFJournal.cleanup(entry);
 
         assertEquals(List.of(), changes);
-        assertEquals(Optional.of("Some Unknown Journal"), entry.getField(StandardField.JOURNAL));
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Some Unknown Journal");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -62,8 +65,9 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("J. Foo"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.empty(), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -75,7 +79,10 @@ public class AbbreviateJournalCleanupTest {
         List<FieldChange> changes = cleanupWithoutFJournal.cleanup(entry);
 
         assertEquals(List.of(), changes);
-        assertEquals(Optional.of("J. Foo"), entry.getField(StandardField.JOURNAL));
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -92,8 +99,10 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Can. J. Math."), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.of("Canadian Journal of Math"), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Can. J. Math.")
+                .withField(AMSField.FJOURNAL, "Canadian Journal of Math");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -109,7 +118,9 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Phys. Rev. Lett."), entry.getField(StandardField.JOURNALTITLE));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNALTITLE, "Phys. Rev. Lett.");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -139,6 +150,11 @@ public class AbbreviateJournalCleanupTest {
                 new FieldChange(entry, StandardField.JOURNAL, "Journal of Foo", "J. Foo")
         );
         assertEquals(expected, changes);
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Foo")
+                .withField(AMSField.FJOURNAL, "Journal of Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -156,7 +172,9 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("J. Foo"), entry.getField(StandardField.JOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -173,6 +191,10 @@ public class AbbreviateJournalCleanupTest {
                 new FieldChange(entry, StandardField.JOURNAL, "Journal of Foo   ", "J. Foo")
         );
         assertEquals(expected, changes);
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -188,6 +210,10 @@ public class AbbreviateJournalCleanupTest {
                 new FieldChange(entry, StandardField.JOURNAL, "MACRO_JOURNAL", "J. Foo")
         );
         assertEquals(expected, changes);
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -225,6 +251,12 @@ public class AbbreviateJournalCleanupTest {
                 new FieldChange(entry, StandardField.JOURNALTITLE, "Review Letters", "Rev. Lett.")
         );
         assertEquals(expected, changes);
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "J. Bar")
+                .withField(StandardField.JOURNALTITLE, "Rev. Lett.")
+                .withField(AMSField.FJOURNAL, "Review Letters");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -242,8 +274,9 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("L N"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.empty(), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "L N");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -262,8 +295,10 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("L N"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.of("Long Name"), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "L N")
+                .withField(AMSField.FJOURNAL, "Long Name");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -281,8 +316,9 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("PRL"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.empty(), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "PRL");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -301,8 +337,10 @@ public class AbbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("PRL"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.of("Physical Review Letters"), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "PRL")
+                .withField(AMSField.FJOURNAL, "Physical Review Letters");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
