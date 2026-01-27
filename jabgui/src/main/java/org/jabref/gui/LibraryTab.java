@@ -812,7 +812,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// navigation history entries.
     ///
     /// @param entries the list of entries to insert; must not be empty
-    /// @see [Issue #13878](https://github.com/JabRef/jabref/issues/13878)
     public void insertEntries(final List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return;
