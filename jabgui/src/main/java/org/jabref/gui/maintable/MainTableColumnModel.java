@@ -22,14 +22,13 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a qualifier, like the
- * field name to be displayed in the column.
- */
+/// Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a qualifier, like the
+/// field name to be displayed in the column.
+@NullMarked
 public class MainTableColumnModel {
 
     public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
@@ -99,13 +98,11 @@ public class MainTableColumnModel {
     private final CliPreferences preferences;
     private final UndoManager undoManager;
 
-    /**
-     * This is used by the preferences dialog, to initialize available columns the user can add to the table.
-     *
-     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
-     * @param qualifier the stored qualifier of the column, e.g. "author/editor"
-     */
-    public MainTableColumnModel(@NonNull Type type, @NonNull String qualifier) {
+    /// This is used by the preferences dialog, to initialize available columns the user can add to the table.
+    ///
+    /// @param type      the `MainTableColumnModel.Type` of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
+    /// @param qualifier the stored qualifier of the column, e.g. "author/editor"
+    public MainTableColumnModel(Type type, String qualifier) {
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
@@ -119,22 +116,18 @@ public class MainTableColumnModel {
         }
     }
 
-    /**
-     * This is used by the preferences dialog, to initialize available basic icon columns, the user can add to the table.
-     *
-     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "GROUPS" or "LINKED_IDENTIFIER"
-     */
+    /// This is used by the preferences dialog, to initialize available basic icon columns, the user can add to the table.
+    ///
+    /// @param type the `MainTableColumnModel.Type` of the column, e.g. "GROUPS" or "LINKED_IDENTIFIER"
     public MainTableColumnModel(Type type) {
         this(type, "");
     }
 
-    /**
-     * This is used by the preference migrations.
-     *
-     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
-     * @param qualifier the stored qualifier of the column, e.g. "author/editor"
-     * @param width     the stored width of the column
-     */
+    /// This is used by the preference migrations.
+    ///
+    /// @param type      the `MainTableColumnModel.Type` of the column, e.g. "NORMALFIELD" or "GROUPS"
+    /// @param qualifier the stored qualifier of the column, e.g. "author/editor"
+    /// @param width     the stored width of the column
     public MainTableColumnModel(Type type, String qualifier, double width) {
         this(type, qualifier);
 
@@ -189,14 +182,12 @@ public class MainTableColumnModel {
         return sortTypeProperty;
     }
 
-    /**
-     * Returns a list of sort cirteria based on the fields the current column displays.
-     * In case it is single field, a single SortCriterion is returned.
-     * In case of multiple fields, for each field, there is a SortCriterion contained in the list.
-     * <p>
-     * Implementation reason: We want to have SortCriterion handle a single field, because the UI allows for handling
-     * "plain" fields only.
-     */
+    /// Returns a list of sort cirteria based on the fields the current column displays.
+    /// In case it is single field, a single SortCriterion is returned.
+    /// In case of multiple fields, for each field, there is a SortCriterion contained in the list.
+    ///
+    /// Implementation reason: We want to have SortCriterion handle a single field, because the UI allows for handling
+    /// "plain" fields only.
     public List<SaveOrder.SortCriterion> getSortCriteria() {
         boolean descending = getSortType() == TableColumn.SortType.DESCENDING;
         return FieldFactory.parseOrFields(getQualifier()).getFields().stream()
@@ -235,13 +226,11 @@ public class MainTableColumnModel {
                 '}';
     }
 
-    /**
-     * This creates a new {@code MainTableColumnModel} out of a given string
-     *
-     * @param rawColumnName the name of the column, e.g. "field:author", or "author"
-     * @return A new {@code MainTableColumnModel}
-     */
-    public static MainTableColumnModel parse(@NonNull String rawColumnName) {
+    /// This creates a new `MainTableColumnModel` out of a given string
+    ///
+    /// @param rawColumnName the name of the column, e.g. "field:author", or "author"
+    /// @return A new `MainTableColumnModel`
+    public static MainTableColumnModel parse(String rawColumnName) {
         String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
         Type type = Type.fromString(splittedName[0]);

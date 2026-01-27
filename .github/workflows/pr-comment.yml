@@ -8,9 +8,9 @@ name: Comment on PR
 on:
   workflow_run:
     # note when updating via a PR and testing - `workflow_run` executes from the `main` branch and not the PR branch
-    workflows: ["Source Code Tests", "On PR opened/updated (check)", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md"]
+    workflows: [ "Source Code Tests", "On PR opened/updated (check)", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md" ]
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
-    types: [completed]
+    types: [ completed ]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         continue-on-error: true
         with:
           name: pr_number
@@ -124,7 +124,7 @@ jobs:
           echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}

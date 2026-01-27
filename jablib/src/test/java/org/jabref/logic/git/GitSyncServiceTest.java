@@ -38,6 +38,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
@@ -49,6 +52,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("git")
 class GitSyncServiceTest {
     private Path library;
 
@@ -115,12 +120,10 @@ class GitSyncServiceTest {
             }
             """;
 
-    /**
-     * Creates a commit graph with a base commit, one modification by Alice and one modification by Bob
-     * 1. Alice commit initial → push to remote
-     * 2. Bob clone remote -> update b → push
-     * 3. Alice update a → pull
-     */
+    /// Creates a commit graph with a base commit, one modification by Alice and one modification by Bob
+    /// 1. Alice commit initial → push to remote
+    /// 2. Bob clone remote -> update b → push
+    /// 3. Alice update a → pull
     @BeforeEach
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
         SystemReader.setInstance(new NoopGitSystemReader());

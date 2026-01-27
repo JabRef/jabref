@@ -138,6 +138,14 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 
 To test that a preferences migration works successfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
 
+## Localization in tests
+
+In case you or your called code uses `Localization.lang`, annotate your test with following annotation:
+
+```java
+@ResourceLock("Localization.lang")
+```
+
 ## Testing different kinds of components
 
 JabRef is split up in the java library ("jablib"), the CLI ("jabkit"), the HTTP server ("jabsrv"), and the GUI ("jabgui").

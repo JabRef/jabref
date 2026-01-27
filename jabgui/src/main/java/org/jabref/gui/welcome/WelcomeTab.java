@@ -32,6 +32,7 @@ import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.NewDatabaseAction;
+import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -240,19 +241,26 @@ public class WelcomeTab extends Tab {
         Hyperlink newLibraryLink = createActionLink(Localization.lang("New empty library"),
                 () -> new NewDatabaseAction(tabContainer, preferences).execute());
 
-        Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library"),
+        Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library..."),
                 () -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
                         stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                         taskExecutor).execute());
 
         Hyperlink openExampleLibraryLink = createActionLink(Localization.lang("New example library"),
                 this::openExampleLibrary);
+        Hyperlink importIntoNewLibraryLink = createActionLink(Localization.lang("Import into new library..."),
+                this::importIntoNewLibrary
+        );
 
         VBox container = new VBox();
         container.getStyleClass().add("welcome-links-content");
-        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink);
+        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importIntoNewLibraryLink);
 
         return createVBoxContainer(header, container);
+    }
+
+    private void importIntoNewLibrary() {
+        new ImportCommand(tabContainer, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService).execute();
     }
 
     private VBox createWelcomeRecentBox() {

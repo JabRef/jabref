@@ -16,6 +16,26 @@ public class MainTablePreferences {
         this.extraFileColumnsEnabled.set(extraFileColumnsEnabled);
     }
 
+    /// Creates Object with default values
+    private MainTablePreferences() {
+        this(
+                ColumnPreferences.getDefault(),               // Default column preferences
+                false,                                        // Default resize columns to fit
+                false                                         // Default extra file columns disabled
+        );
+    }
+
+    public static MainTablePreferences getDefault() {
+        return new MainTablePreferences();
+    }
+
+    public void setAll(MainTablePreferences preferences) {
+        this.columnPreferences.setColumns(preferences.getColumnPreferences().getColumns());
+        this.columnPreferences.setColumnSortOrder(preferences.getColumnPreferences().getColumnSortOrder());
+        this.setResizeColumnsToFit(preferences.getResizeColumnsToFit());
+        this.setExtraFileColumnsEnabled(preferences.getExtraFileColumnsEnabled());
+    }
+
     public ColumnPreferences getColumnPreferences() {
         return columnPreferences;
     }

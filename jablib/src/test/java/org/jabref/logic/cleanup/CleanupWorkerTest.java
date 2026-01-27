@@ -17,6 +17,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -67,7 +68,7 @@ class CleanupWorkerTest {
         // Search and store files relative to bib file overwrites all other dirs
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class));
+        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class), false, mock(JournalAbbreviationRepository.class));
     }
 
     @Test
@@ -165,7 +166,7 @@ class CleanupWorkerTest {
 
     @Test
     void cleanupMonthChangesNumberToBibtex() {
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(true,
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.MONTH, "01");
@@ -176,7 +177,7 @@ class CleanupWorkerTest {
 
     @Test
     void cleanupPageNumbersConvertsSingleDashToDouble() {
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(true,
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.PAGES, "1-2");
@@ -187,7 +188,7 @@ class CleanupWorkerTest {
 
     @Test
     void cleanupDatesConvertsToCorrectFormat() {
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(true,
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.DATE, "01/1999");
@@ -255,7 +256,7 @@ class CleanupWorkerTest {
 
     @Test
     void cleanupHtmlToLatexConvertsEpsilonToLatex() {
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(true,
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "&Epsilon;");
@@ -266,7 +267,7 @@ class CleanupWorkerTest {
 
     @Test
     void cleanupUnitsConvertsOneAmpereToLatex() {
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(true,
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new UnitsToLatexFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "1 A");
@@ -281,7 +282,7 @@ class CleanupWorkerTest {
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), List.of(),
                         List.of(), List.of()));
         assertNotEquals(List.of(), protectedTermsLoader.getProtectedTerms());
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new ProtectTermsFormatter(protectedTermsLoader)))));
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new ProtectTermsFormatter(protectedTermsLoader)))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "AlGaAs");
 
@@ -291,7 +292,7 @@ class CleanupWorkerTest {
 
     @Test
     void cleanupLatexMergesTwoLatexMathEnvironments() {
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(true,
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new LatexCleanupFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "$\\alpha$$\\beta$");
@@ -324,7 +325,7 @@ class CleanupWorkerTest {
 
     @Test
     void cleanupWithDisabledFieldFormatterChangesNothing() {
-        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanups(false,
+        CleanupPreferences preset = new CleanupPreferences(new FieldFormatterCleanupActions(false,
                 List.of(new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.MONTH, "01");

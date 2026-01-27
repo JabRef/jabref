@@ -3,9 +3,9 @@ package org.jabref.logic.cleanup;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.model.FieldChange;
@@ -16,70 +16,78 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 
-/**
- * Formats the DOI (e.g. removes http part) and also infers DOIs from the note, url, eprint or ee fields.
- */
+/// Formats the DOI (e.g. removes http part) and also infers DOIs from the note, url, eprint or ee fields.
 public class DoiCleanup implements CleanupJob {
 
-    /**
-     * Fields to check for DOIs.
-     */
-    private static final List<Field> FIELDS = Arrays.asList(StandardField.NOTE, StandardField.URL, StandardField.EPRINT,
-            new UnknownField("ee"));
+    /// Fields to check for DOIs.
+    private static final List<Field> FIELDS = List.of(
+            StandardField.NOTE,
+            StandardField.URL,
+            StandardField.EPRINT,
+            new UnknownField("ee")
+    );
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
-        // First check if the Doi Field is empty
-        if (entry.hasField(StandardField.DOI)) {
-            String doiFieldValue = entry.getField(StandardField.DOI).orElse(null);
+        AtomicBoolean validDoiExistsInDoiField = new AtomicBoolean(false);
 
-            String decodeDoiFieldValue = "";
-            decodeDoiFieldValue = URLDecoder.decode(doiFieldValue, StandardCharsets.UTF_8);
-            doiFieldValue = decodeDoiFieldValue;
+        entry.getField(StandardField.DOI)
+             .ifPresent(currentlyStoredDoi -> {
+                 String decodedDoiFieldValue;
+                 try {
+                     decodedDoiFieldValue = URLDecoder.decode(currentlyStoredDoi, StandardCharsets.UTF_8);
+                 } catch (IllegalArgumentException e) {
+                     // If decoding fails, we keep the original value
+                     decodedDoiFieldValue = currentlyStoredDoi;
+                 }
 
-            Optional<DOI> doi = DOI.parse(doiFieldValue);
+                 String cleanCurrentlyStoredDoi = decodedDoiFieldValue;
 
-            if (doi.isPresent()) {
-                String newValue = doi.get().asString();
-                if (!doiFieldValue.equals(newValue)) {
-                    entry.setField(StandardField.DOI, newValue);
+                 DOI.parse(cleanCurrentlyStoredDoi)
+                    .map(DOI::asString)
+                    .ifPresent(parsedDoi -> {
+                        validDoiExistsInDoiField.set(true);
+                        if (!parsedDoi.equals(cleanCurrentlyStoredDoi)) {
+                            entry.setField(StandardField.DOI, parsedDoi);
 
-                    FieldChange change = new FieldChange(entry, StandardField.DOI, doiFieldValue, newValue);
-                    changes.add(change);
-                }
+                            FieldChange change = new FieldChange(entry, StandardField.DOI, currentlyStoredDoi, parsedDoi);
+                            changes.add(change);
+                        }
 
-                // Doi field seems to contain Doi -> cleanup note, url, ee field
-                for (Field field : FIELDS) {
-                    entry.getField(field).flatMap(DOI::parse)
-                         .ifPresent(unused -> removeFieldValue(entry, field, changes));
-                }
-            }
-        } else {
-            // As the Doi field is empty we now check if note, url, or ee field contains a Doi
-            for (Field field : FIELDS) {
-                Optional<String> fieldContentOpt = entry.getField(field);
+                        // Doi field seems to contain Doi -> cleanup note, url, ee field
+                        for (Field field : FIELDS) {
+                            entry.getField(field)
+                                 .flatMap(DOI::parse) // only returns something if **complete** field is a DOI
+                                 .ifPresent(_ -> removeFieldValue(entry, field, changes));
+                        }
+                    });
+             });
 
-                Optional<DOI> doi = fieldContentOpt.flatMap(DOI::parse);
-
-                if (doi.isPresent()) {
-                    // Update Doi
-                    Optional<FieldChange> change = entry.setField(StandardField.DOI, doi.get().asString());
-                    change.ifPresent(changes::add);
-                    removeFieldValue(entry, field, changes);
-                }
-
-                if (StandardField.EPRINT == field) {
-                    fieldContentOpt.flatMap(ArXivIdentifier::parse)
-                                   .flatMap(ArXivIdentifier::inferDOI)
-                                   .ifPresent(inferredDoi -> {
-                                       Optional<FieldChange> change = entry.setField(StandardField.DOI, inferredDoi.asString());
-                                       change.ifPresent(changes::add);
-                                   });
-                }
-            }
+        for (Field field : FIELDS) {
+            entry.getField(field)
+                 .flatMap(DOI::parse) // covers a full DOI only
+                 .ifPresent(doi -> {
+                     if (!validDoiExistsInDoiField.get()) {
+                         Optional<FieldChange> change = entry.setField(StandardField.DOI, doi.asString());
+                         change.ifPresent(changes::add);
+                     }
+                     removeFieldValue(entry, field, changes);
+                 });
         }
+
+        if (!validDoiExistsInDoiField.get()) {
+            // Try to infer DOI from arXiv ID in eprint field and set it if DOI field is empty
+            entry.getField(StandardField.EPRINT)
+                 .flatMap(ArXivIdentifier::parse)
+                 .flatMap(ArXivIdentifier::inferDOI)
+                 .ifPresent(inferredDoi -> {
+                     Optional<FieldChange> change = entry.setField(StandardField.DOI, inferredDoi.asString());
+                     change.ifPresent(changes::add);
+                 });
+        }
+
         return changes;
     }
 

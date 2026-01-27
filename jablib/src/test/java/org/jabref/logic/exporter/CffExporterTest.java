@@ -25,12 +25,17 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class CffExporterTest {
 
     private static Exporter cffExporter;

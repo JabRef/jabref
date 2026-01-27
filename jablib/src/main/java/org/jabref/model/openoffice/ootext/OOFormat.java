@@ -3,55 +3,45 @@ package org.jabref.model.openoffice.ootext;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Helper functions to produce some of the markup as understood by OOTextIntoOO.write
- * <p>
- * These do not cover all tags, only those needed to embed markup from Layout and citation marker formatters into citation markers and bibliography.
- */
+/// Helper functions to produce some of the markup as understood by OOTextIntoOO.write
+///
+/// These do not cover all tags, only those needed to embed markup from Layout and citation marker formatters into citation markers and bibliography.
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public class OOFormat {
 
     private OOFormat() {
     }
 
-    /**
-     * Mark {@code ootext} as using a character locale known to OO.
-     *
-     * @param locale language[-country[-territory]]
-     *               <p>
-     *               https://www.openoffice.org/api/docs/common/ref/com/sun/star/lang/Locale.html
-     *               <p>
-     *               The country part is optional.
-     *               <p>
-     *               The territory part is not only optional, the allowed "codes are vendor and browser-specific", so probably best to avoid them if possible.
-     */
+    /// Mark `ootext` as using a character locale known to OO.
+    ///
+    /// https://www.openoffice.org/api/docs/common/ref/com/sun/star/lang/Locale.html
+    ///
+    /// The country part is optional.
+    ///
+    /// The territory part is not only optional, the allowed "codes are vendor and browser-specific", so probably best to avoid them if possible.
+    ///
+    /// @param locale language[-country[-territory]]
     public static OOText setLocale(OOText ootext, String locale) {
         return OOText.fromString("<span lang=\"%s\">".formatted(locale) + ootext.toString() + "</span>");
     }
 
-    /**
-     * Mark {@code ootext} as using the character locale "zxx", which means "no language", "no linguistic content".
-     * <p>
-     * Used around citation marks, probably to turn off spellchecking.
-     */
+    /// Mark `ootext` as using the character locale "zxx", which means "no language", "no linguistic content".
+    ///
+    /// Used around citation marks, probably to turn off spellchecking.
     public static OOText setLocaleNone(OOText ootext) {
         return OOFormat.setLocale(ootext, "zxx");
     }
 
-    /**
-     * Mark {@code ootext} using a character style {@code charStyle}
-     *
-     * @param charStyle Name of a character style known to OO. May be empty for "Standard", which in turn means do not override any properties.
-     */
+    /// Mark `ootext` using a character style `charStyle`
+    ///
+    /// @param charStyle Name of a character style known to OO. May be empty for "Standard", which in turn means do not override any properties.
     public static OOText setCharStyle(OOText ootext, String charStyle) {
         return OOText.fromString("<span oo:CharStyleName=\"%s\">".formatted(charStyle)
                 + ootext.toString()
                 + "</span>");
     }
 
-    /**
-     * Mark {@code ootext} as part of a paragraph with style {@code paraStyle}
-     */
+    /// Mark `ootext` as part of a paragraph with style `paraStyle`
     public static OOText paragraph(OOText ootext, String paraStyle) {
         if (StringUtil.isNullOrEmpty(paraStyle)) {
             return paragraph(ootext);
@@ -60,16 +50,12 @@ public class OOFormat {
         return OOText.fromString(startTag + ootext.toString() + "</p>");
     }
 
-    /**
-     * Mark {@code ootext} as part of a paragraph.
-     */
+    /// Mark `ootext` as part of a paragraph.
     public static OOText paragraph(OOText ootext) {
         return OOText.fromString("<p>" + ootext.toString() + "</p>");
     }
 
-    /**
-     * Format an OO cross-reference showing the target's page number as label to a reference mark.
-     */
+    /// Format an OO cross-reference showing the target's page number as label to a reference mark.
     public static OOText formatReferenceToPageNumberOfReferenceMark(String referenceMarkName) {
         String string = "<oo:referenceToPageNumberOfReferenceMark target=\"%s\">".formatted(referenceMarkName);
         return OOText.fromString(string);

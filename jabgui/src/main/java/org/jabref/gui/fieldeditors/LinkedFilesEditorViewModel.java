@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,7 +26,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -96,12 +96,10 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return FileFieldWriter.getStringRepresentation(filesToSerialize);
     }
 
-    /**
-     * Creates an instance of {@link LinkedFile} based on the given file.
-     * We try to guess the file type and relativize the path against the given file directories.
-     * <p>
-     * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
-     */
+    /// Creates an instance of {@link LinkedFile} based on the given file.
+    /// We try to guess the file type and relativize the path against the given file directories.
+    ///
+    /// TODO: Move this method to {@link LinkedFile} as soon as {@link org.jabref.gui.externalfiletype.CustomExternalFileType} lives in model.
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String fileExtension = FileUtil.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)
@@ -191,9 +189,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         }
     }
 
-    /**
-     * Find files that are probably associated with the given entry but not yet linked.
-     */
+    /// Find files that are probably associated with the given entry but not yet linked.
     private List<LinkedFileViewModel> findAssociatedNotLinkedFiles(BibEntry entry) {
         List<LinkedFileViewModel> result = new ArrayList<>();
 
@@ -203,7 +199,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         try {
-            List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
+            Collection<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
             for (LinkedFile linkedFile : linkedFiles) {
                 LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(
                         linkedFile,

@@ -4,7 +4,6 @@ import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.net.URI
 import java.util.*
 
 plugins {
@@ -15,15 +14,12 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.35.0"
+    id("com.vanniktech.maven.publish") version "0.36.0"
 
-    // id("dev.jbang") version "0.2.0"
-    // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
-    id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
+    id("dev.jbang") version "0.4.0"
 
-    id("net.ltgt.errorprone") version "4.3.0"
-    id("net.ltgt.nullaway") version "2.3.0"
+    id("net.ltgt.errorprone") version "4.4.0"
+    id("net.ltgt.nullaway") version "2.4.0"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -210,7 +206,7 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core")
     // TODO: Use versions of versions/build.gradle.kts
-    mockitoAgent("org.mockito:mockito-core:5.20.0") { isTransitive = false }
+    mockitoAgent("org.mockito:mockito-core:5.21.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")
@@ -256,73 +252,47 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
-    onlyIf {!generatedJournalFile.get().asFile.exists()}
+    val generatedJournalFileProv = generatedJournalFile
+    onlyIf { !generatedJournalFileProv.get().asFile.exists() }
 }
 
 var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
+    // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
+    mustRunAfter(taskGenerateJournalListMV)
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
 
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
     val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
     outputs.file(cslCatalogJson)
-    onlyIf {!cslCatalogJson.get().asFile.exists()}
-}
-
-var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
-
-tasks.register("downloadLtwaFile") {
-    group = "JabRef"
-    description = "Downloads the LTWA file for journal abbreviations"
-
-    val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
-    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
-
-    outputs.file(ltwaCsvFile)
-
-    // Ensure that the task really is not run if the file already exists (otherwise, the task could also run if gradle's cache is cleared, ...)
-    onlyIf {!ltwaCsvFile.get().asFile.exists()}
-
-    doLast {
-        val dir = ltwaDir.get().asFile
-        val file = ltwaCsvFile.get().asFile
-
-        dir.mkdirs()
-
-        URI(ltwaUrl).toURL().openStream().use { input ->
-            file.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-
-        logger.debug("Downloaded LTWA file to $file")
-    }
+    val cslCatalogJsonProv = cslCatalogJson
+    onlyIf { !cslCatalogJsonProv.get().asFile.exists() }
 }
 
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
-    dependsOn("downloadLtwaFile", tasks.named("generateGrammarSource"))
+    // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
+    mustRunAfter(taskGenerateCitationStyleCatalog)
 
-    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath + '"'
 
-    inputs.file(ltwaCsvFile)
-    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv");
+    inputs.file(layout.buildDirectory.file("../src/main/resources/ltwa/ltwa_20210702.csv"))
+    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv")
     outputs.file(ltwaListMv)
-    onlyIf {!ltwaListMv.get().asFile.exists()}
+    val ltwaListMvProv = ltwaListMv
 }
 
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
 sourceSets["main"].resources {
     srcDir(layout.buildDirectory.dir("generated/resources"))
 }
-
 
 // region processResources
 abstract class JoinNonCommentedLines : DefaultTask() {
@@ -362,7 +332,7 @@ val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDa
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
-val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
+val scopusApiKey = providers.environmentVariable("ScopusApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
@@ -384,7 +354,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("ieeeAPIKey", ieeeAPIKey)
     inputs.property("medlineApiKey", medlineApiKey)
     inputs.property("springerNatureAPIKey", springerNatureAPIKey)
-    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
+    inputs.property("scopusApiKey", scopusApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
     inputs.property("unpaywallEmail", unpaywallEmail)
 
@@ -400,7 +370,7 @@ tasks.named<ProcessResources>("processResources") {
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "medlineApiKey" to inputs.properties["medlineApiKey"],
-                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
+                "scopusApiKey" to inputs.properties["scopusApiKey"],
                 "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
                 "unpaywallEmail" to inputs.properties["unpaywallEmail"],

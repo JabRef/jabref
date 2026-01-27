@@ -82,17 +82,15 @@ import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 
-/**
- * GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
- * an entry in the table)
- * <p>
- * It hosts the tabs (required, general, optional) and the buttons to the left.
- * <p>
- * EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
- * the text fields to update themselves if the change is made from somewhere else.
- * <p>
- * The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
- */
+/// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
+/// an entry in the table)
+///
+/// It hosts the tabs (required, general, optional) and the buttons to the left.
+///
+/// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
+/// the text fields to update themselves if the change is made from somewhere else.
+///
+/// The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
 public class EntryEditor extends BorderPane implements PreviewControls, AdaptVisibleTabs {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
@@ -247,6 +245,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         event.consume();
                     }
                 }
+                if (event.getCode() == KeyCode.TAB && event.isShiftDown()) {
+                    if (isFirstFieldInCurrentTab(child)) {
+                        moveToPreviousTabAndFocus();
+                        event.consume();
+                    }
+                }
             });
 
             if (child instanceof Parent childParent) {
@@ -255,9 +259,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
     }
 
-    /**
-     * Set up key bindings specific for the entry editor.
-     */
+    /// Set up key bindings specific for the entry editor.
     private void setupKeyBindings() {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
@@ -333,7 +335,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     @FXML
     private void generateCleanupButton() {
-        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager);
+        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository);
         action.execute();
     }
 
@@ -393,19 +395,17 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, this));
-        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, this, preferences));
-        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, this, taskExecutor));
+        tabs.add(new AiSummaryTab(stateManager, bibEntryTypesManager, preferences, aiService, dialogService, this));
+        tabs.add(new AiChatTab(stateManager, bibEntryTypesManager, preferences, aiService, dialogService, this, taskExecutor));
 
         return tabs;
     }
 
-    /**
-     * The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
-     * These should be shown. Already hard-coded ones (above and below this code block) should be removed.
-     * This method does this calculation.
-     *
-     * @return Map of tab names and the fields to show in them.
-     */
+    /// The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
+    /// These should be shown. Already hard-coded ones (above and below this code block) should be removed.
+    /// This method does this calculation.
+    ///
+    /// @return Map of tab names and the fields to show in them.
     private Map<String, Set<Field>> getAdditionalUserConfiguredTabs() {
         Map<String, Set<Field>> entryEditorTabList = new HashMap<>(preferences.getEntryEditorPreferences().getEntryEditorTabs());
 
@@ -601,12 +601,47 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         this.previewPanel.previousPreviewStyle();
     }
 
-    /**
-     * Checks if the given TextField is the last field in the currently selected tab.
-     *
-     * @param node the Node to check
-     * @return true if this is the last field in the current tab, false otherwise
-     */
+    /// Checks if the given TextField is the first field in the currently selected tab.
+    ///
+    /// @param node the Node to check
+    /// @return true if this is the first field in the current tab, false otherwise
+    boolean isFirstFieldInCurrentTab(Node node) {
+        if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+            return false;
+        }
+
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (!(selectedTab instanceof FieldsEditorTab currentTab)) {
+            return false;
+        }
+
+        Collection<Field> shownFields = currentTab.getShownFields();
+        // Try field-based check first
+        if (!shownFields.isEmpty() && node.getId() != null) {
+            Optional<Field> firstField = shownFields.stream().findFirst();
+
+            boolean matchesFirstFieldId = firstField.map(Field::getName)
+                                                    .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                                                    .orElse(false);
+            if (matchesFirstFieldId) {
+                return true;
+            }
+        }
+
+        // Fallback: check visual tree
+        if (currentTab.getContent() instanceof Parent parent) {
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            Optional<Node> firstFocusable = findFirstFocusableNode(searchRoot);
+            return firstFocusable.map(n -> n == node).orElse(false);
+        }
+
+        return false;
+    }
+
+    /// Checks if the given TextField is the last field in the currently selected tab.
+    ///
+    /// @param node the Node to check
+    /// @return true if this is the last field in the current tab, false otherwise
     boolean isLastFieldInCurrentTab(Node node) {
         if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
             return false;
@@ -641,9 +676,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return false;
     }
 
-    /**
-     * Moves to the next tab and focuses on its first field.
-     */
+    /// Moves to the next tab and focuses on its first field.
     void moveToNextTabAndFocus() {
         tabbed.getSelectionModel().selectNext();
 
@@ -651,6 +684,17 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
             if (selectedTab instanceof FieldsEditorTab currentTab) {
                 focusFirstFieldInTab(currentTab);
+            }
+        });
+    }
+
+    void moveToPreviousTabAndFocus() {
+        tabbed.getSelectionModel().selectPrevious();
+
+        Platform.runLater(() -> {
+            Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+            if (selectedTab instanceof FieldsEditorTab currentTab) {
+                focusLastFieldInTab(currentTab);
             }
         });
     }
@@ -679,6 +723,30 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             // Final fallback: focus first focusable node within the editor grid (e.g., a button-only tab)
             Parent searchRoot = findEditorGridParent(parent).orElse(parent);
             findFirstFocusableNode(searchRoot).ifPresent(Node::requestFocus);
+        }
+    }
+
+    private void focusLastFieldInTab(FieldsEditorTab tab) {
+        Node tabContent = tab.getContent();
+        if (tabContent instanceof Parent parent) {
+            // First try to find field by ID
+            Collection<Field> shownFields = tab.getShownFields();
+            if (!shownFields.isEmpty()) {
+                Optional<Field> lastField = shownFields.stream()
+                                                       .reduce((first, second) -> second);
+
+                Field field = lastField.get();
+                String lastFieldId = field.getName();
+                Optional<TextInputControl> lastTextInput = findTextInputById(parent, lastFieldId);
+                if (lastTextInput.isPresent()) {
+                    lastTextInput.get().requestFocus();
+                    return;
+                }
+            }
+
+            // Final fallback: focus last focusable node within the editor grid
+            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
+            findLastFocusableNode(searchRoot).ifPresent(Node::requestFocus);
         }
     }
 

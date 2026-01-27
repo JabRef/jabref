@@ -40,17 +40,18 @@ import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 
-@Command(name = "jabkit",
+@Command(
+        name = "jabkit",
         mixinStandardHelpOptions = true,
         // sorted alphabetically
         subcommands = {
                 CheckConsistency.class,
                 CheckIntegrity.class,
+                CitationKeys.class,
                 Convert.class,
                 DoiToBibtex.class,
                 Fetch.class,
                 GenerateBibFromAux.class,
-                GenerateCitationKeys.class,
                 GetCitedWorks.class,
                 GetCitingWorks.class,
                 Pdf.class,
@@ -84,9 +85,7 @@ public class JabKit implements Runnable {
         System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
     }
 
-    /**
-     * Reads URIs as input
-     */
+    /// Reads URIs as input
     protected static Optional<ParserResult> importFile(String importArguments,
                                                        String importFormat,
                                                        CliPreferences cliPreferences,
@@ -145,8 +144,7 @@ public class JabKit implements Runnable {
                     System.out.println(Localization.lang("Importing file %0 as unknown format", file));
                 }
 
-                ImportFormatReader.UnknownFormatImport importResult =
-                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                ImportFormatReader.ImportResult importResult = importFormatReader.importWithAutoDetection(file);
 
                 if (!porcelain) {
                     System.out.println(Localization.lang("Format used: %0", importResult.format()));
@@ -238,7 +236,7 @@ public class JabKit implements Runnable {
                 new DummyFileUpdateMonitor()
         );
         return importFormatReader
-                .getImportFormats().stream()
+                .getImporters().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
     }

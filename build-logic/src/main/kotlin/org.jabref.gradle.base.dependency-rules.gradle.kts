@@ -15,13 +15,17 @@ jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
     }
+    conflictResolution {
+        select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
+        select("org.gradlex:jna-platform", "net.java.dev.jna:jna-platform-jpms")
+    }
 }
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
 jvmDependencyConflicts.patch {
-    listOf("base", "controls", "fxml", "graphics", "swing", "web", "media").forEach { jfxModule ->
-        module("org.openjfx:javafx-$jfxModule") {
+    listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
+        module("org.openjfx:$jfxModule") {
             addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
             addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
             addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
@@ -69,7 +73,6 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
-
 }
 
 extraJavaModuleInfo {
@@ -147,7 +150,6 @@ extraJavaModuleInfo {
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
     module("com.squareup.okhttp3:okhttp", "okhttp3")
-    module("com.squareup.okhttp3:okhttp-jvm", "okhttp3")
     module("com.squareup.okhttp3:okhttp-jvm-sse", "okhttp3.sse")
     module("com.squareup.okio:okio", "okio")
     module("com.squareup.retrofit2:converter-jackson", "retrofit2.converter.jackson")
@@ -220,10 +222,6 @@ extraJavaModuleInfo {
         requires("io.github.darvil.utils")
     }
     module("io.github.darvil82:utils", "io.github.darvil.utils") {
-        patchRealModule()
-        exportAllPackages()
-    }
-    module("io.github.adr:e-adr", "io.github.adr") {
         patchRealModule()
         exportAllPackages()
     }
@@ -473,6 +471,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
+
     module("org.openjfx:javafx-base", "javafx.base") {
         patchRealModule()
         // jabgui requires at least "javafx.collections"
@@ -497,8 +496,6 @@ extraJavaModuleInfo {
         requiresTransitive("java.desktop")
         requiresTransitive("jdk.unsupported")
     }
-
-    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty") {}
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()

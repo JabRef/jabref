@@ -1,9 +1,19 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.ExportPreferences;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -11,8 +21,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class ConvertTest extends AbstractJabKitTest {
     @ParameterizedTest
@@ -33,7 +43,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=" + format,
                 "--output=" + outputPath);
 
-        assertTrue(outputPath.toFile().exists());
+        assertFileExists(outputPath);
     }
 
     @Test
@@ -49,7 +59,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=bibtex",
                 "--output=" + outputPath);
 
-        assertTrue(outputPath.toFile().exists());
+        assertFileExists(outputPath);
         assertTrue(Files.readString(outputPath).contains("Darwin1888"));
     }
 
@@ -66,7 +76,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=ffasdfasd",
                 "--output=" + outputPath);
 
-        assertFalse(outputPath.toFile().exists());
+        assertFileDoesntExist(outputPath);
     }
 
     @Test
@@ -81,5 +91,30 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=bibtex");
 
         assertEquals(1, Files.list(tempDir).collect(Collectors.toSet()).size());
+    }
+
+    @Test
+    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws IOException, URISyntaxException {
+        Path originBib = getClassResourceAsPath("origin.bib");
+        String originBibFile = originBib.toAbsolutePath().toString();
+
+        Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
+        String outputHtmlFile = outputHtml.toAbsolutePath().toString();
+
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+
+        SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.TABLE, List.of());
+        ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());
+        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
+
+        SelfContainedSaveOrder selfContainedSaveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
+        SelfContainedSaveConfiguration selfContainedSaveConfiguration = new SelfContainedSaveConfiguration(selfContainedSaveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
+        when(preferences.getSelfContainedExportConfiguration()).thenReturn(selfContainedSaveConfiguration);
+
+        List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
+
+        commandLine.execute(args.toArray(String[]::new));
+
+        assertFileExists(outputHtml);
     }
 }

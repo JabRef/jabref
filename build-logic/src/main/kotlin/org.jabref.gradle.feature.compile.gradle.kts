@@ -9,23 +9,25 @@ java {
         // - jitpack.yml
         // - .sdkmanrc
         // - .devcontainer/devcontainer.json#L34 - there, also check if the gradleVersion matches the one of gradle/wrapper/gradle-wrapper.properties
-        // - .moderne/moderne.yml
-        // - .github/workflows/binaries*.yml
-        // - .github/workflows/publish.yml
-        // - .github/workflows/tests*.yml
-        // - .github/workflows/update-gradle-wrapper.yml
+        // - .github/actions/setup-gradle/action.yml
+        // - .github/workflows/test-code.yml
         // - .jbang/Jab*.java
+        // - .moderne/moderne.yml
+        // - build-support/src/main/java/*.java
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
         // - jablib-examples/jbang/*.java
         // - jablib-examples/maven3/*/pom.xml
-        languageVersion = JavaLanguageVersion.of(24)
+        languageVersion = JavaLanguageVersion.of(25)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
         // We also need a JDK without JavaFX, because we patch JavaFX due to modularity issues
+        // If this is changed, binaries.yml needs to be adapted (e.g., sed'ing to another JDK)
         vendor = JvmVendorSpec.AMAZON
     }
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 24
+    options.release = 25
+    // See https://docs.gradle.org/current/userguide/performance.html#a_run_the_compiler_as_a_separate_process
+    options.isFork = true
 }

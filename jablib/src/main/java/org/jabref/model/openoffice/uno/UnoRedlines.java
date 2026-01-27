@@ -11,9 +11,7 @@ import com.sun.star.document.XRedlinesSupplier;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 
-/**
- * Change tracking and Redlines
- */
+/// Change tracking and Redlines
 public class UnoRedlines {
 
     public static boolean getRecordChanges(XTextDocument doc)

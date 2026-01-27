@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.Importer;
@@ -13,7 +14,7 @@ import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Intermediate class to bundle all PDF analysis steps. [PdfImporter]s are also [org.jabref.logic.importer.Importer]s,
 /// which allows user for more fine-grained control of how [org.jabref.model.entry.BibEntry] is extracted from a PDF file.
@@ -28,14 +29,24 @@ import org.jspecify.annotations.NonNull;
 /// [#importDatabase(Path)] or [PdfMergeMetadataImporter].
 ///
 /// The result might be the metadata of the given PDF *or* the list of references in the references section (also called "citations"). Each implementation should denote which of these two it supports.
+@NullMarked
 public abstract class PdfImporter extends Importer {
+
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
-        return input.readLine().startsWith("%PDF");
+    public boolean isRecognizedFormat(Reader input) throws IOException {
+        return isRecognizedFormat(new BufferedReader(input));
     }
 
     @Override
-    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+        input.mark(1_000);
+        String firstLine = input.readLine();
+        input.reset();
+        return firstLine.startsWith("%PDF");
+    }
+
+    @Override
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         throw new UnsupportedOperationException("PdfImporter does not support importDatabase(BufferedReader reader). "
                 + "Instead use importDatabase(Path filePath).");
     }

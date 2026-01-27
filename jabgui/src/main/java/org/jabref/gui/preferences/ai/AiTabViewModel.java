@@ -23,11 +23,14 @@ import javafx.scene.control.SpinnerValueFactory;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.models.AiModelService;
+import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
 import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbers;
 import org.jabref.logic.util.OptionalObjectProperty;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
@@ -36,7 +39,10 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class AiTabViewModel implements PreferenceTabViewModel {
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
 
@@ -113,6 +119,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
+    private final AiModelService aiModelService;
+    private final TaskExecutor taskExecutor;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -127,10 +135,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMinScoreTypeValidator;
     private final Validator ragMinScoreRangeValidator;
 
-    public AiTabViewModel(CliPreferences preferences) {
+    public AiTabViewModel(CliPreferences preferences, TaskExecutor taskExecutor) {
         this.oldLocale = Locale.getDefault();
 
         this.aiPreferences = preferences.getAiPreferences();
+        this.aiModelService = new AiModelService();
+        this.taskExecutor = taskExecutor;
 
         this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -437,6 +447,54 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             String defaultTemplate = AiDefaultPreferences.TEMPLATES.get(template);
             templateSources.get(template).set(defaultTemplate);
         });
+    }
+
+    /// Fetches available models for the currently selected AI provider.
+    /// Attempts to fetch models dynamically from the API, falling back to hardcoded models if fetch fails.
+    /// This method runs asynchronously using a BackgroundTask and updates the chatModelsList when complete.
+    public void refreshAvailableModels() {
+        AiProvider provider = selectedAiProvider.get();
+        if (provider == null) {
+            return;
+        }
+
+        String apiKey = currentApiKey.get();
+
+        // Get API base URL, defaulting to provider's default URL if not customized
+        String apiBaseUrl;
+        if (customizeExpertSettings.get()) {
+            String customUrl = currentApiBaseUrl.get();
+            apiBaseUrl = (customUrl != null && !customUrl.isBlank()) ? customUrl : provider.getApiUrl();
+        } else {
+            apiBaseUrl = provider.getApiUrl();
+        }
+
+        List<String> staticModels = aiModelService.getStaticModels(provider);
+        chatModelsList.setAll(staticModels);
+
+        FetchAiModelsBackgroundTask fetchTask = getAiModelsBackgroundTask(provider, apiBaseUrl, apiKey);
+
+        fetchTask.executeWith(taskExecutor);
+    }
+
+    private FetchAiModelsBackgroundTask getAiModelsBackgroundTask(AiProvider provider, String apiBaseUrl, @Nullable String apiKey) {
+        FetchAiModelsBackgroundTask fetchTask = new FetchAiModelsBackgroundTask(
+                aiModelService,
+                provider,
+                apiBaseUrl,
+                apiKey
+        );
+
+        fetchTask.onSuccess(dynamicModels -> {
+            if (!dynamicModels.isEmpty()) {
+                String currentModel = currentChatModel.get();
+                chatModelsList.setAll(dynamicModels);
+                if (currentModel != null && !currentModel.isBlank()) {
+                    currentChatModel.set(currentModel);
+                }
+            }
+        });
+        return fetchTask;
     }
 
     @Override

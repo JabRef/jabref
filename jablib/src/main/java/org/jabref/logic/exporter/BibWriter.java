@@ -5,9 +5,7 @@ import java.io.Writer;
 
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Class to write to a .bib file. Used by {@link BibDatabaseWriter}
- */
+/// Class to write to a .bib file. Used by {@link BibDatabaseWriter}
 public class BibWriter {
 
     private final String newLineSeparator;
@@ -18,17 +16,13 @@ public class BibWriter {
     private boolean lastWriteWasNewline = false;
     private int currentPosition = 0;
 
-    /**
-     * @param newLineSeparator the string used for a line break
-     */
+    /// @param newLineSeparator the string used for a line break
     public BibWriter(Writer writer, String newLineSeparator) {
         this.writer = writer;
         this.newLineSeparator = newLineSeparator;
     }
 
-    /**
-     * Writes the given string. The newlines of the given string are converted to the newline set for this class.
-     */
+    /// Writes the given string. The newlines of the given string are converted to the newline set for this class.
     public void write(String string) throws IOException {
         if (precedingNewLineRequired) {
             writer.write(newLineSeparator);
@@ -41,26 +35,20 @@ public class BibWriter {
         somethingWasWritten = true;
     }
 
-    /**
-     * Writes the given string and finishes it with a line break
-     */
+    /// Writes the given string and finishes it with a line break
     public void writeLine(String string) throws IOException {
         this.write(string);
         this.finishLine();
     }
 
-    /**
-     * Finishes a line
-     */
+    /// Finishes a line
     public void finishLine() throws IOException {
         if (!this.lastWriteWasNewline) {
             this.write(newLineSeparator);
         }
     }
 
-    /**
-     * Finishes a block
-     */
+    /// Finishes a block
     public void finishBlock() throws IOException {
         if (!somethingWasWritten) {
             return;

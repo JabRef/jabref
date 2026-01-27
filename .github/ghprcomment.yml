@@ -46,9 +46,11 @@
     IntelliJ auto format covers some cases.
     There seem to be issues with your code style and autoformat configuration.
     Please reformat your code (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>) and commit, then push.
-
-
-    In special cases, consider using `// formatter:off` and `// formatter:on` annotations to allow deviation from the code style.
+- jobName: format-javadoc
+  workflowName: 'Source Code Tests'
+  message: >
+    You introduced non-Markdown JavaDoc.
+    Please use Markdown JavaDoc (`///`).
 - jobName: Checkstyle
   workflowName: 'Source Code Tests'
   message: >
@@ -155,6 +157,10 @@
 
     Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code.
     For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
+
+
+    We strongly recommend using the command line for this process.
+    Using `git merge upstream/main` causes fewer issues with `CHANGELOG.md` and git submodules than most IDE-based tools.
 - jobName: 'Source branch is other than "main"'
   workflowName: 'Check PR Modifications'
   message: >
@@ -189,12 +195,14 @@
   workflowName: 'Check PR Format'
   always: true
   message: >
-    You have removed the "Mandatory Checks" section from your pull request description. Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L10).
+    You have removed the "Mandatory Checks" section from your pull request description.
+    Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
 - jobName: 'PR checklist OK'
   workflowName: 'Check PR Format'
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
+    Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
 - jobName: 'Determine issue number'
   workflowName: 'Link PR to Issue'
   always: true

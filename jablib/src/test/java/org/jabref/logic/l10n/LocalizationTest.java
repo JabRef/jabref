@@ -5,9 +5,11 @@ import java.util.Locale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ResourceLock("Localization.lang")
 class LocalizationTest {
 
     private Locale locale;

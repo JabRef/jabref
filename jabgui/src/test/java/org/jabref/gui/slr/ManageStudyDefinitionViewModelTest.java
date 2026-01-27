@@ -43,7 +43,7 @@ class ManageStudyDefinitionViewModelTest {
                 importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
-                new StudyCatalogItem("ArXiv", false),
+                new StudyCatalogItem("arXiv", false),
                 new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyCatalogItem("Biodiversity Heritage", false),
                 new StudyCatalogItem("CiteSeerX", false),
@@ -63,6 +63,7 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("ResearchGate", false),
                 new StudyCatalogItem("SAO/NASA ADS", false),
                 new StudyCatalogItem("ScholarArchive", false),
+                new StudyCatalogItem("Scopus", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", true),
                 new StudyCatalogItem("Unpaywall", false),
@@ -75,7 +76,7 @@ class ManageStudyDefinitionViewModelTest {
         ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = getManageStudyDefinitionViewModel(tempDir);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
-                new StudyCatalogItem("ArXiv", false),
+                new StudyCatalogItem("arXiv", false),
                 new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyCatalogItem("Biodiversity Heritage", false),
                 new StudyCatalogItem("CiteSeerX", false),
@@ -95,6 +96,7 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("ResearchGate", false),
                 new StudyCatalogItem("SAO/NASA ADS", false),
                 new StudyCatalogItem("ScholarArchive", false),
+                new StudyCatalogItem("Scopus", false),
                 new StudyCatalogItem("SemanticScholar", false),
                 new StudyCatalogItem("Springer", false),
                 new StudyCatalogItem("Unpaywall", false),

@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
@@ -17,12 +18,10 @@ import javafx.util.Callback;
 
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Constructs a {@link TableCell} based on the value of the cell and a bunch of specified converter methods.
- *
- * @param <S> view model of table row
- * @param <T> cell value
- */
+/// Constructs a {@link TableCell} based on the value of the cell and a bunch of specified converter methods.
+///
+/// @param <S> view model of table row
+/// @param <T> cell value
 public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
 
     private Function<T, String> toText;
@@ -35,6 +34,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private BiFunction<S, T, Tooltip> tooltip;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
+    private Pos alignment;
 
     public ValueTableCellFactory<S, T> withText(Function<T, String> toText) {
         this.toText = toText;
@@ -96,6 +96,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
         return this;
     }
 
+    public ValueTableCellFactory<S, T> withContentAlignment(Pos alignment) {
+        this.alignment = alignment;
+        return this;
+    }
+
     @Override
     public TableCell<S, T> call(TableColumn<S, T> param) {
         return new TableCell<>() {
@@ -116,6 +121,9 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     }
                     if (toGraphic != null) {
                         setGraphic(toGraphic.apply(rowItem, item));
+                    }
+                    if (alignment != null) {
+                        setAlignment(alignment);
                     }
                     if (toTooltip != null) {
                         String tooltipText = toTooltip.apply(rowItem, item);

@@ -19,4 +19,13 @@ As a consequence, the file is copied.
 
 Needs: impl
 
+## Auto-link broken linked file
+`req~logic.externalfiles.file-transfer.auto-link~1`
+
+After a file is linked to an entry, the user might move the file to another directory without JabRef, leading to broken linked file.
+
+The function `Quality -> Automatically set file links` can help user to auto-link the moved files based on the broken file name, or the entry citation key.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

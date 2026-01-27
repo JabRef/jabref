@@ -63,9 +63,7 @@ import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Represents the outer stage and the scene of the JabRef window.
- */
+/// Represents the outer stage and the scene of the JabRef window.
 public class JabRefGUI extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
@@ -87,6 +85,7 @@ public class JabRefGUI extends Application {
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
     private static GitHandlerRegistry gitHandlerRegistry;
+    private static JournalAbbreviationRepository journalAbbreviationRepository;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -119,7 +118,8 @@ public class JabRefGUI extends Application {
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     clipBoardManager,
                     taskExecutor,
-                    gitHandlerRegistry);
+                    gitHandlerRegistry,
+                    journalAbbreviationRepository);
 
             openWindow();
 
@@ -170,7 +170,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -183,7 +183,7 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
-        JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository);
+        JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
         JabRefGUI.stateManager = new JabRefGuiStateManager();
@@ -223,6 +223,10 @@ public class JabRefGUI extends Application {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getFieldPreferences(),
+                preferences.getEntryEditorPreferences().citationFetcherTypeProperty(),
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getGrobidPreferences(),
+                JabRefGUI.aiService,
                 entryTypesManager
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
@@ -374,11 +378,9 @@ public class JabRefGUI extends Application {
         debugLogWindowState(mainStage);
     }
 
-    /**
-     * prints the data from the screen (only in debug mode)
-     *
-     * @param mainStage JabRef's stage
-     */
+    /// prints the data from the screen (only in debug mode)
+    ///
+    /// @param mainStage JabRef's stage
     private void debugLogWindowState(Stage mainStage) {
         LOGGER.debug("""
                         screen data:
@@ -391,9 +393,7 @@ public class JabRefGUI extends Application {
                 mainStage.isMaximized(), mainStage.getX(), mainStage.getY(), mainStage.getWidth(), mainStage.getHeight());
     }
 
-    /**
-     * Tests if the window coordinates are inside any screen
-     */
+    /// Tests if the window coordinates are inside any screen
     private boolean isWindowPositionInBounds() {
         CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();
 
@@ -438,7 +438,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            httpServerManager.start(preferences, stateManager, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
@@ -487,7 +487,7 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Shutting down language server controller");
+                LOGGER.trace("Shutting down LSP server controller");
                 languageServerController.stop();
                 LOGGER.trace("LanguageServerController shut down");
             });
@@ -523,7 +523,7 @@ public class JabRefGUI extends Application {
             executor.submit(() -> {
                 LOGGER.trace("Shutting down postgreServer");
                 PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-                postgreServer.shutdown();
+                postgreServer.close();
                 LOGGER.trace("PostgreServer shut down");
             });
 

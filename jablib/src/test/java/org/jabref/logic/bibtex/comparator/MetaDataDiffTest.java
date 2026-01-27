@@ -12,10 +12,15 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@ResourceLock("Localization.lang")
+@Execution(ExecutionMode.SAME_THREAD)
 class MetaDataDiffTest {
     @Test
     void compareWithSameContentSelectorsDoesNotReportAnyDiffs() {

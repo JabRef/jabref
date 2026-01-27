@@ -14,6 +14,8 @@ import org.jabref.model.search.query.SqlQueryNode;
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -22,6 +24,7 @@ import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
 import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Execution(ExecutionMode.SAME_THREAD)
 class SearchQuerySQLConversionTest {
     private static EmbeddedPostgres pg;
 

@@ -2,8 +2,8 @@ name: On issue unlabeled
 
 on:
   issues:
-     types:
-       - unlabeled
+    types:
+      - unlabeled
 
 jobs:
   handle_Assigned_and_FirstTimeCodeContribution:

@@ -32,6 +32,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,6 +46,8 @@ import static org.mockito.Mockito.when;
 /// - The final merged content has been written to disk on the GUI layer;
 /// - Then call DefaultMergeBookkeeper.resultRecord(...) to perform "bookkeeping";
 /// - Use JGit to verify the commit shape.
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("git")
 public class MergeBookkeeperTest {
 
     private Path remoteDir;

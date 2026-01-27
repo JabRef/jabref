@@ -28,11 +28,13 @@ import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
@@ -61,6 +63,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FieldPreferences fieldPreferences;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
@@ -82,20 +86,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
     public GroupTreeViewModel(@NonNull StateManager stateManager,
+                              @NonNull BibEntryTypesManager entryTypesManager,
+                              @NonNull GuiPreferences preferences,
+                              @NonNull FieldPreferences fieldPreferences,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
-                              @NonNull GuiPreferences preferences,
                               @NonNull AdaptVisibleTabs adaptVisibleTabs,
-                              @NonNull TaskExecutor taskExecutor,
-                              @NonNull CustomLocalDragboard localDragboard
+                              @NonNull CustomLocalDragboard localDragboard,
+                              @NonNull TaskExecutor taskExecutor
     ) {
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.preferences = preferences;
+        this.fieldPreferences = fieldPreferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.preferences = preferences;
         this.adaptVisibleTabs = adaptVisibleTabs;
-        this.taskExecutor = taskExecutor;
         this.localDragboard = localDragboard;
+        this.taskExecutor = taskExecutor;
 
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
@@ -125,10 +133,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return filterText;
     }
 
-    /**
-     * Gets invoked if the user selects a different group.
-     * We need to notify the {@link StateManager} about this change so that the main table gets updated.
-     */
+    /// Gets invoked if the user selects a different group.
+    /// We need to notify the {@link StateManager} about this change so that the main table gets updated.
     private void onSelectedGroupChanged(ObservableList<GroupNodeViewModel> newValue) {
         if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
             // Switch of database occurred -> do nothing
@@ -144,9 +150,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * Opens "New Group Dialog" and add the resulting group to the root
-     */
+    /// Opens "New Group Dialog" and add the resulting group to the root
     public void addNewGroupToRoot() {
         if (currentDatabase.isPresent()) {
             addNewSubgroup(rootGroup.get(), GroupDialogHeader.GROUP);
@@ -155,10 +159,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Gets invoked if the user changes the active database.
-     * We need to get the new group tree and update the view
-     */
+    /// Gets invoked if the user changes the active database.
+    /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
         if (newDatabase.isPresent()) {
             GroupNodeViewModel newRoot = newDatabase
@@ -205,9 +207,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
-     */
+    /// Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
     public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
@@ -240,12 +240,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return oldGroup.getClass().equals(newGroup.getClass());
     }
 
-    /**
-     * Adds JabRef suggested groups under the "All Entries" parent node.
-     * Assumes the parent is already validated as "All Entries" by the caller.
-     *
-     * @param parent The "All Entries" parent node.
-     */
+    /// Adds JabRef suggested groups under the "All Entries" parent node.
+    /// Assumes the parent is already validated as "All Entries" by the caller.
+    ///
+    /// @param parent The "All Entries" parent node.
     public void addSuggestedGroups(GroupNodeViewModel parent) {
         currentDatabase.ifPresent(database -> {
             GroupTreeNode rootNode = parent.getGroupNode();
@@ -276,14 +274,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * Check if it is necessary to show a group modified, reassign entry dialog <br>
-     * Group name change is handled separately
-     *
-     * @param oldGroup Original Group
-     * @param newGroup Edited group
-     * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
-     */
+    /// Check if it is necessary to show a group modified, reassign entry dialog <br>
+    /// Group name change is handled separately
+    ///
+    /// @param oldGroup Original Group
+    /// @param newGroup Edited group
+    /// @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
     boolean onlyMinorChanges(AbstractGroup oldGroup, AbstractGroup newGroup) {
         // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {
@@ -326,9 +322,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return true;
     }
 
-    /**
-     * Opens "Edit Group Dialog" and changes the given group to the edited one.
-     */
+    /// Opens "Edit Group Dialog" and changes the given group to the edited one.
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
@@ -479,10 +473,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
             existingWindow.get().requestFocus();
         } else {
             AiChatWindow aiChatWindow = new AiChatWindow(
+                    entryTypesManager,
+                    preferences.getAiPreferences(),
+                    fieldPreferences,
+                    preferences.getExternalApplicationsPreferences(),
                     aiService,
                     dialogService,
-                    preferences.getAiPreferences(),
-                    preferences.getExternalApplicationsPreferences(),
                     adaptVisibleTabs,
                     taskExecutor
             );
@@ -597,9 +593,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Removes the specified group and its subgroups (after asking for confirmation).
-     */
+    /// Removes the specified group and its subgroups (after asking for confirmation).
     public void removeGroupAndSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
         if (selectedGroups.size() <= 1) {
@@ -634,9 +628,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Removes the specified group (after asking for confirmation).
-     */
+    /// Removes the specified group (after asking for confirmation).
     public void removeGroupNoSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
         if (selectedGroups.size() <= 1) {

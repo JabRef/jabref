@@ -30,10 +30,10 @@
             <ColumnConstraints hgrow="NEVER" minWidth="40.0" maxWidth="40.0"/>
             <ColumnConstraints hgrow="SOMETIMES"/>
             <ColumnConstraints hgrow="SOMETIMES" halignment="LEFT"/>
-            <ColumnConstraints hgrow="NEVER" minWidth="30.0" maxWidth="30.0"/>
+            <ColumnConstraints hgrow="NEVER"/>
         </columnConstraints>
         <padding>
-            <Insets left="30.0"/>
+            <Insets left="30.0" right="10.0"/>
         </padding>
     </GridPane>
     <HBox alignment="BASELINE_RIGHT" disable="${!exportInSpecifiedOrder.selected}">
