@@ -1,13 +1,24 @@
 name: Setup JDK, JBang, and gradle
 description: Setup JDK, JBang and gradle
+
+inputs:
+  distribution:
+    description: JDK distribution
+    required: false
+    default: corretto
+  javaVersion:
+    description: Java version
+    required: false
+    default: '25'
+
 runs:
   using: composite
   steps:
     - name: Setup JDK
       uses: actions/setup-java@v5
       with:
-        java-version: '24'
-        distribution: 'corretto'
+        java-version: ${{ inputs.javaVersion }}
+        distribution: ${{ inputs.distribution }}
         check-latest: true
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5

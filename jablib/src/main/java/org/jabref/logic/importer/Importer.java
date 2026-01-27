@@ -32,12 +32,22 @@ public abstract class Importer implements Comparable<Importer> {
 
     /// Check whether the source is in the correct format for this importer.
     ///
+    /// All implementations need to reset the input stream to the beginning again - to enable importing at subsequent calls.
+    ///
     /// The effect of this method is primarily to avoid unnecessary processing of files when searching for a suitable
     /// import format. If this method returns false, the import routine will move on to the next import format.
     ///
     /// Thus, the correct behavior is to return false if it is certain that the file is not of the suitable type, and
     /// true otherwise. Returning true is the safe choice if not certain.
-    public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+        // sensible default - import will be tried
+        return true;
+    }
+
+    /// #isRecognizedFormat(BufferedReader) without the requirement to reset
+    public boolean isRecognizedFormat(Reader input) throws IOException {
+        return true;
+    }
 
     /// Check whether the source is in the correct format for this importer.
     ///
@@ -46,7 +56,8 @@ public abstract class Importer implements Comparable<Importer> {
     /// @throws IOException Signals that an I/O exception has occurred.
     public boolean isRecognizedFormat(Path filePath) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath)) {
-            return isRecognizedFormat(bufferedReader);
+            // We call the method where no reset is required
+            return isRecognizedFormat((Reader) bufferedReader);
         }
     }
 
@@ -76,9 +87,7 @@ public abstract class Importer implements Comparable<Importer> {
     /// 2. Override the method {@link Importer#importDatabase(Path)}.
     /// Example of this workaround is in: {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}.
     ///
-    /// This method should never return null.
-    ///
-    /// @param input the input to read from
+    /// @param input the input to read from - there is no reset done. "BufferedReader" is only a convenience for the implementation
     public abstract ParserResult importDatabase(BufferedReader input) throws IOException;
 
     /// Parse the database in the specified file.

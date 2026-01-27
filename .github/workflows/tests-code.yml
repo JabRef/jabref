@@ -112,6 +112,8 @@ jobs:
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
+    # Version 1.11.0 does not run on JDK25: "java.lang.reflect.InvocationTargetException"
+    if: false
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -169,9 +171,13 @@ jobs:
           # run heylogs verification
           jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md | tee heylogs.txt || true
 
-          # We have three acceptable errors
-          if ! grep -q "3 problems" heylogs.txt; then
-            cat heylogs.txt >> $GITHUB_OUTPUT
+          # We have two acceptable errors
+          if ! grep -q "2 problems" heylogs.txt; then
+            {
+              echo "heylogs<<EOF"
+              cat heylogs.txt
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
@@ -456,7 +462,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           cache: maven
           check-latest: true
@@ -510,7 +516,6 @@ jobs:
     steps:
       - name: Check secrets presence
         id: checksecrets
-        if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
           if [ "$CODECOV_TOKEN" == "" ]; then
@@ -523,34 +528,11 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        if: github.ref == 'refs/heads/main'
         uses: actions/checkout@v6
         with:
           submodules: 'true'
           show-progress: 'false'
-      - name: Set up JDK
-        if: github.ref == 'refs/heads/main'
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -578,7 +560,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
+          java-version: 25
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle

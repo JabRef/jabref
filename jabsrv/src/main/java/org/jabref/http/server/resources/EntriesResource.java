@@ -1,6 +1,10 @@
 package org.jabref.http.server.resources;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +63,28 @@ public class EntriesResource {
             throw new BadRequestException("BibTeX data must not be empty.");
         }
         uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(bibtex)));
+    }
+
+    @POST
+    @Consumes("*/*")
+    public void addUnknown(@PathParam("id") String id, Reader body) throws IOException {
+        if (uiMessageHandler == null) {
+            throw new BadRequestException("Only possible in GUI mode.");
+        }
+        if (!"current".equals(id)) {
+            throw new BadRequestException("Only currently selected library possible");
+        }
+
+        // Stream is read in another thread - when Grizzly already closed the stream
+        // Therefore, we need to create a copy
+        java.nio.file.Path tempFile;
+        tempFile = Files.createTempFile("JabRef-import", "data");
+
+        try (BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8)) {
+            body.transferTo(writer);
+        }
+
+        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendFilesToCurrentLibrary(List.of(tempFile))));
     }
 
     /// Loops through all entries in the specified library and adds attached files of type "PDF" to

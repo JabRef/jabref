@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,8 +64,9 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
-        return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
+    public boolean isRecognizedFormat(@NonNull Reader input) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(input);
+        return bufferedReader.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 
     @Override
