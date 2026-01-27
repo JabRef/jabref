@@ -44,7 +44,7 @@ public class XmpMetadataCleanup implements CleanupJob {
         for (LinkedFile file : files) {
             Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
             filePath.ifPresent(path -> {
-                // We need to check if a File has Metadata to avoid performing the cleanup operation on all Entries containing a Linked File and to accurately report the FieldChange List.
+                // We need to check if a file has metadata to avoid performing the cleanup operation on all entries containing a linked file and to accurately report the FieldChange list.
                 if (XmpUtilShared.hasMetadata(path)) {
                     try {
                         XmpUtilWriter.removeXmpMetadata(path);
