@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class JumpToFieldViewModel extends AbstractViewModel {
 
     public List<String> getFieldNames() {
         if (entryEditor.getCurrentlyEditedEntry() == null) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<String> fieldNames = entryEditor.getAllPossibleTabs().stream()

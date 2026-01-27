@@ -77,12 +77,12 @@ public class ArgumentProcessor {
         }
 
         if (StringUtil.isNotBlank(guiCli.jumpToKey)) {
-            uiCommands.add(new UiCommand.JumpToEntryKey(guiCli.jumpToKey));
+            uiCommands.add(new UiCommand.SelectEntryKeys(List.of(guiCli.jumpToKey)));
         }
 
         if (guiCli.libraries != null && !guiCli.libraries.isEmpty()) {
             if (guiCli.append) {
-                uiCommands.add(new UiCommand.AppendToCurrentLibrary(guiCli.libraries));
+                uiCommands.add(new UiCommand.AppendFilesToCurrentLibrary(guiCli.libraries));
             } else {
                 uiCommands.add(new UiCommand.OpenLibraries(guiCli.libraries));
             }

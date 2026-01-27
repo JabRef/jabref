@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE preferences SYSTEM "http://java.sun.com/dtd/preferences.dtd">
+<preferences EXTERNAL_XML_VERSION="1.0">
+  <root type="user">
+    <map/>
+    <node name="org">
+      <map/>
+      <node name="jabref">
+        <map>
+          <entry key="memoryStickMode" value="true"/>
+          <entry key="bindings" value="shortcut+alt+A;shortcut+ENTER;shortcut+N;shortcut+G;F7;alt+LEFT;;shortcut+F9;shortcut+F8;alt+F8;;Esc;Esc;shortcut+W;shortcut+C;shortcut+shift+K;shortcut+alt+K;shortcut+shift+alt+K;shortcut+shift+C;shortcut+shift+alt+T;shortcut+X;DELETE;;alt+F7;shortcut+T;shortcut+alt+shift+N;alt+DOWN;shortcut+TAB;shortcut+PLUS;alt+UP;shortcut+shift+TAB;shortcut+MINUS;shortcut+ENTER;shortcut+alt+e;shortcut+shift+e;shortcut+DOWN;shortcut+UP;alt+1;alt+s;alt+RIGHT;F5;F1;shortcut+I;shortcut+alt+I;shortcut+shift+N;shortcut+J;;;shortcut+M;;;;;;;;;;;shortcut+shift+A;shortcut+shift+B;shortcut+shift+I;;shortcut+shift+M;shortcut+shift+T;shortcut+shift+P;;shortcut+shift+U;shortcut+PAGE_DOWN;F9;shortcut+E;alt+0;F3;F4;shortcut+shift+O;shortcut+shift+F;shortcut+O;shortcut+shift+L;shortcut+V;shortcut+,;shortcut+PAGE_UP;shift+F9;shortcut+shift+R;shortcut+L;shortcut+Q;shortcut+Y;shortcut+alt+O;;;;F2;shortcut+R;shortcut+shift+D;shortcut+alt+S;shortcut+S;shortcut+shift+S;right;left;shortcut+F;alt+F;shift+F7;shortcut+A;HOME;END;;;shortcut+N;shift+DELETE;shortcut+shift+F7;alt+3;shortcut+alt+shift+A;shortcut+Z;alt+4"/>
+          <entry key="previewStyle" value="&lt;font face=&quot;sans-serif&quot;&gt;&lt;b&gt;\bibtextype&lt;/b&gt;&lt;a name=&quot;\citationkey&quot;&gt;\begin{citationkey} (\citationkey)&lt;/a&gt;\end{citationkey}&#10;\begin{author}&lt;BR&gt;&lt;BR&gt;\format[Authors(LastFirst, FullName,Sep= / ,LastSep= / ),HTMLChars]{\author}\end{author}&#10;\begin{editor &amp; !author}&lt;BR&gt;&lt;BR&gt;\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\editor} (\format[IfPlural(Eds.,Ed.)]{\editor})\end{editor &amp; !author}&#10;\begin{title}&lt;BR&gt;&lt;b&gt;\format[HTMLChars]{\title}&lt;/b&gt; \end{title}&#10;&lt;BR&gt;\begin{date}\date\end{date}\begin{edition}, \edition. edition\end{edition}&#10;\begin{editor &amp; author}&lt;BR&gt;&lt;BR&gt;\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\editor} (\format[IfPlural(Eds.,Ed.)]{\editor})\end{editor &amp; author}&#10;\begin{booktitle}&lt;BR&gt;&lt;i&gt;\format[HTMLChars]{\booktitle}&lt;/i&gt;\end{booktitle}&#10;\begin{chapter} \format[HTMLChars]{\chapter}&lt;BR&gt;\end{chapter}\begin{editor &amp; !author}&lt;BR&gt;\end{editor &amp; !author}\begin{!editor}&lt;BR&gt;\end{!editor}\begin{journal}&lt;BR&gt;&lt;i&gt;\format[HTMLChars]{\journal}&lt;/i&gt; \end{journal} \begin{volume}, Vol. \volume\end{volume}\begin{series}&lt;BR&gt;\format[HTMLChars]{\series}\end{series}\begin{number}, No. \format[HTMLChars]{\number}\end{number}&#10;\begin{school} \format[HTMLChars]{\school}, \end{school}&#10;\begin{institution} &lt;em&gt;\format[HTMLChars]{\institution}, &lt;/em&gt;\end{institution}&#10;\begin{publisher}&lt;BR&gt;\format[HTMLChars]{\publisher}\end{publisher}\begin{location}: \format[HTMLChars]{\location} \end{location}&#10;\begin{pages}&lt;BR&gt; p. \format[FormatPagesForHTML]{\pages}\end{pages}&#10;\begin{abstract}&lt;BR&gt;&lt;BR&gt;&lt;b&gt;Abstract: &lt;/b&gt;\format[HTMLChars]{\abstract} \end{abstract}&#10;\begin{owncitation}&lt;BR&gt;&lt;BR&gt;&lt;b&gt;Own citation: &lt;/b&gt;\format[HTMLChars]{\owncitation} \end{owncitation}&#10;\begin{comment}&lt;BR&gt;&lt;BR&gt;&lt;b&gt;Comment: &lt;/b&gt;\format[Markdown,HTMLChars(keepCurlyBraces)]{\comment}\end{comment}&#10;&lt;/font&gt;&#10;"/>
+          <entry key="sidePaneWidthFX" value="0.17996870109546165"/>
+          <entry key="workingDirectory" value="C:\TEMP\JabRef\test1333"/>
+          <entry key="recentDatabases" value="C:\\TEMP\\JabRef\\test1333\\test.bib;C:\\Users\\koppor\\SynologyDrive\\lit\\0 - bib\\koppor-bibliography.bib;C:\\Users\\koppor\\SynologyDrive\\lit-se\\lite-se.bib;C:\\Users\\koppor\\SynologyDrive\\lit-bpm\\lit-bpm.bib;C:\\TEMP\\JabRef\\duesseldorf.bib;C:\\git-repositories\\jabref-all\\jabref-demo-libraries\\chocolate\\Chocolate.bib;C:\\TEMP\\JabRef\\Chocolate_pseudo.bib;C:\\TEMP\\JabRef\\bib-in-bib.bib"/>
+          <entry key="mainWindowPosX" value="0.0"/>
+          <entry key="mainWindowPosY" value="0.0"/>
+          <entry key="mainWindowSizeX" value="1026.0"/>
+          <entry key="mainWindowSizeY" value="768.0"/>
+          <entry key="windowMaximised" value="false"/>
+          <entry key="latestApproach" value="2"/>
+          <entry key="entryEditorHeightFX" value="0.49633967789165445"/>
+          <entry key="entryEditorPreviewDividerPos" value="0.5"/>
+          <entry key="webSearchVisible" value="true"/>
+          <entry key="groupSidepaneVisible" value="true"/>
+          <entry key="showOOPanel" value="false"/>
+          <entry key="latestInterpretParserName" value="LLM"/>
+          <entry key="bindNames" value="Abbreviate;Accept;Add entry;Autogenerate citation keys;Automatically link files;Back;Capitalize word;Check consistency;Check integrity;Clean up;Clear read status;Clear search;Close dialog;Close library;Copy;Copy citation key;Copy citation key and link;Copy citation key and title;Copy preview;Copy title;Cut;Delete entry;Delete;Download full text documents;Edit strings;Enter identifier;Entry editor, next entry;Entry editor, next panel;Entry editor, next panel 2;Entry editor, previous entry;Entry editor, previous panel;Entry editor, previous panel 2;Execute default action in dialog;Export;Export Selected;File list editor, move entry down;File list editor, move entry up;Focus entry table;Focus group list;Forward;Get bibliographic data from %0, &quot;DOI/ISBN/...&quot;;Help;Import into current library;Import into new library;Interpret citations;Jump to field;Lowercase word;Uppercase word;Merge entries;Move caret left;Move caret right;Move caret to beginning of line;Move caret to  of line;Move caret to next word;Move caret to previous word;Move caret down;Move caret to beginning of text;Move caret to end of text;Move caret up;New article;New book;New inbook;New inproceesings;New mastersthesis;New phdthesis;New proceedings;New technical report;New unpublished;Next library;Next preview layout;Open / close entry editor;Open OpenOffice/LibreOffice connection;Open URL or DOI;Open file;Open folder;Open global search window;Open library;Open terminal here;Paste;Preferences;Previous library;Previous preview layout;Pull changes from shared database;Push to application;Quit JabRef;Redo;Refresh OO;Remove characters until next word;Remove all characters caret to end of line;Characters until previous word;Rename group;Replace string;Resolve duplicate citation keys;Save all;Save library;Save library as ...;Scroll to next match category;Scroll to previous match category;Search;Search document identifier online;Search for unlinked local files;Select all;Select first entry;Select last entry;Set read status to read;Set read status to skimmed;String dialog, add string;String dialog, remove string;Synchronize files;Toggle groups interface;Unabbreviate;Undo;Web search"/>
+          <entry key="searchCatalogs" value="ACM Portal;DBLP;IEEEXplore;Springer"/>
+          <entry key="fetcherCustomKeyNames" value="SAO/NASA ADS;Springer;Unpaywall;Biodiversity Heritage;Medline/PubMed;IEEEXplore"/>
+          <entry key="fetcherCustomKeyUses" value="false;false;false;false;false;false"/>
+          <entry key="aiEnabled" value="true"/>
+          <entry key="resolveStringsForFields" value="author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon;acknowledgement"/>
+          <entry key="nonWrappableFields" value="isbn;issn;url"/>
+          <entry key="mainTableColumnNames" value="groups;group_icons;files;linked_id;field:citationkey;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority"/>
+          <entry key="mainTableColumnWidths" value="28.0;40.0;28.0;28.0;100.0;75.0;300.0;470.0;60.0;130.0;80.0;28.0;28.0"/>
+          <entry key="mainTableColumnSortTypes" value="ASCENDING;ASCENDING;ASCENDING;ASCENDING;ASCENDING;ASCENDING;DESCENDING;ASCENDING;ASCENDING;ASCENDING;ASCENDING;ASCENDING;ASCENDING"/>
+          <entry key="cyclePreview" value="Customized preview style;ieee.csl"/>
+          <entry key="journalPopup" value="DISABLED"/>
+          <entry key="customTabName_0" value="General"/>
+          <entry key="customTabFields_0" value="doi;icore;citationcount;crossref;keywords;eprint;url;file;groups;owner;timestamp;printed;priority;qualityassured;ranking;readstatus;relevance"/>
+          <entry key="customTabName_1" value="Abstract"/>
+          <entry key="customTabFields_1" value="abstract"/>
+          <entry key="autoCompleteFields" value="related;keywords;entryset;editor;publisher;crossref;journal;title;author"/>
+          <entry key="protectedTermsEnabledInternal" value="/protectedterms/months_weekdays.terms;/protectedterms/computer_science.terms;/protectedterms/countries_territories.terms;/protectedterms/electrical_engineering.terms"/>
+          <entry key="emacsPath" value="emacsclient.exe"/>
+          <entry key="texmakerPath" value=""/>
+          <entry key="TeXworksPath" value="C:\MiKTeX\miktex\bin\x64\miktex-texworks.exe"/>
+          <entry key="winEdtPath" value=""/>
+          <entry key="sublimeTextPath" value=""/>
+          <entry key="TeXstudioPath" value="C:\Program Files\TeXstudio\texstudio.exe"/>
+          <entry key="vim" value="vim"/>
+          <entry key="VScodePath" value="C:\Program Files\Microsoft VS Code\Code.exe"/>
+          <entry key="lyxpipe" value="C:\Users\koppor\.lyx/lyxpipe"/>
+          <entry key="externalFileTypes" value="CHM:chm:application/mshelp::WWW;Djvu:djvu:image/vnd.djvu::FILE;Excel:xls:application/excel::FILE_EXCEL;Excel 2007+:xlsx:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet::FILE_EXCEL;GIF image:gif:image/gif::PICTURE;JPG image:jpg:image/jpeg::PICTURE;LaTeX:tex:application/x-latex::FILE_TEXT;MHT:mht:multipart/related::WWW;Markdown:md:text/markdown::FILE_TEXT;OpenDocument presentation:odp:application/vnd.oasis.opendocument.presentation::FILE_OPENOFFICE;OpenDocument spreadsheet:ods:application/vnd.oasis.opendocument.spreadsheet::FILE_OPENOFFICE;OpenDocument text:odt:application/vnd.oasis.opendocument.text::FILE_OPENOFFICE;PDF:pdf:application/pdf::PDF_FILE;PNG image:png:image/png::PICTURE;PostScript:ps:application/postscript::FILE;PowerPoint:ppt:application/vnd.ms-powerpoint::FILE_POWERPOINT;PowerPoint 2007+:pptx:application/vnd.openxmlformats-officedocument.presentationml.presentation::FILE_POWERPOINT;Rich Text Format:rtf:application/rtf::FILE_TEXT;TIFF image:tiff:image/tiff::PICTURE;Text:txt:text/plain::FILE_TEXT;URL:html:text/html::WWW;Word:doc:application/msword::FILE_WORD;Word 2007+:docx:application/vnd.openxmlformats-officedocument.wordprocessingml.document::FILE_WORD;ePUB:epub:application/epub+zip::WWW"/>
+          <entry key="xmpPrivacyFilters" value="note;keywords;owner;review;pdf;timestamp"/>
+          <entry key="mainTableColumnSortOrder" value="field:title"/>
+          <entry key="confirmDelete" value="false"/>
+          <entry key="previewInEntryTableTooltip" value="true"/>
+          <entry key="fulltextSearch" value="true"/>
+          <entry key="searchDisplayMode" value="true"/>
+          <entry key="lastFocused" value="C:\TEMP\JabRef\test1333\test.bib"/>
+          <entry key="lastUsedDirectory" value="C:\TEMP\JabRef"/>
+          <entry key="idLookupGuessing" value="true"/>
+          <entry key="latestIdFetcherName" value="DOI"/>
+          <entry key="enableHttpServer" value="true"/>
+          <entry key="importWorkingDirectory" value="C:\TEMP"/>
+          <entry key="cyclePreviewPos" value="0"/>
+          <entry key="CleanUpJobs" value="CLEAN_UP_DOI;CLEANUP_EPRINT;CLEAN_UP_URL;MAKE_PATHS_RELATIVE;RENAME_PDF_ONLY_RELATIVE_PATHS;CLEAN_UP_UPGRADE_EXTERNAL_LINKS;CLEAN_UP_DELETED_LINKED_FILES;CONVERT_TIMESTAMP_TO_CREATIONDATE;CONVERT_TIMESTAMP_TO_MODIFICATIONDATE;DO_NOT_CONVERT_TIMESTAMP;FIX_FILE_LINKS;CLEAN_UP_ISSN"/>
+          <entry key="overrideDefaultFontSize" value="false"/>
+          <entry key="mainFontSize" value="12"/>
+          <entry key="lastEdited" value="C:\\TEMP\\JabRef\\test1333\\test.bib"/>
+        </map>
+        <node name="bibtexkeypatterns">
+          <map/>
+        </node>
+        <node name="customizedBiblatexTypes">
+          <map/>
+        </node>
+        <node name="customizedBibtexTypes">
+          <map/>
+        </node>
+      </node>
+    </node>
+  </root>
+</preferences>

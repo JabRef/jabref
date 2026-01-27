@@ -19,31 +19,29 @@ import org.jabref.logic.util.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A file output stream that is similar to the standard {@link FileOutputStream}, except that all writes are first
- * redirected to a temporary file. When the stream is closed, the temporary file (atomically) replaces the target file.
- *
- * <p>
- * In detail, the strategy is to:
- * <ol>
- * <li>Write to a temporary file (with .tmp suffix) in the same directory as the destination file.</li>
- * <li>Create a backup (with .bak suffix) of the original file (if it exists) in the same directory.</li>
- * <li>Move the temporary file to the correct place, overwriting any file that already exists at that location.</li>
- * <li>Delete the backup file (if configured to do so).</li>
- * </ol>
- * If all goes well, no temporary or backup files will remain on disk after closing the stream.
- * <p>
- * Errors are handled as follows:
- * <ol>
- * <li>If anything goes wrong while writing to the temporary file, the temporary file will be deleted (leaving the
- * original file untouched).</li>
- * <li>If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
- * kept.</li>
- * </ol>
- * <p>
- * Implementation inspired by code from <a href="https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java">Marty
- * Lamb</a> and <a href="https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java">Apache</a>.
- */
+/// A file output stream that is similar to the standard {@link FileOutputStream}, except that all writes are first
+/// redirected to a temporary file. When the stream is closed, the temporary file (atomically) replaces the target file.
+///
+///
+/// In detail, the strategy is to:
+/// <ol>
+/// - Write to a temporary file (with .tmp suffix) in the same directory as the destination file.
+/// - Create a backup (with .bak suffix) of the original file (if it exists) in the same directory.
+/// - Move the temporary file to the correct place, overwriting any file that already exists at that location.
+/// - Delete the backup file (if configured to do so).
+/// </ol>
+/// If all goes well, no temporary or backup files will remain on disk after closing the stream.
+///
+/// Errors are handled as follows:
+/// <ol>
+/// - If anything goes wrong while writing to the temporary file, the temporary file will be deleted (leaving the
+/// original file untouched).
+/// - If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
+/// kept.
+/// </ol>
+///
+/// Implementation inspired by code from <a href="https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java">Marty
+/// Lamb</a> and <a href="https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java">Apache</a>.
 public class AtomicFileOutputStream extends FilterOutputStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
@@ -51,51 +49,39 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final String TEMPORARY_EXTENSION = ".tmp";
     private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().getFirst();
 
-    /**
-     * The file we want to create/replace.
-     */
+    /// The file we want to create/replace.
     private final Path targetFile;
 
-    /**
-     * The file to which writes are redirected to.
-     */
+    /// The file to which writes are redirected to.
     private final Path temporaryFile;
 
     private FileLock temporaryFileLock;
 
-    /**
-     * A backup of the target file (if it exists), created when the stream is closed
-     */
+    /// A backup of the target file (if it exists), created when the stream is closed
     private final Path backupFile;
 
     private final boolean keepBackup;
 
     private boolean errorDuringWrite = false;
 
-    /**
-     * Creates a new output stream to write to or replace the file at the specified path.
-     *
-     * @param path       the path of the file to write to or replace
-     * @param keepBackup whether to keep the backup file (.sav) after a successful write process
-     */
+    /// Creates a new output stream to write to or replace the file at the specified path.
+    ///
+    /// @param path       the path of the file to write to or replace
+    /// @param keepBackup whether to keep the backup file (.sav) after a successful write process
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
         // Files.newOutputStream(getPathOfTemporaryFile(path)) leads to a "sun.nio.ch.ChannelOutputStream", which does not offer "lock"
         this(path, getPathOfTemporaryFile(path), Files.newOutputStream(getPathOfTemporaryFile(path)), keepBackup);
     }
 
-    /**
-     * Creates a new output stream to write to or replace the file at the specified path.
-     * The backup file (.sav) is deleted when write was successful.
-     *
-     * @param path the path of the file to write to or replace
-     */
+    /// Creates a new output stream to write to or replace the file at the specified path.
+    /// The backup file (.sav) is deleted when write was successful.
+    ///
+    /// @param path the path of the file to write to or replace
     public AtomicFileOutputStream(Path path) throws IOException {
         this(path, false);
     }
 
-    /**
-     * Required for proper testing
-     */
+    /// Required for proper testing
     AtomicFileOutputStream(Path path, Path pathOfTemporaryFile, OutputStream temporaryFileOutputStream, boolean keepBackup) throws IOException {
         super(temporaryFileOutputStream);
         this.targetFile = path;
@@ -129,16 +115,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         return FileUtil.addExtension(targetFile, SAVE_EXTENSION);
     }
 
-    /**
-     * Returns the path of the backup copy of the original file (may not exist)
-     */
+    /// Returns the path of the backup copy of the original file (may not exist)
     public Path getBackup() {
         return backupFile;
     }
 
-    /**
-     * Overridden because of cleanup actions in case of an error
-     */
+    /// Overridden because of cleanup actions in case of an error
     @Override
     public void write(byte b[], int off, int len) throws IOException {
         try {
@@ -150,9 +132,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
     }
 
-    /**
-     * Closes the write process to the temporary file but does not commit to the target file.
-     */
+    /// Closes the write process to the temporary file but does not commit to the target file.
     public void abort() {
         errorDuringWrite = true;
         try {
@@ -180,9 +160,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
     }
 
-    /**
-     * perform the final operations to move the temporary file to its final destination
-     */
+    /// perform the final operations to move the temporary file to its final destination
     @Override
     public void close() throws IOException {
         try {

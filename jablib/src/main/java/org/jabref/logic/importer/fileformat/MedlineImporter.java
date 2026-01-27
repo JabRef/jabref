@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,11 +44,9 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Importer for the Medline/Pubmed format.
- * <p>
- * check here for details on the format https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
- */
+/// Importer for the Medline/Pubmed format.
+///
+/// check here for details on the format https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
 public class MedlineImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MedlineImporter.class);
@@ -89,17 +88,25 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     @Override
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        return isRecognizedFormat(new BufferedReader(reader));
+    }
+
+    @Override
     public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+        reader.mark(5_000);
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
             if (str.toLowerCase(ENGLISH).contains("<pubmedarticle>")
                     || str.toLowerCase(ENGLISH).contains("<pubmedbookarticle>")) {
+                reader.reset();
                 return true;
             }
 
             i++;
         }
+        reader.reset();
         return false;
     }
 
@@ -1052,22 +1059,18 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    /**
-     * Handles text entities that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
-     * We ignore the tags and return only the characters present in the enclosing parent element.
-     *
-     */
+    /// Handles text entities that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// We ignore the tags and return only the characters present in the enclosing parent element.
+    ///
     private void handleTextElement(XMLStreamReader reader, List<String> textList, String startElement)
             throws XMLStreamException {
         StringBuilder result = new StringBuilder();
         handleText(reader, textList, startElement, result);
     }
 
-    /**
-     * Handles text entities of abstracts that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
-     * We ignore the tags and return only the characters present in the enclosing parent element.
-     *
-     */
+    /// Handles text entities of abstracts that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// We ignore the tags and return only the characters present in the enclosing parent element.
+    ///
     private void handleAbstractTextElement(XMLStreamReader reader, List<String> textList, String startElement)
             throws XMLStreamException {
         StringBuilder result = new StringBuilder();
@@ -1231,10 +1234,8 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    /**
-     * Convert medline page ranges from short form to full form. Medline reports page ranges in a shorthand format.
-     * The last page is reported using only the digits which differ from the first page. i.e. 12345-51 refers to the actual range 12345-12351
-     */
+    /// Convert medline page ranges from short form to full form. Medline reports page ranges in a shorthand format.
+    /// The last page is reported using only the digits which differ from the first page. i.e. 12345-51 refers to the actual range 12345-12351
     private String fixPageRange(String pageRange) {
         int minusPos = pageRange.indexOf('-');
         if (minusPos < 0) {

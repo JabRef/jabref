@@ -177,7 +177,6 @@ open module org.jabref {
     // uses org.eclipse.jgit.lib.Signer;
 
     requires transitive org.jspecify;
-    requires io.github.adr;
 
     // region: other libraries (alphabetically)
     // requires cuid;
@@ -185,6 +184,7 @@ open module org.jabref {
     requires com.pixelduke.fxthemes;
     // requires com.sun.jna;
     // requires dd.plist;
+    requires io.github.eadr;
     // required by okhttp and some AI library
     // requires kotlin.stdlib;
     // requires mslinks;

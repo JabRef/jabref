@@ -1,11 +1,14 @@
 # AI Usage Policy
 
+In short, please keep these [two principles](https://roe.dev/blog/using-ai-in-open-source) in mind when you contribute:
+
 > [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
 >
-> Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
+> 1. Never let an LLM speak for you.
+> 2. Never let an LLM think for you.
+
+This project does not accept fully AI-generated pull requests. AI tools may be used only for assistance (e.g. understanding existing code, writing out well-known algorithms). You must understand and take responsibility for every change you submit.
+We reserve the right to reject pull requests that contain little or no genuine contribution from the contributor (with regards to code as well as the thought behind changes).
 
 ## Our Rule
 

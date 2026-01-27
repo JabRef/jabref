@@ -19,6 +19,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -33,10 +34,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetcher for OpenAlex Works API
- * Docs: <a href="https://docs.openalex.org/api-entities/works"> OpenAlex API Docs</a>
- */
+/// Fetcher for OpenAlex Works API
+/// Docs: <a href="https://docs.openalex.org/api-entities/works"> OpenAlex API Docs</a>
 public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, EntryBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAlex.class);
@@ -175,7 +174,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
 
         // Query the single work object and try to extract a PDF URL
         JSONObject work;
-        try (var stream = getUrlDownload(apiUrl.get()).asInputStream()) {
+        try (ProgressInputStream stream = getUrlDownload(apiUrl.get()).asInputStream()) {
             work = JsonReader.toJsonObject(stream);
         } catch (Exception e) {
             throw new FetcherException(apiUrl.get(), "Failed to query OpenAlex for fulltext", e);

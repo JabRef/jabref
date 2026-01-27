@@ -23,6 +23,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
 import org.jabref.logic.cleanup.CleanupWorker;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -31,38 +32,51 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 public class CleanupDialogViewModel extends AbstractViewModel {
 
     private final BibDatabaseContext databaseContext;
+
     private final CliPreferences preferences;
+
     private final DialogService dialogService;
+
     private final StateManager stateManager;
+
     private final UndoManager undoManager;
+
+    @Nullable
     private final Supplier<LibraryTab> tabSupplier;
+
+    @Nullable
     private final TaskExecutor taskExecutor;
+
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
 
+    @NullMarked
     public CleanupDialogViewModel(
-            @NonNull BibDatabaseContext databaseContext,
-            @NonNull CliPreferences preferences,
-            @NonNull DialogService dialogService,
-            @NonNull StateManager stateManager,
-            @NonNull UndoManager undoManager,
-            Supplier<LibraryTab> tabSupplier,
-            TaskExecutor taskExecutor
+            BibDatabaseContext databaseContext,
+            CliPreferences preferences,
+            DialogService dialogService,
+            StateManager stateManager,
+            UndoManager undoManager,
+            @Nullable Supplier<LibraryTab> tabSupplier,
+            @Nullable TaskExecutor taskExecutor,
+            JournalAbbreviationRepository journalAbbreviationRepository
     ) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
-
-        this.tabSupplier = tabSupplier; // can be null
-        this.taskExecutor = taskExecutor; // can be null
+        this.tabSupplier = tabSupplier;
+        this.taskExecutor = taskExecutor;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     public void setTargetEntries(List<BibEntry> entries) {
@@ -132,11 +146,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Runs the cleanup on the entry and records the change.
-     *
-     * @return true iff entry was modified
-     */
+    /// Runs the cleanup on the entry and records the change.
+    ///
+    /// @return true iff entry was modified
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
                               NamedCompoundEdit compoundEdit,
@@ -144,7 +156,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences()
+                preferences.getTimestampPreferences(),
+                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                journalAbbreviationRepository
         );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
