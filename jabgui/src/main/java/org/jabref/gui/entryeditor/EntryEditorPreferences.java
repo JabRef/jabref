@@ -1,7 +1,13 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SequencedMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -15,7 +21,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 public class EntryEditorPreferences {
 
@@ -36,7 +47,6 @@ public class EntryEditorPreferences {
     }
 
     private final MapProperty<String, Set<Field>> entryEditorTabList;
-    private final MapProperty<String, Set<Field>> defaultEntryEditorTabList;
     private final BooleanProperty shouldOpenOnNewEntry;
     private final BooleanProperty shouldShowRecommendationsTab;
     private final BooleanProperty shouldShowAiSummaryTab;
@@ -53,8 +63,28 @@ public class EntryEditorPreferences {
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
 
+    private EntryEditorPreferences() {
+        this(
+                getDefaultEntryEditorTabs(),          // Default Entry Editor Tabs
+                true,                                 // Open editor when a new entry is created
+                true,                                 // Show tab 'Related articles'
+                true,                                 // Show tab 'AI Summary'
+                true,                                 // Show tab 'AI Chat'
+                true,                                 // Show tab 'LaTeX citations'
+                true,                                 // Show tab 'File annotations' only if its contains highlights or comments
+                false,                                // Show BibTeX source by default
+                true,                                 // Show validation messages
+                true,                                 // Allow integers in 'edition' filed in BibTeX mode
+                true,                                 // Automatically search and show unlinked files in the entry editor
+                JournalPopupEnabled.DISABLED,         // Fetch journal information online to show
+                CitationFetcherType.SEMANTIC_SCHOLAR, // Citation Fetcher Type
+                true,                                 // Show tab 'Citation information'
+                true,                                 // Show user comments field
+                0.5                                   // Preview Width Divider Position
+        );
+    }
+
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
-                                  Map<String, Set<Field>> defaultEntryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
                                   boolean shouldShowRecommendationsTab,
                                   boolean shouldShowAiSummaryTab,
@@ -72,7 +102,6 @@ public class EntryEditorPreferences {
                                   double previewWidthDividerPosition) {
 
         this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
-        this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
         this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
         this.shouldShowAiSummaryTab = new SimpleBooleanProperty(shouldShowAiSummaryTab);
@@ -90,6 +119,59 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
+    public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
+        SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
+        String defaultFields = getDefaultGeneralFields().stream()
+                                                        .map(Field::getName)
+                                                        .collect(Collectors.joining(JabRefCliPreferences.STRINGLIST_DELIMITER.toString()));
+        defaultTabsMap.put(Localization.lang("General"), FieldFactory.parseFieldList(defaultFields));
+        defaultTabsMap.put(Localization.lang("Abstract"), FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
+
+        return defaultTabsMap;
+    }
+
+    public static List<Field> getDefaultGeneralFields() {
+        List<Field> defaultGeneralFields = new ArrayList<>(List.of(
+                StandardField.DOI,
+                StandardField.ICORERANKING,
+                StandardField.CITATIONCOUNT,
+                StandardField.CROSSREF,
+                StandardField.KEYWORDS,
+                StandardField.EPRINT,
+                StandardField.EPRINTTYPE,
+                StandardField.URL,
+                StandardField.FILE,
+                StandardField.GROUPS,
+                StandardField.OWNER,
+                StandardField.TIMESTAMP
+        ));
+        defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
+        return defaultGeneralFields;
+    }
+
+    public static EntryEditorPreferences getDefault() {
+        return new EntryEditorPreferences();
+    }
+
+    public void setAll(EntryEditorPreferences preferences) {
+        this.entryEditorTabList.set(preferences.entryEditorTabs());
+        this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
+        this.shouldShowRecommendationsTab.set(preferences.shouldShowRecommendationsTab());
+        this.shouldShowAiSummaryTab.set(preferences.shouldShowAiSummaryTab());
+        this.shouldShowAiChatTab.set(preferences.shouldShowAiChatTab());
+        this.shouldShowLatexCitationsTab.set(preferences.shouldShowLatexCitationsTab());
+        this.shouldShowFileAnnotationsTab.set(preferences.shouldShowFileAnnotationsTab());
+        this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
+        this.enableValidation.set(preferences.shouldEnableValidation());
+        this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
+        this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
+        this.enablementStatus.set(preferences.shouldEnableJournalPopup());
+        this.citationFetcherType.set(preferences.getCitationFetcherType());
+        this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
+        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
+        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
+    }
+
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
         return entryEditorTabList.get();
     }
@@ -100,10 +182,6 @@ public class EntryEditorPreferences {
 
     public void setEntryEditorTabList(Map<String, Set<Field>> entryEditorTabList) {
         this.entryEditorTabList.set(FXCollections.observableMap(entryEditorTabList));
-    }
-
-    public ObservableMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        return defaultEntryEditorTabList.get();
     }
 
     public boolean shouldOpenOnNewEntry() {

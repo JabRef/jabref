@@ -3,7 +3,13 @@ parent: Requirements
 ---
 # UX
 
-This page collects general UX requirements
+This page collects general UX requirements.
+
+## Generally available buttons and menu items are disabled instead of not shown
+
+When there is functionality generally available but cannot be executed at the present time, it is shown as disabled.
+
+Example: Button to open a link. If there is no link, the button should be shown but not enabled.
 
 ## Auto close of merge entries dialog
 `req~ux.auto-close.merge-entries~1`

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -29,7 +30,6 @@ import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -553,13 +553,12 @@ public class PreferencesMigrations {
 
     /// Migrates default fields of the "General" entry editor tab.
     ///
-    ///
     /// This migration handles default configuration before and after v6.0-alpha.3.
-    /// If the user current configuration matched with one of with known default field sets it gets updated to
-    /// current default defined by {@link FieldFactory#getDefaultGeneralFields()}.
+    /// If the user current configuration matched with one of with known default field sets, it gets updated to
+    /// current default defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
     ///
     /// @param preferences the user's current GUI preferences
-    /// @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
+    /// @implNote The default fields for the "General" tab are defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
@@ -592,7 +591,7 @@ public class PreferencesMigrations {
 
         entryEditorPrefs.put(
                 Localization.lang("General"),
-                new HashSet<>(FieldFactory.getDefaultGeneralFields())
+                new HashSet<>(EntryEditorPreferences.getDefaultGeneralFields())
         );
 
         preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -101,23 +102,24 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        String str;
+        int i = 0;
+        while (((str = bufferedReader.readLine()) != null) && (i < 50)) {
+            if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
+                return true;
+            }
+            i++;
+        }
         return false;
     }
 
     @Override
     public boolean isRecognizedFormat(@NonNull Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
-            String str;
-            int i = 0;
-            while (((str = reader.readLine()) != null) && (i < 50)) {
-                if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
-                    return true;
-                }
-                i++;
-            }
+            return (isRecognizedFormat((Reader) reader));
         }
-        return false;
     }
 
     @Override

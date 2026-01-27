@@ -799,6 +799,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         insertEntries(List.of(bibEntry));
     }
 
+    /// Inserts the given entries into the database and updates the UI accordingly.
+    ///
+    /// For single-entry imports, the entry is selected and optionally opened in the editor
+    /// (based on user preferences), which adds it to the navigation history.
+    ///
+    /// For bulk imports (multiple entries), individual entry focus is skipped.
+    ///  This prevents pollution of the navigation history with
+    /// entries the user never explicitly clicked on.
+    ///
+    /// This behavior addresses an issue where bulk imports were creating "ghost"
+    /// navigation history entries.
+    ///
+    /// @param entries the list of entries to insert; must not be empty
+    /// @see [Issue #13878](https://github.com/JabRef/jabref/issues/13878)
     public void insertEntries(final List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return;
@@ -808,10 +822,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
         markBaseChanged();
         stateManager.setSelectedEntries(entries);
-        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-            showAndEdit(entries.getFirst());
-        } else {
-            clearAndSelect(entries.getFirst());
+
+        // Only show/select individual entry for single-entry imports.
+        // For bulk imports (size > 1), we skip the clearAndSelect call.
+        // This prevents navigation history pollution because the listener
+        // only adds to history when entries.size() == 1.
+        if (entries.size() == 1) {
+            if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+                showAndEdit(entries.getFirst());
+            } else {
+                clearAndSelect(entries.getFirst());
+            }
         }
     }
 

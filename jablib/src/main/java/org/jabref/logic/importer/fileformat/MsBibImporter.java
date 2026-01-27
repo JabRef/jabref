@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,7 +37,7 @@ public class MsBibImporter extends Importer {
     /// not of the MsBib type, and true otherwise. Returning true is the safe choice
     /// if not certain.
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(Reader reader) throws IOException {
         Document docin;
         try {
             DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
