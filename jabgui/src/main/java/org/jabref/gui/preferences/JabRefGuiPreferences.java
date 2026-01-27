@@ -286,12 +286,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // endregion
 
         // region NameDisplayPreferences
-        defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
-        defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
-        defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
-        defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
-        defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
-        // endregion
+//
 
         // By default disable "Fit table horizontally on the screen"
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
@@ -350,6 +345,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
+        getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
     }
 
     @Override
@@ -373,6 +369,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
+        getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -933,9 +930,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return nameDisplayPreferences;
         }
 
-        nameDisplayPreferences = new NameDisplayPreferences(
-                getNameDisplayStyle(),
-                getNameAbbreviationStyle());
+        nameDisplayPreferences = getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences.getDefault());
 
         EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
@@ -951,25 +946,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyle() {
-        NameDisplayPreferences.AbbreviationStyle abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.NONE; // default
-        if (getBoolean(ABBR_AUTHOR_NAMES)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.FULL;
-        } else if (getBoolean(NAMES_LAST_ONLY)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
-        }
-        return abbreviationStyle;
+        return NameDisplayPreferences.getDefault().getAbbreviationStyle();
     }
 
     private NameDisplayPreferences.DisplayStyle getNameDisplayStyle() {
-        NameDisplayPreferences.DisplayStyle displayStyle = NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME; // default
-        if (getBoolean(NAMES_NATBIB)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.NATBIB;
-        } else if (getBoolean(NAMES_AS_IS)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.AS_IS;
-        } else if (getBoolean(NAMES_FIRST_LAST)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
-        }
-        return displayStyle;
+        return NameDisplayPreferences.getDefault().getDisplayStyle();
+    }
+
+    private NameDisplayPreferences getNameDisplayPreferencesFromBackingStore(
+            NameDisplayPreferences defaults) {
+        return new NameDisplayPreferences(getNameDisplayStyle(), getNameAbbreviationStyle());
     }
 
     // endregion
