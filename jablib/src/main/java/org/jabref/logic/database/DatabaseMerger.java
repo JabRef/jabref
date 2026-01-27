@@ -49,41 +49,71 @@ public class DatabaseMerger {
      * @param other         the database context to merge from
      * @param otherFileName the filename of the imported library
      */
-    public synchronized void merge(BibDatabaseContext target, BibDatabaseContext other, String otherFileName) {
+    public synchronized void merge(BibDatabaseContext target,
+                                   BibDatabaseContext other,
+                                   String otherFileName) {
+
         mergeEntries(target.getDatabase(), other.getDatabase());
         mergeStrings(target.getDatabase(), other.getDatabase());
-        mergeMetaData(target.getMetaData(), other.getMetaData(), otherFileName, other.getEntries());
+        mergeMetaData(
+                target.getMetaData(),
+                other.getMetaData(),
+                otherFileName,
+                other.getEntries());
     }
 
     private void mergeEntries(BibDatabase target, BibDatabase other) {
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+
         List<BibEntry> newEntries = other.getEntries().stream()
-                                         // Remove all entries that are already part of the database (duplicate)
-                                         .filter(entry -> duplicateCheck.containsDuplicate(target, entry, BibDatabaseModeDetection.inferMode(target)).isEmpty()).collect(Collectors.toList());
+                                         .filter(entry ->
+                                                 duplicateCheck
+                                                         .containsDuplicate(
+                                                                 target,
+                                                                 entry,
+                                                                 BibDatabaseModeDetection.inferMode(target))
+                                                         .isEmpty())
+                                         .collect(Collectors.toList());
+
         target.insertEntries(newEntries);
     }
 
     public void mergeStrings(BibDatabase target, BibDatabase other) {
         for (BibtexString bibtexString : other.getStringValues()) {
             String bibtexStringName = bibtexString.getName();
+            String importedContent = bibtexString.getContent();
+
             if (target.hasStringByName(bibtexStringName)) {
-                String importedContent = bibtexString.getContent();
-                String existingContent = target.getStringByName(bibtexStringName).get().getContent();
-                if (!importedContent.equals(existingContent)) {
-                    LOGGER.info("String contents differ for {}: {} != {}", bibtexStringName, importedContent, existingContent);
-                    int suffix = 1;
-                    String newName = bibtexStringName + "_" + suffix;
-                    while (target.hasStringByName(newName)) {
-                        suffix++;
-                        newName = bibtexStringName + "_" + suffix;
+                target.getStringByName(bibtexStringName).ifPresent(existingString -> {
+                    String existingContent = existingString.getContent();
+
+                    if (!importedContent.equals(existingContent)) {
+                        LOGGER.info(
+                                "String contents differ for {}: {} != {}",
+                                bibtexStringName,
+                                importedContent,
+                                existingContent);
+
+                        int suffix = 1;
+                        String newName = bibtexStringName + "_" + suffix;
+
+                        while (target.hasStringByName(newName)) {
+                            suffix++;
+                            newName = bibtexStringName + "_" + suffix;
+                        }
+
+                        BibtexString newBibtexString =
+                                new BibtexString(newName, importedContent);
+
+                        target.addString(newBibtexString);
+
+                        LOGGER.info(
+                                "New string added: {} = {}",
+                                newBibtexString.getName(),
+                                newBibtexString.getContent());
                     }
-                    BibtexString newBibtexString = new BibtexString(newName, importedContent);
-                    // TODO undo/redo
-                    target.addString(newBibtexString);
-                    LOGGER.info("New string added: {} = {}", newBibtexString.getName(), newBibtexString.getContent());
-                }
+                });
             } else {
-                // TODO undo/redo
                 target.addString(bibtexString);
             }
         }
@@ -97,7 +127,11 @@ public class DatabaseMerger {
      * @param otherFilename   the filename of the imported library
      * @param allOtherEntries all entries from the imported library
      */
-    public void mergeMetaData(@NonNull MetaData target, @NonNull MetaData other, @NonNull String otherFilename, @NonNull List<BibEntry> allOtherEntries) {
+    public void mergeMetaData(@NonNull MetaData target,
+                              @NonNull MetaData other,
+                              @NonNull String otherFilename,
+                              @NonNull List<BibEntry> allOtherEntries) {
+
         mergeGroups(target, other, otherFilename, allOtherEntries);
         mergeContentSelectors(target, other);
     }
@@ -115,26 +149,23 @@ public class DatabaseMerger {
                              @NonNull String otherFilename,
                              @NonNull List<BibEntry> allOtherEntries) {
 
-        // Adds the specified node as a child of the current root. The group contained in <b>newGroups</b> must not be of
-        // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups</b> are
-        // inserted directly, i.e. they are not deepCopy()'d.
         other.getGroups().ifPresent(newGroups -> {
-            // ensure that there is always only one AllEntriesGroup in the resulting database
-            // "Rename" the AllEntriesGroup of the imported database to "Imported"
             if (newGroups.getGroup() instanceof AllEntriesGroup) {
-                // create a dummy group
                 try {
-                    // This will cause a bug if the group already exists
-                    // There will be group where the two groups are merged
-                    ExplicitGroup group = new ExplicitGroup("Imported " + otherFilename, GroupHierarchyType.INDEPENDENT, keywordDelimiter);
+                    ExplicitGroup group = new ExplicitGroup(
+                            "Imported " + otherFilename,
+                            GroupHierarchyType.INDEPENDENT,
+                            keywordDelimiter);
+
                     newGroups.setGroup(group);
                     group.add(allOtherEntries);
                 } catch (IllegalArgumentException e) {
                     LOGGER.error("Problem appending entries to group", e);
                 }
             }
-            target.getGroups().ifPresentOrElse(newGroups::moveTo,
-                    // target does not contain any groups, so we can just use the new groups
+
+            target.getGroups().ifPresentOrElse(
+                    newGroups::moveTo,
                     () -> target.setGroups(newGroups));
 
             target.groupsBinding().invalidate();
