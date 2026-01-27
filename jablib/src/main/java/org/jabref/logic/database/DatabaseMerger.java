@@ -91,6 +91,12 @@ public class DatabaseMerger {
         mergeContentSelectors(target, other);
     }
 
+    /**
+     * @param target
+     * @param other
+     * @param otherFilename
+     * @param allOtherEntries
+     */
     private void mergeGroups(@NonNull MetaData target, @NonNull MetaData other, @NonNull String otherFilename, @NonNull List<BibEntry> allOtherEntries) {
         // Adds the specified node as a child of the current root. The group contained in <b>newGroups</b> must not be of
         // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups</b> are
