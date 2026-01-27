@@ -1,0 +1,53 @@
+package org.jabref.gui.libraryproperties.git;
+
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+
+import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
+import org.jabref.model.database.BibDatabaseContext;
+
+import com.airhacks.afterburner.views.ViewLoader;
+
+/// View controller for the "Git" tab in the Library Properties dialog.
+///
+/// This class handles the UI logic for configuring Git integration settings,
+/// specifically the option to automatically commit and push changes on save.
+public class GitPropertiesView extends AbstractPropertiesTabView<GitPropertiesViewModel> {
+
+    @FXML private CheckBox autoPullCheckBox;
+    @FXML private CheckBox autoCommitCheckBox;
+    @FXML private CheckBox autoPushCheckBox;
+
+    public GitPropertiesView(BibDatabaseContext databaseContext) {
+        this.databaseContext = databaseContext;
+        this.viewModel = new GitPropertiesViewModel(databaseContext);
+    }
+
+    @Override
+    public String getTabName() {
+        return "Git";
+    }
+
+    @Override
+    public Node getBuilder() {
+        return ViewLoader.view(this).load().getView();
+    }
+
+    @FXML
+    public void initialize() {
+        autoPullCheckBox.selectedProperty().bindBidirectional(viewModel.autoPullProperty());
+        autoCommitCheckBox.selectedProperty().bindBidirectional(viewModel.autoCommitProperty());
+        autoPushCheckBox.selectedProperty().bindBidirectional(viewModel.autoPushProperty());
+    }
+
+    @Override
+    public void setValues() {
+        viewModel.setValues();
+    }
+
+    @Override
+    public void storeSettings() {
+        viewModel.storeSettings();
+    }
+}
