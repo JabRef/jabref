@@ -7,7 +7,6 @@ import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
-
 /// View model for the "Git" tab in the Library Properties dialog.
 ///
 /// This class manages the state of the Git integration settings. It reads the configuration
