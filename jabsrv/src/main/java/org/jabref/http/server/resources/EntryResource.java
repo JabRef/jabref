@@ -1,19 +1,29 @@
 package org.jabref.http.server.resources;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -33,6 +43,7 @@ public class EntryResource {
 
     @Inject
     FilesToServe filesToServe;
+
 
     /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
     ///
@@ -121,6 +132,58 @@ public class EntryResource {
                         "<strong>Released on:</strong> " + releaseDate;
 
         return preview;
+    }
+
+    @POST
+    @Path("files")
+    @Consumes("application/pdf")
+    public void addFile(@PathParam("id") String id, @PathParam("entryId") String entryId, InputStream fileInputStream) throws IOException {
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
+        List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
+        if (entriesByCitationKey.isEmpty()) {
+            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+        }
+        BibEntry entry = entriesByCitationKey.getFirst();
+
+        // 1. Determine target directory
+        Optional<java.nio.file.Path> targetDirOpt = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+
+        if (targetDirOpt.isEmpty()) {
+            targetDirOpt = databaseContext.getDatabasePath().map(java.nio.file.Path::getParent);
+        }
+
+        if (targetDirOpt.isEmpty()) {
+            throw new BadRequestException("Library must be saved or have a file directory configured to attach files.");
+        }
+        java.nio.file.Path targetDir = targetDirOpt.get();
+
+        // 2. Save stream to temporary file
+        java.nio.file.Path tempFile = Files.createTempFile("jabref-upload", ".pdf");
+        Files.copy(fileInputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+
+        // 3. Create LinkedFile
+        LinkedFile linkedFile = new LinkedFile("", tempFile, "PDF");
+
+        LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
+
+        // rename to suggested pattern
+        String suggestedName = fileHandler.getSuggestedFileName("pdf");
+        java.nio.file.Path finalPath = targetDir.resolve(suggestedName);
+
+        if (Files.exists(finalPath)) {
+             String name = com.google.common.io.Files.getNameWithoutExtension(suggestedName);
+             String ext = com.google.common.io.Files.getFileExtension(suggestedName);
+             finalPath = targetDir.resolve(name + "_" + System.currentTimeMillis() + "." + ext);
+        }
+
+        Files.move(tempFile, finalPath, StandardCopyOption.REPLACE_EXISTING);
+
+        // 5. Update LinkedFile to point to the new location (relative path)
+        java.nio.file.Path relativePath = FileUtil.relativize(finalPath, databaseContext, preferences.getFilePreferences());
+        linkedFile.setLink(relativePath.toString());
+
+        // 6. Add to entry
+        entry.addFile(linkedFile);
     }
 
     /// @param id - also "demo" for the Chocolate.bib file
