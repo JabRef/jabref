@@ -7,12 +7,11 @@ import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
-/**
- * View model for the "Git" tab in the Library Properties dialog.
- * <p>
- * This class manages the state of the Git integration settings. It reads the configuration
- * from the database metadata and writes changes back to it when the user applies the settings.
- */
+
+/// View model for the "Git" tab in the Library Properties dialog.
+///
+/// This class manages the state of the Git integration settings. It reads the configuration
+/// from the database metadata and writes changes back to it when the user applies the settings.
 public class GitPropertiesViewModel implements PropertiesTabViewModel {
     public static final String LEGACY_GIT_ENABLED = "gitEnabled";
 
