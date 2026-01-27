@@ -78,6 +78,11 @@ class GitPropertiesViewModelTest {
         metaData.putUnknownMetaDataItem(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
 
         viewModel.setValues();
+
+        viewModel.autoCommitProperty().set(true);
+        viewModel.autoPullProperty().set(true);
+        viewModel.autoPushProperty().set(true);
+
         viewModel.storeSettings();
 
         Map<String, List<String>> data = metaData.getUnknownMetaData();
