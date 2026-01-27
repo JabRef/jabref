@@ -12,7 +12,6 @@ import javax.xml.transform.TransformerException;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpUtilShared;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.FieldChange;
@@ -45,6 +44,7 @@ public class XmpMetadataCleanup implements CleanupJob {
         for (LinkedFile file : files) {
             Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
             filePath.ifPresent(path -> {
+                // We need to check if a File has Metadata to avoid performing the cleanup operation on all Entries containing a Linked File and to accurately report the FieldChange List.
                 if (XmpUtilShared.hasMetadata(path)) {
                     try {
                         XmpUtilWriter.removeXmpMetadata(path);
@@ -62,8 +62,10 @@ public class XmpMetadataCleanup implements CleanupJob {
             return List.of(new FieldChange(
                     entry,
                     StandardField.FILE,
-                    entry.getField(StandardField.FILE).orElse(StandardFileType.PDF.toString()),
-                    entry.getField(StandardField.FILE).orElse(StandardFileType.PDF.toString())));
+                    // IntelliJ warning can be ignored since File field is always present if changed is true
+                    entry.getField(StandardField.FILE).get(),
+                    entry.getField(StandardField.FILE).get()
+            ));
         }
         return List.of();
     }

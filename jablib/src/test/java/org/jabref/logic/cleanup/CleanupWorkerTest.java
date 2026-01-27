@@ -31,19 +31,24 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.jabref.logic.xmp.DublinCoreExtractor.DC_SOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +57,7 @@ class CleanupWorkerTest {
     private final CleanupPreferences emptyPreset = new CleanupPreferences(EnumSet.noneOf(CleanupPreferences.CleanupStep.class));
     private CleanupWorker worker;
     private XmpPreferences xmpPreferences;
+    private BibDatabase bibDatabase;
 
     // Ensure that the folder stays the same for all tests.
     // By default, @TempDir creates a new folder for each usage
@@ -76,6 +82,10 @@ class CleanupWorkerTest {
         // Search and store files relative to bib file overwrites all other dirs
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
+        bibDatabase = mock(BibDatabase.class);
+        when(bibDatabase.resolveForStrings(anyList(), eq(false)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
         xmpPreferences = mock(XmpPreferences.class);
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
@@ -86,34 +96,42 @@ class CleanupWorkerTest {
     void cleanupXmpMetadataRemovesMetadata() throws IOException, TransformerException {
         Path pdfFile = pdfPath.resolve("test.pdf");
         try (PDDocument doc = new PDDocument()) {
-            doc.addPage(new org.apache.pdfbox.pdmodel.PDPage());
+            doc.addPage(new PDPage());
             doc.save(pdfFile.toFile());
         }
 
-        BibEntry metadataEntry = new BibEntry();
-        metadataEntry.setCitationKey("Toot");
-        metadataEntry.setField(StandardField.PDF, "aPdfFile");
-        metadataEntry.setField(new UnknownField("some"), "1st");
-        metadataEntry.setField(StandardField.DOI, "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
-        metadataEntry.setField(StandardField.MONTH, "01");
-        metadataEntry.setField(StandardField.PAGES, "1-2");
-        metadataEntry.setField(StandardField.DATE, "01/1999");
-        metadataEntry.setField(StandardField.PDF, "aPdfFile");
-        metadataEntry.setField(StandardField.ISSN, "aPsFile");
-        metadataEntry.setField(StandardField.FILE, "link::");
-        metadataEntry.setField(StandardField.JOURNAL, "test");
-        metadataEntry.setField(StandardField.TITLE, "<b>hallo</b> units 1 A case AlGaAs and latex $\\alpha$$\\beta$");
-        metadataEntry.setField(StandardField.ABSTRACT, "Réflexions");
-        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile, metadataEntry, null);
+        BibEntry metadataEntry = new BibEntry(StandardEntryType.Article);
+        metadataEntry.setCitationKey("olly2018");
+        metadataEntry.withField(StandardField.AUTHOR, "Olly and Johannes")
+                     .withField(StandardField.TITLE, "Stefan's palace")
+                     .withField(StandardField.JOURNAL, "Test Journal")
+                     .withField(StandardField.VOLUME, "1")
+                     .withField(StandardField.NUMBER, "1")
+                     .withField(StandardField.PAGES, "1-2")
+                     .withField(StandardField.ISSN, "978-123-123")
+                     .withField(StandardField.NOTE, "NOTE")
+                     .withField(StandardField.ABSTRACT, "ABSTRACT")
+                     .withField(StandardField.COMMENT, "COMMENT")
+                     .withField(StandardField.DOI, "10/3212.3123")
+                     .withField(StandardField.FILE, ":article_dublinCore.pdf:PDF")
+                     .withField(StandardField.GROUPS, "NO")
+                     .withField(StandardField.HOWPUBLISHED, "online")
+                     .withField(StandardField.KEYWORDS, "k1, k2")
+                     .withField(StandardField.OWNER, "me")
+                     .withField(StandardField.REVIEW, "review")
+                     .withField(StandardField.URL, "https://www.olly2018.edu")
+                     .withField(new UnknownField((DC_SOURCE)), "JabRef")
+                     .setMonth(Month.MARCH);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile, metadataEntry, bibDatabase);
 
         BibEntry entry = new BibEntry();
-        LinkedFile fileField = new LinkedFile("", pdfFile.toAbsolutePath(), "");
+        LinkedFile fileField = new LinkedFile("Test PDF", pdfFile, "PDF");
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.REMOVE_XMP_METADATA);
         List<FieldChange> changes = worker.cleanup(preset, entry);
-        assertFalse(changes.isEmpty());
-        assertFalse(new XmpUtilReader().readRawXmp(pdfFile).stream().findAny().isPresent());
+        assertNotEquals(List.of(), changes);
+        assertEquals(List.of(), new XmpUtilReader().readRawXmp(pdfFile));
     }
 
     @Test
