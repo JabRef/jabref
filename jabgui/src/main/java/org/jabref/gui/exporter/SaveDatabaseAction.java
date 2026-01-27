@@ -7,7 +7,6 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,7 +23,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
-import org.jabref.gui.libraryproperties.git.GitPropertiesViewModel;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -43,6 +41,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
@@ -239,46 +238,34 @@ public class SaveDatabaseAction {
                 dialogService.notify(Localization.lang("Library saved"));
 
                 // Attempt to perform Git auto-save if enabled in Library Properties
-                try {
-                    Map<String, List<String>> metaDataMap = libraryTab.getBibDatabaseContext()
-                                                                      .getMetaData()
-                                                                      .getUnknownMetaData();
+                MetaData metaData = libraryTab.getBibDatabaseContext().getMetaData();
 
-                    boolean shouldCommit = metaDataMap.getOrDefault(GitPropertiesViewModel.GIT_AUTO_COMMIT, List.of())
-                                                      .contains("true");
+                boolean shouldCommit = metaData.isGitAutoCommitEnabled();
+                boolean shouldPush = metaData.isGitAutoPushEnabled();
 
-                    boolean shouldPush = metaDataMap.getOrDefault(GitPropertiesViewModel.GIT_AUTO_PUSH, List.of())
-                                                    .contains("true");
-
-                    if (shouldCommit || shouldPush) {
-                        GitHandler.fromAnyPath(targetPath, preferences.getGitPreferences())
-                                  .ifPresent(gitHandler -> {
-                                      try {
-                                          if (shouldCommit) {
-                                              String commitMsg = "Automatic update via JabRef: " + targetPath.getFileName();
-                                              gitHandler.createCommitOnCurrentBranch(commitMsg, false);
-                                              dialogService.notify(Localization.lang("Git: Changes committed."));
-                                          }
-
-                                          if (shouldPush) {
-                                              gitHandler.pullOnCurrentBranch();
-
-                                              try {
-                                                  gitHandler.pushCommitsToRemoteRepository();
-                                                  dialogService.notify(Localization.lang("Git: Pushed to remote."));
-                                              } catch (Exception pushEx) {
-                                                  LOGGER.warn("Git push failed", pushEx);
-                                                  dialogService.notify(Localization.lang("Git: Committed locally (Push failed)"));
-                                              }
-                                          }
-                                      } catch (Exception e) {
-                                          LOGGER.error("Git auto-save failed", e);
-                                          dialogService.notify(Localization.lang("Git: Auto-save failed. Check logs."));
+                if (shouldCommit || shouldPush) {
+                    GitHandler.fromAnyPath(targetPath, preferences.getGitPreferences())
+                              .ifPresent(gitHandler -> {
+                                  try {
+                                      if (shouldCommit) {
+                                          // We include the path to make it easier for non-git users to see what's going on
+                                          String commitMsg = Localization.lang("Update references");
+                                          gitHandler.createCommitOnCurrentBranch(commitMsg, false);
                                       }
-                                  });
-                    }
-                } catch (Exception e) {
-                    LOGGER.warn("Error during Git auto-save execution", e);
+
+                                      if (shouldPush) {
+                                          gitHandler.pullOnCurrentBranch();
+
+                                          try {
+                                              gitHandler.pushCommitsToRemoteRepository();
+                                          } catch (Exception pushEx) {
+                                              LOGGER.warn("Git push failed", pushEx);
+                                          }
+                                      }
+                                  } catch (Exception e) {
+                                      LOGGER.error("Git auto-save failed", e);
+                                  }
+                              });
                 }
             }
             return success;

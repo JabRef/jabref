@@ -11,9 +11,8 @@
     <children>
         <VBox spacing="10">
             <Label text="Git Automation" styleClass="sectionHeader"/>
-            <CheckBox fx:id="autoCommitCheckBox" text="Commit"/>
-            <CheckBox fx:id="autoPullCheckBox" text="Pull"/>
-            <CheckBox fx:id="autoPushCheckBox" text="Push"/>
+            <CheckBox fx:id="autoCommitCheckBox" text="Automatically commit when library is saved"/>
+            <CheckBox fx:id="autoPushCheckBox" text="Automatically push changes after committing"/>
         </VBox>
     </children>
 </VBox>

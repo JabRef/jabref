@@ -1,7 +1,5 @@
 package org.jabref.gui.libraryproperties.git;
 
-import java.util.Collections;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -48,36 +46,16 @@ public class GitPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void setValues() {
-        boolean isGitEnabled = metaData.getUnknownMetaData().containsKey(GitPropertiesViewModel.LEGACY_GIT_ENABLED)
-                && metaData.getUnknownMetaData().get(GitPropertiesViewModel.LEGACY_GIT_ENABLED).contains("true");
-
-        autoPullProperty.set(isMetaDataSet(GIT_AUTO_PULL) || isGitEnabled);
-        autoCommitProperty.set(isMetaDataSet(GIT_AUTO_COMMIT) || isGitEnabled);
-        autoPushProperty.set(isMetaDataSet(GIT_AUTO_PUSH) || isGitEnabled);
-    }
-
-    private boolean isMetaDataSet(String key) {
-        return metaData.getUnknownMetaData().containsKey(key)
-                && metaData.getUnknownMetaData().get(key).contains("true");
+        autoPullProperty.set(metaData.isGitAutoPullEnabled());
+        autoCommitProperty.set(metaData.isGitAutoCommitEnabled());
+        autoPushProperty.set(metaData.isGitAutoPushEnabled());
     }
 
     @Override
     public void storeSettings() {
-        updateMetaData(GIT_AUTO_PULL, autoPullProperty.get());
-        updateMetaData(GIT_AUTO_COMMIT, autoCommitProperty.get());
-        updateMetaData(GIT_AUTO_PUSH, autoPushProperty.get());
-
-        if (metaData.getUnknownMetaData().containsKey(LEGACY_GIT_ENABLED)) {
-            metaData.removeUnknownMetaDataItem(LEGACY_GIT_ENABLED);
-        }
-    }
-
-    private void updateMetaData(String key, boolean value) {
-        if (value) {
-            metaData.putUnknownMetaDataItem(key, Collections.singletonList("true"));
-        } else {
-            metaData.removeUnknownMetaDataItem(key);
-        }
+        metaData.setGitAutoPullEnabled(autoPullProperty.get());
+        metaData.setGitAutoCommitEnabled(autoCommitProperty.get());
+        metaData.setGitAutoPushEnabled(autoPushProperty.get());
     }
 
     @Override

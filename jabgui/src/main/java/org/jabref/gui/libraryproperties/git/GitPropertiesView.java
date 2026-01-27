@@ -9,12 +9,10 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-/**
- * View controller for the "Git" tab in the Library Properties dialog.
- * <p>
- * This class handles the UI logic for configuring Git integration settings,
- * specifically the option to automatically commit and push changes on save.
- */
+/// View controller for the "Git" tab in the Library Properties dialog.
+///
+/// This class handles the UI logic for configuring Git integration settings,
+/// specifically the option to automatically commit and push changes on save.
 public class GitPropertiesView extends AbstractPropertiesTabView<GitPropertiesViewModel> {
 
     @FXML private CheckBox autoPullCheckBox;
