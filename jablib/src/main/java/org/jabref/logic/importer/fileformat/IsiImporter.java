@@ -2,12 +2,12 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +26,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,10 +69,11 @@ public class IsiImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         String str;
         int i = 0;
-        while (((str = reader.readLine()) != null) && (i < 50)) {
+        while (((str = bufferedReader.readLine()) != null) && (i < 50)) {
             /*
              * The following line gives false positives for RIS files, so it
              * should not be uncommented. The hypen is a characteristic of the
@@ -131,9 +133,7 @@ public class IsiImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibEntries = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
@@ -332,9 +332,7 @@ public class IsiImporter extends Importer {
         return value.replace("-", "--");
     }
 
-    /**
-     * Parses the month and returns it in the JabRef format
-     */
+    /// Parses the month and returns it in the JabRef format
     static String parseMonth(String value) {
         String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
@@ -360,11 +358,9 @@ public class IsiImporter extends Importer {
         return null;
     }
 
-    /**
-     * Will expand ISI first names.
-     * <p>
-     * Fixed bug from: <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306">...</a>
-     */
+    /// Will expand ISI first names.
+    ///
+    /// Fixed bug from: <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306">...</a>
     public static String isiAuthorConvert(String author) {
         String[] s = author.split(",");
         if (s.length != 2) {

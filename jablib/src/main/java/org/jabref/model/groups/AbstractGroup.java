@@ -6,33 +6,31 @@ import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.paint.Color;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
-import org.jabref.model.strings.StringUtil;
 
-/**
- * Base class for all groups.
- */
+import org.jspecify.annotations.NonNull;
+
+/// Base class for all groups.
+@AllowedToUseLogic("Uses StringUtil temporarily")
 public abstract class AbstractGroup implements SearchMatcher {
 
-    /**
-     * The group's name.
-     */
+    /// The group's name.
     protected final StringProperty name = new SimpleStringProperty();
-    /**
-     * The hierarchical context of the group.
-     */
+    /// The hierarchical context of the group.
     protected final GroupHierarchyType context;
-    protected Optional<Color> color = Optional.empty();
+    // group color stored as a String (e.g., hex like "#RRGGBB" or any CSS-compatible representation)
+    protected Optional<String> color = Optional.empty();
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconName = Optional.empty();
 
-    protected AbstractGroup(String name, GroupHierarchyType context) {
+    protected AbstractGroup(String name, @NonNull GroupHierarchyType context) {
         this.name.setValue(name);
-        this.context = Objects.requireNonNull(context);
+        this.context = context;
     }
 
     @Override
@@ -65,19 +63,16 @@ public abstract class AbstractGroup implements SearchMatcher {
         return Objects.hash(name.getValue(), description, context);
     }
 
-    public Optional<Color> getColor() {
+    public Optional<String> getColor() {
         return color;
     }
 
-    public void setColor(Color color) {
-        this.color = Optional.ofNullable(color);
-    }
-
+    /// Sets the group's color string. Pass null or blank to clear.
     public void setColor(String colorString) {
         if (StringUtil.isBlank(colorString)) {
-            color = Optional.empty();
+            this.color = Optional.empty();
         } else {
-            setColor(Color.valueOf(colorString));
+            this.color = Optional.of(colorString);
         }
     }
 
@@ -113,16 +108,12 @@ public abstract class AbstractGroup implements SearchMatcher {
         }
     }
 
-    /**
-     * Returns the way this group relates to its sub- or supergroup.
-     */
+    /// Returns the way this group relates to its sub- or supergroup.
     public GroupHierarchyType getHierarchicalContext() {
         return context;
     }
 
-    /**
-     * Returns this group's name, e.g. for display in a list/tree.
-     */
+    /// Returns this group's name, e.g. for display in a list/tree.
     public final String getName() {
         return name.getValue();
     }
@@ -131,9 +122,7 @@ public abstract class AbstractGroup implements SearchMatcher {
         return name;
     }
 
-    /**
-     * @return true if this group contains the specified entry, false otherwise.
-     */
+    /// @return true if this group contains the specified entry, false otherwise.
     public abstract boolean contains(BibEntry entry);
 
     @Override
@@ -141,9 +130,7 @@ public abstract class AbstractGroup implements SearchMatcher {
         return contains(entry);
     }
 
-    /**
-     * @return true if this group contains any of the specified entries, false otherwise.
-     */
+    /// @return true if this group contains any of the specified entries, false otherwise.
     public boolean containsAny(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
             if (contains(entry)) {
@@ -153,9 +140,7 @@ public abstract class AbstractGroup implements SearchMatcher {
         return false;
     }
 
-    /**
-     * @return true if this group contains all of the specified entries, false otherwise.
-     */
+    /// @return true if this group contains all of the specified entries, false otherwise.
     public boolean containsAll(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
             if (!contains(entry)) {
@@ -165,16 +150,12 @@ public abstract class AbstractGroup implements SearchMatcher {
         return true;
     }
 
-    /**
-     * Returns true if this group is dynamic, i.e. uses a search definition or
-     * equiv. that might match new entries, or false if this group contains a
-     * fixed set of entries and thus will never match a new entry that was not
-     * explicitly added to it.
-     */
+    /// Returns true if this group is dynamic, i.e. uses a search definition or
+    /// equiv. that might match new entries, or false if this group contains a
+    /// fixed set of entries and thus will never match a new entry that was not
+    /// explicitly added to it.
     public abstract boolean isDynamic();
 
-    /**
-     * @return A deep copy of this object.
-     */
+    /// @return A deep copy of this object.
     public abstract AbstractGroup deepCopy();
 }

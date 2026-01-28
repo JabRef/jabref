@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,12 +104,10 @@ public class Date {
         season = null;
     }
 
-    /**
-     * Creates a Date from date and endDate.
-     *
-     * @param date    the start date
-     * @param endDate the start date
-     */
+    /// Creates a Date from date and endDate.
+    ///
+    /// @param date    the start date
+    /// @param endDate the start date
     public Date(TemporalAccessor date, TemporalAccessor endDate) {
         this.date = date;
         this.endDate = endDate;
@@ -121,15 +120,11 @@ public class Date {
         this.endDate = null;
     }
 
-    /**
-     * Creates a Date from date and endDate.
-     *
-     * @param dateString the string to extract the date information
-     * @throws DateTimeParseException if dataString is mal-formatted
-     */
-    public static Optional<Date> parse(String dateString) {
-        Objects.requireNonNull(dateString);
-
+    /// Creates a Date from date and endDate.
+    ///
+    /// @param dateString the string to extract the date information
+    /// @throws DateTimeParseException if dataString is mal-formatted
+    public static Optional<Date> parse(@NonNull String dateString) {
         dateString = dateString.strip();
 
         if (dateString.isEmpty()) {
@@ -303,12 +298,10 @@ public class Date {
         }
     }
 
-    /**
-     * Create a date with a string with era indicator.
-     *
-     * @param dateString the string which contain era indicator to extract the date information
-     * @return the date information with TemporalAccessor type
-     */
+    /// Create a date with a string with era indicator.
+    ///
+    /// @param dateString the string which contain era indicator to extract the date information
+    /// @return the date information with TemporalAccessor type
     private static TemporalAccessor parseDateWithEraIndicator(String dateString) {
         String yearString = dateString.strip().substring(0, dateString.length() - 2);
 
@@ -325,12 +318,10 @@ public class Date {
         return Year.of(year);
     }
 
-    /**
-     * Create a date whose month is represented as a season.
-     *
-     * @param dateString the string which contain season to extract the date information
-     * @return the date information with TemporalAccessor type
-     */
+    /// Create a date whose month is represented as a season.
+    ///
+    /// @param dateString the string which contain season to extract the date information
+    /// @return the date information with TemporalAccessor type
     private static Optional<Date> parseDateWithSeason(String dateString) {
         String[] parts = dateString.split("-");
         int monthOrSeason = Integer.parseInt(parts[1].strip());

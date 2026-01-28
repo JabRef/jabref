@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DoiCleanupTest {
 
     @ParameterizedTest
-    @MethodSource("provideDoiForAllLowers")
+    @MethodSource
     void changeDoi(BibEntry expected, BibEntry doiInfoField) {
         DoiCleanup cleanUp = new DoiCleanup();
         cleanUp.cleanup(doiInfoField);
@@ -23,7 +23,7 @@ class DoiCleanupTest {
         assertEquals(expected, doiInfoField);
     }
 
-    private static Stream<Arguments> provideDoiForAllLowers() {
+    private static Stream<Arguments> changeDoi() {
         UnknownField unknownField = new UnknownField("ee");
         BibEntry doiResult = new BibEntry().withField(StandardField.DOI, "10.1145/2594455");
 
@@ -66,6 +66,24 @@ class DoiCleanupTest {
                 Arguments.of(new BibEntry()
                                 .withField(StandardField.DOI, "10.18726/2018_3"),
                         new BibEntry()
-                                .withField(unknownField, "https://doi.org/10.18726/2018%7B%5Ctextunderscore%7D3")));
+                                .withField(unknownField, "https://doi.org/10.18726/2018%7B%5Ctextunderscore%7D3")),
+
+                // cleanup of wrong percent encoded chars
+                Arguments.of(new BibEntry()
+                                .withField(StandardField.NOTE, "Some strange %% LaTeX %% text"),
+                        new BibEntry()
+                                .withField(StandardField.NOTE, "Some strange %% LaTeX %% text")),
+
+                // cleanup of correct percent encoded chars
+                Arguments.of(new BibEntry()
+                                .withField(StandardField.DOI, "10.18726/2018_3"),
+                        new BibEntry()
+                                .withField(StandardField.NOTE, "10.18726/2018%7B%5Ctextunderscore%7D3")),
+
+                // cleanup of wrong percent encoded chars in DOI field
+                Arguments.of(new BibEntry()
+                                .withField(StandardField.NOTE, "10.18726/2018%7B%%5Ctextunderscore%7D3"),
+                        new BibEntry()
+                                .withField(StandardField.NOTE, "10.18726/2018%7B%%5Ctextunderscore%7D3")));
     }
 }

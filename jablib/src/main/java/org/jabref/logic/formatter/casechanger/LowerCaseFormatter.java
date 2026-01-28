@@ -1,7 +1,9 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 public class LowerCaseFormatter extends Formatter {
 
@@ -15,14 +17,12 @@ public class LowerCaseFormatter extends Formatter {
         return "lower_case";
     }
 
-    /**
-     * Converts all characters of the string to lower case, but does not change words starting with "{"
-     */
+    /// Converts all characters of the string to lower case, but does not change words starting with "{"
     @Override
-    public String format(String input) {
+    public String format(@NonNull String input) {
         Title title = new Title(input);
 
-        title.getWords().stream().forEach(Word::toLowerCase);
+        title.getWords().forEach(Word::toLowerCase);
 
         return title.toString();
     }

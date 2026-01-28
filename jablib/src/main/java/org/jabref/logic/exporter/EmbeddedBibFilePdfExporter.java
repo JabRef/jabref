@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -19,7 +18,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -35,12 +33,11 @@ import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecifica
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A custom exporter to write bib entries to an embedded bib file.
- */
+/// A custom exporter to write bib entries to an embedded bib file.
 public class EmbeddedBibFilePdfExporter extends Exporter {
     public static String EMBEDDED_FILE_NAME = "main.bib";
 
@@ -57,17 +54,13 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         this.fieldPreferences = fieldPreferences;
     }
 
-    /**
-     * @param databaseContext the database to export from
-     * @param file            the file to write to. If it contains "split", then the output is split into different files
-     * @param entries         a list containing all entries that should be exported
-     */
+    /// @param databaseContext the database to export from
+    /// @param file            the file to write to. If it contains "split", then the output is split into different files
+    /// @param entries         a list containing all entries that should be exported
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(file);
-        Objects.requireNonNull(entries);
-
+    public void export(@NonNull BibDatabaseContext databaseContext,
+                       @NonNull Path file,
+                       @NonNull List<BibEntry> entries) throws IOException {
         if (!Files.exists(file)) {
             try (PDDocument document = new PDDocument()) {
                 PDPage page = new PDPage();
@@ -90,9 +83,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
         embedBibTex(bibString, file);
     }
 
-    /**
-     * Similar method: {@link XmpUtilWriter#writeXmp(Path, BibEntry, org.jabref.model.database.BibDatabase)}
-     */
+    /// Similar method: {@link org.jabref.logic.xmp.XmpUtilWriter#writeXmp(Path, BibEntry, org.jabref.model.database.BibDatabase)}
     private void embedBibTex(String bibTeX, Path path) throws IOException {
         if (!Files.exists(path) || !FileUtil.isPDFFile(path)) {
             return;

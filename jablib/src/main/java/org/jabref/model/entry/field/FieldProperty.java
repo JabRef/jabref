@@ -23,8 +23,6 @@ public enum FieldProperty {
 
     MONTH,
 
-    YEARDIVISION,
-
     MULTILINE_TEXT,
     NUMERIC,
     PAGINATION,
@@ -35,6 +33,9 @@ public enum FieldProperty {
 
     // Field content should be treated as data
     VERBATIM,
+
+    // Contains a year value
+    YEAR,
 
     YES_NO
 }

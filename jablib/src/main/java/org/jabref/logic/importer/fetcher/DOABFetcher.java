@@ -13,23 +13,21 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 
-/**
- * fetches books from https://www.doabooks.org/ through
- * <a href="https://www.doabooks.org/en/resources/metadata-harvesting-and-content-dissemination">their API</a>.
- */
+/// fetches books from https://www.doabooks.org/ through
+/// <a href="https://www.doabooks.org/en/resources/metadata-harvesting-and-content-dissemination">their API</a>.
 public class DOABFetcher implements SearchBasedParserFetcher {
     private static final String SEARCH_URL = "https://directory.doabooks.org/rest/search?";
 

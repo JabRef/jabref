@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
@@ -14,13 +13,12 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import kong.unirest.core.Unirest;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FulltextFetcher implementation that attempts to find a PDF URL at APS. Also see the <a
- * href="https://harvest.aps.org/docs/harvest-api">API</a>, although it isn't currently used.
- */
+/// FulltextFetcher implementation that attempts to find a PDF URL at APS. Also see the <a
+/// href="https://harvest.aps.org/docs/harvest-api">API</a>, although it isn't currently used.
 public class ApsFetcher implements FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApsFetcher.class);
@@ -30,9 +28,7 @@ public class ApsFetcher implements FulltextFetcher {
     private static final String PDF_URL = "https://journals.aps.org/prl/pdf/";
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {
@@ -62,12 +58,10 @@ public class ApsFetcher implements FulltextFetcher {
         return TrustLevel.PUBLISHER;
     }
 
-    /**
-     * Convert a DOI into an appropriate APS id.
-     *
-     * @param doi A case insensitive DOI
-     * @return A DOI cased as APS likes it
-     */
+    /// Convert a DOI into an appropriate APS id.
+    ///
+    /// @param doi A case insensitive DOI
+    /// @return A DOI cased as APS likes it
     private Optional<String> getId(String doi) {
         // DOI is not case sensitive, but the id for the PDF URL is,
         // so we follow DOI.org redirects to get the proper id.

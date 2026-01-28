@@ -85,7 +85,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
         Hyperlink hyperlink = new Hyperlink(aiProvider.getPrivacyPolicyUrl());
         hyperlink.setWrapText(true);
         // hyperlink.setFont(aiName.getFont());
-        hyperlink.setOnAction(event -> openBrowser(aiProvider.getApiUrl()));
+        hyperlink.setOnAction(event -> openBrowser(aiProvider.getPrivacyPolicyUrl()));
         gridPane.add(hyperlink, 1, row);
     }
 

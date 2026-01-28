@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +39,7 @@ import org.jabref.logic.importer.fileformat.citavi.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.Reference;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -47,10 +49,10 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,30 +102,28 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        return false;
-    }
-
-    @Override
-    public boolean isRecognizedFormat(Path filePath) throws IOException {
-        try (BufferedReader reader = getReaderFromZip(filePath)) {
-            String str;
-            int i = 0;
-            while (((str = reader.readLine()) != null) && (i < 50)) {
-                if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
-                    return true;
-                }
-                i++;
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        String str;
+        int i = 0;
+        while (((str = bufferedReader.readLine()) != null) && (i < 50)) {
+            if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
+                return true;
             }
+            i++;
         }
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath) throws IOException {
-        Objects.requireNonNull(filePath);
+    public boolean isRecognizedFormat(@NonNull Path filePath) throws IOException {
+        try (BufferedReader reader = getReaderFromZip(filePath)) {
+            return (isRecognizedFormat((Reader) reader));
+        }
+    }
 
+    @Override
+    public ParserResult importDatabase(@NonNull Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
 
@@ -264,6 +264,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
+                    if (keywordName == null) {
+                        LOGGER.error("No keyword name found for keyword with id {}. Please check if the keyword name is present in the XML file and if the keyword name is not empty.", id);
+                        return;
+                    }
+
                     if ("Keyword".equals(reader.getLocalName())) {
                         Keyword keyword = new Keyword(keywordName);
                         knownKeywords.put(id, keyword);
@@ -685,8 +690,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         throw new UnsupportedOperationException("CitaviXmlImporter does not support importDatabase(BufferedReader reader). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
@@ -714,40 +718,46 @@ public class CitaviXmlImporter extends Importer implements Parser {
         }
     }
 
-    /**
-     * {@code PageRange} and {@code PageCount} tags contain text
-     * with additional markers that need to be discarded.
-     * <p>
-     * Example {@code PageCount}:
-     * {@snippet :
-     *   <PageCount>
-     *   <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
-     *   </PageCount>
-     *}
-     * Contents of {@code PageCount} after parsing above example data:
-     * {@snippet :
-     *   <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
-     *}
-     * Content of "ps" tag is returned by {@code getPages}.
-     * <p>
-     * Example {@code PageRange}:
-     * {@snippet :
-     *   <PageRange>
-     *   <![CDATA[
-     *     <sp> <n>34165</n> <in>true</in> <os>34165</os> <ps>34165</ps> </sp>
-     *     <ep> <n>34223</n> <in>true</in> <os>34223</os> <ps>34223</ps> </ep>
-     *     <os>34165-223</os>
-     *   ]]>
-     *   </PageRange>
-     *}
-     * Contents of {@code PageRange} after parsing above example data:
-     * {@snippet :
-     *   <sp> <n>24</n> <in>true</in> <os>24</os> <ps>24</ps> </sp>
-     *   <ep> <n>31</n> <in>true</in> <os>31</os> <ps>31</ps> </ep>
-     *   <os>24-31</os>
-     *}
-     * Content of "os" tag is returned by {@code getPages}.
-     */
+    /// `PageRange` and `PageCount` tags contain text
+    /// with additional markers that need to be discarded.
+    ///
+    /// Example `PageCount`:
+    ///
+    /// ```xml
+    /// <PageCount>
+    /// <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
+    /// </PageCount>
+    /// ```
+    ///
+    /// Contents of `PageCount` after parsing above example data:
+    ///
+    /// ```xml
+    /// <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
+    /// ```
+    ///
+    /// Content of "ps" tag is returned by `getPages`.
+    ///
+    /// Example `PageRange`:
+    ///
+    /// ```xml
+    /// <PageRange>
+    /// <![CDATA[
+    /// <sp> <n>34165</n> <in>true</in> <os>34165</os> <ps>34165</ps> </sp>
+    /// <ep> <n>34223</n> <in>true</in> <os>34223</os> <ps>34223</ps> </ep>
+    /// <os>34165-223</os>
+    /// ]]>
+    /// </PageRange>
+    /// ```
+    ///
+    /// Contents of `PageRange` after parsing above example data:
+    ///
+    /// ```xml
+    /// <sp> <n>24</n> <in>true</in> <os>24</os> <ps>24</ps> </sp>
+    /// <ep> <n>31</n> <in>true</in> <os>31</os> <ps>31</ps> </ep>
+    /// <os>24-31</os>
+    /// ```
+    ///
+    /// Content of "os" tag is returned by `getPages`.
     private String getPages(String pageRange, String pageCount) {
         String tmpStr = "";
         if ((pageCount != null) && (pageRange == null)) {

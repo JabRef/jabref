@@ -1,6 +1,5 @@
 package org.jabref.gui.specialfields;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.actions.Action;
@@ -9,12 +8,13 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.SpecialFieldValue;
 
+import org.jspecify.annotations.NonNull;
+
 public class SpecialFieldValueViewModel {
 
     private final SpecialFieldValue value;
 
-    public SpecialFieldValueViewModel(SpecialFieldValue value) {
-        Objects.requireNonNull(value);
+    public SpecialFieldValueViewModel(@NonNull SpecialFieldValue value) {
         this.value = value;
     }
 

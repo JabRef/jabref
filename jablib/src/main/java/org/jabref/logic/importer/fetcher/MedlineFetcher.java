@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -31,20 +32,21 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.MedlineQueryTransformer;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.search.query.BaseQueryNode;
 
+import kong.unirest.core.UnirestException;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetch or search from PubMed <a href="http://www.ncbi.nlm.nih.gov/sites/entrez/">www.ncbi.nlm.nih.gov</a>
- * The MedlineFetcher fetches the entries from the PubMed database.
- * See <a href="https://docs.jabref.org/collect/import-using-online-bibliographic-database#medline-pubmed">docs.jabref.org</a> for a detailed documentation of the available fields.
- */
+/// Fetch or search from PubMed <a href="http://www.ncbi.nlm.nih.gov/sites/entrez/">www.ncbi.nlm.nih.gov</a>
+/// The MedlineFetcher fetches the entries from the PubMed database.
+/// See <a href="https://docs.jabref.org/collect/import-using-online-bibliographic-database#medline-pubmed">docs.jabref.org</a> for a detailed documentation of the available fields.
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Medline/PubMed";
 
@@ -53,7 +55,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
-    private static final String TEST_URL_WITHOUT_API_KEY = "https://www.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed&api_key=";
 
     private final ImporterPreferences importerPreferences;
     private int numberOfResultsFound;
@@ -62,13 +63,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
         this.importerPreferences = importerPreferences;
     }
 
-    /**
-     * When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
-     * Input: Any text query (&term)
-     * Output: List of UIDs matching the query
-     *
-     * @see <a href="https://www.ncbi.nlm.nih.gov/books/NBK25500/">www.ncbi.nlm.nih.gov/books/NBK25500/</a>
-     */
+    /// When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
+    /// Input: Any text query (&term)
+    /// Output: List of UIDs matching the query
+    ///
+    /// @see <a href="https://www.ncbi.nlm.nih.gov/books/NBK25500/">www.ncbi.nlm.nih.gov/books/NBK25500/</a>
     private List<String> getPubMedIdsFromQuery(String query) throws FetcherException {
         boolean fetchIDs = false;
         boolean firstOccurrenceOfCount = false;
@@ -168,13 +167,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
         return uriBuilder.build().toURL();
     }
 
-    /**
-     * Fetch and parse an medline item from eutils.ncbi.nlm.nih.gov.
-     * The E-utilities generate a huge XML file containing all entries for the ids
-     *
-     * @param ids A list of IDs to search for.
-     * @return Will return an empty list on error.
-     */
+    /// Fetch and parse an medline item from eutils.ncbi.nlm.nih.gov.
+    /// The E-utilities generate a huge XML file containing all entries for the ids
+    ///
+    /// @param ids A list of IDs to search for.
+    /// @return Will return an empty list on error.
     private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {
         try {
             // Separate the IDs with a comma to search multiple entries
@@ -225,7 +222,17 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     }
 
     @Override
-    public String getTestUrl() {
-        return TEST_URL_WITHOUT_API_KEY;
+    public boolean isValidKey(@NonNull String apiKey) {
+        try {
+            URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
+            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
+            return (statusCode >= 200) && (statusCode < 300);
+        } catch (IOException | UnirestException e) {
+            return false;
+        }
+    }
+
+    private String getTestUrl(String apiKey) {
+        return "https://www.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed&api_key=" + apiKey;
     }
 }

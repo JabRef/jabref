@@ -13,11 +13,11 @@
          fx:controller="org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent">
     <VBox spacing="20.0" styleClass="gdpr-notice" fx:id="text">
         <Label wrapText="true" text="%Privacy notice" styleClass="heading" />
-        <Text text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider. As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service. By using this service you agree to the privacy policy of the selected AI provider."/>
-        <Text text="%This setting may be changed in preferences at any time."/>
+        <Text text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). At present, all supported AI providers are JabRef external services. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider and as soon as you send a message or start summarizing, the text content of all PDFs attached to the entry is sent to the external service. By using this service, you agree to the privacy policy of the selected AI provider."/>
+        <Text text="%In the preferences, you can turn AI functionality on and off at any time."/>
         <GridPane fx:id="aiPolicies" hgap="4" vgap="4" />
-        <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. The embedding model will be downloaded in background (size %0) from Deep Java Library servers anonymously." />
-        <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" styleClass="embeddedHyperlink" text="%You can find information about DJL privacy policy here." />
+        <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. Embedding models will automatically be downloaded in the background from Deep Java Library servers. The currently configured model has a size of %0." />
+        <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" styleClass="embeddedHyperlink" text="%You can find information about the DJL privacy policy here." />
         <HBox spacing="10.0">
             <Button onAction="#onIAgreeButtonClick" text="%I agree"/>
             <Button onAction="#hideAITabs" text="%Hide 'AI' tabs"/>

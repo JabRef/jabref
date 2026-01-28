@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +23,11 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-/**
- * Importer for the MEDLINE Plain format.
- * <p>
- * check here for details on the format <a href="http://www.nlm.nih.gov/bsd/mms/medlineelements.html">...</a>
- */
+import org.jspecify.annotations.NonNull;
+
+/// Importer for the MEDLINE Plain format.
+///
+/// check here for details on the format <a href="http://www.nlm.nih.gov/bsd/mms/medlineelements.html">...</a>
 public class MedlinePlainImporter extends Importer {
 
     private static final Pattern PMID_PATTERN = Pattern.compile("PMID.*-.*");
@@ -61,12 +62,12 @@ public class MedlinePlainImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
         String str;
-        while ((str = reader.readLine()) != null) {
+        while ((str = bufferedReader.readLine()) != null) {
             if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
                     || PMCR_PATTERN.matcher(str).find()) {
                 return true;
@@ -76,7 +77,7 @@ public class MedlinePlainImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
 
         // use optional here, so that no exception will be thrown if the file is empty

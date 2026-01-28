@@ -12,10 +12,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Parser for the LTWA (List of Title Word Abbreviations) CSV file.
- * Converts CSV data into a list of LtwaEntry objects.
- */
+/// Parser for the LTWA (List of Title Word Abbreviations) CSV file.
+/// Converts CSV data into a list of LtwaEntry objects.
 public class LtwaTsvParser {
     private static final Pattern ANNOTATION = Pattern.compile("\\s*\\(.*?\\)");
     private static final Pattern LINE_FORMAT = Pattern.compile("\"\\s*(.*?)\\s*\";\"\\s*(.*?)\\s*\";\"\\s*(.*?)\\s*\"");
@@ -27,12 +25,10 @@ public class LtwaTsvParser {
         this.file = file;
     }
 
-    /**
-     * Parse LTWA entries from the given file.
-     *
-     * @return List of LtwaEntry objects
-     * @throws IOException If an I/O error occurs
-     */
+    /// Parse LTWA entries from the given file.
+    ///
+    /// @return List of LtwaEntry objects
+    /// @throws IOException If an I/O error occurs
     public List<LtwaEntry> parse() throws IOException {
         List<LtwaEntry> entries = new ArrayList<>();
 

@@ -1,18 +1,18 @@
 package org.jabref.gui.mergeentries.threewaymerge.cell;
 
-import java.util.Objects;
-
-import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.clipboard.ClipBoardManager;
+
+import org.jspecify.annotations.NonNull;
 
 public class CopyFieldValueCommand extends SimpleCommand {
     private final String fieldValue;
     private final ClipBoardManager clipBoardManager;
 
-    public CopyFieldValueCommand(final String fieldValue) {
-        Objects.requireNonNull(fieldValue, "Field value cannot be null");
+    public CopyFieldValueCommand(@NonNull final String fieldValue, StateManager stateManager) {
         this.fieldValue = fieldValue;
-        this.clipBoardManager = new ClipBoardManager();
+        this.clipBoardManager = new ClipBoardManager(stateManager);
     }
 
     @Override

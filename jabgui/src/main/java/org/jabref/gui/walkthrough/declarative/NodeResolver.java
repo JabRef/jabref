@@ -96,7 +96,7 @@ public interface NodeResolver {
 
             if (button.getTooltip() != null) {
                 String tooltipText = button.getTooltip().getText();
-                if (tooltipText != null && tooltipText.equals(action.getText())) {
+                if (tooltipText.equals(action.getText())) {
                     return true;
                 }
             }
@@ -109,7 +109,7 @@ public interface NodeResolver {
                         return true;
                     }
                 }
-                return button.getText() != null && button.getText().equals(actionText);
+                return button.getText().equals(actionText);
             }
 
             return false;

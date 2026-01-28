@@ -2,7 +2,6 @@ package org.jabref.model.openoffice.uno;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.sun.star.beans.IllegalTypeException;
@@ -19,14 +18,13 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Document level user-defined properties.
- * <p>
- * LibreOffice GUI: [File]/[Properties]/[Custom Properties]
- */
+/// Document level user-defined properties.
+///
+/// LibreOffice GUI: `[File]/[Properties]/[Custom Properties]`
 public class UnoUserDefinedProperty {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnoUserDefinedProperty.class);
@@ -44,11 +42,9 @@ public class UnoUserDefinedProperty {
                                      .orElse(new ArrayList<>());
     }
 
-    /**
-     * @param property Name of a custom document property in the current document.
-     * @return The value of the property or Optional.empty()
-     * These properties are used to store extra data about individual citation. In particular, the `pageInfo` part.
-     */
+    /// @param property Name of a custom document property in the current document.
+    /// @return The value of the property or Optional.empty()
+    /// These properties are used to store extra data about individual citation. In particular, the `pageInfo` part.
     public static Optional<String> getStringValue(XTextDocument doc, String property)
             throws
             WrappedTargetException {
@@ -65,19 +61,13 @@ public class UnoUserDefinedProperty {
         }
     }
 
-    /**
-     * @param property Name of a custom document property in the current document. Created if does not exist yet.
-     * @param value    The value to be stored.
-     */
-    public static void setStringProperty(XTextDocument doc, String property, String value)
+    /// @param property Name of a custom document property in the current document. Created if does not exist yet.
+    /// @param value    The value to be stored.
+    public static void setStringProperty(XTextDocument doc, @NonNull String property, @NonNull String value)
             throws
             IllegalTypeException,
             PropertyVetoException,
             WrappedTargetException {
-
-        Objects.requireNonNull(property);
-        Objects.requireNonNull(value);
-
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
@@ -107,17 +97,10 @@ public class UnoUserDefinedProperty {
         }
     }
 
-    /**
-     * @param property Name of a custom document property in the current document.
-     *                 <p>
-     *                 Logs warning if does not exist.
-     */
-    public static void remove(XTextDocument doc, String property)
+    /// @param property Name of a custom document property in the current document. Logs warning if does not exist.
+    public static void remove(XTextDocument doc, @NonNull String property)
             throws
             NotRemoveableException {
-
-        Objects.requireNonNull(property);
-
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
@@ -131,17 +114,10 @@ public class UnoUserDefinedProperty {
         }
     }
 
-    /**
-     * @param property Name of a custom document property in the current document.
-     *                 <p>
-     *                 Keep silent if property did not exist.
-     */
-    public static void removeIfExists(XTextDocument doc, String property)
+    /// @param property Name of a custom document property in the current document. Keep silent if property did not exist.
+    public static void removeIfExists(XTextDocument doc, @NonNull String property)
             throws
             NotRemoveableException {
-
-        Objects.requireNonNull(property);
-
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {

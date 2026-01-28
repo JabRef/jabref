@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.keybindings;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.ListProperty;
@@ -27,6 +26,8 @@ import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OptionalObjectProperty;
 
+import org.jspecify.annotations.NonNull;
+
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final KeyBindingRepository keyBindingRepository;
@@ -39,18 +40,18 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, GuiPreferences preferences) {
+    public KeyBindingsTabViewModel(@NonNull KeyBindingRepository keyBindingRepository,
+                                   @NonNull DialogService dialogService,
+                                   @NonNull GuiPreferences preferences) {
         this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferences = Objects.requireNonNull(preferences);
+        this.dialogService = dialogService;
+        this.preferences = preferences;
 
         keyBindingPresets.add(new BashKeyBindingPreset());
         keyBindingPresets.add(new NewEntryBindingPreset());
     }
 
-    /**
-     * Read all keybindings from the keybinding repository and create table keybinding models for them
-     */
+    /// Read all keybindings from the keybinding repository and create table keybinding models for them
     @Override
     public void setValues() {
         KeyBindingViewModel root = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
@@ -79,13 +80,11 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    /**
-     * Searches for the term in the keybinding's localization, category, or key combination
-     *
-     * @param keyBinding keybinding to search in
-     * @param searchTerm term to search for
-     * @return true if the term is found in the keybinding
-     */
+    /// Searches for the term in the keybinding's localization, category, or key combination
+    ///
+    /// @param keyBinding keybinding to search in
+    /// @param searchTerm term to search for
+    /// @return true if the term is found in the keybinding
     private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {
         if (keyBinding.getLocalization().toLowerCase().contains(searchTerm) ||
                 keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {
@@ -113,11 +112,20 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
     }
 
+    @Override
     public void storeSettings() {
-        if (!keyBindingRepository.equals(preferences.getKeyBindingRepository())) {
-            preferences.getKeyBindingRepository().getBindingsProperty().set(keyBindingRepository.getBindingsProperty());
-            restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
+        KeyBindingRepository prefsRepo = preferences.getKeyBindingRepository();
+
+        if (prefsRepo.equals(keyBindingRepository)) {
+            return;
         }
+
+        prefsRepo.getBindingsProperty().clear();
+        keyBindingRepository.getKeyBindings().forEach((key, value) -> {
+            prefsRepo.getBindingsProperty().put(key, value);
+        });
+
+        restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
     }
 
     public void resetToDefault() {

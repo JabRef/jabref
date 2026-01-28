@@ -2,7 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
@@ -15,16 +14,16 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+
+import org.jspecify.annotations.NonNull;
 
 public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
-    /**
-     * Variable that contains user-defined behavior for paste action.
-     */
+    /// Variable that contains user-defined behavior for paste action.
     private Runnable pasteActionHandler = () -> {
         // Set empty paste behavior by default
     };
@@ -59,19 +58,14 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
         // not needed
     }
 
-    /**
-     * Set pasteActionHandler variable to passed handler
-     *
-     * @param handler an instance of PasteActionHandler that describes paste behavior
-     */
-    public void setPasteActionHandler(Runnable handler) {
-        Objects.requireNonNull(handler);
+    /// Set pasteActionHandler variable to passed handler
+    ///
+    /// @param handler an instance of PasteActionHandler that describes paste behavior
+    public void setPasteActionHandler(@NonNull Runnable handler) {
         this.pasteActionHandler = handler;
     }
 
-    /**
-     * Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
-     */
+    /// Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
     @Override
     public void paste() {
         super.paste();

@@ -186,14 +186,12 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         keywords.remove(keywordToRemove);
     }
 
-    /**
-     * Determines the list of fields to remove in case a non-default map:
-     *
-     * <ul>
-     *     <li>Fields that are not in the new list of fields and</li>
-     *     <li>>all default fields that have no associated keywords</li>
-     * </ul>
-     */
+    /// Determines the list of fields to remove in case a non-default map:
+    ///
+    ///
+    /// - Fields that are not in the new list of fields and
+    /// - >all default fields that have no associated keywords
+    ///
     private List<Field> determineFieldsToRemove() {
         Set<Field> newlyAddedKeywords = fieldKeywordsMap.keySet();
 

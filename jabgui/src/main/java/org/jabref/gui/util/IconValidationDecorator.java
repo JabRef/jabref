@@ -17,17 +17,13 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.decoration.GraphicValidationDecoration;
 
-/**
- * This class is similar to {@link GraphicValidationDecoration} but with a different style and font-based icon.
- */
+/// This class is similar to {@link GraphicValidationDecoration} but with a different style and font-based icon.
 public class IconValidationDecorator extends GraphicValidationDecoration {
 
     private final Pos position;
 
-    /**
-     * Creates a new IconValidationDecorator with default position CENTER_LEFT.
-     * This position is chosen to better align with text content regardless of case.
-     */
+    /// Creates a new IconValidationDecorator with default position CENTER_LEFT.
+    /// This position is chosen to better align with text content regardless of case.
     public IconValidationDecorator() {
         this(Pos.CENTER_LEFT);
     }

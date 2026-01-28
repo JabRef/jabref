@@ -24,12 +24,12 @@ public class BibtexWorkspaceService implements WorkspaceService {
         this.diagnosticHandler = diagnosticHandler;
     }
 
-    // Todo: handle event
     @Override
     public void didChangeConfiguration(DidChangeConfigurationParams didChangeConfigurationParams) {
         if (didChangeConfigurationParams.getSettings() instanceof JsonObject settings) {
+            LOGGER.debug("Received new settings: {}", settings);
             clientHandler.getSettings().copyFromJsonObject(settings);
-            LOGGER.info("Updated settings: {}", clientHandler.getSettings());
+            LOGGER.info("Updated settings to: {}", clientHandler.getSettings());
             diagnosticHandler.refreshDiagnostics(client);
             LOGGER.debug("Refreshed diagnostics.");
         }

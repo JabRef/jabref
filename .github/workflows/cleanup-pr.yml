@@ -2,7 +2,7 @@ name: Cleanup after PR
 
 on:
   pull_request:
-    types: [closed]
+    types: [ closed ]
 
 jobs:
   cleanup:
@@ -13,16 +13,16 @@ jobs:
       packages: write
     steps:
       - name: Cancel workflow "binaries" run
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.0
         with:
           ignore_sha: true
           workflow_id: 9160969135
       - name: Cancel workflow "binaries (ea)" run
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.0
         with:
           ignore_sha: true
           workflow_id: 160969125
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: "Check for 'dev: binaries' label"
         id: check_label
         run: |
@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Delete folder on builds.jabref.org
         if: steps.check_label.outputs.has_label_binaries == 'yes'
-        uses: appleboy/ssh-action@v1.2.2
+        uses: appleboy/ssh-action@v1.2.4
         with:
           script: rm -rf /var/www/builds.jabref.org/www/pull/${{ github.event.pull_request.number }} || true
           host: build-upload.jabref.org

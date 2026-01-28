@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,16 +23,15 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Represents the link to an external file (e.g. associated PDF file).
- * This class is {@link Serializable} which is needed for drag and drop in gui
- */
+/// Represents the link to an external file (e.g. associated PDF file).
+/// This class is {@link Serializable} which is needed for drag and drop in gui
+/// The conversion from String ([org.jabref.model.entry.field.StandardField.FILE]) is done at [org.jabref.logic.importer.util.FileFieldParser#parse(String)]
 @AllowedToUseLogic("Uses FileUtil from logic")
 @NullMarked
 public class LinkedFile implements Serializable {
@@ -50,24 +50,22 @@ public class LinkedFile implements Serializable {
     private transient StringProperty sourceURL = new SimpleStringProperty();
 
     public LinkedFile(String description, Path link, String fileType) {
-        this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+        this(description, link.toString(), fileType);
     }
 
     public LinkedFile(String description, Path link, String fileType, String sourceUrl) {
-        this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType), Objects.requireNonNull(sourceUrl));
+        this(description, link.toString(), fileType, sourceUrl);
     }
 
     public LinkedFile(String description, String link, FileType fileType) {
         this(description, link, fileType.getName());
     }
 
-    /**
-     * Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
-     */
+    /// Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
     public LinkedFile(String description, String link, String fileType, String sourceUrl) {
-        this.description.setValue(Objects.requireNonNull(description));
+        this.description.setValue(description);
         setLink(link);
-        this.fileType.setValue(Objects.requireNonNull(fileType));
+        this.fileType.setValue(fileType);
         this.sourceURL.setValue(sourceUrl);
     }
 
@@ -76,22 +74,20 @@ public class LinkedFile implements Serializable {
     }
 
     public LinkedFile(URL link, String fileType) {
-        this("", Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+        this("", link.toString(), fileType);
     }
 
     public LinkedFile(String description, URL link, String fileType) {
-        this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+        this(description, link.toString(), fileType);
     }
 
     public LinkedFile(String description, URL link, String fileType, String sourceUrl) {
-        this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType), Objects.requireNonNull(sourceUrl));
+        this(description, link.toString(), fileType, sourceUrl);
     }
 
-    /**
-     * Constructs a new LinkedFile with an empty file type and an empty description
-     */
+    /// Constructs a new LinkedFile with an empty file type and an empty description
     public LinkedFile(Path link) {
-        this("", Objects.requireNonNull(link), "");
+        this("", link, "");
     }
 
     public StringProperty descriptionProperty() {
@@ -168,9 +164,7 @@ public class LinkedFile implements Serializable {
         return false;
     }
 
-    /**
-     * Writes serialized object to ObjectOutputStream, automatically called
-     */
+    /// Writes serialized object to ObjectOutputStream, automatically called
     @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeUTF(getFileType());
@@ -180,9 +174,7 @@ public class LinkedFile implements Serializable {
         out.flush();
     }
 
-    /**
-     * Reads serialized object from {@link ObjectInputStream}, automatically called
-     */
+    /// Reads serialized object from {@link ObjectInputStream}, automatically called
     @Serial
     private void readObject(ObjectInputStream in) throws IOException {
         fileType = new SimpleStringProperty(in.readUTF());
@@ -191,12 +183,10 @@ public class LinkedFile implements Serializable {
         sourceURL = new SimpleStringProperty(in.readUTF());
     }
 
-    /**
-     * Checks if the given String is an online link
-     *
-     * @param toCheck The String to check
-     * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
-     */
+    /// Checks if the given String is an online link
+    ///
+    /// @param toCheck The String to check
+    /// @return `true`, if it starts with "http://", "https://" or contains "www."; `false` otherwise
     public static boolean isOnlineLink(String toCheck) {
         String normalizedFilePath = toCheck.trim().toLowerCase();
         return URL_PATTERN.matcher(normalizedFilePath).matches();
@@ -223,6 +213,24 @@ public class LinkedFile implements Serializable {
 
     public boolean isOnlineLink() {
         return isOnlineLink(link.get());
+    }
+
+    /// Extracts the file name, including basename and extension, from the link.
+    ///
+    /// @return extracted file name
+    public Optional<String> getFileName() {
+        String linkedName = link.get();
+        if (isOnlineLink(linkedName)) {
+            return FileUtil.getFileNameFromUrl(linkedName);
+        } else if (linkedName.isEmpty()) {
+            return Optional.empty();
+        } else {
+            int slash = linkedName.lastIndexOf(File.separatorChar);
+            if (slash >= 0) {
+                return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
+            }
+        }
+        return Optional.of(FileUtil.getValidFileName(linkedName));
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {

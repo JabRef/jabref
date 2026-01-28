@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.strings.StringUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -106,7 +106,7 @@ class FieldWriterTest {
         // This was a decision on 2024-06-15 when fixing https://github.com/JabRef/jabref/issues/4877
         // We want to have a clean architecture for reading and writing
         // Normalizing is done during write (and not during read)
-        // Furthermore, normalizing is done in the BibDatabaseWriter#applySaveActions and not in the fielld writer
+        // Furthermore, normalizing is done in the BibDatabaseWriter#applySaveActions and not in the field writer
 
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
         String expected = "{" + original + "}";
@@ -126,8 +126,15 @@ class FieldWriterTest {
     }
 
     @Test
-    void reportUnbalancedBracingWithEscapedBraces() {
+    void reportUnbalancedBracingWithEscapedClosingBraces() {
         String unbalanced = "{\\}";
+
+        assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
+    }
+
+    @Test
+    void reportUnbalancedBracingWithEscapedOpeningBraces() {
+        String unbalanced = "\\{}";
 
         assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
     }

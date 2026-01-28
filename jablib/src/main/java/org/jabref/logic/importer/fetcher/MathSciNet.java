@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,12 +40,11 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetches data from the <a href="http://www.ams.org/mathscinet">MathSciNet</a> API.
- */
+/// Fetches data from the <a href="http://www.ams.org/mathscinet">MathSciNet</a> API.
 public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathSciNet.class);
 
@@ -62,8 +60,8 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     private final ImportFormatPreferences preferences;
 
-    public MathSciNet(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public MathSciNet(@NonNull ImportFormatPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
@@ -71,10 +69,8 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         return "MathSciNet";
     }
 
-    /**
-     * We use <a href="https://mathscinet.ams.org/mathscinet/freetools/mrlookup">MR Lookup</a> instead of the usual search since this tool is also available
-     * without subscription and, moreover, is optimized for finding a publication based on partial information.
-     */
+    /// We use <a href="https://mathscinet.ams.org/mathscinet/freetools/mrlookup">MR Lookup</a> instead of the usual search since this tool is also available
+    /// without subscription and, moreover, is optimized for finding a publication based on partial information.
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         Optional<String> mrNumberInEntry = entry.getField(StandardField.MR_NUMBER);
@@ -244,11 +240,9 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         return Optional.empty();
     }
 
-    /**
-     * Method to change character set, to fix output string encoding
-     * If we don't convert to the correct character set, the parser outputs anomalous characters.
-     * This is observed in case of non-UTF-8 characters, such as accented characters.
-     */
+    /// Method to change character set, to fix output string encoding
+    /// If we don't convert to the correct character set, the parser outputs anomalous characters.
+    /// This is observed in case of non-UTF-8 characters, such as accented characters.
 
     private String fixStringEncoding(String value) {
         return new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);

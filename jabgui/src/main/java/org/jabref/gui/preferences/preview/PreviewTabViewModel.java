@@ -52,20 +52,19 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is Preferences -> Entry Preview tab model
- * <p>
- * {@link PreviewTab} is the controller of Entry Preview tab
- * </p>
- *
- * @see PreviewTab
- */
+/// This class is Preferences -> Entry Preview tab model
+///
+/// {@link PreviewTab} is the controller of Entry Preview tab
+///
+/// @see PreviewTab
 public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
 
     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);
+
+    private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
 
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
@@ -148,6 +147,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             BstPreviewLayout layout = new BstPreviewLayout(path);
             availableListProperty.add(layout);
         });
+
+        shouldDownloadCovers.setValue(previewPreferences.shouldDownloadCovers());
     }
 
     public void setPreviewLayout(PreviewLayout selectedLayout) {
@@ -188,9 +189,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                               .orElse(null));
     }
 
-    /**
-     * Store the changes of preference-preview settings.
-     */
+    /// Store the changes of preference-preview settings.
     @Override
     public void storeSettings() {
         if (chosenListProperty.isEmpty()) {
@@ -213,6 +212,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             previewPreferences.setLayoutCyclePosition(chosenListProperty.getValue().indexOf(
                     chosenSelectionModelProperty.getValue().getSelectedItems().getFirst()));
         }
+
+        previewPreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
     }
 
     public ValidationStatus chosenListValidationStatus() {
@@ -298,18 +299,16 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         refreshPreview();
     }
 
-    /**
-     * XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github:
-     * <a href="https://github.com/cmartins">@cemartins</a>)
-     * <p>
-     * License: <a href="https://github.com/FXMisc/RichTextFX/blob/master/LICENSE">BSD-2-Clause</a>
-     * <p>
-     * See also
-     * <a href="https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor">https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor</a>
-     *
-     * @param text to parse and highlight
-     * @return highlighted span for codeArea
-     */
+    /// XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github:
+    /// <a href="https://github.com/cmartins">@cemartins</a>)
+    ///
+    /// License: <a href="https://github.com/FXMisc/RichTextFX/blob/master/LICENSE">BSD-2-Clause</a>
+    ///
+    /// See also
+    /// <a href="https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor">https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor</a>
+    ///
+    /// @param text to parse and highlight
+    /// @return highlighted span for codeArea
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
         final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
                 + "|(?<COMMENT><!--[^<>]+-->)");
@@ -379,11 +378,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         dragSourceSelectionModel = sourceSelectionModel;
     }
 
-    /**
-     * This is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of chosenListView
-     *
-     * @param targetList either availableListView or chosenListView
-     */
+    /// This is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of chosenListView
+    ///
+    /// @param targetList either availableListView or chosenListView
 
     public boolean dragDropped(ListProperty<PreviewLayout> targetList, Dragboard dragboard) {
         boolean success = false;
@@ -405,11 +402,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return success;
     }
 
-    /**
-     * This is called, when the user drops some PreviewLayouts on another cell in chosenListView to sort them
-     *
-     * @param targetLayout the Layout, the user drops a layout on
-     */
+    /// This is called, when the user drops some PreviewLayouts on another cell in chosenListView to sort them
+    ///
+    /// @param targetLayout the Layout, the user drops a layout on
 
     public boolean dragDroppedInChosenCell(PreviewLayout targetLayout, Dragboard dragboard) {
         boolean success = false;
@@ -498,10 +493,23 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return sourceTextProperty;
     }
 
+    public BooleanProperty shouldDownloadCoversProperty() {
+        return shouldDownloadCovers;
+    }
+
     public void addBstStyle(Path bstFile) {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);
         bstStylesPaths.add(bstFile);
         availableListProperty().add(bstPreviewLayout);
         chosenListProperty().add(bstPreviewLayout);
+    }
+
+    public void removeCustomStyle(PreviewLayout layout) {
+        if (layout instanceof BstPreviewLayout bstLayout) {
+            availableListProperty.remove(layout);
+            chosenListProperty.remove(layout);
+            // Remove the path so it doesn't come back on restart
+            bstStylesPaths.remove(((BstPreviewLayout) layout).getFilePath());
+        }
     }
 }

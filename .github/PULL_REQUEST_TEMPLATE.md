@@ -1,7 +1,7 @@
 Closes _____
 <!-- LINK THE ISSUE WITH THE "Closes" KEYWORD. Example: Closes https://github.com/JabRef/jabref/issues/13109 OR Closes #13109 -->
 
-<!-- In about one to three sentences, describe the changes you have made: what, where, why, ... (REPLACE THIS LINE) -->
+<!-- In about one to three sentences, describe the changes you have made: what, where, why, ... Summarize changes and DO NOT list modified classes one-by-one. (REPLACE THIS LINE) -->
 
 <!-- NOTE: If your work is not yet complete, please open a draft pull request. In that case, outline your intended next steps. Do you need feedback? Will you continue in parallel? ... -->
 
@@ -11,7 +11,7 @@ Closes _____
 <!-- You can add screenshots or videos (using Loom - https://www.loom.com or by just adding .mp4 files). -->
 <!-- (REPLACE THIS PARAGRAPH) -->
 
-<!-- YOU HAVE TO MODIFY THE ABOVE TEXT FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
+<!-- YOU HAVE TO MODIFY THE ABOVE TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
 
 ### Mandatory checks
 

@@ -4,10 +4,14 @@ import java.net.MalformedURLException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.Range;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +25,7 @@ public class FileFieldParser {
 
     private boolean windowsPath;
 
-    public FileFieldParser(String value) {
+    private FileFieldParser(String value) {
         if (value == null) {
             this.value = null;
         } else {
@@ -29,28 +33,31 @@ public class FileFieldParser {
         }
     }
 
-    /**
-     * Converts the string representation of LinkedFileData to a List of LinkedFile
-     * <p>
-     * The syntax of one element is description:path:type
-     * Multiple elements are concatenated with ;
-     * <p>
-     * The main challenges of the implementation are:
-     *
-     * <ul>
-     *     <li>that XML characters might be included (thus one cannot simply split on ";")</li>
-     *     <li>some characters might be escaped</li>
-     *     <li>Windows absolute paths might be included without escaping</li>
-     * </ul>
-     */
+    /// Converts the string representation of LinkedFileData to a List of LinkedFile
+    ///
+    /// The syntax of one element is description:path:type
+    /// Multiple elements are concatenated with ;
+    ///
+    /// The main challenges of the implementation are:
+    ///
+    ///
+    /// - that XML characters might be included (thus one cannot simply split on ";")
+    /// - some characters might be escaped
+    /// - Windows absolute paths might be included without escaping
+    ///
     public static List<LinkedFile> parse(String value) {
         // We need state to have a more clean code. Thus, we instantiate the class and then return the result
         FileFieldParser fileFieldParser = new FileFieldParser(value);
-        return fileFieldParser.parse();
+        return fileFieldParser.parse().stream().map(LinkedFilePosition::linkedFile).collect(Collectors.toList());
     }
 
-    public List<LinkedFile> parse() {
-        List<LinkedFile> files = new ArrayList<>();
+    public static Map<LinkedFile, Range> parseToPosition(String value) {
+        FileFieldParser fileFieldParser = new FileFieldParser(value);
+        return fileFieldParser.parse().stream().collect(HashMap::new, (map, position) -> map.put(position.linkedFile(), position.range()), HashMap::putAll);
+    }
+
+    private List<LinkedFilePosition> parse() {
+        List<LinkedFilePosition> files = new ArrayList<>();
 
         if ((value == null) || value.trim().isEmpty()) {
             return files;
@@ -59,7 +66,7 @@ public class FileFieldParser {
         if (LinkedFile.isOnlineLink(value.trim())) {
             // needs to be modifiable
             try {
-                return List.of(new LinkedFile(URLUtil.create(value), ""));
+                return List.of(new LinkedFilePosition(new LinkedFile(URLUtil.create(value), ""), new Range(0, value.length() - 1)));
             } catch (MalformedURLException e) {
                 LOGGER.error("invalid url", e);
                 return files;
@@ -72,6 +79,7 @@ public class FileFieldParser {
         resetDataStructuresForNextElement();
         boolean inXmlChar = false;
         boolean escaped = false;
+        int startColumn = 0;
 
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -114,7 +122,8 @@ public class FileFieldParser {
                 }
             } else if (!escaped && (c == ';') && !inXmlChar) {
                 linkedFileData.add(charactersOfCurrentElement.toString());
-                files.add(convert(linkedFileData));
+                files.add(new LinkedFilePosition(convert(linkedFileData), new Range(startColumn, i)));
+                startColumn = i + 1;
 
                 // next iteration
                 resetDataStructuresForNextElement();
@@ -127,7 +136,7 @@ public class FileFieldParser {
             linkedFileData.add(charactersOfCurrentElement.toString());
         }
         if (!linkedFileData.isEmpty()) {
-            files.add(convert(linkedFileData));
+            files.add(new LinkedFilePosition(convert(linkedFileData), new Range(startColumn, value.length() - 1)));
         }
         return files;
     }
@@ -137,17 +146,15 @@ public class FileFieldParser {
         windowsPath = false;
     }
 
-    /**
-     * Converts the given textual representation of a LinkedFile object
-     * <p>
-     * SIDE EFFECT: The given entry list is cleared upon completion
-     * <p>
-     * Expected format is: description:link:fileType:sourceURL
-     * fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
-     *
-     * @param entry the list of elements in the linked file textual representation
-     * @return a LinkedFile object
-     */
+    /// Converts the given textual representation of a LinkedFile object
+    ///
+    /// SIDE EFFECT: The given entry list is cleared upon completion
+    ///
+    /// Expected format is: description:link:fileType:sourceURL
+    /// fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
+    ///
+    /// @param entry the list of elements in the linked file textual representation
+    /// @return a LinkedFile object
     static LinkedFile convert(List<String> entry) {
         // ensure list has at least 3 fields
         while (entry.size() < 3) {
@@ -192,5 +199,8 @@ public class FileFieldParser {
         }
         entry.clear();
         return field;
+    }
+
+    private record LinkedFilePosition(LinkedFile linkedFile, Range range) {
     }
 }

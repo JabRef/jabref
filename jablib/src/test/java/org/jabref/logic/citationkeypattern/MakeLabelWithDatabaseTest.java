@@ -14,9 +14,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
- */
+/// Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
 @Execution(ExecutionMode.CONCURRENT)
 class MakeLabelWithDatabaseTest {
 
@@ -38,6 +36,7 @@ class MakeLabelWithDatabaseTest {
         pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         bibtexKeyPattern = new DatabaseCitationKeyPatterns(pattern);
         preferences = new CitationKeyPatternPreferences(
+                false,
                 false,
                 false,
                 false,
@@ -73,6 +72,7 @@ class MakeLabelWithDatabaseTest {
                 false,
                 false,
                 false,
+                false,
                 CitationKeyPatternPreferences.KeySuffix.ALWAYS,
                 "",
                 "",
@@ -88,6 +88,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyAlwaysLetterAlreadyExistsDuplicatesStartAtB() {
         preferences = new CitationKeyPatternPreferences(
+                false,
                 false,
                 false,
                 false,
@@ -114,6 +115,7 @@ class MakeLabelWithDatabaseTest {
                 false,
                 false,
                 false,
+                false,
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
                 "",
                 "",
@@ -129,6 +131,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateDefaultKeyAlreadyExistsDuplicatesStartAtB() {
         preferences = new CitationKeyPatternPreferences(
+                false,
                 false,
                 false,
                 false,
@@ -430,6 +433,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateKeyRegExReplace() {
         preferences = new CitationKeyPatternPreferences(
+                false,
                 false,
                 false,
                 false,

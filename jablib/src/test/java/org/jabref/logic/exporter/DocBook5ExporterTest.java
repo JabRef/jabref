@@ -24,6 +24,9 @@ import org.jabref.model.metadata.SaveOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
@@ -34,6 +37,8 @@ import org.xmlunit.matchers.CompareMatcher;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 public class DocBook5ExporterTest {
 
     public BibDatabaseContext databaseContext;

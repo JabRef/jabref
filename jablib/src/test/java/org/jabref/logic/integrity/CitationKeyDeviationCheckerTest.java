@@ -15,11 +15,13 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ResourceLock("Localization.lang")
 class CitationKeyDeviationCheckerTest {
 
     private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);

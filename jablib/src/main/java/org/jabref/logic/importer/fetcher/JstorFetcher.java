@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
@@ -31,16 +32,18 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NonNull;
 
-/**
- * Fetcher for jstor.org
- **/
+/// Fetcher for jstor.org
+///
 public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, IdBasedParserFetcher {
 
     private static final String HOST = "https://www.jstor.org";
     private static final String SEARCH_HOST = HOST + "/open/search";
     private static final String CITE_HOST = HOST + "/citation/text/";
     private static final String URL_QUERY_REGEX = "(?<=\\?).*";
+
+    private static final Pattern URL_QUERY_PATTERN = Pattern.compile(URL_QUERY_REGEX);
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -62,10 +65,10 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
             identifier = identifier.replace("https://www.jstor.org/stable", "");
             identifier = identifier.replace("http://www.jstor.org/stable", "");
         }
-        identifier = identifier.replaceAll(URL_QUERY_REGEX, "");
+        identifier = URL_QUERY_PATTERN.matcher(identifier).replaceAll("");
 
         if (identifier.contains("/")) {
-            // if identifier links to a entry with a valid doi
+            // if identifier links to an entry with a valid doi
             return URLUtil.create(start + identifier);
         }
         // else use default doi start.
@@ -111,7 +114,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws FetcherException, IOException {
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws FetcherException, IOException {
         if (entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }

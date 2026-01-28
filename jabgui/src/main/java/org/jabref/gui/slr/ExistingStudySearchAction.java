@@ -40,10 +40,8 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final LibraryTabContainer tabContainer;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
 
-    /**
-     * @param tabContainer               Required to close the tab before the study is updated
-     * @param openDatabaseActionSupplier Required to open the tab after the study is executed
-     */
+    /// @param tabContainer               Required to close the tab before the study is updated
+    /// @param openDatabaseActionSupplier Required to open the tab after the study is executed
     public ExistingStudySearchAction(
             LibraryTabContainer tabContainer,
             Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
@@ -113,7 +111,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         try {
             crawler = new Crawler(
                     this.studyDirectory,
-                    new SlrGitHandler(this.studyDirectory),
+                    new SlrGitHandler(this.studyDirectory, preferences.getGitPreferences()),
                     preferences,
                     new BibEntryTypesManager(),
                     fileUpdateMonitor);
@@ -139,9 +137,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                       .executeWith(taskExecutor);
     }
 
-    /**
-     * Hook for setting up the crawl phase (e.g., initialization the repository)
-     */
+    /// Hook for setting up the crawl phase (e.g., initialization the repository)
     protected void crawlPreparation(Path studyRepositoryRoot) throws IOException, GitAPIException {
         // Do nothing with the repository as repository is already setup
 

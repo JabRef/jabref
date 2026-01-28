@@ -2,9 +2,7 @@ package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 
 import java.util.List;
 
-/**
- * Used for GSON
- */
+/// Used for GSON
 public class CitationsResponse {
     private int offset;
     private int next;

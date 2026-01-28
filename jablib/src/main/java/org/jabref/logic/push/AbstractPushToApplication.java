@@ -9,17 +9,15 @@ import java.util.stream.Collectors;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Abstract class for pushing entries into different editors.
- */
+/// Abstract class for pushing entries into different editors.
 public abstract class AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
@@ -132,24 +130,20 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return true;
     }
 
-    /**
-     * Constructs the command line arguments for pushing citations to the application.
-     * The method formats the citation key and prefixes/suffixes as per user preferences
-     * before invoking the application with the command to insert text.
-     *
-     * @param keyString String containing the Bibtex keys to be pushed to the application
-     * @return String array with the command to call and its arguments
-     */
+    /// Constructs the command line arguments for pushing citations to the application.
+    /// The method formats the citation key and prefixes/suffixes as per user preferences
+    /// before invoking the application with the command to insert text.
+    ///
+    /// @param keyString String containing the Bibtex keys to be pushed to the application
+    /// @return String array with the command to call and its arguments
     @SuppressWarnings("unused")
     protected String[] getCommandLine(String keyString) {
         return new String[0];
     }
 
-    /**
-     * Function to get the command name in case it is different from the application name
-     *
-     * @return String with the command name
-     */
+    /// Function to get the command name in case it is different from the application name
+    ///
+    /// @return String with the command name
     public String getCommandName() {
         return null;
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
@@ -46,7 +47,9 @@ public class AiChatLogic {
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final AiTemplatesService aiTemplatesService;
+    private final FollowUpQuestionGenerator followUpQuestionGenerator;
 
+    private final ObservableList<String> followUpQuestions = FXCollections.observableArrayList();
     private final ObservableList<ChatMessage> chatHistory;
     private final ObservableList<BibEntry> entries;
     private final StringProperty name;
@@ -61,6 +64,7 @@ public class AiChatLogic {
                        EmbeddingModel embeddingModel,
                        EmbeddingStore<TextSegment> embeddingStore,
                        AiTemplatesService aiTemplatesService,
+                       FollowUpQuestionGenerator followUpQuestionGenerator,
                        StringProperty name,
                        ObservableList<ChatMessage> chatHistory,
                        ObservableList<BibEntry> entries,
@@ -71,6 +75,7 @@ public class AiChatLogic {
         this.embeddingModel = embeddingModel;
         this.embeddingStore = embeddingStore;
         this.aiTemplatesService = aiTemplatesService;
+        this.followUpQuestionGenerator = followUpQuestionGenerator;
         this.chatHistory = chatHistory;
         this.entries = entries;
         this.name = name;
@@ -191,6 +196,18 @@ public class AiChatLogic {
 
         LOGGER.debug("Message was answered by the AI provider for {}: {}", name.get(), aiMessage.text());
 
+        if (aiPreferences.getGenerateFollowUpQuestions()) {
+            try {
+                List<String> questions = followUpQuestionGenerator.generateFollowUpQuestions(message, aiMessage);
+                followUpQuestions.setAll(questions);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to generate follow-up questions", e);
+                followUpQuestions.clear();
+            }
+        } else {
+            followUpQuestions.clear();
+        }
+
         return aiMessage;
     }
 
@@ -204,5 +221,9 @@ public class AiChatLogic {
 
     public ObservableList<ChatMessage> getChatHistory() {
         return chatHistory;
+    }
+
+    public ObservableList<String> getFollowUpQuestions() {
+        return followUpQuestions;
     }
 }

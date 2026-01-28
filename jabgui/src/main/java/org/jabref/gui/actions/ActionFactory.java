@@ -14,7 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.sun.javafx.scene.control.ContextMenuContent;
@@ -24,9 +24,7 @@ import org.controlsfx.control.action.ActionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Helper class to create and style controls according to an {@link Action}.
- */
+/// Helper class to create and style controls according to an {@link Action}.
 public class ActionFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
@@ -37,9 +35,7 @@ public class ActionFactory {
         this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
     }
 
-    /**
-     * For some reason the graphic is not set correctly by the {@link ActionUtils} class, so we have to fix this by hand
-     */
+    /// For some reason the graphic is not set correctly by the {@link ActionUtils} class, so we have to fix this by hand
     private static void setGraphic(MenuItem node, Action action) {
         node.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> node.setGraphic(icon.getGraphicNode()));

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
@@ -20,9 +20,7 @@ import mslinks.ShellLinkException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * For GUI-specific things, see `jabref.gui.desktop.os.NativeDesktop`
- */
+/// For GUI-specific things, see `jabref.gui.desktop.os.NativeDesktop`
 public class OS {
     // No LOGGER may be initialized directly
     // Otherwise, org.jabref.Launcher.addLogToDisk will fail, because tinylog's properties are frozen

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +21,9 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 
-/**
- * INSPEC format importer.
- */
+import org.jspecify.annotations.NonNull;
+
+/// INSPEC format importer.
 public class InspecImporter extends Importer {
 
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
@@ -48,10 +49,11 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         // Our strategy is to look for the "PY <year>" line.
         String str;
-        while ((str = reader.readLine()) != null) {
+        while ((str = bufferedReader.readLine()) != null) {
             if (INSPEC_PATTERN.matcher(str).find()) {
                 return true;
             }
@@ -60,7 +62,7 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;

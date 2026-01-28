@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,13 +25,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>.
- * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
- */
+/// FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>.
+/// See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
 public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "ScienceDirect";
 
@@ -47,9 +45,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
         if (doi.isEmpty()) {
             // Full text fetching works only if a DOI is present
@@ -139,7 +135,8 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
-                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(getName()).orElse(""))
+                                                         // Shares the same key as Scopus, because both are offered by Elsevier (https://devdocs.jabref.org/code-howtos/fetchers.html#fetchers)
+                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey("Scopus").orElse(""))
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 

@@ -9,9 +9,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,23 +29,18 @@ public class FileAnnotationCache {
     }
 
     public FileAnnotationCache(BibDatabaseContext context, FilePreferences filePreferences) {
-        annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<>() {
-            @Override
-            public Map<Path, List<FileAnnotation>> load(BibEntry entry) {
-                return new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences);
-            }
-        });
+        annotationCache = Caffeine.newBuilder()
+                                  .maximumSize(CACHE_SIZE)
+                                  .build(entry -> new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences));
     }
 
-    /**
-     * Note that entry becomes the most recent entry in the cache
-     *
-     * @param entry entry for which to get the annotations
-     * @return Map containing a list of annotations in a list for each file
-     */
+    /// Note that entry becomes the most recent entry in the cache
+    ///
+    /// @param entry entry for which to get the annotations
+    /// @return Map containing a list of annotations in a list for each file
     public Map<Path, List<FileAnnotation>> getFromCache(BibEntry entry) {
         LOGGER.debug("Loading BibEntry '{}' from cache.", entry.getCitationKey().orElse(entry.getId()));
-        return annotationCache.getUnchecked(entry);
+        return annotationCache.get(entry);
     }
 
     public void remove(BibEntry entry) {

@@ -176,6 +176,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         }
 
         // fielded expression
+        // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText();
         int operator = ctx.operator().getStart().getType();
 
@@ -553,11 +554,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                : (searchFlags.contains(CASE_SENSITIVE) ? "LIKE" : "ILIKE");
     }
 
-    /**
-     * Escapes wildcard characters in the search term for SQL queries.
-     * <p>
-     * - Escapes {@code \}, {@code _}, and {@code %} for SQL LIKE queries.
-     */
+    /// Escapes wildcard characters in the search term for SQL queries.
+    ///
+    /// - Escapes `\`, `_`, and `%` for SQL LIKE queries.
     private static String escapeTermForSql(String term) {
         return term.replaceAll("[\\\\_%]", "\\\\$0");
     }

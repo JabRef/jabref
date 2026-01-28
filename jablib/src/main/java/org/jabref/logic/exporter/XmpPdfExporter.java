@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.transform.TransformerException;
 
@@ -20,6 +19,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +34,10 @@ public class XmpPdfExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path pdfFile, List<BibEntry> entries) throws IOException, TransformerException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(pdfFile);
-        Objects.requireNonNull(entries);
-
+    public void export(@NonNull BibDatabaseContext databaseContext,
+                       @NonNull Path pdfFile,
+                       @NonNull List<BibEntry> entries)
+            throws IOException, TransformerException {
         Path filePath = pdfFile.toAbsolutePath();
 
         if (!Files.exists(filePath)) {

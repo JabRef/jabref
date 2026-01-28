@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -45,22 +44,21 @@ import org.jabref.model.search.query.SearchQuery;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class manages the GUI-state of JabRef, including:
- *
- * <ul>
- *   <li>currently selected database</li>
- *   <li>currently selected group</li>
- *   <li>active search</li>
- *   <li>active number of search results</li>
- *   <li>focus owner</li>
- *   <li>dialog window sizes/positions</li>
- *   <li>opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})</li>
- * </ul>
- */
+/// This class manages the GUI-state of JabRef, including:
+///
+///
+/// - currently selected database
+/// - currently selected group
+/// - active search
+/// - active number of search results
+/// - focus owner
+/// - dialog window sizes/positions
+/// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
+///
 public class JabRefGuiStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
@@ -144,8 +142,7 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
-        Objects.requireNonNull(newSelectedGroups);
+    public void setSelectedGroups(BibDatabaseContext context, @NonNull List<GroupTreeNode> newSelectedGroups) {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 

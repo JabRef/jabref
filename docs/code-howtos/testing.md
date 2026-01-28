@@ -27,6 +27,28 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 * _Bug fixing:_ write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
 * Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, () -> doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/) to the test method.
 
+### Use `@ParamterizedTests`
+
+If possible, use `@ParamterizedTests`.
+Read more at <https://mikemybytes.com/2021/10/19/parameterize-like-a-pro-with-junit-5-csvsource/>.
+
+Example for a nicely formatted `@CsvSource`
+
+```java
+@ParameterizedTest
+@CsvSource(textBlock = """
+    # underscore removed
+    junit_jupiter, JunitJupiter
+    # camel case kept
+    fooBar,        FooBar
+    CsvSource,     CsvSource
+""")
+void convertsToUpperCamelCase(String input, String expected) {
+    String converted = caseConverter.toUpperCamelCase(input);
+    Assertions.assertEquals(expected, converted);
+}
+```
+
 ## Coverage
 
 IntelliJ has build in test coverage reports. Choose "Run with coverage".
@@ -115,6 +137,14 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 ```
 
 To test that a preferences migration works successfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
+
+## Localization in tests
+
+In case you or your called code uses `Localization.lang`, annotate your test with following annotation:
+
+```java
+@ResourceLock("Localization.lang")
+```
 
 ## Testing different kinds of components
 

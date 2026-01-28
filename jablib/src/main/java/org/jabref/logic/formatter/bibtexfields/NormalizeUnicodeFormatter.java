@@ -2,13 +2,13 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.text.Normalizer;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 
-/**
- * Clean up field values by formatting Unicode values by using the <a href="https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms">Normal form "Normalization Form Canonical Composition" (NFC)</a>: Characters are decomposed and then recomposed by canonical equivalence.
- * <p>
- * The {@link org.jabref.logic.integrity.UnicodeNormalFormCanonicalCompositionCheck} is for checking the presence of other Unicode representations.
- */
+import org.jspecify.annotations.NonNull;
+
+/// Clean up field values by formatting Unicode values by using the <a href="https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms">Normal form "Normalization Form Canonical Composition" (NFC)</a>: Characters are decomposed and then recomposed by canonical equivalence.
+///
+/// The {@link org.jabref.logic.integrity.UnicodeNormalFormCanonicalCompositionCheck} is for checking the presence of other Unicode representations.
 public class NormalizeUnicodeFormatter extends Formatter {
 
     @Override
@@ -32,8 +32,7 @@ public class NormalizeUnicodeFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
-        String normalizedValue = Normalizer.normalize(value, Normalizer.Form.NFC);
-        return normalizedValue;
+    public String format(@NonNull String value) {
+        return Normalizer.normalize(value, Normalizer.Form.NFC);
     }
 }

@@ -4,23 +4,17 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-/**
- * <code>EntryChangedEvent</code> is fired when a <code>BibEntry</code> has been changed.
- */
+/// `EntryChangedEvent` is fired when a `BibEntry` has been changed.
 
 public class EntryChangedEvent extends EntriesEvent {
 
-    /**
-     * @param bibEntry <code>BibEntry</code> object the changes were applied on.
-     */
+    /// @param bibEntry `BibEntry` object the changes were applied on.
     public EntryChangedEvent(BibEntry bibEntry) {
         super(List.of(bibEntry));
     }
 
-    /**
-     * @param bibEntry <code>BibEntry</code> object the changes were applied on.
-     * @param location Location affected by this event
-     */
+    /// @param bibEntry `BibEntry` object the changes were applied on.
+    /// @param location Location affected by this event
     public EntryChangedEvent(BibEntry bibEntry, EntriesEventSource location) {
         super(List.of(bibEntry), location);
     }

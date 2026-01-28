@@ -7,8 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.exporter.MetaDataSerializerTest;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -42,9 +41,7 @@ public class MetaDataParserTest {
         assertEquals(expected, MetaDataParser.parseDirectory(input));
     }
 
-    /**
-     * In case of any change, copy the content to {@link MetaDataSerializerTest#serializeCustomizedEntryType()}
-     */
+    /// In case of any change, copy the content to {@link org.jabref.logic.exporter.MetaDataSerializerTest#serializeCustomizedEntryType()}
     public static Stream<Arguments> parseCustomizedEntryType() {
         return Stream.of(
                 Arguments.of(
@@ -75,8 +72,8 @@ public class MetaDataParserTest {
         MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
 
         MetaData expected = new MetaData();
-        FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
-        expected.setSaveActions(fieldFormatterCleanups);
+        FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
+        expected.setSaveActions(fieldFormatterCleanupActions);
         assertEquals(expected, parsed);
     }
 

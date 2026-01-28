@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -21,9 +20,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * TemplateExporter for exporting in MSBIB XML format.
- */
+/// TemplateExporter for exporting in MSBIB XML format.
 class MSBibExporter extends Exporter {
 
     private final TransformerFactory transformerFactory;
@@ -37,7 +34,6 @@ class MSBibExporter extends Exporter {
     public void export(@NonNull BibDatabaseContext databaseContext,
                        @NonNull Path file,
                        @NonNull List<BibEntry> entries) throws SaveException {
-        Objects.requireNonNull(databaseContext); // required by test case
         if (entries.isEmpty()) {
             return;
         }

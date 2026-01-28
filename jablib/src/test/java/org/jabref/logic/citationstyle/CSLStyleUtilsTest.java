@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Execution(ExecutionMode.SAME_THREAD)
 class CSLStyleUtilsTest {
 
     // internal styles
@@ -135,12 +138,12 @@ class CSLStyleUtilsTest {
 
     static Stream<Arguments> titleMatches() {
         return Stream.of(
-                Arguments.of("IEEE", IEEE),
+                Arguments.of("IEEE Reference Guide version 11.29.2023", IEEE),
                 Arguments.of("American Psychological Association 7th edition", APA),
                 Arguments.of("Vancouver", VANCOUVER),
                 Arguments.of("Chicago Manual of Style 18th edition (author-date)", CHICAGO_AUTHOR_DATE),
                 Arguments.of("Nature", NATURE),
-                Arguments.of("Modern Language Association 9th edition (in-text citations)", MLA),
+                Arguments.of("MLA Handbook 9th edition (in-text citations)", MLA),
                 Arguments.of("The Journal of Clinical Ethics", JOURNAL_OF_CLINICAL_ETHICS)
         );
     }

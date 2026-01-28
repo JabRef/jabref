@@ -6,6 +6,7 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.WeakMapChangeListener;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -18,8 +19,11 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.EprintIdentifier;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<EprintIdentifier> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EprintIdentifierEditorViewModel.class);
 
     // The following listener will be wrapped in a weak reference change listener, thus it will be garbage collected
     // automatically once this object is disposed.
@@ -36,14 +40,17 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
                                            DialogService dialogService,
                                            TaskExecutor taskExecutor,
                                            GuiPreferences preferences,
-                                           UndoManager undoManager) {
-        super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
-        configure(false, false, false);
+                                           UndoManager undoManager,
+                                           StateManager stateManager) {
+        super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
         EasyBind.subscribe(identifier, newIdentifier -> newIdentifier.ifPresent(id -> {
             // TODO: We already have a common superclass between ArXivIdentifier and ARK. This could be refactored further.
             if (id instanceof ArXivIdentifier) {
                 configure(true, false, false);
             } else if (id instanceof ARK) {
+                configure(false, false, false);
+            } else {
+                LOGGER.warn("Unknown eprint identifier type: {}", id.getClass().getName());
                 configure(false, false, false);
             }
         }));

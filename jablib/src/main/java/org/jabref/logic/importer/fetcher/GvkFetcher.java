@@ -26,10 +26,8 @@ public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParser
 
     private static final String URL_PATTERN = "https://sru.k10plus.de/opac-de-627?";
 
-    /**
-     * Searchkeys are used to specify a search request. For example "tit" stands for "title".
-     * If no searchkey is used, the default searchkey "all" is used.
-     */
+    /// Searchkeys are used to specify a search request. For example "tit" stands for "title".
+    /// If no searchkey is used, the default searchkey "all" is used.
     private final Collection<String> searchKeys = Arrays.asList("all", "tit", "per", "thm", "slw", "txt", "num", "kon", "ppn", "bkl", "erj");
 
     public GvkFetcher(ImportFormatPreferences importFormatPreferences) {

@@ -19,15 +19,19 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 public class ExporterTest {
 
     private static Stream<Object[]> exportFormats() {
@@ -52,15 +56,5 @@ public class ExporterTest {
         Files.createFile(tmpFile);
         exportFormat.export(new BibDatabaseContext(), tmpFile, List.of());
         assertEquals(List.of(), Files.readAllLines(tmpFile));
-    }
-
-    @ParameterizedTest
-    @MethodSource("exportFormats")
-    void exportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, () -> {
-            Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
-            Files.createFile(tmpFile);
-            exportFormat.export(null, tmpFile, List.of());
-        });
     }
 }

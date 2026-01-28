@@ -5,6 +5,9 @@ plugins {
     id("application")
 }
 
+group = "org.jabref.languageserver"
+version = project.findProperty("projVersion") ?: "100.0.0"
+
 application{
     mainClass.set("org.jabref.languageserver.cli.ServerCli")
     mainModule.set("org.jabref.jabls.cli")
@@ -49,16 +52,13 @@ tasks.test {
 }
 
 tasks.named<JavaExec>("run") {
-    doFirst {
-        application.applicationDefaultJvmArgs =
-            listOf(
-                "--enable-native-access=com.sun.jna"
-            )
-    }
+    // "assert" statements in the code should activated when running using gradle
+    enableAssertions = true
+    jvmArgs("--enable-native-access=com.sun.jna")
 }
 
 javaModulePackaging {
-    applicationName = "jabös"
+    applicationName = "jabls"
     vendor = "JabRef"
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer

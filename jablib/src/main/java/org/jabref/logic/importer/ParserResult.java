@@ -3,12 +3,10 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,11 +21,13 @@ import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
     private final Multimap<Range, String> warnings;
-    private BibDatabase database;
+    @NonNull private BibDatabase database;
     private MetaData metaData;
     private Path file;
     private boolean invalid;
@@ -48,10 +48,12 @@ public class ParserResult {
         this(database, new MetaData(), new HashSet<>());
     }
 
-    public ParserResult(BibDatabase database, MetaData metaData, Set<BibEntryType> entryTypes) {
-        this.database = Objects.requireNonNull(database);
-        this.metaData = Objects.requireNonNull(metaData);
-        this.entryTypes = Objects.requireNonNull(entryTypes);
+    public ParserResult(@NonNull BibDatabase database,
+                        @NonNull MetaData metaData,
+                        @NonNull Set<BibEntryType> entryTypes) {
+        this.database = database;
+        this.metaData = metaData;
+        this.entryTypes = entryTypes;
         this.warnings = MultimapBuilder.hashKeys().hashSetValues().build();
     }
 
@@ -74,7 +76,7 @@ public class ParserResult {
         return fromErrorMessage(getErrorMessage(exception));
     }
 
-    public BibDatabase getDatabase() {
+    public @NonNull BibDatabase getDatabase() {
         return database;
     }
 
@@ -86,6 +88,7 @@ public class ParserResult {
         this.metaData = md;
     }
 
+    @NonNull
     public Set<BibEntryType> getEntryTypes() {
         return entryTypes;
     }
@@ -94,20 +97,18 @@ public class ParserResult {
         return Optional.ofNullable(file);
     }
 
-    public void setPath(Path path) {
+    public void setPath(@Nullable Path path) {
         file = path;
     }
 
-    /**
-     * Add a parser warning.
-     *
-     * @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
-     */
-    public void addWarning(String s) {
+    /// Add a parser warning.
+    ///
+    /// @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
+    public void addWarning(@NonNull String s) {
         addWarning(Range.NULL_RANGE, s);
     }
 
-    public void addWarning(Range range, String s) {
+    public void addWarning(Range range, @NonNull String s) {
         warnings.put(range, s);
     }
 
@@ -144,8 +145,7 @@ public class ParserResult {
         return new BibDatabaseContext(database, metaData, file);
     }
 
-    public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
-        Objects.requireNonNull(bibDatabaseContext);
+    public void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         database = bibDatabaseContext.getDatabase();
         metaData = bibDatabaseContext.getMetaData();
         file = bibDatabaseContext.getDatabasePath().orElse(null);
@@ -188,7 +188,7 @@ public class ParserResult {
 
     /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
     public Range getFieldRange(BibEntry entry, Field field) {
-        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Map.of());
 
         if (rangeMap.isEmpty()) {
             return Range.NULL_RANGE;
@@ -206,7 +206,7 @@ public class ParserResult {
 
     /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
     public Range getCompleteEntryIndicator(BibEntry entry) {
-        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Map.of());
         Range range = rangeMap.get(InternalField.KEY_FIELD);
         if (range != null) {
             // this ensures that the line is highlighted from the beginning of the entry so it highlights "@Article{key," (but only if on the same line) and not just the citation key

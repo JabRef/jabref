@@ -19,6 +19,37 @@ public class ColumnPreferences {
         this.columnSortOrder = FXCollections.observableArrayList(columnSortOrder);
     }
 
+    /// Creates object with default values
+    private ColumnPreferences() {
+        this(
+                List.of(
+                        new MainTableColumnModel(MainTableColumnModel.Type.GROUPS, "", 28),                        // groups, default width: 28
+                        new MainTableColumnModel(MainTableColumnModel.Type.GROUP_ICONS, "", 40),                   // group_icons, default width: 40
+                        new MainTableColumnModel(MainTableColumnModel.Type.FILES, "", 28),                         // files, default width: 28
+                        new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER, "", 28),             // linked_identifier, default width: 28
+                        new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, "citationkey", 100),       // citationkey, default width: 100
+                        new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, "entrytype", 75),          // entrytype, default width: 75
+                        new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, "author/editor", 300),     // author/editor, default width: 300
+                        new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, "title", 470),             // title, default width: 470
+                        new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, "year", 60),               // year, default width: 60
+                        new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, "journal/booktitle", 130), // journal, default width: 130
+                        new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, "ranking", 50),           // ranking, default width: 50
+                        new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, "readstatus", 50),        // readstatus, default width: 50
+                        new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, "priority", 50)           // priority, default width: 50
+                ),
+                List.of()   // Empty list for columnSortOrder by default
+        );
+    }
+
+    public static ColumnPreferences getDefault() {
+        return new ColumnPreferences();
+    }
+
+    public void setAll(ColumnPreferences columnPreferences) {
+        this.columns.addAll(columnPreferences.getColumns());
+        this.columnSortOrder.addAll(columnPreferences.getColumnSortOrder());
+    }
+
     public ObservableList<MainTableColumnModel> getColumns() {
         return columns;
     }

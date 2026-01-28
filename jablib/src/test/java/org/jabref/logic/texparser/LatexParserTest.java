@@ -94,10 +94,10 @@ class LatexParserTest {
 
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
         expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
-        expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
-        expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
-        expectedParserResult.addKey(EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
-        expectedParserResult.addKey(DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
+        expectedParserResult.addKey(EINSTEIN, texFile, 4, 6, 18, "\\cite{Einstein1920}");
+        expectedParserResult.addKey(DARWIN, texFile, 5, 6, 16, "\\cite{Darwin1888}.");
+        expectedParserResult.addKey(EINSTEIN, texFile, 6, 20, 32, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
+        expectedParserResult.addKey(DARWIN, texFile, 7, 73, 83, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
 
         LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(new LatexParserResults(parserResult));
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(new LatexParserResults(expectedParserResult));
@@ -123,16 +123,16 @@ class LatexParserTest {
 
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
         expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
-        expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
-        expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
-        expectedParserResult.addKey(EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
-        expectedParserResult.addKey(DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
+        expectedParserResult.addKey(EINSTEIN, texFile, 4, 6, 18, "\\cite{Einstein1920}");
+        expectedParserResult.addKey(DARWIN, texFile, 5, 6, 16, "\\cite{Darwin1888}.");
+        expectedParserResult.addKey(EINSTEIN, texFile, 6, 20, 32, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
+        expectedParserResult.addKey(DARWIN, texFile, 7, 73, 83, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
 
         LatexParserResult expectedParserResult2 = new LatexParserResult(texFile2);
         expectedParserResult2.addBibFile(texFile2.getParent().resolve("origin.bib"));
-        expectedParserResult2.addKey(DARWIN, texFile2, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}");
-        expectedParserResult2.addKey(EINSTEIN, texFile2, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}");
-        expectedParserResult2.addKey(NEWTON, texFile2, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{Newton1999}");
+        expectedParserResult2.addKey(DARWIN, texFile2, 4, 54, 64, "This is some content trying to cite a bib file: \\cite{Darwin1888}");
+        expectedParserResult2.addKey(EINSTEIN, texFile2, 5, 54, 66, "This is some content trying to cite a bib file: \\cite{Einstein1920}");
+        expectedParserResult2.addKey(NEWTON, texFile2, 6, 54, 64, "This is some content trying to cite a bib file: \\cite{Newton1999}");
 
         LatexParserResults expectedParserResults = new LatexParserResults(expectedParserResult, expectedParserResult2);
 

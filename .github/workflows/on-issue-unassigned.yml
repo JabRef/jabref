@@ -2,8 +2,8 @@ name: On issue unassigned
 
 on:
   issues:
-     types:
-       - unassigned
+    types:
+      - unassigned
 
 jobs:
   columns_and_labels:
@@ -13,7 +13,7 @@ jobs:
       issues: write
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Check assignees
         id: check_assignee
         run: |

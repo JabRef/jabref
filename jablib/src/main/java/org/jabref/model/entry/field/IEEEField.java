@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 
-/**
- * IEEE BSTctl fields
- */
+/// IEEE BSTctl fields
 public enum IEEEField implements Field {
     CTLALT_STRETCH_FACTOR("ctlalt_stretch_factor", FieldProperty.NUMERIC),
     CTLDASH_REPEATED_NAMES("ctldash_repeated_names", FieldProperty.YES_NO),

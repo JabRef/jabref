@@ -44,10 +44,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -203,8 +203,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public Observable[] getObservables() {
         List<Observable> observables = new ArrayList<>(Arrays.asList(linkedFile.getObservables()));
-        observables.add(downloadOngoing);
-        observables.add(downloadProgress);
         observables.add(isAutomaticallyFound);
         return observables.toArray(new Observable[0]);
     }
@@ -355,11 +353,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Gets the filename for the current linked file and compares it to the new suggested filename.
-     *
-     * @return true if the suggested filename is same as current filename.
-     */
+    /// Gets the filename for the current linked file and compares it to the new suggested filename.
+    ///
+    /// @return true if the suggested filename is same as current filename.
     public boolean isGeneratedNameSameAsOriginal() {
         Path file = Path.of(this.linkedFile.getLink());
         String currentFileName = file.getFileName().toString();
@@ -368,11 +364,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return currentFileName.equals(suggestedFileName);
     }
 
-    /**
-     * Compares suggested directory of current linkedFile with existing filepath directory.
-     *
-     * @return true if suggested filepath is same as existing filepath.
-     */
+    /// Compares suggested directory of current linkedFile with existing filepath directory.
+    ///
+    /// @return true if suggested filepath is same as existing filepath.
     public boolean isGeneratedPathSameAsOriginal() {
         FilePreferences filePreferences = preferences.getFilePreferences();
         Optional<Path> baseDir = databaseContext.getFirstExistingFileDir(filePreferences);
@@ -410,13 +404,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
         renameToSuggestion();
     }
 
-    /**
-     * Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link)
-     * and then proceeds accordingly.
-     *
-     * @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
-     * successfully, does not exist in the first place, or the user choose to remove it)
-     */
+    /// Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link)
+    /// and then proceeds accordingly.
+    ///
+    /// @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
+    /// successfully, does not exist in the first place, or the user choose to remove it)
     public boolean delete() {
         DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this));
         deleteFileAction.execute();
@@ -433,18 +425,22 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * @implNote Similar method {@link org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing}
-     */
+    /// @implNote Similar method {@link org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing}
     public void redownload() {
         LOGGER.info("Redownloading file from {}", linkedFile.getSourceUrl());
         if (linkedFile.getSourceUrl().isEmpty() || !LinkedFile.isOnlineLink(linkedFile.getSourceUrl())) {
             throw new UnsupportedOperationException("In order to download the file, the source url has to be an online link");
         }
 
+        DownloadLinkedFileAction downloadLinkedFileAction = getDownloadLinkedFileAction();
+        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
+        downloadLinkedFileAction.execute();
+    }
+
+    private DownloadLinkedFileAction getDownloadLinkedFileAction() {
         String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
-        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
+        return new DownloadLinkedFileAction(
                 databaseContext,
                 entry,
                 linkedFile,
@@ -455,8 +451,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 taskExecutor,
                 fileName,
                 true);
-        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
-        downloadLinkedFileAction.execute();
     }
 
     public void download(boolean keepHtmlLink) {

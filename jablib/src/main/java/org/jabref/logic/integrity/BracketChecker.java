@@ -3,7 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class BracketChecker implements ValueChecker {
 

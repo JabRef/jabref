@@ -22,11 +22,9 @@ import dev.langchain4j.model.output.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Wrapper around langchain4j {@link dev.langchain4j.model.embedding.EmbeddingModel}.
- * <p>
- * This class listens to preferences changes.
- */
+/// Wrapper around langchain4j {@link dev.langchain4j.model.embedding.EmbeddingModel}.
+///
+/// This class listens to preferences changes.
 public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefEmbeddingModel.class);
 
@@ -74,7 +72,7 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
         predictorProperty.set(Optional.empty());
 
         new UpdateEmbeddingModelTask(aiPreferences, predictorProperty)
-                .onSuccess(v -> {
+                .onSuccess(_ -> {
                     LOGGER.info("Embedding model was successfully updated");
                     errorWhileBuildingModel = "";
                     eventBus.post(new EmbeddingModelBuiltEvent());
@@ -82,7 +80,7 @@ public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
                 .onFailure(e -> {
                     LOGGER.error("An error occurred while building the embedding model", e);
                     notificationService.notify(Localization.lang("An error occurred while building the embedding model"));
-                    errorWhileBuildingModel = e.getMessage();
+                    errorWhileBuildingModel = e.getMessage() == null ? "" : e.getMessage();
                     eventBus.post(new EmbeddingModelBuildingErrorEvent());
                 })
                 .executeWith(taskExecutor);

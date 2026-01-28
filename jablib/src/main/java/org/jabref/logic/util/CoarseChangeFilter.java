@@ -11,9 +11,7 @@ import org.jabref.model.entry.field.Field;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
-/**
- * Filters change events and only relays major changes.
- */
+/// Filters change events and only relays major changes.
 public class CoarseChangeFilter {
 
     private final BibDatabaseContext context;

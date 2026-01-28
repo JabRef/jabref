@@ -4,9 +4,7 @@ import com.sun.star.text.XTextCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Utility methods for processing OO Writer documents.
- */
+/// Utility methods for processing OO Writer documents.
 public class GetContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetContext.class);
@@ -14,15 +12,13 @@ public class GetContext {
     private GetContext() {
     }
 
-    /**
-     * Get the text belonging to cursor with up to charBefore and charAfter characters of context.
-     * <p>
-     * The actual context may be smaller than requested.
-     *
-     * @param charBefore Number of characters requested.
-     * @param charAfter  Number of characters requested.
-     * @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
-     */
+    /// Get the text belonging to cursor with up to charBefore and charAfter characters of context.
+    ///
+    /// The actual context may be smaller than requested.
+    ///
+    /// @param charBefore Number of characters requested.
+    /// @param charAfter  Number of characters requested.
+    /// @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
     public static String getCursorStringWithContext(XTextCursor cursor,
                                                     int charBefore,
                                                     int charAfter,

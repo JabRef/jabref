@@ -8,9 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AuthorFirstAbbrLastOxfordCommasTest {
 
-    /**
-     * Test method for {@link org.jabref.logic.layout.format.AuthorFirstAbbrLastOxfordCommas#format(java.lang.String)}.
-     */
+    /// Test method for {@link org.jabref.logic.layout.format.AuthorFirstAbbrLastOxfordCommas#format(java.lang.String)}.
     @Test
     void format() {
         LayoutFormatter a = new AuthorFirstAbbrLastOxfordCommas();

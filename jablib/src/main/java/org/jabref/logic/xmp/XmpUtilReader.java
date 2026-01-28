@@ -24,11 +24,9 @@ import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Readings on XMP are available at docs/code-howtos/xmp-parsing.md
- * <p>
- * See also {@link org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation}
- */
+/// Readings on XMP are available at docs/code-howtos/xmp-parsing.md
+///
+/// See also {@link org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation}
 public class XmpUtilReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilReader.class);
@@ -43,39 +41,33 @@ public class XmpUtilReader {
         System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); // To get higher rendering speed on java 8 oder 9 for images
     }
 
-    /**
-     * Will read the XMPMetadata from the given pdf file, closing the file afterwards.
-     *
-     * @param path The path to read the XMPMetadata from.
-     * @return The XMPMetadata object found in the file
-     */
+    /// Will read the XMPMetadata from the given pdf file, closing the file afterwards.
+    ///
+    /// @param path The path to read the XMPMetadata from.
+    /// @return The XMPMetadata object found in the file
     public List<XMPMetadata> readRawXmp(Path path) throws IOException {
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
             return getXmpMetadata(document);
         }
     }
 
-    /**
-     * @param path The path to read from.
-     * @return list of a single BibEntry retrieved by merging the data from the stream
-     */
+    /// @param path The path to read from.
+    /// @return list of a single BibEntry retrieved by merging the data from the stream
     public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences) throws IOException {
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
             return readXmp(path, document, xmpPreferences);
         }
     }
 
-    /**
-     * Merges all XMP data together in one entry.
-     * <p>
-     * Try to read the given BibTexEntry from the given PDF file.
-     * <p>
-     * Looks at the DocumentInformation and the XMP metadata.
-     * Regarding the XMP metadata, only Dublin Core is supported.
-     *
-     * @param path     the path to the PDF file
-     * @param document the PDF document to read from (should have been created from <code>path</code>
-     */
+    /// Merges all XMP data together in one entry.
+    ///
+    /// Try to read the given BibTexEntry from the given PDF file.
+    ///
+    /// Looks at the DocumentInformation and the XMP metadata.
+    /// Regarding the XMP metadata, only Dublin Core is supported.
+    ///
+    /// @param path     the path to the PDF file
+    /// @param document the PDF document to read from (should have been created from `path`
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
         final SequencedCollection<BibEntry> result = new LinkedHashSet<>();
 
@@ -118,18 +110,15 @@ public class XmpUtilReader {
         return result.stream().toList();
     }
 
-    /**
-     * <p>
-     * This method is a hack to generate multiple XMPMetadata objects, because the
-     * implementation of the pdfbox does not support methods for reading multiple
-     * DublinCoreSchemas from a single metadata entry.
-     * </p>
-     * <p>
-     * Moreover, DomXmpParser does not handle unknown namespaces
-     * </p>
-     *
-     * @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
-     */
+    ///
+    /// This method is a hack to generate multiple XMPMetadata objects, because the
+    /// implementation of the pdfbox does not support methods for reading multiple
+    /// DublinCoreSchemas from a single metadata entry.
+    ///
+    ///
+    /// Moreover, DomXmpParser does not handle unknown namespaces
+    ///
+    /// @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
     private List<XMPMetadata> getXmpMetadata(PDDocument document) {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
@@ -175,12 +164,10 @@ public class XmpUtilReader {
         return metaList;
     }
 
-    /**
-     * Loads the specified file with the basic pdfbox functionality and uses an empty string as default password.
-     *
-     * @param path The path to load.
-     * @throws IOException from the underlying @link PDDocument#load(File)
-     */
+    /// Loads the specified file with the basic pdfbox functionality and uses an empty string as default password.
+    ///
+    /// @param path The path to load.
+    /// @throws IOException from the underlying @link PDDocument#load(File)
     public PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document
         // also uses an empty string as default password

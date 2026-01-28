@@ -8,8 +8,8 @@
     <columns>
         <TableColumn fx:id="entryTypeColumn" editable="false" minWidth="100.0" text="%Name"/>
         <TableColumn fx:id="patternColumn" minWidth="100.0" text="%Key pattern"/>
-        <TableColumn fx:id="actionsColumn" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0"
-                     reorderable="false" resizable="false" sortable="false"/>
+        <TableColumn fx:id="actionsColumn" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="30.0"
+                     reorderable="false" resizable="false" sortable="false"  styleClass="actions-column"/>
     </columns>
     <columnResizePolicy>
         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

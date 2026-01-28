@@ -12,6 +12,7 @@ import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
@@ -64,6 +65,12 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
                         .mapObservable(TreeItem::valueProperty)
         );
         keyBindingsTable.setOnKeyPressed(viewModel::setNewBindingForCurrent);
+
+        keyBindingsTable.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            event.consume();
+            viewModel.setNewBindingForCurrent(event);
+        });
+
         keyBindingsTable.rootProperty().bind(
                 EasyBind.map(viewModel.rootKeyBindingProperty(),
                         keybinding -> new RecursiveTreeItem<>(keybinding, KeyBindingViewModel::getChildren))
@@ -73,10 +80,12 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getResetIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> evt -> keyBinding.resetToDefault())
+                .withStyleClass(keyBinding -> "keybinding-table-icon-cell")
                 .install(resetColumn);
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getClearIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> evt -> keyBinding.clear())
+                .withStyleClass(keyBinding -> "keybinding-table-icon-cell")
                 .install(clearColumn);
 
         viewModel.keyBindingPresets().forEach(preset -> presetsButton.getItems().add(createMenuItem(preset)));

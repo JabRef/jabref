@@ -2,14 +2,14 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,19 +21,15 @@ public class RegexFormatter extends Formatter {
     private static final Pattern ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
     private static final Pattern ESCAPED_CLOSING_CURLY_BRACE = Pattern.compile("\\\\\\}");
 
-    /**
-     * Matches text enclosed in curly brackets. The capturing group is used to prevent part of the input from being
-     * replaced.
-     */
+    /// Matches text enclosed in curly brackets. The capturing group is used to prevent part of the input from being
+    /// replaced.
     private static final Pattern ENCLOSED_IN_CURLY_BRACES = Pattern.compile("\\{.*?}");
 
     private static final String REGEX_CAPTURING_GROUP = "regex";
     private static final String REPLACEMENT_CAPTURING_GROUP = "replacement";
 
-    /**
-     * Matches a valid argument to the constructor. Two capturing groups are used to parse the {@link
-     * RegexFormatter#regex} and {@link RegexFormatter#replacement} used in {@link RegexFormatter#format(String)}
-     */
+    /// Matches a valid argument to the constructor. Two capturing groups are used to parse the {@link
+    /// RegexFormatter#regex} and {@link RegexFormatter#replacement} used in {@link RegexFormatter#format(String)}
     private static final Pattern CONSTRUCTOR_ARGUMENT = Pattern.compile(
             "^\\(\"(?<" + REGEX_CAPTURING_GROUP + ">.*?)\" *?, *?\"(?<" + REPLACEMENT_CAPTURING_GROUP + ">.*)\"\\)$");
 
@@ -46,14 +42,10 @@ public class RegexFormatter extends Formatter {
     private final String regex;
     private final String replacement;
 
-    /**
-     * Constructs a new regular expression-based formatter with the given RegEx.
-     *
-     * @param input the regular expressions for matching and replacing given in the form {@code ("<regex>",
-     *              "<replace>")}.
-     */
-    public RegexFormatter(String input) {
-        Objects.requireNonNull(input);
+    /// Constructs a new regular expression-based formatter with the given RegEx.
+    ///
+    /// @param input the regular expressions for matching and replacing given in the form `("<regex>", "<replace>")`.
+    public RegexFormatter(@NonNull String input) {
         input = input.trim().replace("\\\"", PLACEHOLDER_FOR_QUOTE_SIGN);
         Matcher constructorArgument = CONSTRUCTOR_ARGUMENT.matcher(input);
         if (constructorArgument.matches()) {
@@ -98,8 +90,7 @@ public class RegexFormatter extends Formatter {
     }
 
     @Override
-    public String format(final String input) {
-        Objects.requireNonNull(input);
+    public String format(@NonNull final String input) {
         if (regex == null || replacement == null) {
             return input;
         }

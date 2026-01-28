@@ -1,7 +1,6 @@
 package org.jabref.model.entry.identifier;
 
 import java.net.URI;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,9 +8,9 @@ import java.util.regex.Pattern;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.URLUtil;
 
-/**
- * Represents an SSRN article, identified by its abstract ID.
- */
+import org.jspecify.annotations.NonNull;
+
+/// Represents an SSRN article, identified by its abstract ID.
 @AllowedToUseLogic("Because URL utility is needed")
 public class SSRN extends EprintIdentifier {
 
@@ -21,15 +20,12 @@ public class SSRN extends EprintIdentifier {
 
     private final Integer abstractId;
 
-    /**
-     * Tries to parse an SSRN identifier
-     *
-     * @param string Either a number or a SSRN url that has the abstract ID in it
-     * @throws NullPointerException     If you pass a null to the constructor
-     * @throws IllegalArgumentException Invalid string passed to the constructor
-     */
-    public SSRN(String string) {
-        Objects.requireNonNull(string);
+    /// Tries to parse an SSRN identifier
+    ///
+    /// @param string Either a number or a SSRN url that has the abstract ID in it
+    /// @throws NullPointerException     If you pass a null to the constructor
+    /// @throws IllegalArgumentException Invalid string passed to the constructor
+    public SSRN(@NonNull String string) {
         string = string.trim();
 
         if (string.chars().allMatch(Character::isDigit)) {
@@ -71,11 +67,9 @@ public class SSRN extends EprintIdentifier {
         return Optional.of(uri);
     }
 
-    /**
-     * Generate the DOI based on the SSRN
-     *
-     * @return a DOI formatted as <code>10.2139/ssrn.[article]</code>
-     */
+    /// Generate the DOI based on the SSRN
+    ///
+    /// @return a DOI formatted as `10.2139/ssrn.[article]`
     public DOI toDoi() {
         return new DOI("10.2139/ssrn." + abstractId);
     }

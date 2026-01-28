@@ -14,9 +14,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Place for handling the preferences for the remote communication
- */
+/// Place for handling the preferences for the remote communication
 public class RemotePreferences {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemotePreferences.class);

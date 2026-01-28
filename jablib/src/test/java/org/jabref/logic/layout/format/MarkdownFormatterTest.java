@@ -3,13 +3,11 @@ package org.jabref.logic.layout.format;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MarkdownFormatterTest {
 
@@ -18,12 +16,6 @@ class MarkdownFormatterTest {
     @BeforeEach
     void setUp() {
         markdownFormatter = new MarkdownFormatter();
-    }
-
-    @Test
-    void formatWhenFormattingNullThenThrowsException() {
-        Exception exception = assertThrows(NullPointerException.class, () -> markdownFormatter.format(null));
-        assertEquals("Field Text should not be null, when handed to formatter", exception.getMessage());
     }
 
     private static Stream<Arguments> provideMarkdownAndHtml() {

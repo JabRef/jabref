@@ -4,16 +4,14 @@ import java.util.Optional;
 
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.DOI;
 
-/**
- * Copies the doi url to the clipboard
- */
+/// Copies the doi url to the clipboard
 public class CopyDoiUrlAction extends SimpleCommand {
 
     private final TextField component;

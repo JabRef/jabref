@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringJoiner;
 
 import javax.xml.stream.XMLInputFactory;
@@ -33,6 +33,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,10 +126,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         String str;
         int i = 0;
-        while (((str = reader.readLine()) != null) && (i < 50)) {
+        while (((str = bufferedReader.readLine()) != null) && (i < 50)) {
             if (str.toLowerCase(Locale.ENGLISH).contains("<records>")) {
                 return true;
             }
@@ -138,9 +140,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
-        Objects.requireNonNull(input);
-
+    public ParserResult importDatabase(@NonNull BufferedReader input) throws IOException {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {

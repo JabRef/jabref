@@ -1,15 +1,20 @@
 package org.jabref.model.texparser;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
+import org.jspecify.annotations.NonNull;
+
+///
+/// @param path     the path to the file containing the citationkey
+/// @param line     the line number of the citationkey (starting at 1)
+/// @param colStart the column number of the start of the citation key (starting at 0)
+/// @param colEnd   the column number of the end of the citation key (starting at 0)
+/// @param lineText the text of the line containing the citationkey
 public record Citation(Path path, int line, int colStart, int colEnd, String lineText) {
-    /**
-     * The total number of characters that are shown around a cite (cite width included).
-     */
+    /// The total number of characters that are shown around a cite (cite width included).
     private static final int CONTEXT_WIDTH = 300;
 
-    public Citation(Path path, int line, int colStart, int colEnd, String lineText) {
+    public Citation(@NonNull Path path, int line, int colStart, int colEnd, String lineText) {
         if (line <= 0) {
             throw new IllegalArgumentException("Line has to be greater than 0.");
         }
@@ -18,16 +23,14 @@ public record Citation(Path path, int line, int colStart, int colEnd, String lin
             throw new IllegalArgumentException("Citation has to be between 0 and line length.");
         }
 
-        this.path = Objects.requireNonNull(path);
+        this.path = path;
         this.line = line;
         this.colStart = colStart;
         this.colEnd = colEnd;
         this.lineText = lineText;
     }
 
-    /**
-     * Get a fixed-width string that contains a cite and the text that surrounds it along the same line.
-     */
+    /// Get a fixed-width string that contains a cite and the text that surrounds it along the same line.
     public String getContext() {
         int center = (colStart + colEnd) / 2;
         int lineLength = lineText.length();

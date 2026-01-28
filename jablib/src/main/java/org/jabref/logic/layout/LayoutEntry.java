@@ -84,13 +84,13 @@ import org.jabref.logic.layout.format.WrapContent;
 import org.jabref.logic.layout.format.WrapFileLinks;
 import org.jabref.logic.layout.format.XMLChars;
 import org.jabref.logic.openoffice.style.OOPreFormatter;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -341,11 +341,9 @@ class LayoutEntry {
         }
     }
 
-    /**
-     * Do layout for general formatters (no bibtex-entry fields).
-     *
-     * @param databaseContext Bibtex Database
-     */
+    /// Do layout for general formatters (no bibtex-entry fields).
+    ///
+    /// @param databaseContext Bibtex Database
     public String doLayout(BibDatabaseContext databaseContext, Charset encoding) {
         switch (type) {
             case LayoutHelper.IS_LAYOUT_TEXT:
@@ -570,9 +568,7 @@ class LayoutEntry {
         };
     }
 
-    /**
-     * Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
-     */
+    /// Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
     private List<LayoutFormatter> getOptionalLayout(String formatterName) {
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());

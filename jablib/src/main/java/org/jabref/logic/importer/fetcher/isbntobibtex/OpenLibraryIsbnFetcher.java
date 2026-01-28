@@ -15,13 +15,13 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
@@ -32,10 +32,8 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetcher for OpenLibrary.
- * <a href="https://openlibrary.org/dev/docs/api/books">API documentation</a>.
- */
+/// Fetcher for OpenLibrary.
+/// <a href="https://openlibrary.org/dev/docs/api/books">API documentation</a>.
 public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenLibraryIsbnFetcher.class);

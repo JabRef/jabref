@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
-
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 public class ClearFormatter extends Formatter {
 
@@ -18,8 +18,7 @@ public class ClearFormatter extends Formatter {
     }
 
     @Override
-    public String format(String oldString) {
-        Objects.requireNonNull(oldString);
+    public String format(@NonNull String oldString) {
         return "";
     }
 

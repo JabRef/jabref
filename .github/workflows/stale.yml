@@ -1,0 +1,69 @@
+name: Mark and close stale change-request PRs
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+
+jobs:
+  stale:
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        id: stale
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          exempt-pr-labels: "📌 Pinned,dev: no-bot-comments"
+
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+
+          only-pr-labels: "status: changes-required"
+          stale-pr-label: "status: stale"
+          remove-pr-stale-when-updated: false
+
+          days-before-pr-stale: 10
+          stale-pr-message: >
+            The requested changes were not addressed for 10 days.
+            Please follow-up in the next 10 days or your PR will be automatically closed.
+            You can check the [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for hints on the pull request process.
+
+          days-before-pr-close: 10
+          close-pr-message: >
+            This PR is being closed due to continued inactivity.
+      - uses: actions/checkout@v6
+        if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
+      - name: Process closed issues/PRs
+        if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
+        env:
+          CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Raw payload:"
+          cat <<EOF
+          ${{ steps.stale.outputs.closed-issues-prs }}
+          EOF
+
+          echo "PR numbers:"
+          echo "$CLOSED_JSON" | jq -r '.[] | select(.pull_request != null) | .number' | while read -r n; do
+            [ -n "$n" ] || continue
+            echo "Handling #$n"
+            gh workflow run "On PR closed" --ref main --field pr_number="$n"
+          done
+      - name: Write closed PR URLs to summary
+        if: always()
+        env:
+          CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
+        run: |
+          {
+            echo "## Closed PRs"
+            echo
+            echo "$CLOSED_JSON" \
+              | jq -r '.[] | select(.pull_request != null) | "- [#\(.number)](\(.pull_request.html_url))"' \
+              || true
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"

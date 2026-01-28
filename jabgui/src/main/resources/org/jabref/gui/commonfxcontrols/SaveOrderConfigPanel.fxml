@@ -7,8 +7,8 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root prefWidth="650.0" spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
@@ -30,10 +30,10 @@
             <ColumnConstraints hgrow="NEVER" minWidth="40.0" maxWidth="40.0"/>
             <ColumnConstraints hgrow="SOMETIMES"/>
             <ColumnConstraints hgrow="SOMETIMES" halignment="LEFT"/>
-            <ColumnConstraints hgrow="NEVER" minWidth="30.0" maxWidth="30.0"/>
+            <ColumnConstraints hgrow="NEVER"/>
         </columnConstraints>
         <padding>
-            <Insets left="30.0"/>
+            <Insets left="30.0" right="10.0"/>
         </padding>
     </GridPane>
     <HBox alignment="BASELINE_RIGHT" disable="${!exportInSpecifiedOrder.selected}">

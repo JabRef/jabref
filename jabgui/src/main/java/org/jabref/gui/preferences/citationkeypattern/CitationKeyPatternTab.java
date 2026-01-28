@@ -1,18 +1,13 @@
 package org.jabref.gui.preferences.citationkeypattern;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
@@ -21,6 +16,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox transliterateFieldsForCitationKey;
     @FXML private CheckBox overwriteAllow;
     @FXML private CheckBox overwriteWarning;
     @FXML private CheckBox generateOnSave;
@@ -31,7 +27,6 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     @FXML private TextField keyPatternRegex;
     @FXML private TextField keyPatternReplacement;
     @FXML private TextField unwantedCharacters;
-    @FXML private Button keyPatternHelp;
     @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
 
     public CitationKeyPatternTab() {
@@ -48,6 +43,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     public void initialize() {
         this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences(), preferences.getImporterPreferences());
 
+        transliterateFieldsForCitationKey.selectedProperty().bindBidirectional(viewModel.transliterateFieldsForCitationKeyProperty());
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
         generateOnSave.selectedProperty().bindBidirectional(viewModel.generateOnSaveProperty());
@@ -61,9 +57,6 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
 
         bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
-
-        ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferences.getExternalApplicationsPreferences()), keyPatternHelp);
     }
 
     @Override

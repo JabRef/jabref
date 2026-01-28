@@ -5,11 +5,11 @@ import java.util.List;
 
 import javafx.scene.input.ClipboardContent;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -21,9 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard. This worker cannot be reused.
- */
+/// Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard. This worker cannot be reused.
 public class CopyCitationAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyCitationAction.class);

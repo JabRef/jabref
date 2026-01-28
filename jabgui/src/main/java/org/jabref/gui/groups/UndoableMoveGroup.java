@@ -1,11 +1,12 @@
 package org.jabref.gui.groups;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.GroupTreeNode;
+
+import org.jspecify.annotations.NonNull;
 
 class UndoableMoveGroup extends AbstractUndoableJabRefEdit {
 
@@ -15,9 +16,9 @@ class UndoableMoveGroup extends AbstractUndoableJabRefEdit {
     private final List<Integer> pathToOldParent;
     private final int oldChildIndex;
 
-    public UndoableMoveGroup(GroupTreeNodeViewModel root, MoveGroupChange moveChange) {
-        this.root = Objects.requireNonNull(root);
-        Objects.requireNonNull(moveChange);
+    public UndoableMoveGroup(@NonNull GroupTreeNodeViewModel root, @NonNull MoveGroupChange moveChange) {
+        this.root = root;
+
         pathToOldParent = moveChange.getOldParent().getIndexedPathFromRoot();
         pathToNewParent = moveChange.getNewParent().getIndexedPathFromRoot();
         oldChildIndex = moveChange.getOldChildIndex();

@@ -23,19 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-/**
- * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry. Indirectly the
- * net.sf.jabref.export.layout.Layout is tested too.
- * <p/>
- * The LayoutEntry creates a human readable String assigned with HTML formatters. To test the Highlighting Feature, an
- * instance of LayoutEntry will be instantiated via Layout and LayoutHelper. With these instance the doLayout() Method
- * is called several times for each test case. To simulate a search, a BibEntry will be created, which will be used by
- * LayoutEntry.
- * There are five test cases: - The shown result text has no words which should be highlighted. - There is one word
- * which will be highlighted ignoring case sensitivity. - There are two words which will be highlighted ignoring case
- * sensitivity. - There is one word which will be highlighted case sensitivity. - There are more words which will be
- * highlighted case sensitivity.
- */
+/// The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry. Indirectly the
+/// net.sf.jabref.export.layout.Layout is tested too.
+/// <p/>
+/// The LayoutEntry creates a human readable String assigned with HTML formatters. To test the Highlighting Feature, an
+/// instance of LayoutEntry will be instantiated via Layout and LayoutHelper. With these instance the doLayout() Method
+/// is called several times for each test case. To simulate a search, a BibEntry will be created, which will be used by
+/// LayoutEntry.
+/// There are five test cases: - The shown result text has no words which should be highlighted. - There is one word
+/// which will be highlighted ignoring case sensitivity. - There are two words which will be highlighted ignoring case
+/// sensitivity. - There is one word which will be highlighted case sensitivity. - There are more words which will be
+/// highlighted case sensitivity.
 
 class LayoutEntryTest {
 
@@ -73,32 +71,38 @@ class LayoutEntryTest {
         return layout.doLayout(entry, null);
     }
 
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            bla, bla
+            bla, 'bla,'
+            _bla.bla.blub, '_bla.bla.blub,'
+            """)
+    void parseSingleMethodWithoutArguments(String expected, String input) {
+        assertEquals(1, LayoutEntry.parseMethodsCalls(input).size());
+        assertEquals(expected, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
+    }
+
     @Test
-    void parseMethodCalls() {
-        assertEquals(1, LayoutEntry.parseMethodsCalls("bla").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla").getFirst().getFirst());
+    void parseTwoMethodsWithoutArguments() {
+        String input = "bla,foo";
+        List<List<String>> result = LayoutEntry.parseMethodsCalls(input);
+        assertEquals(2, result.size());
+        assertEquals("bla", result.getFirst().getFirst());
+        assertEquals("foo", result.get(1).getFirst());
+    }
 
-        assertEquals(1, LayoutEntry.parseMethodsCalls("bla,").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla,").getFirst().getFirst());
-
-        assertEquals(1, LayoutEntry.parseMethodsCalls("_bla.bla.blub,").size());
-        assertEquals("_bla.bla.blub", LayoutEntry.parseMethodsCalls("_bla.bla.blub,").getFirst().getFirst());
-
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla,foo").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla,foo").getFirst().getFirst());
-        assertEquals("foo", LayoutEntry.parseMethodsCalls("bla,foo").get(1).getFirst());
-
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").getFirst().getFirst());
-        assertEquals("foo", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1).getFirst());
-        assertEquals("test", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").getFirst().get(1));
-        assertEquals("fark", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1).get(1));
-
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").getFirst().getFirst());
-        assertEquals("foo", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1).getFirst());
-        assertEquals("test", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").getFirst().get(1));
-        assertEquals("fark", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1).get(1));
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            bla, test, foo, fark, 'bla("test"),foo("fark")'
+            bla, test, foo, fark, 'bla(test),foo(fark)'
+            """)
+    void parseTwoMethodsWithArguments(String expectedName1, String expectedArg1,
+                                      String expectedName2, String expectedArg2, String input) {
+        assertEquals(2, LayoutEntry.parseMethodsCalls(input).size());
+        assertEquals(expectedName1, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
+        assertEquals(expectedArg1, LayoutEntry.parseMethodsCalls(input).getFirst().get(1));
+        assertEquals(expectedName2, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
+        assertEquals(expectedArg2, LayoutEntry.parseMethodsCalls(input).get(1).get(1));
     }
 
     @ParameterizedTest

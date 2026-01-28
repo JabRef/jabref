@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
@@ -12,15 +13,15 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import com.dlsc.gemsfx.Spacer?>
 <?import com.dlsc.unitfx.IntegerInputField?>
 <?import org.controlsfx.control.SearchableComboBox?>
 <?import org.controlsfx.control.textfield.CustomPasswordField?>
-<?import javafx.scene.layout.Region?>
-<?import com.dlsc.gemsfx.Spacer?>
-<?import javafx.scene.layout.Pane?>
+<?import com.sun.javafx.scene.control.IntegerField?>
 <fx:root
         spacing="10.0"
         type="VBox"
@@ -296,6 +297,11 @@
              closable="false">
             <TextArea fx:id="citationParsingUserMessageTextArea"/>
         </Tab>
+        <Tab fx:id="followUpQuestionsTab"
+             text="%Prompt for generating follow-up questions"
+             closable="false">
+             <TextArea fx:id="followUpQuestionsTextArea"/>
+        </Tab>
     </TabPane>
 
     <HBox spacing="10" alignment="CENTER_LEFT">
@@ -330,4 +336,23 @@
               text="%Automatically generate summaries for new entries"
               HBox.hgrow="ALWAYS"
               maxWidth="Infinity"/>
+
+    <CheckBox fx:id="generateFollowUpQuestions"
+              mnemonicParsing="false"
+              text="%Generate follow-up questions"
+              HBox.hgrow="ALWAYS"
+              maxWidth="Infinity"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+        <Label fx:id="followUpQuestionsCountLabel"
+               alignment="BASELINE_CENTER"
+               text="%Number of follow-up questions"/>
+        <Spinner fx:id="followUpQuestionsCountSpinner"
+                 editable="true"
+                 maxWidth="100"/>
+    </HBox>
+
 </fx:root>

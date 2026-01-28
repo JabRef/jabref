@@ -1,20 +1,18 @@
 package org.jabref.gui.undo;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class represents a change in any field value. The relevant
- * information is the BibEntry, the field name, the old and the
- * new value. Old/new values can be null.
- */
+/// This class represents a change in any field value. The relevant
+/// information is the BibEntry, the field name, the old and the
+/// new value. Old/new values can be null.
 public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableFieldChange.class);
 

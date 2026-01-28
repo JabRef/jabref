@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +33,12 @@ public class JStyleLoader {
     private final List<JStyle> internalStyles = new ArrayList<>();
     private final List<JStyle> externalStyles = new ArrayList<>();
 
-    public JStyleLoader(OpenOfficePreferences openOfficePreferences,
-                        LayoutFormatterPreferences formatterPreferences,
-                        JournalAbbreviationRepository abbreviationRepository) {
-        this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
-        this.layoutFormatterPreferences = Objects.requireNonNull(formatterPreferences);
-        this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);
+    public JStyleLoader(@NonNull OpenOfficePreferences openOfficePreferences,
+                        @NonNull LayoutFormatterPreferences formatterPreferences,
+                        @NonNull JournalAbbreviationRepository abbreviationRepository) {
+        this.openOfficePreferences = openOfficePreferences;
+        this.layoutFormatterPreferences = formatterPreferences;
+        this.abbreviationRepository = abbreviationRepository;
         loadInternalStyles();
         loadExternalStyles();
     }
@@ -49,14 +49,11 @@ public class JStyleLoader {
         return result;
     }
 
-    /**
-     * Adds the given style to the list of styles
-     *
-     * @param filename The filename of the style
-     * @return True if the added style is valid, false otherwise
-     */
-    public boolean addStyleIfValid(Path filename) {
-        Objects.requireNonNull(filename);
+    /// Adds the given style to the list of styles
+    ///
+    /// @param filename The filename of the style
+    /// @return True if the added style is valid, false otherwise
+    public boolean addStyleIfValid(@NonNull Path filename) {
         try {
             JStyle newStyle = new JStyle(filename, layoutFormatterPreferences, abbreviationRepository);
             if (externalStyles.contains(newStyle)) {
@@ -117,8 +114,7 @@ public class JStyleLoader {
         openOfficePreferences.setExternalJStyles(filenames);
     }
 
-    public boolean removeStyle(JStyle style) {
-        Objects.requireNonNull(style);
+    public boolean removeStyle(@NonNull JStyle style) {
         if (!style.isInternalStyle()) {
             boolean result = externalStyles.remove(style);
             storeExternalStyles();

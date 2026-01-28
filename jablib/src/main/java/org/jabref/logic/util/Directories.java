@@ -13,11 +13,9 @@ import net.harawata.appdirs.AppDirsFactory;
 /// OS-dependent directories are handled in the NativeDesktop class.
 /// See e.g. `org.jabref.gui.desktop.os.NativeDesktop#getApplicationDirectory()`
 public class Directories {
-    /**
-     * Returns the path to the system's user directory.
-     *
-     * @return the path
-     */
+    /// Returns the path to the system's user directory.
+    ///
+    /// @return the path
     public static Path getUserDirectory() {
         return Path.of(System.getProperty("user.home"));
     }
@@ -66,6 +64,15 @@ public class Directories {
                               .getUserDataDir(
                                       OS.APP_DIR_APP_NAME,
                                       "relations",
+                                      OS.APP_DIR_APP_AUTHOR));
+    }
+
+    public static Path getCoverDirectory() {
+        return Path.of(
+                AppDirsFactory.getInstance()
+                              .getUserDataDir(
+                                      OS.APP_DIR_APP_NAME,
+                                      "covers",
                                       OS.APP_DIR_APP_AUTHOR));
     }
 }

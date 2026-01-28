@@ -1,10 +1,10 @@
 package org.jabref.logic.layout;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 
-/**
- * When having to use a LayoutFormatter as Formatter, this class is helpful. One usecase is {@link org.jabref.logic.cleanup.FieldFormatterCleanup}
- */
+import org.jspecify.annotations.NonNull;
+
+/// When having to use a LayoutFormatter as Formatter, this class is helpful. One usecase is {@link org.jabref.logic.cleanup.FieldFormatterCleanup}
 public class LayoutFormatterBasedFormatter extends Formatter {
 
     private final LayoutFormatter layoutFormatter;
@@ -24,7 +24,7 @@ public class LayoutFormatterBasedFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
+    public String format(@NonNull String value) {
         return layoutFormatter.format(value);
     }
 

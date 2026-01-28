@@ -7,20 +7,19 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
-/**
- * Helper class to get a Layout object.
- *
- * <pre>
- * <code>
- * LayoutHelper helper = new LayoutHelper(...a reader...);
- * Layout layout = helper.getLayoutFromText();
- * </code>
- * </pre>
- */
+import org.jspecify.annotations.NonNull;
+
+/// Helper class to get a Layout object.
+///
+/// <pre>
+/// <code>
+/// LayoutHelper helper = new LayoutHelper(...a reader...);
+/// Layout layout = helper.getLayoutFromText();
+/// </code>
+/// </pre>
 public class LayoutHelper {
 
     public static final int IS_LAYOUT_TEXT = 1;
@@ -43,12 +42,12 @@ public class LayoutHelper {
     private final JournalAbbreviationRepository abbreviationRepository;
     private boolean endOfFile;
 
-    public LayoutHelper(Reader in,
+    public LayoutHelper(@NonNull Reader in,
                         List<Path> fileDirForDatabase,
-                        LayoutFormatterPreferences preferences,
+                        @NonNull LayoutFormatterPreferences preferences,
                         JournalAbbreviationRepository abbreviationRepository) {
-        this.in = new PushbackReader(Objects.requireNonNull(in), 2);
-        this.preferences = Objects.requireNonNull(preferences);
+        this.in = new PushbackReader(in, 2);
+        this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;
         this.fileDirForDatabase = fileDirForDatabase;
     }

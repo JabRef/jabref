@@ -14,9 +14,7 @@ import org.jabref.model.metadata.MetaData;
 /// 2. Default: same name as .bib file with .blg extension
 public class BibLogPathResolver {
 
-    /**
-     * Resolves .blg path using current user context.
-     */
+    /// Resolves .blg path using current user context.
     public static Optional<Path> resolve(BibDatabaseContext context) {
         if (context == null) {
             return Optional.empty();
@@ -26,9 +24,7 @@ public class BibLogPathResolver {
         return resolve(context.getMetaData(), context.getDatabasePath(), user);
     }
 
-    /**
-     * Test-friendly API (allows direct input of MetaData and Path)
-     */
+    /// Test-friendly API (allows direct input of MetaData and Path)
     public static Optional<Path> resolve(MetaData metaData, Optional<Path> databasePath, String user) {
         if (metaData == null || user == null) {
             return Optional.empty();

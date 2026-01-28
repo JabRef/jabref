@@ -1,13 +1,14 @@
 package org.jabref.logic.integrity;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class NoteChecker implements ValueChecker {
 
@@ -15,16 +16,14 @@ public class NoteChecker implements ValueChecker {
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
-    public NoteChecker(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
+    public NoteChecker(@NonNull BibDatabaseContext bibDatabaseContext) {
+        this.bibDatabaseContextEdition = bibDatabaseContext;
     }
 
-    /**
-     * biblatex package documentation (Section 4.9.1):
-     * The biblatex package will automatically capitalize the first word when required at the beginning of a sentence.
-     * Official BibTeX specification:
-     * note: Any additional information that can help the reader. The first word should be capitalized.
-     */
+    /// biblatex package documentation (Section 4.9.1):
+    /// The biblatex package will automatically capitalize the first word when required at the beginning of a sentence.
+    /// Official BibTeX specification:
+    /// note: Any additional information that can help the reader. The first word should be capitalized.
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {

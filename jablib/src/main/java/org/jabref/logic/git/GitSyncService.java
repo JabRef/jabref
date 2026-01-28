@@ -6,15 +6,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
-import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
-import org.jabref.logic.git.merge.GitMergeUtil;
-import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
-import org.jabref.logic.git.model.PullResult;
+import org.jabref.logic.git.merge.execution.MergeBookkeeper;
+import org.jabref.logic.git.merge.planning.SemanticMergeAnalyzer;
+import org.jabref.logic.git.model.BookkeepingResult;
+import org.jabref.logic.git.model.MergeAnalysis;
+import org.jabref.logic.git.model.MergePlan;
+import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
@@ -22,37 +23,38 @@ import org.jabref.logic.git.status.SyncStatus;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/// GitSyncService currently serves as an orchestrator for Git pull/push logic.
+/// GitSyncService currently serves as an orchestrator for Git pull/push logic (Not responsible for writing.).
 ///
 /// if (hasConflict)
 ///     → UI merge;
 /// else
 ///     → autoMerge := local + remoteDiff
 public class GitSyncService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitSyncService.class);
-
-    private static final boolean AMEND = true;
     private final ImportFormatPreferences importFormatPreferences;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private final GitConflictResolverStrategy gitConflictResolverStrategy;
-    private final GitSemanticMergeExecutor mergeExecutor;
+    private final MergeBookkeeper bookkeeper;
 
-    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry gitHandlerRegistry, GitConflictResolverStrategy gitConflictResolverStrategy, GitSemanticMergeExecutor mergeExecutor) {
+    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry gitHandlerRegistry, MergeBookkeeper bookkeeper) {
         this.importFormatPreferences = importFormatPreferences;
         this.gitHandlerRegistry = gitHandlerRegistry;
-        this.gitConflictResolverStrategy = gitConflictResolverStrategy;
-        this.mergeExecutor = mergeExecutor;
+        this.bookkeeper = bookkeeper;
     }
 
-    public PullResult fetchAndMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
+    public static GitSyncService create(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry registry) {
+        return new GitSyncService(
+                importFormatPreferences,
+                registry,
+                new MergeBookkeeper(registry)
+        );
+    }
+
+    ///  compute merge inputs/outputs for GUI
+    public Optional<PullPlan> prepareMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRoot.isEmpty()) {
             throw new JabRefException("Pull aborted: Path is not inside a Git repository.");
@@ -76,85 +78,65 @@ public class GitSyncService {
         }
 
         if (status.syncStatus() == SyncStatus.UP_TO_DATE) {
-            return PullResult.noopUpToDate();
+            return Optional.empty();
         }
         if (status.syncStatus() == SyncStatus.AHEAD) {
-            return PullResult.noopAhead();
+            return Optional.empty();
         }
 
         try (Git git = gitHandler.open()) {
-            // 1. Locate base / local / remote commits
+            // 1. locate base / local / remote commits
             GitRevisionLocator locator = new GitRevisionLocator();
             RevisionTriple triple = locator.locateMergeCommits(git);
+            Optional<RevCommit> baseCommitOpt = triple.base();
             RevCommit remoteCommit = triple.remote();
+            RevCommit localHead = triple.local();
 
-            if (status.syncStatus() == SyncStatus.BEHIND) {
-                gitHandler.fastForwardTo(remoteCommit);
-                return PullResult.merged(List.of());
+            // 2. load 3 versions (base/remote from Git; local from active DB)
+            Path bibPath = bibFilePath.toRealPath();
+            Path workTree = git.getRepository().getWorkTree().toPath().toRealPath();
+            Path relativePath;
+
+            if (!bibPath.startsWith(workTree)) {
+                throw new IllegalStateException("Given .bib file is not inside repository");
+            }
+            relativePath = workTree.relativize(bibPath);
+
+            BibDatabaseContext base;
+            if (baseCommitOpt.isPresent()) {
+                Optional<String> baseContent = GitFileReader.readFileFromCommit(git, baseCommitOpt.get(), relativePath);
+                base = baseContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(baseContent.get(), importFormatPreferences);
+            } else {
+                base = new BibDatabaseContext();
             }
 
-            // 2. Perform semantic merge
-            if (status.syncStatus() == SyncStatus.DIVERGED) {
-                try (GitHandler.MergeGuard guard = gitHandler.beginSemanticMergeGuard(remoteCommit, bibFilePath)) {
-                    PullResult result = performSemanticMerge(git, triple.base(), remoteCommit, localDatabaseContext, bibFilePath);
+            Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
+            BibDatabaseContext remote = remoteContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(remoteContent.get(), importFormatPreferences);
+            BibDatabaseContext local = localDatabaseContext;
 
-                    if (result.isSuccessful()) {
-                        guard.commit("Auto-merged by JabRef");
-                    }
-                    return result;
-                }
-            }
+            // 2. compute conflicts & auto plan
+            MergeAnalysis analysis = SemanticMergeAnalyzer.analyze(base, local, remote);
+            List<ThreeWayEntryConflict> conflicts = analysis.conflicts();
+            MergePlan autoPlan = analysis.autoPlan();
 
-            throw new JabRefException("Pull aborted: Unsupported sync status " + status.syncStatus());
+            // 5) return computation (GUI will apply & save, then finalize)
+            return Optional.of(PullPlan.of(status.syncStatus(), baseCommitOpt, localHead, remoteCommit, autoPlan, conflicts));
         }
     }
 
-    public PullResult performSemanticMerge(Git git,
-                                           Optional<RevCommit> baseCommitOpt,
-                                           RevCommit remoteCommit,
-                                           BibDatabaseContext localDatabaseContext,
-                                           Path bibFilePath) throws IOException, JabRefException, GitAPIException {
-
-        Path bibPath = bibFilePath.toRealPath();
-        Path workTree = git.getRepository().getWorkTree().toPath().toRealPath();
-        Path relativePath;
-
-        if (!bibPath.startsWith(workTree)) {
-            throw new IllegalStateException("Given .bib file is not inside repository");
-        }
-        relativePath = workTree.relativize(bibPath);
-
-        // 1. Load three versions
-        BibDatabaseContext base;
-        if (baseCommitOpt.isPresent()) {
-            Optional<String> baseContent = GitFileReader.readFileFromCommit(git, baseCommitOpt.get(), relativePath);
-            base = baseContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(baseContent.get(), importFormatPreferences);
-        } else {
-            base = new BibDatabaseContext();
-        }
-
-        Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
-        BibDatabaseContext remote = remoteContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(remoteContent.get(), importFormatPreferences);
-        BibDatabaseContext local = localDatabaseContext;
-
-        // 2. Conflict detection
-        List<ThreeWayEntryConflict> conflicts = SemanticConflictDetector.detectConflicts(base, local, remote);
-
-        BibDatabaseContext localPrime;
-        if (conflicts.isEmpty()) {
-            localPrime = local;
-            // No conflict: let logic write merged result to disk
-            mergeExecutor.merge(base, localPrime, remote, bibFilePath);
-        } else {
-            // 3. If there are conflicts, ask strategy to resolve
-            List<BibEntry> resolved = gitConflictResolverStrategy.resolveConflicts(conflicts);
-            if (resolved.isEmpty()) {
-                throw new JabRefException("Merge aborted: Conflict resolution was canceled or denied.");
-            }
-            localPrime = GitMergeUtil.replaceEntries(local, resolved);
-        }
-
-        return PullResult.merged(localPrime.getDatabase().getEntries());
+    /// Phase-2: finalize after GUI saved the file with applied plan.
+    ///
+    /// Responsibilities:
+    /// - (Re)open repo, stage bib file
+    /// - For BEHIND: fast-forward or create commit consistent with GUI-saved tree
+    /// - For DIVERGED: merge commit with parents (localHead, remote)
+    ///
+    /// Preconditions:
+    /// - The bib file on disk already reflects: local + autoPlan (+ resolvedPlan)
+    /// - No uncommitted unrelated changes
+    public BookkeepingResult finalizeMerge(Path bibFilePath,
+                                           PullPlan computation) throws GitAPIException, IOException, JabRefException {
+        return bookkeeper.resultRecord(bibFilePath, computation);
     }
 
     public PushResult push(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
@@ -202,24 +184,7 @@ public class GitSyncService {
 
             case BEHIND,
                  DIVERGED -> {
-                fetchAndMerge(localDatabaseContext, bibFilePath);
-                status = GitStatusChecker.checkStatus(gitHandler);
-                if (status.conflict()) {
-                    throw new JabRefException("Push aborted: Merge left conflicts unresolved.");
-                }
-                if (status.uncommittedChanges()) {
-                    throw new JabRefException("Push aborted: Merge produced uncommitted changes.");
-                }
-
-                SyncStatus after = status.syncStatus();
-                if (after == SyncStatus.AHEAD) {
-                    gitHandler.pushCommitsToRemoteRepository();
-                    return PushResult.pushed();
-                } else if (after == SyncStatus.UP_TO_DATE) {
-                    return PushResult.noopUpToDate();
-                } else {
-                    throw new JabRefException("Push aborted: Repository not ahead after merge. Status: " + after);
-                }
+                throw new JabRefException("Push aborted: Local branch is behind or has diverged from remote. Please pull first.");
             }
             default -> {
                 throw new JabRefException("Push aborted: Unsupported sync status.");

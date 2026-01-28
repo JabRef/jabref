@@ -12,7 +12,7 @@ import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;

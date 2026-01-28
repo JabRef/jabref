@@ -7,10 +7,8 @@ import javafx.scene.layout.GridPane;
 import org.jabref.gui.mergeentries.threewaymerge.cell.HeaderCell;
 import org.jabref.logic.l10n.Localization;
 
-/**
- * GridPane was used instead of a Hbox because Hbox allocates more space for cells
- * with longer text, but I wanted all cells to have the same width
- */
+/// GridPane was used instead of a Hbox because Hbox allocates more space for cells
+/// with longer text, but I wanted all cells to have the same width
 public class ThreeWayMergeHeaderView extends GridPane {
     public static final String DEFAULT_STYLE_CLASS = "merge-header";
     private final HeaderCell leftHeaderCell;

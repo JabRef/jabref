@@ -8,17 +8,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-/**
- * Parse a plain citation using regex rules.
- * <p>
- * TODO: This class is similar to {@link org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter}, we need to unify them.
- */
+/// Parse a plain citation using regex rules.
+///
+/// TODO: This class is similar to {@link org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter}, we need to unify them.
 public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String AUTHOR_TAG = "[author_tag]";
     private static final String URL_TAG = "[url_tag]";
@@ -52,16 +49,24 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             "(p.)?\\s?\\d+(-\\d+)?",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
-    private final List<String> urls = new ArrayList<>();
-    private final List<String> authors = new ArrayList<>();
-    private String year = "";
-    private String pages = "";
-    private String title = "";
-    private boolean isArticle = true;
-    private String journalOrPublisher = "";
+    private List<String> urls;
+    private List<String> authors;
+    private String year;
+    private String pages;
+    private String title;
+    private boolean isArticle;
+    private String journalOrPublisher;
 
     @Override
-    public Optional<BibEntry> parsePlainCitation(String text) throws FetcherException {
+    public Optional<BibEntry> parsePlainCitation(String text) {
+        urls = new ArrayList<>();
+        authors = new ArrayList<>();
+        year = "";
+        pages = "";
+        title = "";
+        isArticle = true;
+        journalOrPublisher = "";
+
         String inputWithoutUrls = findUrls(text);
         String inputWithoutAuthors = findAuthors(inputWithoutUrls);
         String inputWithoutYear = findYear(inputWithoutAuthors);

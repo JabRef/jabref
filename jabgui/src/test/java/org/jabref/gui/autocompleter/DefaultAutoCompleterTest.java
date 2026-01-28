@@ -27,11 +27,6 @@ class DefaultAutoCompleterTest {
     }
 
     @Test
-    void initAutoCompleterWithNullFieldThrowsException() {
-        assertThrows(NullPointerException.class, () -> new WordSuggestionProvider(null, database));
-    }
-
-    @Test
     void completeWithoutAddingAnythingReturnsNothing() {
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
         assertEquals(List.of(), result);

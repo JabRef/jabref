@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
-
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 public class AddBracesFormatter extends Formatter {
 
@@ -18,9 +18,7 @@ public class AddBracesFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
-
+    public String format(@NonNull String value) {
         if ((value.length() >= 2) && (value.charAt(0) != '{') && (value.charAt(value.length() - 1) != '}')) {
             // Title does not start with { and does not end with }, then this formatter can be applied
             return "{" + value + "}";

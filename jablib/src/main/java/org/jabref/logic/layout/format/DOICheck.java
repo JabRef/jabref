@@ -7,12 +7,10 @@ import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.identifier.DOI;
 
-/**
- * Used to fix [ 1588028 ] export HTML table DOI URL.
- * <p>
- * Will prepend "<a href="http://doi.org/">http://doi.org/</a>" or the DOI url with a custom base URL defined in the {@link DOIPreferences}
- * if only DOI and not an URL is given.
- */
+/// Used to fix [1588028] export HTML table DOI URL.
+///
+/// Will prepend "<a href="http://doi.org/">http://doi.org/</a>" or the DOI url with a custom base URL defined in the {@link DOIPreferences}
+/// if only DOI and not an URL is given.
 public class DOICheck implements LayoutFormatter {
 
     private final DOIPreferences doiPreferences;

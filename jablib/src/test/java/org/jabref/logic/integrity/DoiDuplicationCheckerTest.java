@@ -8,9 +8,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ResourceLock("Localization.lang")
 class DoiDuplicationCheckerTest {
 
     private final DoiDuplicationChecker checker = new DoiDuplicationChecker();

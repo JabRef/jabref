@@ -88,7 +88,7 @@ public class Benchmarks {
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 new BibEntryTypesManager());
-        databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());
+        databaseWriter.writePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());
         return outputWriter;
     }
 
@@ -145,7 +145,7 @@ public class Benchmarks {
         return group.containsAll(database.getEntries());
     }
 
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         Main.main(args);
     }
 }

@@ -407,10 +407,8 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     public void supportsYearRangeSearch() {
     }
 
-    /**
-     * A phrase is a sequence of terms wrapped in quotes.
-     * Only documents that contain exactly this sequence are returned.
-     */
+    /// A phrase is a sequence of terms wrapped in quotes.
+    /// Only documents that contain exactly this sequence are returned.
     @Test
     void supportsPhraseSearch() throws FetcherException {
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
@@ -419,10 +417,8 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
     }
 
-    /**
-     * A phrase is a sequence of terms wrapped in quotes.
-     * Only documents that contain exactly this sequence are returned.
-     */
+    /// A phrase is a sequence of terms wrapped in quotes.
+    /// Only documents that contain exactly this sequence are returned.
     @Test
     void supportsPhraseSearchAndMatchesExact() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)

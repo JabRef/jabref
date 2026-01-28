@@ -4,11 +4,9 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldWriter;
 
-/**
- * Language identifiers based on BibLaTeX manual specifications.
- * See the BibLaTeX documentation for full details:
- * <a href="http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdfhangelo">BibLaTeX manual</a>
- */
+/// Language identifiers based on BibLaTeX manual specifications.
+/// See the BibLaTeX documentation for full details:
+/// <a href="http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdfhangelo">BibLaTeX manual</a>
 
 public enum Langid {
     BASQUE("Basque", "basque"),

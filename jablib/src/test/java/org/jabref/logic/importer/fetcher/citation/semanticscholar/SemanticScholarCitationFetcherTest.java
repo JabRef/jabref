@@ -45,7 +45,7 @@ class SemanticScholarCitationFetcherTest {
                 .withField(StandardField.ISSN, "0195-6663")
                 .withField(StandardField.PUBLISHER, "Elsevier BV");
 
-        List<BibEntry> result = fetcher.searchCiting(entry);
+        List<BibEntry> result = fetcher.getReferences(entry);
         // Paper has more than 400 cites, but server returns "null" as data
         assertNotEquals(null, result);
     }
@@ -65,7 +65,7 @@ class SemanticScholarCitationFetcherTest {
                 .withField(StandardField.ISSN, "0195-6663")
                 .withField(StandardField.PUBLISHER, "Elsevier BV");
 
-        Optional<Integer> result = fetcher.searchCitationCount(entry);
+        Optional<Integer> result = fetcher.getCitationCount(entry);
         assertNotNull(result.get());
         assertThat(result.get(), greaterThan(0));
     }

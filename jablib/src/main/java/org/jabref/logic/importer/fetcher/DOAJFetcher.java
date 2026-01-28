@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -17,24 +16,23 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetches data from the Directory of Open Access Journals (DOAJ)
- *
- * @see <a href="https://doaj.org/api/v1/docs">API documentation</a>
- */
+/// Fetches data from the Directory of Open Access Journals (DOAJ)
+///
+/// @see <a href="https://doaj.org/api/v1/docs">API documentation</a>
 public class DOAJFetcher implements SearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOAJFetcher.class);
@@ -42,16 +40,14 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
     private final ImportFormatPreferences preferences;
 
-    public DOAJFetcher(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public DOAJFetcher(@NonNull ImportFormatPreferences preferences) {
+        this.preferences = preferences;
     }
 
-    /**
-     * Convert a JSONObject containing a bibJSON entry to a BibEntry
-     *
-     * @param bibJsonEntry The JSONObject to convert
-     * @return the converted BibEntry
-     */
+    /// Convert a JSONObject containing a bibJSON entry to a BibEntry
+    ///
+    /// @param bibJsonEntry The JSONObject to convert
+    /// @return the converted BibEntry
     public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
         // Fields that are directly accessible at the top level BibJson object
         List<Field> singleFields = List.of(StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH);

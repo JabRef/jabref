@@ -8,7 +8,7 @@ import org.jabref.logic.util.NotificationService;
 
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.MVStoreException;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ public abstract class MVStoreBase implements AutoCloseable {
 
     protected MVStore mvStore;
 
-    public MVStoreBase(@Nullable Path path, NotificationService dialogService) {
+    public MVStoreBase(@NonNull Path path, NotificationService dialogService) {
         Path mvStorePath = path;
 
         try {

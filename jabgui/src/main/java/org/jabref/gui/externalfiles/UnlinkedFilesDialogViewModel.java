@@ -158,7 +158,7 @@ public class UnlinkedFilesDialogViewModel {
         resultList.clear();
 
         importFilesBackgroundTask = importHandler
-                .importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)
+                .importFilesInBackground(fileList, TransferMode.LINK)
                 .onRunning(() -> {
                     progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
                     progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
@@ -173,9 +173,7 @@ public class UnlinkedFilesDialogViewModel {
         importFilesBackgroundTask.executeWith(taskExecutor);
     }
 
-    /**
-     * This starts the export of all files of all selected nodes in the file tree view.
-     */
+    /// This starts the export of all files of all selected nodes in the file tree view.
     public void startExport() {
         List<Path> fileList = checkedFileListProperty
                 .stream()

@@ -82,7 +82,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     public List<String> getEntryTypes() {
         List<String> entryTypes = new ArrayList<>();
-        result.entryTypeToResultMap().forEach((entrySet, _) -> entryTypes.add(entrySet.toString()));
+        result.entryTypeToResultMap().forEach((entrySet, _) -> entryTypes.add(entrySet.getDisplayName()));
         return entryTypes;
     }
 

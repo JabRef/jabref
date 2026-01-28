@@ -4,13 +4,11 @@ import org.jabref.model.openoffice.rangesort.RangeHolder;
 
 import com.sun.star.text.XTextRange;
 
-/**
- * Describe a protected range for overlap checking and reporting.
- * <p>
- * To check that our protected ranges do not overlap, we collect these ranges. To check for overlaps between these, we need the {@code range} itself. To report the results of overlap checking, we need a {@code description} that can be understood by the user.
- * <p>
- * To be able to refer back to more extended data, we might need to identify its {@code kind}, and its index in the corresponding tables or other identifier within its kind ({@code idWithinKind})
- */
+/// Describe a protected range for overlap checking and reporting.
+///
+/// To check that our protected ranges do not overlap, we collect these ranges. To check for overlaps between these, we need the `range` itself. To report the results of overlap checking, we need a `description` that can be understood by the user.
+///
+/// To be able to refer back to more extended data, we might need to identify its `kind`, and its index in the corresponding tables or other identifier within its kind (`idWithinKind`)
 public class RangeForOverlapCheck<T> implements RangeHolder {
 
     public final static int REFERENCE_MARK_KIND = 0;

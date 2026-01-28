@@ -98,7 +98,7 @@ public class SideEffectExecutor {
         try {
             return conditionFuture.get(sideEffect.timeoutMs() + 100, TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            LOGGER.debug("Error waiting for condition: {}", e.getMessage());
+            LOGGER.debug("Error waiting for condition: {}", e.getMessage(), e);
             return false;
         }
     }

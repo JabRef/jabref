@@ -3,11 +3,12 @@ package org.jabref.logic.layout.format;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jabref.logic.bst.util.BstNameFormatter;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
+
+import org.jspecify.annotations.NonNull;
 
 /// This layout formatter uses the BibTeX `name.format$` method and provides ultimate flexibility.
 ///
@@ -16,7 +17,7 @@ import org.jabref.model.entry.AuthorList;
 /// ```
 /// <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
 /// <case2>@<range21>@...
-///```
+/// ```
 ///
 /// Individual cases are separated by `@@` and items in a case by `@`.
 ///
@@ -51,17 +52,17 @@ import org.jabref.model.entry.AuthorList;
 /// Input:
 /// ```
 /// Joe Doe and Mary Jane and Bruce Bar and Arthur Kay
-///```
+/// ```
 ///
 /// Output:
 /// ```
 /// Doe, J., Jane, M., Bar, B. and Kay, A.
-///```
+/// ```
 ///
 /// Formatter parameter:
 /// ```
 /// 1@*@{ll},{f}.@@2@1@{ll},{f}.@2@ and {ll},{f}.@@*@1..-3@{ll},{f}., @-2@{ll},{f}.@-1@ and {ll},{f}.
-///```
+/// ```
 ///
 /// This is troublesome to write, but it works.
 /// For more examples see the test cases.
@@ -153,13 +154,11 @@ public class NameFormatter implements LayoutFormatter {
         this.parameter = parameter;
     }
 
-    public static Map<String, String> getNameFormatters(NameFormatterPreferences prefs) {
-        Objects.requireNonNull(prefs);
-
+    public static Map<String, String> getNameFormatters(@NonNull NameFormatterPreferences preferences) {
         Map<String, String> result = new HashMap<>();
 
-        List<String> names = prefs.getNameFormatterKey();
-        List<String> formats = prefs.getNameFormatterValue();
+        List<String> names = preferences.getNameFormatterKey();
+        List<String> formats = preferences.getNameFormatterValue();
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {

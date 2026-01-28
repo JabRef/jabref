@@ -55,23 +55,17 @@ public class TimestampPreferences {
         this.addModificationDate.set(addModificationDate);
     }
 
-    /**
-     * Required for migration only.
-     */
+    /// Required for migration only.
     public boolean shouldUpdateTimestamp() {
         return updateTimestamp;
     }
 
-    /**
-     * Required for migration only.
-     */
+    /// Required for migration only.
     public Field getTimestampField() {
         return timestampField;
     }
 
-    /**
-     * Required for migration only.
-     */
+    /// Required for migration only.
     public String getTimestampFormat() {
         return timestampFormat;
     }

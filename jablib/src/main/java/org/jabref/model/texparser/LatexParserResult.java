@@ -31,16 +31,12 @@ public class LatexParserResult {
         return citations;
     }
 
-    /**
-     * Return a collection of citations using a string as key reference.
-     */
+    /// Return a collection of citations using a string as key reference.
     public Collection<Citation> getCitationsByKey(String key) {
         return citations.get(key);
     }
 
-    /**
-     * Add a citation to the citations multimap.
-     */
+    /// Add a citation to the citations multimap.
     public void addKey(String key, Path path, int lineNumber, int start, int end, String line) {
         citations.put(key, new Citation(path, lineNumber, start, end, line));
     }

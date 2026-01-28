@@ -6,9 +6,10 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
-import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +19,13 @@ public class FetcherException extends JabRefException {
     private static final Pattern API_KEY_PATTERN = Pattern.compile("(?i)(?<" + API_KEY_PARAM_NAME + ">api|key|api[-_]?key)=[^&]*");
     private static final String REDACTED_STRING = "[REDACTED]";
 
+    @Nullable
     private final String url;
+
+    @Nullable
     private final SimpleHttpResponse httpResponse;
 
-    public FetcherException(String url, SimpleHttpResponse httpResponse) {
+    public FetcherException(@Nullable String url, @Nullable SimpleHttpResponse httpResponse) {
         // Empty string handled at org.jabref.logic.importer.FetcherException.getPrefix.
         super("");
         this.url = url;
@@ -87,7 +91,7 @@ public class FetcherException extends JabRefException {
     }
 
     String getRedactedUrl() {
-        return getRedactedUrl(url);
+        return getRedactedUrl(url == null ? "" : url);
     }
 
     public static String getRedactedUrl(String source) {

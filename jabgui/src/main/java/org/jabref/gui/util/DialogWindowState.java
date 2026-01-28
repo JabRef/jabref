@@ -1,9 +1,7 @@
 package org.jabref.gui.util;
 
-/**
- * This class is used to store the size and position of dialog windows so that
- * these properties stay consistent when they are closed and re-opened
- */
+/// This class is used to store the size and position of dialog windows so that
+/// these properties stay consistent when they are closed and re-opened
 public class DialogWindowState {
     private final double x;
     private final double y;

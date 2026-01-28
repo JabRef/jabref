@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.websearch;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
@@ -11,7 +12,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -24,7 +28,7 @@ import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -44,6 +48,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
+    @FXML private TableView<SearchEngineItem> searchEngineTable;
+    @FXML private TableColumn<SearchEngineItem, String> searchEngineName;
+    @FXML private TableColumn<SearchEngineItem, String> searchEngineUrlTemplate;
+
     @FXML private VBox fetchersContainer;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
@@ -57,12 +65,34 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     @Override
+    public List<String> getSearchKeywords() {
+        return List.of(
+                getTabName(),
+                Localization.lang("Configure API key"),
+                Localization.lang("Custom API key"),
+                "api",
+                "api key",
+                "apikey"
+        );
+    }
+
+    @Override
     public String getTabName() {
         return Localization.lang("Web search");
     }
 
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);
+
+        searchEngineName.setCellValueFactory(param -> param.getValue().nameProperty());
+        searchEngineName.setCellFactory(TextFieldTableCell.forTableColumn());
+        searchEngineName.setEditable(false);
+
+        searchEngineUrlTemplate.setCellValueFactory(param -> param.getValue().urlTemplateProperty());
+        searchEngineUrlTemplate.setCellFactory(TextFieldTableCell.forTableColumn());
+        searchEngineUrlTemplate.setEditable(true);
+
+        searchEngineTable.setItems(viewModel.getSearchEngines());
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());

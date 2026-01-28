@@ -1,7 +1,6 @@
 package org.jabref.model.openoffice.rangesort;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 import org.jabref.model.openoffice.uno.UnoCursor;
 import org.jabref.model.openoffice.uno.UnoSelection;
@@ -12,6 +11,7 @@ import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextViewCursor;
 import com.sun.star.uno.RuntimeException;
+import org.jspecify.annotations.NonNull;
 
 /*
  * A problem with XTextViewCursor: if it is not in text, then we get a crippled version that does
@@ -69,9 +69,7 @@ public class FunctionalTextViewCursor {
      * On failure the constructor restores the selection. On success, the caller may want to call
      * instance.restore() after finished using the cursor.
      */
-    public static OOResult<FunctionalTextViewCursor, String> get(XTextDocument doc) {
-        Objects.requireNonNull(doc);
-
+    public static OOResult<FunctionalTextViewCursor, String> get(@NonNull XTextDocument doc) {
         XTextRange initialPosition = null;
         XServiceInfo initialSelection = UnoSelection.getSelectionAsXServiceInfo(doc).orElse(null);
         XTextViewCursor viewCursor = UnoCursor.getViewCursor(doc).orElse(null);

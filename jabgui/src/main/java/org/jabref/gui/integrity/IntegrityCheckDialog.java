@@ -145,10 +145,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         }
     }
 
-    /**
-     * Loads the BibLogSettingsPane.fxml view
-     * and initializes its controller.
-     */
+    /// Loads the BibLogSettingsPane.fxml view
+    /// and initializes its controller.
     private void loadBibLogSettingsPane() {
         try {
             ViewLoaderResult result = ViewLoader.view(BibLogSettingsPane.class).load();
@@ -172,13 +170,11 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         }
     }
 
-    /**
-     * Called on:
-     * (1) Dialog initialization (default load)
-     * (2) User triggers Browse or Reset in BibLogSettingsPane
-     * <p>
-     * This reloads .blg warnings and merges them into the main message list.
-     */
+    /// Called on:
+    /// (1) Dialog initialization (default load)
+    /// (2) User triggers Browse or Reset in BibLogSettingsPane
+    ///
+    /// This reloads .blg warnings and merges them into the main message list.
     private void reloadBlgWarnings() {
         try {
             bibLogSettingsPane.refreshWarnings(libraryTab.getBibDatabaseContext());

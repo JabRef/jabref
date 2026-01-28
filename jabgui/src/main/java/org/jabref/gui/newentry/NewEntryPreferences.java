@@ -7,7 +7,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class NewEntryPreferences {
     private final ObjectProperty<NewEntryDialogTab> latestApproach;
@@ -35,6 +38,34 @@ public class NewEntryPreferences {
         this.idLookupGuessing = new SimpleBooleanProperty(idLookupGuessing);
         this.latestIdFetcherName = new SimpleStringProperty(idFetcherName);
         this.latestInterpretParserName = new SimpleStringProperty(interpretParserName);
+    }
+
+    private NewEntryPreferences() {
+        this(
+                NewEntryDialogTab.CHOOSE_ENTRY_TYPE, // Default latest approach
+                true,                                // Default expanded recommended
+                false,                               // Default expanded other
+                true,                                // Default expanded custom
+                StandardEntryType.Article,           // Default immediate type
+                true,                                // Default Id lookup guessing
+                DoiFetcher.NAME,                     // Default fetcher
+                PlainCitationParserChoice.RULE_BASED_GENERAL.getLocalizedName() // Default parser
+        );
+    }
+
+    public static NewEntryPreferences getDefault() {
+        return new NewEntryPreferences();
+    }
+
+    public void setAll(NewEntryPreferences other) {
+        this.latestApproach.set(other.getLatestApproach());
+        this.typesRecommendedExpanded.set(other.getTypesRecommendedExpanded());
+        this.typesOtherExpanded.set(other.getTypesOtherExpanded());
+        this.typesCustomExpanded.set(other.getTypesCustomExpanded());
+        this.latestImmediateType.set(other.getLatestImmediateType());
+        this.idLookupGuessing.set(other.getIdLookupGuessing());
+        this.latestIdFetcherName.set(other.getLatestIdFetcher());
+        this.latestInterpretParserName.set(other.getLatestInterpretParser());
     }
 
     public NewEntryDialogTab getLatestApproach() {

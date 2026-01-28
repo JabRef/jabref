@@ -4,9 +4,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.actions.SimpleCommand;
 
-/**
- * Opens a shared database.
- */
+/// Opens a shared database.
 public class ConnectToSharedDatabaseCommand extends SimpleCommand {
 
     private final LibraryTabContainer tabContainer;

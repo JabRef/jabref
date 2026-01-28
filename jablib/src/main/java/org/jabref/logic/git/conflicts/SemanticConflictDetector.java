@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
-import org.jabref.logic.git.merge.MergePlan;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -31,6 +31,7 @@ import static com.google.common.collect.Sets.union;
 /// - Only entries with the same citation key are considered matching.
 /// - Entries without citation keys are currently ignored.
 /// - Changing a citation key is not supported and is treated as deletion + addition.
+@Deprecated
 public class SemanticConflictDetector {
     public static List<ThreeWayEntryConflict> detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         // 1. get diffs between base, local and remote
@@ -60,15 +61,12 @@ public class SemanticConflictDetector {
         return conflicts;
     }
 
-    /**
-     * Detect entry-level conflicts among base, local, and remote versions of an entry.
-     * <p>
-     *
-     * @param base   the entry in the common ancestor
-     * @param local  the entry in the local version
-     * @param remote the entry in the remote version
-     * @return optional conflict (if detected)
-     */
+    /// Detect entry-level conflicts among base, local, and remote versions of an entry.
+    ///
+    /// @param base   the entry in the common ancestor
+    /// @param local  the entry in the local version
+    /// @param remote the entry in the remote version
+    /// @return optional conflict (if detected)
     private static Optional<ThreeWayEntryConflict> detectEntryConflict(BibEntry base,
                                                                        BibEntry local,
                                                                        BibEntry remote) {
@@ -174,20 +172,19 @@ public class SemanticConflictDetector {
         return !Objects.equals(a, b);
     }
 
-    /**
-     * Compares base and remote, finds all semantic-level changes (new entries, updated fields), and builds a patch plan.
-     * This plan is meant to be applied to local during merge:
-     * result = local + (remote − base)
-     *
-     * @param base   The base version of the database.
-     * @param remote The remote version to be merged.
-     * @return A {@link MergePlan} describing how to update the local copy with remote changes.
-     */
+    /// Compares base and remote, finds all semantic-level changes (new entries, updated fields), and builds a patch plan.
+    /// This plan is meant to be applied to local during merge:
+    /// result = local + (remote − base)
+    ///
+    /// @param base   The base version of the database.
+    /// @param remote The remote version to be merged.
+    /// @return A {@link MergePlan} describing how to update the local copy with remote changes.
     public static MergePlan extractMergePlan(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         EntryTriples triples = EntryTriples.from(base, local, remote);
 
         Map<String, Map<Field, String>> fieldPatches = new LinkedHashMap<>();
         List<BibEntry> newEntries = new ArrayList<>();
+        List<String> deletedEntryKeys = new ArrayList<>();
 
         for (Map.Entry<String, BibEntry> remoteEntryPair : triples.remoteMap.entrySet()) {
             String key = remoteEntryPair.getKey();
@@ -218,20 +215,19 @@ public class SemanticConflictDetector {
             }
         }
 
-        return new MergePlan(fieldPatches, newEntries);
+        return new MergePlan(fieldPatches, newEntries, deletedEntryKeys);
     }
 
-    /**
-     * Compares base and remote and constructs a patch at the field level. null == the field is deleted.
-     * - Apply remote change when local kept base value (including deletions: null);
-     * - If both sides changed to the same value, no patch needed;
-     * - Fallback: if a divergence is still observed, do not override local; skip this field,
-     *
-     * @param base   base version
-     * @param local  local version
-     * @param remote remote version
-     * @return A map from field to new value
-     */
+    /// Compares base and remote and constructs a patch at the field level. null == the field is deleted.
+    ///
+    /// - Apply remote change when local kept base value (including deletions: null);
+    /// - If both sides changed to the same value, no patch needed;
+    /// - Fallback: if a divergence is still observed, do not override local; skip this field,
+    ///
+    /// @param base   base version
+    /// @param local  local version
+    /// @param remote remote version
+    /// @return A map from field to new value
     private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry local, BibEntry remote) {
         Map<Field, String> patch = new LinkedHashMap<>();
 
@@ -261,19 +257,16 @@ public class SemanticConflictDetector {
         return patch;
     }
 
-    /**
-     * Converts a List of BibEntryDiff into a Map where the key is the citation key,
-     * and the value is the corresponding BibEntryDiff.
-     * <p>
-     * Notes:
-     * - Only entries with a citation key are included (entries without a key cannot be uniquely identified during merge).
-     * - Entries that represent additions (base == null) or deletions (new == null) are also included.
-     * - If multiple BibEntryDiffs share the same citation key (rare), the latter one will overwrite the former.
-     * <p>
-     *
-     * @param entryDiffs A list of entry diffs produced by BibDatabaseDiff
-     * @return A map from citation key to corresponding BibEntryDiff
-     */
+    /// Converts a List of BibEntryDiff into a Map where the key is the citation key,
+    /// and the value is the corresponding BibEntryDiff.
+    ///
+    /// Notes:
+    /// - Only entries with a citation key are included (entries without a key cannot be uniquely identified during merge).
+    /// - Entries that represent additions (base == null) or deletions (new == null) are also included.
+    /// - If multiple BibEntryDiffs share the same citation key (rare), the latter one will overwrite the former.
+    ///
+    /// @param entryDiffs A list of entry diffs produced by BibDatabaseDiff
+    /// @return A map from citation key to corresponding BibEntryDiff
     private static Map<String, BibEntryDiff> indexByCitationKey(List<BibEntryDiff> entryDiffs) {
         Map<String, BibEntryDiff> result = new LinkedHashMap<>();
 

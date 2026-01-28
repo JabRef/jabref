@@ -2,15 +2,17 @@ package org.jabref.logic.importer.fetcher;
 
 import org.jabref.logic.importer.WebFetcher;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Fetchers implementing this interface support customizable keys
+@NullMarked
 public interface CustomizableKeyFetcher extends WebFetcher {
 
-    /// Returns an URL for testing a key
+    /// Returns whether the API key is valid
     ///
-    /// The key is appended at the URL
-    ///
-    /// @return null if key validity checking is not supported
-    default String getTestUrl() {
-        return null;
+    /// @param apiKey API key to check
+    /// @return true if key is valid, false otherwise
+    default boolean isValidKey(String apiKey) {
+        return true;
     }
 }

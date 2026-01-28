@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -18,7 +18,7 @@ import org.jabref.model.entry.KeywordList;
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.eclipse.jgit.annotations.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,22 +58,21 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
 
     @NonNull
     @Override
-    public String format(String text) {
+    public String format(@NonNull String text) {
         if (text.isEmpty() || !conversionPossible) {
             return text;
         }
 
         // Using Injector to avoid widespread refactoring for constructor injection.
-        // Class that calls formatters (FieldFormatterCleanups.java) has many usages that would need updates.
+        // Class that calls formatters (FieldFormatterCleanupActions.java) has many usages that would need updates.
         JabRefCliPreferences cliPreferences = Injector.instantiateModelOrService(JabRefCliPreferences.class);
 
         // get preferences for BibEntry
         BibEntryPreferences bibPreferences = cliPreferences.getBibEntryPreferences();
         Character dlim = bibPreferences.getKeywordSeparator();
-        Character hdlim = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
 
         // create KeywordList to tokenize
-        KeywordList keyList = KeywordList.parse(text, dlim, hdlim);
+        KeywordList keyList = KeywordList.parse(text, dlim);
         Iterator<Keyword> list = keyList.iterator();
         List<Keyword> modifiedList = new ArrayList<>();
         while (list.hasNext()) {

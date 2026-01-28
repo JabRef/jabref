@@ -1,13 +1,14 @@
 package org.jabref.logic.integrity;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class EditionChecker implements ValueChecker {
 
@@ -22,18 +23,16 @@ public class EditionChecker implements ValueChecker {
     // Allow integers in 'edition' field in BibTeX mode --> see GeneralTab.fml
     private final boolean allowIntegerEdition;
 
-    public EditionChecker(BibDatabaseContext bibDatabaseContext, boolean allowIntegerEdition) {
-        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
+    public EditionChecker(@NonNull BibDatabaseContext bibDatabaseContext, boolean allowIntegerEdition) {
+        this.bibDatabaseContextEdition = bibDatabaseContext;
         this.allowIntegerEdition = allowIntegerEdition;
     }
 
-    /**
-     * Checks, if field contains only an integer or a literal (biblatex mode) Checks, if the first letter is capitalized
-     * (BibTeX mode) biblatex package documentation: The edition of a printed publication. This must be an integer, not
-     * an ordinal. It is also possible to give the edition as a literal string, for example "Third, revised and expanded
-     * edition". Official BibTeX specification: The edition of a book-for example, "Second". This should be an ordinal,
-     * and should have the first letter capitalized.
-     */
+    /// Checks, if field contains only an integer or a literal (biblatex mode) Checks, if the first letter is capitalized
+    /// (BibTeX mode) biblatex package documentation: The edition of a printed publication. This must be an integer, not
+    /// an ordinal. It is also possible to give the edition as a literal string, for example "Third, revised and expanded
+    /// edition". Official BibTeX specification: The edition of a book-for example, "Second". This should be an ordinal,
+    /// and should have the first letter capitalized.
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {

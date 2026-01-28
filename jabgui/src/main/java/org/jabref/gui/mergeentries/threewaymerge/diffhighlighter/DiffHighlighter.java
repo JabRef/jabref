@@ -2,11 +2,11 @@ package org.jabref.gui.mergeentries.threewaymerge.diffhighlighter;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.gui.mergeentries.threewaymerge.DiffMethod;
 
 import org.fxmisc.richtext.StyleClassedTextArea;
+import org.jspecify.annotations.NonNull;
 
 public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, UnifiedDiffHighlighter {
     protected final StyleClassedTextArea sourceTextview;
@@ -14,10 +14,9 @@ public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, Unifi
 
     protected DiffMethod diffMethod;
 
-    public DiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview, DiffMethod diffMethod) {
-        Objects.requireNonNull(sourceTextview, "source text view MUST NOT be null.");
-        Objects.requireNonNull(targetTextview, "target text view MUST NOT be null.");
-
+    public DiffHighlighter(@NonNull StyleClassedTextArea sourceTextview,
+                           @NonNull StyleClassedTextArea targetTextview,
+                           DiffMethod diffMethod) {
         this.sourceTextview = sourceTextview;
         this.targetTextview = targetTextview;
         this.diffMethod = diffMethod;

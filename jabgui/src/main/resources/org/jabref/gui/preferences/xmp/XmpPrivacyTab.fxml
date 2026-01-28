@@ -22,8 +22,8 @@
                     <TableColumn fx:id="fieldColumn" minWidth="100.0"
                                  text="%Field name"/>
                     <TableColumn fx:id="actionsColumn" editable="false"
-                                 minWidth="30.0" prefWidth="30.0" maxWidth="39"
-                                 resizable="false" sortable="false"/>
+                                 minWidth="40.0" prefWidth="40.0" maxWidth="39"
+                                 resizable="false" sortable="false" styleClass="actions-column"/>
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

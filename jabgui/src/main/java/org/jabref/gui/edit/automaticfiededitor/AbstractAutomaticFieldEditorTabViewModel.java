@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import javafx.collections.FXCollections;
@@ -16,14 +15,15 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
+
 public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractViewModel {
     protected final StateManager stateManager;
 
     private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
-    public AbstractAutomaticFieldEditorTabViewModel(BibDatabase bibDatabase, StateManager stateManager) {
-        Objects.requireNonNull(bibDatabase);
-        Objects.requireNonNull(stateManager);
+    public AbstractAutomaticFieldEditorTabViewModel(@NonNull BibDatabase bibDatabase,
+                                                    @NonNull StateManager stateManager) {
         this.stateManager = stateManager;
 
         addFields(EnumSet.allOf(StandardField.class));

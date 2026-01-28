@@ -27,8 +27,9 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     protected final Field field;
     protected StringProperty text = new SimpleStringProperty("");
     protected BibEntry entry;
+    protected final UndoManager undoManager;
+
     private final SuggestionProvider<?> suggestionProvider;
-    private final UndoManager undoManager;
     private final CompositeValidator fieldValidator;
     private EasyObservableValue<String> fieldBinding;
 

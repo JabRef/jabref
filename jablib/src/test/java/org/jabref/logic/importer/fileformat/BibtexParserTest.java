@@ -17,7 +17,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
@@ -63,6 +63,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
@@ -74,12 +75,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
- * <p>
- * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
- */
+/// Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+///
+/// Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
+@ResourceLock("Localization.lang")
 class BibtexParserTest {
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private ImportFormatPreferences importFormatPreferences;
@@ -488,9 +488,7 @@ class BibtexParserTest {
         );
     }
 
-    /**
-     * JabRef's heuristics is not able to parse this special case.
-     */
+    /// JabRef's heuristics is not able to parse this special case.
     @Test
     void parseFailsWithFinalSlashAsSlashWhenSingleLine() throws IOException {
         ParserResult parserResult = parser.parse(Reader.of("@misc{, test = {wired\\}}"));
@@ -1059,9 +1057,7 @@ class BibtexParserTest {
         assertEquals(Optional.of("H'{e}lne Fiaux"), parsedEntry.getField(StandardField.AUTHOR));
     }
 
-    /**
-     * Test for <a href="https://github.com/JabRef/jabref/issues/669">#669</a>
-     */
+    /// Test for <a href="https://github.com/JabRef/jabref/issues/669">#669</a>
     @Test
     void parsePreambleAndEntryWithoutNewLine() throws IOException {
         ParserResult result = parser
@@ -1217,7 +1213,7 @@ class BibtexParserTest {
 
                         @comment{jabref-meta: saveActions:enabled;title[lower_case]}"""));
 
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
@@ -1250,7 +1246,7 @@ class BibtexParserTest {
                         ;}
                         """));
 
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
 
@@ -1307,7 +1303,7 @@ class BibtexParserTest {
         ParserResult parserResult = parser
                 .parse(Reader.of("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
 
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
@@ -1398,9 +1394,7 @@ class BibtexParserTest {
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
     }
 
-    /**
-     * Checks that BibDesk Static Groups are available after parsing the library
-     */
+    /// Checks that BibDesk Static Groups are available after parsing the library
     @Test
     void integrationTestBibDeskStaticGroup() throws IOException {
         ParserResult result = parser.parse(Reader.of("""
@@ -1469,9 +1463,7 @@ class BibtexParserTest {
         assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntryByCitationKey("Heyl:2023aa").stream().toList(), false).stream().map(GroupTreeNode::getGroup).toList());
     }
 
-    /**
-     * Checks that BibDesk Smart Groups are available after parsing the library
-     */
+    /// Checks that BibDesk Smart Groups are available after parsing the library
     @Test
     @Disabled("Not yet supported")
     void integrationTestBibDeskSmartGroup() throws IOException {
@@ -1588,9 +1580,7 @@ class BibtexParserTest {
         assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Swain:2023aa").get()));
     }
 
-    /**
-     * Checks that both BibDesk Static Groups and Smart Groups are available after parsing the library
-     */
+    /// Checks that both BibDesk Static Groups and Smart Groups are available after parsing the library
     @Test
     @Disabled("Not yet supported")
     void integrationTestBibDeskMultipleGroup() throws IOException {
@@ -1703,9 +1693,7 @@ class BibtexParserTest {
         assertTrue(root.getChildren().getFirst().getGroup().containsAll(smartGroupEntriesExpected));
     }
 
-    /**
-     * Checks that a TexGroup finally gets the required data, after parsing the library.
-     */
+    /// Checks that a TexGroup finally gets the required data, after parsing the library.
     @Test
     void integrationTestTexGroup() throws IOException {
         String userHostInfo = new UserHostInfo(System.getProperty("user.name"), OS.getHostName()).getUserHostString();

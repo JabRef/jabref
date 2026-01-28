@@ -10,8 +10,8 @@ import java.util.List;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.citationkeypattern.CitationKeyGeneratorTestUtils;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.git.SlrGitHandler;
@@ -32,15 +32,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Integration test of the components used for SLR support
- * Marked as FetcherTest as it calls fetcher
- */
+/// Integration test of the components used for SLR support
+/// Marked as FetcherTest as it calls fetcher
 @FetcherTest
 class CrawlerTest {
     @TempDir
@@ -55,24 +52,12 @@ class CrawlerTest {
 
     CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
-    /**
-     * Set up mocks and copies the study definition file into the test repository
-     */
+    /// Set up mocks and copies the study definition file into the test repository
     @BeforeEach
     void setUp() throws GitAPIException, URISyntaxException {
         setUpRepository();
 
-        CitationKeyPatternPreferences citationKeyPatternPreferences = new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
-                "",
-                ',');
+        CitationKeyPatternPreferences citationKeyPatternPreferences = CitationKeyGeneratorTestUtils.getInstanceForTesting();
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class);

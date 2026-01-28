@@ -4,13 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -39,14 +39,13 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.google.common.base.Joiner;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Importer for the MODS format.<br>
- * More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>. <br>
- * The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
- */
+/// Importer for the MODS format.<br>
+/// More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>. <br>
+/// The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
 public class ModsImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModsImporter.class);
@@ -65,14 +64,13 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
+    public boolean isRecognizedFormat(@NonNull Reader input) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(input);
+        return bufferedReader.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
-        Objects.requireNonNull(input);
-
+    public ParserResult importDatabase(@NonNull BufferedReader input) throws IOException {
         List<BibEntry> bibItems = new ArrayList<>();
         try {
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
@@ -172,12 +170,10 @@ public class ModsImporter extends Importer implements Parser {
         putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
     }
 
-    /**
-     * Parses information from the RelatedModsGroup. It has the same elements as ModsGroup.
-     * But information like volume, issue and the pages appear here instead of in the ModsGroup.
-     * Also, if there appears a title field, then this indicates that is the name of the journal
-     * which the article belongs to.
-     */
+    /// Parses information from the RelatedModsGroup. It has the same elements as ModsGroup.
+    /// But information like volume, issue and the pages appear here instead of in the ModsGroup.
+    /// Also, if there appears a title field, then this indicates that is the name of the journal
+    /// which the article belongs to.
     private void parseRelatedItem(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
@@ -527,7 +523,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
                 case "dateCreated" -> {
                     // If there was no year in date issued, then take the year from date created
-                    fields.computeIfAbsent(StandardField.YEAR, k -> date.substring(0, 4));
+                    fields.computeIfAbsent(StandardField.YEAR, _ -> date.substring(0, 4));
                     fields.put(new UnknownField("created"), date);
                 }
                 case "dateCaptured" ->

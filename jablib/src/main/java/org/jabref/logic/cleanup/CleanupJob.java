@@ -7,9 +7,6 @@ import org.jabref.model.entry.BibEntry;
 
 @FunctionalInterface
 public interface CleanupJob {
-
-    /**
-     * Cleanup the entry.
-     */
+    /// Cleans up the given entry and returns the list of changes made.
     List<FieldChange> cleanup(BibEntry entry);
 }

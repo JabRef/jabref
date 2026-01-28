@@ -22,9 +22,7 @@ public class BibTeXConverter {
     private BibTeXConverter() {
     }
 
-    /**
-     * Converts an {@link MSBibEntry} to a {@link BibEntry} for import
-     */
+    /// Converts an {@link MSBibEntry} to a {@link BibEntry} for import
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
         Map<Field, String> fieldValues = new HashMap<>();

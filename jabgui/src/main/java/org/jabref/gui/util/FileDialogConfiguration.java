@@ -4,13 +4,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.stage.FileChooser;
 
 import org.jabref.logic.util.FileType;
+
+import org.jspecify.annotations.NonNull;
 
 public class FileDialogConfiguration {
 
@@ -20,10 +21,12 @@ public class FileDialogConfiguration {
     private final String initialFileName;
     private FileChooser.ExtensionFilter selectedExtensionFilter;
 
-    private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
-                                    FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
+    private FileDialogConfiguration(Path initialDirectory,
+                                    @NonNull List<FileChooser.ExtensionFilter> extensionFilters,
+                                    FileChooser.ExtensionFilter defaultExtension,
+                                    String initialFileName) {
         this.initialDirectory = initialDirectory;
-        this.extensionFilters = Objects.requireNonNull(extensionFilters);
+        this.extensionFilters = extensionFilters;
         this.defaultExtension = defaultExtension;
         this.initialFileName = initialFileName;
     }

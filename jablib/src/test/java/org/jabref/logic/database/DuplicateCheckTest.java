@@ -2,6 +2,7 @@ package org.jabref.logic.database;
 
 import java.util.stream.Stream;
 
+import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -348,9 +349,9 @@ public class DuplicateCheckTest {
         String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
         String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
 
-        assertEquals(1.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
-        assertEquals(0.78, DuplicateCheck.correlateByWords(d1, d3), 0.01);
-        assertEquals(0.78, DuplicateCheck.correlateByWords(d2, d3), 0.01);
+        assertEquals(1.0, StringSimilarity.correlateByWords(d1, d2), 0.01);
+        assertEquals(0.78, StringSimilarity.correlateByWords(d1, d3), 0.01);
+        assertEquals(0.78, StringSimilarity.correlateByWords(d2, d3), 0.01);
     }
 
     @Test
@@ -554,9 +555,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
-    /**
-     * Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
-     */
+    /// Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)

@@ -10,18 +10,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/**
- * This interface provides general test methods for paged fetchers
- */
+/// This interface provides general test methods for paged fetchers
 public interface PagedSearchFetcherTest {
 
     default String queryForUniqueResultsPerPage() {
         return "Software";
     }
 
-    /**
-     * Ensure that different page return different entries
-     */
+    /// Ensure that different page return different entries
     @Test
     default void pageSearchReturnsUniqueResultsPerPage() throws FetcherException {
         String query = queryForUniqueResultsPerPage();

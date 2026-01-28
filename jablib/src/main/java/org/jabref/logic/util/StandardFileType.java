@@ -24,6 +24,7 @@ public enum StandardFileType implements FileType {
     CSV("CSV", "csv"),
     ENDNOTE("Endnote", "ref", "enw"),
     HTML("HTML", "html", "htm"),
+    IMAGE("Image", "png", "jpg", "jpeg", "gif", "bmp", "tiff", "webp"),
     ISI("Isi", "isi", "txt"),
     JAR("JAR", "jar"),
     JAVA_KEYSTORE("Java Keystore", "jks"),

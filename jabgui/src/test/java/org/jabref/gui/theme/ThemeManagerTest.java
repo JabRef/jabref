@@ -88,14 +88,12 @@ class ThemeManagerTest {
         assertEquals(TEST_CSS_DATA, cssLocationAfterDeletion.get());
     }
 
-    /**
-     * This test was orinially part of a more complex test. After a major refactor and simplification of the theme
-     * subsystem, it was decided to drop this functionality in particular, as there is no use case for it and removing
-     * this does simplify the implementation of the theme system.
-     * See https://github.com/JabRef/jabref/pull/7336#issuecomment-874267375
-     *
-     * @throws IOException when the testfile cannot be created
-     */
+    /// This test was orinially part of a more complex test. After a major refactor and simplification of the theme
+    /// subsystem, it was decided to drop this functionality in particular, as there is no use case for it and removing
+    /// this does simplify the implementation of the theme system.
+    /// See https://github.com/JabRef/jabref/pull/7336#issuecomment-874267375
+    ///
+    /// @throws IOException when the testfile cannot be created
     @Disabled
     @Test
     void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
@@ -200,10 +198,8 @@ class ThemeManagerTest {
         });
     }
 
-    /**
-     * Since the DefaultFileUpdateMonitor runs in a separate thread we have to wait for some arbitrary number of msecs
-     * for the thread to start up and the changed css to reload.
-     */
+    /// Since the DefaultFileUpdateMonitor runs in a separate thread we have to wait for some arbitrary number of msecs
+    /// for the thread to start up and the changed css to reload.
     @Test
     void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");

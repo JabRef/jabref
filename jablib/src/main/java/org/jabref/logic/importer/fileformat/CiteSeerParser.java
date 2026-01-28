@@ -8,9 +8,9 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
@@ -26,14 +26,13 @@ public class CiteSeerParser {
         return response;
     }
 
-    /***
-     * WARNING: The DOI for each parsed BibEntry is not a valid DOI.
-     * Cite Seer associates an id with each response as a unique hash.
-     * However, it is not a valid variation of a DOI value.
-     *
-     * @param jsonObj Search response as a JSON Object
-     * @return BibEntry
-     */
+    ///
+    /// WARNING: The DOI for each parsed BibEntry is not a valid DOI.
+    /// Cite Seer associates an id with each response as a unique hash.
+    /// However, it is not a valid variation of a DOI value.
+    ///
+    /// @param jsonObj Search response as a JSON Object
+    /// @return BibEntry
     private BibEntry parseBibEntry(JSONObject jsonObj) {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.DOI, jsonObj.optString("id"));

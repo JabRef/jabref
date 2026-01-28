@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Represents a title of a bibtex entry.
- */
+/// Represents a title of a bibtex entry.
 public final class Title {
 
     private final List<Word> words = new LinkedList<>();

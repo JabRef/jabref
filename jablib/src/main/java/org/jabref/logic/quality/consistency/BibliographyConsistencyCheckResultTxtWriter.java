@@ -18,11 +18,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 
-/**
- * Outputs the findings as plain text.
- * <p>
- * The symbols from {@link BibliographyConsistencyCheckResultWriter} are used.
- */
+/// Outputs the findings as plain text.
+///
+/// The symbols from {@link BibliographyConsistencyCheckResultWriter} are used.
 public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyConsistencyCheckResultWriter {
 
     private List<Integer> columnWidths;

@@ -10,18 +10,14 @@ import org.jabref.logic.push.PushToApplicationPreferences;
 
 public interface GuiPushToApplication extends PushToApplication {
 
-    /**
-     * Gets a tooltip for the push operation.
-     */
+    /// Gets a tooltip for the push operation.
     default String getTooltip() {
         return Localization.lang("Push entries to external application (%0)", getDisplayName());
     }
 
-    /**
-     * Gets the icon associated with the application.
-     *
-     * @return The icon for the application.
-     */
+    /// Gets the icon associated with the application.
+    ///
+    /// @return The icon for the application.
     JabRefIcon getApplicationIcon();
 
     default Action getAction() {

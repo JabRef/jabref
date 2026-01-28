@@ -5,8 +5,8 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
 
 public class TitleChecker implements ValueChecker {
 
@@ -20,16 +20,14 @@ public class TitleChecker implements ValueChecker {
         this.databaseContext = databaseContext;
     }
 
-    /**
-     * Algorithm:
-     * - remove everything that is in curly brackets
-     * - split the title into subtitles based on the delimiters
-     * (defined in the local variable DELIMITERS, currently . ! ? ; : [)
-     * - for each sub title:
-     * -    remove trailing whitespaces
-     * -    ignore first letter as this can always be written in caps
-     * -    check if at least one capital letter is in the subtitle
-     */
+    /// Algorithm:
+    /// - remove everything that is in curly brackets
+    /// - split the title into subtitles based on the delimiters
+    /// (defined in the local variable DELIMITERS, currently . ! ? ; : [)
+    /// - for each sub title:
+    /// -    remove trailing whitespaces
+    /// -    ignore first letter as this can always be written in caps
+    /// -    check if at least one capital letter is in the subtitle
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {

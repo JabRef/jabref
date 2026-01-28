@@ -13,12 +13,10 @@ public class OpenDatabase {
     private OpenDatabase() {
     }
 
-    /**
-     * Load database (bib-file)
-     *
-     * @param fileToOpen Name of the BIB-file to open
-     * @return ParserResult which never is null
-     */
+    /// Load database (bib-file)
+    ///
+    /// @param fileToOpen Name of the BIB-file to open
+    /// @return ParserResult which never is null
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
         return new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen);

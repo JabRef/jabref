@@ -6,9 +6,7 @@ import java.util.Iterator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-/**
- * Sorts entries by the number of fields and then by the field names.
- */
+/// Sorts entries by the number of fields and then by the field names.
 public class BibEntryByFieldsComparator implements Comparator<BibEntry> {
     @Override
     public int compare(BibEntry e1, BibEntry e2) {

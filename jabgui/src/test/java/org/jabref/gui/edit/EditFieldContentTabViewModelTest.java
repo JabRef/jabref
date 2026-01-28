@@ -40,23 +40,6 @@ class EditFieldContentTabViewModelTest {
     }
 
     @Test
-    void clearSelectedFieldShouldClearFieldContentEvenWhenOverwriteFieldContentIsNotEnabled() {
-        editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);
-        editFieldContentViewModel.overwriteFieldContentProperty().set(false);
-        editFieldContentViewModel.clearSelectedField();
-
-        assertEquals(Optional.empty(), entryA.getField(StandardField.YEAR));
-    }
-
-    @Test
-    void clearSelectedFieldShouldDoNothingWhenFieldDoesntExistOrIsEmpty() {
-        editFieldContentViewModel.selectedFieldProperty().set(StandardField.FILE);
-        editFieldContentViewModel.clearSelectedField();
-
-        assertEquals(Optional.empty(), entryA.getField(StandardField.FILE));
-    }
-
-    @Test
     void setFieldValueShouldNotDoAnythingIfOverwriteFieldContentIsNotEnabled() {
         editFieldContentViewModel.overwriteFieldContentProperty().set(false);
         editFieldContentViewModel.selectedFieldProperty().set(StandardField.YEAR);

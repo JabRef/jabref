@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.SequencedMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -34,6 +33,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -59,10 +59,8 @@ public class EndnoteXmlExporter extends Exporter {
         ENTRY_TYPE_MAPPING.put(StandardEntryType.Misc, new EndNoteType("Generic", 15));
     }
 
-    /**
-     * Contains the mapping of all fields not explicitly handled by mapX methods.
-     * We need a fixed order here, so we use a SequencedMap
-     */
+    /// Contains the mapping of all fields not explicitly handled by mapX methods.
+    /// We need a fixed order here, so we use a SequencedMap
     private static final SequencedMap<Field, String> STANDARD_FIELD_MAPPING = new LinkedHashMap<>();
 
     static {
@@ -106,11 +104,9 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws ParserConfigurationException, TransformerException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(file);
-        Objects.requireNonNull(entries);
-
+    public void export(@NonNull BibDatabaseContext databaseContext,
+                       @NonNull Path file,
+                       @NonNull List<BibEntry> entries) throws ParserConfigurationException, TransformerException {
         if (entries.isEmpty()) {
             return;
         }

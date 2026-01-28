@@ -2,7 +2,6 @@ package org.jabref.logic.util;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -13,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,13 +51,11 @@ public class HeadlessExecutorService implements Executor {
     private HeadlessExecutorService() {
     }
 
-    public void execute(Runnable command) {
-        Objects.requireNonNull(command);
+    public void execute(@NonNull Runnable command) {
         executorService.execute(command);
     }
 
-    public void executeAndWait(Runnable command) {
-        Objects.requireNonNull(command);
+    public void executeAndWait(@NonNull Runnable command) {
         Future<?> future = executorService.submit(command);
         try {
             future.get();
@@ -68,25 +66,19 @@ public class HeadlessExecutorService implements Executor {
         }
     }
 
-    /**
-     * Executes a callable task that provides a return value after the calculation is done.
-     *
-     * @param command The task to execute.
-     * @return A Future object that provides the returning value.
-     */
-    public <T> Future<T> execute(Callable<T> command) {
-        Objects.requireNonNull(command);
+    /// Executes a callable task that provides a return value after the calculation is done.
+    ///
+    /// @param command The task to execute.
+    /// @return A Future object that provides the returning value.
+    public <T> Future<T> execute(@NonNull Callable<T> command) {
         return executorService.submit(command);
     }
 
-    /**
-     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done.
-     *
-     * @param tasks The tasks to execute
-     * @return A List of Future objects that provide the returning values.
-     */
-    public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) {
-        Objects.requireNonNull(tasks);
+    /// Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done.
+    ///
+    /// @param tasks The tasks to execute
+    /// @return A List of Future objects that provide the returning values.
+    public <T> List<Future<T>> executeAll(@NonNull Collection<Callable<T>> tasks) {
         try {
             return executorService.invokeAll(tasks);
         } catch (InterruptedException exception) {
@@ -95,8 +87,7 @@ public class HeadlessExecutorService implements Executor {
         }
     }
 
-    public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks, int timeout, TimeUnit timeUnit) {
-        Objects.requireNonNull(tasks);
+    public <T> List<Future<T>> executeAll(@NonNull Collection<Callable<T>> tasks, int timeout, TimeUnit timeUnit) {
         try {
             return executorService.invokeAll(tasks, timeout, timeUnit);
         } catch (InterruptedException exception) {
@@ -109,9 +100,7 @@ public class HeadlessExecutorService implements Executor {
         this.lowPriorityExecutorService.execute(new NamedRunnable(taskName, runnable));
     }
 
-    public void executeInterruptableTaskAndWait(Runnable runnable) {
-        Objects.requireNonNull(runnable);
-
+    public void executeInterruptableTaskAndWait(@NonNull Runnable runnable) {
         Future<?> future = lowPriorityExecutorService.submit(runnable);
         try {
             future.get();
@@ -126,9 +115,7 @@ public class HeadlessExecutorService implements Executor {
         timer.schedule(timerTask, millisecondsDelay);
     }
 
-    /**
-     * Shuts everything down. After termination, this method returns.
-     */
+    /// Shuts everything down. After termination, this method returns.
     public void shutdownEverything() {
         LOGGER.trace("Gracefully shut down executor service");
         gracefullyShutdown(EXECUTOR_NAME, this.executorService, 15);
@@ -165,10 +152,8 @@ public class HeadlessExecutorService implements Executor {
         }
     }
 
-    /**
-     * Shuts down the provided executor service by first trying a normal shutdown, then waiting for the shutdown and then forcibly shutting it down.
-     * Returns if the status of the shut down is known.
-     */
+    /// Shuts down the provided executor service by first trying a normal shutdown, then waiting for the shutdown and then forcibly shutting it down.
+    /// Returns if the status of the shut down is known.
     public static void gracefullyShutdown(String name, ExecutorService executorService, int timeoutInSeconds) {
         try {
             // This is non-blocking. See https://stackoverflow.com/a/57383461/873282.

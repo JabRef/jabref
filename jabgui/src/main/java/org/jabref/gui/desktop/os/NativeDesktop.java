@@ -1,7 +1,6 @@
 package org.jabref.gui.desktop.os;
 
 import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -13,8 +12,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -39,19 +38,17 @@ import static org.jabref.model.entry.field.StandardField.PDF;
 import static org.jabref.model.entry.field.StandardField.PS;
 import static org.jabref.model.entry.field.StandardField.URL;
 
-/**
- * This class contains bundles OS specific implementations for file directories and file/application open handling methods.
- * In case the default does not work, subclasses provide the correct behavior.
- * <p>
- * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
- * The configuration of tinylog will become immutable as soon as the first log entry is issued.
- * https://tinylog.org/v2/configuration/
- * <p>
- * See https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
- * https://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT.
- * <p>
- * For non-GUI things, see {@link org.jabref.logic.os.OS}.
- */
+/// This class contains bundles OS specific implementations for file directories and file/application open handling methods.
+/// In case the default does not work, subclasses provide the correct behavior.
+///
+/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+/// The configuration of tinylog will become immutable as soon as the first log entry is issued.
+/// https://tinylog.org/v2/configuration/
+///
+/// See https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
+/// https://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT.
+///
+/// For non-GUI things, see {@link org.jabref.logic.os.OS}.
 @AllowedToUseAwt("Because of moveToTrash() is not available elsewhere.")
 public abstract class NativeDesktop {
     // No LOGGER may be initialized directly
@@ -59,11 +56,9 @@ public abstract class NativeDesktop {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
-    /**
-     * Open a http/pdf/ps viewer for the given link string.
-     * <p>
-     * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
-     */
+    /// Open a http/pdf/ps viewer for the given link string.
+    ///
+    /// Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
     public static void openExternalViewer(BibDatabaseContext databaseContext,
                                           GuiPreferences preferences,
                                           String initialLink,
@@ -167,14 +162,12 @@ public abstract class NativeDesktop {
         openBrowser(link, preferences.getExternalApplicationsPreferences());
     }
 
-    /**
-     * Open an external file, attempting to use the correct viewer for it.
-     * If the "file" is an online link, instead open it with the browser
-     *
-     * @param databaseContext The database this file belongs to.
-     * @param link            The filename.
-     * @return false if the link couldn't be resolved, true otherwise.
-     */
+    /// Open an external file, attempting to use the correct viewer for it.
+    /// If the "file" is an online link, instead open it with the browser
+    ///
+    /// @param databaseContext The database this file belongs to.
+    /// @param link            The filename.
+    /// @return false if the link couldn't be resolved, true otherwise.
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
                                                     ExternalApplicationsPreferences externalApplicationsPreferences,
                                                     FilePreferences filePreferences,
@@ -213,12 +206,10 @@ public abstract class NativeDesktop {
         }
     }
 
-    /**
-     * Opens a file browser of the folder of the given file. If possible, the file is selected
-     *
-     * @param fileLink the location of the file
-     * @throws IOException if the default file browser cannot be opened
-     */
+    /// Opens a file browser of the folder of the given file. If possible, the file is selected
+    ///
+    /// @param fileLink the location of the file
+    /// @throws IOException if the default file browser cannot be opened
     public static void openFolderAndSelectFile(Path fileLink,
                                                ExternalApplicationsPreferences externalApplicationsPreferences,
                                                DialogService dialogService) throws IOException {
@@ -241,11 +232,9 @@ public abstract class NativeDesktop {
         executeCommand(command, absolutePath, dialogService);
     }
 
-    /**
-     * Opens a new console starting on the given file location
-     *
-     * @param file Location the console should be opened at.
-     */
+    /// Opens a new console starting on the given file location
+    ///
+    /// @param file Location the console should be opened at.
     public static void openConsole(Path file, GuiPreferences preferences, DialogService dialogService) throws IOException {
         if (file == null) {
             return;
@@ -287,11 +276,9 @@ public abstract class NativeDesktop {
         }
     }
 
-    /**
-     * Opens the given URL using the system browser
-     *
-     * @param url the URL to open
-     */
+    /// Opens the given URL using the system browser
+    ///
+    /// @param url the URL to open
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
         openExternalFilePlatformIndependent(fileType, url, externalApplicationsPreferences);
@@ -301,11 +288,9 @@ public abstract class NativeDesktop {
         openBrowser(url.toASCIIString(), externalApplicationsPreferences);
     }
 
-    /**
-     * Opens the url with the users standard Browser. If that fails a popup will be shown to instruct the user to open the link manually and the link gets copied to the clipboard
-     *
-     * @param url the URL to open
-     */
+    /// Opens the url with the users standard Browser. If that fails a popup will be shown to instruct the user to open the link manually and the link gets copied to the clipboard
+    ///
+    /// @param url the URL to open
     public static void openBrowserShowPopup(String url, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
         try {
             openBrowser(url, externalApplicationsPreferences);
@@ -334,30 +319,24 @@ public abstract class NativeDesktop {
 
     public abstract void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException;
 
-    /**
-     * Opens a file on an Operating System, using the given application.
-     *
-     * @param filePath    The filename.
-     * @param application Link to the app that opens the file.
-     */
+    /// Opens a file on an Operating System, using the given application.
+    ///
+    /// @param filePath    The filename.
+    /// @param application Link to the app that opens the file.
     public abstract void openFileWithApplication(String filePath, String application) throws IOException;
 
     public abstract void openFolderAndSelectFile(Path file) throws IOException;
 
     public abstract void openConsole(String absolutePath, DialogService dialogService) throws IOException;
 
-    /**
-     * Returns the path to the system's applications folder.
-     *
-     * @return the path
-     */
+    /// Returns the path to the system's applications folder.
+    ///
+    /// @return the path
     public abstract Path getApplicationDirectory();
 
-    /**
-     * Get the user's default file chooser directory
-     *
-     * @return the path
-     */
+    /// Get the user's default file chooser directory
+    ///
+    /// @return the path
     public Path getDefaultFileChooserDirectory() {
         Path userDirectory = Directories.getUserDirectory();
         Path documents = userDirectory.resolve("Documents");
@@ -367,12 +346,10 @@ public abstract class NativeDesktop {
         return documents;
     }
 
-    /**
-     * Moves the given file to the trash.
-     *
-     * @throws UnsupportedOperationException if the current platform does not support the {@link Desktop.Action#MOVE_TO_TRASH} action
-     * @see Desktop#moveToTrash(File)
-     */
+    /// Moves the given file to the trash.
+    ///
+    /// @throws UnsupportedOperationException if the current platform does not support the {@link Desktop.Action#MOVE_TO_TRASH} action
+    /// @see Desktop#moveToTrash(java.io.File)
     public void moveToTrash(Path path) {
         boolean success = Desktop.getDesktop().moveToTrash(path.toFile());
         if (!success) {

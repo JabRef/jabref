@@ -25,13 +25,11 @@ public class GroupTreeNodeTest {
     private final List<BibEntry> entries = new ArrayList<>();
     private BibEntry entry;
 
-    /**
-     * Gets the marked node in the following tree of explicit groups:
-     * Root
-     * A ExplicitA, Including
-     * A ExplicitParent, Independent (= parent)
-     * B ExplicitNode, Refining (<-- this)
-     */
+    /// Gets the marked node in the following tree of explicit groups:
+    /// Root
+    /// A ExplicitA, Including
+    /// A ExplicitParent, Independent (= parent)
+    /// B ExplicitNode, Refining (<-- this)
     public static GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) {
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         GroupTreeNode parent = root
@@ -39,23 +37,21 @@ public class GroupTreeNodeTest {
         return parent.addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING, ','));
     }
 
-    /**
-     * Gets the marked node in the following tree:
-     * Root
-     * A SearchA
-     * A ExplicitA, Including
-     * A ExplicitGrandParent (= grand parent)
-     * B ExplicitB
-     * B KeywordParent (= parent)
-     * C KeywordNode (<-- this)
-     * D ExplicitChild (= child)
-     * C SearchC
-     * C ExplicitC
-     * C KeywordC
-     * B SearchB
-     * B KeywordB
-     * A KeywordA
-     */
+    /// Gets the marked node in the following tree:
+    /// Root
+    /// A SearchA
+    /// A ExplicitA, Including
+    /// A ExplicitGrandParent (= grand parent)
+    /// B ExplicitB
+    /// B KeywordParent (= parent)
+    /// C KeywordNode (<-- this)
+    /// D ExplicitChild (= child)
+    /// C SearchC
+    /// C ExplicitC
+    /// C KeywordC
+    /// B SearchB
+    /// B KeywordB
+    /// A KeywordA
     public static GroupTreeNode getNodeInComplexTree(GroupTreeNode root) {
         root.addSubgroup(getSearchGroup("SearchA"));
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
@@ -89,14 +85,12 @@ public class GroupTreeNodeTest {
         return new ExplicitGroup(name, GroupHierarchyType.REFINING, ',');
     }
 
-    /**
-     * Gets the marked in the following tree:
-     * Root
-     * A
-     * A
-     * A (<- this)
-     * A
-     */
+    /// Gets the marked in the following tree:
+    /// Root
+    /// A
+    /// A
+    /// A (<- this)
+    /// A
     /*
     GroupTreeNode getNodeAsChild(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());

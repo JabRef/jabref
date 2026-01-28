@@ -1,6 +1,5 @@
 package org.jabref.gui.errorconsole;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.icon.IconTheme;
@@ -8,14 +7,15 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.os.OS;
 
 import com.google.common.base.Throwables;
+import org.jspecify.annotations.NonNull;
 import org.tinylog.core.LogEntry;
 
 public class LogEventViewModel {
 
     private final LogEntry logEvent;
 
-    public LogEventViewModel(LogEntry logEvent) {
-        this.logEvent = Objects.requireNonNull(logEvent);
+    public LogEventViewModel(@NonNull LogEntry logEvent) {
+        this.logEvent = logEvent;
     }
 
     public String getDisplayText() {

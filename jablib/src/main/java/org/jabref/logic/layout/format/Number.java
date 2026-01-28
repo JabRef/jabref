@@ -2,10 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
-/**
- * Formatter that outputs a sequence number for the current entry. The sequence number is
- * tied to the entry's position in the order, not to the number of calls to this formatter.
- */
+/// Formatter that outputs a sequence number for the current entry. The sequence number is
+/// tied to the entry's position in the order, not to the number of calls to this formatter.
 public class Number implements ParamLayoutFormatter {
 
     public static int serialExportNumber;
