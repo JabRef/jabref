@@ -9,8 +9,16 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      # - uses: actions/checkout@v6
       - name: 'Add label "status: to-be-merged"'
-        run: |
-          gh pr edit ${{ github.event.merge_group.pull_request.number }} --add-label "status: to-be-merged"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ref="${GITHUB_REF_NAME}"  # e.g. gh-readonly-queue/main/pr-14925-abc...
+          if [[ "$ref" =~ ^gh-readonly-queue/[^/]+/pr-([0-9]+)- ]]; then
+            pr="${BASH_REMATCH[1]}"
+            gh pr edit "$pr" --repo "$GITHUB_REPOSITORY" --add-label "status: to-be-merged"
+          else
+            echo "Cannot extract PR number from ref: $ref" >&2
+            exit 1
+          fi
