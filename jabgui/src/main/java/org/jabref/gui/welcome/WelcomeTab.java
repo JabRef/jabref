@@ -241,7 +241,7 @@ public class WelcomeTab extends Tab {
         Hyperlink newLibraryLink = createActionLink(Localization.lang("New empty library"),
                 () -> new NewDatabaseAction(tabContainer, preferences).execute());
 
-        Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library"),
+        Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library..."),
                 () -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
                         stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                         taskExecutor).execute());
