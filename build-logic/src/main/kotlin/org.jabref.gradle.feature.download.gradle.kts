@@ -1,3 +1,6 @@
-plugins {
-    id("de.undercouch.download")
+import org.gradle.kotlin.dsl.named
+
+configurations.named { it.contains("download") }.configureEach {
+    attributes.attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily.WINDOWS))
+    attributes.attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture.ARM64))
 }
