@@ -34,18 +34,14 @@ public class UpdateWithWebInfoAction extends SimpleCommand {
         }
 
         BibEntry selectedEntry = stateManager.getSelectedEntries().get(0);
-
-        // This constructor is correct (GuiPreferences, TaskExecutor)
         MultiMergeEntriesView mergeView = new MultiMergeEntriesView(preferences, taskExecutor);
-
         mergeView.addSource("Original", () -> selectedEntry);
 
-        // FIXED: The 4th argument must be the BibDatabaseContext
         var fetchers = WebFetchers.getEntryBasedFetchers(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getFilePreferences(),
-                stateManager.getActiveDatabase().get() // THIS WAS THE MISSING KEY
+                stateManager.getActiveDatabase().get()
         );
 
         for (var fetcher : fetchers) {

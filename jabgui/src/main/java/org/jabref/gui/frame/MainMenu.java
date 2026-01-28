@@ -307,12 +307,7 @@ public class MainMenu extends MenuBar {
                         StandardActions.MERGE_WITH_FETCHED_ENTRY,
                         new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
 
-                factory.createMenuItem(StandardActions.UPDATE_WITH_WEB_INFO, new UpdateWithWebInfoAction(
-                        stateManager,
-                        dialogService,
-                        preferences,
-                        taskExecutor
-                )),
+                factory.createMenuItem(StandardActions.UPDATE_WITH_WEB_INFO, new UpdateWithWebInfoAction(stateManager, dialogService, preferences, taskExecutor)),
 
                 factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
