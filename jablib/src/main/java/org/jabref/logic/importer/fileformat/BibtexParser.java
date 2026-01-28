@@ -115,7 +115,10 @@ public class BibtexParser implements Parser {
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibDeskGroups;
 
+    private StringBuilder currentEntryBuffer = new StringBuilder();
+
     private GroupTreeNode bibDeskGroupTreeNode;
+    private String lastBrokenEntryText = null;
 
     public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = importFormatPreferences;
@@ -318,13 +321,14 @@ public class BibtexParser implements Parser {
         database.setEpilog(dumpTextReadSoFarToString().trim());
     }
 
-    private void parseAndAddEntry(String type) {
+    private void parseAndAddEntry(String type) throws RecoverableParseException, IOException {
         int startLine = line;
         int startColumn = column;
+        String commentsAndEntryTypeDefinition = "";
         try {
             // collect all comments and the entry type definition in front of the actual entry
             // this is at least `@Type`
-            String commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();
+            commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();
 
             // remove first newline
             // this is appended by JabRef during writing automatically
@@ -335,9 +339,17 @@ public class BibtexParser implements Parser {
             }
 
             BibEntry entry = parseEntry(type);
+            String commentBeforeEntry = "";
+            if (lastBrokenEntryText != null && !lastBrokenEntryText.isEmpty()) {
+                commentBeforeEntry = lastBrokenEntryText;
+                lastBrokenEntryText = null;
+            }
+
+            commentBeforeEntry = commentBeforeEntry
+                    + commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf('@'));
             // store comments collected without type definition
             entry.setCommentsBeforeEntry(
-                    commentsAndEntryTypeDefinition.substring(0, commentsAndEntryTypeDefinition.lastIndexOf('@')));
+                    commentBeforeEntry);
 
             // store complete parsed serialization (comments, type definition + type contents)
 
@@ -345,14 +357,65 @@ public class BibtexParser implements Parser {
             entry.setParsedSerialization(parsedSerialization);
 
             database.insertEntry(entry);
-        } catch (IOException ex) {
+            currentEntryBuffer = new StringBuilder();
+        } catch (RecoverableParseException ex) {
             // This makes the parser more robust:
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
+            LOGGER.warn("Could not parse entry", ex);
+
+            String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
+                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
+
+            parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
+            int safePos = ex.getRecoveryPosition();
+            int consumed = currentEntryBuffer.length();
+
+            String chunk = getPureTextFromFileSnapshot();
+            int totalLen = chunk.length();
+            int valueLen = currentEntryBuffer.length();
+            int headerLen = totalLen - valueLen;
+            if (headerLen < 0) {
+                headerLen = 0;
+            }
+
+            int cut = headerLen + safePos;
+            if (cut > totalLen) {
+                cut = totalLen;
+            }
+
+            String brokenBody = chunk.substring(0, cut);
+            String brokenEntryText = commentsAndEntryTypeDefinition + brokenBody;
+
+            lastBrokenEntryText = brokenEntryText;
+
+            // roll back to the start
+            for (int i = 0; i < consumed; i++) {
+                unread(currentEntryBuffer.charAt(consumed - 1 - i));
+            }
+
+            // go to safePos
+            for (int i = 0; i < safePos; i++) {
+                read();
+            }
+
+            int next = peek();
+            LOGGER.info(">>> RECOVERED NEXT CHAR = [{}] @ line {}", (char) next, line);
+            currentEntryBuffer = new StringBuilder();
+            dumpTextReadSoFarToString();
+        } catch (IOException ex) {
             LOGGER.warn("Could not parse entry", ex);
             String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
         }
+    }
+
+    private String getPureTextFromFileSnapshot() {
+        StringBuilder sb = new StringBuilder();
+        for (Character c : pureTextFromFile) {
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     private void parseJabRefComment(Map<String, String> meta) {
@@ -1061,6 +1124,7 @@ public class BibtexParser implements Parser {
         StringBuilder value = new StringBuilder();
 
         consume('{');
+        currentEntryBuffer.append('{');
 
         int brackets = 0;
         char character;
@@ -1098,17 +1162,48 @@ public class BibtexParser implements Parser {
             if (isClosingBracket && (brackets == 0)) {
                 return value;
             } else if (isEOFCharacter(character)) {
-                throw new IOException("Error in line " + line + ": EOF in mid-string");
+                String scanned = currentEntryBuffer.toString();
+                int pos = findRecoveryStart(scanned, scanned.length() - 1);
+                throw new RecoverableParseException(pos);
             } else if ((character == '{') && (!isEscapeSymbol(lastCharacter))) {
                 brackets++;
             } else if (isClosingBracket) {
                 brackets--;
             }
 
+            currentEntryBuffer.append(character);
             value.append(character);
 
             lastCharacter = character;
         }
+    }
+
+    private int findRecoveryStart(String buffer, int failPos) {
+        char[] chars = buffer.toCharArray();
+        int unmatched = 0;
+        int lastEntryStart = -1;
+
+        for (int i = failPos; i >= 0; i--) {
+            char c = chars[i];
+
+            if (c == '}') {
+                unmatched++;
+            } else if (c == '{') {
+                if (unmatched > 0) {
+                    unmatched--;
+                } else {
+                    // Found an unmatched '{', safe to stop trimming
+                    return (lastEntryStart >= 0) ? lastEntryStart : failPos;
+                }
+            }
+
+            // detect entry start: @
+            if (c == '@' && unmatched == 0) {
+                lastEntryStart = i;
+            }
+        }
+
+        return 0;
     }
 
     private boolean isEscapeSymbol(char character) {
@@ -1185,6 +1280,20 @@ public class BibtexParser implements Parser {
         if ((character != firstOption) && (character != secondOption)) {
             throw new IOException("Error in line " + line + ": Expected " + firstOption + " or " + secondOption
                     + " but received " + (char) character);
+        }
+    }
+
+    private static class RecoverableParseException extends RuntimeException {
+
+        private final int recoveryPosition;
+
+        RecoverableParseException(int recoveryPosition) {
+            super("Recoverable parse error at position " + recoveryPosition);
+            this.recoveryPosition = recoveryPosition;
+        }
+
+        int getRecoveryPosition() {
+            return recoveryPosition;
         }
     }
 }
