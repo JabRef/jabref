@@ -49,6 +49,7 @@ import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.importer.actions.UpdateWithWebInfoAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.journals.AbbreviateAction;
@@ -305,6 +306,13 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(
                         StandardActions.MERGE_WITH_FETCHED_ENTRY,
                         new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+
+                factory.createMenuItem(StandardActions.UPDATE_WITH_WEB_INFO, new UpdateWithWebInfoAction(
+                        stateManager,
+                        dialogService,
+                        preferences,
+                        taskExecutor
+                )),
 
                 factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
