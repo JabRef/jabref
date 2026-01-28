@@ -180,12 +180,6 @@ javaModulePackaging {
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
             "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
         )
-        targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
-            include("jabref-firefox.json")
-            include("jabref-chrome.json")
-            include("JabRefHost.bat")
-            include("JabRefHost.ps1")
-        })
     }
 
     targetsWithOs("linux") {
@@ -197,10 +191,6 @@ javaModulePackaging {
             "--linux-shortcut",
             "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
         )
-        targetResources.from(layout.projectDirectory.dir("buildres/linux").asFileTree.matching {
-            include("native-messaging-host/**")
-            include("jabrefHost.py")
-        })
     }
     targetsWithOs("macos") {
         options.addAll(
@@ -216,9 +206,6 @@ javaModulePackaging {
                 "--mac-package-signing-prefix", "org.jabref.",
             )
         }
-        targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
-            include("Resources/**")
-        })
     }
 }
 
