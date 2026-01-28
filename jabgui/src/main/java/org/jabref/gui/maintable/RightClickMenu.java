@@ -21,6 +21,7 @@ import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
+import org.jabref.gui.importer.actions.UpdateWithWebInfoAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
@@ -106,6 +107,7 @@ public class RightClickMenu {
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
                 factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+                factory.createMenuItem(StandardActions.UPDATE_WITH_WEB_INFO, new UpdateWithWebInfoAction(stateManager, dialogService, preferences, taskExecutor)),
                 factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor))
         );
 
