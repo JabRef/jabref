@@ -1,0 +1,52 @@
+# syntax=docker/dockerfile:1
+
+FROM debian:unstable
+
+# Canonical's Ubuntu Rust image
+# Has issues with "passwd" package
+# FROM ubuntu/rust:1.84-25.04_edge
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get update
+
+RUN apt-get install -y --no-install-recommends \
+      curl git
+
+RUN apt-get install -y --no-install-recommends \
+      passwd
+
+RUN apt-get install -y --no-install-recommends \
+      adduser debianutils
+
+RUN apt-get install -y --no-install-recommends \
+      ca-certificates
+
+RUN apt-get install -y --no-install-recommends \
+       openssh-client
+
+WORKDIR /work
+RUN git clone --recursive https://github.com/JabRef/jabref.git
+
+WORKDIR /work/jabref
+RUN git checkout jbundle
+
+RUN apt-get install -y --no-install-recommends \
+      openjdk-21-jdk
+
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+WORKDIR /work/jabref
+RUN ./gradlew :jabkit:ShadowJar
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential pkg-config \
+      cargo rustc
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libssl-dev
+
+RUN cargo install --git https://github.com/avelino/jbundle/ --branch avelino/issue-6-41-42 jbundle
+
+RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit
