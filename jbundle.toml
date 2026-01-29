@@ -6,3 +6,5 @@ appcds = true
 
 # see https://jbundle.avelino.run/user-guide/configuration#maximum-performance-linux
 crac = true
+
+shrink = true
