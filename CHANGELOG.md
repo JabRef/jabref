@@ -58,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Endashes and emdashes are now supported in citation keys for the LibreOffice CSL integration. [#14961](https://github.com/JabRef/jabref/issues/14961)
 - We fixed an issue where JabRef would throw an `IllegalCharacterException` trying to download pdfs using links containing a colon (`:`). [#14975](https://github.com/JabRef/jabref/issues/14975)
 - Fixed groups sidebar not refreshing after importing a library. [#13684]
+- Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
 
 ### Removed
 
