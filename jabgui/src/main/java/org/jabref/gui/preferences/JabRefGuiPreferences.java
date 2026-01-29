@@ -311,6 +311,30 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return JabRefGuiPreferences.singleton;
     }
 
+    private static List<String> getColumnNamesAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(MainTableColumnModel::getName)
+                                .toList();
+    }
+
+    private static List<String> getColumnWidthsAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(column -> column.widthProperty().getValue().toString())
+                                .toList();
+    }
+
+    private static List<String> getColumnSortTypesAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(column -> column.sortTypeProperty().getValue().toString())
+                                .toList();
+    }
+
+    private static List<String> getColumnSortOrderAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumnSortOrder().stream()
+                                .map(MainTableColumnModel::getName)
+                                .collect(Collectors.toList());
+    }
+
     public CopyToPreferences getCopyToPreferences() {
         if (copyToPreferences != null) {
             return copyToPreferences;
@@ -351,7 +375,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getNameDisplayPreferences().resetToDefaults();
-
     }
 
     @Override
@@ -376,6 +399,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
     }
+
+    // endregion
 
     // region EntryEditorPreferences
     public EntryEditorPreferences getEntryEditorPreferences() {
@@ -463,7 +488,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         getEntryEditorTabs();
     }
-
     // endregion
 
     @Override
@@ -499,6 +523,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaults.getAllEntriesDuplicateResolverDecision().name()))
         );
     }
+    // endregion
 
     // region auto complete preferences
     @Override
@@ -546,7 +571,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 nameFormat,
                 getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaults.getCompleteFields()));
     }
-    // endregion
 
     // region core GUI preferences
     public CoreGuiPreferences getGuiPreferences() {
@@ -577,7 +601,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getDouble(MAIN_WINDOW_SIDEPANE_WIDTH, defaults.getHorizontalDividerPosition()),
                 getDouble(MAIN_WINDOW_EDITOR_HEIGHT, defaults.getVerticalDividerPosition()));
     }
-    // endregion
 
     @Override
     public WorkspacePreferences getWorkspacePreferences() {
@@ -680,6 +703,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
         );
     }
+    // endregion
 
     private Set<SidePaneType> getVisibleSidePanes(Set<SidePaneType> defaults) {
         Set<SidePaneType> visiblePanes = new HashSet<>();
@@ -741,7 +765,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         putStringList(SIDE_PANE_COMPONENT_NAMES, names);
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
-    // endregion
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
@@ -868,6 +891,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(COVER_IMAGE_DOWNLOAD, newValue));
         return this.previewPreferences;
     }
+    // endregion
+
+    // region NameDisplayPreferences
 
     private void storeBstPaths(List<Path> bstPaths) {
         putStringList(PREVIEW_BST_LAYOUT_PATHS, bstPaths.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
@@ -917,6 +943,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         );
     }
 
+    // endregion
+
+    // region: Main table, main table column, and search dialog column preferences
+
     private int getPreviewCyclePosition(List<PreviewLayout> layouts) {
         int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
         if (storedCyclePos < layouts.size()) {
@@ -925,9 +955,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return 0; // fallback if stored position is no longer valid
         }
     }
-    // endregion
-
-    // region NameDisplayPreferences
 
     @Override
     public NameDisplayPreferences getNameDisplayPreferences() {
@@ -973,10 +1000,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
         return displayStyle;
     }
-
-    // endregion
-
-    // region: Main table, main table column, and search dialog column preferences
 
     public MainTablePreferences getMainTablePreferences() {
         if (mainTablePreferences != null) {
@@ -1099,30 +1122,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                                                                        .ifPresent(columnsOrdered::add));
 
         return columnsOrdered;
-    }
-
-    private static List<String> getColumnNamesAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(MainTableColumnModel::getName)
-                                .toList();
-    }
-
-    private static List<String> getColumnWidthsAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(column -> column.widthProperty().getValue().toString())
-                                .toList();
-    }
-
-    private static List<String> getColumnSortTypesAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumns().stream()
-                                .map(column -> column.sortTypeProperty().getValue().toString())
-                                .toList();
-    }
-
-    private static List<String> getColumnSortOrderAsStringList(ColumnPreferences columnPreferences) {
-        return columnPreferences.getColumnSortOrder().stream()
-                                .map(MainTableColumnModel::getName)
-                                .collect(Collectors.toList());
     }
     // endregion
 

@@ -32,24 +32,24 @@ public class NameDisplayPreferences {
         return displayStyle.get();
     }
 
-    public ObjectProperty<DisplayStyle> displayStyleProperty() {
-        return displayStyle;
-    }
-
     public void setDisplayStyle(DisplayStyle displayStyle) {
         this.displayStyle.set(displayStyle);
+    }
+
+    public ObjectProperty<DisplayStyle> displayStyleProperty() {
+        return displayStyle;
     }
 
     public AbbreviationStyle getAbbreviationStyle() {
         return abbreviationStyle.get();
     }
 
-    public ObjectProperty<AbbreviationStyle> abbreviationStyleProperty() {
-        return abbreviationStyle;
-    }
-
     public void setAbbreviationStyle(AbbreviationStyle abbreviationStyle) {
         this.abbreviationStyle.set(abbreviationStyle);
+    }
+
+    public ObjectProperty<AbbreviationStyle> abbreviationStyleProperty() {
+        return abbreviationStyle;
     }
 
     public void resetToDefaults() {
