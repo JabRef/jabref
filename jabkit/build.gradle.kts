@@ -4,6 +4,7 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 plugins {
     id("org.jabref.gradle.module")
     id("application")
+    id("com.gradleup.shadow") version("9.3.1")
 }
 
 group = "org.jabref.jabkit"
@@ -121,4 +122,8 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     jvmArgs(app.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
     args("--debug", "check-consistency", "--input=empty.bib")
+}
+
+tasks.shadowJar {
+    isZip64 = true
 }
