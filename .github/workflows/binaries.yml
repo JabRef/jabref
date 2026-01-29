@@ -437,7 +437,8 @@ jobs:
       - name: Run jbundle
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         run: |
-          jbundle build --all --output ./build/app
+          # jbundle build --all --output ./build/app
+          jbundle build --input . --output ./build/app --all
       - name: Upload to GitHub
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         run: |
