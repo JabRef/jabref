@@ -421,6 +421,36 @@ jobs:
           which jlink
           jlink --version
 
+      - name: Checkout jbundle (custom branch)
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        uses: actions/checkout@v6
+        with:
+          repository: avelino/jbundle
+          ref: avelino/issue-6-41-42
+          path: /tmp/jbundle
+      - name: Install jbundle
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        run: |
+          cd /tmp/jbundle
+          cargo install --path .
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      - name: Run jbundle
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        run: |
+          jbundle build --all --output ./build/app
+      - name: Upload to GitHub
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        run: |
+          jbundle build --all --output ./build/app
+      - name: Upload artifacts
+        # if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: jbundle (${{ matrix.displayName }})
+          path: |
+            build/app/*
+
       - name: Workaround for jpackage issue
         run: |
           cd jabgui
