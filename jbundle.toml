@@ -5,6 +5,8 @@ profile = "cli"
 appcds = true
 
 # see https://jbundle.avelino.run/user-guide/configuration#maximum-performance-linux
-crac = true
+# set to "false" for speedup
+crac = false
 
-shrink = true
+# set to "false" for speedup
+shrink = false
