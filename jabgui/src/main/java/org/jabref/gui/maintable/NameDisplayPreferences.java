@@ -13,8 +13,14 @@ public class NameDisplayPreferences {
         NONE, LASTNAME_ONLY, FULL
     }
 
-    private final ObjectProperty<DisplayStyle> displayStyle = new SimpleObjectProperty<>();
-    private final ObjectProperty<AbbreviationStyle> abbreviationStyle = new SimpleObjectProperty<>();
+    // Default values (used for reset)
+    public static final DisplayStyle DEFAULT_DISPLAY_STYLE = DisplayStyle.NATBIB;
+    public static final AbbreviationStyle DEFAULT_ABBREVIATION_STYLE = AbbreviationStyle.FULL;
+
+    private final ObjectProperty<DisplayStyle> displayStyle =
+            new SimpleObjectProperty<>(DEFAULT_DISPLAY_STYLE);
+    private final ObjectProperty<AbbreviationStyle> abbreviationStyle =
+            new SimpleObjectProperty<>(DEFAULT_ABBREVIATION_STYLE);
 
     public NameDisplayPreferences(DisplayStyle displayStyle,
                                   AbbreviationStyle abbreviationStyle) {
@@ -44,5 +50,10 @@ public class NameDisplayPreferences {
 
     public void setAbbreviationStyle(AbbreviationStyle abbreviationStyle) {
         this.abbreviationStyle.set(abbreviationStyle);
+    }
+
+    public void resetToDefaults() {
+        setDisplayStyle(DEFAULT_DISPLAY_STYLE);
+        setAbbreviationStyle(DEFAULT_ABBREVIATION_STYLE);
     }
 }
