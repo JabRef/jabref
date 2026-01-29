@@ -525,7 +525,7 @@ jobs:
       - name: ShadowJar JabKit
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
-        run: /gradlew :jabkit:ShadowJar
+        run: ./gradlew :jabkit:ShadowJar
       - name: Smoke test JabKit
         shell: bash
         run: |
