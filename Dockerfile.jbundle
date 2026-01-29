@@ -31,22 +31,35 @@ RUN git clone --recursive https://github.com/JabRef/jabref.git
 WORKDIR /work/jabref
 RUN git checkout jbundle
 
+# JabRef uses Amazon Corretto as JDK
 RUN apt-get install -y --no-install-recommends \
-      openjdk-21-jdk
+       wget gnupg
+RUN wget -O - https://apt.corretto.aws/corretto.key | gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | tee /etc/apt/sources.list.d/corretto.list
+RUN apt-get update
+RUN apt-get install -y java-25-amazon-corretto-jdk
 
-ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-ENV PATH="${JAVA_HOME}/bin:${PATH}"
+# ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+# ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 WORKDIR /work/jabref
 RUN ./gradlew :jabkit:ShadowJar
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential pkg-config \
-      cargo rustc
+RUN apt-get install -y --no-install-recommends \
+      fakeroot
+
+RUN ./gradlew :jabkit:jpackage
+RUN ./gradlew :jabgui:jpackage
+RUN ./gradlew :jabls-cli:jpackage
+RUN ./gradlew :jabsrv-cli:jpackage
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential pkg-config \
+      cargo rustc \
       libssl-dev
 
 RUN cargo install --git https://github.com/avelino/jbundle/ --branch avelino/issue-6-41-42 jbundle
 
-RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit
+# RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit
+
+RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit --jlink-runtime jabgui/build/packages
