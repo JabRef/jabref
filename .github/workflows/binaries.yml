@@ -421,19 +421,12 @@ jobs:
           which jlink
           jlink --version
 
-      - name: Checkout jbundle (custom branch)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
-        uses: actions/checkout@v6
-        with:
-          repository: avelino/jbundle
-          ref: avelino/issue-6-41-42
-          path: jbundle
       - name: Install jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
-        run: |
-          cd jbundle
-          cargo install --path .
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: jbundle
+          git: https://github.com/avelino/jbundle/
+          branch: avelino/issue-6-41-42
       - name: Run jbundle
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         run: |
