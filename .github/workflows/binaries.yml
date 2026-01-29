@@ -392,6 +392,9 @@ jobs:
           website: jdk.java.net
           release: EA
           version: ${{ needs.conditions.outputs.jdkVersionFlavour }}
+      - name: Expose JAVA_HOME
+        id: java
+        run: echo "java_home=$JAVA_HOME" >> "$GITHUB_OUTPUT"
       - name: Tell gradle to use JDK EA and JavaFX EA
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         shell: bash
@@ -428,11 +431,13 @@ jobs:
           git: https://github.com/avelino/jbundle/
           branch: avelino/issue-6-41-42
       - name: Run jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && !needs.conditions.outputs.useEaJdk }}
         run: |
-          # jbundle build --all --output ./build/app
-          jbundle build --all --output ./build/app --jlink-runtime `which jlink`
-          # jbundle build --input . --output ./build/app --all --java-version 21
+          jbundle build --input . --output ./build/app --all
+      - name: Run jbundle (JDK EA)
+        if: ${{ (matrix.os == 'ubuntu-22.04') && needs.conditions.outputs.useEaJdk }}
+        run: |
+          jbundle build --all --output ./build/app --jlink-runtime "${{ steps.java.outputs.java_home }}/bin/jlink"
       - name: Upload artifacts
         # if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
