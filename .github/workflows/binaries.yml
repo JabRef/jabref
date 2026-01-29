@@ -431,8 +431,8 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         run: |
           # jbundle build --all --output ./build/app
-          jbundle build --all --output ./build/app --jlink-runtime `which jlink`
-          # jbundle build --input . --output ./build/app --all --java-version 21
+          # jbundle build --all --output ./build/app --jlink-runtime `which jlink`
+          jbundle build --input . --output ./build/app --all --java-version 21
       - name: Upload artifacts
         # if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
