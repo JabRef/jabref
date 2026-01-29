@@ -1,0 +1,8 @@
+java_version = 25
+target = "linux-x64"
+jvm_args = ["-Xlog:disable", "-XX:+UseZGC", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders", "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"]
+profile = "cli"
+appcds = true
+
+# see https://jbundle.avelino.run/user-guide/configuration#maximum-performance-linux
+crac = true
