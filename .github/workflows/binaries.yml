@@ -438,7 +438,7 @@ jobs:
       - name: Run jbundle (JDK EA)
         if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.useEaJdk  == 'true') }}
         run: |
-          jbundle build --all --output ./build/app --jlink-runtime "${{ steps.java.outputs.java_home }}/bin/jlink"
+          jbundle build --all --output ./build/app --jlink "${{ steps.java.outputs.java_home }}/bin/jlink"
       - name: Upload artifacts
         # if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
