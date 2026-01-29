@@ -120,13 +120,23 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        prefsRepo.getBindingsProperty().clear();
-        keyBindingRepository.getKeyBindings().forEach((key, value) -> {
-            prefsRepo.getBindingsProperty().put(key, value);
-        });
-
-        restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
+        try {
+            copyKeyBindingsToPreferences(prefsRepo);
+            restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
+        } catch (IllegalArgumentException e) {
+            // Invalid key bindings detected → reset ONLY keyboard shortcuts
+            keyBindingRepository.resetToDefault();
+            copyKeyBindingsToPreferences(prefsRepo);
+            restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
+        }
     }
+
+    private void copyKeyBindingsToPreferences(KeyBindingRepository prefsRepo) {
+        prefsRepo.getBindingsProperty().clear();
+        keyBindingRepository.getKeyBindings()
+                            .forEach(prefsRepo.getBindingsProperty()::put);
+    }
+
 
     public void resetToDefault() {
         String title = Localization.lang("Resetting all keyboard shortcuts");

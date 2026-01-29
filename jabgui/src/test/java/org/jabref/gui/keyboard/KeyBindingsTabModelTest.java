@@ -8,6 +8,7 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.jabref.gui.preferences.keybindings.KeyBindingViewModel;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTabViewModel;
 import org.jabref.logic.os.OS;
@@ -182,4 +183,15 @@ class KeyBindingsTabModelTest {
         model.selectedKeyBindingProperty().set(Optional.of(viewModel));
         return viewModel;
     }
+
+    @Test
+    void corruptedKeyBindingsDoNotCrashOnSave() {
+        // Simulate corrupted shortcut from imported preferences
+        keyBindingRepository.getBindingsProperty()
+                            .put(KeyBinding.COPY, "INVALID_KEY_COMBINATION");
+
+        // Saving preferences must not crash
+        assertDoesNotThrow(() -> model.storeSettings());
+    }
+
 }

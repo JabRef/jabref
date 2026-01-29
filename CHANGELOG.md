@@ -31,7 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 
 ### Fixed
-
+- Fixed crash caused by corrupted keyboard shortcut preferences when saving preferences. [#14630](https://github.com/JabRef/jabref/issues/14630)
 - We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
