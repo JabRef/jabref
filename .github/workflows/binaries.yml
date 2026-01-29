@@ -426,7 +426,7 @@ jobs:
         with:
           crate: jbundle
           git: https://github.com/avelino/jbundle/
-          branch: avelino/issue-6-41-42
+          tag: avelino/issue-6-41-42
       - name: Run jbundle
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         run: |
