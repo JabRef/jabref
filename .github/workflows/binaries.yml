@@ -432,11 +432,11 @@ jobs:
           git: https://github.com/avelino/jbundle/
           branch: avelino/issue-6-41-42
       - name: Run jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') && !needs.conditions.outputs.useEaJdk }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.useEaJdk != 'true') }}
         run: |
           jbundle build --input . --output ./build/app --all
       - name: Run jbundle (JDK EA)
-        if: ${{ (matrix.os == 'ubuntu-22.04') && needs.conditions.outputs.useEaJdk }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.useEaJdk  == 'true') }}
         run: |
           jbundle build --all --output ./build/app --jlink-runtime "${{ steps.java.outputs.java_home }}/bin/jlink"
       - name: Upload artifacts
