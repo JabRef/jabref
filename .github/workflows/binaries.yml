@@ -427,11 +427,11 @@ jobs:
         with:
           repository: avelino/jbundle
           ref: avelino/issue-6-41-42
-          path: /tmp/jbundle
+          path: jbundle
       - name: Install jbundle
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         run: |
-          cd /tmp/jbundle
+          cd jbundle
           cargo install --path .
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
       - name: Run jbundle
