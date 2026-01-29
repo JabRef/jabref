@@ -425,29 +425,6 @@ jobs:
           which jlink
           jlink --version
 
-      - name: Install jbundle
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: jbundle
-          git: https://github.com/avelino/jbundle/
-          branch: avelino/issue-6-41-42
-      - name: Run jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.useEaJdk != 'true') }}
-        run: |
-          jbundle build --input . --output ./build/app --all
-      - name: Run jbundle (JDK EA)
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.useEaJdk  == 'true') }}
-        run: |
-          jbundle build --all --output ./build/app --jlink "${{ steps.java.outputs.java_home }}/bin/jlink"
-      - name: Upload artifacts
-        # if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: jbundle (${{ matrix.displayName }})
-          path: |
-            build/app/*
-
       - name: Workaround for jpackage issue
         run: |
           cd jabgui
@@ -480,6 +457,25 @@ jobs:
         shell: bash
         run: |
           ./gradlew :jabgui:run --args="--help"
+
+      - name: Install jbundle
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: jbundle
+          git: https://github.com/avelino/jbundle/
+          branch: avelino/issue-6-41-42
+      - name: Run jbundle
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        run: |
+          jbundle build --input . --output ./build/app --gradle-project jabgui --jlink-runtime jabgui/build/packages
+      - name: Upload artifacts
+        # if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: jbundle (${{ matrix.displayName }})
+          path: |
+            build/app/*
 
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
