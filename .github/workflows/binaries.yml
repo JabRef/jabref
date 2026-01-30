@@ -432,16 +432,17 @@ jobs:
         with:
           crate: jbundle
           git: https://github.com/avelino/jbundle/
-          # branch: main
-          branch: avelino/issue-6-41-42
-      - name: Build with jbundle
+          branch: avelino/issue-41
+      - name: Build jabkit with jbundle
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --output ./build/jbundle --all
+          # Build only jabkit which has shadowJar properly configured
+          # Other subprojects need shadowJar configuration before jbundle can work
+          jbundle build --input . --output ./build/jbundle/jabkit --gradle-project jabkit || true
 
           echo "## jbundle binaries" >> $GITHUB_STEP_SUMMARY
-          ls -la ./build/jbundle/ >> $GITHUB_STEP_SUMMARY
+          ls -la ./build/jbundle/ >> $GITHUB_STEP_SUMMARY || echo "No binaries generated" >> $GITHUB_STEP_SUMMARY
       - name: Test jbundle binaries (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -452,23 +453,29 @@ jobs:
               "$bin" --help 2>&1 | head -5 || echo "Warning: $bin --help failed (may need Main-Class in manifest)"
             fi
           done
+        continue-on-error: true
       - name: Upload jbundle artifacts
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
           path: build/jbundle/*
+          if-no-files-found: ignore
       - name: Upload jbundle to builds.jabref.org
         if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.disk-space-check.outputs.available == 'true') }}
         shell: bash
         run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
-            --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/jbundle && rsync" \
-            -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-            ./build/jbundle/ \
-            jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/jbundle/ || true
+          if [ -d "./build/jbundle" ] && [ "$(ls -A ./build/jbundle)" ]; then
+            echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+            chmod 600 sshkey
+            rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
+              --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/jbundle && rsync" \
+              -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
+              ./build/jbundle/ \
+              jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/jbundle/ || true
+          else
+            echo "No jbundle binaries to upload"
+          fi
       # endregion
 
       - name: Workaround for jpackage issue

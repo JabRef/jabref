@@ -1,6 +1,6 @@
 java_version = 25
 target = "linux-x64"
-jvm_args = ["-Xlog:disable", "-XX:+UseZGC", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders", "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"]
+jvm_args = ["-Xlog:disable", "--enable-native-access=ALL-UNNAMED"]
 profile = "cli"
 appcds = true
 

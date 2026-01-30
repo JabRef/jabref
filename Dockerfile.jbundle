@@ -1,65 +1,41 @@
-# syntax=docker/dockerfile:1
-
-FROM debian:unstable
-
-# Canonical's Ubuntu Rust image
-# Has issues with "passwd" package
-# FROM ubuntu/rust:1.84-25.04_edge
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get update
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y --no-install-recommends \
-      curl git
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
 
-RUN apt-get install -y --no-install-recommends \
-      passwd
+# Install Java 25 (Corretto)
+RUN curl -L "https://corretto.aws/downloads/latest/amazon-corretto-25-x64-linux-jdk.tar.gz" -o /tmp/jdk.tar.gz \
+    && mkdir -p /opt/java \
+    && tar -xzf /tmp/jdk.tar.gz -C /opt/java \
+    && rm /tmp/jdk.tar.gz
 
-RUN apt-get install -y --no-install-recommends \
-      adduser debianutils
+ENV JAVA_HOME=/opt/java/amazon-corretto-25.0.1.2.1-linux-x64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-RUN apt-get install -y --no-install-recommends \
-      ca-certificates
+WORKDIR /app
 
-RUN apt-get install -y --no-install-recommends \
-       openssh-client
+# Copy jbundle source and build
+COPY . /jbundle-src
+RUN cd /jbundle-src && cargo build --release && cp target/release/jbundle /usr/local/bin/
 
-WORKDIR /work
-RUN git clone --recursive https://github.com/JabRef/jabref.git
+# Clone JabRef
+RUN git clone --depth 1 --recurse-submodules https://github.com/JabRef/jabref.git /app/jabref
 
-WORKDIR /work/jabref
-RUN git checkout jbundle
+WORKDIR /app/jabref
 
-# JabRef uses Amazon Corretto as JDK
-RUN apt-get install -y --no-install-recommends \
-       wget gnupg
-RUN wget -O - https://apt.corretto.aws/corretto.key | gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg
-RUN echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | tee /etc/apt/sources.list.d/corretto.list
-RUN apt-get update
-RUN apt-get install -y java-25-amazon-corretto-jdk
+# Create jbundle.toml
+RUN echo 'java_version = 25' > jbundle.toml && \
+    echo 'jvm_args = ["-Xlog:disable"]' >> jbundle.toml
 
-# ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-# ENV PATH="${JAVA_HOME}/bin:${PATH}"
-
-WORKDIR /work/jabref
-RUN ./gradlew :jabkit:ShadowJar
-
-RUN apt-get install -y --no-install-recommends \
-      fakeroot
-
-RUN ./gradlew :jabkit:jpackage
-RUN ./gradlew :jabgui:jpackage
-RUN ./gradlew :jabls-cli:jpackage
-RUN ./gradlew :jabsrv-cli:jpackage
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential pkg-config \
-      cargo rustc \
-      libssl-dev
-
-RUN cargo install --git https://github.com/avelino/jbundle/ --branch avelino/issue-6-41-42 jbundle
-
-# RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit
-
-RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit --jlink-runtime jabgui/build/packages
+CMD ["jbundle", "build", "--input", ".", "--output", "./build/jbundle", "--all"]

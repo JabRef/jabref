@@ -1,0 +1,57 @@
+name: jbundle Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build-jbundle:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Install Java 25
+        run: |
+          curl -L "https://corretto.aws/downloads/latest/amazon-corretto-25-x64-linux-jdk.tar.gz" -o /tmp/jdk.tar.gz
+          sudo mkdir -p /opt/java
+          sudo tar -xzf /tmp/jdk.tar.gz -C /opt/java
+          export JAVA_HOME=$(ls -d /opt/java/amazon-corretto-* | head -1)
+          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
+          $JAVA_HOME/bin/java -version
+
+      - name: Build project with Gradle
+        run: |
+          ./gradlew classes --no-daemon
+
+      - name: Install Rust and build jbundle
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          git clone --depth 1 -b avelino/issue-41 https://github.com/avelino/jbundle.git /tmp/jbundle
+          cd /tmp/jbundle
+          cargo build --release
+          sudo cp target/release/jbundle /usr/local/bin/
+          jbundle --version
+
+      - name: Run jbundle
+        run: |
+          jbundle build --input . --output ./build/jbundle --all
+
+      - name: List jbundle output
+        run: |
+          echo "=== jbundle binaries ==="
+          ls -la ./build/jbundle/ || echo "No output directory"
+
+      - name: Smoke test binaries
+        run: |
+          for bin in ./build/jbundle/*; do
+            if [ -f "$bin" ] && [ -x "$bin" ]; then
+              echo "Testing: $bin"
+              "$bin" --help 2>&1 | head -5 || echo "Warning: $bin --help failed"
+            fi
+          done
