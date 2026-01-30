@@ -301,8 +301,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
-    /// All other usages should get the preferences passed (or injected).
-    /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
+     /// All other usages should get the preferences passed (or injected).
+     /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
         if (JabRefGuiPreferences.singleton == null) {
@@ -351,7 +351,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getPreviewPreferences().setAll(PreviewPreferences.getDefault());
-
     }
 
     @Override

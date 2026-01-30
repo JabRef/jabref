@@ -12,8 +12,6 @@
     <JavaCodeStyleSettings>
       <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
       <option name="SPACE_INSIDE_ONE_LINE_ENUM_BRACES" value="true" />
-      <option name="LAYOUT_ON_DEMAND_IMPORT_FROM_SAME_PACKAGE_FIRST" value="false" />
-      <option name="PRESERVE_MODULE_IMPORTS" value="false" />
       <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
       <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
       <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">

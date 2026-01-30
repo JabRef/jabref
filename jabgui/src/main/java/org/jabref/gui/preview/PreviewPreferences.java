@@ -47,7 +47,7 @@ public class PreviewPreferences {
         this.shouldDownloadCovers.set(shouldDownloadCovers);
     }
 
-    private PreviewPreferences(){
+    private PreviewPreferences() {
         this(
                 List.of(),
                 0,
@@ -60,8 +60,7 @@ public class PreviewPreferences {
         );
     }
 
-
-    public static PreviewPreferences getDefault(){
+    public static PreviewPreferences getDefault() {
         return new PreviewPreferences();
     }
 
@@ -147,7 +146,7 @@ public class PreviewPreferences {
         this.bstPreviewLayoutPaths.setAll(bstPreviewLayoutPaths);
     }
 
-    public void setAll(PreviewPreferences preferences){
+    public void setAll(PreviewPreferences preferences) {
         this.layoutCycle.setAll(preferences.getLayoutCycle());
         this.layoutCyclePosition.set(preferences.getLayoutCyclePosition());
         this.customPreviewLayout.set(preferences.getCustomPreviewLayout());
@@ -156,7 +155,6 @@ public class PreviewPreferences {
         this.showPreviewEntryTableTooltip.set(preferences.shouldShowPreviewEntryTableTooltip());
         this.bstPreviewLayoutPaths.setAll(preferences.getBstPreviewLayoutPaths());
         this.shouldDownloadCovers.set(preferences.shouldDownloadCovers());
-
     }
 
     public boolean shouldDownloadCovers() {
