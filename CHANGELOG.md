@@ -46,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
+- Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
 
 ### Removed
 
