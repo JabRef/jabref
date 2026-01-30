@@ -6,11 +6,16 @@ import javafx.beans.property.SimpleObjectProperty;
 public class NameDisplayPreferences {
 
     public enum DisplayStyle {
-        NATBIB, AS_IS, FIRSTNAME_LASTNAME, LASTNAME_FIRSTNAME
+        NATBIB,
+        AS_IS,
+        FIRSTNAME_LASTNAME,
+        LASTNAME_FIRSTNAME
     }
 
     public enum AbbreviationStyle {
-        NONE, LASTNAME_ONLY, FULL
+        NONE,
+        LASTNAME_ONLY,
+        FULL
     }
 
     // Default values (used for reset)
@@ -19,6 +24,7 @@ public class NameDisplayPreferences {
 
     private final ObjectProperty<DisplayStyle> displayStyle =
             new SimpleObjectProperty<>(DEFAULT_DISPLAY_STYLE);
+
     private final ObjectProperty<AbbreviationStyle> abbreviationStyle =
             new SimpleObjectProperty<>(DEFAULT_ABBREVIATION_STYLE);
 
