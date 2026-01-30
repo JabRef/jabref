@@ -75,8 +75,13 @@ WORKDIR /work
 
 COPY --from=build /work/build/ /jabref
 
-EXPOSE 2087  # LSP Server
-EXPOSE 6050  # native messaging
-EXPOSE 23119 # HTTP Server
+# LSP Server
+EXPOSE 2087
+
+# native messaging
+EXPOSE 6050
+
+# HTTP Server
+EXPOSE 23119
 
 ENTRYPOINT ["/jabref/jabkit"]
