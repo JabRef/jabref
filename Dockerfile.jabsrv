@@ -20,6 +20,7 @@ FROM debian:bookworm-slim AS runtime
 LABEL org.opencontainers.image.title="jabsrv"
 LABEL org.opencontainers.image.description="JabRef's HTTP server"
 LABEL org.opencontainers.image.source=https://github.com/JabRef/jabref
+LABEL org.opencontainers.image.ref.name="jabref/jabkit"
 
 WORKDIR /work
 
