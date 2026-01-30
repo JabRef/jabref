@@ -552,7 +552,7 @@ jobs:
 
       - name: jpackage JabKit
         shell: bash
-        run: ./gradlew ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
+        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
       - name: ShadowJar JabKit
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
