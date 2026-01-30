@@ -472,8 +472,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p build/jbundle
-          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages --output ./build/jbundle
-          ls -la build/jbundle
+          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages --output ./build/jbundle/jabgui
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -567,6 +566,22 @@ jobs:
         run: |
           set -e
           ${{ matrix.archivePortableJabKit }}
+      - name: jbundle jabkit
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          jbundle build --input . --gradle-project jabkit --jlink-runtime jabkit/build/packages --output ./build/jbundle/jabkit
+      - name: Test jbundle binary (smoke test)
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          build/jbundle/jabkit --help
+      - name: Upload jbundle artifacts
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: jbundle-${{ matrix.displayName }}
+          path: build/jbundle/jabkit*
       - name: Upload jabkit to builds.jabref.org (Linux, macOS)
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
@@ -609,6 +624,22 @@ jobs:
         run: |
           set -e
           ${{ matrix.archivePortableJabLS }}
+      - name: jbundle jabls-cli
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          jbundle build --input . --gradle-project jabls-cli --jlink-runtime jabls-cli/build/packages --output ./build/jbundle/jabls
+      - name: Test jbundle binary (smoke test)
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          build/jbundle/jabls --help
+      - name: Upload jbundle artifacts
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: jbundle-${{ matrix.displayName }}
+          path: build/jbundle/jabls*
       - name: Upload jabls-cli to builds.jabref.org (Linux, macOS)
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
@@ -627,7 +658,25 @@ jobs:
           path: |
             jabls-cli/build/packages/${{ matrix.os }}
 
-      # Currently not packaged, but we build and smoke test it to detect errors early
+      - name: jpackage jabsrv-cli
+        shell: bash
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:jpackage
+      - name: jbundle jabsrv-cli
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          jbundle build --input . --gradle-project jabsrv-cli --jlink-runtime jabsrv-cli/build/packages --output ./build/jbundle/jabsrv
+      - name: Test jbundle binary (smoke test)
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          build/jbundle/jabsrv --help
+      - name: Upload jbundle artifacts
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: jbundle-${{ matrix.displayName }}
+          path: build/jbundle/jabsrv*
       - name: Smoke test jabsrv-cli
         shell: bash
         run: |
