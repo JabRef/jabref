@@ -49,6 +49,9 @@ RUN apt-get install -y --no-install-recommends \
       fakeroot
 
 RUN ./gradlew :jabkit:jpackage
+
+RUN git pull
+
 RUN ./gradlew :jabgui:jpackage
 RUN ./gradlew :jabls-cli:jpackage
 RUN ./gradlew :jabsrv-cli:jpackage
@@ -60,6 +63,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN cargo install --git https://github.com/avelino/jbundle/ --branch avelino/issue-6-41-42 jbundle
 
-# RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit
-
 RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit --jlink-runtime jabgui/build/packages
+
+RUN ~/.cargo/bin/jbundle build --input . --output ./build/app --gradle-project jabkit
