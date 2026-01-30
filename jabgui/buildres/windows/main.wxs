@@ -161,5 +161,6 @@
       <ComponentRef Id="RegistryJabRefBrowserEntries" />
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\..\..\..\buildres\windows\JabRefTopBanner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="..\..\..\..\..\buildres\windows\JabRefTopBanner.bmp" />
   </Product>
 </Wix>
