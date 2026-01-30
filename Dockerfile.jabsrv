@@ -25,6 +25,6 @@ WORKDIR /work
 
 COPY --from=build /dist /jabref
 
-EXPOSE 6050
+EXPOSE 23119 # HTTP Server
 
 ENTRYPOINT ["/jabref/jabsrv/bin/jabsrv"]
