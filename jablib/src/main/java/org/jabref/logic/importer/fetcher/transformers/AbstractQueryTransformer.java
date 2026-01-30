@@ -196,9 +196,9 @@ public abstract class AbstractQueryTransformer {
     /// Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
     ///
     /// @param queryNode The first search node
-    /// @return A query string containing all fields that are contained in the original lucene query and
-    /// that are expressible in the library specific query language, other information either is discarded or
-    /// stored as part of the state of the transformer if it can be used e.g. as a URL parameter for the query.
+     /// @return A query string containing all fields that are contained in the original lucene query and
+     /// that are expressible in the library specific query language, other information either is discarded or
+     /// stored as part of the state of the transformer if it can be used e.g. as a URL parameter for the query.
     public Optional<String> transformSearchQuery(BaseQueryNode queryNode) {
         Optional<String> transformedQuery = transform(queryNode);
         transformedQuery = transformedQuery.map(this::removeOuterBraces);

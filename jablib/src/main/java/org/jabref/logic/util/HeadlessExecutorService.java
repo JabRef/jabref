@@ -69,7 +69,7 @@ public class HeadlessExecutorService implements Executor {
     /// Executes a callable task that provides a return value after the calculation is done.
     ///
     /// @param command The task to execute.
-    /// @return A Future object that provides the returning value.
+     /// @return A Future object that provides the returning value.
     public <T> Future<T> execute(@NonNull Callable<T> command) {
         return executorService.submit(command);
     }
@@ -77,7 +77,7 @@ public class HeadlessExecutorService implements Executor {
     /// Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done.
     ///
     /// @param tasks The tasks to execute
-    /// @return A List of Future objects that provide the returning values.
+     /// @return A List of Future objects that provide the returning values.
     public <T> List<Future<T>> executeAll(@NonNull Collection<Callable<T>> tasks) {
         try {
             return executorService.invokeAll(tasks);

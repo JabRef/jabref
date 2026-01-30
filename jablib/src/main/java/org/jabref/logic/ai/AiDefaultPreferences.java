@@ -88,7 +88,7 @@ public class AiDefaultPreferences {
                     You are an AI assistant that analyses research papers. You answer questions about papers.
                     You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.
                     Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key.
-
+                    
                     Here are the papers you are analyzing:
                     #foreach( $entry in $entries )
                     ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
@@ -96,7 +96,7 @@ public class AiDefaultPreferences {
 
             AiTemplate.CHATTING_USER_MESSAGE, """
                     $message
-
+                    
                     Here is some relevant information for you:
                     #foreach( $excerpt in $excerpts )
                     ${excerpt.citationKey()}:
@@ -123,13 +123,13 @@ public class AiDefaultPreferences {
                     Based on this conversation:
                     User: $userMessage
                     Assistant: $aiResponse
-
+                    
                     Generate $count short follow-up questions (maximum 10 words each) that the user might want to ask next.
                     Format your response as a numbered list:
                     1. [question]
                     2. [question]
                     3. [question]
-
+                    
                     Only provide the numbered list, nothing else."""
     );
 

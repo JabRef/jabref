@@ -15,7 +15,7 @@ public final class StaxParser {
     /// attributes, namespace, prefix and contained text
     ///
     /// @param reader the stream reader
-    /// @return Returns the inner XML content
+     /// @return Returns the inner XML content
     public static String getXMLContent(XMLStreamReader reader) throws XMLStreamException {
         // skip over START DOCUMENT event
         while (reader.getEventType() == XMLStreamConstants.START_DOCUMENT && reader.hasNext()) {

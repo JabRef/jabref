@@ -16,12 +16,12 @@ import org.jspecify.annotations.Nullable;
 /// Example usage:
 ///
 /// ```java
-/// private class BasicChainNode extends ChainNode&lt;BasicChainNode> {
-///   public BasicChainNode() {
-///     super(BasicChainNode.class);
-///   }
-/// }
-/// ```
+ /// private class BasicChainNode extends ChainNode&lt;BasicChainNode> {
+ ///   public BasicChainNode(){
+ ///     super(BasicChainNode.class);
+ ///}
+ ///}
+ ///```
 ///
 /// @param <T> the type of the class
 @SuppressWarnings("unchecked")
@@ -73,8 +73,8 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     /// The given node is not allowed to already be in a tree (i.e. it has to have no parent).
     ///
     /// @param child the node to add as child
-    /// @return the child node
-    /// @throws UnsupportedOperationException if the given node has already a parent
+     /// @return the child node
+     /// @throws UnsupportedOperationException if the given node has already a parent
     public T setChild(@NonNull T child) {
         if (child.getParent().isPresent()) {
             throw new UnsupportedOperationException("Cannot add a node which already has a parent, use moveTo instead");
@@ -90,8 +90,8 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     /// In this way the whole subchain based at this node is moved to the given node.
     ///
     /// @param target the new parent
-    /// @throws NullPointerException          if target is null
-    /// @throws UnsupportedOperationException if target is an descendant of this node
+     /// @throws NullPointerException          if target is null
+     /// @throws UnsupportedOperationException if target is an descendant of this node
     public void moveTo(@NonNull T target) {
         // Check that the target node is not an ancestor of this node, because this would create loops in the tree
         if (this.isAncestorOf(target)) {
@@ -119,8 +119,8 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     /// A node is considered an ancestor of itself.
     ///
     /// @param anotherNode node to test
-    /// @return true if anotherNode is a descendant of this node
-    /// @throws NullPointerException if anotherNode is null
+     /// @return true if anotherNode is a descendant of this node
+     /// @throws NullPointerException if anotherNode is null
     public boolean isAncestorOf(@NonNull T anotherNode) {
         if (anotherNode == this) {
             return true;

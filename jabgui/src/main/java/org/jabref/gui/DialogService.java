@@ -69,7 +69,7 @@ public interface DialogService extends NotificationService {
     /// Create and display error dialog displaying the given exception.
     ///
     /// @param message   the error message
-    /// @param exception the exception causing the error
+     /// @param exception the exception causing the error
     void showErrorDialogAndWait(String message, Throwable exception);
 
     /// Create and display error dialog displaying the given exception.
@@ -180,15 +180,15 @@ public interface DialogService extends NotificationService {
     /// Shows a custom dialog and returns the result.
     ///
     /// @param dialog dialog to show
-    /// @param <R>    type of result
+     /// @param <R>    type of result
     <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
     /// Constructs and shows a cancelable {@link org.controlsfx.dialog.ProgressDialog}.
     /// Clicking cancel will cancel the underlying service and close the dialog
     ///
     /// @param title   title of the dialog
-    /// @param content message to show above the progress bar
-    /// @param task    The {@link Task} which executes the work and for which to show the dialog
+     /// @param content message to show above the progress bar
+     /// @param task    The {@link Task} which executes the work and for which to show the dialog
     <V> void showProgressDialog(String title, String content, Task<V> task);
 
     /// Constructs and shows a cancelable {@link org.controlsfx.dialog.ProgressDialog}.
@@ -196,8 +196,8 @@ public interface DialogService extends NotificationService {
     /// otherwise will wait for the task to finish.
     ///
     /// @param title   title of the dialog
-    /// @param content message to show above the progress bar
-    /// @param task    The {@link Task} which executes the work and for which to show the dialog
+     /// @param content message to show above the progress bar
+     /// @param task    The {@link Task} which executes the work and for which to show the dialog
     <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 
     /// Constructs and shows a dialog showing the progress of running background tasks.
@@ -205,8 +205,8 @@ public interface DialogService extends NotificationService {
     /// The dialog will exit as soon as none of the background tasks are running
     ///
     /// @param title        title of the dialog
-    /// @param content      message to show below the list of background tasks
-    /// @param stateManager The {@link StateManager} which contains the background tasks
+     /// @param content      message to show below the list of background tasks
+     /// @param stateManager The {@link StateManager} which contains the background tasks
     <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
 
     /// Shows a new file save dialog. The method doesn't return until the
@@ -247,7 +247,7 @@ public interface DialogService extends NotificationService {
     /// confirm the user wants to proceed with printing.
     ///
     /// @param job the print job to customize
-    /// @return false if the user opts to cancel printing
+     /// @return false if the user opts to cancel printing
     boolean showPrintDialog(PrinterJob job);
 
     /// Shows a new dialog that list all files contained in the given archive and which lets the user select one of these

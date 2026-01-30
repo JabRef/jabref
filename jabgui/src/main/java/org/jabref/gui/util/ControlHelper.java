@@ -99,10 +99,10 @@ public class ControlHelper {
     /// If needed, truncates a given string to `maxCharacters`, adding `ellipsisString` instead.
     ///
     /// @param text             text which should be truncated, if needed
-    /// @param maxCharacters    maximum amount of characters which the resulting text should have, including the `ellipsisString`; if set to -1, then the default length of 75 characters will be used
-    /// @param ellipsisString   string which should be used for indicating the truncation
-    /// @param ellipsisPosition location in the given text where the truncation should be performed
-    /// @return the new, truncated string
+     /// @param maxCharacters    maximum amount of characters which the resulting text should have, including the `ellipsisString`; if set to -1, then the default length of 75 characters will be used
+     /// @param ellipsisString   string which should be used for indicating the truncation
+     /// @param ellipsisPosition location in the given text where the truncation should be performed
+     /// @return the new, truncated string
     public static String truncateString(String text, int maxCharacters, String ellipsisString, EllipsisPosition ellipsisPosition) {
         if (text == null || text.isEmpty()) {
             return text; // return original

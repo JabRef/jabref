@@ -9,58 +9,99 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.SearchableComboBox?>
-<fx:root spacing="10.0" type="VBox"
-         xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel">
+<fx:root
+        spacing="10.0"
+        type="VBox"
+        xmlns="http://javafx.com/javafx/10.0.2-internal"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel">
     <HBox spacing="4.0">
-        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-            <TableView fx:id="cleanupsList" minHeight="200.0">
+        <VBox spacing="4.0"
+              HBox.hgrow="ALWAYS">
+            <TableView
+                    fx:id="cleanupsList"
+                    minHeight="200.0">
                 <columns>
-                    <TableColumn fx:id="fieldColumn" text="%Field name" reorderable="false"
-                                 minWidth="100.0" prefWidth="108.0"/>
-                    <TableColumn fx:id="formatterColumn" text="%Formatter name" reorderable="false"
-                                 minWidth="94.0" prefWidth="108.0"/>
-                    <TableColumn fx:id="actionsColumn" editable="false" reorderable="false" resizable="false" sortable="false"
-                                 maxWidth="40.0" minWidth="40.0" prefWidth="40.0" styleClass="actions-column"/>
+                    <TableColumn
+                            fx:id="fieldColumn"
+                            text="%Field name"
+                            reorderable="false"
+                            minWidth="100.0"
+                            prefWidth="108.0"/>
+                    <TableColumn
+                            fx:id="formatterColumn"
+                            text="%Formatter name"
+                            reorderable="false"
+                            minWidth="94.0"
+                            prefWidth="108.0"/>
+                    <TableColumn
+                            fx:id="actionsColumn"
+                            editable="false"
+                            reorderable="false"
+                            resizable="false"
+                            sortable="false"
+                            maxWidth="40.0"
+                            minWidth="40.0"
+                            prefWidth="40.0"
+                            styleClass="actions-column"/>
                 </columns>
                 <columnResizePolicy>
-                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    <TableView
+                            fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
             <HBox spacing="4.0">
-                <SearchableComboBox fx:id="addableFields" editable="true"
-                          HBox.hgrow="SOMETIMES" minWidth="100.0"/>
-                <SearchableComboBox fx:id="addableFormatters"
-                          HBox.hgrow="ALWAYS" minWidth="100.0" maxWidth="Infinity"/>
+                <SearchableComboBox
+                        fx:id="addableFields"
+                        editable="true"
+                        HBox.hgrow="SOMETIMES"
+                        minWidth="100.0"/>
+                <SearchableComboBox
+                        fx:id="addableFormatters"
+                        HBox.hgrow="ALWAYS"
+                        minWidth="100.0"
+                        maxWidth="Infinity"/>
             </HBox>
         </VBox>
         <VBox spacing="4.0">
             <Button onAction="#resetToRecommended"
-                    prefHeight="25.0" prefWidth="25.0" styleClass="icon-button,narrow">
+                    prefHeight="25.0"
+                    prefWidth="25.0"
+                    styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="REFRESH"/>
+                    <JabRefIconView
+                            glyph="REFRESH"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Reset to recommended"/>
+                    <Tooltip
+                            text="%Reset to recommended"/>
                 </tooltip>
             </Button>
             <Button onAction="#clearAll"
-                    prefHeight="25.0" prefWidth="25.0" styleClass="icon-button,narrow">
+                    prefHeight="25.0"
+                    prefWidth="25.0"
+                    styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="CLEANUP_ENTRIES"/>
+                    <JabRefIconView
+                            glyph="CLEANUP_ENTRIES"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Remove all"/>
+                    <Tooltip
+                            text="%Remove all"/>
                 </tooltip>
             </Button>
             <VBox VBox.vgrow="ALWAYS"/>
             <Button onAction="#addCleanup"
-                    prefHeight="25.0" prefWidth="25.0" styleClass="icon-button,narrow">
+                    prefHeight="25.0"
+                    prefWidth="25.0"
+                    styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="ADD_NOBOX"/>
+                    <JabRefIconView
+                            glyph="ADD_NOBOX"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Add"/>
+                    <Tooltip
+                            text="%Add"/>
                 </tooltip>
             </Button>
         </VBox>

@@ -30,8 +30,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /// A builder is available at {@link BibEntryTypeBuilder}
     ///
     /// @param type           The EntryType this BibEntryType is wrapped around.
-    /// @param allFields      A BibFields list of all fields, including the required fields
-    /// @param requiredFields A OrFields list of just the required fields
+     /// @param allFields      A BibFields list of all fields, including the required fields
+     /// @param requiredFields A OrFields list of just the required fields
     public BibEntryType(@NonNull EntryType type, Collection<BibField> allFields, Collection<OrFields> requiredFields) {
         this.type = type;
         this.allFields = new LinkedHashSet<>(allFields);

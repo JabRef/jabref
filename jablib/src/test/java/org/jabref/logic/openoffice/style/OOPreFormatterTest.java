@@ -16,15 +16,15 @@ class OOPreFormatterTest {
                     \\$ -> $
                     \\% -> %
                     \\\\ -> \\
-
+                    
                     # remove braces
                     {aaa} -> aaa
-
+                    
                     # foreign accents
                     {\\\"{a}} -> ä
                     {\\\"{A}} -> Ä
                     {\\c{C}} -> Ç
-
+                    
                     # special commands
                     {\\aa} -> å
                     {\\bb} -> bb
@@ -32,18 +32,18 @@ class OOPreFormatterTest {
                     {\\aa a} -> å a
                     \\aa\\AA -> åÅ
                     \\bb a -> bb a
-
+                    
                     # unsupported special commands
                     \\ftmch -> ftmch
                     {\\ftmch} -> ftmch
                     {\\ftmch\\aaa} -> ftmchaaa
-
+                    
                     # equations
                     $\\Sigma$ -> Σ
-
+                    
                     # strip latex commands
                     \\mbox{-} -> -
-
+                    
                     # formatting commands
                     \\textit{kkk} -> <i>kkk</i>
                     {\\it kkk} -> <i>kkk</i>

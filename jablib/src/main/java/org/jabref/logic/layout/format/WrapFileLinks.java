@@ -55,9 +55,9 @@ import org.jabref.model.entry.LinkedFile;
 /// "Text file" type with description 'An early "draft"', the output would be as follows:
 ///
 /// ```
-/// 1. John's final report (/home/john/report.pdf)
-/// 2. An early "draft" (/home/john/draft.txt)
-/// ```
+ /// 1. John's final report (/home/john/report.pdf)
+ /// 2. An early "draft" (/home/john/draft.txt)
+ ///```
 ///
 /// If the formatter was called with a second argument, the list would be filtered.
 /// For instance:
@@ -67,8 +67,8 @@ import org.jabref.model.entry.LinkedFile;
 /// would show only the text file:
 ///
 /// ```
-/// 1. An early "draft" (/home/john/draft.txt)
-/// ```
+ /// 1. An early "draft" (/home/john/draft.txt)
+ ///```
 ///
 /// If we wanted this output to be part of an XML styled output, the quotes in the
 /// file description could cause problems. Adding two additional arguments to translate
@@ -79,8 +79,8 @@ import org.jabref.model.entry.LinkedFile;
 /// would give the following output:
 ///
 /// ```
-/// 1. An early &quot;draft&quot; (/home/john/draft.txt)
-/// ```
+ /// 1. An early &quot;draft&quot; (/home/john/draft.txt)
+ ///```
 ///
 /// Additional pairs of replacements can be added.
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
@@ -121,7 +121,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     /// should be inserted, plus additional markers.
     ///
     /// @param format The marked-up string.
-    /// @return the resulting format entries.
+     /// @return the resulting format entries.
     private static List<FormatEntry> parseFormatString(String format) {
         List<FormatEntry> l = new ArrayList<>();
         StringBuilder sb = new StringBuilder();

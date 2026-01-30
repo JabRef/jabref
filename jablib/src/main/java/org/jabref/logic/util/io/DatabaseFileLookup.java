@@ -45,7 +45,7 @@ public class DatabaseFileLookup {
     /// For the matching, the absolute file paths will be used.
     ///
     /// @return `true`, if the file Object is stored in at least one
-    /// entry in the database, otherwise `false`.
+     /// entry in the database, otherwise `false`.
     public boolean lookupDatabase(Path pathname) {
         return fileCache.contains(pathname);
     }

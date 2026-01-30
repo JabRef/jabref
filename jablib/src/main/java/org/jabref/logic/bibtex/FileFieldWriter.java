@@ -34,7 +34,7 @@ public class FileFieldWriter {
     /// ';' as separators. The characters ':' and ';' are escaped with '\'.
     ///
     /// @param values The String array.
-    /// @return The encoded String.
+     /// @return The encoded String.
     public static String encodeStringArray(String[][] values) {
         return Arrays.stream(values)
                      .map(FileFieldWriter::encodeStringArray)
@@ -45,7 +45,7 @@ public class FileFieldWriter {
     /// The characters ':' and ';' are escaped with '\'.
     ///
     /// @param entry The String array.
-    /// @return The encoded String.
+     /// @return The encoded String.
     private static String encodeStringArray(String[] entry) {
         return Arrays.stream(entry)
                      .map(FileFieldWriter::quote)

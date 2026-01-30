@@ -110,7 +110,7 @@ recipeList:
   - org.openrewrite.java.migrate.lang.StringFormatted
 
   - org.openrewrite.java.RemoveObjectsIsNull
- # - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
+  # - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 
   - org.openrewrite.java.testing.junit5.AssertTrueInstanceofToAssertInstanceOf
   - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
@@ -133,33 +133,33 @@ recipeList:
   - org.openrewrite.staticanalysis.EqualsAvoidsNull
   - org.openrewrite.staticanalysis.EqualsToContentEquals
   # Needs manual intervention
-#  - org.openrewrite.staticanalysis.ExplicitCharsetOnStringGetBytes
+  #  - org.openrewrite.staticanalysis.ExplicitCharsetOnStringGetBytes
   - org.openrewrite.staticanalysis.ExternalizableHasNoArgsConstructor
   - org.openrewrite.staticanalysis.FallThrough
-#  - org.openrewrite.staticanalysis.ForLoopControlVariablePostfixOperators
+  #  - org.openrewrite.staticanalysis.ForLoopControlVariablePostfixOperators
   - org.openrewrite.staticanalysis.ForLoopIncrementInUpdate
   - org.openrewrite.staticanalysis.IndexOfChecksShouldUseAStartPosition
   - org.openrewrite.staticanalysis.IndexOfReplaceableByContains
-#  - org.openrewrite.staticanalysis.IndexOfShouldNotCompareGreaterThanZero
+  #  - org.openrewrite.staticanalysis.IndexOfShouldNotCompareGreaterThanZero
   - org.openrewrite.staticanalysis.InstanceOfPatternMatch
   - org.openrewrite.staticanalysis.IsEmptyCallOnCollections
-#  - org.openrewrite.staticanalysis.MissingOverrideAnnotation
-#  - org.openrewrite.staticanalysis.ModifierOrder
+  #  - org.openrewrite.staticanalysis.MissingOverrideAnnotation
+  #  - org.openrewrite.staticanalysis.ModifierOrder
   - org.openrewrite.staticanalysis.MultipleVariableDeclarations
   - org.openrewrite.staticanalysis.NeedBraces
   - org.openrewrite.staticanalysis.NestedEnumsAreNotStatic
   - org.openrewrite.staticanalysis.NewStringBuilderBufferWithCharArgument
   - org.openrewrite.staticanalysis.NoDoubleBraceInitialization
-#  - org.openrewrite.staticanalysis.NoEmptyCollectionWithRawType
+  #  - org.openrewrite.staticanalysis.NoEmptyCollectionWithRawType
   - org.openrewrite.staticanalysis.NoEqualityInForCondition
   - org.openrewrite.staticanalysis.NoFinalizer
-#  - org.openrewrite.staticanalysis.NoPrimitiveWrappersForToStringOrCompareTo
-#  - org.openrewrite.staticanalysis.NoRedundantJumpStatements
+  #  - org.openrewrite.staticanalysis.NoPrimitiveWrappersForToStringOrCompareTo
+  #  - org.openrewrite.staticanalysis.NoRedundantJumpStatements
   - org.openrewrite.staticanalysis.NoToStringOnStringType
   - org.openrewrite.staticanalysis.NoValueOfOnStringType
-#  - org.openrewrite.staticanalysis.NoWhitespaceBefore
+  #  - org.openrewrite.staticanalysis.NoWhitespaceBefore
   - org.openrewrite.staticanalysis.ObjectFinalizeCallsSuper
-#  - org.openrewrite.staticanalysis.OperatorWrap
+  #  - org.openrewrite.staticanalysis.OperatorWrap
   - org.openrewrite.staticanalysis.PrimitiveWrapperClassConstructorToValueOf
   - org.openrewrite.staticanalysis.RedundantFileCreation
   - org.openrewrite.staticanalysis.RemoveCallsToObjectFinalize
@@ -167,20 +167,20 @@ recipeList:
   - org.openrewrite.staticanalysis.RemoveExtraSemicolons
   - org.openrewrite.staticanalysis.RemoveJavaDocAuthorTag
   - org.openrewrite.staticanalysis.RemoveHashCodeCallsFromArrayInstances
-#  - org.openrewrite.staticanalysis.RemoveRedundantTypeCast
+  #  - org.openrewrite.staticanalysis.RemoveRedundantTypeCast
   - org.openrewrite.staticanalysis.RemoveToStringCallsFromArrayInstances
   - org.openrewrite.staticanalysis.RemoveUnneededAssertion
   - org.openrewrite.staticanalysis.RemoveUnneededBlock
-#  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
-#  - org.openrewrite.staticanalysis.RemoveUnusedPrivateFields
-#  - org.openrewrite.staticanalysis.RenameLocalVariablesToCamelCase
+  #  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
+  #  - org.openrewrite.staticanalysis.RemoveUnusedPrivateFields
+  #  - org.openrewrite.staticanalysis.RenameLocalVariablesToCamelCase
   - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrToString
   - org.openrewrite.staticanalysis.ReplaceRedundantFormatWithPrintf
   - org.openrewrite.staticanalysis.ReplaceStringBuilderWithString
   - org.openrewrite.staticanalysis.ReplaceWeekYearWithYear
-#  - org.openrewrite.staticanalysis.ShortenFullyQualifiedTypeReferences
-#  - org.openrewrite.staticanalysis.SimplifyConsecutiveAssignments
-#  - org.openrewrite.staticanalysis.SimplifyCompoundStatement
+  #  - org.openrewrite.staticanalysis.ShortenFullyQualifiedTypeReferences
+  #  - org.openrewrite.staticanalysis.SimplifyConsecutiveAssignments
+  #  - org.openrewrite.staticanalysis.SimplifyCompoundStatement
   - org.openrewrite.staticanalysis.SimplifyBooleanExpression
   - org.openrewrite.staticanalysis.SimplifyBooleanReturn
   - org.openrewrite.staticanalysis.SimplifyDurationCreationUnits
@@ -192,15 +192,15 @@ recipeList:
   - org.openrewrite.staticanalysis.UnwrapRepeatableAnnotations
   - org.openrewrite.staticanalysis.UpperCaseLiteralSuffixes
   - org.openrewrite.staticanalysis.UseDiamondOperator
-#  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
+  #  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
   - org.openrewrite.staticanalysis.UseLambdaForFunctionalInterface
-#  - org.openrewrite.staticanalysis.UseListSort
+  #  - org.openrewrite.staticanalysis.UseListSort
   - org.openrewrite.staticanalysis.UseObjectNotifyAll
   - org.openrewrite.staticanalysis.UseStandardCharset
   - org.openrewrite.staticanalysis.UseStringReplace
   - org.openrewrite.staticanalysis.UseSystemLineSeparator
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
-#  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
+  #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
 
   # - org.openrewrite.java.testing.junit5.JUnit5BestPractices -- cannot be used directly, because one recipe is not working (see below)
   - org.openrewrite.java.testing.cleanup.AssertLiteralBooleanToFailRecipe

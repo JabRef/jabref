@@ -29,8 +29,8 @@ public class NormalizeWhitespaceFormatter {
     /// Also depends on the caller whether strings have been resolved.
     ///
     /// @param fieldContent the content to format.
-    /// @param field        the name of the bibtex field
-    /// @return the formatted field content.
+     /// @param field        the name of the bibtex field
+     /// @return the formatted field content.
     public String format(String fieldContent, Field field) {
         if (FieldFactory.isMultiLineField(field, preferences.getNonWrappableFields())) {
             // In general, keep the field as is.
@@ -48,8 +48,8 @@ public class NormalizeWhitespaceFormatter {
     /// content. This allows for things like `jan { - } feb` to be passed.
     ///
     /// @param fieldContent the content to format.
-    /// @param field        the name of the bibtex field
-    /// @return the formatted field content.
+     /// @param field        the name of the bibtex field
+     /// @return the formatted field content.
     public String format(StringBuilder fieldContent, Field field) {
         return format(fieldContent.toString(), field);
     }

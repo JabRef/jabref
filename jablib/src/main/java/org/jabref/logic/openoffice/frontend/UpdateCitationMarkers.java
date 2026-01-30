@@ -87,9 +87,9 @@ public class UpdateCitationMarkers {
     /// Inserts a citation group in the document: creates and fills it.
     ///
     /// @param citationKeys     BibTeX keys of
-    /// @param citationText     Text for the citation. A citation mark or placeholder if not yet available.
-    /// @param position         Location to insert at.
-    /// @param insertSpaceAfter A space inserted after the reference mark makes it easier to separate from the text coming after. But is not wanted when we recreate a reference mark.
+     /// @param citationText     Text for the citation. A citation mark or placeholder if not yet available.
+     /// @param position         Location to insert at.
+     /// @param insertSpaceAfter A space inserted after the reference mark makes it easier to separate from the text coming after. But is not wanted when we recreate a reference mark.
     public static void createAndFillCitationGroup(OOFrontend frontend,
                                                   XTextDocument doc,
                                                   List<String> citationKeys,

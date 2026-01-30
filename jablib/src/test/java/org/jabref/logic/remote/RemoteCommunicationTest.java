@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /// Tests for the case where the client and server are set-up correctly. Testing the exceptional cases happens in {@link
-/// RemoteSetupTest}.
+ /// RemoteSetupTest}.
 @DisabledOnCIServer("Tests fails sporadically on CI server")
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("remote")

@@ -107,15 +107,15 @@ public class AuthorListTest {
             # No authors
             '', '', true, false
             '', '', false, false
-
+            
             # One author
             'John Smith', 'John Smith', false, false,
             'John Smith', 'J. Smith', true, false,
-
+            
             # Two authors
             'John Smith and Black Brown, Peter', 'John Smith and Peter Black Brown', false, false
             'John Smith and Black Brown, Peter', 'J. Smith and P. Black Brown', true, false
-
+            
             # Oxford comma = true
             '', '', true, true
             '', '', false, true
@@ -280,7 +280,7 @@ public class AuthorListTest {
                     von Neumann, John and Smith, John and Black Brown, Peter;John von Neumann and John Smith and Black Brown, Peter;false
                     von Last, Jr, First;von Last, Jr ,First;false
                     von Neumann, John and Smith, John and Black Brown, Peter;John von Neumann and John Smith and Black Brown, Peter;false
-
+                    
                     Smith, J.;John Smith;true
                     Smith, J. and Black Brown, P.;John Smith and Black Brown, Peter;true
                     von Neumann, J. and Smith, J. and Black Brown, P.;John von Neumann and John Smith and Black Brown, Peter;true
@@ -299,7 +299,7 @@ public class AuthorListTest {
             'John Smith', 'Smith', false
             'Smith, Jr, John', 'Smith', false
             'John von Neumann and John Smith and Black Brown, Peter', 'von Neumann, Smith and Black Brown', false
-
+            
             # with Oxford comma
             '', '', true
             'John Smith', 'Smith', true

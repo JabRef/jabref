@@ -67,7 +67,7 @@ public enum Month {
     /// - Full English month identifiers.
     ///
     /// @param value the given value
-    /// @return the corresponding Month instance
+     /// @return the corresponding Month instance
     public static Optional<Month> parse(String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
@@ -101,8 +101,8 @@ public enum Month {
     /// "Oktober" or in German short form such as "Okt"
     ///
     /// @param value a String that represents a month in German form
-    /// @return the corresponding month instance, empty if input is not in German
-    /// form
+     /// @return the corresponding month instance, empty if input is not in German
+     /// form
     static Optional<Month> parseGermanShortMonth(String value) {
         value = value.toLowerCase();
         return switch (value) {
@@ -194,7 +194,7 @@ public enum Month {
     /// Plain text months (e.g. `June`) are considered non-strict.
     ///
     /// @param value the string value to check
-    /// @return true if the value matches the strict format criteria
+     /// @return true if the value matches the strict format criteria
     public static boolean isStrictFormat(String value) {
         if (value == null) {
             return false;

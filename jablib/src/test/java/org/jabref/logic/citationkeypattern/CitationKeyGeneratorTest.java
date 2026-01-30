@@ -147,7 +147,7 @@ class CitationKeyGeneratorTest {
     @CsvSource(quoteCharacter = '"', textBlock = """
             # see https://sourceforge.net/forum/message.php?msg_id=4498555
             "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", "Koe",
-
+            
             # Accent ague: Á á Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
             "@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}", "Aoe",
             "@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}", "Eoe",
@@ -160,14 +160,14 @@ class CitationKeyGeneratorTest {
             "@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}", "Uoe",
             "@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}", "Yoe",
             "@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}", "Zoe",
-
+            
             # Accent grave: À È Ì Ò Ù
             "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", "Aoe",
             "@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}", "Eoe",
             "@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}", "Ioe",
             "@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}", "Ooe",
             "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}", "Uoe",
-
+            
             # Special cases
             # We keep "-" in citation keys, thus Al-Ketan with three letters is "Al-"
             "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "Al-",
@@ -209,11 +209,11 @@ class CitationKeyGeneratorTest {
     ///
     /// not tested/ not in hashmap UNICODE_CHARS:
     /// {@code
-    /// Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů    Ǣ ǣ ǖ ǘ ǚ ǜ
-    /// Ǣ ǣ ǖ ǘ ǚ ǜ
-    /// Đ đ   Ů ů
-    /// Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
-    /// }
+     /// Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů    Ǣ ǣ ǖ ǘ ǚ ǜ
+     /// Ǣ ǣ ǖ ǘ ǚ ǜ
+     /// Đ đ   Ů ů
+     /// Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
+     /// }
     ///
     /// @see CitationKeyGenerator#cleanKey(String, String)
     @ParameterizedTest(name = "accents={0}, expectedResult={1}")

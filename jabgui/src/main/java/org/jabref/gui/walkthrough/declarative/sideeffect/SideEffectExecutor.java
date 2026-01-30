@@ -33,8 +33,8 @@ public class SideEffectExecutor {
     /// necessary.
     ///
     /// @param sideEffect  the side effect to execute
-    /// @param walkthrough the walkthrough context
-    /// @return true if the side effect was executed successfully, false otherwise
+     /// @param walkthrough the walkthrough context
+     /// @return true if the side effect was executed successfully, false otherwise
     public boolean executeForward(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough) {
         return execute(sideEffect, walkthrough, true);
     }
@@ -42,8 +42,8 @@ public class SideEffectExecutor {
     /// Executes a side effect's backward action.
     ///
     /// @param sideEffect  the side effect to execute
-    /// @param walkthrough the walkthrough context
-    /// @return true if the side effect was executed successfully, false otherwise
+     /// @param walkthrough the walkthrough context
+     /// @return true if the side effect was executed successfully, false otherwise
     public boolean executeBackward(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough) {
         return execute(sideEffect, walkthrough, false);
     }

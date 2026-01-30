@@ -41,7 +41,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
 
     /// @param tabContainer               Required to close the tab before the study is updated
-    /// @param openDatabaseActionSupplier Required to open the tab after the study is executed
+     /// @param openDatabaseActionSupplier Required to open the tab after the study is executed
     public ExistingStudySearchAction(
             LibraryTabContainer tabContainer,
             Supplier<OpenDatabaseAction> openDatabaseActionSupplier,

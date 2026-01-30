@@ -160,7 +160,7 @@ public class FieldEditorsMultilinePropertyTest {
     /// Check if the class implements FieldEditorFX interface
     ///
     /// @param cu CompilationUnit
-    /// @return true if the class implements FieldEditorFX interface
+     /// @return true if the class implements FieldEditorFX interface
     private static boolean implementedFieldEditorFX(CompilationUnit cu) {
         return cu.findAll(ClassOrInterfaceDeclaration.class).stream()
                  .anyMatch(classDecl -> classDecl.getImplementedTypes().stream()
@@ -170,7 +170,7 @@ public class FieldEditorsMultilinePropertyTest {
     /// Check if the class has a new EditorTextArea creation
     ///
     /// @param cu CompilationUnit
-    /// @return true if the class has a new EditorTextArea creation
+     /// @return true if the class has a new EditorTextArea creation
     private static boolean hasEditorTextAreaCreationExisted(CompilationUnit cu) {
         return cu.findAll(ObjectCreationExpr.class).stream()
                  .anyMatch(creation -> Objects.equals("EditorTextArea", creation.getType().toString()));
@@ -179,7 +179,7 @@ public class FieldEditorsMultilinePropertyTest {
     /// Check if the class holds a TextInputControl field
     ///
     /// @param cu CompilationUnit
-    /// @return true if the class holds a TextInputControl field
+     /// @return true if the class holds a TextInputControl field
     private static boolean holdTextInputControlField(CompilationUnit cu) {
         // Since the class implements FieldEditorFX, we are going to check the first parameter when call
         // establishBinding method, which should be a TextInputControl

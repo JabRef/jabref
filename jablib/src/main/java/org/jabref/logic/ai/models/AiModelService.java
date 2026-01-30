@@ -23,9 +23,9 @@ public class AiModelService {
     /// If that fails or times out, falls back to the hardcoded list.
     ///
     /// @param aiProvider The AI provider
-    /// @param apiBaseUrl The base URL for the API
-    /// @param apiKey     The API key for authentication (may be null)
-    /// @return A list of available model names
+     /// @param apiBaseUrl The base URL for the API
+     /// @param apiKey     The API key for authentication (may be null)
+     /// @return A list of available model names
     public List<String> getAvailableModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         List<String> dynamicModels = fetchModelsSynchronously(aiProvider, apiBaseUrl, apiKey);
 
@@ -42,7 +42,7 @@ public class AiModelService {
     /// Gets the list of available models for the given provider, using only hardcoded values.
     ///
     /// @param aiProvider The AI provider
-    /// @return A list of available model names
+     /// @return A list of available model names
     public List<String> getStaticModels(AiProvider aiProvider) {
         return AiDefaultPreferences.getAvailableModels(aiProvider);
     }
@@ -51,9 +51,9 @@ public class AiModelService {
     /// This method will block until the fetch completes or the HTTP client times out.
     ///
     /// @param aiProvider The AI provider
-    /// @param apiBaseUrl The base URL for the API
-    /// @param apiKey     The API key for authentication (may be null)
-    /// @return A list of model names, or an empty list if the fetch fails
+     /// @param apiBaseUrl The base URL for the API
+     /// @param apiKey     The API key for authentication (may be null)
+     /// @return A list of model names, or an empty list if the fetch fails
     public List<String> fetchModelsSynchronously(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         for (AiModelProvider provider : modelProviders) {
             if (provider.supports(aiProvider)) {

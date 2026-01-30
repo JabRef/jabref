@@ -31,11 +31,11 @@ public class WalkthroughUtils {
         /// future.
         ///
         /// @implNote In other words, the implementation of debounced is NOT actually
-        /// putting a counter of how many times the methods have executed, but rather to
-        /// always delay the execution to specified intervals later, for which, only if
-        /// during the specified interval no other tasks are scheduled, the operation
-        /// proceeds. Therefore, you are likely interested in calling this method to
-        /// prevent unwanted execution.
+         /// putting a counter of how many times the methods have executed, but rather to
+         /// always delay the execution to specified intervals later, for which, only if
+         /// during the specified interval no other tasks are scheduled, the operation
+         /// proceeds. Therefore, you are likely interested in calling this method to
+         /// prevent unwanted execution.
         void cancel();
     }
 
@@ -49,7 +49,7 @@ public class WalkthroughUtils {
     /// from all the properties that it is attached to.
     ///
     /// @param listener the listener to debounce
-    /// @return a debounced listener
+     /// @return a debounced listener
     public static DebouncedInvalidationListener debounced(InvalidationListener listener) {
         return debounced(listener, DEFAULT_DEBOUNCE);
     }
@@ -64,8 +64,8 @@ public class WalkthroughUtils {
     /// from all the properties that it is attached to.
     ///
     /// @param listener   the listener to debounce
-    /// @param intervalMs the minimum interval between executions in milliseconds
-    /// @return a debounced listener
+     /// @param intervalMs the minimum interval between executions in milliseconds
+     /// @return a debounced listener
     public static DebouncedInvalidationListener debounced(InvalidationListener listener, long intervalMs) {
         Timeline timeline = new Timeline();
 
@@ -88,11 +88,11 @@ public class WalkthroughUtils {
         /// Cancel any debounced Runnable that's scheduled to run in the future.
         ///
         /// @implNote In other words, the implementation of debounced is NOT actually
-        /// putting a counter of how many times the methods have executed, but rather to
-        /// always delay the execution to specified intervals later, for which, only if
-        /// during the specified interval no other tasks are scheduled, the operation
-        /// proceeds. Therefore, you are likely interested in calling this method to
-        /// prevent unwanted execution.
+         /// putting a counter of how many times the methods have executed, but rather to
+         /// always delay the execution to specified intervals later, for which, only if
+         /// during the specified interval no other tasks are scheduled, the operation
+         /// proceeds. Therefore, you are likely interested in calling this method to
+         /// prevent unwanted execution.
         void cancel();
     }
 
@@ -104,7 +104,7 @@ public class WalkthroughUtils {
     /// methods after you removed it from all the properties that it is attached to.
     ///
     /// @param runnable the runnable to debounce
-    /// @return a debounced runnable
+     /// @return a debounced runnable
     public static DebouncedRunnable debounced(Runnable runnable) {
         return debounced(runnable, DEFAULT_DEBOUNCE);
     }
@@ -117,8 +117,8 @@ public class WalkthroughUtils {
     /// methods after you removed it from all the properties that it is attached to.
     ///
     /// @param runnable   the runnable to debounce
-    /// @param intervalMs the minimum interval between executions in milliseconds
-    /// @return a debounced runnable
+     /// @param intervalMs the minimum interval between executions in milliseconds
+     /// @return a debounced runnable
     public static DebouncedRunnable debounced(Runnable runnable, long intervalMs) {
         Timeline timeline = new Timeline();
         return new DebouncedRunnable() {
@@ -145,7 +145,7 @@ public class WalkthroughUtils {
     /// until a stop condition is met.
     ///
     /// @param stopCondition A supplier that should return true when the listener should be detached (as well as run anything interesting for the actual callee).
-    /// @return A runnable that can be used to detach the listener prematurely.
+     /// @return A runnable that can be used to detach the listener prematurely.
     public static Runnable onWindowChangedUntil(@NonNull BooleanSupplier stopCondition) {
         ListChangeListener<Window> listener = new ListChangeListener<>() {
             @Override

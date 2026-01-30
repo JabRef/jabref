@@ -55,10 +55,10 @@ public class TemplateExporter extends Exporter {
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
     ///
     /// @param displayName Name to display to the user.
-    /// @param consoleName Name to call this format in the console.
-    /// @param lfFileName  Name of the main layout file.
-    /// @param directory   Directory in which to find the layout file.
-    /// @param extension   Should contain the . (for instance .txt).
+     /// @param consoleName Name to call this format in the console.
+     /// @param lfFileName  Name of the main layout file.
+     /// @param directory   Directory in which to find the layout file.
+     /// @param extension   Should contain the . (for instance .txt).
     public TemplateExporter(String displayName,
                             String consoleName,
                             String lfFileName,
@@ -70,8 +70,8 @@ public class TemplateExporter extends Exporter {
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
     ///
     /// @param name       to display to the user and to call this format in the console.
-    /// @param lfFileName Name of the main layout file.
-    /// @param extension  May or may not contain the . (for instance .txt).
+     /// @param lfFileName Name of the main layout file.
+     /// @param extension  May or may not contain the . (for instance .txt).
     public TemplateExporter(String name,
                             String lfFileName,
                             String extension,
@@ -89,10 +89,10 @@ public class TemplateExporter extends Exporter {
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
     ///
     /// @param displayName Name to display to the user.
-    /// @param consoleName Name to call this format in the console.
-    /// @param lfFileName  Name of the main layout file.
-    /// @param directory   Directory in which to find the layout file.
-    /// @param extension   Should contain the . (for instance .txt).
+     /// @param consoleName Name to call this format in the console.
+     /// @param lfFileName  Name of the main layout file.
+     /// @param directory   Directory in which to find the layout file.
+     /// @param extension   Should contain the . (for instance .txt).
     public TemplateExporter(String displayName,
                             String consoleName,
                             String lfFileName,
@@ -106,12 +106,12 @@ public class TemplateExporter extends Exporter {
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
     ///
     /// @param displayName        Name to display to the user.
-    /// @param consoleName        Name to call this format in the console.
-    /// @param lfFileName         Name of the main layout file.
-    /// @param directory          Directory in which to find the layout file.
-    /// @param extension          Should contain the . (for instance .txt).
-    /// @param layoutPreferences  Preferences for layout
-    /// @param blankLineBehaviour how to behave regarding blank lines.
+     /// @param consoleName        Name to call this format in the console.
+     /// @param lfFileName         Name of the main layout file.
+     /// @param directory          Directory in which to find the layout file.
+     /// @param extension          Should contain the . (for instance .txt).
+     /// @param layoutPreferences  Preferences for layout
+     /// @param blankLineBehaviour how to behave regarding blank lines.
     public TemplateExporter(String displayName,
                             String consoleName,
                             @NonNull String lfFileName,
@@ -146,8 +146,8 @@ public class TemplateExporter extends Exporter {
     /// Subclasses of TemplateExporter are free to override and provide their own implementation.
     ///
     /// @param filename the filename
-    /// @return a newly created reader
-    /// @throws IOException if the reader could not be created (e.g., file is not found)
+     /// @return a newly created reader
+     /// @throws IOException if the reader could not be created (e.g., file is not found)
     private Reader getReader(String filename) throws IOException {
         // If this is a custom export, just use the given filename:
         String dir;

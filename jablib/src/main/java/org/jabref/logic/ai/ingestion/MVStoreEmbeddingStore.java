@@ -116,7 +116,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
     /// - [IsEqualTo] with key [FileEmbeddingsManager#LINK_METADATA_KEY]
     ///
     /// @param request embedding search request
-    /// @return an [EmbeddingSearchResult], which contains most relevant text segments
+     /// @return an [EmbeddingSearchResult], which contains most relevant text segments
     @Override
     public EmbeddingSearchResult<TextSegment> search(EmbeddingSearchRequest request) {
         // Source: {@link InMemoryEmbeddingStore}.

@@ -115,7 +115,7 @@ public record ClipboardContentGenerator(
     /// and to satisfy tests expecting a newline-terminated string.
     ///
     /// @param citations the list of already-formatted citation strings to be combined as Markdown
-    /// @return clipboard content containing the Markdown representation in its plain string flavor
+     /// @return clipboard content containing the Markdown representation in its plain string flavor
     @VisibleForTesting
     static ClipboardContent processMarkdown(List<String> citations) {
         String markdown = String.join(OS.NEWLINE, citations);

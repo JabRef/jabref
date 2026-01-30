@@ -28,8 +28,8 @@ public sealed abstract class DatabaseChangeDetailsView extends AnchorPane permit
     /// and attach it to children.
     ///
     /// @param child the child node of the implementation
-    /// @see AnchorPane#getChildren()
-    /// @see javafx.collections.ObservableList#setAll(Object[])
+     /// @see AnchorPane#getChildren()
+     /// @see javafx.collections.ObservableList#setAll(Object[])
     protected void setAllAnchorsAndAttachChild(Node child) {
         double ANCHOR_PANE_OFFSET = 8D;
         setLeftAnchor(child, ANCHOR_PANE_OFFSET);

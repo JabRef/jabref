@@ -69,7 +69,7 @@ public class LtwaRepository {
     /// Abbreviates a given title using the ISO4 rules.
     ///
     /// @param title The title to be abbreviated
-    /// @return The abbreviated title
+     /// @return The abbreviated title
     public Optional<String> abbreviate(String title) {
         if (title == null || title.isEmpty()) {
             return Optional.empty();

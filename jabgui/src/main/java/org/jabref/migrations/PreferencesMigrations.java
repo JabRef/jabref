@@ -558,7 +558,7 @@ public class PreferencesMigrations {
     /// current default defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
     ///
     /// @param preferences the user's current GUI preferences
-    /// @implNote The default fields for the "General" tab are defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
+     /// @implNote The default fields for the "General" tab are defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));

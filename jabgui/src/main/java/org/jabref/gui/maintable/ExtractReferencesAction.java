@@ -57,7 +57,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     /// Can be used to bind the action on a context menu in the linked file view (future work)
     ///
     /// @param entry      the entry to handle (can be null)
-    /// @param linkedFile the linked file (can be null)
+     /// @param linkedFile the linked file (can be null)
     private ExtractReferencesAction(@NonNull DialogService dialogService,
                                     @NonNull StateManager stateManager,
                                     @NonNull CliPreferences preferences,

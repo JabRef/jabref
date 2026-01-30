@@ -16,7 +16,7 @@ public class EntriesAddedEvent extends EntriesEvent {
     private final BibEntry firstEntry;
 
     /// @param bibEntries `List` of `BibEntry` objects which are being added.
-    /// @param location   Location affected by this event
+     /// @param location   Location affected by this event
     public EntriesAddedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super(bibEntries, location);
         if (bibEntries.isEmpty()) {

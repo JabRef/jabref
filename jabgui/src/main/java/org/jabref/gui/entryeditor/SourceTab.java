@@ -156,7 +156,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    /// Method similar to [BibEntry#getStringRepresentation(BibEntry, BibDatabaseMode, BibEntryTypesManager, FieldPreferences)]. This method additionally updates [#fieldPositions].
+    /// Method similar to [BibEntry#getStringRepresentation(BibEntry,BibDatabaseMode,BibEntryTypesManager,FieldPreferences)]. This method additionally updates [#fieldPositions].
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences) throws IOException {
         try (StringWriter writer = new StringWriter()) {
             BibWriter bibWriter = new BibWriter(writer, "\n"); // JavaFX works with LF only

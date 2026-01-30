@@ -62,7 +62,7 @@ public class UiTaskExecutor implements TaskExecutor {
     /// Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
     ///
     /// @param action the {@link Runnable} to run
-    /// @throws NullPointerException if `action` is `null`
+     /// @throws NullPointerException if `action` is `null`
     public static void runAndWaitInJavaFXThread(@NonNull Runnable action) {
         // Run synchronously on JavaFX thread
         if (Platform.isFxApplicationThread()) {
@@ -95,8 +95,8 @@ public class UiTaskExecutor implements TaskExecutor {
     /// The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
     ///
     /// @param task the BackgroundTask to run
-    /// @param <V>  The background task type
-    /// @return Future of a JavaFX Task which will execute the call method a background thread
+     /// @param <V>  The background task type
+     /// @return Future of a JavaFX Task which will execute the call method a background thread
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
@@ -115,10 +115,10 @@ public class UiTaskExecutor implements TaskExecutor {
     }
 
     /// Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
-    /// #execute(BackgroundTask)}.
+     /// #execute(BackgroundTask)}.
     ///
     /// @param <V>  type of return value of the task
-    /// @param task the task to run
+     /// @param task the task to run
     public <V> Future<V> execute(Task<V> task) {
         executor.submit(task);
         return task;
@@ -152,7 +152,7 @@ public class UiTaskExecutor implements TaskExecutor {
     /// `call` is routed to the given task object.
     ///
     /// @param task the BackgroundTask to wrap
-    /// @return a new Javafx Task object
+     /// @return a new Javafx Task object
     public static <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<>() {
             {

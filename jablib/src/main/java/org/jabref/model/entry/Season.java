@@ -53,7 +53,7 @@ public enum Season {
     /// - Full English Season identifiers.
     ///
     /// @param value the given value
-    /// @return the corresponding Season instance
+     /// @return the corresponding Season instance
     public static Optional<Season> parse(String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
@@ -81,8 +81,8 @@ public enum Season {
     /// Parses a season having the string in German standard form
     ///
     /// @param value a String that represents a season in German form
-    /// @return the corresponding season instance, empty if input is not in German
-    /// form
+     /// @return the corresponding season instance, empty if input is not in German
+     /// form
     static Optional<Season> parseGermanSeason(String value) {
         value = value.toLowerCase();
         return switch (value) {

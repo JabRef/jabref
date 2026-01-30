@@ -55,8 +55,8 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     }
 
     /// @param databaseContext the database to export from
-    /// @param file            the file to write to. If it contains "split", then the output is split into different files
-    /// @param entries         a list containing all entries that should be exported
+     /// @param file            the file to write to. If it contains "split", then the output is split into different files
+     /// @param entries         a list containing all entries that should be exported
     @Override
     public void export(@NonNull BibDatabaseContext databaseContext,
                        @NonNull Path file,

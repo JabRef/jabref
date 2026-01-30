@@ -38,7 +38,7 @@ public enum FileAnnotationType {
     /// list of FileAnnotationTypes.
     ///
     /// @param annotation the raw PDAnnotation
-    /// @return The determined FileAnnotationType
+     /// @return The determined FileAnnotationType
     public static FileAnnotationType parse(PDAnnotation annotation) {
         try {
             return FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT));
@@ -51,7 +51,7 @@ public enum FileAnnotationType {
     /// Determines if a String is a supported marked FileAnnotation type.
     ///
     /// @param annotationType a type descriptor
-    /// @return true if annotationType is a supported marked FileAnnotation type
+     /// @return true if annotationType is a supported marked FileAnnotation type
     public static boolean isMarkedFileAnnotationType(String annotationType) {
         try {
             return FileAnnotationType.valueOf(annotationType.toUpperCase(Locale.ROOT)).linkedFileAnnotationType;

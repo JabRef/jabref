@@ -15,9 +15,9 @@ import org.jspecify.annotations.NonNull;
 /// The formatter needs a parameter with the following format:
 ///
 /// ```
-/// <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
-/// <case2>@<range21>@...
-/// ```
+ /// <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
+ /// <case2>@<range21>@...
+ ///```
 ///
 /// Individual cases are separated by `@@` and items in a case by `@`.
 ///
@@ -51,18 +51,18 @@ import org.jspecify.annotations.NonNull;
 ///
 /// Input:
 /// ```
-/// Joe Doe and Mary Jane and Bruce Bar and Arthur Kay
-/// ```
+ /// Joe Doe and Mary Jane and Bruce Bar and Arthur Kay
+ ///```
 ///
 /// Output:
 /// ```
-/// Doe, J., Jane, M., Bar, B. and Kay, A.
-/// ```
+ /// Doe, J., Jane, M., Bar, B. and Kay, A.
+ ///```
 ///
 /// Formatter parameter:
 /// ```
-/// 1@*@{ll},{f}.@@2@1@{ll},{f}.@2@ and {ll},{f}.@@*@1..-3@{ll},{f}., @-2@{ll},{f}.@-1@ and {ll},{f}.
-/// ```
+ /// 1@*@{ll},{f}.@@2@1@{ll},{f}.@2@ and {ll},{f}.@@*@1..-3@{ll},{f}., @-2@{ll},{f}.@-1@ and {ll},{f}.
+ ///```
 ///
 /// This is troublesome to write, but it works.
 /// For more examples see the test cases.

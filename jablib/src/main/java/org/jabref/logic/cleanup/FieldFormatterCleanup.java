@@ -41,8 +41,8 @@ public class FieldFormatterCleanup implements CleanupJob {
     /// If the formatter returns an empty string, then the field is removed.
     ///
     /// @param fieldKey the field on which to run the formatter
-    /// @param entry    the entry to be cleaned up
-    /// @return a list of changes of the entry
+     /// @param entry    the entry to be cleaned up
+     /// @return a list of changes of the entry
     private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do

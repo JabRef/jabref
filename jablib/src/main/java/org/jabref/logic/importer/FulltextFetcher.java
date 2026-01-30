@@ -16,10 +16,10 @@ public interface FulltextFetcher {
     /// Tries to find a fulltext URL for a given BibTex entry.
     ///
     /// @param entry The Bibtex entry
-    /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-    /// @throws NullPointerException if no BibTex entry is given
-    /// @throws java.io.IOException  if an IO operation has failed
-    /// @throws FetcherException     if a fetcher-specific error occurred
+     /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+     /// @throws NullPointerException if no BibTex entry is given
+     /// @throws java.io.IOException  if an IO operation has failed
+     /// @throws FetcherException     if a fetcher-specific error occurred
     Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException;
 
     /// Returns the level of trust for this fetcher.

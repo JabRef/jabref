@@ -52,7 +52,7 @@ public class JStyleLoader {
     /// Adds the given style to the list of styles
     ///
     /// @param filename The filename of the style
-    /// @return True if the added style is valid, false otherwise
+     /// @return True if the added style is valid, false otherwise
     public boolean addStyleIfValid(@NonNull Path filename) {
         try {
             JStyle newStyle = new JStyle(filename, layoutFormatterPreferences, abbreviationRepository);

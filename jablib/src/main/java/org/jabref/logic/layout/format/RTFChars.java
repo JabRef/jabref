@@ -159,9 +159,9 @@ public class RTFChars implements LayoutFormatter {
     }
 
     /// @param text                  the text to extract the part from
-    /// @param i                     the position to start
-    /// @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
-    /// @return a tuple of number of added characters and the extracted part
+     /// @param i                     the position to start
+     /// @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
+     /// @return a tuple of number of added characters and the extracted part
     private StringInt getPart(String text, int i, boolean commandNestedInBraces) {
         char c;
         int count = 0;
@@ -197,7 +197,7 @@ public class RTFChars implements LayoutFormatter {
     /// This method transforms the unicode of a special character into its base character: 233 (é) - > e
     ///
     /// @param c long
-    /// @return returns the basic character of the given unicode
+     /// @return returns the basic character of the given unicode
     private String transformSpecialCharacter(long c) {
         if (((192 <= c) && (c <= 197)) || (c == 256) || (c == 258) || (c == 260)) {
             return "A";

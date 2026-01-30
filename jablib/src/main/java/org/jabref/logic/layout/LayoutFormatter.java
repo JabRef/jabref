@@ -18,6 +18,6 @@ public interface LayoutFormatter {
     /// a wrong output.
     ///
     /// @param fieldText The text to layout.
-    /// @return The layouted text.
+     /// @return The layouted text.
     String format(String fieldText);
 }

@@ -33,18 +33,18 @@ public interface CitationFetcher {
     /// Looks for hits which are cited by the given {@link BibEntry}. This typically is the "References" (or "Bibliography" or "Literature") section of a paper.
     ///
     /// @param entry entry to search articles for
-    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+     /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
     List<BibEntry> getReferences(BibEntry entry) throws FetcherException;
 
     /// Looks for hits which are citing the given {@link BibEntry}.
     ///
     /// @param entry entry to search articles for
-    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+     /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
     List<BibEntry> getCitations(BibEntry entry) throws FetcherException;
 
     /// Get the paper details that includes citation count field for a given {@link BibEntry}.
     ///
     /// @param entry entry to search citation count field
-    /// @return returns a {@link Integer} for citation count field (may be empty)
+     /// @return returns a {@link Integer} for citation count field (may be empty)
     Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException;
 }

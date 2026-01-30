@@ -87,7 +87,7 @@ class GitSyncServiceTest {
                   author = {don't know the author},
                   doi = {xya},
                 }
-
+            
                 @article{b,
                   author = {don't know the author},
                   doi = {xyz},
@@ -100,7 +100,7 @@ class GitSyncServiceTest {
                   author = {author-a},
                   doi = {xya},
                 }
-
+            
                 @article{b,
                   author = {don't know the author},
                   doi = {xyz},
@@ -113,7 +113,7 @@ class GitSyncServiceTest {
               author = {author-b},
               doi = {xyz},
             }
-
+            
             @article{a,
               author = {don't know the author},
               doi = {xya},
@@ -239,7 +239,7 @@ class GitSyncServiceTest {
                   author = {author-a},
                   doi = {xya},
                 }
-
+                
                 @article{b,
                   author = {author-b},
                   doi = {xyz},
@@ -276,7 +276,7 @@ class GitSyncServiceTest {
                   author = {author-a},
                   doi = {xya},
                 }
-
+                
                 @article{b,
                   author = {author-b},
                   doi = {xyz},
@@ -298,12 +298,12 @@ class GitSyncServiceTest {
                       author = {author-b},
                       doi = {xyz},
                     }
-
+                
                     @article{a,
                       author = {don't know the author},
                       doi = {xya},
                     }
-
+                
                     @article{c,
                       author = {bob-c},
                       title = {Title C},
@@ -316,12 +316,12 @@ class GitSyncServiceTest {
                       author = {author-a},
                       doi = {xya},
                     }
-
+                
                     @article{b,
                       author = {don't know the author},
                       doi = {xyz},
                     }
-
+                
                     @article{c,
                       author = {alice-c},
                       title = {Title C},
@@ -366,12 +366,12 @@ class GitSyncServiceTest {
                       author = {author-a},
                       doi = {xya},
                     }
-
+                
                     @article{b,
                       author = {author-b},
                       doi = {xyz},
                     }
-
+                
                     @article{c,
                       author = {alice-c + bob-c},
                       title = {Title C},

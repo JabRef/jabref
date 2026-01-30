@@ -164,7 +164,7 @@ public class CustomExternalFileType implements ExternalFileType {
     /// iconName are equal.
     ///
     /// @param object The file type to compare with.
-    /// @return true if the file types are equal.
+     /// @return true if the file types are equal.
     @Override
     public boolean equals(Object object) {
         if (this == object) {

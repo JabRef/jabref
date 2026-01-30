@@ -171,7 +171,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     /// The E-utilities generate a huge XML file containing all entries for the ids
     ///
     /// @param ids A list of IDs to search for.
-    /// @return Will return an empty list on error.
+     /// @return Will return an empty list on error.
     private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {
         try {
             // Separate the IDs with a comma to search multiple entries

@@ -276,7 +276,7 @@ public class EndnoteImporter extends Importer {
     /// this format and fix it.
     ///
     /// @param s The author string
-    /// @return The fixed author string
+     /// @return The fixed author string
     private static String fixAuthor(String s) {
         int index = s.indexOf(" and ");
         if (index >= 0) {

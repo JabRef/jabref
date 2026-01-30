@@ -74,7 +74,7 @@ public abstract class AbstractJabKitTest {
     /// retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.
     ///
     /// @param args the command line arguments to parse
-    /// @return the error code
+     /// @return the error code
     int executeToLog(String... args) {
         PrintStream or = System.out;
         PrintStream orErr = System.err;
@@ -110,7 +110,7 @@ public abstract class AbstractJabKitTest {
     /// Throws a runtime exception if the resource URL cannot be turned into a URI.
     ///
     /// @param resourceName the resource name
-    /// @return the class resource as fully qualified string
+     /// @return the class resource as fully qualified string
     String getClassResourceAsFullyQualifiedString(String resourceName) {
         return getClassResourceAsPath(resourceName).toAbsolutePath().toString();
     }
@@ -120,7 +120,7 @@ public abstract class AbstractJabKitTest {
     /// Throws a runtime exception if the resource URL cannot be turned into a URI.
     ///
     /// @param resourceName the resource name
-    /// @return the class resource as path
+     /// @return the class resource as path
     Path getClassResourceAsPath(String resourceName) {
         try {
             return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())

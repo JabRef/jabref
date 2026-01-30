@@ -16,8 +16,8 @@ public class StringSimilarity {
     /// String similarity based on Levenshtein, ignoreCase, and fixed metric threshold of 4.
     ///
     /// @param a String to compare
-    /// @param b String to compare
-    /// @return true if Strings are considered as similar by the algorithm
+     /// @param b String to compare
+     /// @return true if Strings are considered as similar by the algorithm
     public boolean isSimilar(String a, String b) {
         return editDistanceIgnoreCase(a, b) <= METRIC_THRESHOLD;
     }
@@ -95,8 +95,8 @@ public class StringSimilarity {
     /// Compare two strings on the basis of word-by-word correlation analysis.
     ///
     /// @param s1 The first string
-    /// @param s2 The second string
-    /// @return a value in the interval [0, 1] indicating the degree of match.
+     /// @param s2 The second string
+     /// @return a value in the interval [0,1] indicating the degree of match.
     public static double correlateByWords(final String s1, final String s2) {
         final String[] w1 = s1.split("\\s");
         final String[] w2 = s2.split("\\s");

@@ -57,8 +57,8 @@ public class CSLAdapter {
     /// Initialized the static CSL instance if needed.
     ///
     /// @param newStyle  journal style of the output
-    /// @param newFormat usually HTML or RTF.
-    /// @throws IOException An error occurred in the underlying framework
+     /// @param newFormat usually HTML or RTF.
+     /// @throws IOException An error occurred in the underlying framework
     private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
         final boolean newCslInstanceNeedsToBeCreated = (cslInstance == null) || !Objects.equals(newStyle, style);
         if (newCslInstanceNeedsToBeCreated) {

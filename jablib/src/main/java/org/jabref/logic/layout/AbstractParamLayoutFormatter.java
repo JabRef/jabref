@@ -16,7 +16,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
     /// separated by commas, and escaped commas are reduced to literal commas.
     ///
     /// @param arg The argument string.
-    /// @return A list of strings representing the parts of the argument.
+     /// @return A list of strings representing the parts of the argument.
     protected static List<String> parseArgument(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();

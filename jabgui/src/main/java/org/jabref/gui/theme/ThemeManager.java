@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 /// {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
 ///
 /// @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
-/// the Jabref documentation.
+ /// the Jabref documentation.
 public class ThemeManager {
     public static Map<String, Node> getDownloadIconTitleMap = Map.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()

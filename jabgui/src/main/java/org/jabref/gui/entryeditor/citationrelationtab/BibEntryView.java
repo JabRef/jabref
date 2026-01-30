@@ -25,7 +25,7 @@ public class BibEntryView {
     /// Creates a layout for a given {@link BibEntry} to be displayed in a List
     ///
     /// @param entry {@link BibEntry} to display
-    /// @return layout container displaying the entry
+     /// @return layout container displaying the entry
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
@@ -60,7 +60,7 @@ public class BibEntryView {
     /// Gets the correct Icon for a given {@link EntryType}
     ///
     /// @param type {@link EntryType} to get Icon for
-    /// @return Icon corresponding to {@link EntryType}
+     /// @return Icon corresponding to {@link EntryType}
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
         if (type instanceof StandardEntryType standardEntry) {
             if (standardEntry == StandardEntryType.Book) {
@@ -75,7 +75,7 @@ public class BibEntryView {
     /// Checks if text contains right-to-left characters
     ///
     /// @param text Text to check
-    /// @return true if text contains RTL characters
+     /// @return true if text contains RTL characters
     private static boolean isRTL(String text) {
         for (char c : text.toCharArray()) {
             if (Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
@@ -90,9 +90,9 @@ public class BibEntryView {
     /// avoiding JavaFX bug related to RTL text wrapping
     ///
     /// @param text The summary text content
-    /// @return Node with either:
-    /// - ScrollPane (for RTL text)
-    /// - TextFlowLimited (for LTR text)
+     /// @return Node with either:
+     /// - ScrollPane (for RTL text)
+     /// - TextFlowLimited (for LTR text)
     private static Node createSummary(String text) {
         if (isRTL(text)) {
             Text textNode = new Text(text);
@@ -109,9 +109,9 @@ public class BibEntryView {
     /// avoiding JavaFX bug related to RTL text wrapping
     ///
     /// @param text The label text content
-    /// @return Node with either:
-    /// - ScrollPane (for RTL text)
-    /// - Wrapped Label (for LTR text)
+     /// @return Node with either:
+     /// - ScrollPane (for RTL text)
+     /// - Wrapped Label (for LTR text)
     private static Node createLabel(String text) {
         if (isRTL(text)) {
             Label label = new Label(text);

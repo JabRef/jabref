@@ -52,8 +52,8 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     /// Constructs a URL for querying the Scopus Search API.
     ///
     /// @param queryNode  the search query node
-    /// @param pageNumber the page number (0-indexed)
-    /// @return URL for the Scopus API request
+     /// @param pageNumber the page number (0-indexed)
+     /// @return URL for the Scopus API request
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         transformer = new ScopusQueryTransformer();
@@ -165,7 +165,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     /// Parses a single Scopus JSON entry into a BibEntry.
     ///
     /// @param jsonEntry the JSON object representing a Scopus search result
-    /// @return Optional containing the BibEntry, or empty if parsing fails
+     /// @return Optional containing the BibEntry, or empty if parsing fails
     private Optional<BibEntry> parseScopusEntry(JSONObject jsonEntry) {
         try {
             BibEntry entry = new BibEntry();
@@ -309,8 +309,8 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     /// Determines the BibTeX entry type based on Scopus aggregationType and subtype.
     ///
     /// @param aggregationType the aggregation type (Journal, Book, Conference Proceeding, etc.)
-    /// @param subtype         the document subtype (ar, cp, re, etc.)
-    /// @return appropriate StandardEntryType
+     /// @param subtype         the document subtype (ar, cp, re, etc.)
+     /// @return appropriate StandardEntryType
     private StandardEntryType determineEntryType(String aggregationType, String subtype) {
         return switch (subtype.toLowerCase()) {
             case "cp" ->

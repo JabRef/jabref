@@ -17,7 +17,7 @@ public interface GUIPostOpenAction {
     /// performed or not.
     ///
     /// @param pr The result of the BIB parse operation.
-    /// @return true if the action should be called, false otherwise.
+     /// @return true if the action should be called, false otherwise.
     boolean isActionNecessary(ParserResult pr, DialogService dialogService, CliPreferences preferences);
 
     /// This method is called after the new database has been added to the GUI, if

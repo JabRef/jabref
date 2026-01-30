@@ -52,8 +52,8 @@ public class NamedRangeReferenceMark implements NamedRange {
     /// The pattern used is: `safeInsertSpaces(n): para, para, left, space(n), right-delete, left(n), left-delete`
     ///
     /// @param position  Where to insert (at position.getStart())
-    /// @param numSpaces Number of spaces to insert.
-    /// @return a new cursor, covering the just-inserted spaces.
+     /// @param numSpaces Number of spaces to insert.
+     /// @return a new cursor, covering the just-inserted spaces.
     public static XTextCursor safeInsertSpacesBetweenReferenceMarks(XTextRange position, int numSpaces) {
         // Start with an empty cursor at position.getStart();
         XText text = position.getText();

@@ -53,7 +53,7 @@ public abstract class AbstractCitationKeyPatterns {
     /// the parent.<br /> If that fails, we return the DEFAULT_LABELPATTERN<br />
     ///
     /// @param entryType a `String`
-    /// @return the list of Strings for the given key. First entry: the complete key
+     /// @return the list of Strings for the given key. First entry: the complete key
     public CitationKeyPattern getValue(EntryType entryType) {
         CitationKeyPattern result = data.get(entryType);
         //  Test to see if we found anything

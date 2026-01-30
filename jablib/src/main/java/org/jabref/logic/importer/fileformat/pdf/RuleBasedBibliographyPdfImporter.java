@@ -86,7 +86,7 @@ public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporte
         return Localization.lang("Reads the references from the 'References' section of a PDF file.");
     }
 
-    /// Online Grobid implementation: [org.jabref.logic.importer.util.GrobidService#processReferences(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences)]
+    /// Online Grobid implementation: [org.jabref.logic.importer.util.GrobidService#processReferences(java.nio.file.Path,org.jabref.logic.importer.ImportFormatPreferences)]
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
         String contents;

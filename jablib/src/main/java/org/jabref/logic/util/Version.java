@@ -48,7 +48,7 @@ public class Version {
     }
 
     /// @param version must be in form of following pattern: `(\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?` (e.g., 3.3; 3.4-dev)
-    /// @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
+     /// @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
     public static Version parse(String version) {
         if ((version == null) || version.isEmpty() || BuildInfo.UNKNOWN_VERSION.equals(version)
                 || "${version}".equals(version)) {

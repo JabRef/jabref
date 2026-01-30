@@ -19,9 +19,9 @@ public final class ConflictRules {
     /// Detect entry-level conflicts among base, local, and remote versions of an entry.
     ///
     /// @param base   the entry in the common ancestor
-    /// @param local  the entry in the local version
-    /// @param remote the entry in the remote version
-    /// @return optional conflict (if detected)
+     /// @param local  the entry in the local version
+     /// @param remote the entry in the remote version
+     /// @return optional conflict (if detected)
     public static Optional<ThreeWayEntryConflict> detectEntryConflict(BibEntry base,
                                                                       BibEntry local,
                                                                       BibEntry remote) {

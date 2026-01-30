@@ -27,7 +27,7 @@ class UnicodeConverterTest {
             # combining accents
             {\\"{a}}, a\u0308
             {\\"{a}}b, a\u0308b
-
+            
             # plain unicode letters
             {\\"{a}}, ä
             {{$\\Epsilon$}}, \u0395

@@ -38,9 +38,9 @@ class JStyleGetNumCitationMarker {
     /// to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
     ///
     /// @return "[${number}]" where
-    /// "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
-    /// "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
-    /// "${number}" stands for the formatted number.
+     /// "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
+     /// "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
+     /// "${number}" stands for the formatted number.
     public static OOText getNumCitationMarkerForBibliography(JStyle style,
                                                              CitationMarkerNumericBibEntry entry) {
         // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST
@@ -169,8 +169,8 @@ class JStyleGetNumCitationMarker {
     /// pageInfos are expected to be normalized
     ///
     /// @param entries          Provide the citation numbers.
-    /// @param minGroupingCount Zero and negative means never group. Only used by tests to override the value in style.
-    /// @return The text for the citation.
+     /// @param minGroupingCount Zero and negative means never group. Only used by tests to override the value in style.
+     /// @return The text for the citation.
     ///
     public static OOText getNumCitationMarker2(JStyle style,
                                                List<CitationMarkerNumericEntry> entries,

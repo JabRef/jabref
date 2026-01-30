@@ -106,7 +106,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     /// This is used to edit an existing study.
     ///
     /// @param study          the study to edit
-    /// @param studyDirectory the directory of the study
+     /// @param studyDirectory the directory of the study
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
         this.pathToStudyDataDirectory = studyDirectory;
         this.setTitle(Localization.lang("Manage study definition"));

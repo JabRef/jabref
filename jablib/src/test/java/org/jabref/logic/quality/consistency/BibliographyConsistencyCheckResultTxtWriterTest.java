@@ -56,12 +56,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         }
         assertEquals("""
                 Field Presence Consistency Check Result
-
+                
                 | entry type | citation key | Pages | Publisher |
                 | ---------- | ------------ | ----- | --------- |
                 | Article    | first        | o     | -         |
                 | Article    | second       | -     | ?         |
-
+                
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
                 | x      | required field is present |
@@ -102,12 +102,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         assertEquals("""
                 Field Presence Consistency Check Result
-
+                
                 | entry type | citation key | Date |
                 | ---------- | ------------ | ---- |
                 | Online     | withDate     | x    |
                 | Online     | withoutDate  | -    |
-
+                
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
                 | x      | required field is present |
@@ -143,12 +143,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         }
         assertEquals("""
                 Field Presence Consistency Check Result
-
+                
                 | entry type | citation key | custom | Pages | Title |
                 | ---------- | ------------ | ------ | ----- | ----- |
                 | Article    | first        | ?      | o     | x     |
                 | Article    | second       | -      | -     | -     |
-
+                
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
                 | x      | required field is present |
@@ -183,12 +183,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         }
         assertEquals("""
                 Field Presence Consistency Check Result
-
+                
                 | entry type | citation key        | custom | Pages | Title |
                 | ---------- | ------------------- | ------ | ----- | ----- |
                 | Article    | first-very-long-key | ?      | o     | x     |
                 | Article    | second              | -      | -     | -     |
-
+                
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
                 | x      | required field is present |
@@ -240,7 +240,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         }
         assertEquals("""
                 Field Presence Consistency Check Result
-
+                
                 | entry type    | citation key | Location | Pages | Publisher |
                 | ------------- | ------------ | -------- | ----- | --------- |
                 | Article       | first        | -        | o     | -         |
@@ -249,7 +249,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | InProceedings | fourth       | -        | -     | o         |
                 | InProceedings | sixth        | -        | -     | -         |
                 | InProceedings | third        | o        | o     | -         |
-
+                
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
                 | x      | required field is present |
@@ -288,7 +288,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         }
         assertEquals("""
                 Field Presence Consistency Check Result
-
+                
                 No errors found.
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }

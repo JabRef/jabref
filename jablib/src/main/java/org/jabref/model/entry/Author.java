@@ -33,10 +33,10 @@ public class Author {
     /// In case only the last part is passed, enclosing braces are
     ///
     /// @param givenName            the first name of the author (may consist of several tokens, like "Charles Louis Xavier Joseph" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
-    /// @param givenNameAbbreviated the abbreviated first name of the author (may consist of several tokens, like "C. L. X. J." in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin"). It is a responsibility of the caller to create a reasonable abbreviation of the first name.
-    /// @param namePrefix           the von part of the author's name (may consist of several tokens, like "de la" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
-    /// @param familyName           the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
-    /// @param nameSuffix           the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
+     /// @param givenNameAbbreviated the abbreviated first name of the author (may consist of several tokens, like "C. L. X. J." in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin"). It is a responsibility of the caller to create a reasonable abbreviation of the first name.
+     /// @param namePrefix           the von part of the author's name (may consist of several tokens, like "de la" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     /// @param familyName           the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     /// @param nameSuffix           the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
@@ -231,7 +231,7 @@ public class Author {
     /// Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.
     ///
     /// @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
-    /// @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
+     /// @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
     public String getFamilyGiven(boolean abbr) {
         StringBuilder res = new StringBuilder(getNamePrefixAndFamilyName());
         getNameSuffix().ifPresent(jr -> res.append(", ").append(jr));
@@ -246,7 +246,7 @@ public class Author {
     /// Returns the author's name in form 'First von Last, Jr.' with the first name full or abbreviated depending on parameter.
     ///
     /// @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
-    /// @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F. von Last, Jr.' (if <CODE>abbr==true</CODE>)
+     /// @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F. von Last, Jr.' (if <CODE>abbr==true</CODE>)
     public String getGivenFamily(boolean abbr) {
         StringBuilder res = new StringBuilder();
         if (abbr) {

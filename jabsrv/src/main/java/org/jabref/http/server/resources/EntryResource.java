@@ -39,8 +39,8 @@ public class EntryResource {
     /// Combines attributes of a given BibEntry into a basic entry preview for as plain text.
     ///
     /// @param id      The name of the library
-    /// @param entryId The CitationKey of the BibEntry
-    /// @return a basic entry preview as plain text
+     /// @param entryId The CitationKey of the BibEntry
+     /// @return a basic entry preview as plain text
     @GET
     @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
     public String getPlainRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
@@ -83,9 +83,9 @@ public class EntryResource {
     /// Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
     ///
     /// @param id      The name of the library
-    /// @param entryId The CitationKey of the BibEntry
-    /// @return a basic entry preview as HTML text
-    /// @throws IOException
+     /// @param entryId The CitationKey of the BibEntry
+     /// @return a basic entry preview as HTML text
+     /// @throws IOException
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")

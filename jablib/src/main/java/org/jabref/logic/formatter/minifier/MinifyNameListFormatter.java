@@ -21,10 +21,10 @@ public class MinifyNameListFormatter extends Formatter {
     ///
     /// <h4>Example</h4>
     /// <pre>{@code
-    /// Stefan Kolb -> Stefan Kolb
-    /// Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer
-    /// Stefan Kolb and Simon Harrer and Jörg Lenhard -> Stefan Kolb and others
-    /// }</pre>
+     /// Stefan Kolb -> Stefan Kolb
+     /// Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer
+     /// Stefan Kolb and Simon Harrer and Jörg Lenhard -> Stefan Kolb and others
+     /// }</pre>
     @Override
     public String format(@NonNull String value) {
         if (value.isEmpty()) {

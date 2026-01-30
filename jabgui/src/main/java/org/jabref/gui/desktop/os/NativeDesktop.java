@@ -166,8 +166,8 @@ public abstract class NativeDesktop {
     /// If the "file" is an online link, instead open it with the browser
     ///
     /// @param databaseContext The database this file belongs to.
-    /// @param link            The filename.
-    /// @return false if the link couldn't be resolved, true otherwise.
+     /// @param link            The filename.
+     /// @return false if the link couldn't be resolved, true otherwise.
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
                                                     ExternalApplicationsPreferences externalApplicationsPreferences,
                                                     FilePreferences filePreferences,
@@ -209,7 +209,7 @@ public abstract class NativeDesktop {
     /// Opens a file browser of the folder of the given file. If possible, the file is selected
     ///
     /// @param fileLink the location of the file
-    /// @throws IOException if the default file browser cannot be opened
+     /// @throws IOException if the default file browser cannot be opened
     public static void openFolderAndSelectFile(Path fileLink,
                                                ExternalApplicationsPreferences externalApplicationsPreferences,
                                                DialogService dialogService) throws IOException {
@@ -322,7 +322,7 @@ public abstract class NativeDesktop {
     /// Opens a file on an Operating System, using the given application.
     ///
     /// @param filePath    The filename.
-    /// @param application Link to the app that opens the file.
+     /// @param application Link to the app that opens the file.
     public abstract void openFileWithApplication(String filePath, String application) throws IOException;
 
     public abstract void openFolderAndSelectFile(Path file) throws IOException;
@@ -349,7 +349,7 @@ public abstract class NativeDesktop {
     /// Moves the given file to the trash.
     ///
     /// @throws UnsupportedOperationException if the current platform does not support the {@link Desktop.Action#MOVE_TO_TRASH} action
-    /// @see Desktop#moveToTrash(java.io.File)
+     /// @see Desktop#moveToTrash(java.io.File)
     public void moveToTrash(Path path) {
         boolean success = Desktop.getDesktop().moveToTrash(path.toFile());
         if (!success) {

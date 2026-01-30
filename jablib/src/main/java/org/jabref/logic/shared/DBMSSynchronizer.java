@@ -213,7 +213,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Removes all local entries which are not present on shared database.
     ///
     /// @param localEntries List of {@link BibEntry} the entries should be removed from
-    /// @param sharedIDs    Set of all IDs which are present on shared database
+     /// @param sharedIDs    Set of all IDs which are present on shared database
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         List<BibEntry> entriesToRemove =
                 localEntries.stream()
@@ -323,7 +323,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Checks whether the current SQL connection is valid. In case that the connection is not valid a new {@link
-    /// ConnectionLostEvent} is going to be sent.
+     /// ConnectionLostEvent} is going to be sent.
     ///
     /// @return `true` if the connection is valid, else `false`.
     public boolean checkCurrentConnection() {
@@ -343,8 +343,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Checks whether the {@link EntriesEventSource} of an {@link EntriesEvent} is crucial for this class.
     ///
     /// @param event An {@link EntriesEvent}
-    /// @return `true` if the event is able to trigger operations in {@link DBMSSynchronizer}, else
-    /// `false`
+     /// @return `true` if the event is able to trigger operations in {@link DBMSSynchronizer}, else
+     /// `false`
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();
         return (eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO);

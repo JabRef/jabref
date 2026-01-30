@@ -23,7 +23,7 @@ public abstract class Formatter {
     /// Formats a field value by with a particular formatter transformation.
     ///
     /// @param value the input String
-    /// @return the formatted output String
+     /// @return the formatted output String
     public abstract String format(@NonNull String value);
 
     /// Returns a description of the formatter.
@@ -48,7 +48,7 @@ public abstract class Formatter {
     /// Indicates whether some other object is the same formatter as this one based on the key.
     ///
     /// @param obj the object to compare the formatter to
-    /// @return true if the object is a formatter with the same key
+     /// @return true if the object is a formatter with the same key
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Formatter formatter) {

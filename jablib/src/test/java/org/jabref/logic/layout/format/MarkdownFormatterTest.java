@@ -23,10 +23,10 @@ class MarkdownFormatterTest {
                 Arguments.of("Hello World", "<p>Hello World</p>"),
                 Arguments.of("""
                                 Markup
-
+                                
                                 * list item one
                                 * list item two
-
+                                
                                  rest
                                 """,
                         "<p>Markup</p> <ul> <li>list item one</li> <li>list item two</li> </ul> <p>rest</p>"
@@ -40,9 +40,9 @@ class MarkdownFormatterTest {
                 ),
                 Arguments.of("""
                                    First line
-
+                                
                                    Second line
-
+                                
                                    ```java
                                    String test;
                                    ```
@@ -54,7 +54,7 @@ class MarkdownFormatterTest {
                                    ```javascript
                                    let test = "Hello World";
                                    ```
-
+                                
                                    ```java
                                    String test = "Hello World";
                                    ```
@@ -66,11 +66,11 @@ class MarkdownFormatterTest {
                 ),
                 Arguments.of("""
                                 Some text.
-
+                                
                                 ```java
                                 int foo = 0;
                                 foo = 1;
-
+                                
                                 ```
                                 """,
                         "<p>Some text.</p> <pre><code class=\"language-java\">int foo = 0; foo = 1;  </code></pre>"

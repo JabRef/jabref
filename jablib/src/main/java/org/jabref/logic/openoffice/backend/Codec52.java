@@ -72,8 +72,8 @@ class Codec52 {
     /// Or the first unused in this series, after removals.
     ///
     /// @param usedNames    Reference mark names already in use.
-    /// @param citationKeys Identifies the cited sources.
-    /// @param citationType Encodes the effect of withText and inParenthesis options.
+     /// @param citationKeys Identifies the cited sources.
+     /// @param citationType Encodes the effect of withText and inParenthesis options.
     ///
     public static String getUniqueMarkName(Set<String> usedNames,
                                            List<String> citationKeys,

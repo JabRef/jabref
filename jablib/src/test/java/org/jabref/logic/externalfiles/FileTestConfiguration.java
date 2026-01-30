@@ -27,7 +27,7 @@ public class FileTestConfiguration {
     private final BibTestConfiguration targetBibTestConfiguration;
 
     /// @param tempDir         the temporary directory to use
-    /// @param filePreferences the file preferences to modify
+     /// @param filePreferences the file preferences to modify
     @Builder(style = BuilderStyle.STAGED_PRESERVING_ORDER)
     public FileTestConfiguration(
             @Opt String mainFileDir,

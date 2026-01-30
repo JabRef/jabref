@@ -50,8 +50,8 @@ public class KeyBindingRepository {
     /// Check if the given keyCombination equals the given keyEvent
     ///
     /// @param combination as KeyCombination
-    /// @param keyEvent    as KeEvent
-    /// @return true if matching, else false
+     /// @param keyEvent    as KeEvent
+     /// @return true if matching, else false
     public static boolean checkKeyCombinationEquality(KeyCombination combination, KeyEvent keyEvent) {
         KeyCode code = keyEvent.getCode();
         if (code == KeyCode.UNDEFINED) {
@@ -146,8 +146,8 @@ public class KeyBindingRepository {
     /// Check if the given KeyBinding equals the given keyEvent
     ///
     /// @param binding  as KeyBinding
-    /// @param keyEvent as KeEvent
-    /// @return true if matching, else false
+     /// @param keyEvent as KeEvent
+     /// @return true if matching, else false
     public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
         return getKeyCombination(binding).filter(combination -> checkKeyCombinationEquality(combination, keyEvent))
                                          .isPresent();

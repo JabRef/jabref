@@ -34,7 +34,7 @@ public class EntryAnnotationImporter {
     /// Reads the annotations from the files that are attached to a BibEntry.
     ///
     /// @param databaseContext The context is needed for the importer.
-    /// @return Map from each PDF to a list of file annotations
+     /// @return Map from each PDF to a list of file annotations
     public Map<Path, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         Map<Path, List<FileAnnotation>> annotations = new HashMap<>();
         AnnotationImporter importer = new PdfAnnotationImporter();

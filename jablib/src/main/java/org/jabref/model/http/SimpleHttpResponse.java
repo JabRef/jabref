@@ -69,7 +69,7 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
     /// Appends "... (truncated)" to indicate truncation.
     ///
     /// @param responseBody the original response body
-    /// @return the truncated response body
+     /// @return the truncated response body
     private static String truncateResponseBody(String responseBody) {
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
         if (bytes.length > MAX_RESPONSE_LENGTH) {
@@ -86,8 +86,8 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
     /// which may contain error messages or other information from the server.
     ///
     /// @param connection the HttpURLConnection to read the response body from
-    /// @return the response body as a string
-    /// @throws IOException if an I/O error occurs while reading the response body
+     /// @return the response body as a string
+     /// @throws IOException if an I/O error occurs while reading the response body
     private static String getResponseBody(HttpURLConnection connection) throws IOException {
         InputStream errorStream = connection.getErrorStream();
         if (errorStream == null) {

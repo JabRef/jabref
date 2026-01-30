@@ -308,7 +308,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     /// <a href="https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor">https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor</a>
     ///
     /// @param text to parse and highlight
-    /// @return highlighted span for codeArea
+     /// @return highlighted span for codeArea
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
         final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
                 + "|(?<COMMENT><!--[^<>]+-->)");

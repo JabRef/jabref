@@ -70,7 +70,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
     /// - Removes trailing slashes before building the path
     ///
     /// @param apiBaseUrl the base URL of the API (e.g., "https://api.openai.com" or "https://api.openai.com/v1")
-    /// @return the complete URL for the models endpoint
+     /// @return the complete URL for the models endpoint
     private String buildModelsEndpoint(String apiBaseUrl) {
         String baseUrl = apiBaseUrl.trim();
         if (baseUrl.endsWith("/")) {

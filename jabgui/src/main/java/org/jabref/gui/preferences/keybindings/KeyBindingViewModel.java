@@ -87,7 +87,7 @@ public class KeyBindingViewModel {
     /// the given key event is a valid combination of keys.
     ///
     /// @param evt as KeyEvent
-    /// @return true if the KeyEvent is a valid binding, false else
+     /// @return true if the KeyEvent is a valid binding, false else
     public boolean setNewBinding(KeyEvent evt) {
         // validate the shortcut is no modifier key
 

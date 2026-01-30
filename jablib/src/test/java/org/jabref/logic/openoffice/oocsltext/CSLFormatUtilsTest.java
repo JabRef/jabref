@@ -469,10 +469,10 @@ class CSLFormatUtilsTest {
     /// The rest of the citation should stay as it is (other numbers in the body shouldn't be affected).
     ///
     /// @implSpec <ol>
-    /// - Assumes that {@link CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} works as expected.
-    /// - Assumes that the method {@link CSLFormatUtils#transformHTML(String) transformHTML} works as expected.
-    /// - Run this test ONLY on numeric Citation Styles.
-    /// </ol>
+     /// - Assumes that {@link CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} works as expected.
+     /// - Assumes that the method {@link CSLFormatUtils#transformHTML(String) transformHTML} works as expected.
+     /// - Run this test ONLY on numeric Citation Styles.
+     /// </ol>
     @ParameterizedTest
     @MethodSource
     void updateSingleNumericBibliography(String expected, CitationStyle style) {

@@ -111,7 +111,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     /// Constructs the query based on title of the BibEntry. Adds statistical stuff to the url.
     ///
     /// @param queryWithTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
-    /// @return the string used to make the query at mdl server
+     /// @return the string used to make the query at mdl server
     private URL constructQuery(String queryWithTitle) throws URISyntaxException, MalformedURLException {
         // The encoding does not work for / so we convert them by our own
         queryWithTitle = queryWithTitle.replace("/", " ");

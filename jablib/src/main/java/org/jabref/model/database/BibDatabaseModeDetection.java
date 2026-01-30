@@ -20,7 +20,7 @@ public class BibDatabaseModeDetection {
     /// 2. Otherwise return BibTex
     ///
     /// @param database a BibDatabase database
-    /// @return the inferred database type
+     /// @return the inferred database type
     public static BibDatabaseMode inferMode(BibDatabase database) {
         final Stream<EntryType> entryTypes = database.getEntries().stream().map(BibEntry::getType);
 

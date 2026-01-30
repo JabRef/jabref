@@ -13,7 +13,7 @@ import io.github.darvil.terminal.textformatter.color.SimpleColor;
 
 public final class BuildInfo {
     public static final String JABREF_BANNER = TextFormatter.of("""
-
+            
                &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
                &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
                &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&

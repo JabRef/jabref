@@ -45,7 +45,7 @@ public final class CSLStyleUtils {
     /// Creates a CitationStyle from a file path.
     ///
     /// @param styleFile Path to the CSL file
-    /// @return Optional containing the CitationStyle if valid, empty otherwise
+     /// @return Optional containing the CitationStyle if valid, empty otherwise
     public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
         if (!isCitationStyleFile(styleFile)) {
             LOGGER.error("Not a .csl style file: {}", styleFile);
@@ -103,8 +103,8 @@ public final class CSLStyleUtils {
     /// Parses the style information from a style content using StAX.
     ///
     /// @param filename The filename of the style (for logging)
-    /// @param content  The XML content of the style
-    /// @return Optional containing the StyleInfo if valid, empty otherwise
+     /// @param content  The XML content of the style
+     /// @return Optional containing the StyleInfo if valid, empty otherwise
     public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         try {
             XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(Reader.of(content));

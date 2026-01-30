@@ -259,7 +259,7 @@ public class MetaDataParser {
     /// Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
     ///
     /// @param entry    the metadata entry containing the user-specific .blg path.
-    /// @param metaData the MetaData object to update.
+     /// @param metaData the MetaData object to update.
     private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {
         String user = entry.getKey().substring(MetaData.BLG_FILE_PATH.length() + 1);
         List<String> values;

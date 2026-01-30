@@ -129,7 +129,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     /// dialogService.showFileOpenDialogAndGetMultipleFiles().
     ///
     /// @param initialDirectory Path to use as the initial directory
-    /// @return new FileDialogConfig with given initial directory
+     /// @return new FileDialogConfig with given initial directory
     public FileDialogConfiguration getFileDialogConfiguration(Path initialDirectory) {
         return new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)

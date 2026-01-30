@@ -136,12 +136,12 @@ class LocalizationConsistencyTest {
                                    key.getValueForEnglishPropertiesFile()))
                            .collect(Collectors.joining("\n",
                                    """
-
+                                           
                                            DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE.
                                            PASTE THESE INTO THE ENGLISH LANGUAGE FILE "JabRef_en.properties".
                                            Search for a proper place; typically related keys are grouped together.
                                            If a similar key is already present, please adapt your language instead of adding load to translators by adding a new key.
-
+                                           
                                            """,
                                    "\n\n")));
     }
@@ -153,10 +153,10 @@ class LocalizationConsistencyTest {
                 obsoleteKeys.stream().collect(Collectors.joining("\n",
                         "Obsolete keys found in language properties file: \n\n",
                         """
-
+                                
                                 1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE.
                                 2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE "JabRef_en.properties".
-
+                                
                                 """))
         );
     }

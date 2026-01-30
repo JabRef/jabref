@@ -61,7 +61,7 @@ class RegExpBasedFileFinder implements FileFinder {
     /// Helper method for both exact matching (if the file name were not created by JabRef) and cleaned file name matching.
     ///
     /// @param expandedContent the expanded content of a bracketed expression
-    /// @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
+     /// @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
     private static String toFileNameRegex(String expandedContent) {
         String cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
         return expandedContent.equals(cleanedContent) ? Pattern.quote(expandedContent) :
@@ -72,9 +72,9 @@ class RegExpBasedFileFinder implements FileFinder {
     /// given.
     ///
     /// @param entry       The entry to search for.
-    /// @param extensions  The extensions that are acceptable.
-    /// @param directories The root directories to search.
-    /// @return A list of files paths matching the given criteria.
+     /// @param extensions  The extensions that are acceptable.
+     /// @param directories The root directories to search.
+     /// @return A list of files paths matching the given criteria.
     @Override
     public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) throws IOException {
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
@@ -102,9 +102,9 @@ class RegExpBasedFileFinder implements FileFinder {
     /// - .* Anything else is taken to be a Regular expression.
     ///
     /// @param entry non-null
-    /// @param dirs  A set of root directories to start the search from. Paths are returned relative to these directories if relative is set to true. These directories will not be expanded or anything. Use the file attribute for this.
-    /// @return Will return the first file found to match the given criteria or
-    /// null if none was found.
+     /// @param dirs  A set of root directories to start the search from. Paths are returned relative to these directories if relative is set to true. These directories will not be expanded or anything. Use the file attribute for this.
+     /// @return Will return the first file found to match the given criteria or
+     /// null if none was found.
     private List<Path> findFile(BibEntry entry, List<Path> dirs, String extensionRegExp) throws IOException {
         List<Path> res = new ArrayList<>();
         for (Path directory : dirs) {

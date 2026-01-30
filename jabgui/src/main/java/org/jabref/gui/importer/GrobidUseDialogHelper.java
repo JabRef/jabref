@@ -13,7 +13,7 @@ public class GrobidUseDialogHelper {
     /// a dialog. The users' preference is saved.
     ///
     /// @param dialogService the DialogService to use
-    /// @return if the user enabled Grobid, either in the past or after being asked by the dialog.
+     /// @return if the user enabled Grobid, either in the past or after being asked by the dialog.
     public static boolean showAndWaitIfUserIsUndecided(DialogService dialogService, GrobidPreferences preferences) {
         if (preferences.isGrobidUseAsked()) {
             return preferences.isGrobidEnabled();

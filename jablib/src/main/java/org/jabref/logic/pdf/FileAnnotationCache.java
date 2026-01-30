@@ -37,7 +37,7 @@ public class FileAnnotationCache {
     /// Note that entry becomes the most recent entry in the cache
     ///
     /// @param entry entry for which to get the annotations
-    /// @return Map containing a list of annotations in a list for each file
+     /// @return Map containing a list of annotations in a list for each file
     public Map<Path, List<FileAnnotation>> getFromCache(BibEntry entry) {
         LOGGER.debug("Loading BibEntry '{}' from cache.", entry.getCitationKey().orElse(entry.getId()));
         return annotationCache.get(entry);

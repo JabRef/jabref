@@ -179,7 +179,7 @@ public class WalkthroughOverlay {
     /// menu. This lead to moving to next step results in revert to previous step.
     /// 2. Hide is necessary because [WindowOverlay] have a hack---automatically recover PopOver throughout the course
     /// when it's supposed to be displayed. That seems harmless, but since we used
-    /// [org.jabref.gui.walkthrough.utils.WalkthroughUtils#debounced(Runnable, long)], the following "race condition"
+    /// [org.jabref.gui.walkthrough.utils.WalkthroughUtils#debounced(Runnable,long)], the following "race condition"
     /// can occur:
     ///     - [#prepareForNavigation()] ran
     ///     - node hid (original event dispatcher ran)

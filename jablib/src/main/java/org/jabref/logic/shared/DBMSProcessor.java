@@ -49,7 +49,7 @@ public abstract class DBMSProcessor {
     /// Scans the database for required tables.
     ///
     /// @return `true` if the structure matches the requirements, `false` if not.
-    /// @throws SQLException in case of error
+     /// @throws SQLException in case of error
     public boolean checkBaseIntegrity() throws SQLException {
         boolean databasePassesIntegrityCheck = false;
         DBMSType type = this.connectionProperties.getType();
@@ -81,7 +81,7 @@ public abstract class DBMSProcessor {
     /// Checks whether all given table names (**case insensitive**) exist in database.
     ///
     /// @param tableNames Table names to be checked
-    /// @return `true` if **all** given tables are present, else `false`.
+     /// @return `true` if **all** given tables are present, else `false`.
     protected boolean checkTableAvailability(String... tableNames) throws SQLException {
         List<String> requiredTables = new ArrayList<>();
         for (String name : tableNames) {
@@ -123,7 +123,7 @@ public abstract class DBMSProcessor {
     /// This method is package private, because of DBMSProcessorTest
     ///
     /// @param expression Table or field name
-    /// @return Correctly escaped expression
+     /// @return Correctly escaped expression
     abstract String escape(String expression);
 
     abstract String escape_Table(String expression);
@@ -188,7 +188,7 @@ public abstract class DBMSProcessor {
     /// Filters a list of BibEntry to and returns those which do not exist in the database
     ///
     /// @param bibEntries {@link BibEntry} to be checked
-    /// @return `true` if existent, else `false`
+     /// @return `true` if existent, else `false`
     private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
         List<Integer> remoteIds = new ArrayList<>();
         List<Integer> localIds = bibEntries.stream()
@@ -269,7 +269,7 @@ public abstract class DBMSProcessor {
     /// Updates the whole {@link BibEntry} on shared database.
     ///
     /// @param localBibEntry {@link BibEntry} affected by changes
-    /// @throws SQLException in case of error
+     /// @throws SQLException in case of error
     public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
         connection.setAutoCommit(false); // disable auto commit due to transaction
 
@@ -437,7 +437,7 @@ public abstract class DBMSProcessor {
     }
 
     /// @param sharedID Entry ID
-    /// @return instance of {@link BibEntry}
+     /// @return instance of {@link BibEntry}
     public Optional<BibEntry> getSharedEntry(int sharedID) {
         List<BibEntry> sharedEntries = getSharedEntries(List.of(sharedID));
         if (sharedEntries.isEmpty()) {

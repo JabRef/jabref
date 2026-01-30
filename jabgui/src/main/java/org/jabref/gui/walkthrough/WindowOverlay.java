@@ -86,17 +86,17 @@ class WindowOverlay {
     /// not yet ready to be displayed.
     ///
     /// @param step           The step to display.
-    /// @param node           The node to anchor the tooltip to, or null to show it at the window. The node is expected to be positionable by [WalkthroughUtils#cannotPositionNode(Node)] standard.
-    /// @param beforeNavigate A runnable to execute before navigating to the next step.
-    /// @implNote The requirement for the node to be positionable by
-    /// [WalkthroughUtils#cannotPositionNode(Node)] standard is just to make things
-    /// easier to define. This requirement come from
-    /// [javafx.stage.PopupWindow#show(Node)], which check whether the node is tree
-    /// visible before showing the popup and [PopOver#show(Node)], which checks whether
-    /// the node contains a scene and window to assign the owning window to the
-    /// popover.
-    /// @see WindowOverlay#showPanel(PanelStep, Runnable)
-    /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
+     /// @param node           The node to anchor the tooltip to, or null to show it at the window. The node is expected to be positionable by [WalkthroughUtils#cannotPositionNode(Node)] standard.
+     /// @param beforeNavigate A runnable to execute before navigating to the next step.
+     /// @implNote The requirement for the node to be positionable by
+     /// [WalkthroughUtils#cannotPositionNode(Node)] standard is just to make things
+     /// easier to define. This requirement come from
+     /// [javafx.stage.PopupWindow#show(Node)], which check whether the node is tree
+     /// visible before showing the popup and [PopOver#show(Node)], which checks whether
+     /// the node contains a scene and window to assign the owning window to the
+     /// popover.
+     /// @see WindowOverlay#showPanel(PanelStep, Runnable)
+     /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
     public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
         showing = true;
@@ -178,7 +178,7 @@ class WindowOverlay {
 
     /// Convenience method to show a panel for the given step without a node.
     ///
-    /// See [WindowOverlay#showPanel(PanelStep, Node, Runnable)] for details.
+    /// See [WindowOverlay#showPanel(PanelStep,Node,Runnable)] for details.
     public void showPanel(PanelStep step, Runnable beforeNavigate) {
         showPanel(step, null, beforeNavigate);
     }
@@ -186,10 +186,10 @@ class WindowOverlay {
     /// Display a Panel for the given step at the specified node.
     ///
     /// @param step           The step to display.
-    /// @param node           The node to anchor highlight to (e.g., BackdropHighlight may poke a hole at the position of the node), or null to use fallback effect of corresponding position.
-    /// @param beforeNavigate A runnable to execute before navigating to the next step. More precisely, the runnable to execute immediately upon the button press before Walkthrough's state change to the next step and before the original button/node's action is executed. Usually used to prevent automatic revert from unexpected reverting to the previous step when the node is not yet ready to be displayed
-    /// @see WindowOverlay#showPanel(PanelStep, Runnable)
-    /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
+     /// @param node           The node to anchor highlight to (e.g., BackdropHighlight may poke a hole at the position of the node), or null to use fallback effect of corresponding position.
+     /// @param beforeNavigate A runnable to execute before navigating to the next step. More precisely, the runnable to execute immediately upon the button press before Walkthrough's state change to the next step and before the original button/node's action is executed. Usually used to prevent automatic revert from unexpected reverting to the previous step when the node is not yet ready to be displayed
+     /// @see WindowOverlay#showPanel(PanelStep, Runnable)
+     /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
     public void showPanel(PanelStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
         showing = true;

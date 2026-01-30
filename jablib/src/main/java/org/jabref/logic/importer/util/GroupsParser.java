@@ -97,8 +97,8 @@ public class GroupsParser {
     /// Re-create a group instance from a textual representation.
     ///
     /// @param input The result from the group's toString() method.
-    /// @return New instance of the encoded group.
-    /// @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
+     /// @return New instance of the encoded group.
+     /// @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
     public static AbstractGroup fromString(String input, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost)
             throws ParseException {
         if (input.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {

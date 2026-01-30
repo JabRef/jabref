@@ -19,7 +19,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
     private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
     /// Executes the task on the current thread. The code is essentially taken from {@link
-    /// javafx.concurrent.Task.TaskCallable#call()}, but adapted to run sequentially.
+     /// javafx.concurrent.Task.TaskCallable#call()}, but adapted to run sequentially.
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Runnable onRunning = task.getOnRunning();

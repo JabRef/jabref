@@ -69,7 +69,7 @@ public class BibEntryTypesManager {
     /// For example, a modified "article" type will not be included in the list, but an entry type like "MyCustomType" will be included.
     ///
     /// @param mode the BibDatabaseMode to be checked
-    /// @return the list of all found custom types
+     /// @return the list of all found custom types
     public List<BibEntryType> getAllCustomTypes(BibDatabaseMode mode) {
         return getEntryTypes(mode).getAllCustomTypes();
     }

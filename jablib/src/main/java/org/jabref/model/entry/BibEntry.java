@@ -180,9 +180,9 @@ public class BibEntry {
     /// Map an (empty) field of a BibEntry to a field of a cross-referenced entry.
     ///
     /// @param targetField field name of the BibEntry
-    /// @param targetEntry type of the BibEntry
-    /// @param sourceEntry type of the cross-referenced BibEntry
-    /// @return the mapped field or null if there is no valid mapping available
+     /// @param targetEntry type of the BibEntry
+     /// @param sourceEntry type of the cross-referenced BibEntry
+     /// @return the mapped field or null if there is no valid mapping available
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
         // 1. Sort out forbidden fields
         if ((targetField == StandardField.IDS) ||
@@ -307,8 +307,8 @@ public class BibEntry {
     /// unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
     ///
     /// @param field    The field to return the value of.
-    /// @param database The database of the bibtex entry.
-    /// @return The resolved field value or null if not found.
+     /// @param database The database of the bibtex entry.
+     /// @return The resolved field value or null if not found.
     public Optional<String> getResolvedFieldOrAlias(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
     }
@@ -473,8 +473,8 @@ public class BibEntry {
     /// Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
     ///
     /// @param field         the field
-    /// @param getFieldValue the method to get the value of a given field in a given entry
-    /// @return determined field value
+     /// @param getFieldValue the method to get the value of a given field in a given entry
+     /// @return determined field value
     private Optional<String> genericGetFieldOrAlias(Field field, BiFunction<BibEntry, Field, Optional<String>> getFieldValue) {
         Optional<String> fieldValue = getFieldValue.apply(this, field);
 
@@ -557,7 +557,7 @@ public class BibEntry {
     /// For details see also {@link #getFieldOrAlias(Field)}
     ///
     /// @param name the name of the field
-    /// @return the stored latex-free content of the field (or its alias)
+     /// @return the stored latex-free content of the field (or its alias)
     public Optional<String> getFieldOrAliasLatexFree(Field name) {
         return genericGetFieldOrAlias(name, BibEntry::getFieldLatexFree);
     }
@@ -571,8 +571,8 @@ public class BibEntry {
     /// Set a field, and notify listeners about the change.
     ///
     /// @param field       The field to set
-    /// @param value       The value to set
-    /// @param eventSource Source the event is sent from
+     /// @param value       The value to set
+     /// @param eventSource Source the event is sent from
     public Optional<FieldChange> setField(@NonNull Field field,
                                           @NonNull String value,
                                           @NonNull EntriesEventSource eventSource) {
@@ -603,7 +603,7 @@ public class BibEntry {
     /// Set a field, and notify listeners about the change.
     ///
     /// @param field The field to set.
-    /// @param value The value to set.
+     /// @param value The value to set.
     public Optional<FieldChange> setField(Field field, String value) {
         return setField(field, value, EntriesEventSource.LOCAL);
     }
@@ -619,7 +619,7 @@ public class BibEntry {
     /// the change including the {@link EntriesEventSource}.
     ///
     /// @param field       the field to clear.
-    /// @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
+     /// @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
         if (oldValue.isEmpty()) {
@@ -641,8 +641,8 @@ public class BibEntry {
     /// entries linked by the "crossref" field, if any.
     ///
     /// @param fields   An array of field names to be checked.
-    /// @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning that no attempt will be made to follow crossrefs.
-    /// @return true if all fields are set or could be resolved, false otherwise.
+     /// @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning that no attempt will be made to follow crossrefs.
+     /// @return true if all fields are set or could be resolved, false otherwise.
     public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
@@ -670,7 +670,7 @@ public class BibEntry {
 
     /// Uses `\n` as newline separator
     ///
-    /// Method similar to [org.jabref.gui.entryeditor.SourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences)]
+    /// Method similar to [org.jabref.gui.entryeditor.SourceTab#getSourceString(BibEntry,BibDatabaseMode,FieldPreferences)]
     ///
     /// @return String representation - empty string in case of an error (to ease calling)
     public @NonNull String getStringRepresentation(
@@ -713,8 +713,8 @@ public class BibEntry {
     /// If `0` is passed as `maxCharacters`, the description is not truncated.
     ///
     /// @param maxCharacters The maximum number of characters (additional characters are replaced by "..."). Set to 0 to disable truncation.
-    /// @return A short textual description of the entry in the format:
-    /// Author1, Author2: Title (Year)
+     /// @return A short textual description of the entry in the format:
+     /// Author1, Author2: Title (Year)
     public String getAuthorTitleYear(int maxCharacters) {
         String authorField = getField(StandardField.AUTHOR).orElse("N/A");
         String titleField = getField(StandardField.TITLE).orElse("N/A");
@@ -1031,7 +1031,7 @@ public class BibEntry {
     /// Gets a list of linked files.
     ///
     /// @return the list of linked files, is never null but can be empty.
-    /// Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
+     /// Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
     public List<LinkedFile> getFiles() {
         Optional<String> oldValue = getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
@@ -1125,7 +1125,7 @@ public class BibEntry {
     /// This method. adds the given path (as file) to the entry and removes the url.
     ///
     /// @param linkToDownloadedFile the link to the file, which was downloaded
-    /// @param downloadedFile       the path to be added to the entry
+     /// @param downloadedFile       the path to be added to the entry
     public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
         List<LinkedFile> linkedFiles = this.getFiles();
 
@@ -1160,7 +1160,7 @@ public class BibEntry {
     /// intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
     ///
     /// @param other                  another BibEntry from which fields are sourced from
-    /// @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
+     /// @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {
         Set<Field> thisFields = new TreeSet<>(Comparator.comparing(Field::getName));
         Set<Field> otherFields = new TreeSet<>(Comparator.comparing(Field::getName));

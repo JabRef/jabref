@@ -74,7 +74,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final Optional<String> query;
 
     /// @param databaseContext the database to import into
-    /// @param task            the task executed for parsing the selected files(s).
+     /// @param task            the task executed for parsing the selected files(s).
     public ImportEntriesViewModel(BackgroundTask<ParserResult> task,
                                   TaskExecutor taskExecutor,
                                   BibDatabaseContext databaseContext,
@@ -209,7 +209,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     /// Checks if there are duplicates to the given entry in the list of entries to be imported.
     ///
     /// @param entry The entry to search for duplicates of.
-    /// @return A possible duplicate, if any, or null if none were found.
+     /// @return A possible duplicate, if any, or null if none were found.
     private Optional<BibEntry> findInternalDuplicate(BibEntry entry) {
         for (BibEntry othEntry : entries) {
             if (othEntry.equals(entry)) {

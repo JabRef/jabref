@@ -17,8 +17,8 @@ public class GetContext {
     /// The actual context may be smaller than requested.
     ///
     /// @param charBefore Number of characters requested.
-    /// @param charAfter  Number of characters requested.
-    /// @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
+     /// @param charAfter  Number of characters requested.
+     /// @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold html tag.
     public static String getCursorStringWithContext(XTextCursor cursor,
                                                     int charBefore,
                                                     int charAfter,

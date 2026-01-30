@@ -48,7 +48,7 @@ public class XmpUtilShared {
     /// itself from the PDF.
     ///
     /// @param path the path to the PDF.
-    /// @return whether a BibEntry was found in the given PDF.
+     /// @return whether a BibEntry was found in the given PDF.
     public static boolean hasMetadata(Path path) {
         try {
             List<XMPMetadata> metadata = new XmpUtilReader().readRawXmp(path);

@@ -35,8 +35,8 @@ public class BstNameFormatter {
     /// Formats the nth author of the author name list by a given format string
     ///
     /// @param authorsNameList The string from an author field
-    /// @param whichName       index of the list, starting with 1
-    /// @param formatString    TODO
+     /// @param whichName       index of the list, starting with 1
+     /// @param formatString    TODO
     public static String formatName(String authorsNameList, int whichName, String formatString) {
         AuthorList al = AuthorList.parse(authorsNameList);
 

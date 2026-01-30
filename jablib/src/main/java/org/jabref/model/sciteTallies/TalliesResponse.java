@@ -15,7 +15,7 @@ public record TalliesResponse(
     /// Creates a {@link TalliesResponse} from a JSONObject (dictionary/map)
     ///
     /// @param jsonObject The JSON object holding the tally values
-    /// @return a new {@link TalliesResponse}
+     /// @return a new {@link TalliesResponse}
     public static TalliesResponse fromJSONObject(JSONObject jsonObject) {
         return new TalliesResponse(
                 jsonObject.getString("doi"),

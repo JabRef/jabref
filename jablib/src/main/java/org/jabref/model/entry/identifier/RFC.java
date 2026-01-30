@@ -18,7 +18,7 @@ public class RFC extends EprintIdentifier {
     /// Constructs an RFC object from a given string.
     ///
     /// @param rfcString The RFC ID or URL, which will be converted to lowercase and trimmed.
-    /// @throws NullPointerException if the given rfcString is null.
+     /// @throws NullPointerException if the given rfcString is null.
     public RFC(@NonNull String rfcString) {
         this.rfcString = rfcString.trim().toLowerCase();
     }
@@ -27,7 +27,7 @@ public class RFC extends EprintIdentifier {
     /// The input can be a plain RFC ID or a full URL.
     ///
     /// @param input The input string, which could be in the form of an RFC ID (e.g., "rfc1234") or a complete URL.
-    /// @return An Optional containing a valid RFC if the input matches the expected pattern, otherwise an empty Optional.
+     /// @return An Optional containing a valid RFC if the input matches the expected pattern, otherwise an empty Optional.
     public static Optional<RFC> parse(String input) {
         Matcher matcher = RFC_URL_MATCH.matcher(input);
         if (matcher.matches()) {

@@ -116,7 +116,7 @@ public class ActionHelper {
     /// Used in {@link org.jabref.gui.maintable.OpenSelectedEntriesFilesAction} when multiple entries selected
     ///
     /// @param stateManager manager for the state of the GUI
-    /// @return a boolean binding
+     /// @return a boolean binding
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));

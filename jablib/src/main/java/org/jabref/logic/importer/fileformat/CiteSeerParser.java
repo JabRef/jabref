@@ -32,7 +32,7 @@ public class CiteSeerParser {
     /// However, it is not a valid variation of a DOI value.
     ///
     /// @param jsonObj Search response as a JSON Object
-    /// @return BibEntry
+     /// @return BibEntry
     private BibEntry parseBibEntry(JSONObject jsonObj) {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.DOI, jsonObj.optString("id"));

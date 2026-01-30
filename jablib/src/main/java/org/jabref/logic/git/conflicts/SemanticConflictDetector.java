@@ -64,9 +64,9 @@ public class SemanticConflictDetector {
     /// Detect entry-level conflicts among base, local, and remote versions of an entry.
     ///
     /// @param base   the entry in the common ancestor
-    /// @param local  the entry in the local version
-    /// @param remote the entry in the remote version
-    /// @return optional conflict (if detected)
+     /// @param local  the entry in the local version
+     /// @param remote the entry in the remote version
+     /// @return optional conflict (if detected)
     private static Optional<ThreeWayEntryConflict> detectEntryConflict(BibEntry base,
                                                                        BibEntry local,
                                                                        BibEntry remote) {
@@ -177,8 +177,8 @@ public class SemanticConflictDetector {
     /// result = local + (remote − base)
     ///
     /// @param base   The base version of the database.
-    /// @param remote The remote version to be merged.
-    /// @return A {@link MergePlan} describing how to update the local copy with remote changes.
+     /// @param remote The remote version to be merged.
+     /// @return A {@link MergePlan} describing how to update the local copy with remote changes.
     public static MergePlan extractMergePlan(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         EntryTriples triples = EntryTriples.from(base, local, remote);
 
@@ -225,9 +225,9 @@ public class SemanticConflictDetector {
     /// - Fallback: if a divergence is still observed, do not override local; skip this field,
     ///
     /// @param base   base version
-    /// @param local  local version
-    /// @param remote remote version
-    /// @return A map from field to new value
+     /// @param local  local version
+     /// @param remote remote version
+     /// @return A map from field to new value
     private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry local, BibEntry remote) {
         Map<Field, String> patch = new LinkedHashMap<>();
 
@@ -266,7 +266,7 @@ public class SemanticConflictDetector {
     /// - If multiple BibEntryDiffs share the same citation key (rare), the latter one will overwrite the former.
     ///
     /// @param entryDiffs A list of entry diffs produced by BibDatabaseDiff
-    /// @return A map from citation key to corresponding BibEntryDiff
+     /// @return A map from citation key to corresponding BibEntryDiff
     private static Map<String, BibEntryDiff> indexByCitationKey(List<BibEntryDiff> entryDiffs) {
         Map<String, BibEntryDiff> result = new LinkedHashMap<>();
 

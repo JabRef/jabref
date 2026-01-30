@@ -19,7 +19,7 @@ public class CustomLocalDragboard {
     /// Puts the value of the concrete class in a map. All previous content stored in the map is removed
     ///
     /// @param type  The Type of the class
-    /// @param value The value to store
+     /// @param value The value to store
     public <T> void putValue(Class<T> type, T value) {
         clearAll();
         contents.put(type, type.cast(value));

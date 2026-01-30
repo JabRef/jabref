@@ -17,7 +17,7 @@ public class UnoNamed {
     /// Passed to this.asXMultiServiceFactory().createInstance(service) The result is expected to support the XNamed and XTextContent interfaces.
     ///
     /// @param service For example "com.sun.star.text.ReferenceMark", "com.sun.star.text.Bookmark" or "com.sun.star.text.TextSection".
-    /// @return The XNamed interface, in case we need to check the actual name.
+     /// @return The XNamed interface, in case we need to check the actual name.
     static XNamed insertNamedTextContent(String service, DocumentAnnotation documentAnnotation)
             throws
             CreationException {

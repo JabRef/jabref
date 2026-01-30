@@ -47,7 +47,7 @@ public class UnoTextSection {
     /// Get the XTextRange covering to the named section.
     ///
     /// @param name The name of the section to find.
-    /// @return The XTextRange for the section, or Optional.empty().
+     /// @return The XTextRange for the section, or Optional.empty().
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
             throws
             WrappedTargetException,

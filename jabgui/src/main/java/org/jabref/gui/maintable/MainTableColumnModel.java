@@ -101,7 +101,7 @@ public class MainTableColumnModel {
     /// This is used by the preferences dialog, to initialize available columns the user can add to the table.
     ///
     /// @param type      the `MainTableColumnModel.Type` of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
-    /// @param qualifier the stored qualifier of the column, e.g. "author/editor"
+     /// @param qualifier the stored qualifier of the column, e.g. "author/editor"
     public MainTableColumnModel(Type type, String qualifier) {
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
@@ -126,8 +126,8 @@ public class MainTableColumnModel {
     /// This is used by the preference migrations.
     ///
     /// @param type      the `MainTableColumnModel.Type` of the column, e.g. "NORMALFIELD" or "GROUPS"
-    /// @param qualifier the stored qualifier of the column, e.g. "author/editor"
-    /// @param width     the stored width of the column
+     /// @param qualifier the stored qualifier of the column, e.g. "author/editor"
+     /// @param width     the stored width of the column
     public MainTableColumnModel(Type type, String qualifier, double width) {
         this(type, qualifier);
 
@@ -229,7 +229,7 @@ public class MainTableColumnModel {
     /// This creates a new `MainTableColumnModel` out of a given string
     ///
     /// @param rawColumnName the name of the column, e.g. "field:author", or "author"
-    /// @return A new `MainTableColumnModel`
+     /// @return A new `MainTableColumnModel`
     public static MainTableColumnModel parse(String rawColumnName) {
         String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 

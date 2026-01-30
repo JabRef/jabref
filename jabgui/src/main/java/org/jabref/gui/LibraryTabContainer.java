@@ -25,7 +25,7 @@ public interface LibraryTabContainer {
     /// Closes a designated libraryTab
     ///
     /// @param tab to be closed.
-    /// @return true if closing the tab was successful
+     /// @return true if closing the tab was successful
     boolean closeTab(@Nullable LibraryTab tab);
 
     boolean closeTabs(List<LibraryTab> tabs);

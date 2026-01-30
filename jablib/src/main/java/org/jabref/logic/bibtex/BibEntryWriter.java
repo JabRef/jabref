@@ -62,9 +62,9 @@ public class BibEntryWriter {
     /// Writes the given BibEntry using the given writer
     ///
     /// @param entry           The entry to write
-    /// @param out             The writer to use
-    /// @param bibDatabaseMode The database mode (bibtex or biblatex)
-    /// @param reformat        Should the entry be in any case, even if no change occurred?
+     /// @param out             The writer to use
+     /// @param bibDatabaseMode The database mode (bibtex or biblatex)
+     /// @param reformat        Should the entry be in any case, even if no change occurred?
     public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode, boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!reformat && !entry.hasChanged()) {
@@ -160,9 +160,9 @@ public class BibEntryWriter {
     /// Write a single field, if it has any content.
     ///
     /// @param entry the entry to write
-    /// @param out   the target of the write
-    /// @param field the field
-    /// @throws IOException In case of an IO error
+     /// @param out   the target of the write
+     /// @param field the field
+     /// @throws IOException In case of an IO error
     private void writeField(BibEntry entry, BibWriter out, Field field, int indent) throws IOException {
         Optional<String> value = entry.getField(field);
         // only write field if it is not empty
@@ -196,7 +196,7 @@ public class BibEntryWriter {
     /// Get serializable version of field name with trailing spaces and the equal sign.
     ///
     /// @param field The name of the field.
-    /// @return The display version of the field name.
+     /// @return The display version of the field name.
     @ADR(49)
     static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();

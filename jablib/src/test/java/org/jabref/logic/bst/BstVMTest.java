@@ -159,7 +159,7 @@ public class BstVMTest {
         BstVM vm = new BstVM("""
                 STRINGS { s }
                 INTEGERS { len }
-
+                
                 FUNCTION { chop.word }
                 {
                     's :=
@@ -169,17 +169,17 @@ public class BstVMTest {
                         's
                         if$
                 }
-
+                
                 FUNCTION { test } {
                     "A " #2
                     "A Colorful Morning"
                     chop.word
-
+                
                     "An " #3
                     "A Colorful Morning"
                     chop.word
                 }
-
+                
                 EXECUTE { test }
                 """);
 
@@ -199,7 +199,7 @@ public class BstVMTest {
                     purify$
                     "l" change.case$
                 }
-
+                
                 FUNCTION { chop.word }
                 {
                     's :=
@@ -209,7 +209,7 @@ public class BstVMTest {
                         's
                         if$
                 }
-
+                
                 FUNCTION { sort.format.title }
                 { 't :=
                    "A " #2
@@ -220,12 +220,12 @@ public class BstVMTest {
                   sortify
                   #1 global.max$ substring$
                 }
-
+                
                 FUNCTION { test } {
                     "A Colorful Morning"
                     sort.format.title
                 }
-
+                
                 EXECUTE {test}
                 """);
 

@@ -30,7 +30,7 @@ class LibraryResourceTest extends ServerTest {
                   title  = {Demo Title},
                   year   = {2023},
                 }
-
+                
                 @Comment{jabref-meta: databaseType:bibtex;}
                 """, target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.BIBTEX).get(String.class));
     }

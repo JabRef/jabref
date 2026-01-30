@@ -152,7 +152,7 @@ class OOBibStyleTestHelper {
     }
 
     /// @implNote Similar to old API. pageInfo is new, and unlimAuthors is
-    /// replaced with isFirstAppearanceOfSource
+     /// replaced with isFirstAppearanceOfSource
     static String getCitationMarker2ab(JStyle style,
                                        List<BibEntry> entries,
                                        Map<BibEntry, BibDatabase> entryDBMap,

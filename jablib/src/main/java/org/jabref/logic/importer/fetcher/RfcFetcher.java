@@ -41,7 +41,7 @@ public class RfcFetcher implements IdBasedParserFetcher {
     /// Get the URL of the RFC resource according to the given identifier
     ///
     /// @param identifier the ID
-    /// @return the URL of the RFC resource
+     /// @return the URL of the RFC resource
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         String prefixedIdentifier = identifier.toLowerCase(Locale.ENGLISH);
