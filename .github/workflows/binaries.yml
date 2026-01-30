@@ -471,7 +471,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --output ./build/jbundle --jlink-runtime jabgui/build/packages
+          jbundle build --input . --gradle-project jabgui --output ./build/jbundle --jlink-runtime jabgui/build/packages
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
