@@ -48,7 +48,7 @@
                         <Hyperlink onAction="#openDonation" text="%Make a donation"/>
                         <Label styleClass="space" text="%or" wrapText="true"/>
                         <Hyperlink onAction="#openGithub" text="%get involved"/>
-                        <Label text="  BUILT FROM KALP PATHAK THIS ONE LINE RIGHT HERE"/>
+                        <Label text="."/>
                     </HBox>
                 </VBox>
 
