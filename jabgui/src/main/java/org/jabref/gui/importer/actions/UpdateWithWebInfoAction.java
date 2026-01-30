@@ -26,8 +26,8 @@ public class UpdateWithWebInfoAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-
-        this.executableProperty().bind(ActionHelper.needsEntriesSelected(1, stateManager));
+        // Bind enablement to selection
+        this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
 
     @Override
