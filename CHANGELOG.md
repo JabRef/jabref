@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added Git integration settings to **Library Properties**, allowing users to automatically commit and push changes to a remote repository upon saving the library. [#12630](https://github.com/JabRef/jabref/issues/12630)
+- We added Git integration settings to Library Properties, allowing users to automatically commit and push changes to a remote repository upon saving the library. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - We added the ability to remove XMP metadata from linked files. [#8277](https://github.com/JabRef/jabref/issues/8277)
 - We Added Git integration settings to Library Properties, allowing users to automatically commit and push changes to a remote repository upon saving the library. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - Improved merge dialog decisions for the `month` field by using a new plausibility comparator. JabRef now prefers normalized months (e.g., `#jun#`) or integers over unnormalized strings. [#14457](https://github.com/JabRef/jabref/issues/14457)
