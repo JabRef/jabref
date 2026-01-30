@@ -339,6 +339,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
+        getPreviewPreferences().setAll(PreviewPreferences.getDefault());
+
     }
 
     @Override
@@ -854,10 +856,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         this.previewPreferences = new PreviewPreferences(
                 layouts,
                 getPreviewCyclePosition(layouts),
-                new TextBasedPreviewLayout(
-                        style,
-                        getLayoutFormatterPreferences(),
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
+                new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(), Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
                 (String) defaults.get(PREVIEW_STYLE),
                 getBoolean(PREVIEW_AS_TAB),
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
@@ -880,7 +879,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private List<PreviewLayout> getPreviewLayouts(String style) {
-        List<String> cycle = getStringList(CYCLE_PREVIEW);
+        List<String> cycle = new ArrayList<>(getStringList(CYCLE_PREVIEW));
 
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
