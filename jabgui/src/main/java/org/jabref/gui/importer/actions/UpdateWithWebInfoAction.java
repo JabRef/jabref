@@ -2,6 +2,7 @@ package org.jabref.gui.importer.actions;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -25,6 +26,8 @@ public class UpdateWithWebInfoAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+
+        this.executableProperty().bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
 
     @Override
