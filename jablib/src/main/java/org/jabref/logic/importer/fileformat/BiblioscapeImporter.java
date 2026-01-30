@@ -47,11 +47,6 @@ public class BiblioscapeImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader reader) {
-        return true;
-    }
-
-    @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibItems = new ArrayList<>();
         String line;

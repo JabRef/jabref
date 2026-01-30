@@ -63,7 +63,7 @@ class MedlinePlainImporterTest {
 
     @Test
     void doesNotRecognizeEmptyFiles() throws IOException {
-        assertFalse(importer.isRecognizedFormat(readerForString("")));
+        assertFalse(importer.isRecognizedFormat((Reader) readerForString("")));
     }
 
     @Test

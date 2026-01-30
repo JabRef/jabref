@@ -154,7 +154,19 @@ public class JournalAbbreviationRepository {
         return findBestFuzzyMatched(fullToAbbreviationObject.values(), input);
     }
 
+    /// Fuzzy searches abbreviations
+    ///
+    /// To prevent wrong matches, such as Nutrients converted to Nutrition we do fuzzy matching if the title is three words or more (or contains non-ASCII characters)
     private Optional<Abbreviation> findBestFuzzyMatched(Collection<Abbreviation> abbreviations, String input) {
+        // Only one or two words - do not do fuzzy matching
+        if (input.trim().split("\\s+").length <= 1) {
+            // Some Chinese titles do not contain spaces
+            boolean isAscii = input.chars().allMatch(c -> c <= 0x7F);
+            if (isAscii) {
+                return Optional.empty();
+            }
+        }
+
         // threshold for edit distance similarity comparison
         final double SIMILARITY_THRESHOLD = 1.0;
 
