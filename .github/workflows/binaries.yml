@@ -465,7 +465,7 @@ jobs:
           crate: jbundle
           git: https://github.com/avelino/jbundle/
           # branch: main
-          branch: avelino/issue-6-41-42
+          branch: avelino/issue-41
 
       - name: jbundle JabGui
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
