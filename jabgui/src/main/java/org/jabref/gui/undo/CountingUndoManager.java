@@ -16,9 +16,7 @@ public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint;
 
-    /**
-     * Indicates the number of edits aka balance of edits on the stack +1 when an edit is added/redone and -1 when an edit is undoed.
-     */
+    /// Indicates the number of edits aka balance of edits on the stack +1 when an edit is added/redone and -1 when an edit is undoed.
     private final IntegerProperty balanceProperty = new SimpleIntegerProperty(0);
     private final BooleanProperty undoableProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty redoableProperty = new SimpleBooleanProperty(false);

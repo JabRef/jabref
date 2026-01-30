@@ -104,9 +104,7 @@ class EmbeddedBibFilePdfExporterTest {
         vapnik2000.setField(StandardField.OWNER, "Ich");
     }
 
-    /**
-     * Create a temporary PDF-file with a single empty page.
-     */
+    /// Create a temporary PDF-file with a single empty page.
     @BeforeEach
     void setUp() throws IOException {
         abbreviationRepository = mock(JournalAbbreviationRepository.class);

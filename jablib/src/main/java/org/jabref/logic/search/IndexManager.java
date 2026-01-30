@@ -225,9 +225,7 @@ public class IndexManager {
         return searchResults;
     }
 
-    /**
-     * @implNote No need to check for full-text searches as this method only used by the search groups
-     */
+    /// @implNote No need to check for full-text searches as this method only used by the search groups
     public boolean isEntryMatched(BibEntry entry, SearchQuery query) {
         return bibFieldsSearcher.isMatched(entry, query);
     }

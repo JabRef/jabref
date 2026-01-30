@@ -48,9 +48,7 @@ class TimeStampToCreationDateTest {
         );
     }
 
-    /**
-     * Tests migration to creationdate if the users uses the default ISO yyyy-mm-dd format and the standard timestamp field
-     */
+    /// Tests migration to creationdate if the users uses the default ISO yyyy-mm-dd format and the standard timestamp field
     @ParameterizedTest
     @MethodSource("standardFieldToCreationDate")
     void withStandardFieldToCreationDate(BibEntry expected, BibEntry input) {
@@ -77,9 +75,7 @@ class TimeStampToCreationDateTest {
         );
     }
 
-    /**
-     * Tests migration to creationdate if the users uses the default ISO yyyy-mm-dd format and a custom timestamp field
-     */
+    /// Tests migration to creationdate if the users uses the default ISO yyyy-mm-dd format and a custom timestamp field
     @ParameterizedTest
     @MethodSource("customFieldToCreationDate")
     void withCustomFieldToCreationDate(BibEntry expected, BibEntry input) {
@@ -164,9 +160,7 @@ class TimeStampToCreationDateTest {
                 ));
     }
 
-    /**
-     * Tests migration of different timestamp formats with the standard timestamp field
-     */
+    /// Tests migration of different timestamp formats with the standard timestamp field
     @ParameterizedTest
     @MethodSource("entriesMigratedToCreationDateFromDifferentFormats")
     void withDifferentFormats(BibEntry expected, BibEntry input) {

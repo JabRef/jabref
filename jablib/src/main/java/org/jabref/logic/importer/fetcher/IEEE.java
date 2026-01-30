@@ -41,13 +41,11 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for finding PDF URLs for entries on IEEE.
- * Will first look for URLs of the type <code>https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&amp;]arnumber=...</code>.
- * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page.
- *
- * @see <a href="https://developer.ieee.org/docs">API documentation</a>
- */
+/// Class for finding PDF URLs for entries on IEEE.
+/// Will first look for URLs of the type `https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&amp;]arnumber=...`.
+/// If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page.
+///
+/// @see <a href="https://developer.ieee.org/docs">API documentation</a>
 public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
     public static final String FETCHER_NAME = "IEEEXplore";
@@ -74,9 +72,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         this.importerPreferences = importerPreferences;
     }
 
-    /**
-     * @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
-     */
+    /// @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
     private static BibEntry parseJsonResponse(JSONObject jsonEntry, Character keywordSeparator) {
         BibEntry entry = new BibEntry();
 

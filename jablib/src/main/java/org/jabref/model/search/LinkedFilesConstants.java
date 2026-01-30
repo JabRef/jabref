@@ -6,13 +6,11 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 
 public enum LinkedFilesConstants {
-    /**
-     * Version number for the search index.
-     * Increment when:
-     * 1. Index changes require reindexing (e.g., new/removed/renamed fields, analyzer changes)
-     * 2. Lucene codec changes (see module-info.java Lucene section)
-     * Incrementing triggers reindexing.
-     */
+    /// Version number for the search index.
+    /// Increment when:
+    /// 1. Index changes require reindexing (e.g., new/removed/renamed fields, analyzer changes)
+    /// 2. Lucene codec changes (see module-info.java Lucene section)
+    /// Incrementing triggers reindexing.
     VERSION("5"),
     PATH("path"),
     CONTENT("content"),

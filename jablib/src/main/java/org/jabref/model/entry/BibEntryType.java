@@ -25,15 +25,13 @@ public class BibEntryType implements Comparable<BibEntryType> {
     private final SequencedSet<BibField> allFields;
     private final SequencedSet<OrFields> requiredFields;
 
-    /**
-     * Provides an enriched EntryType with information about defined standards as mandatory fields etc.
-     * <p>
-     * A builder is available at {@link BibEntryTypeBuilder}
-     *
-     * @param type           The EntryType this BibEntryType is wrapped around.
-     * @param allFields      A BibFields list of all fields, including the required fields
-     * @param requiredFields A OrFields list of just the required fields
-     */
+    /// Provides an enriched EntryType with information about defined standards as mandatory fields etc.
+    ///
+    /// A builder is available at {@link BibEntryTypeBuilder}
+    ///
+    /// @param type           The EntryType this BibEntryType is wrapped around.
+    /// @param allFields      A BibFields list of all fields, including the required fields
+    /// @param requiredFields A OrFields list of just the required fields
     public BibEntryType(@NonNull EntryType type, Collection<BibField> allFields, Collection<OrFields> requiredFields) {
         this.type = type;
         this.allFields = new LinkedHashSet<>(allFields);
@@ -55,20 +53,16 @@ public class BibEntryType implements Comparable<BibEntryType> {
                                   .anyMatch(fields -> fields.contains(field));
     }
 
-    /**
-     * Returns all required field names.
-     * If fields have an OR relationship the name includes both field names divided by /, e.g. author/editor.
-     * If you need all required fields as sole entities use @see{getRequiredFieldsFlat} .
-     *
-     * @return a Set of required field name Strings
-     */
+    /// Returns all required field names.
+    /// If fields have an OR relationship the name includes both field names divided by /, e.g. author/editor.
+    /// If you need all required fields as sole entities use @see{getRequiredFieldsFlat} .
+    ///
+    /// @return a Set of required field name Strings
     public SequencedSet<OrFields> getRequiredFields() {
         return Collections.unmodifiableSequencedSet(requiredFields);
     }
 
-    /**
-     * Returns all defined fields.
-     */
+    /// Returns all defined fields.
     public SequencedSet<BibField> getAllBibFields() {
         return Collections.unmodifiableSequencedSet(allFields);
     }
@@ -114,9 +108,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return optionalFieldsNotPrimaryOrDeprecated;
     }
 
-    /**
-     * Get list of all optional fields of this entry and all fields being source for a BibTeX to BibLaTeX conversion.
-     */
+    /// Get list of all optional fields of this entry and all fields being source for a BibTeX to BibLaTeX conversion.
     private SequencedSet<Field> getOptionalFieldsAndAliases() {
         SequencedSet<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
         for (BibField field : getOptionalFields()) {
@@ -160,9 +152,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
                 '}';
     }
 
-    /**
-     * WARNING! This does not follow the equals contract. Even if this here returns 0, the objects can be different.
-     */
+    /// WARNING! This does not follow the equals contract. Even if this here returns 0, the objects can be different.
     @Override
     public int compareTo(BibEntryType o) {
         return this.getType().getName().compareTo(o.getType().getName());

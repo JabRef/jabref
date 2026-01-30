@@ -2,11 +2,11 @@ name: Adapt PR status labels (Move)
 
 on:
   workflow_run:
-    workflows: ["Adapt PR status labels (Check)"]
-    types: [completed]
+    workflows: [ "Adapt PR status labels (Check)" ]
+    types: [ completed ]
 
 jobs:
-   apply-labels:
+  apply-labels:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:

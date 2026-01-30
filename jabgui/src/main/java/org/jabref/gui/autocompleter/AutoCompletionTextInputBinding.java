@@ -1,29 +1,27 @@
-/**
- * Copyright (c) 2014, 2015, ControlsFX
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * * Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * * Neither the name of ControlsFX, any associated website, nor the
- * names of its contributors may be used to endorse or promote products
- * derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// Copyright (c) 2014, 2015, ControlsFX
+/// All rights reserved.
+///
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+/// * Redistributions of source code must retain the above copyright
+/// notice, this list of conditions and the following disclaimer.
+/// * Redistributions in binary form must reproduce the above copyright
+/// notice, this list of conditions and the following disclaimer in the
+/// documentation and/or other materials provided with the distribution.
+/// * Neither the name of ControlsFX, any associated website, nor the
+/// names of its contributors may be used to endorse or promote products
+/// derived from this software without specific prior written permission.
+///
+/// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+/// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.jabref.gui.autocompleter;
 
 import java.util.Collection;
@@ -37,16 +35,12 @@ import org.jabref.gui.util.UiTaskExecutor;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
-/**
- * Represents a binding between a text input control and an auto-completion popup
- * This class is a slightly modified version of {@link impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding}
- * that works with general text input controls instead of just text fields.
- */
+/// Represents a binding between a text input control and an auto-completion popup
+/// This class is a slightly modified version of {@link impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding}
+/// that works with general text input controls instead of just text fields.
 public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> {
 
-    /**
-     * String converter to be used to convert suggestions to strings.
-     */
+    /// String converter to be used to convert suggestions to strings.
     private StringConverter<T> converter;
     private AutoCompletionStrategy inputAnalyzer;
     private final ChangeListener<String> textChangeListener = (_, _, newText) -> {
@@ -65,10 +59,8 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         }
     };
 
-    /**
-     * Creates a new auto-completion binding between the given textInputControl
-     * and the given suggestion provider.
-     */
+    /// Creates a new auto-completion binding between the given textInputControl
+    /// and the given suggestion provider.
     private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
                                            Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
 

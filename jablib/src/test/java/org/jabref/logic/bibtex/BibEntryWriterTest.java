@@ -846,11 +846,9 @@ class BibEntryWriterTest {
         assertEquals(expected, BibEntryWriter.getLengthOfLongestFieldName(entry));
     }
 
-    /**
-     * Provides the first entry, from the database, built of the given textual representation.
-     * <p>
-     * Instance import preferences object used.
-     */
+    /// Provides the first entry, from the database, built of the given textual representation.
+    ///
+    /// Instance import preferences object used.
     private BibEntry firstEntryFrom(final String bibContentText) throws JabRefException {
         return BibDatabaseContext
                 .of(bibContentText, importFormatPreferences)

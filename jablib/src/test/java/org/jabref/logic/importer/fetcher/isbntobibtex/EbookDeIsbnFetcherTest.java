@@ -80,10 +80,8 @@ class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
-    /**
-     * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
-     * not available on ebook.de.
-     */
+    /// This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
+    /// not available on ebook.de.
     @Test
     void searchForValidButNotFoundISBN() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("3728128155"));

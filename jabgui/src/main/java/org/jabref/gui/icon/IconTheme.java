@@ -98,13 +98,11 @@ public class IconTheme {
         return new Image(getIconUrl(name).toString());
     }
 
-    /**
-     * Looks up the URL for the image representing the given function, in the resource
-     * file listing images.
-     *
-     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
-     * @return The URL to the actual image to use.
-     */
+    /// Looks up the URL for the image representing the given function, in the resource
+    /// file listing images.
+    ///
+    /// @param name The name of the icon, such as "open", "save", "saveAs" etc.
+    /// @return The URL to the actual image to use.
     public static URL getIconUrl(@NonNull String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
@@ -113,16 +111,13 @@ public class IconTheme {
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + name);
     }
 
-    /**
-     * Read a typical java property url into a Map. Currently doesn't support escaping
-     * of the '=' character - it simply looks for the first '=' to determine where the key ends.
-     * Both the key and the value is trimmed for whitespace at the ends.
-     *
-     * @param url    The URL to read information from.
-     * @param prefix A String to prefix to all values read. Can represent e.g. the directory where icon files are to be
-     *               found.
-     * @return A Map containing all key-value pairs found.
-     */
+    /// Read a typical java property url into a Map. Currently, doesn't support escaping
+    /// of the '=' character - it simply looks for the first '=' to determine where the key ends.
+    /// Both the key and the value is trimmed for whitespace at the ends.
+    ///
+    /// @param url    The URL to read information from.
+    /// @param prefix A String to prefix to all values read. Can represent e.g. the directory where icon files are to be found.
+    /// @return A Map containing all key-value pairs found.
     // FIXME: prefix can be removed?!
     private static Map<String, String> readIconThemeFile(@NonNull URL url, @NonNull String prefix) {
         Map<String, String> result = new HashMap<>();

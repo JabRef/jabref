@@ -36,9 +36,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Backend52, Codec52 and OODataModel.JabRef52 refer to the mode of storage, encoding and what-is-stored in the document under JabRef version 5.2. These basically did not change up to JabRef 5.4.
- */
+/// Backend52, Codec52 and OODataModel.JabRef52 refer to the mode of storage, encoding and what-is-stored in the document under JabRef version 5.2. These basically did not change up to JabRef 5.4.
 public class Backend52 {
     private static final Logger LOGGER = LoggerFactory.getLogger(Backend52.class);
     public final OODataModel dataModel;
@@ -52,11 +50,9 @@ public class Backend52 {
         this.cgidToNamedRange = new HashMap<>();
     }
 
-    /**
-     * Get reference mark names from the document matching the pattern used for JabRef reference mark names.
-     * <p>
-     * Note: the names returned are in arbitrary order.
-     */
+    /// Get reference mark names from the document matching the pattern used for JabRef reference mark names.
+    ///
+    /// Note: the names returned are in arbitrary order.
     public List<String> getJabRefReferenceMarkNames(XTextDocument doc)
             throws
             NoDocumentException {
@@ -64,11 +60,9 @@ public class Backend52 {
         return Codec52.filterIsJabRefReferenceMarkName(allNames);
     }
 
-    /**
-     * Names of custom properties belonging to us, but without a corresponding reference mark. These can be deleted.
-     *
-     * @param citationGroupNames These are the names that are used.
-     */
+    /// Names of custom properties belonging to us, but without a corresponding reference mark. These can be deleted.
+    ///
+    /// @param citationGroupNames These are the names that are used.
     private List<String> findUnusedJabrefPropertyNames(XTextDocument doc,
                                                        List<String> citationGroupNames) {
 
@@ -88,9 +82,7 @@ public class Backend52 {
         return pageInfoThrash;
     }
 
-    /**
-     * @return Optional.empty if all is OK, message text otherwise.
-     */
+    /// @return Optional.empty if all is OK, message text otherwise.
     public Optional<String> healthReport(XTextDocument doc)
             throws
             NoDocumentException {
@@ -121,9 +113,7 @@ public class Backend52 {
         return citations.getLast().getPageInfo();
     }
 
-    /**
-     * @param markName Reference mark name
-     */
+    /// @param markName Reference mark name
     public CitationGroup readCitationGroupFromDocumentOrThrow(XTextDocument doc, String markName)
             throws
             WrappedTargetException,
@@ -154,16 +144,14 @@ public class Backend52 {
         return group;
     }
 
-    /**
-     * Create a reference mark at the end of {@code position} in the document.
-     * <p>
-     * On return {@code position} is collapsed, and is after the inserted space, or at the end of the reference mark.
-     *
-     * @param citationKeys     Keys to be cited.
-     * @param pageInfos        An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
-     * @param position         Collapsed to its end.
-     * @param insertSpaceAfter We insert a space after the mark, that carries on format of characters from the original position.
-     */
+    /// Create a reference mark at the end of `position` in the document.
+    ///
+    /// On return `position` is collapsed, and is after the inserted space, or at the end of the reference mark.
+    ///
+    /// @param citationKeys     Keys to be cited.
+    /// @param pageInfos        An optional pageInfo for each citation key. Backend52 only uses and stores the last pageInfo, all others should be Optional.empty()
+    /// @param position         Collapsed to its end.
+    /// @param insertSpaceAfter We insert a space after the mark, that carries on format of characters from the original position.
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
@@ -255,11 +243,9 @@ public class Backend52 {
         }
     }
 
-    /**
-     * @return A list with a nullable pageInfo entry for each citation in joinableGroups.
-     * TODO: JabRef52 combinePageInfos is not reversible. Should warn user to check the result. Or
-     *        ask what to do.
-     */
+    /// @return A list with a nullable pageInfo entry for each citation in joinableGroups.
+    /// TODO: JabRef52 combinePageInfos is not reversible. Should warn user to check the result. Or
+    /// ask what to do.
     public static List<Optional<OOText>>
     combinePageInfosCommon(OODataModel dataModel, List<CitationGroup> joinableGroup) {
         switch (dataModel) {
@@ -317,9 +303,7 @@ public class Backend52 {
         this.cgidToNamedRange.remove(group.groupId);
     }
 
-    /**
-     * @return Optional.empty if the reference mark is missing.
-     */
+    /// @return Optional.empty if the reference mark is missing.
     public Optional<XTextRange> getMarkRange(CitationGroup group, XTextDocument doc)
             throws
             NoDocumentException,
@@ -329,9 +313,7 @@ public class Backend52 {
         return namedRange.getMarkRange(doc);
     }
 
-    /**
-     * Cursor for the reference marks as is: not prepared for filling, but does not need cleanFillCursorForCitationGroup either.
-     */
+    /// Cursor for the reference marks as is: not prepared for filling, but does not need cleanFillCursorForCitationGroup either.
     public Optional<XTextCursor> getRawCursorForCitationGroup(CitationGroup group, XTextDocument doc)
             throws
             NoDocumentException,
@@ -340,9 +322,7 @@ public class Backend52 {
         return namedRange.getRawCursor(doc);
     }
 
-    /**
-     * Must be followed by call to cleanFillCursorForCitationGroup
-     */
+    /// Must be followed by call to cleanFillCursorForCitationGroup
     public XTextCursor getFillCursorForCitationGroup(CitationGroup group, XTextDocument doc)
             throws
             NoDocumentException,
@@ -353,9 +333,7 @@ public class Backend52 {
         return namedRange.getFillCursor(doc);
     }
 
-    /**
-     * To be called after getFillCursorForCitationGroup
-     */
+    /// To be called after getFillCursorForCitationGroup
     public void cleanFillCursorForCitationGroup(CitationGroup group, XTextDocument doc)
             throws
             NoDocumentException,
@@ -396,9 +374,7 @@ public class Backend52 {
         }
     }
 
-    /**
-     * Only applies to storage. Citation markers are not changed.
-     */
+    /// Only applies to storage. Citation markers are not changed.
     public void applyCitationEntries(XTextDocument doc, List<CitationEntry> citationEntries)
             throws
             PropertyVetoException,

@@ -34,10 +34,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetcher for OpenAlex Works API
- * Docs: <a href="https://docs.openalex.org/api-entities/works"> OpenAlex API Docs</a>
- */
+/// Fetcher for OpenAlex Works API
+/// Docs: <a href="https://docs.openalex.org/api-entities/works"> OpenAlex API Docs</a>
 public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, EntryBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAlex.class);

@@ -66,9 +66,7 @@ public class BibFieldsIndexer {
         setup();
     }
 
-    /**
-     * Creates a table for the library in the database, and sets up indexes on the columns.
-     */
+    /// Creates a table for the library in the database, and sets up indexes on the columns.
     private void setup() {
         try {
             connection.createStatement().executeUpdate("""
@@ -477,9 +475,7 @@ public class BibFieldsIndexer {
         addBatch(preparedStatement, entryId, field, value, LatexToUnicodeAdapter.format(value));
     }
 
-    /**
-     * The values are passed as they should be inserted into the database table
-     */
+    /// The values are passed as they should be inserted into the database table
     private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value, String normalized) {
         try {
             preparedStatement.setString(1, entryId);

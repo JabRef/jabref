@@ -12,9 +12,7 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
     private JSONObject payload = new JSONObject();
 
-    /**
-     * Default values for necessary parameters set in constructor
-     */
+    /// Default values for necessary parameters set in constructor
     public CiteSeerQueryTransformer() {
         handlePage("1");
         handlePageSize("20");
@@ -78,10 +76,8 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
         return yearRange;
     }
 
-    /**
-     * covers the five fields that are required to make a POST request
-     * except "must_have_pdf" as FullTextFetcher is not yet implemented for CiteSeer
-     */
+    /// covers the five fields that are required to make a POST request
+    /// except "must_have_pdf" as FullTextFetcher is not yet implemented for CiteSeer
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {

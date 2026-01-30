@@ -32,10 +32,8 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetcher for OpenLibrary.
- * <a href="https://openlibrary.org/dev/docs/api/books">API documentation</a>.
- */
+/// Fetcher for OpenLibrary.
+/// <a href="https://openlibrary.org/dev/docs/api/books">API documentation</a>.
 public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenLibraryIsbnFetcher.class);

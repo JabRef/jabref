@@ -12,35 +12,31 @@ import org.jabref.model.entry.AuthorList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * From Bibtex:
- * <p>
- * "The |built_in| function {\.{format.name\$}} pops the
- * top three literals (they are a string, an integer, and a string
- * literal, in that order). The last string literal represents a
- * name list (each name corresponding to a person), the integer
- * literal specifies which name to pick from this list, and the
- * first string literal specifies how to format this name, as
- * described in the \BibTeX\ documentation. Finally, this function
- * pushes the formatted name. If any of the types is incorrect, it
- * complains and pushes the null string."
- * <p>
- * Sounds easy - is a nightmare... X-(
- *
- */
+/// From Bibtex:
+///
+/// "The |built_in| function {\.{format.name\$}} pops the
+/// top three literals (they are a string, an integer, and a string
+/// literal, in that order). The last string literal represents a
+/// name list (each name corresponding to a person), the integer
+/// literal specifies which name to pick from this list, and the
+/// first string literal specifies how to format this name, as
+/// described in the \BibTeX\ documentation. Finally, this function
+/// pushes the formatted name. If any of the types is incorrect, it
+/// complains and pushes the null string."
+///
+/// Sounds easy - is a nightmare... X-(
+///
 public class BstNameFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstNameFormatter.class);
 
     private BstNameFormatter() {
     }
 
-    /**
-     * Formats the nth author of the author name list by a given format string
-     *
-     * @param authorsNameList The string from an author field
-     * @param whichName       index of the list, starting with 1
-     * @param formatString    TODO
-     */
+    /// Formats the nth author of the author name list by a given format string
+    ///
+    /// @param authorsNameList The string from an author field
+    /// @param whichName       index of the list, starting with 1
+    /// @param formatString    TODO
     public static String formatName(String authorsNameList, int whichName, String formatString) {
         AuthorList al = AuthorList.parse(authorsNameList);
 
@@ -223,9 +219,7 @@ public class BstNameFormatter {
         return sb.toString();
     }
 
-    /**
-     * Including the matching brace.
-     */
+    /// Including the matching brace.
     public static int consumeToMatchingBrace(StringBuilder interTokenSb, char[] c, int pos) {
         int braceLevel = 0;
 
@@ -244,9 +238,7 @@ public class BstNameFormatter {
         return c.length;
     }
 
-    /**
-     * Takes care of special characters too
-     */
+    /// Takes care of special characters too
     public static String getFirstCharOfString(String s) {
         char[] c = s.toCharArray();
         for (int i = 0; i < c.length; i++) {

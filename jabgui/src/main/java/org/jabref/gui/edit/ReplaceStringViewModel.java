@@ -56,10 +56,8 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         return counter;
     }
 
-    /**
-     * Does the actual operation on a Bibtex entry based on the settings specified in this same dialog. Returns the
-     * number of occurrences replaced.
-     */
+    /// Does the actual operation on a Bibtex entry based on the settings specified in this same dialog. Returns the
+    /// number of occurrences replaced.
     private int replaceItem(BibEntry entry, NamedCompoundEdit compound) {
         int counter = 0;
         if (this.allFieldReplace) {

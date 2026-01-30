@@ -257,11 +257,9 @@ public class GroupNodeViewModel {
         return groupNode;
     }
 
-    /**
-     * Gets invoked if an entry in the current database changes.
-     *
-     * @implNote Search groups are updated in {@link SearchIndexListener}.
-     */
+    /// Gets invoked if an entry in the current database changes.
+    ///
+    /// @implNote Search groups are updated in {@link SearchIndexListener}.
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
         if (groupNode.getGroup() instanceof SearchGroup) {
             return;
@@ -347,13 +345,11 @@ public class GroupNodeViewModel {
         return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
     }
 
-    /**
-     * Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
-     * <ul>
-     *     <li>another group (will be added as subgroup on drop)</li>
-     *     <li>entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)</li>
-     * </ul>
-     */
+    /// Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
+    ///
+    /// - another group (will be added as subgroup on drop)
+    /// - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+    ///
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant
         boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
@@ -577,19 +573,17 @@ public class GroupNodeViewModel {
         };
     }
 
-    /**
-     * Returns whether the given entry should be considered part of this group
-     * for the purpose of the groups sidebar (hit counter, highlighting, etc.).
-     *
-     * We cannot simply use groupNode.matches(entry) here. That only checks
-     * the rule of this single group and ignores the configured hierarchy type and
-     * any child groups created in the view model (for example automatic subgroups)
-     *
-     * This method applies the hierarchy type:
-     * INDEPENDENT: match this group only,
-     * INCLUDING: match this group or any child group,
-     * REFINING: match this group and all ancestor groups.
-     */
+    /// Returns whether the given entry should be considered part of this group
+    /// for the purpose of the groups sidebar (hit counter, highlighting, etc.).
+    ///
+    /// We cannot simply use groupNode.matches(entry) here. That only checks
+    /// the rule of this single group and ignores the configured hierarchy type and
+    /// any child groups created in the view model (for example automatic subgroups)
+    ///
+    /// This method applies the hierarchy type:
+    /// INDEPENDENT: match this group only,
+    /// INCLUDING: match this group or any child group,
+    /// REFINING: match this group and all ancestor groups.
     private boolean isMatchEffective(GroupNodeViewModel vm, BibEntry entry) {
         GroupTreeNode node = vm.groupNode;
         return switch (node.getGroup().getHierarchicalContext()) {

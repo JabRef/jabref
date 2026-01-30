@@ -25,10 +25,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is responsible for storing and retrieving relations between BibEntry objects.
- * It uses an MVStore to store the relations.
- */
+/// This class is responsible for storing and retrieving relations between BibEntry objects.
+/// It uses an MVStore to store the relations.
 public class MVStoreBibEntryRelationRepository implements BibEntryRelationRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationRepository.class);
@@ -98,9 +96,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
                 .orElse(List.of());
     }
 
-    /**
-     * Allows insertion of empty list in order to keep track of insertion date for an entry.
-     */
+    /// Allows insertion of empty list in order to keep track of insertion date for an entry.
     @Override
     synchronized public void addRelations(@NonNull BibEntry entry, @NonNull List<BibEntry> relations) {
         entry.getDOI().ifPresent(doi -> {

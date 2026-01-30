@@ -363,9 +363,7 @@ public class GlobalSearchBar extends HBox {
         searchButton.visibleProperty().bind(searchField.editableProperty());
     }
 
-    /**
-     * Focuses the search field if it is not focused.
-     */
+    /// Focuses the search field if it is not focused.
     @Override
     public void requestFocus() {
         if (!searchField.isFocused()) {
@@ -401,9 +399,7 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    /**
-     * The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
-     */
+    /// The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
     @SuppressWarnings("unchecked")
     private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
         try {

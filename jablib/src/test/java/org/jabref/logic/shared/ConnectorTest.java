@@ -5,9 +5,7 @@ import java.sql.SQLException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.testutils.category.DatabaseTest;
 
-/**
- * Stores the credentials for the test systems
- */
+/// Stores the credentials for the test systems
 @DatabaseTest
 public class ConnectorTest {
 

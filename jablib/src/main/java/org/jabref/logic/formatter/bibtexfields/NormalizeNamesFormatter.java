@@ -6,9 +6,7 @@ import org.jabref.model.entry.AuthorList;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Formatter normalizing a list of person names to the BibTeX format.
- */
+/// Formatter normalizing a list of person names to the BibTeX format.
 public class NormalizeNamesFormatter extends Formatter {
 
     @Override

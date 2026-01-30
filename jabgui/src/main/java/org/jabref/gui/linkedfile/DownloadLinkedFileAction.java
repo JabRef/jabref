@@ -86,9 +86,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
     }
 
-    /**
-     * Downloads the given linked file to the first existing file directory. It keeps HTML files as URLs.
-     */
+    /// Downloads the given linked file to the first existing file directory. It keeps HTML files as URLs.
     public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
                                     BibEntry entry,
                                     LinkedFile linkedFile,
@@ -150,9 +148,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         taskExecutor.execute(downloadTask);
     }
 
-    /**
-     * @param targetDirectory The directory to store the file into. Is an absolute path.
-     */
+    /// @param targetDirectory The directory to store the file into. Is an absolute path.
     private void onSuccess(Path targetDirectory, Path downloadedFile) {
         assert targetDirectory.isAbsolute();
 

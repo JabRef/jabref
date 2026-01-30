@@ -11,10 +11,8 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Caches the generated Citations for quicker access
- * {@link CitationStyleGenerator} generates the citation with JavaScript which may take some time
- */
+/// Caches the generated Citations for quicker access
+/// {@link CitationStyleGenerator} generates the citation with JavaScript which may take some time
 public class CitationStyleCache {
 
     private static final int CACHE_SIZE = 1024;
@@ -33,18 +31,14 @@ public class CitationStyleCache {
         databaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
     }
 
-    /**
-     * Returns the citation for the given entry.
-     */
+    /// Returns the citation for the given entry.
     public String getCitationFor(BibEntry entry) {
         return citationStyleCache.get(entry);
     }
 
-    /**
-     * Set a new citation style and invalidate all cached styles
-     *
-     * @param citationStyle The new citation style
-     */
+    /// Set a new citation style and invalidate all cached styles
+    ///
+    /// @param citationStyle The new citation style
     public void setCitationStyle(@NonNull PreviewLayout citationStyle) {
         if (!this.citationStyle.equals(citationStyle)) {
             this.citationStyle = citationStyle;
@@ -53,17 +47,13 @@ public class CitationStyleCache {
     }
 
     private class BibDatabaseEntryListener {
-        /**
-         * removes the outdated citation of the changed entry
-         */
+        /// removes the outdated citation of the changed entry
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
             citationStyleCache.invalidate(entryChangedEvent.getBibEntry());
         }
 
-        /**
-         * removes the citation of the removed entries as they are not needed anymore
-         */
+        /// removes the citation of the removed entries as they are not needed anymore
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {
             for (BibEntry entry : entriesRemovedEvent.getBibEntries()) {

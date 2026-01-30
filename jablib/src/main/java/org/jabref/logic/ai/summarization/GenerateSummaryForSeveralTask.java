@@ -25,11 +25,9 @@ import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This task generates summaries for several {@link BibEntry}ies (typically used for groups).
- * It will check if summaries were already generated.
- * And it also will store the summaries.
- */
+/// This task generates summaries for several {@link BibEntry}ies (typically used for groups).
+/// It will check if summaries were already generated.
+/// And it also will store the summaries.
 public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryForSeveralTask.class);
 

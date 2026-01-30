@@ -8,9 +8,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
-/**
- * Moves the content of one field to another field.
- */
+/// Moves the content of one field to another field.
 public class MoveFieldCleanup implements CleanupJob {
 
     private Field sourceField;

@@ -20,9 +20,7 @@ import org.jabref.model.entry.field.OrFields;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-/**
- * A column for fields with content selectors.
- */
+/// A column for fields with content selectors.
 public class ContentSelectorColumn extends MainTableColumn<Optional<String>> {
 
     private final List<String> values;

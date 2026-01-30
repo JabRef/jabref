@@ -21,9 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard. This worker cannot be reused.
- */
+/// Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard. This worker cannot be reused.
 public class CopyCitationAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyCitationAction.class);

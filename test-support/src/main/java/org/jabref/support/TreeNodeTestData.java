@@ -61,9 +61,7 @@ public class TreeNodeTestData {
         return node;
     }
 
-    /**
-     * This is just a dummy class deriving from TreeNode&lt;T> so that we can test the generic class
-     */
+    /// This is just a dummy class deriving from TreeNode&lt;T> so that we can test the generic class
     public static class TreeNodeMock extends TreeNode<TreeNodeMock> {
 
         private String name;

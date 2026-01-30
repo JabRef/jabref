@@ -53,16 +53,14 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         this.importerPreferences = importerPreferences;
     }
 
-    /**
-     * Tries to find a fulltext URL for a given BibTex entry.
-     * <p>
-     * Uses the DOI if present, otherwise the arXiv identifier.
-     *
-     * @param entry The Bibtex entry
-     * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
-     * @throws IOException      if a page could not be fetched correctly
-     * @throws FetcherException if the received page differs from what was expected
-     */
+    /// Tries to find a fulltext URL for a given BibTex entry.
+    ///
+    /// Uses the DOI if present, otherwise the arXiv identifier.
+    ///
+    /// @param entry The Bibtex entry
+    /// @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+    /// @throws IOException      if a page could not be fetched correctly
+    /// @throws FetcherException if the received page differs from what was expected
     @Override
     public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
@@ -145,9 +143,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return result;
     }
 
-    /**
-     * Returns the parser used to convert the response to a list of {@link BibEntry}.
-     */
+    /// Returns the parser used to convert the response to a list of {@link BibEntry}.
     @Override
     public Parser getParser() {
         return inputStream -> {
@@ -178,13 +174,11 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         };
     }
 
-    /**
-     * This is copy-paste from CrossRef, need to be checked.
-     *
-     * @param item an entry received, needs to be parsed into a BibEntry
-     * @return The BibEntry that corresponds to the received object
-     * @throws ParseException if the JSONObject could not be parsed
-     */
+    /// This is copy-paste from CrossRef, need to be checked.
+    ///
+    /// @param item an entry received, needs to be parsed into a BibEntry
+    /// @return The BibEntry that corresponds to the received object
+    /// @throws ParseException if the JSONObject could not be parsed
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
             BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -213,23 +207,19 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         }
     }
 
-    /**
-     * Returns the localized name of this fetcher. The title can be used to display the fetcher in the menu and in the side pane.
-     *
-     * @return the localized name
-     */
+    /// Returns the localized name of this fetcher. The title can be used to display the fetcher in the menu and in the side pane.
+    ///
+    /// @return the localized name
     @Override
     public String getName() {
         return "SemanticScholar";
     }
 
-    /**
-     * Looks for hits which are matched by the given {@link BibEntry}.
-     *
-     * @param entry entry to search bibliographic information for
-     * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
-     * @throws FetcherException if an error linked to the Fetcher applies
-     */
+    /// Looks for hits which are matched by the given {@link BibEntry}.
+    ///
+    /// @param entry entry to search bibliographic information for
+    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @throws FetcherException if an error linked to the Fetcher applies
     @Override
     public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();

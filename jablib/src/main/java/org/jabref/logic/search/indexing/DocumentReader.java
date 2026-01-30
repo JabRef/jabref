@@ -29,9 +29,7 @@ import static org.jabref.model.search.LinkedFilesConstants.MODIFIED;
 import static org.jabref.model.search.LinkedFilesConstants.PAGE_NUMBER;
 import static org.jabref.model.search.LinkedFilesConstants.PATH;
 
-/**
- * Utility class for reading the data from LinkedFiles of a BibEntry for Lucene.
- */
+/// Utility class for reading the data from LinkedFiles of a BibEntry for Lucene.
 public final class DocumentReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentReader.class);

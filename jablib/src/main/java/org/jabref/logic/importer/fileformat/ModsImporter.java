@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,11 +43,9 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Importer for the MODS format.<br>
- * More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>. <br>
- * The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
- */
+/// Importer for the MODS format.<br>
+/// More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>. <br>
+/// The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
 public class ModsImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModsImporter.class);
@@ -65,8 +64,9 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
-        return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
+    public boolean isRecognizedFormat(@NonNull Reader input) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(input);
+        return bufferedReader.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 
     @Override
@@ -170,12 +170,10 @@ public class ModsImporter extends Importer implements Parser {
         putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
     }
 
-    /**
-     * Parses information from the RelatedModsGroup. It has the same elements as ModsGroup.
-     * But information like volume, issue and the pages appear here instead of in the ModsGroup.
-     * Also, if there appears a title field, then this indicates that is the name of the journal
-     * which the article belongs to.
-     */
+    /// Parses information from the RelatedModsGroup. It has the same elements as ModsGroup.
+    /// But information like volume, issue and the pages appear here instead of in the ModsGroup.
+    /// Also, if there appears a title field, then this indicates that is the name of the journal
+    /// which the article belongs to.
     private void parseRelatedItem(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();

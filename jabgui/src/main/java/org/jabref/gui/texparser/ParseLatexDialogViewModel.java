@@ -120,9 +120,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * Run a recursive search in a background task.
-     */
+    /// Run a recursive search in a background task.
     public void searchButtonClicked() {
         BackgroundTask.wrap(() -> searchDirectory(Path.of(latexFileDirectory.get())))
                       .onRunning(() -> {
@@ -188,9 +186,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         return parent;
     }
 
-    /**
-     * Parse all checked files in a background task.
-     */
+    /// Parse all checked files in a background task.
     public void parseButtonClicked() {
         List<Path> fileList = checkedFileList.stream()
                                              .map(item -> item.getValue().getPath())

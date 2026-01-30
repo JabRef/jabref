@@ -34,9 +34,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Fetcher for jstor.org
- **/
+/// Fetcher for jstor.org
+///
 public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, IdBasedParserFetcher {
 
     private static final String HOST = "https://www.jstor.org";

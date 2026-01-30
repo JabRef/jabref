@@ -17,15 +17,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-/**
- * Handles keyboard shortcuts. Including checking whether a keybinding matches.
- * See {@link #matches}.
- */
+/// Handles keyboard shortcuts. Including checking whether a keybinding matches.
+/// See {@link #matches}.
 public class KeyBindingRepository {
 
-    /**
-     * sorted by localization
-     */
+    /// sorted by localization
     private final MapProperty<KeyBinding, String> bindings;
 
     public KeyBindingRepository() {
@@ -51,13 +47,11 @@ public class KeyBindingRepository {
         }
     }
 
-    /**
-     * Check if the given keyCombination equals the given keyEvent
-     *
-     * @param combination as KeyCombination
-     * @param keyEvent    as KeEvent
-     * @return true if matching, else false
-     */
+    /// Check if the given keyCombination equals the given keyEvent
+    ///
+    /// @param combination as KeyCombination
+    /// @param keyEvent    as KeEvent
+    /// @return true if matching, else false
     public static boolean checkKeyCombinationEquality(KeyCombination combination, KeyEvent keyEvent) {
         KeyCode code = keyEvent.getCode();
         if (code == KeyCode.UNDEFINED) {
@@ -84,9 +78,7 @@ public class KeyBindingRepository {
         }
     }
 
-    /**
-     * Returns the HashMap containing all key bindings.
-     */
+    /// Returns the HashMap containing all key bindings.
     public SortedMap<KeyBinding, String> getKeyBindings() {
         return new TreeMap<>(bindings);
     }
@@ -115,11 +107,9 @@ public class KeyBindingRepository {
         return this.bindings.size();
     }
 
-    /**
-     * Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
-     * <p>
-     * If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
-     */
+    /// Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
+    ///
+    /// If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()) {
             if (checkKeyCombinationEquality(binding, keyEvent)) {
@@ -129,20 +119,16 @@ public class KeyBindingRepository {
         return Optional.empty();
     }
 
-    /**
-     * Used if the same key could be used by multiple actions
-     */
+    /// Used if the same key could be used by multiple actions
     private Set<KeyBinding> mapToKeyBindings(KeyEvent keyEvent) {
         return Arrays.stream(KeyBinding.values())
                      .filter(binding -> checkKeyCombinationEquality(binding, keyEvent))
                      .collect(Collectors.toSet());
     }
 
-    /**
-     * Checks if the given KeyEvent matches the given KeyBinding.
-     * <p>
-     * Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
-     */
+    /// Checks if the given KeyEvent matches the given KeyBinding.
+    ///
+    /// Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
     public boolean matches(KeyEvent event, KeyBinding keyBinding) {
         return mapToKeyBindings(event)
                 .stream()
@@ -157,13 +143,11 @@ public class KeyBindingRepository {
         return Optional.of(KeyCombination.valueOf(binding));
     }
 
-    /**
-     * Check if the given KeyBinding equals the given keyEvent
-     *
-     * @param binding  as KeyBinding
-     * @param keyEvent as KeEvent
-     * @return true if matching, else false
-     */
+    /// Check if the given KeyBinding equals the given keyEvent
+    ///
+    /// @param binding  as KeyBinding
+    /// @param keyEvent as KeEvent
+    /// @return true if matching, else false
     public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
         return getKeyCombination(binding).filter(combination -> checkKeyCombinationEquality(combination, keyEvent))
                                          .isPresent();

@@ -16,9 +16,7 @@ public class FieldPreferences {
     private final ObservableList<Field> resolvableFields;
     private final ObservableList<Field> nonWrappableFields;
 
-    /**
-     * @param resolveStrings true - The character {@link FieldWriter#BIBTEX_STRING_START_END_SYMBOL} should be interpreted as indicator of BibTeX strings
-     */
+    /// @param resolveStrings true - The character {@link FieldWriter#BIBTEX_STRING_START_END_SYMBOL} should be interpreted as indicator of BibTeX strings
     public FieldPreferences(boolean resolveStrings,
                             List<Field> resolvableFields,
                             List<Field> nonWrappableFields) {

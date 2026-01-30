@@ -108,9 +108,7 @@ public class MetaDataSerializerTest {
         assertEquals(Set.of(), type.get().getOptionalFields());
     }
 
-    /**
-     * Code clone of {@link org.jabref.logic.importer.util.MetaDataParserTest#parseCustomizedEntryType()}
-     */
+    /// Code clone of {@link org.jabref.logic.importer.util.MetaDataParserTest#parseCustomizedEntryType()}
     public static Stream<Arguments> serializeCustomizedEntryType() {
         return Stream.of(
                 Arguments.of(
@@ -147,10 +145,8 @@ public class MetaDataSerializerTest {
         assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypes(bibEntryTypeBuilder.build()));
     }
 
-    /**
-     * Ensures that user-specific .blg path is correctly serialized
-     * to the form: blgFilePath-{username}=/path/to/file.blg;
-     */
+    /// Ensures that user-specific .blg path is correctly serialized
+    /// to the form: blgFilePath-{username}=/path/to/file.blg;
     @Test
     void serializeUserSpecificBlgPath() {
         String user = "testUser";

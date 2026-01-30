@@ -85,9 +85,7 @@ public class EditorContextAction extends SimpleCommand {
         textInputControl.requestFocus();
     }
 
-    /**
-     * Returns the default context menu items (except undo/redo)
-     */
+    /// Returns the default context menu items (except undo/redo)
     public static List<MenuItem> getDefaultContextMenuItems(TextInputControl textInputControl) {
         ActionFactory factory = new ActionFactory();
 

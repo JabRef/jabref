@@ -20,11 +20,9 @@ public class TitleCaseFormatter extends Formatter {
         return "title_case";
     }
 
-    /**
-     * Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
-     * Capitalizes first and last word
-     * Does not change words starting with "{"
-     */
+    /// Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
+    /// Capitalizes first and last word
+    /// Does not change words starting with "{"
     @Override
     public String format(@NonNull String input) {
         return StringUtil.getStringAsSentences(input)

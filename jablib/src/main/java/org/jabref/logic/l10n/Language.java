@@ -10,9 +10,7 @@ import java.util.stream.Stream;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Contains all supported languages.
- */
+/// Contains all supported languages.
 public enum Language {
     ARABIC("العربية (Arabic)", "ar"),
     BAHASA_INDONESIA("Bahasa Indonesia", "id"),
@@ -45,9 +43,7 @@ public enum Language {
     private final String displayName;
     private final String id;
 
-    /**
-     * @param id Typically as 639-1 code
-     */
+    /// @param id Typically as 639-1 code
     Language(String displayName, String id) {
         this.displayName = displayName;
         this.id = id;

@@ -1,5 +1,5 @@
 name: Auto Merge
-on: [pull_request_target, workflow_dispatch]
+on: [ pull_request_target, workflow_dispatch ]
 
 permissions:
   contents: write

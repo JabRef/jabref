@@ -36,9 +36,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A readonly, selectable field cell that contains the value of some field
- */
+/// A readonly, selectable field cell that contains the value of some field
 public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     public static final Logger LOGGER = LoggerFactory.getLogger(FieldValueCell.class);
 

@@ -7,9 +7,7 @@ import com.sun.star.document.XUndoManagerSupplier;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.util.InvalidStateException;
 
-/**
- * Undo : group document changes into larger Undo actions.
- */
+/// Undo : group document changes into larger Undo actions.
 public class UnoUndo {
 
     private UnoUndo() {
@@ -21,9 +19,7 @@ public class UnoUndo {
                       .map(XUndoManagerSupplier::getUndoManager);
     }
 
-    /**
-     * Each call to enterUndoContext must be paired by a call to leaveUndoContext, otherwise, the document's undo stack is left in an inconsistent state.
-     */
+    /// Each call to enterUndoContext must be paired by a call to leaveUndoContext, otherwise, the document's undo stack is left in an inconsistent state.
     public static void enterUndoContext(XTextDocument doc, String title) {
         getXUndoManager(doc).ifPresent(undoManager -> undoManager.enterUndoContext(title));
     }

@@ -18,10 +18,8 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     private final ObservableList<DatabaseChange> visibleChanges = FXCollections.observableArrayList();
 
-    /**
-     * Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
-     * track of changes even when they're removed from the UI.
-     */
+    /// Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
+    /// track of changes even when they're removed from the UI.
     private final ObservableList<DatabaseChange> changes = FXCollections.observableArrayList();
     private final ObjectProperty<DatabaseChange> selectedChange = new SimpleObjectProperty<>();
     private final BooleanBinding areAllChangesResolved;

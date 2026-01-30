@@ -11,9 +11,7 @@ import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
 
-/**
- * Class to model a reference mark. See {@link CSLReferenceMarkManager} for the usage and management of all reference marks.
- */
+/// Class to model a reference mark. See {@link CSLReferenceMarkManager} for the usage and management of all reference marks.
 public class CSLReferenceMark {
     private ReferenceMark referenceMark;
     private XTextContent textContent;

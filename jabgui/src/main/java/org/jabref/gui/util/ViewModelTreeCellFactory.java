@@ -6,7 +6,6 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
@@ -15,11 +14,9 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.JabRefIcon;
 
-/**
- * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
- *
- * @param <T> cell value
- */
+/// Constructs a {@link javafx.scene.control.TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
+///
+/// @param <T> cell value
 public class ViewModelTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {
 
     private Callback<T, String> toText;

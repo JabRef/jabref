@@ -2,7 +2,7 @@ name: Link PR to Issue
 
 on:
   pull_request_target:
-    types: [opened, reopened, edited]
+    types: [ opened, reopened, edited ]
 
 jobs:
   determine_issue_number:

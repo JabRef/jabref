@@ -6,9 +6,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Makes sure the key is legal
- */
+/// Makes sure the key is legal
 public class ValidCitationKeyChecker implements ValueChecker {
 
     @Override

@@ -71,9 +71,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
         return false;
     }
 
-    /**
-     * Returns a list of all files in the given directories which have one of the given extension.
-     */
+    /// Returns a list of all files in the given directories which have one of the given extension.
     private SortedSet<Path> findFilesByExtension(List<Path> directories,
                                                  @NonNull Collection<String> extensions,
                                                  Function<Path, Boolean> filteringFunction) throws IOException {

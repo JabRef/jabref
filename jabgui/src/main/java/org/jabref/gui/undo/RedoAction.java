@@ -14,9 +14,7 @@ import org.jabref.logic.l10n.Localization;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-/**
- * @implNote See also {@link UndoAction}
- */
+/// @implNote See also {@link UndoAction}
 public class RedoAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;

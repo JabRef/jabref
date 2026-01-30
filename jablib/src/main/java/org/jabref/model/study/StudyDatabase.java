@@ -10,9 +10,7 @@ public class StudyDatabase {
         this.enabled = enabled;
     }
 
-    /**
-     * Used for Jackson deserialization
-     */
+    /// Used for Jackson deserialization
     public StudyDatabase() {
         // Per default fetcher is activated
         this.enabled = true;

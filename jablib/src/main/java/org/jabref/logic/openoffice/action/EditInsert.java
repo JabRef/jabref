@@ -33,13 +33,11 @@ public class EditInsert {
     private EditInsert() {
     }
 
-    /**
-     * In insertEntry we receive BibEntry values from the GUI.
-     * <p>
-     * In the document we store citations by their citation key.
-     * <p>
-     * If the citation key is missing, the best we can do is to notify the user. Or the programmer, that we cannot accept such input.
-     */
+    /// In insertEntry we receive BibEntry values from the GUI.
+    ///
+    /// In the document we store citations by their citation key.
+    ///
+    /// If the citation key is missing, the best we can do is to notify the user. Or the programmer, that we cannot accept such input.
     private static String insertEntryGetCitationKey(BibEntry entry) {
         Optional<String> key = entry.getCitationKey();
         if (key.isEmpty()) {
@@ -48,10 +46,8 @@ public class EditInsert {
         return key.get();
     }
 
-    /**
-     * @param cursor   Where to insert.
-     * @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
-     */
+    /// @param cursor   Where to insert.
+    /// @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
     public static void insertCitationGroup(XTextDocument doc,
                                            OOFrontend frontend,
                                            XTextCursor cursor,

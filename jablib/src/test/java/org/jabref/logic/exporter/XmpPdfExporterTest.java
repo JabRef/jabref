@@ -103,9 +103,7 @@ class XmpPdfExporterTest {
                    .withField(StandardField.DOI, "10.1007/978-1-4757-3264-1").withField(StandardField.OWNER, "Ich");
     }
 
-    /**
-     * Create a temporary PDF-file with a single empty page.
-     */
+    /// Create a temporary PDF-file with a single empty page.
     @BeforeEach
     void setUp() throws IOException {
         abbreviationRepository = mock(JournalAbbreviationRepository.class);

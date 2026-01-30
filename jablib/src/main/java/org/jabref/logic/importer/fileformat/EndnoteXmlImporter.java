@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,10 +126,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         String str;
         int i = 0;
-        while (((str = reader.readLine()) != null) && (i < 50)) {
+        while (((str = bufferedReader.readLine()) != null) && (i < 50)) {
             if (str.toLowerCase(Locale.ENGLISH).contains("<records>")) {
                 return true;
             }

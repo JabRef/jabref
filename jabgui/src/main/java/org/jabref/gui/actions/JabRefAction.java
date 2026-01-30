@@ -6,9 +6,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 
-/**
- * Wrapper around one of our actions from {@link Action} to convert them to controlsfx {@link org.controlsfx.control.action.Action}.
- */
+/// Wrapper around one of our actions from {@link Action} to convert them to controlsfx {@link org.controlsfx.control.action.Action}.
 class JabRefAction extends org.controlsfx.control.action.Action {
 
     public JabRefAction(Action action, KeyBindingRepository keyBindingRepository) {

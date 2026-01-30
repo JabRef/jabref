@@ -276,12 +276,10 @@ public class GroupDialogViewModel {
                 sameNameValidator);
     }
 
-    /**
-     * Gets the absolute path relative to the LatexFileDirectory, if given a relative path
-     *
-     * @param input the user input path
-     * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
-     */
+    /// Gets the absolute path relative to the LatexFileDirectory, if given a relative path
+    ///
+    /// @param input the user input path
+    /// @return an absolute path if LatexFileDirectory exists; otherwise, returns input
     private Path getAbsoluteTexGroupPath(String input) {
         Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));

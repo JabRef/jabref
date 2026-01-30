@@ -127,13 +127,11 @@ public class BibtexParser implements Parser {
         this(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
-    /**
-     * Parses BibtexEntries from the given string and returns one entry found (or null if none found)
-     * <p>
-     * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
-     *
-     * @return An {@code Optional<BibEntry>. Optional.empty()} if non was found or an error occurred.
-     */
+    /// Parses BibtexEntries from the given string and returns one entry found (or null if none found)
+    ///
+    /// It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
+    ///
+    /// @return An `Optional<BibEntry>. Optional.empty()` if non was found or an error occurred.
     public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) throws ParseException {
         Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
@@ -161,15 +159,13 @@ public class BibtexParser implements Parser {
         return parseEntries(bibtexString).stream().findFirst();
     }
 
-    /**
-     * Parses BibTeX data found when reading from reader.
-     * <p>
-     * The reader will be consumed.
-     * <p>
-     * Multiple calls to parse() return the same results
-     * <p>
-     * Handling of encoding is done at {@link BibtexImporter}
-     */
+    /// Parses BibTeX data found when reading from reader.
+    ///
+    /// The reader will be consumed.
+    ///
+    /// Multiple calls to parse() return the same results
+    ///
+    /// Handling of encoding is done at {@link BibtexImporter}
     public ParserResult parse(@NonNull Reader in) throws IOException {
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
 
@@ -408,9 +404,7 @@ public class BibtexParser implements Parser {
         }
     }
 
-    /**
-     * Adds BibDesk group entries to the JabRef database
-     */
+    /// Adds BibDesk group entries to the JabRef database
     private void addBibDeskGroupEntriesToJabRefGroups() {
         for (String groupName : parsedBibDeskGroups.keySet()) {
             String[] citationKeys = parsedBibDeskGroups.get(groupName).split(",");
@@ -428,9 +422,7 @@ public class BibtexParser implements Parser {
         }
     }
 
-    /**
-     * Parses comment types found in BibDesk, to migrate BibDesk Static Groups to JabRef.
-     */
+    /// Parses comment types found in BibDesk, to migrate BibDesk Static Groups to JabRef.
     private void parseBibDeskComment(String comment, Map<String, String> meta) throws ParseException {
         String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);
         try {
@@ -480,11 +472,9 @@ public class BibtexParser implements Parser {
         }
     }
 
-    /**
-     * Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string. Removes the JabRef file header, if it is found
-     *
-     * @return the text read so far
-     */
+    /// Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string. Removes the JabRef file header, if it is found
+    ///
+    /// @return the text read so far
     private String dumpTextReadSoFarToString() {
         String result = getPureTextFromFile();
         int indexOfAt = result.indexOf("@");
@@ -501,11 +491,9 @@ public class BibtexParser implements Parser {
         }
     }
 
-    /**
-     * Purges the given stringToPurge (if it exists) from the given context
-     *
-     * @return a stripped version of the context
-     */
+    /// Purges the given stringToPurge (if it exists) from the given context
+    ///
+    /// @return a stripped version of the context
     private String purge(String context, String stringToPurge) {
         // purge the given string line if it exists
         int runningIndex = context.indexOf(stringToPurge);
@@ -539,11 +527,9 @@ public class BibtexParser implements Parser {
         return entry.toString();
     }
 
-    /**
-     * Removes all eof characters from a StringBuilder and returns a new String with the resulting content
-     *
-     * @return a String without eof characters
-     */
+    /// Removes all eof characters from a StringBuilder and returns a new String with the resulting content
+    ///
+    /// @return a String without eof characters
     private String purgeEOFCharacters(String input) {
         StringBuilder remainingText = new StringBuilder();
         for (Character character : input.toCharArray()) {
@@ -854,9 +840,7 @@ public class BibtexParser implements Parser {
         return value.toString();
     }
 
-    /**
-     * This method is used to parse string labels, field names, entry type and numbers outside brackets.
-     */
+    /// This method is used to parse string labels, field names, entry type and numbers outside brackets.
     private String parseTextToken() throws IOException {
         StringBuilder token = new StringBuilder(20);
 
@@ -876,12 +860,10 @@ public class BibtexParser implements Parser {
         }
     }
 
-    /**
-     * Tries to restore the key
-     *
-     * @return rest of key on success, otherwise empty string
-     * @throws IOException on Reader-Error
-     */
+    /// Tries to restore the key
+    ///
+    /// @return rest of key on success, otherwise empty string
+    /// @throws IOException on Reader-Error
     private String fixKey() throws IOException {
         StringBuilder key = new StringBuilder();
         int lookaheadUsed = 0;
@@ -960,9 +942,7 @@ public class BibtexParser implements Parser {
         return removeWhitespaces(key).toString();
     }
 
-    /**
-     * returns a new <code>StringBuilder</code> which corresponds to <code>toRemove</code> without whitespaces
-     */
+    /// returns a new `StringBuilder` which corresponds to `toRemove` without whitespaces
     private StringBuilder removeWhitespaces(StringBuilder toRemove) {
         StringBuilder result = new StringBuilder();
         char current;
@@ -975,20 +955,16 @@ public class BibtexParser implements Parser {
         return result;
     }
 
-    /**
-     * pushes buffer back into input
-     *
-     * @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
-     */
+    /// pushes buffer back into input
+    ///
+    /// @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
     private void unreadBuffer(StringBuilder stringBuilder) throws IOException {
         for (int i = stringBuilder.length() - 1; i >= 0; --i) {
             unread(stringBuilder.charAt(i));
         }
     }
 
-    /**
-     * This method is used to parse the citation key of an entry.
-     */
+    /// This method is used to parse the citation key of an entry.
     private String parseKey() throws IOException {
         StringBuilder token = new StringBuilder(20);
 
@@ -1079,10 +1055,8 @@ public class BibtexParser implements Parser {
         }
     }
 
-    /**
-     * This is called if a field in the form of <code>field = {content}</code> is parsed.
-     * The global variable <code>character</code> contains <code>{</code>.
-     */
+    /// This is called if a field in the form of `field = {content}` is parsed.
+    /// The global variable `character` contains `{`.
     private StringBuilder parseBracketedFieldContent() throws IOException {
         StringBuilder value = new StringBuilder();
 

@@ -18,9 +18,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 
-/**
- * A comparator for BibEntry fields
- */
+/// A comparator for BibEntry fields
 public class FieldComparator implements Comparator<BibEntry> {
 
     private static final Collator COLLATOR = getCollator();

@@ -13,9 +13,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * The inverse operation is "somehow" contained in {@link org.jabref.logic.openoffice.style.OOPreFormatter}
- */
+/// The inverse operation is "somehow" contained in {@link org.jabref.logic.openoffice.style.OOPreFormatter}
 public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);

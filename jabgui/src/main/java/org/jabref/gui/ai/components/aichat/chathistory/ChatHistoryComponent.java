@@ -27,9 +27,7 @@ public class ChatHistoryComponent extends ScrollPane {
         });
     }
 
-    /**
-     * @implNote You must call this method only once.
-     */
+    /// @implNote You must call this method only once.
     public void setItems(ObservableList<ChatMessage> items) {
         fill(items);
         items.addListener((ListChangeListener<? super ChatMessage>) obs -> fill(items));

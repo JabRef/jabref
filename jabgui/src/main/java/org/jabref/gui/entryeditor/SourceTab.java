@@ -362,9 +362,9 @@ public class SourceTab extends EntryEditorTab {
     private void listenForSaveKeybinding(KeyEvent event) {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
-                case SAVE_DATABASE,
+                case SAVE_LIBRARY,
                      SAVE_ALL,
-                     SAVE_DATABASE_AS ->
+                     SAVE_LIBRARY_AS ->
                         storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });

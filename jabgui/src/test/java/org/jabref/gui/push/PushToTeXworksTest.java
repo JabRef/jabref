@@ -50,19 +50,15 @@ class PushToTeXworksTest {
         pushToTeXworks = new GuiPushToTeXworks(dialogService, pushToApplicationPreferences);
     }
 
-    /**
-     * To verify that the PushToTeXworks class correctly returns its designated display name.
-     * The display name is used to identify the application in the GUI.
-     */
+    /// To verify that the PushToTeXworks class correctly returns its designated display name.
+    /// The display name is used to identify the application in the GUI.
     @Test
     void displayName() {
         assertEquals(DISPLAY_NAME, pushToTeXworks.getDisplayName());
     }
 
-    /**
-     * To verify that the PushToTeXworks class correctly returns the command line for TeXworks.
-     * The command line is used to execute the application from the command line.
-     */
+    /// To verify that the PushToTeXworks class correctly returns the command line for TeXworks.
+    /// The command line is used to execute the application from the command line.
     @Test
     void getCommandLine() {
         String keyString = "TestKey";
@@ -73,9 +69,7 @@ class PushToTeXworksTest {
         assertArrayEquals(expectedCommand, actualCommand);
     }
 
-    /**
-     * Check for the actual command and path with path is run.
-     */
+    /// Check for the actual command and path with path is run.
     @Test
     void pushEntries() {
         ProcessBuilder processBuilder = mock(ProcessBuilder.class);
@@ -88,10 +82,8 @@ class PushToTeXworksTest {
         verify(processBuilder).command(expectedCommand);
     }
 
-    /**
-     * To verify that the PushToTeXworks class correctly returns the tooltip for TeXworks.
-     * The tooltip is used to display a short description of the application in the GUI.
-     */
+    /// To verify that the PushToTeXworks class correctly returns the tooltip for TeXworks.
+    /// The tooltip is used to display a short description of the application in the GUI.
     @Test
     void getTooltip() {
         assertEquals("Push entries to external application (TeXworks)", pushToTeXworks.getTooltip());

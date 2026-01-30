@@ -106,7 +106,7 @@ class FieldWriterTest {
         // This was a decision on 2024-06-15 when fixing https://github.com/JabRef/jabref/issues/4877
         // We want to have a clean architecture for reading and writing
         // Normalizing is done during write (and not during read)
-        // Furthermore, normalizing is done in the BibDatabaseWriter#applySaveActions and not in the fielld writer
+        // Furthermore, normalizing is done in the BibDatabaseWriter#applySaveActions and not in the field writer
 
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
         String expected = "{" + original + "}";

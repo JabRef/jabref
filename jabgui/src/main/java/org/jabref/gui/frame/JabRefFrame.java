@@ -75,13 +75,9 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsSavedLocalDatabase;
 
-/**
- * Represents the inner frame of the JabRef window
- */
+/// Represents the inner frame of the JabRef window
 public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMessageHandler {
-    /**
-     * Defines the different modes that the tab can operate in
-     */
+    /// Defines the different modes that the tab can operate in
     private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     public static final String FRAME_TITLE = "JabRef";
@@ -105,6 +101,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -129,7 +126,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
-                       GitHandlerRegistry gitHandlerRegistry) {
+                       GitHandlerRegistry gitHandlerRegistry,
+                       JournalAbbreviationRepository journalAbbreviationRepository) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -141,6 +139,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         setId("frame");
 
@@ -233,7 +232,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager);
+                undoManager,
+                journalAbbreviationRepository);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -252,7 +252,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this::getOpenDatabaseAction,
                 aiService,
                 entryEditor,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                journalAbbreviationRepository
+        );
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
@@ -508,16 +510,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
      *
      **************************************************************************/
 
-    /**
-     * Returns a list of all LibraryTabs in this frame.
-     */
+    /// Returns a list of all LibraryTabs in this frame.
     public @NonNull ObservableList<LibraryTab> getLibraryTabs() {
         return EasyBind.map(tabbedPane.getTabs().filtered(LibraryTab.class::isInstance), LibraryTab.class::cast);
     }
 
-    /**
-     * Returns the currently viewed LibraryTab.
-     */
+    /// Returns the currently viewed LibraryTab.
     public LibraryTab getCurrentLibraryTab() {
         if (tabbedPane.getSelectionModel().getSelectedItem() == null
                 || !(tabbedPane.getSelectionModel().getSelectedItem() instanceof LibraryTab)) {
@@ -559,11 +557,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         tabbedPane.getSelectionModel().select(welcomeTab);
     }
 
-    /**
-     * Opens a new tab with existing data.
-     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
-     */
+    /// Opens a new tab with existing data.
+    /// Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
+    /// Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
@@ -669,9 +665,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor);
     }
 
-    /**
-     * Refreshes the ui after preferences changes
-     */
+    /// Refreshes the ui after preferences changes
     public void refresh() {
         // Disabled, because Bindings implement automatic update. Left here as commented out code to guide if something does not work after updating the preferences.
         // getLibraryTabs().forEach(LibraryTab::setupMainPanel);
@@ -702,9 +696,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         });
     }
 
-    /**
-     * The action concerned with closing the window.
-     */
+    /// The action concerned with closing the window.
     static protected class CloseAction extends SimpleCommand {
 
         private final JabRefFrame frame;
@@ -732,9 +724,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             this.executable.bind(ActionHelper.needsDatabase(stateManager));
         }
 
-        /**
-         * Using this constructor will result in executing the command on the currently open library tab
-         */
+        /// Using this constructor will result in executing the command on the currently open library tab
         public CloseDatabaseAction(LibraryTabContainer tabContainer, StateManager stateManager) {
             this(tabContainer, null, stateManager);
         }

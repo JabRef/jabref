@@ -113,9 +113,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         return source;
     }
 
-    /**
-     * Checks if the given style file is a BST file by checking the extension
-     */
+    /// Checks if the given style file is a BST file by checking the extension
     public static boolean isBstStyleFile(String styleFile) {
         return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);
     }

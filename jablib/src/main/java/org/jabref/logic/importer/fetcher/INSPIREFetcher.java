@@ -30,9 +30,7 @@ import org.jabref.model.search.query.BaseQueryNode;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Fetches data from the INSPIRE database.
- */
+/// Fetches data from the INSPIRE database.
 public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
 
     private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";

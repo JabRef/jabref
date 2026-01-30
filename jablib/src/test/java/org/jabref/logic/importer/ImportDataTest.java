@@ -17,9 +17,7 @@ public class ImportDataTest {
     public static final Path NOT_EXISTING_PDF = Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/null.pdf");
     public static final Path UNLINKED_FILES_TEST_BIB = Path.of("src/test/resources/org/jabref/util/unlinkedFilesTestBib.bib");
 
-    /**
-     * Tests the testing environment.
-     */
+    /// Tests the testing environment.
     @Test
     void environment() {
         assertTrue(Files.exists(ImportDataTest.EXISTING_FOLDER), "EXISTING_FOLDER does not exist");

@@ -2,7 +2,7 @@ name: Cleanup after PR
 
 on:
   pull_request:
-    types: [closed]
+    types: [ closed ]
 
 jobs:
   cleanup:
@@ -13,12 +13,12 @@ jobs:
       packages: write
     steps:
       - name: Cancel workflow "binaries" run
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.0
         with:
           ignore_sha: true
           workflow_id: 9160969135
       - name: Cancel workflow "binaries (ea)" run
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.0
         with:
           ignore_sha: true
           workflow_id: 160969125

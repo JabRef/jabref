@@ -27,10 +27,8 @@ import org.jabref.model.entry.field.StandardField;
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
-/**
- * This Action may only be used in a menu or button.
- * Never in the entry editor. FileListEditor and EntryEditor have other ways to update the file links
- */
+/// This Action may only be used in a menu or button.
+/// Never in the entry editor. FileListEditor and EntryEditor have other ways to update the file links
 public class AutoLinkFilesAction extends SimpleCommand {
 
     private final DialogService dialogService;

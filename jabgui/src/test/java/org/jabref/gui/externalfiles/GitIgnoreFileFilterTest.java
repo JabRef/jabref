@@ -54,8 +54,7 @@ class GitIgnoreFileFilterTest {
         Files.writeString(dir.resolve(".gitignore"), """
                 ignore/.*
                 ignore/*
-                ignore/**
-                ignore/**/*
+                ignore/// *
                 """);
         Path subDir = dir.resolve("ignore");
         Files.createDirectories(subDir);

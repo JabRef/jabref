@@ -2,7 +2,7 @@ name: On PR closed
 
 on:
   pull_request_target:
-    types: [closed]
+    types: [ closed ]
 
   workflow_dispatch:
     inputs:
@@ -103,7 +103,7 @@ jobs:
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
-    needs: [collect_parameters, determine_issue_number]
+    needs: [ collect_parameters, determine_issue_number ]
     if: >
       (needs.determine_issue_number.outputs.issue_number != '') &&
       (github.event_name == 'workflow_dispatch' || !github.event.pull_request.merged)

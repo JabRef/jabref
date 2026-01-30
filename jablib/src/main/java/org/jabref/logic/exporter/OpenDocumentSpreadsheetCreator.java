@@ -37,9 +37,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentSpreadsheetCreator.class);
 
-    /**
-     * Creates a new instance of OpenOfficeDocumentCreator
-     */
+    /// Creates a new instance of OpenOfficeDocumentCreator
     public OpenDocumentSpreadsheetCreator() {
         super("ods", Localization.lang("OpenDocument spreadsheet"), StandardFileType.ODS);
     }

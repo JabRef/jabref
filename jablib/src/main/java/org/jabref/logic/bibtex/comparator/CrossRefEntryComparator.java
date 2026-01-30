@@ -5,12 +5,10 @@ import java.util.Comparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * Compares Bibtex entries based on their 'crossref' fields. Entries including
- * this field are deemed smaller than entries without this field. This serves
- * the purpose of always placing referenced entries after referring entries in
- * the .bib file. After this criterion comes comparisons of individual fields.
- */
+/// Compares Bibtex entries based on their 'crossref' fields. Entries including
+/// this field are deemed smaller than entries without this field. This serves
+/// the purpose of always placing referenced entries after referring entries in
+/// the .bib file. After this criterion comes comparisons of individual fields.
 public class CrossRefEntryComparator implements Comparator<BibEntry> {
 
     @Override

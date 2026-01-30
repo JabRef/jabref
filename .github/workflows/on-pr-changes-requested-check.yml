@@ -2,7 +2,7 @@ name: Adapt PR status labels (Check)
 
 on:
   pull_request_review:
-    types: [submitted]
+    types: [ submitted ]
 
 jobs:
   label-changes-required:

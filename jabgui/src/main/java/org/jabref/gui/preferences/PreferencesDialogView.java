@@ -27,11 +27,9 @@ import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
-/**
- * Preferences dialog. Contains a TabbedPane, and tabs will be defined in separate classes. Tabs MUST implement the
- * PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses
- * ok.
- */
+/// Preferences dialog. Contains a TabbedPane, and tabs will be defined in separate classes. Tabs MUST implement the
+/// PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses
+/// ok.
 public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
     public static final String DIALOG_TITLE = Localization.lang("JabRef preferences");

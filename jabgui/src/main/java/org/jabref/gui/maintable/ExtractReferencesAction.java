@@ -29,16 +29,14 @@ import org.jabref.model.entry.field.StandardField;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * SIDE EFFECT: Sets the "cites" field of the entry having the linked files
- *
- * <ul>
- *   <li>Mode choice A: online or offline</li>
- *   <li>Mode choice B: complete entry or single file (the latter is not implemented)</li>
- * </ul>
- * <p>
- * The mode is selected by the preferences whether to use Grobid or not.
- */
+/// SIDE EFFECT: Sets the "cites" field of the entry having the linked files
+///
+///
+/// - Mode choice A: online or offline
+/// - Mode choice B: complete entry or single file (the latter is not implemented)
+///
+///
+/// The mode is selected by the preferences whether to use Grobid or not.
 public class ExtractReferencesAction extends SimpleCommand {
     private final int FILES_LIMIT = 10;
 
@@ -56,12 +54,10 @@ public class ExtractReferencesAction extends SimpleCommand {
         this(dialogService, stateManager, preferences, null, null);
     }
 
-    /**
-     * Can be used to bind the action on a context menu in the linked file view (future work)
-     *
-     * @param entry      the entry to handle (can be null)
-     * @param linkedFile the linked file (can be null)
-     */
+    /// Can be used to bind the action on a context menu in the linked file view (future work)
+    ///
+    /// @param entry      the entry to handle (can be null)
+    /// @param linkedFile the linked file (can be null)
     private ExtractReferencesAction(@NonNull DialogService dialogService,
                                     @NonNull StateManager stateManager,
                                     @NonNull CliPreferences preferences,
@@ -162,13 +158,11 @@ public class ExtractReferencesAction extends SimpleCommand {
         currentEntry.setField(StandardField.CITES, cites);
     }
 
-    /**
-     * Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
-     * <p>
-     * TODO: Move this part to logic somehow
-     *
-     * @param currentEntry used to create citation keys if the importer did not provide one from the imported entry
-     */
+    /// Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
+    ///
+    /// TODO: Move this part to logic somehow
+    ///
+    /// @param currentEntry used to create citation keys if the importer did not provide one from the imported entry
     private static String getCites(List<BibEntry> entries, BibEntry currentEntry) {
         StringJoiner cites = new StringJoiner(",");
         int count = 0;

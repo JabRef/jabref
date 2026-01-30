@@ -5,9 +5,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.exporter.TemplateExporter;
 
-/**
- * ExporterViewModel wraps a TemplateExporter from logic and is used in the exporter customization dialog view and ViewModel.
- */
+/// ExporterViewModel wraps a TemplateExporter from logic and is used in the exporter customization dialog view and ViewModel.
 
 public class ExporterViewModel {
 

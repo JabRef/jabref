@@ -14,9 +14,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-/**
- * Editor for external file types.
- */
+/// Editor for external file types.
 public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFileTypesTabViewModel> implements PreferencesTab {
 
     @FXML private TableColumn<ExternalFileTypeItemViewModel, JabRefIcon> fileTypesTableIconColumn;

@@ -44,9 +44,7 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
         entry.removeKeywords(possibleKeywordsToMigrate, keywordDelimiter);
     }
 
-    /**
-     * Mapping of special field values (contained in the keywords) to their corresponding special field
-     */
+    /// Mapping of special field values (contained in the keywords) to their corresponding special field
     private Map<String, SpecialField> getMigrationTable() {
         Map<String, SpecialField> map = new HashMap<>();
         map.put("printed", SpecialField.PRINTED);

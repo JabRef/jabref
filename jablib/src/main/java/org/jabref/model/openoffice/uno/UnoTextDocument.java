@@ -20,9 +20,7 @@ public class UnoTextDocument {
     private UnoTextDocument() {
     }
 
-    /**
-     * @return True if we cannot reach the current document.
-     */
+    /// @return True if we cannot reach the current document.
     public static boolean isDocumentConnectionMissing(XTextDocument doc) {
         boolean missing = doc == null;
 
@@ -49,10 +47,8 @@ public class UnoTextDocument {
         return Optional.of(controller);
     }
 
-    /**
-     * @param doc The XTextDocument we want the frame title for. Null allowed.
-     * @return The title or Optional.empty()
-     */
+    /// @param doc The XTextDocument we want the frame title for. Null allowed.
+    /// @return The title or Optional.empty()
     public static Optional<String> getFrameTitle(XTextDocument doc) {
         Optional<XFrame> frame = getCurrentController(doc).map(XController::getFrame);
         if (frame.isEmpty()) {

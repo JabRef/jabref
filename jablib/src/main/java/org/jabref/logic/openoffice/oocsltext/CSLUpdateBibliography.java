@@ -35,9 +35,7 @@ public class CSLUpdateBibliography {
         return range;
     }
 
-    /**
-     * Rebuilds the bibliography using CSL.
-     */
+    /// Rebuilds the bibliography using CSL.
     public void rebuildCSLBibliography(XTextDocument doc,
                                        CSLCitationOOAdapter cslCitationOOAdapter,
                                        List<BibEntry> entries,

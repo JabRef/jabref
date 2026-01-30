@@ -15,7 +15,8 @@ public class CleanupFileViewModel {
             CleanupPreferences.CleanupStep.RENAME_PDF,
             CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
             CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-            CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES
+            CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES,
+            CleanupPreferences.CleanupStep.REMOVE_XMP_METADATA
     );
 
     public final BooleanProperty movePdfSelected = new SimpleBooleanProperty();
@@ -24,6 +25,7 @@ public class CleanupFileViewModel {
     public final BooleanProperty renamePdfOnlyRelativeSelected = new SimpleBooleanProperty();
     public final BooleanProperty upgradeLinksSelected = new SimpleBooleanProperty();
     public final BooleanProperty deleteFilesSelected = new SimpleBooleanProperty();
+    public final BooleanProperty removeXmpMetadataSelected = new SimpleBooleanProperty();
 
     public final BooleanProperty movePdfEnabled = new SimpleBooleanProperty(true);
 
@@ -34,6 +36,7 @@ public class CleanupFileViewModel {
         renamePdfOnlyRelativeSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
         upgradeLinksSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
         deleteFilesSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
+        removeXmpMetadataSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.REMOVE_XMP_METADATA));
 
         renamePdfSelected.addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
@@ -62,6 +65,9 @@ public class CleanupFileViewModel {
         }
         if (deleteFilesSelected.get()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);
+        }
+        if (removeXmpMetadataSelected.get()) {
+            activeJobs.add(CleanupPreferences.CleanupStep.REMOVE_XMP_METADATA);
         }
         return activeJobs;
     }

@@ -15,17 +15,15 @@ public class RangeOverlapWithin {
     private RangeOverlapWithin() {
     }
 
-    /**
-     * Report identical, overlapping or touching ranges between elements of rangeHolders.
-     * <p>
-     * For overlapping and touching, only report consecutive ranges and only with a single sample of otherwise identical ranges.
-     *
-     * @param rangeHolders    represent the ranges to be checked.
-     *                        <p>
-     *                        Note: for each rangeHolder, rangeHolder.getRange() is called multiple times. To avoid repeated work, they should keep a copy of the range instead of getting it each time from the document.
-     * @param reportAtMost    Limit the number of records returned to atMost. Zero {@code reportAtMost} means no limit.
-     * @param includeTouching Should the result contain ranges sharing only a boundary?
-     */
+    /// Report identical, overlapping or touching ranges between elements of rangeHolders.
+    ///
+    /// For overlapping and touching, only report consecutive ranges and only with a single sample of otherwise identical ranges.
+    ///
+    /// Note: for each rangeHolder, rangeHolder.getRange() is called multiple times. To avoid repeated work, they should keep a copy of the range instead of getting it each time from the document.
+    ///
+    /// @param rangeHolders    represent the ranges to be checked.
+    /// @param reportAtMost    Limit the number of records returned to atMost. Zero `reportAtMost` means no limit.
+    /// @param includeTouching Should the result contain ranges sharing only a boundary?
     public static <V extends RangeHolder>
     List<RangeOverlap<V>> findOverlappingRanges(XTextDocument doc,
                                                 List<V> rangeHolders,
@@ -37,14 +35,12 @@ public class RangeOverlapWithin {
         return findOverlappingRanges(partitions, reportAtMost, includeTouching);
     }
 
-    /**
-     * Report identical, overlapping or touching ranges.
-     * <p>
-     * For overlapping and touching, only report consecutive ranges and only with a single sample of otherwise identical ranges.
-     *
-     * @param atMost          Limit the number of records returned to atMost. Zero {@code atMost} means no limit.
-     * @param includeTouching Should the result contain ranges sharing only a boundary?
-     */
+    /// Report identical, overlapping or touching ranges.
+    ///
+    /// For overlapping and touching, only report consecutive ranges and only with a single sample of otherwise identical ranges.
+    ///
+    /// @param atMost          Limit the number of records returned to atMost. Zero `atMost` means no limit.
+    /// @param includeTouching Should the result contain ranges sharing only a boundary?
     public static <V extends RangeHolder>
     List<RangeOverlap<V>> findOverlappingRanges(RangeSort.RangePartitions<V> input,
                                                 int atMost,

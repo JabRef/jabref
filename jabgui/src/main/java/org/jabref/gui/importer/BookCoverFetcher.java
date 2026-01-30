@@ -23,9 +23,7 @@ import org.jabref.model.entry.identifier.ISBN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Provides functions for downloading and retrieving book covers for entries.
- */
+/// Provides functions for downloading and retrieving book covers for entries.
 public class BookCoverFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookCoverFetcher.class);

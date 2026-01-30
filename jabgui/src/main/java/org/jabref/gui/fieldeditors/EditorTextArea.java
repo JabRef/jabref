@@ -23,9 +23,7 @@ import org.jspecify.annotations.NonNull;
 public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
-    /**
-     * Variable that contains user-defined behavior for paste action.
-     */
+    /// Variable that contains user-defined behavior for paste action.
     private Runnable pasteActionHandler = () -> {
         // Set empty paste behavior by default
     };
@@ -60,18 +58,14 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
         // not needed
     }
 
-    /**
-     * Set pasteActionHandler variable to passed handler
-     *
-     * @param handler an instance of PasteActionHandler that describes paste behavior
-     */
+    /// Set pasteActionHandler variable to passed handler
+    ///
+    /// @param handler an instance of PasteActionHandler that describes paste behavior
     public void setPasteActionHandler(@NonNull Runnable handler) {
         this.pasteActionHandler = handler;
     }
 
-    /**
-     * Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
-     */
+    /// Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
     @Override
     public void paste() {
         super.paste();

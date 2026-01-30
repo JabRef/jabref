@@ -106,9 +106,7 @@ class PseudonymizationTest {
         assertEquals(Files.readString(expectedPath), stringWriter.toString());
     }
 
-    /**
-     * This test can be used to anonymize a library.
-     */
+    /// This test can be used to anonymize a library.
     @Test
     void pseudonymizeLibraryFile(@TempDir Path tempDir) throws URISyntaxException, IOException {
         // modify path to the file to be anonymized

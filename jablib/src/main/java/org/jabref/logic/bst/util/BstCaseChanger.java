@@ -48,11 +48,9 @@ public final class BstCaseChanger {
             return asChar;
         }
 
-        /**
-         * Convert bstFormat char into ENUM
-         *
-         * @throws IllegalArgumentException if char is not 't', 'l', 'u'
-         */
+        /// Convert bstFormat char into ENUM
+        ///
+        /// @throws IllegalArgumentException if char is not 't', 'l', 'u'
         public static FormatMode of(final char bstFormat) {
             for (FormatMode mode : FormatMode.values()) {
                 if (mode.asChar == bstFormat) {
@@ -70,12 +68,10 @@ public final class BstCaseChanger {
     private BstCaseChanger() {
     }
 
-    /**
-     * Changes case of the given string s
-     *
-     * @param s      the string to handle
-     * @param format the format
-     */
+    /// Changes case of the given string s
+    ///
+    /// @param s      the string to handle
+    /// @param format the format
     public static String changeCase(String s, FormatMode format) {
         return new BstCaseChanger().doChangeCase(s, format);
     }
@@ -130,18 +126,16 @@ public final class BstCaseChanger {
         return sb.toString();
     }
 
-    /**
-     * We're dealing with a special character (usually either an undotted `\i'
-     * or `\j', or an accent like one in Table~3.1 of the \LaTeX\ manual, or a
-     * foreign character like one in Table~3.2) if the first character after the
-     * |left_brace| is a |backslash|; the special character ends with the
-     * matching |right_brace|. How we handle what is in between depends on the
-     * special character. In general, this code will do reasonably well if there
-     * is other stuff, too, between braces, but it doesn't try to do anything
-     * special with |colon|s.
-     *
-     * @param start the current position. It points to the opening brace
-     */
+    /// We're dealing with a special character (usually either an undotted `\i'
+    /// or `\j', or an accent like one in Table~3.1 of the \LaTeX\ manual, or a
+    /// foreign character like one in Table~3.2) if the first character after the
+    /// |left_brace| is a |backslash|; the special character ends with the
+    /// matching |right_brace|. How we handle what is in between depends on the
+    /// special character. In general, this code will do reasonably well if there
+    /// is other stuff, too, between braces, but it doesn't try to do anything
+    /// special with |colon|s.
+    ///
+    /// @param start the current position. It points to the opening brace
     private int convertSpecialChar(StringBuilder sb, char[] c, int start, FormatMode format) {
         int i = start;
 
@@ -170,13 +164,11 @@ public final class BstCaseChanger {
         return i;
     }
 
-    /**
-     * Convert the given string according to the format character (title, lower,
-     * up) and append the result to the stringBuffer, return the updated
-     * position.
-     *
-     * @return the new position
-     */
+    /// Convert the given string according to the format character (title, lower,
+    /// up) and append the result to the stringBuffer, return the updated
+    /// position.
+    ///
+    /// @return the new position
     private int convertAccented(char[] c, int start, String s, StringBuilder sb, FormatMode format) {
         int pos = start;
         pos += s.length();
@@ -254,17 +246,15 @@ public final class BstCaseChanger {
         return i;
     }
 
-    /**
-     * Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
-     * If nothing found, return Optional.empty()
-     *
-     * <p>
-     * Also used by BibtexPurify
-     *
-     * @param c   the current "String"
-     * @param pos the position
-     * @return the special LaTeX character or null
-     */
+    /// Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
+    /// If nothing found, return Optional.empty()
+    ///
+    ///
+    /// Also used by BibtexPurify
+    ///
+    /// @param c   the current "String"
+    /// @param pos the position
+    /// @return the special LaTeX character or null
     public static Optional<String> findSpecialChar(char[] c, int pos) {
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {

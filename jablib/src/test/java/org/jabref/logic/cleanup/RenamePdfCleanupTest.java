@@ -51,9 +51,7 @@ class RenamePdfCleanupTest {
         cleanup = new RenamePdfCleanup(false, () -> context, filePreferences);
     }
 
-    /**
-     * Test for #466
-     */
+    /// Test for #466
     @Test
     void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
         Path path = testFolder.resolve("toot.tmp");

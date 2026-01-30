@@ -37,9 +37,7 @@ public class StringUtil {
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
-    /**
-     * Pattern for normalizing whitespace and punctuation using named capture groups
-     */
+    /// Pattern for normalizing whitespace and punctuation using named capture groups
     private static final Pattern NORMALIZE_PATTERN = Pattern.compile(
             "(?<whitespace>\\s+)|" +                   // multiple whitespace
                     "(?<hyphen>\\s*-+\\s*)|" +         // hyphens with surrounding spaces
@@ -56,14 +54,12 @@ public class StringUtil {
         return expression ? "1" : "0";
     }
 
-    /**
-     * Quote special characters.
-     *
-     * @param toQuote   The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
-     * @param quoteChar The quoting character.
-     * @return A String with every special character (including the quoting character itself) quoted.
-     */
+    /// Quote special characters.
+    ///
+    /// @param toQuote   The String which may contain special characters.
+    /// @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
+    /// @param quoteChar The quoting character.
+    /// @return A String with every special character (including the quoting character itself) quoted.
     public static String quote(String toQuote, String specials, char quoteChar) {
         if (toQuote == null) {
             return "";
@@ -87,9 +83,7 @@ public class StringUtil {
         return result.toString();
     }
 
-    /**
-     * Creates a substring from a text
-     */
+    /// Creates a substring from a text
     public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
         char c;
         int count = 0;
@@ -120,10 +114,8 @@ public class StringUtil {
         return part.toString();
     }
 
-    /**
-     * Returns the string, after shaving off whitespace at the beginning and end,
-     * and removing (at most) one pair of braces or " surrounding it.
-     */
+    /// Returns the string, after shaving off whitespace at the beginning and end,
+    /// and removing (at most) one pair of braces or " surrounding it.
     public static String shaveString(String toShave) {
         if ((toShave == null) || (toShave.isEmpty())) {
             return "";
@@ -135,17 +127,15 @@ public class StringUtil {
         return shaved;
     }
 
-    /**
-     * Concatenate all strings in the array from index 'from' to 'to' (excluding
-     * to) with the given separator.
-     * <p>
-     * Example:
-     * <p>
-     * String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
-     * "ab\\cd\\ed"
-     *
-     * @param to Excluding strings[to]
-     */
+    /// Concatenate all strings in the array from index 'from' to 'to' (excluding
+    /// to) with the given separator.
+    ///
+    /// Example:
+    ///
+    /// String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
+    /// "ab\\cd\\ed"
+    ///
+    /// @param to Excluding strings[to]
     public static String join(String[] strings, String separator, int from, int to) {
         if ((strings.length == 0) || (from >= to)) {
             return "";
@@ -161,9 +151,7 @@ public class StringUtil {
         return stringBuilder.append(strings[updatedTo - 1]).toString();
     }
 
-    /**
-     * Removes optional square brackets from the string s
-     */
+    /// Removes optional square brackets from the string s
     public static String stripBrackets(String toStrip) {
         if (isInSquareBrackets(toStrip)) {
             return toStrip.substring(1, toStrip.length() - 1);
@@ -171,10 +159,8 @@ public class StringUtil {
         return toStrip;
     }
 
-    /**
-     * extends the filename with a default Extension, if no Extension '.x' could
-     * be found
-     */
+    /// extends the filename with a default Extension, if no Extension '.x' could
+    /// be found
     public static String getCorrectFileName(String orgName, String defaultExtension) {
         if (orgName == null) {
             return "";
@@ -192,15 +178,13 @@ public class StringUtil {
         return orgName;
     }
 
-    /**
-     * Formats field contents for output. Must be "symmetric" with the parse method above, so stored and reloaded fields
-     * are not mangled.
-     *
-     * @param in         the string to wrap
-     * @param wrapAmount the number of characters belonging to a line of text
-     * @param newline    the newline character(s)
-     * @return the wrapped string
-     */
+    /// Formats field contents for output. Must be "symmetric" with the parse method above, so stored and reloaded fields
+    /// are not mangled.
+    ///
+    /// @param in         the string to wrap
+    /// @param wrapAmount the number of characters belonging to a line of text
+    /// @param newline    the newline character(s)
+    /// @return the wrapped string
     public static String wrap(String in, int wrapAmount, String newline) {
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
@@ -223,14 +207,12 @@ public class StringUtil {
         return result.toString();
     }
 
-    /**
-     * Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
-     * Wrapping is done using newline and tab character.
-     *
-     * @param line          the line of text to be wrapped and appended
-     * @param wrapAmount    the number of characters belonging to a line of text
-     * @param newlineString a string containing the newline character(s)
-     */
+    /// Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
+    /// Wrapping is done using newline and tab character.
+    ///
+    /// @param line          the line of text to be wrapped and appended
+    /// @param wrapAmount    the number of characters belonging to a line of text
+    /// @param newlineString a string containing the newline character(s)
     private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
         int length = result.length();
@@ -250,10 +232,8 @@ public class StringUtil {
         }
     }
 
-    /**
-     * Quotes each and every character, e.g. '!' as &#33;. Used for verbatim
-     * display of arbitrary strings that may contain HTML entities.
-     */
+    /// Quotes each and every character, e.g. '!' as &#33;. Used for verbatim
+    /// display of arbitrary strings that may contain HTML entities.
     public static String quoteForHTML(String toQuote) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < toQuote.length(); ++i) {
@@ -262,14 +242,12 @@ public class StringUtil {
         return result.toString();
     }
 
-    /**
-     * Decodes an encoded double String array back into array form. The array
-     * is assumed to be square, and delimited by the characters ';' (first dim) and
-     * ':' (second dim).
-     *
-     * @param value The encoded String to be decoded.
-     * @return The decoded String array.
-     */
+    /// Decodes an encoded double String array back into array form. The array
+    /// is assumed to be square, and delimited by the characters ';' (first dim) and
+    /// ':' (second dim).
+    ///
+    /// @param value The encoded String to be decoded.
+    /// @return The decoded String array.
     public static String[][] decodeStringDoubleArray(String value) {
         List<List<String>> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -311,14 +289,12 @@ public class StringUtil {
         return res;
     }
 
-    /**
-     * Wrap all uppercase letters, or sequences of uppercase letters, in curly
-     * braces. Ignore letters within a pair of # character, as these are part of
-     * a string label that should not be modified.
-     *
-     * @param s The string to modify.
-     * @return The resulting string after wrapping capitals.
-     */
+    /// Wrap all uppercase letters, or sequences of uppercase letters, in curly
+    /// braces. Ignore letters within a pair of # character, as these are part of
+    /// a string label that should not be modified.
+    ///
+    /// @param s The string to modify.
+    /// @return The resulting string after wrapping capitals.
     public static String putBracesAroundCapitals(String s) {
         boolean inString = false;
         boolean isBracing = false;
@@ -363,14 +339,12 @@ public class StringUtil {
         return buf.toString();
     }
 
-    /**
-     * This method looks for occurrences of capital letters enclosed in an
-     * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
-     * pairs of braces are removed.
-     *
-     * @param s The String to analyze.
-     * @return A new String with braces removed.
-     */
+    /// This method looks for occurrences of capital letters enclosed in an
+    /// arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
+    /// pairs of braces are removed.
+    ///
+    /// @param s The String to analyze.
+    /// @return A new String with braces removed.
     public static String removeBracesAroundCapitals(String s) {
         String current = s;
         String previous = s;
@@ -380,14 +354,12 @@ public class StringUtil {
         return current;
     }
 
-    /**
-     * This method looks for occurrences of capital letters enclosed in one pair
-     * of braces, e.g. "{AB}". All these are replaced by only the capitals in
-     * between the braces.
-     *
-     * @param s The String to analyze.
-     * @return A new String with braces removed.
-     */
+    /// This method looks for occurrences of capital letters enclosed in one pair
+    /// of braces, e.g. "{AB}". All these are replaced by only the capitals in
+    /// between the braces.
+    ///
+    /// @param s The String to analyze.
+    /// @return A new String with braces removed.
     private static String removeSingleBracesAroundCapitals(String s) {
         Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
         StringBuilder buf = new StringBuilder();
@@ -399,31 +371,27 @@ public class StringUtil {
         return buf.toString();
     }
 
-    /**
-     * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
-     * AKA normalize newlines
-     * <p>
-     * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
-     *
-     * <h4>Example</h4>
-     * <pre>{@code
-     * Legacy Macintosh \r -> OS.NEWLINE
-     * Windows \r\n -> OS.NEWLINE
-     * }</pre>
-     *
-     * @return a String with only OS.NEWLINE as line breaks
-     */
+    /// Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
+    /// AKA normalize newlines
+    ///
+    /// We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
+    ///
+    /// <h4>Example</h4>
+    /// <pre>{@code
+    /// Legacy Macintosh \r -> OS.NEWLINE
+    /// Windows \r\n -> OS.NEWLINE
+    /// }</pre>
+    ///
+    /// @return a String with only OS.NEWLINE as line breaks
     public static String unifyLineBreaks(String s, String newline) {
         return LINE_BREAKS.matcher(s).replaceAll(newline);
     }
 
-    /**
-     * Checks if the given String has exactly one pair of surrounding curly braces <br>
-     * Strings with escaped characters in curly braces at the beginning and end are respected, too
-     *
-     * @param toCheck The string to check
-     * @return True, if the check was successful. False otherwise.
-     */
+    /// Checks if the given String has exactly one pair of surrounding curly braces <br>
+    /// Strings with escaped characters in curly braces at the beginning and end are respected, too
+    ///
+    /// @param toCheck The string to check
+    /// @return True, if the check was successful. False otherwise.
     public static boolean isInCurlyBrackets(String toCheck) {
         int count = 0;
         int brackets = 0;
@@ -464,15 +432,13 @@ public class StringUtil {
         }
     }
 
-    /**
-     * Optimized method for converting a String into an Integer
-     * <p>
-     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
-     *
-     * @param str the String holding an Integer value
-     * @return the int value of str
-     * @throws NumberFormatException if str cannot be parsed to an int
-     */
+    /// Optimized method for converting a String into an Integer
+    ///
+    /// From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+    ///
+    /// @param str the String holding an Integer value
+    /// @return the int value of str
+    /// @throws NumberFormatException if str cannot be parsed to an int
     public static int intValueOf(String str) {
         int idx = 0;
         int end;
@@ -495,14 +461,12 @@ public class StringUtil {
         }
     }
 
-    /**
-     * Optimized method for converting a String into an Integer
-     * <p>
-     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
-     *
-     * @param str the String holding an Integer value
-     * @return the int value of str or Optional.empty() if not possible
-     */
+    /// Optimized method for converting a String into an Integer
+    ///
+    /// From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+    ///
+    /// @param str the String holding an Integer value
+    /// @return the int value of str or Optional.empty() if not possible
     public static Optional<Integer> intValueOfOptional(String str) {
         int idx = 0;
         int end;
@@ -525,19 +489,17 @@ public class StringUtil {
         }
     }
 
-    /**
-     * This method ensures that the output String has only
-     * valid XML unicode characters as specified by the
-     * XML 1.0 standard. For reference, please see
-     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
-     * standard</a>. This method will return an empty
-     * String if the input is null or empty.
-     * <p>
-     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
-     *
-     * @param in The String whose non-valid characters we want to remove.
-     * @return The in String, stripped of non-valid characters.
-     */
+    /// This method ensures that the output String has only
+    /// valid XML unicode characters as specified by the
+    /// XML 1.0 standard. For reference, please see
+    /// <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+    /// standard</a>. This method will return an empty
+    /// String if the input is null or empty.
+    ///
+    /// URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+    ///
+    /// @param in The String whose non-valid characters we want to remove.
+    /// @return The in String, stripped of non-valid characters.
     public static String stripNonValidXMLCharacters(String in) {
         if ((in == null) || in.isEmpty()) {
             return ""; // vacancy test.
@@ -590,10 +552,8 @@ public class StringUtil {
         return s.substring(0, Math.max(0, maxLength - 3)) + "...";
     }
 
-    /**
-     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
-     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
-     */
+    /// Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+    /// accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
     public static String replaceSpecialCharacters(String s) {
         /* Some unicode characters can be encoded in multiple ways. This uses <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/text/Normalizer.Form.html#NFC">NFC</a>
          * to re-encode the characters so that these characters can be found.
@@ -607,23 +567,19 @@ public class StringUtil {
         return result;
     }
 
-    /**
-     * Return a String with n spaces
-     *
-     * @param n Number of spaces
-     * @return String with n spaces
-     */
+    /// Return a String with n spaces
+    ///
+    /// @param n Number of spaces
+    /// @return String with n spaces
     public static String repeatSpaces(int n) {
         return repeat(Math.max(0, n), ' ');
     }
 
-    /**
-     * Return a String with n copies of the char c
-     *
-     * @param n Number of copies
-     * @param c char to copy
-     * @return String with n copies of c
-     */
+    /// Return a String with n copies of the char c
+    ///
+    /// @param n Number of copies
+    /// @param c char to copy
+    /// @return String with n copies of c
     public static String repeat(int n, char c) {
         StringBuilder resultSB = new StringBuilder(n);
 
@@ -646,9 +602,7 @@ public class StringUtil {
         return string.isEmpty() || isBlank(string.get());
     }
 
-    /**
-     * Checks if a CharSequence is not empty (""), not null and not whitespace only.
-     */
+    /// Checks if a CharSequence is not empty (""), not null and not whitespace only.
     public static boolean isNotBlank(String string) {
         return !isBlank(string);
     }
@@ -657,16 +611,12 @@ public class StringUtil {
         return string.isPresent() && isNotBlank(string.get());
     }
 
-    /**
-     * Return string enclosed in HTML bold tags
-     */
+    /// Return string enclosed in HTML bold tags
     public static String boldHTML(String input) {
         return "<b>" + input + "</b>";
     }
 
-    /**
-     * Return string enclosed in HTML bold tags  if not null, otherwise return alternative text in HTML bold tags
-     */
+    /// Return string enclosed in HTML bold tags  if not null, otherwise return alternative text in HTML bold tags
     public static String boldHTML(String input, String alternative) {
         if (input == null) {
             return "<b>" + alternative + "</b>";
@@ -674,13 +624,11 @@ public class StringUtil {
         return "<b>" + input + "</b>";
     }
 
-    /**
-     * Unquote special characters.
-     *
-     * @param toUnquote The String which may contain quoted special characters.
-     * @param quoteChar The quoting character.
-     * @return A String with all quoted characters unquoted.
-     */
+    /// Unquote special characters.
+    ///
+    /// @param toUnquote The String which may contain quoted special characters.
+    /// @param quoteChar The quoting character.
+    /// @return A String with all quoted characters unquoted.
     public static String unquote(String toUnquote, char quoteChar) {
         StringBuilder result = new StringBuilder();
         char c;
@@ -707,9 +655,7 @@ public class StringUtil {
         return StringUtils.stripAccents(searchQuery);
     }
 
-    /**
-     * Make first character of String uppercase, and the rest lowercase.
-     */
+    /// Make first character of String uppercase, and the rest lowercase.
     public static String capitalizeFirst(String toCapitalize) {
         if (toCapitalize.length() > 1) {
             return toCapitalize.substring(0, 1).toUpperCase(Locale.ROOT)
@@ -719,20 +665,16 @@ public class StringUtil {
         }
     }
 
-    /**
-     * Returns a list of words contained in the given text.
-     * Whitespace, comma and semicolon are considered as separator between words.
-     *
-     * @param text the input
-     * @return a list of words
-     */
+    /// Returns a list of words contained in the given text.
+    /// Whitespace, comma and semicolon are considered as separator between words.
+    ///
+    /// @param text the input
+    /// @return a list of words
     public static List<String> getStringAsWords(String text) {
         return Arrays.asList(text.split("[\\s,;]+"));
     }
 
-    /**
-     * Returns a list of sentences contained in the given text.
-     */
+    /// Returns a list of sentences contained in the given text.
     public static List<String> getStringAsSentences(String text) {
         // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
         Pattern splitTextPattern = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
@@ -763,11 +705,9 @@ public class StringUtil {
         return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
     }
 
-    /**
-     * Encloses the given string with " if there is a space contained
-     *
-     * @return Returns a string
-     */
+    /// Encloses the given string with " if there is a space contained
+    ///
+    /// @return Returns a string
     public static String quoteStringIfSpaceIsContained(String string) {
         if (string.contains(" ")) {
             return "\"" + string + "\"";
@@ -776,13 +716,11 @@ public class StringUtil {
         }
     }
 
-    /**
-     * Checks if the given string contains any whitespace characters. The supported whitespace characters
-     * are the set of characters matched by {@code \s} in regular expressions, which are {@code [ \t\n\x0B\f\r]}.
-     *
-     * @param s The string to check
-     * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
-     */
+    /// Checks if the given string contains any whitespace characters. The supported whitespace characters
+    /// are the set of characters matched by `\s` in regular expressions, which are `[ \t\n\x0B\f\r]`.
+    ///
+    /// @param s The string to check
+    /// @return `True` if the given string does contain at least one whitespace character, `False` otherwise
     public static boolean containsWhitespace(String s) {
         return s.chars().anyMatch(Character::isWhitespace);
     }

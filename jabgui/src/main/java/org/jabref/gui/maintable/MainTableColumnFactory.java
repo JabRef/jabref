@@ -151,12 +151,10 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
-    /**
-     * Creates a column for the match category.
-     * <p>This column is always hidden but is used for sorting the table
-     * in the floating mode. The order of the {@link MatchCategory} enum constants
-     * determines the sorting order.</p>
-     */
+    /// Creates a column for the match category.
+    /// This column is always hidden but is used for sorting the table
+    /// in the floating mode. The order of the {@link MatchCategory} enum constants
+    /// determines the sorting order.
     private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
         column.setCellValueFactory(cellData -> cellData.getValue().matchCategory());
@@ -166,9 +164,7 @@ public class MainTableColumnFactory {
         return column;
     }
 
-    /**
-     * Creates a column with a continuous number
-     */
+    /// Creates a column with a continuous number
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
         Node header = new Text("#");
@@ -185,9 +181,7 @@ public class MainTableColumnFactory {
         return column;
     }
 
-    /**
-     * Creates a column for group color bars.
-     */
+    /// Creates a column for group color bars.
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
@@ -205,9 +199,7 @@ public class MainTableColumnFactory {
         return column;
     }
 
-    /**
-     * Creates a column for group icons
-     */
+    /// Creates a column for group icons
     private TableColumn<BibEntryTableViewModel, ?> createGroupIconColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLUMN.getGraphicNode();
@@ -283,39 +275,29 @@ public class MainTableColumnFactory {
         return new Pane();
     }
 
-    /**
-     * Creates a text column to display any standard field.
-     */
+    /// Creates a text column to display any standard field.
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel, MainTableTooltip tooltip) {
         return new FieldColumn(columnModel, tooltip);
     }
 
-    /**
-     * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
-     */
+    /// Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
         return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
     }
 
-    /**
-     * Creates a column that displays a {@link SpecialField}
-     */
+    /// Creates a column that displays a {@link SpecialField}
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
         return new SpecialFieldColumn(columnModel, preferences, undoManager);
     }
 
-    /**
-     * Creates a column for fields with content selectors.
-     */
+    /// Creates a column for fields with content selectors.
     private TableColumn<BibEntryTableViewModel, ?> createContentSelectorColumn(MainTableColumnModel columnModel,
                                                                                List<String> values) {
         return new ContentSelectorColumn(columnModel, values, undoManager);
     }
 
-    /**
-     * Creates a column for all the linked files. Instead of creating a column for a single file type, like {@link
-     * #createExtraFileColumn(MainTableColumnModel)} createExtraFileColumn} does, this creates one single column collecting all file links.
-     */
+    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like {@link
+    /// #createExtraFileColumn(MainTableColumnModel)} createExtraFileColumn} does, this creates one single column collecting all file links.
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,
@@ -324,9 +306,7 @@ public class MainTableColumnFactory {
                 taskExecutor);
     }
 
-    /**
-     * Creates a column for all the linked files of a single file type.
-     */
+    /// Creates a column for all the linked files of a single file type.
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,
@@ -336,9 +316,7 @@ public class MainTableColumnFactory {
                 taskExecutor);
     }
 
-    /**
-     * Create library column containing the Filename of the library's bib file
-     */
+    /// Create library column containing the Filename of the library's bib file
     private TableColumn<BibEntryTableViewModel, String> createLibraryColumn(MainTableColumnModel columnModel) {
         return new LibraryColumn(columnModel);
     }

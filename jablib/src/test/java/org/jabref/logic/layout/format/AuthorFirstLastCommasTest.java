@@ -14,9 +14,7 @@ class AuthorFirstLastCommasTest {
 
     LayoutFormatter authorFLCFormatter = new AuthorFirstLastCommas();
 
-    /**
-     * Test method for {@link org.jabref.logic.layout.format.AuthorFirstLastCommas#format(java.lang.String)}.
-     */
+    /// Test method for {@link org.jabref.logic.layout.format.AuthorFirstLastCommas#format(java.lang.String)}.
     @ParameterizedTest
     @MethodSource("formatTests")
     void paramLayoutFormatTest(String expectedString, String inputString) {

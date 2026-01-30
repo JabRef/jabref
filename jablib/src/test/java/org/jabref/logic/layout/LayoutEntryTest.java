@@ -23,19 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-/**
- * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry. Indirectly the
- * net.sf.jabref.export.layout.Layout is tested too.
- * <p/>
- * The LayoutEntry creates a human readable String assigned with HTML formatters. To test the Highlighting Feature, an
- * instance of LayoutEntry will be instantiated via Layout and LayoutHelper. With these instance the doLayout() Method
- * is called several times for each test case. To simulate a search, a BibEntry will be created, which will be used by
- * LayoutEntry.
- * There are five test cases: - The shown result text has no words which should be highlighted. - There is one word
- * which will be highlighted ignoring case sensitivity. - There are two words which will be highlighted ignoring case
- * sensitivity. - There is one word which will be highlighted case sensitivity. - There are more words which will be
- * highlighted case sensitivity.
- */
+/// The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry. Indirectly the
+/// net.sf.jabref.export.layout.Layout is tested too.
+/// <p/>
+/// The LayoutEntry creates a human readable String assigned with HTML formatters. To test the Highlighting Feature, an
+/// instance of LayoutEntry will be instantiated via Layout and LayoutHelper. With these instance the doLayout() Method
+/// is called several times for each test case. To simulate a search, a BibEntry will be created, which will be used by
+/// LayoutEntry.
+/// There are five test cases: - The shown result text has no words which should be highlighted. - There is one word
+/// which will be highlighted ignoring case sensitivity. - There are two words which will be highlighted ignoring case
+/// sensitivity. - There is one word which will be highlighted case sensitivity. - There are more words which will be
+/// highlighted case sensitivity.
 
 class LayoutEntryTest {
 

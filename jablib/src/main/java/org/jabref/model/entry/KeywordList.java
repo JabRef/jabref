@@ -17,10 +17,8 @@ import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Represents a list of keyword chains.
- * For example, "Type > A, Type > B, Something else".
- */
+/// Represents a list of keyword chains.
+/// For example, "Type > A, Type > B, Something else".
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public class KeywordList implements Iterable<Keyword> {
 
@@ -47,13 +45,11 @@ public class KeywordList implements Iterable<Keyword> {
         this(Arrays.asList(keywordChains));
     }
 
-    /**
-     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
-     *
-     * @param keywordString a String of keywordChains
-     * @param delimiter     The delimiter used for separating the keywords
-     * @return a parsed list containing the keywordChains
-     */
+    /// Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+    ///
+    /// @param keywordString a String of keywordChains
+    /// @param delimiter     The delimiter used for separating the keywords
+    /// @return a parsed list containing the keywordChains
     public static KeywordList parse(@NonNull String keywordString, @NonNull Character delimiter) {
         if (StringUtil.isBlank(keywordString)) {
             return new KeywordList();
@@ -150,9 +146,7 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordChains.add(keyword);
     }
 
-    /**
-     * Keywords are separated by the given delimiter and an additional space, i.e. "one, two".
-     */
+    /// Keywords are separated by the given delimiter and an additional space, i.e. "one, two".
     public String getAsString(Character delimiter) {
         return keywordChains.stream().map(Keyword::toString).collect(Collectors.joining(delimiter + " "));
     }

@@ -23,9 +23,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-/**
- * Dialog for managing term list files.
- */
+/// Dialog for managing term list files.
 public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsTabViewModel> implements PreferencesTab {
     @FXML private TableView<ProtectedTermsListItemModel> filesTable;
     @FXML private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableEnabledColumn;

@@ -32,10 +32,8 @@ public class FieldRowViewModel {
     public enum Selection {
         LEFT,
         RIGHT,
-        /**
-         * When the user types something into the merged field value and neither the left nor
-         * right values match it, NONE is selected
-         */
+        /// When the user types something into the merged field value and neither the left nor
+        /// right values match it, NONE is selected
         NONE
     }
 
@@ -122,6 +120,8 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(hasEqualLeftAndRightBinding(), this::setIsFieldsMerged);
+
+        autoSelectBetterValue();
     }
 
     public void autoSelectBetterValue() {

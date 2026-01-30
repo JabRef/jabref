@@ -21,10 +21,8 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 class FulltextFetchersTest {
 
-    /**
-     * Required for testing the FulltextFetchers class.
-     * That code is not put to the FulltextFetcher class itself, because subclasses of FulltextFetcher should implement the getTrustLevel method.
-     */
+    /// Required for testing the FulltextFetchers class.
+    /// That code is not put to the FulltextFetcher class itself, because subclasses of FulltextFetcher should implement the getTrustLevel method.
     private interface FulltextFetcherWithTrustLevel extends FulltextFetcher {
         default TrustLevel getTrustLevel() {
             return TrustLevel.UNKNOWN;

@@ -8,15 +8,11 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Represents a word in a title of a bibtex entry.
- * <p>
- * A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
- */
+/// Represents a word in a title of a bibtex entry.
+///
+/// A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
 public final class Word {
-    /**
-     * Set containing common lowercase function words
-     */
+    /// Set containing common lowercase function words
     public static final Set<String> SMALLER_WORDS;
 
     public static final Set<Character> DASHES = Set.of('-', '~', '⸗', '〰', '᐀', '֊', '־', '‐', '‑', '‒',
@@ -56,16 +52,12 @@ public final class Word {
         }
     }
 
-    /**
-     * Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common function words.
-     */
+    /// Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common function words.
     public static boolean isSmallerWord(String word) {
         return SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));
     }
 
-    /**
-     * Only change letters of the word that are unprotected to upper case.
-     */
+    /// Only change letters of the word that are unprotected to upper case.
     public void toUpperCase() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
@@ -74,9 +66,7 @@ public final class Word {
         }
     }
 
-    /**
-     * Only change letters of the word that are unprotected to lower case.
-     */
+    /// Only change letters of the word that are unprotected to lower case.
     public void toLowerCase() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {

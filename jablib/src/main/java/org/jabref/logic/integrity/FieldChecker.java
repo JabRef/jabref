@@ -9,10 +9,8 @@ import org.jabref.model.util.OptionalUtil;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * This is a "proxy" to use a {@link ValueChecker} as {@link EntryChecker}.
- * The "proxy" is configured using the field to handle and the value checker to apply.
- */
+/// This is a "proxy" to use a {@link ValueChecker} as {@link EntryChecker}.
+/// The "proxy" is configured using the field to handle and the value checker to apply.
 public class FieldChecker implements EntryChecker {
     protected final Field field;
     private final ValueChecker checker;

@@ -28,13 +28,12 @@ public class ReferenceMark {
     private List<Integer> citationNumbers;
     private String uniqueId;
 
-    /**
-     * @param name Allowed formats:
-     *             Single entry: <code>JABREF_{citationKey} CID_{citationNumber} {uniqueId}</code>
-     *             Group of entries: <code>JABREF_{citationKey1} CID_{citationNumber1}, JABREF_{citationKey2} CID_{citationNumber2}, ..., JABREF_{citationKeyN} CID_{citationNumberN} {uniqueId}</code>
-     *             Disallowed: <code>JABREF_{citationKey} CID_{citationNumber}</code> (no unique ID at the end)
-     *             Disallowed: <code>JABREF_{citationKey1} CID_{citationNumber1} JABREF_{citationKey2} CID_{citationNumber2} {uniqueId}</code> (no comma between entries)
-     */
+    /// - Single entry: `JABREF_{citationKey} CID_{citationNumber} {uniqueId}`
+    /// - Group of entries: `JABREF_{citationKey1} CID_{citationNumber1}, JABREF_{citationKey2} CID_{citationNumber2}, ..., JABREF_{citationKeyN} CID_{citationNumberN} {uniqueId}`
+    /// - Disallowed: `JABREF_{citationKey} CID_{citationNumber}` (no unique ID at the end)
+    /// - Disallowed: `JABREF_{citationKey1} CID_{citationNumber1} JABREF_{citationKey2} CID_{citationNumber2} {uniqueId}` (no comma between entries)
+    ///
+    /// @param name The format
     public ReferenceMark(String name) {
         this.name = name;
         parse(name);
@@ -82,9 +81,7 @@ public class ReferenceMark {
         return name;
     }
 
-    /**
-     * The BibTeX citation keys
-     */
+    /// The BibTeX citation keys
     public List<String> getCitationKeys() {
         return citationKeys;
     }

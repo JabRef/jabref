@@ -217,9 +217,7 @@ class LocalizationConsistencyTest {
             super();
         }
 
-        /**
-         * Overriding the HashTable put() so we can check for duplicates
-         */
+        /// Overriding the HashTable put() so we can check for duplicates
         @Override
         public synchronized Object put(Object key, Object value) {
             // Have we seen this key before?

@@ -1,13 +1,7 @@
 package org.jabref.model.database.event;
 
-import org.jabref.model.entry.event.EntriesEvent;
-import org.jabref.model.groups.event.GroupUpdatedEvent;
-import org.jabref.model.metadata.event.MetaDataChangedEvent;
-
-/**
- * This event is automatically fired at the same time as {@link EntriesEvent}, {@link GroupUpdatedEvent}, or {@link MetaDataChangedEvent},
- * because all three inherit from this class.
- */
+/// This event is automatically fired at the same time as {@link org.jabref.model.entry.event.EntriesEvent}, {@link org.jabref.model.groups.event.GroupUpdatedEvent}, or {@link org.jabref.model.metadata.event.MetaDataChangedEvent},
+/// because all three inherit from this class.
 public abstract class BibDatabaseContextChangedEvent {
     // If the event has been filtered out
     private boolean filteredOut;
@@ -20,9 +14,7 @@ public abstract class BibDatabaseContextChangedEvent {
         this.filteredOut = filteredOut;
     }
 
-    /**
-     * Check if this event can be filtered out to be synchronized with a database at a later time.
-     */
+    /// Check if this event can be filtered out to be synchronized with a database at a later time.
     public boolean isFilteredOut() {
         return filteredOut;
     }

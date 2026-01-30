@@ -70,21 +70,17 @@ public class ExporterFactory {
         return new ExporterFactory(exporters);
     }
 
-    /**
-     * Get a list of all exporters.
-     *
-     * @return A list containing all exporters
-     */
+    /// Get a list of all exporters.
+    ///
+    /// @return A list containing all exporters
     public List<Exporter> getExporters() {
         return Collections.unmodifiableList(exporters);
     }
 
-    /**
-     * Look up the named exporter (case-insensitive).
-     *
-     * @param consoleName The export name given in the JabRef console help information.
-     * @return The exporter, or an empty option if no exporter with that name is registered.
-     */
+    /// Look up the named exporter (case-insensitive).
+    ///
+    /// @param consoleName The export name given in the JabRef console help information.
+    /// @return The exporter, or an empty option if no exporter with that name is registered.
     public Optional<Exporter> getExporterByName(String consoleName) {
         return exporters.stream().filter(exporter -> exporter.getId().equalsIgnoreCase(consoleName)).findFirst();
     }

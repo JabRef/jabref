@@ -7,10 +7,8 @@ import java.io.InputStream;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 
-/**
- * An input stream that keeps track of the amount of bytes already read.
- * Code based on http://stackoverflow.com/a/1339589/873661, but converted to use JavaFX properties instead of listeners
- */
+/// An input stream that keeps track of the amount of bytes already read.
+/// Code based on http://stackoverflow.com/a/1339589/873661, but converted to use JavaFX properties instead of listeners
 public class ProgressInputStream extends FilterInputStream {
 
     private final long maxNumBytes;

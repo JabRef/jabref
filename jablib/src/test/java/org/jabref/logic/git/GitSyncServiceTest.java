@@ -120,12 +120,10 @@ class GitSyncServiceTest {
             }
             """;
 
-    /**
-     * Creates a commit graph with a base commit, one modification by Alice and one modification by Bob
-     * 1. Alice commit initial → push to remote
-     * 2. Bob clone remote -> update b → push
-     * 3. Alice update a → pull
-     */
+    /// Creates a commit graph with a base commit, one modification by Alice and one modification by Bob
+    /// 1. Alice commit initial → push to remote
+    /// 2. Bob clone remote -> update b → push
+    /// 3. Alice update a → pull
     @BeforeEach
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
         SystemReader.setInstance(new NoopGitSystemReader());

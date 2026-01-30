@@ -14,14 +14,14 @@ class KeyBindingRepositoryTest {
         return Stream.of(
                 // Correctly mapped
                 Arguments.of(
-                        List.of(KeyBinding.ABBREVIATE, KeyBinding.NEW_TECHREPORT, KeyBinding.PASTE),
+                        List.of(KeyBinding.MERGE_ENTRIES, KeyBinding.NEW_TECHREPORT, KeyBinding.PASTE),
                         List.of("shortcut+1", "alt+2", "shift+3")
                 ),
 
                 // Defaults on faulty data
                 Arguments.of(
-                        List.of(KeyBinding.ABBREVIATE, KeyBinding.NEW_TECHREPORT, KeyBinding.PASTE),
-                        List.of(KeyBinding.ABBREVIATE.getDefaultKeyBinding(), KeyBinding.NEW_TECHREPORT.getDefaultKeyBinding())
+                        List.of(KeyBinding.MERGE_ENTRIES, KeyBinding.NEW_TECHREPORT, KeyBinding.PASTE),
+                        List.of(KeyBinding.MERGE_ENTRIES.getDefaultKeyBinding(), KeyBinding.NEW_TECHREPORT.getDefaultKeyBinding())
                 ));
     }
 

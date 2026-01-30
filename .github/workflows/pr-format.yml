@@ -3,7 +3,7 @@ name: Check PR Format
 on:
   # _target to run even in the case of merge conflicts
   pull_request_target:
-    types: [opened, reopened, edited]
+    types: [ opened, reopened, edited ]
 
 permissions:
   pull-requests: write

@@ -22,11 +22,9 @@ import dev.langchain4j.model.output.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Wrapper around langchain4j {@link dev.langchain4j.model.embedding.EmbeddingModel}.
- * <p>
- * This class listens to preferences changes.
- */
+/// Wrapper around langchain4j {@link dev.langchain4j.model.embedding.EmbeddingModel}.
+///
+/// This class listens to preferences changes.
 public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefEmbeddingModel.class);
 

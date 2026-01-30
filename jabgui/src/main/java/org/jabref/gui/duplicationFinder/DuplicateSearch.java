@@ -230,11 +230,9 @@ public class DuplicateSearch extends SimpleCommand {
         libraryTab.getUndoManager().addEdit(compoundEdit);
     }
 
-    /**
-     * Result of a duplicate search.
-     * Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
-     * {@link BibEntry BibEntries} are equal to each other.
-     */
+    /// Result of a duplicate search.
+    /// Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
+    /// {@link BibEntry BibEntries} are equal to each other.
     static class DuplicateSearchResult {
 
         private final Map<String, BibEntry> toRemove = new HashMap<>();

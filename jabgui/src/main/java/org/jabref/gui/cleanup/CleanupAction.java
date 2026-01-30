@@ -9,6 +9,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 
@@ -20,19 +21,22 @@ public class CleanupAction extends SimpleCommand {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
                          CliPreferences preferences,
                          DialogService dialogService,
                          StateManager stateManager,
                          TaskExecutor taskExecutor,
-                         UndoManager undoManager) {
+                         UndoManager undoManager,
+                         JournalAbbreviationRepository journalAbbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -50,7 +54,8 @@ public class CleanupAction extends SimpleCommand {
                 stateManager,
                 undoManager,
                 tabSupplier,
-                taskExecutor
+                taskExecutor,
+                journalAbbreviationRepository
         );
 
         dialogService.showCustomDialogAndWait(cleanupDialog);

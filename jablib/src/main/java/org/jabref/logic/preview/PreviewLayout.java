@@ -8,9 +8,7 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-/**
- * Used for displaying a rendered entry in the UI. Due to historical reasons, "rendering" is called "layout".
- */
+/// Used for displaying a rendered entry in the UI. Due to historical reasons, "rendering" is called "layout".
 public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePreviewLayout, TextBasedPreviewLayout {
 
     String generatePreview(BibEntry entry, BibDatabaseContext databaseContext);

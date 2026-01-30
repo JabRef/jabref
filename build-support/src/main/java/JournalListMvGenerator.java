@@ -1,4 +1,4 @@
-//JAVA 24+
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.h2database:h2:2.4.240
@@ -48,7 +48,7 @@ public class JournalListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalListMvGenerator.class);
 
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
         Path abbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", "journals");
