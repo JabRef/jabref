@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 /// Each window can have at most one WalkthroughPane instance.
 ///
 /// @implNote This pane is created since [impl.org.controlsfx.skin.DecorationPane] from
- /// ControlsFX also modifies the scene root, which can lead to issues with overlapping,
- /// never-removed Walkthrough effects. To prevent this, we use a dedicated pane that can
- /// be identified as part of the walkthrough system.
+/// ControlsFX also modifies the scene root, which can lead to issues with overlapping,
+/// never-removed Walkthrough effects. To prevent this, we use a dedicated pane that can
+/// be identified as part of the walkthrough system.
 public class WalkthroughPane extends StackPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughPane.class);
     /// Mutable map of all the instances created. Not thread-safe because the entire

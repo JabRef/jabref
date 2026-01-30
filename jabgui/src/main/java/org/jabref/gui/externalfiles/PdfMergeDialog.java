@@ -27,9 +27,9 @@ public class PdfMergeDialog {
     /// and gives user a choice between field values.
     ///
     /// @param entry        the entry to merge with
-     /// @param filePath     the path to the PDF file. This PDF is used as the source for the {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s.
-     /// @param preferences  the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
-     /// @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
+    /// @param filePath     the path to the PDF file. This PDF is used as the source for the {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s.
+    /// @param preferences  the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
+    /// @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
 

@@ -21,7 +21,7 @@ public interface WindowResolver {
     /// Creates a resolver that finds a window by its title.
     ///
     /// @param key the language key of the window title
-     /// @return a resolver that finds the window by title
+    /// @return a resolver that finds the window by title
     static WindowResolver title(@NonNull String key) {
         return () -> Window.getWindows().stream()
                            .filter(Window::isShowing)
@@ -35,7 +35,7 @@ public interface WindowResolver {
     /// Creates a resolver that finds a window that's not the window specified.
     ///
     /// @param window the window to exclude from the search. Usually this is the current window.
-     /// @return a resolver that finds any window except the specified one
+    /// @return a resolver that finds any window except the specified one
     static WindowResolver not(Window window) {
         return () -> {
             List<Window> windows = Window.getWindows()
@@ -54,7 +54,7 @@ public interface WindowResolver {
     /// Create a resolver that finds a window by its class.
     ///
     /// @param clazz the class of the window
-     /// @return a resolver that finds the window by class
+    /// @return a resolver that finds the window by class
     static WindowResolver clazz(@NonNull Class<? extends Window> clazz) {
         return () -> Window.getWindows().stream()
                            .filter(clazz::isInstance)

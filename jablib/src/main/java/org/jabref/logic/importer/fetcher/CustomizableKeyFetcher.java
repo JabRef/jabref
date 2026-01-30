@@ -11,7 +11,7 @@ public interface CustomizableKeyFetcher extends WebFetcher {
     /// Returns whether the API key is valid
     ///
     /// @param apiKey API key to check
-     /// @return true if key is valid, false otherwise
+    /// @return true if key is valid, false otherwise
     default boolean isValidKey(String apiKey) {
         return true;
     }

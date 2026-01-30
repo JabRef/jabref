@@ -251,7 +251,7 @@ public class LinkedFileHandler {
     /// Uses the provided file extension.
     ///
     /// @param extension The extension of the file.
-     /// @return the suggested filename, including extension
+    /// @return the suggested filename, including extension
     public String getSuggestedFileName(@NonNull String extension) {
         assert !StringUtil.isBlank(extension);
         String filename = linkedFile.getFileName().orElse("file");

@@ -44,7 +44,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     /// Constructing the url for the searchpage.
     ///
     /// @param queryNode the first query node
-     /// @return query URL
+    /// @return query URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);

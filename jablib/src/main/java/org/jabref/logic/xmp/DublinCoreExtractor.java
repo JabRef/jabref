@@ -48,7 +48,7 @@ public class DublinCoreExtractor {
     private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
     /// @param dcSchema      Metadata in DublinCore format.
-     /// @param resolvedEntry The BibEntry object, which is filled during metadata extraction.
+    /// @param resolvedEntry The BibEntry object, which is filled during metadata extraction.
     public DublinCoreExtractor(DublinCoreSchema dcSchema, XmpPreferences xmpPreferences, BibEntry resolvedEntry) {
         this.dcSchema = dcSchema;
         this.xmpPreferences = xmpPreferences;

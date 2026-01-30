@@ -52,8 +52,8 @@ public abstract class Importer implements Comparable<Importer> {
     /// Check whether the source is in the correct format for this importer.
     ///
     /// @param filePath the path of the file to check
-     /// @return true, if the file is in a recognized format
-     /// @throws IOException Signals that an I/O exception has occurred.
+    /// @return true, if the file is in a recognized format
+    /// @throws IOException Signals that an I/O exception has occurred.
     public boolean isRecognizedFormat(Path filePath) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath)) {
             // We call the method where no reset is required
@@ -64,8 +64,8 @@ public abstract class Importer implements Comparable<Importer> {
     /// Check whether the source is in the correct format for this importer.
     ///
     /// @param data the data to check
-     /// @return true, if the data is in a recognized format
-     /// @throws IOException Signals that an I/O exception has occurred.
+    /// @return true, if the data is in a recognized format
+    /// @throws IOException Signals that an I/O exception has occurred.
     public boolean isRecognizedFormat(String data) throws IOException {
         try (Reader reader = Reader.of(data);
              BufferedReader bufferedReader = new BufferedReader(reader)) {
@@ -146,8 +146,8 @@ public abstract class Importer implements Comparable<Importer> {
     /// the encoding and then call {@link #importDatabase(BufferedReader)}.
     ///
     /// @param data the string which should be imported
-     /// @return the parsed result
-     /// @throws IOException Signals that an I/O exception has occurred.
+    /// @return the parsed result
+    /// @throws IOException Signals that an I/O exception has occurred.
     public ParserResult importDatabase(String data) throws IOException {
         try (Reader reader = Reader.of(data);
              BufferedReader bufferedReader = new BufferedReader(reader)) {

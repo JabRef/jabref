@@ -16,7 +16,7 @@ public enum OODataModel {
     JabRef60;
 
     /// @param pageInfo Nullable.
-     /// @return JabRef60 style pageInfo list with pageInfo in the last slot.
+    /// @return JabRef60 style pageInfo list with pageInfo in the last slot.
     public static List<Optional<OOText>> fakePageInfos(String pageInfo, int nCitations) {
         List<Optional<OOText>> pageInfos = new ArrayList<>(nCitations);
         for (int i = 0; i < nCitations; i++) {

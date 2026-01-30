@@ -78,7 +78,7 @@ public class ZipFileChooser extends BaseDialog<Path> {
     /// Entries that can be selected with this dialog.
     ///
     /// @param zipFile ZIP-File
-     /// @return entries that can be selected
+    /// @return entries that can be selected
     private static ObservableList<Path> getSelectableZipEntries(FileSystem zipFile) throws IOException {
         Path rootDir = zipFile.getRootDirectories().iterator().next();
 

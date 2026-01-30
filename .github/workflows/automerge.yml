@@ -11,8 +11,8 @@ jobs:
     if: github.repository == 'JabRef/jabref'
     env:
       HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-      USER: ${{ github.event.pull_request.user.login }}
-      TITLE: ${{ github.event.pull_request.title }}
+      USER:      ${{ github.event.pull_request.user.login }}
+      TITLE:     ${{ github.event.pull_request.title }}
     steps:
       - name: Determine if job should run
         id: shouldrun

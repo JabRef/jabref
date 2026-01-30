@@ -26,8 +26,8 @@ public class DatabaseChangeList {
     /// Compares the given two databases, and returns the list of changes required to change the `originalDatabase` into the `otherDatabase`
     ///
     /// @param originalDatabase This is the original database
-     /// @param otherDatabase    This is the other database.
-     /// @return an unmodifiable list of `DatabaseChange` required to change `originalDatabase` into `otherDatabase`
+    /// @param otherDatabase    This is the other database.
+    /// @return an unmodifiable list of `DatabaseChange` required to change `originalDatabase` into `otherDatabase`
     public static List<DatabaseChange> compareAndGetChanges(BibDatabaseContext originalDatabase, BibDatabaseContext otherDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
         List<DatabaseChange> changes = new ArrayList<>();
 

@@ -131,7 +131,7 @@ public class AuthorListParser {
     /// Parses the String containing person names and returns a list of person information.
     ///
     /// @param listOfNames the String containing the person names to be parsed
-     /// @return a parsed list of persons
+    /// @return a parsed list of persons
     public AuthorList parse(@NonNull String listOfNames) {
         SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);
         listOfNames = simpleNormalForm.authors;
@@ -398,10 +398,10 @@ public class AuthorListParser {
     /// in 'tokens'. Callers always ensure that start < end; thus, there exists at least one token to be concatenated.
     ///
     /// @param start    index of the first token to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
-     /// @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
-     /// @param offset   offset within token group (used to request concatenation of either full tokens or abbreviation).
-     /// @param dotAfter `true`` -- add period after each token, `false` do not add.
-     /// @return the result of concatenation.
+    /// @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
+    /// @param offset   offset within token group (used to request concatenation of either full tokens or abbreviation).
+    /// @param dotAfter `true`` -- add period after each token, `false` do not add.
+    /// @return the result of concatenation.
     private String concatTokens(List<Object> tokens, int start, int end, int offset, boolean dotAfter) {
         StringBuilder result = new StringBuilder();
         // Here we always have start < end
@@ -438,11 +438,11 @@ public class AuthorListParser {
     /// upper-case and <CODE>false</CODE> if token is lower-case.
     ///
     /// @return <CODE>Token.EOF</CODE> -- no more tokens, <CODE>Token.COMMA</CODE> --
-     /// token is comma, <CODE>Token.AND</CODE> -- token is the word "and" (or "And", or "aND", etc.) or a semicolon,
-     /// <CODE>Token.WORD</CODE> -- token is a word; additional information is given in global variables
-     /// <CODE>token_start</CODE>, <CODE>token_end</CODE>,
-     /// <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
-     /// <CODE>token_case</CODE>.
+    /// token is comma, <CODE>Token.AND</CODE> -- token is the word "and" (or "And", or "aND", etc.) or a semicolon,
+    /// <CODE>Token.WORD</CODE> -- token is a word; additional information is given in global variables
+    /// <CODE>token_start</CODE>, <CODE>token_end</CODE>,
+    /// <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
+    /// <CODE>token_case</CODE>.
     private Token getToken() {
         tokenStart = tokenEnd;
         while (tokenStart < original.length()) {

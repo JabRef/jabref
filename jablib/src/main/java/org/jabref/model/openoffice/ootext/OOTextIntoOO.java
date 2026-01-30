@@ -125,7 +125,7 @@ public class OOTextIntoOO {
     /// - The user can format citation marks (it is enough to format their start) and the properties not (everywhere) dictated by the style are preserved (where they are not).
     ///
     /// @param position The cursor giving the insert location. Not modified.
-     /// @param ootext   The marked-up text to insert.
+    /// @param ootext   The marked-up text to insert.
     public static void write(@NonNull XTextDocument doc,
                              @NonNull XTextCursor position,
                              @NonNull OOText ootext)

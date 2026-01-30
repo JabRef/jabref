@@ -33,7 +33,7 @@ public enum BibDatabaseMode {
     /// {@link IllegalArgumentException} will be thrown.
     ///
     /// @return BIBTEX, if the string is bibtex<br>
-     /// BIBLATEX, if the string is biblatex<br>
+    /// BIBLATEX, if the string is biblatex<br>
     public static BibDatabaseMode parse(String data) {
         return BibDatabaseMode.valueOf(data.toUpperCase(Locale.ENGLISH));
     }

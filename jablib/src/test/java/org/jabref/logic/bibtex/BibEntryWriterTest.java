@@ -383,7 +383,7 @@ class BibEntryWriterTest {
     @Test
     void entryTypeChange() throws Exception {
         String expected = """
-                
+
                 @Article{test,
                   author       = {BlaBla},
                   journal      = {International Journal of Something},
@@ -612,7 +612,7 @@ class BibEntryWriterTest {
     @Test
     void addFieldWithLongerLength() throws Exception {
         String bibtexEntry = """
-                
+
                 @Article{test,
                   author =  {BlaBla},
                   journal = {International Journal of Something},

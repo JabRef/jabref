@@ -604,7 +604,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     /// Checks if the given TextField is the first field in the currently selected tab.
     ///
     /// @param node the Node to check
-     /// @return true if this is the first field in the current tab, false otherwise
+    /// @return true if this is the first field in the current tab, false otherwise
     boolean isFirstFieldInCurrentTab(Node node) {
         if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
             return false;
@@ -641,7 +641,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     /// Checks if the given TextField is the last field in the currently selected tab.
     ///
     /// @param node the Node to check
-     /// @return true if this is the last field in the current tab, false otherwise
+    /// @return true if this is the last field in the current tab, false otherwise
     boolean isLastFieldInCurrentTab(Node node) {
         if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
             return false;

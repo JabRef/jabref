@@ -14,13 +14,13 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
     /// @param queryNode  first search node
-     /// @param pageNumber requested site number indexed from 0
-     /// @return Page with search results
+    /// @param pageNumber requested site number indexed from 0
+    /// @return Page with search results
     Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException;
 
     /// @param searchQuery query string that can be parsed into a lucene query
-     /// @param pageNumber  requested site number indexed from 0
-     /// @return Page with search results
+    /// @param pageNumber  requested site number indexed from 0
+    /// @return Page with search results
     default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, List.of());
@@ -42,7 +42,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     /// This method is used to send complex queries using fielded search.
     ///
     /// @param queryNode the first search node
-     /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
     @Override
     default List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         return new ArrayList<>(performSearchPaged(queryNode, 0).getContent());

@@ -22,7 +22,7 @@ public class ShortDOIService {
     /// Obtains shortened DOI name for given DOI
     ///
     /// @param doi DOI
-     /// @return A shortened DOI name
+    /// @return A shortened DOI name
     public DOI getShortDOI(DOI doi) throws ShortDOIServiceException {
         JSONObject responseJSON = makeRequest(doi);
         String shortDoi = responseJSON.getString("ShortDOI");

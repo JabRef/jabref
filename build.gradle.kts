@@ -10,29 +10,15 @@ plugins {
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
 dependencies {
-    rewrite(
-        platform(
-            "org.openrewrite.recipe:rewrite-recipe-bom:3.23.0"
-        )
-    )
-    rewrite(
-        "org.openrewrite.recipe:rewrite-static-analysis"
-    )
-    rewrite(
-        "org.openrewrite.recipe:rewrite-logging-frameworks"
-    )
-    rewrite(
-        "org.openrewrite.recipe:rewrite-testing-frameworks"
-    )
-    rewrite(
-        "org.openrewrite.recipe:rewrite-migrate-java"
-    )
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.23.0"))
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
 }
 
 rewrite {
-    activeRecipe(
-        "org.jabref.config.rewrite.cleanup"
-    )
+    activeRecipe("org.jabref.config.rewrite.cleanup")
     exclusion(
         "settings.gradle",
         "**/generated/sources/**",
@@ -45,11 +31,8 @@ rewrite {
         "**/*.xml",
         "**/*.yml"
     )
-    plainTextMask(
-        "**/*.md"
-    )
-    failOnDryRunResults =
-        true
+    plainTextMask("**/*.md")
+    failOnDryRunResults = true
 }
 
 requirementTracing {
@@ -72,24 +55,16 @@ requirementTracing {
 }
 
 // TODO: "run" should run the GUI, not all modules
-tasks.register(
-    "run"
-) {
-    group =
-        "application"
-    description =
-        "Runs the GUI"
-    dependsOn(
-        ":jabgui:run"
-    )
+tasks.register("run") {
+    group = "application"
+    description = "Runs the GUI"
+    dependsOn(":jabgui:run")
 }
 
 allprojects {
     tasks.cyclonedxDirectBom {
         includeConfigs =
-            listOf(
-                "runtimeClasspath"
-            )
+            listOf("runtimeClasspath")
         skipConfigs =
             listOf(
                 "testRuntimeClasspath",
@@ -104,12 +79,8 @@ allprojects {
 
 tasks.cyclonedxBom {
     // Aggregated SBOM configuration
-    projectType =
-        org.cyclonedx.model.Component.Type.APPLICATION
-    includeBuildSystem =
-        true
-    componentVersion =
-        project.version.toString()
-    componentGroup =
-        "org.jabref"
+    projectType = org.cyclonedx.model.Component.Type.APPLICATION
+    includeBuildSystem = true
+    componentVersion = project.version.toString()
+    componentGroup = "org.jabref"
 }

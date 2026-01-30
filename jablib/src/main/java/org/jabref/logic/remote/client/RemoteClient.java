@@ -49,7 +49,7 @@ public class RemoteClient {
     /// Attempt to send command line arguments to already running JabRef instance.
     ///
     /// @param args command line arguments.
-     /// @return true if successful, false otherwise.
+    /// @return true if successful, false otherwise.
     public boolean sendCommandLineArguments(String[] args) {
         try (Protocol protocol = openNewConnection()) {
             protocol.sendMessage(RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS, args);

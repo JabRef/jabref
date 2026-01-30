@@ -95,7 +95,7 @@ public class MsBibImporter extends Importer {
     /// XML then returns original builder given and logs error.
     ///
     /// @param dBuild | DocumentBuilderFactory to be made XXE safe.
-     /// @return If supported, XXE safe DocumentBuilderFactory. Else, returns original builder given
+    /// @return If supported, XXE safe DocumentBuilderFactory. Else, returns original builder given
     private static DocumentBuilderFactory makeSafeDocBuilderFactory(DocumentBuilderFactory dBuild) {
         String feature = null;
 

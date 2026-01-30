@@ -37,21 +37,21 @@ public class UnoSelection {
     }
 
     /// @return may be Optional.empty(), or some type supporting XServiceInfo
-     /// So far it seems the first thing we have to do with a selection is to decide what do we have.
-     ///
-     /// One way to do that is accessing its XServiceInfo interface.
-     ///
-     /// Experiments using printServiceInfo with cursor in various positions in the document:
-     ///
-     /// With cursor within the frame, in text: *** xserviceinfo.getImplementationName: "SwXTextRanges" "com.sun.star.text.TextRanges"
-     ///
-     /// With cursor somewhere else in text: *** xserviceinfo.getImplementationName: "SwXTextRanges" "com.sun.star.text.TextRanges"
-     ///
-     /// With cursor in comment (also known as "annotation"): *** XSelectionSupplier is OK *** Object initialSelection is null *** xserviceinfo is null
-     ///
-     /// With frame selected: *** xserviceinfo.getImplementationName: "SwXTextFrame" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextFrame" "com.sun.star.text.Text"
-     ///
-     /// With cursor selecting an inserted image: *** XSelectionSupplier is OK *** Object initialSelection is OK *** xserviceinfo is OK *** xserviceinfo.getImplementationName: "SwXTextGraphicObject" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextGraphicObject"
+    /// So far it seems the first thing we have to do with a selection is to decide what do we have.
+    ///
+    /// One way to do that is accessing its XServiceInfo interface.
+    ///
+    /// Experiments using printServiceInfo with cursor in various positions in the document:
+    ///
+    /// With cursor within the frame, in text: *** xserviceinfo.getImplementationName: "SwXTextRanges" "com.sun.star.text.TextRanges"
+    ///
+    /// With cursor somewhere else in text: *** xserviceinfo.getImplementationName: "SwXTextRanges" "com.sun.star.text.TextRanges"
+    ///
+    /// With cursor in comment (also known as "annotation"): *** XSelectionSupplier is OK *** Object initialSelection is null *** xserviceinfo is null
+    ///
+    /// With frame selected: *** xserviceinfo.getImplementationName: "SwXTextFrame" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextFrame" "com.sun.star.text.Text"
+    ///
+    /// With cursor selecting an inserted image: *** XSelectionSupplier is OK *** Object initialSelection is OK *** xserviceinfo is OK *** xserviceinfo.getImplementationName: "SwXTextGraphicObject" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextGraphicObject"
     public static Optional<XServiceInfo> getSelectionAsXServiceInfo(@NonNull XTextDocument doc) {
         Optional<XSelectionSupplier> supplier = getSelectionSupplier(doc);
         if (supplier.isEmpty()) {

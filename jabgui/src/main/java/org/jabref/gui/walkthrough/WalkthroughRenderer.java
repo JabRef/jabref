@@ -26,9 +26,9 @@ public class WalkthroughRenderer {
     /// Renders a tooltip step into a JavaFX node.
     ///
     /// @param step           The tooltip step to render
-     /// @param walkthrough    The walkthrough context for navigation
-     /// @param beforeNavigate Runnable to execute before any navigation action
-     /// @return The rendered tooltip content node
+    /// @param walkthrough    The walkthrough context for navigation
+    /// @param beforeNavigate Runnable to execute before any navigation action
+    /// @return The rendered tooltip content node
     public Node render(TooltipStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
         VBox tooltip = new VBox();
         tooltip.getStyleClass().addAll("root", "walkthrough-tooltip-content-container");
@@ -57,9 +57,9 @@ public class WalkthroughRenderer {
     /// Renders a panel step into a JavaFX node.
     ///
     /// @param step           The panel step to render
-     /// @param walkthrough    The walkthrough context for navigation
-     /// @param beforeNavigate Runnable to execute before any navigation action
-     /// @return The rendered panel node
+    /// @param walkthrough    The walkthrough context for navigation
+    /// @param beforeNavigate Runnable to execute before any navigation action
+    /// @return The rendered panel node
     public Node render(PanelStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
         VBox panel = makePanel();
         configurePanelSize(panel, step);

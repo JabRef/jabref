@@ -408,7 +408,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     /// and then proceeds accordingly.
     ///
     /// @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
-     /// successfully, does not exist in the first place, or the user choose to remove it)
+    /// successfully, does not exist in the first place, or the user choose to remove it)
     public boolean delete() {
         DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this));
         deleteFileAction.execute();

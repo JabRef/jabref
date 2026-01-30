@@ -72,9 +72,9 @@ public class StudyRepository {
     /// Creates a study repository.
     ///
     /// @param pathToRepository Where the repository root is located.
-     /// @param gitHandler       The git handler that manages any interaction with the remote repository
-     /// @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not contain the study definition file.
-     /// @throws IOException              Thrown if the given repository does not exist, or the study definition file does not exist
+    /// @param gitHandler       The git handler that manages any interaction with the remote repository
+    /// @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not contain the study definition file.
+    /// @throws IOException              Thrown if the given repository does not exist, or the study definition file does not exist
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
                            CliPreferences preferences,
@@ -159,7 +159,7 @@ public class StudyRepository {
     /// The study definition file contains all the definitions of a study. This method extracts this study from the yaml study definition file
     ///
     /// @return Returns the BibEntries parsed from the study definition file.
-     /// @throws IOException Problem opening the input stream.
+    /// @throws IOException Problem opening the input stream.
     private Study parseStudyFile() throws IOException {
         return new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);
     }
@@ -177,7 +177,7 @@ public class StudyRepository {
     /// Extracts all active fetchers from the library entries.
     ///
     /// @return List of BibEntries of type Library
-     /// @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
+    /// @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
     public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
         return study.getDatabases()
                     .parallelStream()
@@ -328,7 +328,7 @@ public class StudyRepository {
     /// Note that this method might be similar to {@link org.jabref.logic.util.io.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
     ///
     /// @param query that is trimmed and combined with its query id
-     /// @return a unique folder name for any query.
+    /// @return a unique folder name for any query.
     private String trimNameAndAddID(String query) {
         // Replace all field: with field= for folder name
         String trimmedNamed = MATCH_COLON.matcher(query).replaceAll("=");

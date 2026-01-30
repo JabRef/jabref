@@ -30,7 +30,7 @@ public class UTF8Checker implements EntryChecker {
     /// Detect any non UTF-8 encoded field
     ///
     /// @param entry the BibEntry of BibLatex.
-     /// @return return the warning of UTF-8 check for BibLatex.
+    /// @return return the warning of UTF-8 check for BibLatex.
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
@@ -49,7 +49,7 @@ public class UTF8Checker implements EntryChecker {
     /// Use java api decoder and try&catch block to check the charset.
     ///
     /// @param data the byte array used to check the encoding charset
-     /// @return true if is encoded in UTF-8 and false is not encoded in UTF-8
+    /// @return true if is encoded in UTF-8 and false is not encoded in UTF-8
     public static boolean UTF8EncodingChecker(byte[] data) {
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
         try {

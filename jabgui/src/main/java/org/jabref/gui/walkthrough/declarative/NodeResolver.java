@@ -30,14 +30,14 @@ public interface NodeResolver {
     /// Resolves a node from the given scene.
     ///
     /// @param scene the scene to search in
-     /// @return an optional containing the found node, or empty if not found
+    /// @return an optional containing the found node, or empty if not found
     Optional<Node> resolve(@NonNull Scene scene);
 
     /// Creates a resolver that finds a node by CSS selector. The returned node is
     /// guaranteed to be visible.
     ///
     /// @param selector the CSS selector to find the node
-     /// @return a resolver that finds the node by selector
+    /// @return a resolver that finds the node by selector
     static NodeResolver selector(@NonNull String selector) {
         return scene -> scene.getRoot().lookupAll(selector).stream().filter(NodeResolver::isVisible).findFirst();
     }
@@ -46,7 +46,7 @@ public interface NodeResolver {
     /// guaranteed to be visible.
     ///
     /// @param fxId the fx:id of the node
-     /// @return a resolver that finds the node by fx:id
+    /// @return a resolver that finds the node by fx:id
     static NodeResolver fxId(@NonNull String fxId) {
         return selector("#" + fxId);
     }
@@ -55,7 +55,7 @@ public interface NodeResolver {
     /// guaranteed to be visible.
     ///
     /// @param glyph the graphic of the button
-     /// @return a resolver that finds the button by graphic
+    /// @return a resolver that finds the button by graphic
     static NodeResolver buttonWithGraphic(IconTheme.JabRefIcons glyph) {
         return scene -> Streams
                 // .icon-button, .button selector is not used, because lookupAll doesn't support multiple selectors
@@ -76,7 +76,7 @@ public interface NodeResolver {
     /// guaranteed to be visible.
     ///
     /// @param predicate the predicate to match the node
-     /// @return a resolver that finds the node matching the predicate
+    /// @return a resolver that finds the node matching the predicate
     static NodeResolver predicate(@NonNull Predicate<Node> predicate) {
         return scene -> Optional.ofNullable(findNode(scene.getRoot(),
                 node -> NodeResolver.isVisible(node) && predicate.test(node)));
@@ -87,7 +87,7 @@ public interface NodeResolver {
     /// be visible.
     ///
     /// @param action the StandardAction associated with the button
-     /// @return a resolver that finds the button by action
+    /// @return a resolver that finds the button by action
     static NodeResolver action(@NonNull StandardActions action) {
         return scene -> Optional.ofNullable(findNode(scene.getRoot(), node -> {
             if (!(node instanceof ButtonBase button) || !NodeResolver.isVisible(button)) {
@@ -120,7 +120,7 @@ public interface NodeResolver {
     /// resolved is a [javafx.scene.control.DialogPane].
     ///
     /// @param buttonType the button type to find
-     /// @return a resolver that finds the button by button type
+    /// @return a resolver that finds the button by button type
     static NodeResolver buttonType(@NonNull ButtonType buttonType) {
         return scene -> predicate(DialogPane.class::isInstance)
                 .resolve(scene)
@@ -132,8 +132,8 @@ public interface NodeResolver {
     /// guaranteed to be visible.
     ///
     /// @param selector    the style class to match
-     /// @param textMatcher predicate to match text content in LabeledText children
-     /// @return a resolver that finds the node by style class and text content
+    /// @param textMatcher predicate to match text content in LabeledText children
+    /// @return a resolver that finds the node by style class and text content
     static NodeResolver selectorWithText(@NonNull String selector, @NonNull Predicate<String> textMatcher) {
         return scene -> scene
                 .getRoot()
@@ -153,7 +153,7 @@ public interface NodeResolver {
     /// Creates a resolver that finds a menu item by its language key.
     ///
     /// @param key the language key of the menu item
-     /// @return a resolver that finds the menu item by language key
+    /// @return a resolver that finds the menu item by language key
     static NodeResolver menuItem(@NonNull String key) {
         return scene -> {
             if (!(scene.getWindow() instanceof ContextMenu menu)) {

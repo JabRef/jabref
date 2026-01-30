@@ -74,7 +74,7 @@ public class AstrophysicsDataSystem
     }
 
     /// @param queryList the list that contains the parsed nodes
-     /// @return URL which points to a search request for given query
+    /// @return URL which points to a search request for given query
     @Override
     public URL getURLForQuery(BaseQueryNode queryList, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
@@ -87,7 +87,7 @@ public class AstrophysicsDataSystem
     }
 
     /// @param entry BibEntry for which a search URL is created
-     /// @return URL which points to a search request for given entry
+    /// @return URL which points to a search request for given entry
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -112,7 +112,7 @@ public class AstrophysicsDataSystem
     }
 
     /// @param identifier bibcode or doi for which a search URL is created
-     /// @return URL which points to a search URL for given identifier
+    /// @return URL which points to a search URL for given identifier
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
@@ -170,7 +170,7 @@ public class AstrophysicsDataSystem
     }
 
     /// @param url search ul for which bibcode will be returned
-     /// @return list of bibcodes matching the search request. May be empty
+    /// @return list of bibcodes matching the search request. May be empty
     private List<String> fetchBibcodes(URL url) throws FetcherException {
         try {
             URLDownload download = getUrlDownload(url);
@@ -215,7 +215,7 @@ public class AstrophysicsDataSystem
     }
 
     /// @param identifiers bibcodes for which bibentries should be fetched
-     /// @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
+    /// @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());
         if (ids.isEmpty()) {

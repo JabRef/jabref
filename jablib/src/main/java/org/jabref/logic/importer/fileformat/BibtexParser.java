@@ -863,7 +863,7 @@ public class BibtexParser implements Parser {
     /// Tries to restore the key
     ///
     /// @return rest of key on success, otherwise empty string
-     /// @throws IOException on Reader-Error
+    /// @throws IOException on Reader-Error
     private String fixKey() throws IOException {
         StringBuilder key = new StringBuilder();
         int lookaheadUsed = 0;

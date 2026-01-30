@@ -216,7 +216,7 @@ public abstract class BackgroundTask<V> {
     /// Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
     ///
     /// @param nextTaskFactory the function that creates the new task
-     /// @param <T>             type of the return value of the second task
+    /// @param <T>             type of the return value of the second task
     public <T> BackgroundTask<T> then(Function<V, BackgroundTask<T>> nextTaskFactory) {
         return new BackgroundTask<>() {
             @Override
@@ -232,7 +232,7 @@ public abstract class BackgroundTask<V> {
     /// Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
     ///
     /// @param nextOperation the function that performs the next operation
-     /// @param <T>           type of the return value of the second task
+    /// @param <T>           type of the return value of the second task
     public <T> BackgroundTask<T> thenRun(Function<V, T> nextOperation) {
         return new BackgroundTask<>() {
             @Override

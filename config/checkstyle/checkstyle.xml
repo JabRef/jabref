@@ -4,62 +4,40 @@
         "http://www.checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-    <property
-            name="charset"
-            value="UTF-8"/>
+    <property name="charset" value="UTF-8"/>
 
     <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="[/\\]\.idea[/\\]"/>
+        <property name="fileNamePattern" value="[/\\]\.idea[/\\]" />
     </module>
     <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="[/\\]\.jbang[/\\]"/>
+        <property name="fileNamePattern" value="[/\\]\.jbang[/\\]" />
     </module>
     <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="[/\\]build-support[/\\]"/>
+        <property name="fileNamePattern" value="[/\\]build-support[/\\]" />
     </module>
     <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="[/\\]generated(-sources|-src)?[/\\]"/>
+        <property name="fileNamePattern" value="[/\\]generated(-sources|-src)?[/\\]" />
     </module>
     <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="[/\\]jablib-examples[/\\]"/>
+        <property name="fileNamePattern" value="[/\\]jablib-examples[/\\]" />
     </module>
     <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="[/\\]src-gen[/\\]"/>
+        <property name="fileNamePattern" value="[/\\]src-gen[/\\]" />
     </module>
     <module name="BeforeExecutionExclusionFileFilter">
         <!-- We ignore this file because it's a modification of the original java code https://github.com/openjdk/jfx/blob/jfx15/modules/javafx.controls/src/main/java/javafx/scene/control/skin/TitledPaneSkin.java -->
-        <property
-                name="fileNamePattern"
-                value="CustomTitledPaneSkin\.java$"/>
+        <property name="fileNamePattern" value="CustomTitledPaneSkin\.java$" />
     </module>
     <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="module\-info\.java$"/>
+        <property name="fileNamePattern" value="module\-info\.java$"/>
     </module>
 
     <module name="SuppressionFilter">
-        <property
-                name="file"
-                value="${config_loc}/suppressions.xml"/>
+        <property name="file" value="${config_loc}/suppressions.xml"/>
     </module>
 
     <module name="Header">
-        <property
-                name="header"
-                value=""/>
+        <property name="header" value=""/>
     </module>
 
     <module name="FileTabCharacter"/>
@@ -67,55 +45,29 @@
 
     <!-- Prevent empty start and end of blocks - source: comments to https://stackoverflow.com/a/48027770/873282 -->
     <module name="RegexpMultiline">
-        <property
-                name="message"
-                value="Blank line at start of block should be removed"/>
-        <property
-                name="format"
-                value="(\(.*\)|else)\s*\{\s*[\r]?\n\s*[\r]?\n"/>
-        <property
-                name="fileExtensions"
-                value="groovy,java"/>
+        <property name="message" value="Blank line at start of block should be removed" />
+        <property name="format" value="(\(.*\)|else)\s*\{\s*[\r]?\n\s*[\r]?\n" />
+        <property name="fileExtensions" value="groovy,java" />
     </module>
     <module name="RegexpMultiline">
-        <property
-                name="message"
-                value="Blank line at end of block should be removed"/>
-        <property
-                name="format"
-                value="[\r]?\n\s*[\r]?\n\s*\}"/>
-        <property
-                name="fileExtensions"
-                value="groovy,java"/>
+        <property name="message" value="Blank line at end of block should be removed" />
+        <property name="format" value="[\r]?\n\s*[\r]?\n\s*\}" />
+        <property name="fileExtensions" value="groovy,java" />
     </module>
 
     <!-- Prevent newline after catch opening parenthesis -->
     <module name="RegexpMultiline">
-        <property
-                name="message"
-                value="No newline allowed after catch opening parenthesis"/>
-        <property
-                name="format"
-                value="catch\s*\(\s*[\r]?\n"/>
-        <property
-                name="fileExtensions"
-                value="groovy,java"/>
+        <property name="message" value="No newline allowed after catch opening parenthesis" />
+        <property name="format" value="catch\s*\(\s*[\r]?\n" />
+        <property name="fileExtensions" value="groovy,java" />
     </module>
 
     <!-- Prevent multiple closing curly braces in the same line -->
     <module name="RegexpSingleline">
-        <property
-                name="id"
-                value="NoMultipleClosingBracesAtEndOfLine"/>
-        <property
-                name="message"
-                value="Multiple closing curly braces in the same line are not allowed"/>
-        <property
-                name="format"
-                value="\}\s*\}\s*$"/>
-        <property
-                name="fileExtensions"
-                value="groovy,java"/>
+        <property name="id" value="NoMultipleClosingBracesAtEndOfLine"/>
+        <property name="message" value="Multiple closing curly braces in the same line are not allowed" />
+        <property name="format" value="\}\s*\}\s*$" />
+        <property name="fileExtensions" value="groovy,java" />
     </module>
 
     <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
@@ -126,12 +78,8 @@
         <!-- Checks for Javadoc comments: https://checkstyle.org/config_javadoc.html -->
         <module name="InvalidJavadocPosition"/>
         <module name="JavadocMethod">
-            <property
-                    name="allowMissingParamTags"
-                    value="true"/>
-            <property
-                    name="allowMissingReturnTag"
-                    value="true"/>
+            <property name="allowMissingParamTags" value="true"/>
+            <property name="allowMissingReturnTag" value="true"/>
         </module>
         <module name="RequireEmptyLineBeforeBlockTagGroup"/>
         <module name="JavadocMissingLeadingAsteriskCheck"/>
@@ -143,21 +91,11 @@
         <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
         <module name="ImportOrder">
-            <property
-                    name="groups"
-                    value="java,javax,javafx,org.jabref,*"/>
-            <property
-                    name="ordered"
-                    value="true"/>
-            <property
-                    name="separated"
-                    value="true"/>
-            <property
-                    name="option"
-                    value="bottom"/>
-            <property
-                    name="sortStaticImportsAlphabetically"
-                    value="true"/>
+            <property name="groups" value="java,javax,javafx,org.jabref,*"/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="true"/>
+            <property name="option" value="bottom"/>
+            <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
 
         <!-- Checks for whitespace: https://checkstyle.org/config_whitespace.html -->
@@ -165,15 +103,10 @@
         <module name="EmptyForInitializerPad"/>
         <module name="EmptyLineSeparator">
             <!-- check all except variable declarations -->
-            <property
-                    name="tokens"
-                    value="IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF, STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF"/>
-            <property
-                    name="allowMultipleEmptyLines"
-                    value="false"/>
-            <property
-                    name="allowMultipleEmptyLinesInsideClassMembers"
-                    value="false"/>
+            <property name="tokens"
+                      value="IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF, STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF"/>
+            <property name="allowMultipleEmptyLines" value="false"/>
+            <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
         </module>
         <module name="GenericWhitespace"/>
         <module name="MethodParamPad"/>
@@ -182,18 +115,15 @@
         <module name="NoWhitespaceBefore"/>
         <module name="ParenPad"/>
         <module name="SeparatorWrap">
-            <property
-                    name="tokens"
-                    value="COMMA, SEMI, ELLIPSIS, ARRAY_DECLARATOR, RBRACK, METHOD_REF"/>
+            <property name="tokens" value="COMMA, SEMI, ELLIPSIS, ARRAY_DECLARATOR, RBRACK, METHOD_REF"/>
         </module>
         <module name="SingleSpaceSeparator"/>
         <module name="NoWhitespaceBeforeCaseDefaultColon"/>
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround">
             <!-- RCULRY causes issues if classes are nested within arrays, therefore not activated -->
-            <property
-                    name="tokens"
-                    value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV,
+            <property name="tokens"
+                      value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV,
                       DIV_ASSIGN, DO_WHILE, EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE,
                       LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SWITCH, LITERAL_SYNCHRONIZED,
                       LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL,
@@ -203,11 +133,9 @@
 
         <!-- Checks for Naming Conventions: https://checkstyle.org/config_naming.html -->
         <module name="ConstantName">
-            <property
-                    name="format"
-                    value="^log(ger)?|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
+            <property name="format" value="^log(ger)?|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
         </module>
-        <module name="PatternVariableName"/>
+        <module name="PatternVariableName" />
         <module name="RecordComponentName"/>
 
         <!-- Checks for blocks: https://checkstyle.org/config_blocks.html -->
@@ -217,9 +145,7 @@
         <module name="NeedBraces"/>
 
         <module name="EmptyBlock">
-            <property
-                    name="option"
-                    value="text"/>
+            <property name="option" value="text"/>
         </module>
 
         <!-- Disallows empty catch blocks (not even having a comment): https://checkstyle.sourceforge.io/config_blocks.html#EmptyCatchBlock -->
@@ -244,9 +170,7 @@
         <module name="MultipleVariableDeclarations"/>
 
         <module name="OneStatementPerLine">
-            <property
-                    name="treatTryResourcesAsStatement"
-                    value="true"/>
+            <property name="treatTryResourcesAsStatement" value="true"/>
         </module>
 
         <module name="UnnecessarySemicolonInTryWithResources"/>
@@ -260,15 +184,9 @@
 
         <!-- force a space after // for comments -->
         <module name="TodoComment">
-            <property
-                    name="id"
-                    value="commentStartWithSpace"/>
-            <property
-                    name="format"
-                    value="^(DEPS|JAVA|SOURCES|FILES|RUNTIME_OPTIONS|[^\s/*])"/>
-            <message
-                    key="todo.match"
-                    value="Comment text should start with space."/>
+            <property name="id" value="commentStartWithSpace"/>
+            <property name="format" value="^(DEPS|JAVA|SOURCES|FILES|RUNTIME_OPTIONS|[^\s/*])"/>
+            <message key="todo.match" value="Comment text should start with space."/>
         </module>
 
         <module name="MissingDeprecated"/>

@@ -13,7 +13,7 @@ public class FileNameCleaner {
     /// Replaces illegal characters in given fileName by '_'
     ///
     /// @param badFileName the fileName to clean
-     /// @return a clean filename
+    /// @return a clean filename
     public static String cleanFileName(String badFileName) {
         StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {
@@ -31,7 +31,7 @@ public class FileNameCleaner {
     /// Directory name may contain directory separators, e.g. 'deep/in/a/tree'; these are left untouched.
     ///
     /// @param badFileName the fileName to clean
-     /// @return a clean filename
+    /// @return a clean filename
     public static String cleanDirectoryName(String badFileName) {
         StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {

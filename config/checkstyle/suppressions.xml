@@ -6,7 +6,5 @@
 
 <suppressions>
     <!-- Following contain examples or comments with "}}" that are necessary -->
-    <suppress
-            id="NoMultipleClosingBracesAtEndOfLine"
-            files="(BibtexParserTest|StringUtil).java"/>
+    <suppress id="NoMultipleClosingBracesAtEndOfLine" files="(BibtexParserTest|StringUtil).java" />
 </suppressions>

@@ -169,7 +169,7 @@ public class AuthorList implements Iterable<Author> {
     /// This function tries to cache the parsed AuthorLists by the string passed in.
     ///
     /// @param authors The string of authors or editors in bibtex format to parse.
-     /// @return An AuthorList object representing the given authors.
+    /// @return An AuthorList object representing the given authors.
     public static AuthorList parse(@NonNull final String authors) {
         return AUTHOR_CACHE.computeIfAbsent(authors, string -> {
             AuthorListParser parser = new AuthorListParser();
@@ -250,7 +250,7 @@ public class AuthorList implements Iterable<Author> {
     /// Returns the <CODE>Author</CODE> object for the i-th author.
     ///
     /// @param i Index of the author (from 0 to <CODE>size()-1</CODE>).
-     /// @return the <CODE>Author</CODE> object.
+    /// @return the <CODE>Author</CODE> object.
     public Author getAuthor(int i) {
         return authors.get(i);
     }
@@ -305,9 +305,9 @@ public class AuthorList implements Iterable<Author> {
     /// Neumann, Smith and Black Brown".
     ///
     /// @param oxfordComma Whether to put a comma before the and at the end.
-     /// @return formatted list of authors.
-     /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
-     /// Oxford comma.</a>
+    /// @return formatted list of authors.
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// Oxford comma.</a>
     public String getAsLastNames(boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), Author::getNamePrefixAndFamilyName, oxfordComma);
     }
@@ -323,10 +323,10 @@ public class AuthorList implements Iterable<Author> {
     /// Smith, J. and Black Brown, P.".
     ///
     /// @param abbreviate  whether to abbreivate first names.
-     /// @param oxfordComma Whether to put a comma before the and at the end.
-     /// @return formatted list of authors.
-     /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
-     /// Oxford comma.</a>
+    /// @param oxfordComma Whether to put a comma before the and at the end.
+    /// @return formatted list of authors.
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// Oxford comma.</a>
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), auth -> auth.getFamilyGiven(abbreviate), oxfordComma);
     }
@@ -383,10 +383,10 @@ public class AuthorList implements Iterable<Author> {
     /// Smith and P. Black Brown"
     ///
     /// @param abbreviate  whether to abbreivate first names.
-     /// @param oxfordComma Whether to put a comma before the and at the end.
-     /// @return formatted list of authors.
-     /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
-     /// Oxford comma.</a>
+    /// @param oxfordComma Whether to put a comma before the and at the end.
+    /// @return formatted list of authors.
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// Oxford comma.</a>
     public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), author -> author.getGivenFamily(abbreviate), oxfordComma);
     }

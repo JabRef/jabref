@@ -37,8 +37,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /// Fetcher for <a href="https://isidore.science">ISIDORE</a>```
- /// Will take in the link to the website or the last six digits that identify the reference
- /// Uses <a href="https://isidore.science/api">ISIDORE's API</a>.
+/// Will take in the link to the website or the last six digits that identify the reference
+/// Uses <a href="https://isidore.science/api">ISIDORE's API</a>.
 public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);

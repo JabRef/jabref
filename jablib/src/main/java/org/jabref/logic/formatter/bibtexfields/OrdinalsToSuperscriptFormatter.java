@@ -32,8 +32,8 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
     ///
     /// <h4>Example</h4>
     /// <pre>{@code
-     /// 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing
-     /// }</pre>
+    /// 1st Conf. Cloud Computing -> 1\textsuperscript{st} Conf. Cloud Computing
+    /// }</pre>
     @Override
     public String format(@NonNull String value) {
         if (value.isEmpty()) {

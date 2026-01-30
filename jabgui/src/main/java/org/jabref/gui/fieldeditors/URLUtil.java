@@ -20,7 +20,7 @@ public class URLUtil {
     /// This gives the extension for most reasonably named links.
     ///
     /// @param link The link
-     /// @return The suffix, excluding the dot (e.g. "pdf")
+    /// @return The suffix, excluding the dot (e.g. "pdf")
     public static Optional<String> getSuffix(final String link, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String strippedLink = link;
         try {

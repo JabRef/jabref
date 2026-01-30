@@ -152,17 +152,17 @@ class MedlinePlainImporterTest {
                 PMID-22664220
                 CON - Comment1
                 CIN - Comment2\
-                
+
                 EIN - Comment3
                 EFR - Comment4
                 CRI - Comment5
                 CRF - Comment6\
-                
+
                 PRIN- Comment7
                 PROF- Comment8
                 RPI - Comment9
                 RPF - Comment10\
-                
+
                 RIN - Comment11
                 ROF - Comment12
                 UIN - Comment13
@@ -254,7 +254,7 @@ class MedlinePlainImporterTest {
                 PMID-22664795
                 MH  - Female
                 PT  - journal article\
-                
+
                 PT  - classical article
                 PT  - corrected and republished article
                 PT  - introductory journal article

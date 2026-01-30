@@ -28,8 +28,8 @@ public final class MergeEntriesHelper {
     /// Merges two BibEntry objects with undo support.
     ///
     /// @param entryFromFetcher  The entry containing new information (source, from the fetcher)
-     /// @param entryFromLibrary  The entry to be updated (target, from the library)
-     /// @param namedCompoundEdit Compound edit to collect undo information
+    /// @param entryFromLibrary  The entry to be updated (target, from the library)
+    /// @param namedCompoundEdit Compound edit to collect undo information
     public static boolean mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompoundEdit namedCompoundEdit) {
         LOGGER.debug("Entry from fetcher: {}", entryFromFetcher);
         LOGGER.debug("Entry from library: {}", entryFromLibrary);

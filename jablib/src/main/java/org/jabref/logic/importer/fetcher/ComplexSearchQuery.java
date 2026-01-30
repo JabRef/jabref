@@ -284,7 +284,7 @@ public class ComplexSearchQuery {
         /// See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
         ///
         /// @return ComplexSearchQuery instance with the fields set to the values defined in the building instance.
-         /// @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
+        /// @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
         public ComplexSearchQuery build() throws IllegalStateException {
             if (textSearchFieldsAndYearFieldsAreEmpty()) {
                 throw new IllegalStateException("At least one text field has to be set");

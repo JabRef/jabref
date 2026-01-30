@@ -85,8 +85,8 @@ final class StyleSheetFile extends StyleSheet {
     /// This method allows callers to obtain the theme's additional stylesheet.
     ///
     /// @return the stylesheet location if there is an additional stylesheet present and available. The
-     /// location will be a local URL. Typically, it will be a `'data:'` URL where the CSS is embedded. However, for
-     /// large themes it can be `'file:'`.
+    /// location will be a local URL. Typically, it will be a `'data:'` URL where the CSS is embedded. However, for
+    /// large themes it can be `'file:'`.
     @Override
     public String getWebEngineStylesheet() {
         if (Strings.isNullOrEmpty(dataUrl.get())) {

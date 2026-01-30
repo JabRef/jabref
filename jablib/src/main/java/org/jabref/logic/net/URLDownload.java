@@ -93,7 +93,7 @@ public class URLDownload {
     }
 
     /// @param source the URL to download from
-     /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
+    /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
     public URLDownload(String source) throws MalformedURLException {
         this(URLUtil.create(source));
     }
@@ -213,8 +213,8 @@ public class URLDownload {
     /// Downloads the web resource to a String.
     ///
     /// @param encoding   the desired String encoding
-     /// @param connection an existing connection
-     /// @return the downloaded string
+    /// @param connection an existing connection
+    /// @return the downloaded string
     private static String asString(Charset encoding, URLConnection connection) throws FetcherException {
         try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {

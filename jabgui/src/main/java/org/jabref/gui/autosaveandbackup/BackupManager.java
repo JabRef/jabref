@@ -113,8 +113,8 @@ public class BackupManager {
     /// Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
     ///
     /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
-     /// @param backupDir          The path to the backup directory
-     /// @param createBackup       True, if a backup should be created
+    /// @param backupDir          The path to the backup directory
+    /// @param createBackup       True, if a backup should be created
     public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
         RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(backupDir, createBackup));
         RUNNING_INSTANCES.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
@@ -126,9 +126,9 @@ public class BackupManager {
     /// In case a discarded file is present, the method also returns `false`, See also {@link #discardBackup(Path)}.
     ///
     /// @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
-     /// @return `true` if backup file exists AND differs from originalPath. `false` is the
-     /// "default" return value in the good case. In case a discarded file exists, `false` is returned, too.
-     /// In the case of an exception `true` is returned to ensure that the user checks the output.
+    /// @return `true` if backup file exists AND differs from originalPath. `false` is the
+    /// "default" return value in the good case. In case a discarded file exists, `false` is returned, too.
+    /// In the case of an exception `true` is returned to ensure that the user checks the output.
     public static boolean backupFileDiffers(Path originalPath, Path backupDir) {
         Path discardedFile = determineDiscardedFile(originalPath, backupDir);
         if (Files.exists(discardedFile)) {
@@ -347,7 +347,7 @@ public class BackupManager {
     /// This method should only be used when closing a database/JabRef in a normal way.
     ///
     /// @param backupDir    The backup directory
-     /// @param createBackup If the backup manager should still perform a backup
+    /// @param createBackup If the backup manager should still perform a backup
     private void shutdown(Path backupDir, boolean createBackup) {
         coarseChangeFilter.unregisterListener(this);
         executor.shutdown();

@@ -128,8 +128,8 @@ jobs:
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
-      jvmDistribution: ${{ steps.binary.outputs.jvmDistribution }}
-      useEaJdk: ${{ steps.binary.outputs.useEaJdk }}
+      jvmDistribution:  ${{ steps.binary.outputs.jvmDistribution }}
+      useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
       jdkVersion: ${{ steps.binary.outputs.jdkVersion }}
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}

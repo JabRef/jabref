@@ -1,39 +1,20 @@
 # Linux Mint Cinnamon VM
 
-[Linux Mint](https://linuxmint.com/)
-with
-JabRef
-sources.
+[Linux Mint](https://linuxmint.com/) with JabRef sources.
 
 Uses <https://portal.cloud.hashicorp.com/vagrant/discover/aaronvonawesome/linux-mint-21-cinnamon>.
 
-Start
-JabRef
-by
-following
-steps:
+Start JabRef by following steps:
 
-1.
-Open
-termminal
-2.
-`cd jabref`
-3.
-`./gradlew run`
+1. Open termminal
+2. `cd jabref`
+3. `./gradlew run`
 
 ## Alternatives
 
-### Using
-`archman/linuxmint`
+### Using `archman/linuxmint`
 
-This
-image
-does
-not
-work
-with
-multiple
-monitors.
+This image does not work with multiple monitors.
 
 Issues
 
@@ -42,44 +23,12 @@ Issues
 
 ### Building an own image
 
-We
-could
-have
-build
-our
-own
-image.
-First
-creating
-an
-image
-using
-packer
-with <https://github.com/rmoesbergen/packer-linuxmint>.
-Then,
-building
-a
-`Vagrantfile`
-on
-top
-of
-it.
-Seemed
-to
-be
-too
-much
-issues
-for
-the
-users.
+We could have build our own image.
+First creating an image using packer with <https://github.com/rmoesbergen/packer-linuxmint>.
+Then, building a `Vagrantfile` on top of it.
+Seemed to be too much issues for the users.
 
-1.
-Install
-packer
-2.
-`packer plugins install github.com/hashicorp/virtualbox`
-3.
-`packer plugins install github.com/hashicorp/vagrant`
-4.
-`packer build -var-file=mint-cinnamon-22.json core_template.json`
+1. Install packer
+2. `packer plugins install github.com/hashicorp/virtualbox`
+3. `packer plugins install github.com/hashicorp/vagrant`
+4. `packer build -var-file=mint-cinnamon-22.json core_template.json`

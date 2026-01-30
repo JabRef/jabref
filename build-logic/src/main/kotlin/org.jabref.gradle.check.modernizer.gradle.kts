@@ -3,12 +3,9 @@ plugins {
 }
 
 modernizer {
-    failOnViolations =
-        true
-    includeTestClasses =
-        true
-    exclusions =
-        setOf(
-            "java/util/Optional.get:()Ljava/lang/Object;"
-        )
+    failOnViolations = true
+    includeTestClasses = true
+    exclusions = setOf(
+        "java/util/Optional.get:()Ljava/lang/Object;"
+    )
 }

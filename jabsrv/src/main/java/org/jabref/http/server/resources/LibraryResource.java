@@ -51,8 +51,8 @@ public class LibraryResource {
     /// At http://localhost:23119/libraries/{id}
     ///
     /// @param id The specified library
-     /// @return specified library in JSON format
-     /// @throws IOException
+    /// @return specified library in JSON format
+    /// @throws IOException
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson(@PathParam("id") String id) throws IOException {

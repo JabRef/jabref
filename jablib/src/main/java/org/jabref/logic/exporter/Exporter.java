@@ -53,8 +53,8 @@ public abstract class Exporter {
     /// Performs the export.
     ///
     /// @param databaseContext the database to export from
-     /// @param file            the file to write to
-     /// @param entries         a list containing all entries that should be exported
+    /// @param file            the file to write to
+    /// @param entries         a list containing all entries that should be exported
     public abstract void export(@NonNull BibDatabaseContext databaseContext,
                                 Path file,
                                 @NonNull List<BibEntry> entries)
@@ -72,12 +72,12 @@ public abstract class Exporter {
     /// Exports to all files linked to a given entry
     ///
     /// @param databaseContext        the database to export from
-     /// @param filePreferences        the filePreferences to use for resolving paths
-     /// @param entryToWriteOn         the entry for which we want to write on all linked pdfs
-     /// @param entriesToWrite         the content that we want to export to the pdfs
-     /// @param abbreviationRepository the opened repository of journal abbreviations
-     /// @return whether any file was written on
-     /// @throws IOException if the writing fails
+    /// @param filePreferences        the filePreferences to use for resolving paths
+    /// @param entryToWriteOn         the entry for which we want to write on all linked pdfs
+    /// @param entriesToWrite         the content that we want to export to the pdfs
+    /// @param abbreviationRepository the opened repository of journal abbreviations
+    /// @return whether any file was written on
+    /// @throws IOException if the writing fails
     public boolean exportToAllFilesOfEntry(BibDatabaseContext databaseContext,
                                            FilePreferences filePreferences,
                                            BibEntry entryToWriteOn,
@@ -105,11 +105,11 @@ public abstract class Exporter {
     /// If it extends existing information, all found bib-entries will be exported.
     ///
     /// @param databaseContext        the database-context to export from
-     /// @param filePreferences        the filePreferences to use for resolving paths
-     /// @param filePath               the path to the file we want to write on
-     /// @param abbreviationRepository the opened repository of journal abbreviations
-     /// @return whether the file was written on at least once
-     /// @throws IOException if the writing fails
+    /// @param filePreferences        the filePreferences to use for resolving paths
+    /// @param filePath               the path to the file we want to write on
+    /// @param abbreviationRepository the opened repository of journal abbreviations
+    /// @return whether the file was written on at least once
+    /// @throws IOException if the writing fails
     public boolean exportToFileByPath(BibDatabaseContext databaseContext,
                                       FilePreferences filePreferences,
                                       Path filePath,

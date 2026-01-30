@@ -39,9 +39,9 @@ public interface Trigger {
     /// most once.
     ///
     /// @param node           the node to attach the listeners to
-     /// @param beforeNavigate the runnable to execute before navigation
-     /// @param onNavigate     the runnable to execute when navigation occurs
-     /// @return a runnable to clean up the listeners
+    /// @param beforeNavigate the runnable to execute before navigation
+    /// @param onNavigate     the runnable to execute when navigation occurs
+    /// @return a runnable to clean up the listeners
     Runnable attach(@NonNull Node node, Runnable beforeNavigate, Runnable onNavigate);
 
     static Trigger onClick() {
@@ -95,8 +95,8 @@ public interface Trigger {
             /// conditions are met.
             ///
             /// @param node       The node to attach the trigger to.
-             /// @param onNavigate A function that wraps the original event handler. It takes a Supplier representing the original action and returns the result of that action.
-             /// @return A cleanup runnable that detaches the trigger.
+            /// @param onNavigate A function that wraps the original event handler. It takes a Supplier representing the original action and returns the result of that action.
+            /// @return A cleanup runnable that detaches the trigger.
             Runnable create(Node node, Function<Supplier<?>, ?> onNavigate);
         }
 
@@ -110,7 +110,7 @@ public interface Trigger {
         /// The timeout after which navigation is triggered automatically.
         ///
         /// @param timeout The timeout duration. Defaults to 1000ms.
-         /// @return this builder
+        /// @return this builder
         public Builder withTimeout(Duration timeout) {
             this.timeout = timeout;
             return this;

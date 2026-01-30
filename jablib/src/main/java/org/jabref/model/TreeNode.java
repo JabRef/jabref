@@ -76,7 +76,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// an empty Optional will be returned.
     ///
     /// @param indexedPath sequence of child indices that describe a path from this node to one of its descendants. Be aware that if indexedPath was obtained by getIndexedPathFromRoot(), this node should usually be the root node.
-     /// @return descendant found by evaluating indexedPath
+    /// @return descendant found by evaluating indexedPath
     public Optional<T> getDescendant(List<Integer> indexedPath) {
         T cursor = (T) this;
         for (int index : indexedPath) {
@@ -107,9 +107,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// This method performs a linear search and is O(n) where n is the number of children.
     ///
     /// @param childNode the node to search for among this node's children
-     /// @return an integer giving the index of the node in this node's child list
-     /// or an empty Optional if the specified node is a not a child of this node
-     /// @throws NullPointerException if childNode is null
+    /// @return an integer giving the index of the node in this node's child list
+    /// or an empty Optional if the specified node is a not a child of this node
+    /// @throws NullPointerException if childNode is null
     public Optional<Integer> getIndexOfChild(@NonNull T childNode) {
         int index = children.indexOf(childNode);
         if (index == -1) {
@@ -143,9 +143,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// In this way the whole subtree based at this node is moved to the given node.
     ///
     /// @param target the new parent
-     /// @throws NullPointerException           if target is null
-     /// @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
-     /// @throws UnsupportedOperationException  if target is an descendant of this node
+    /// @throws NullPointerException           if target is null
+    /// @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
+    /// @throws UnsupportedOperationException  if target is an descendant of this node
     public void moveTo(@NonNull T target) {
         Optional<T> oldParent = getParent();
         if (oldParent.isPresent() && (oldParent.get() == target)) {
@@ -158,7 +158,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Returns the path from the root, to get to this node. The last element in the path is this node.
     ///
     /// @return a list of nodes giving the path, where the first element in the path is the root
-     /// and the last element is this node.
+    /// and the last element is this node.
     public List<T> getPathFromRoot() {
         if (parent == null) {
             List<T> pathToMe = new ArrayList<>();
@@ -178,7 +178,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// To traverse the entire children collection, use the parent's getChildren() instead.
     ///
     /// @return the sibling of this node that immediately follows this node
-     /// @see #getChildren
+    /// @see #getChildren
     public Optional<T> getNextSibling() {
         return getRelativeSibling(+1);
     }
@@ -189,7 +189,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// This method performs a linear search that is O(n) where n is the number of children.
     ///
     /// @return the sibling of this node that immediately precedes this node
-     /// @see #getChildren
+    /// @see #getChildren
     public Optional<T> getPreviousSibling() {
         return getRelativeSibling(-1);
     }
@@ -229,8 +229,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Returns the child at the specified index in this node's children collection.
     ///
     /// @param index an index into this node's children collection
-     /// @return the node in this node's children collection at the specified index,
-     /// or an empty Optional if the index does not point to a child
+    /// @return the node in this node's children collection at the specified index,
+    /// or an empty Optional if the index does not point to a child
     public Optional<T> getChildAt(int index) {
         return childIndexExists(index) ? Optional.of(children.get(index)) : Optional.empty();
     }
@@ -238,7 +238,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Returns whether the specified index is a valid index for a child.
     ///
     /// @param index the index to be tested
-     /// @return returns true when index is at least 0 and less then the count of children
+    /// @return returns true when index is at least 0 and less then the count of children
     protected boolean childIndexExists(int index) {
         return (index >= 0) && (index < children.size());
     }
@@ -256,9 +256,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// A node is considered an ancestor of itself.
     ///
     /// @param anotherNode node to test
-     /// @return true if anotherNode is a descendant of this node
-     /// @throws NullPointerException if anotherNode is null
-     /// @see #isNodeDescendant
+    /// @return true if anotherNode is a descendant of this node
+    /// @throws NullPointerException if anotherNode is null
+    /// @see #isNodeDescendant
     public boolean isAncestorOf(@NonNull T anotherNode) {
         if (anotherNode == this) {
             return true;
@@ -328,8 +328,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// If anotherNode is null, an exception is thrown.
     ///
     /// @param anotherNode node to test as descendant of this node
-     /// @return true if this node is an ancestor of anotherNode
-     /// @see #isAncestorOf
+    /// @return true if this node is an ancestor of anotherNode
+    /// @see #isAncestorOf
     public boolean isNodeDescendant(@NonNull T anotherNode) {
         return this.isAncestorOf(anotherNode);
     }
@@ -375,7 +375,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// The given node is not allowed to already be in a tree (i.e. it has to have no parent).
     ///
     /// @param child the node to add
-     /// @return the child node
+    /// @return the child node
     public T addChild(T child) {
         return addChild(child, children.size());
     }
@@ -384,9 +384,9 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// The given node is not allowed to already be in a tree (i.e. it has to have no parent).
     ///
     /// @param child the node to add
-     /// @param index the position where the node should be added
-     /// @return the child node
-     /// @throws IndexOutOfBoundsException if the index is out of range
+    /// @param index the position where the node should be added
+    /// @return the child node
+    /// @throws IndexOutOfBoundsException if the index is out of range
     public T addChild(@NonNull T child, int index) {
         if (child.getParent().isPresent()) {
             throw new UnsupportedOperationException("Cannot add a node which already has a parent, use moveTo instead");
@@ -404,10 +404,10 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// by adding it to the specified position in the children list.
     ///
     /// @param target      the new parent
-     /// @param targetIndex the position where the children should be inserted
-     /// @throws NullPointerException           if target is null
-     /// @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
-     /// @throws UnsupportedOperationException  if target is an descendant of one of the children of this node
+    /// @param targetIndex the position where the children should be inserted
+    /// @throws NullPointerException           if target is null
+    /// @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
+    /// @throws UnsupportedOperationException  if target is an descendant of one of the children of this node
     public void moveAllChildrenTo(T target, int targetIndex) {
         while (getNumberOfChildren() > 0) {
             getLastChild().get().moveTo(target, targetIndex);
@@ -421,8 +421,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// for any children `e1` and `e2` in the list).
     ///
     /// @param comparator the comparator used to compare the child nodes
-     /// @param recursive  if true the whole subtree is sorted
-     /// @throws NullPointerException if the comparator is null
+    /// @param recursive  if true the whole subtree is sorted
+    /// @throws NullPointerException if the comparator is null
     public void sortChildren(@NonNull Comparator<? super T> comparator, boolean recursive) {
         if (this.isLeaf()) {
             return; // nothing to sort
@@ -454,10 +454,10 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// In this way the whole subtree based at this node is moved to the given node.
     ///
     /// @param target      the new parent
-     /// @param targetIndex the position where the children should be inserted
-     /// @throws NullPointerException           if target is null
-     /// @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
-     /// @throws UnsupportedOperationException  if target is an descendant of this node
+    /// @param targetIndex the position where the children should be inserted
+    /// @throws NullPointerException           if target is null
+    /// @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
+    /// @throws UnsupportedOperationException  if target is an descendant of this node
     public void moveTo(@NonNull T target, int targetIndex) {
         // Check that the target node is not an ancestor of this node, because this would create loops in the tree
         if (this.isAncestorOf(target)) {

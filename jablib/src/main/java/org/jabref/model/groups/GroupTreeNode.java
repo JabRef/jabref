@@ -59,9 +59,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
     ///
     /// @param newGroup                        the new group (has to be non-null)
-     /// @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new group
-     /// @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
-     /// @param entriesInDatabase               list of entries in the database
+    /// @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new group
+    /// @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
+    /// @param entriesInDatabase               list of entries in the database
     public List<FieldChange> setGroup(@NonNull AbstractGroup newGroup,
                                       boolean shouldKeepPreviousAssignments,
                                       boolean shouldRemovePreviousAssignments,
@@ -134,8 +134,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// Get only groups containing all the entries or just groups containing any of the
     ///
     /// @param entries    List of {@link BibEntry} to search for
-     /// @param requireAll Whether to return only groups that must contain all entries
-     /// @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained}
+    /// @param requireAll Whether to return only groups that must contain all entries
+    /// @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained}
     public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
         List<GroupTreeNode> groups = new ArrayList<>();
 
@@ -215,7 +215,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// Determines the entries in the specified list which are matched by this group.
     ///
     /// @param entries list of entries to be searched
-     /// @return matched entries
+    /// @return matched entries
     public List<BibEntry> findMatches(List<BibEntry> entries) {
         SearchMatcher matcher = getSearchMatcher();
         return entries.stream()
@@ -226,7 +226,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// Determines the entries in the specified database which are matched by this group.
     ///
     /// @param database database to be searched
-     /// @return matched entries
+    /// @return matched entries
     public List<BibEntry> findMatches(BibDatabase database) {
         return findMatches(database.getEntries());
     }

@@ -345,7 +345,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Method to create main SplitPane holding all lists, buttons and labels for tab and starts search
     ///
     /// @param entry BibEntry which is currently selected in JabRef Database
-     /// @return SplitPane to display
+    /// @return SplitPane to display
     private SplitPane getPaneAndStartSearch(BibEntry entry) {
         // Create Layout Containers
         VBox citingVBox = new VBox();
@@ -616,7 +616,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Method to style heading labels
     ///
     /// @param label       label to style
-     /// @param tooltipText tooltip text
+    /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
         label.setStyle("-fx-padding: 5px");
         label.setAlignment(Pos.CENTER);
@@ -639,7 +639,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Determines if tab should be shown according to preferences
     ///
     /// @param entry Currently selected BibEntry
-     /// @return whether tab should be shown
+    /// @return whether tab should be shown
     @Override
     public boolean shouldShow(BibEntry entry) {
         // TODO: Create a preference and show tab only if preference is enabled
@@ -845,7 +845,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Function to open possible duplicate entries window to compare duplicate entries
     ///
     /// @param citationRelationItem duplicate in the citation relations tab
-     /// @param listView             CheckListView to display citations
+    /// @param listView             CheckListView to display citations
     private void openPossibleDuplicateEntriesWindow(CitationRelationItem citationRelationItem, CheckListView<CitationRelationItem> listView) {
         BibEntry libraryEntry = citationRelationItem.localEntry();
         BibEntry citationEntry = citationRelationItem.entry();

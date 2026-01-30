@@ -154,7 +154,7 @@ public class FileFieldParser {
     /// fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
     ///
     /// @param entry the list of elements in the linked file textual representation
-     /// @return a LinkedFile object
+    /// @return a LinkedFile object
     static LinkedFile convert(List<String> entry) {
         // ensure list has at least 3 fields
         while (entry.size() < 3) {

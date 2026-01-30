@@ -21,7 +21,7 @@ public final class TextExtractor {
     private final PDPage page;
 
     /// @param page          the page the annotation is on, must not be null
-     /// @param boundingBoxes the raw annotation, must not be null
+    /// @param boundingBoxes the raw annotation, must not be null
     public TextExtractor(@NonNull PDPage page, @NonNull COSArray boundingBoxes) {
         this.page = page;
         this.boundingBoxes = boundingBoxes;
@@ -30,7 +30,7 @@ public final class TextExtractor {
     /// Extracts the text of a marked annotation such as highlights, underlines, strikeouts etc.
     ///
     /// @return The text of the annotation
-     /// @throws IOException If the PDFTextStripperByArea fails to initialize.
+    /// @throws IOException If the PDFTextStripperByArea fails to initialize.
     public String extractMarkedText() throws IOException {
         // Text has to be extracted by the rectangle calculated from the marking
         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();

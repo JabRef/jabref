@@ -9,8 +9,8 @@ import org.jspecify.annotations.NullMarked;
 /// it is a helper value object used exclusively during merge resolution, not part of the domain model
 ///
 /// @param base   the merge base (common ancestor of local and remote)
- /// @param local  the current local branch tip
- /// @param remote the tip of the remote tracking branch (typically origin/main)
+/// @param local  the current local branch tip
+/// @param remote the tip of the remote tracking branch (typically origin/main)
 @NullMarked
 public record RevisionTriple(
         Optional<RevCommit> base,

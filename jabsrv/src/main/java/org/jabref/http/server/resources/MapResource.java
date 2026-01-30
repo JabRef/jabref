@@ -33,8 +33,8 @@ public class MapResource {
     /// Looks for the .jmp file in the directory of the given library ({id}.bib file).
     ///
     /// @param id The given library
-     /// @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
-     /// @throws IOException
+    /// @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
+    /// @throws IOException
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJabMapJson(@PathParam("id") String id) throws IOException {
@@ -76,7 +76,7 @@ public class MapResource {
     /// Saves the mindmap next to its associated library.
     ///
     /// @param id The given library
-     /// @throws IOException
+    /// @throws IOException
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public void updateJabMapJson(@PathParam("id") String id, String fileContent) throws IOException {

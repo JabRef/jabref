@@ -4,13 +4,11 @@
 
 `Dockerfile.jabkit`
 
-Building
-locally:
+Building locally:
 
     docker build -f Dockerfile.jabkit -t jabkit:latest .
 
-Running
-locally:
+Running locally:
 
      docker run --rm -it jabkit:latest --help
 
@@ -18,12 +16,10 @@ locally:
 
 `Dockerfile.jabsrv`
 
-Building
-locally:
+Building locally:
 
     docker build -f Dockerfile.jabsrv -t jabkit:latest .
 
-Running
-locally:
+Running locally:
 
     docker run --rm -it -p 6050:6050 jabsrv:latest -h 0.0.0.0

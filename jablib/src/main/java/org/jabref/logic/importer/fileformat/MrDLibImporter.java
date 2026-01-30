@@ -112,7 +112,7 @@ public class MrDLibImporter extends Importer {
     /// Parses the JSON recommendations into bib entries
     ///
     /// @param recommendation JSON object of a single recommendation returned by Mr. DLib
-     /// @return A ranked bib entry created from the recommendation input
+    /// @return A ranked bib entry created from the recommendation input
     private RankedBibEntry populateBibEntry(JSONObject recommendation) {
         BibEntry current = new BibEntry();
 

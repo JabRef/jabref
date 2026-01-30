@@ -30,7 +30,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 /// Creates the right commit shape based on the merge graph:
 ///  - BEHIND: fast-forward if content equals remote;
 ///            otherwise create a new commit on top of `remote`.
-///  - DIVERGED: create a merge commit with parents [localHead,remote].
+///  - DIVERGED: create a merge commit with parents [localHead, remote].
 ///
 /// Preconditions:
 ///  - GUI has already saved the final .bib file to disk.

@@ -43,8 +43,8 @@ public class UnoUserDefinedProperty {
     }
 
     /// @param property Name of a custom document property in the current document.
-     /// @return The value of the property or Optional.empty()
-     /// These properties are used to store extra data about individual citation. In particular, the `pageInfo` part.
+    /// @return The value of the property or Optional.empty()
+    /// These properties are used to store extra data about individual citation. In particular, the `pageInfo` part.
     public static Optional<String> getStringValue(XTextDocument doc, String property)
             throws
             WrappedTargetException {
@@ -62,7 +62,7 @@ public class UnoUserDefinedProperty {
     }
 
     /// @param property Name of a custom document property in the current document. Created if does not exist yet.
-     /// @param value    The value to be stored.
+    /// @param value    The value to be stored.
     public static void setStringProperty(XTextDocument doc, @NonNull String property, @NonNull String value)
             throws
             IllegalTypeException,

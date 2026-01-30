@@ -75,7 +75,7 @@ class LlmPlainCitationParserTest {
         // Given
         String input = """
                 E. G. Santana Jr., G. Benjamin, M. Araujo, and H. Santos, \"Which Prompting Technique Should I Use? An Empirical Investigation of Prompting Techniques for Software Engineering Tasks\", arXiv:2506.05614, Jun. 2025.
-                
+
                 Z. Rasheed, M. A. Sami, M. Waseem, K.-K. Kemell, X. Wang, A. Nguyen, K. Systä, and P. Abrahamsson, "AI-powered Code Review with LLMs: Early Results", arXiv:2404.18496, Apr. 2024.
                 """;
 
@@ -98,7 +98,7 @@ class LlmPlainCitationParserTest {
                   volume={2506.05614},
                   year={2025}
                 }
-                
+
                 @Article{Rasheed,
                   author     = {Z. Rasheed and M. A. Sami and M. Waseem and K.-K. Kemell and X. Wang and A. Nguyen and K. Systä and P. Abrahamsson},
                   year       = {2025},

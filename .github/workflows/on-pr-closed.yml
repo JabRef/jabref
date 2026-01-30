@@ -31,8 +31,8 @@ jobs:
       pull-requests: read
     outputs:
       pr_number: ${{ steps.pick.outputs.pr_number }}
-      pr_url: ${{ steps.pick.outputs.pr_url }}
-      pr_body: ${{ steps.pick.outputs.pr_body }}
+      pr_url:    ${{ steps.pick.outputs.pr_url }}
+      pr_body:   ${{ steps.pick.outputs.pr_body }}
     steps:
       - id: from_dispatch
         if: github.event_name == 'workflow_dispatch'
@@ -81,8 +81,8 @@ jobs:
         id: get_issue_number
         env:
           PR_NUMBER: ${{ needs.collect_parameters.outputs.pr_number }}
-          PR_URL: ${{ needs.collect_parameters.outputs.pr_url }}
-          PR_BODY: ${{ needs.collect_parameters.outputs.pr_body }}
+          PR_URL:    ${{ needs.collect_parameters.outputs.pr_url }}
+          PR_BODY:   ${{ needs.collect_parameters.outputs.pr_body }}
         run: |
           echo "PR Number: $PR_NUMBER"
           echo "PR URL: $PR_URL"

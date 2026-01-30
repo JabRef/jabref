@@ -29,10 +29,10 @@ public class FileAnnotation {
     /// A flexible constructor, mainly used as dummy if there is actually no annotation.
     ///
     /// @param author         The authors of the annotation
-     /// @param timeModified   The last time this annotation was modified
-     /// @param pageNumber     The page of the pdf where the annotation occurs
-     /// @param content        the actual content of the annotation
-     /// @param annotationType the type of the annotation
+    /// @param timeModified   The last time this annotation was modified
+    /// @param pageNumber     The page of the pdf where the annotation occurs
+    /// @param content        the actual content of the annotation
+    /// @param annotationType the type of the annotation
     public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
                           final String content, final FileAnnotationType annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
         this.author = author;
@@ -46,7 +46,7 @@ public class FileAnnotation {
     /// Creating a normal FileAnnotation from a PDAnnotation.
     ///
     /// @param annotation The actual annotation that holds the information
-     /// @param pageNumber The page of the pdf where the annotation occurs
+    /// @param pageNumber The page of the pdf where the annotation occurs
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
         this(annotation.getCOSObject().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
@@ -57,8 +57,8 @@ public class FileAnnotation {
     /// highlighted or underlined annotation with a sticky note.
     ///
     /// @param annotation           The actual annotation that holds the information
-     /// @param pageNumber           The page of the pdf where the annotation occurs
-     /// @param linkedFileAnnotation The corresponding note of a marked text area.
+    /// @param pageNumber           The page of the pdf where the annotation occurs
+    /// @param linkedFileAnnotation The corresponding note of a marked text area.
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
         this(annotation.getCOSObject().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
                 pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.of(linkedFileAnnotation));
@@ -67,7 +67,7 @@ public class FileAnnotation {
     /// Parses a String into a LocalDateTime.
     ///
     /// @param dateTimeString In this case of format yyyyMMddHHmmss.
-     /// @return a LocalDateTime parsed from the dateTimeString
+    /// @return a LocalDateTime parsed from the dateTimeString
     public static LocalDateTime extractModifiedTime(String dateTimeString) {
         if (dateTimeString == null) {
             return LocalDateTime.now();
@@ -103,7 +103,7 @@ public class FileAnnotation {
     /// Abbreviate annotation names when they are longer than `ABBREVIATED_ANNOTATION_NAME_LENGTH` chars
     ///
     /// @param annotationName annotation to be shortened
-     /// @return the abbreviated name
+    /// @return the abbreviated name
     private String abbreviateAnnotationName(final String annotationName) {
         if (annotationName.length() > ABBREVIATED_ANNOTATION_NAME_LENGTH) {
             return annotationName.subSequence(0, ABBREVIATED_ANNOTATION_NAME_LENGTH) + "...";

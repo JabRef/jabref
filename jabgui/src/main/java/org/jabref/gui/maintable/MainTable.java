@@ -275,7 +275,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     /// If the user presses any other special key as well, e.g. alt or shift we don't jump
     ///
     /// @param sortedColumn The sorted column in {@link MainTable}
-     /// @param keyEvent     The pressed character
+    /// @param keyEvent     The pressed character
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
         if (keyEvent.isAltDown() || keyEvent.isControlDown() || keyEvent.isMetaDown() || keyEvent.isShiftDown()) {
             return;

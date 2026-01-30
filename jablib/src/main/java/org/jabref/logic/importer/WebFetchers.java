@@ -78,7 +78,7 @@ public class WebFetchers {
     private WebFetchers() {
     }
 
-    /// @implNote Needs to be consistent with [#getIdBasedFetcherFoIdentifier(Identifier,ImportFormatPreferences) ]
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences) ]
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(Field field, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
@@ -99,7 +99,7 @@ public class WebFetchers {
         return Optional.of(fetcher);
     }
 
-    /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field,ImportFormatPreferences) ]
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field, ImportFormatPreferences) ]
     public static Optional<IdBasedFetcher> getIdBasedFetcherForIdentifier(Identifier identifier, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 

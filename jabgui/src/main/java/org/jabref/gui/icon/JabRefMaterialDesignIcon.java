@@ -10,7 +10,7 @@ import org.kordamp.ikonli.Ikon;
 /// IcoMoon</a>. The final TTF font is located in the resource folder.
 ///
 /// @see <a href="https://github.com/JabRef/jabref/wiki/Custom-SVG-Icons-for-JabRef">Tutorial on our Wiki</a>
- /// @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
+/// @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
 public enum JabRefMaterialDesignIcon implements Ikon {
 
     TEX_STUDIO("jab-texstudio", '\ue900'),

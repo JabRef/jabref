@@ -842,7 +842,7 @@ class SemanticConflictDetectorTest {
                 ),
                 Arguments.of("F21 - entryType changed differently on both sides",
                         """
-                                
+
                                 """,
                         """
                                     @book{a,

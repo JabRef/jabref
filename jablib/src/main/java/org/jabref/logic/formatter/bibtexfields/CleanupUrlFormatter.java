@@ -41,8 +41,8 @@ public class CleanupUrlFormatter extends Formatter {
     /// to be replaced by a space during the decoding execution.
     ///
     /// @param url should not be null
-     /// @return the decoded URL as a String representation
-     /// @see URLDecoder#decode(String, java.nio.charset.Charset)
+    /// @return the decoded URL as a String representation
+    /// @see URLDecoder#decode(String, java.nio.charset.Charset)
     @Override
     public String format(@NonNull String url) {
         String toDecode = Objects

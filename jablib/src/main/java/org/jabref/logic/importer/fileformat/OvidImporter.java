@@ -114,7 +114,7 @@ public class OvidImporter extends Importer {
     /// Convert a string of author names into a BibTeX-compatible format.
     ///
     /// @param content The name string.
-     /// @return The formatted names.
+    /// @return The formatted names.
     private static String fixNames(String content) {
         String names;
         if (content.indexOf(';') > 0) { // LN FN; [LN FN;]*

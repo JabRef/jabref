@@ -51,7 +51,7 @@ public class RemoveEnclosingBracesFormatter extends Formatter {
     /// Will e.g. return true for the string "DNA} text {EPA"
     ///
     /// @param value The string to check.
-     /// @return true if at any index the brace count is negative.
+    /// @return true if at any index the brace count is negative.
     private boolean hasNegativeBraceCount(String value) {
         int braceCount = 0;
         for (int index = 0; index < value.length(); index++) {

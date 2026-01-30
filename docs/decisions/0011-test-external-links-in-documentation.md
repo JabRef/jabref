@@ -2,216 +2,51 @@
 parent: Decision Records
 nav_order: 11
 ---
-
 # Test external links in documentation
 
 ## Context and Problem Statement
 
-The
-JabRef
-repository
-contains
-Markdown (
-`.md`)
-files
-documenting
-the
-JabRef
-code.
-The
-documentation
-contains
-links
-to
-external
-resources.
-For
-high-quality
-documentation,
-external
-links
-should
-be
-working.
+The JabRef repository contains Markdown (`.md`) files documenting the JabRef code.
+The documentation contains links to external resources.
+For high-quality documentation, external links should be working.
 
 ## Decision Drivers
 
-*
-Checking
-external
-links
-should
-not
-cause
-issues
-in
-the
-normal
-workflow
+* Checking external links should not cause issues in the normal workflow
 
 ## Considered Options
 
-*
-Check
-external
-links
-once
-a
-month
-*
-Check
-external
-links
-in
-the "
-checkstyle"
-task
-*
-Do
-not
-check
-external
-links
+* Check external links once a month
+* Check external links in the "checkstyle" task
+* Do not check external links
 
 ## Decision Outcome
 
-Chosen
-option: "
-Check
-external
-links
-once
-a
-month",
-because
-it
-provides
-a
-basic
-quality
-baseline.
+Chosen option: "Check external links once a month", because it provides a basic quality baseline.
 
 ### Positive Consequences
 
-*
-Automatic
-notification
-of
-broken
-external
-links
+* Automatic notification of broken external links
 
 ### Negative Consequences
 
-*
-Some
-external
-sites
-need
-to [be disabled](https://github.com/JabRef/jabref/pull/6542/files).
-For
-instance,
-GitHub.com
-always
-returns "
-forbidden".
-*
-Contributors
-find
-it
-strange
-if
-external
-links
-are
-broken (
-example: [user-documentation#526](https://github.com/JabRef/user-documentation/pull/526#issuecomment-2416462977))
+* Some external sites need to [be disabled](https://github.com/JabRef/jabref/pull/6542/files). For instance, GitHub.com always returns "forbidden".
+* Contributors find it strange if external links are broken (example: [user-documentation#526](https://github.com/JabRef/user-documentation/pull/526#issuecomment-2416462977))
 
 ## Pros and Cons of the Options
 
 ### Check external links once a month
 
-*
-Good,
-because
-does
-not
-interfere
-with
-the
-normal
-development
-workflow
-*
-Bad,
-because
-an
-additional
-workflow
-is
-required
+* Good, because does not interfere with the normal development workflow
+* Bad, because an additional workflow is required
 
 ### Check external links in the "checkstyle" task
 
-*
-Good,
-because
-no
-separate
-workflow
-is
-required
-*
-Bad,
-because
-checks
-fail
-independent
-of
-the
-PR (
-because
-external
-web
-sites
-can
-go
-down
-and
-go
-up
-independent
-of
-a
-PR)
+* Good, because no separate workflow is required
+* Bad, because checks fail independent of the PR (because external web sites can go down and go up independent of a PR)
 
 ### Do not check external links
 
-*
-Good,
-because
-no
-testing
-at
-all
-is
-required
-*
-Bad,
-because
-external
-links
-break
-without
-any
-notice
-*
-Bad,
-because
-external
-links
-have
-to
-be
-checked
-manually
+* Good, because no testing at all is required
+* Bad, because external links break without any notice
+* Bad, because external links have to be checked manually

@@ -57,8 +57,8 @@ public final class ConferenceUtils {
     /// - `""` -> `Optional.empty()`
     ///
     /// @param input the string to search, must not be `null`
-     /// @return an `Optional` containing the extracted and trimmed string from the first set of parentheses,
-     /// or `Optional.empty()` if no string is found
+    /// @return an `Optional` containing the extracted and trimmed string from the first set of parentheses,
+    /// or `Optional.empty()` if no string is found
     public static Optional<String> extractStringFromParentheses(@NonNull String input) {
         if (input.indexOf('(') < 0) {
             return Optional.empty();
@@ -92,9 +92,9 @@ public final class ConferenceUtils {
     /// is positioned ahead and retains the `-` in between.
     ///
     /// @param input  the raw string to extract acronym candidates from, must not be `null`
-     /// @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
-     /// @return a set of acronym candidates ordered by descending length and then lexicographically,
-     /// or an empty set if no valid candidates are found
+    /// @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
+    /// @return a set of acronym candidates ordered by descending length and then lexicographically,
+    /// or an empty set if no valid candidates are found
     public static Set<String> generateAcronymCandidates(@NonNull String input, int cutoff) {
         if (input.isEmpty() || cutoff <= 0) {
             return Set.of();
@@ -182,7 +182,7 @@ public final class ConferenceUtils {
     /// `"internationalconferenceonmachinelearning"`
     ///
     /// @param input the pre-lowercased raw string to normalize, must not be `null`
-     /// @return a normalized string representation of the input
+    /// @return a normalized string representation of the input
     public static String normalize(@NonNull String input) {
         StringBuilder normalized = new StringBuilder();
         StringBuilder currentToken = new StringBuilder();

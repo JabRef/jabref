@@ -44,7 +44,7 @@ public class XmpUtilReader {
     /// Will read the XMPMetadata from the given pdf file, closing the file afterwards.
     ///
     /// @param path The path to read the XMPMetadata from.
-     /// @return The XMPMetadata object found in the file
+    /// @return The XMPMetadata object found in the file
     public List<XMPMetadata> readRawXmp(Path path) throws IOException {
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
             return getXmpMetadata(document);
@@ -52,7 +52,7 @@ public class XmpUtilReader {
     }
 
     /// @param path The path to read from.
-     /// @return list of a single BibEntry retrieved by merging the data from the stream
+    /// @return list of a single BibEntry retrieved by merging the data from the stream
     public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences) throws IOException {
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
             return readXmp(path, document, xmpPreferences);
@@ -67,7 +67,7 @@ public class XmpUtilReader {
     /// Regarding the XMP metadata, only Dublin Core is supported.
     ///
     /// @param path     the path to the PDF file
-     /// @param document the PDF document to read from (should have been created from `path`
+    /// @param document the PDF document to read from (should have been created from `path`
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
         final SequencedCollection<BibEntry> result = new LinkedHashSet<>();
 
@@ -167,7 +167,7 @@ public class XmpUtilReader {
     /// Loads the specified file with the basic pdfbox functionality and uses an empty string as default password.
     ///
     /// @param path The path to load.
-     /// @throws IOException from the underlying @link PDDocument#load(File)
+    /// @throws IOException from the underlying @link PDDocument#load(File)
     public PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document
         // also uses an empty string as default password

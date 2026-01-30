@@ -584,7 +584,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
     ///
     /// @param numberOfEntries number of entries user is selecting
-     /// @return true if user confirm to delete entry
+    /// @return true if user confirm to delete entry
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (preferences.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
@@ -1037,7 +1037,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// Creates a new library tab. Contents are loaded by the `dataLoadingTask`. Most of the other parameters are required by `resetChangeMonitor()`.
     ///
     /// @param dataLoadingTask The task to execute to load the data asynchronously.
-     /// @param file            the path to the file (loaded by the dataLoadingTask)
+    /// @param file            the path to the file (loaded by the dataLoadingTask)
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
                                               DialogService dialogService,

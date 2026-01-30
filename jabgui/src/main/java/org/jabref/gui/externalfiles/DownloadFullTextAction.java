@@ -122,8 +122,8 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// from the findFullTexts map and then downloads the file into the given targetDirectory
     ///
     /// @param databaseContext the active database
-     /// @param url             the url "key"
-     /// @param entry           the entry "value"
+    /// @param url             the url "key"
+    /// @param entry           the entry "value"
     private void addLinkedFileFromURL(BibDatabaseContext databaseContext, URL url, BibEntry entry) {
         LinkedFile newLinkedFile = new LinkedFile(url, "");
 

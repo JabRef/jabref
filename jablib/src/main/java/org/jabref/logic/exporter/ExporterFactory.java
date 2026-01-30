@@ -80,7 +80,7 @@ public class ExporterFactory {
     /// Look up the named exporter (case-insensitive).
     ///
     /// @param consoleName The export name given in the JabRef console help information.
-     /// @return The exporter, or an empty option if no exporter with that name is registered.
+    /// @return The exporter, or an empty option if no exporter with that name is registered.
     public Optional<Exporter> getExporterByName(String consoleName) {
         return exporters.stream().filter(exporter -> exporter.getId().equalsIgnoreCase(consoleName)).findFirst();
     }

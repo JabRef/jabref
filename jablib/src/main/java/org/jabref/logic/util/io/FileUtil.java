@@ -131,7 +131,7 @@ public class FileUtil {
     /// Does not check that the file is a valid URL.
     ///
     /// @param link the URL string to extract the filename from
-     /// @return the extracted filename, or Optional.empty if there is none.
+    /// @return the extracted filename, or Optional.empty if there is none.
     public static Optional<String> getFileNameFromUrl(@NonNull String link) {
         // Apache Commons IO has no good support; FilenameUtils.getName(link) doesn't strip query parameters
         // Source: https://stackoverflow.com/a/33871029/873282
@@ -188,8 +188,8 @@ public class FileUtil {
     /// *Warning: If "ext" is passed, this is literally added. Thus `addExtension("tmp.txt", "ext")` leads to "tmp.txtext".*
     ///
     /// @param path      the path to add the extension to
-     /// @param extension the extension to add
-     /// @return the modified file name
+    /// @param extension the extension to add
+    /// @return the modified file name
     public static Path addExtension(Path path, String extension) {
         return path.resolveSibling(path.getFileName() + extension);
     }
@@ -197,8 +197,8 @@ public class FileUtil {
     /// Looks for the shortest unique path of the parent directory in the list of paths
     ///
     /// @param paths       List of paths as Strings
-     /// @param comparePath The to be tested path
-     /// @return Optional.empty() if the paths are disjoint
+    /// @param comparePath The to be tested path
+    /// @return Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
         // Difference to getUniquePathFragment: We want the parent directory, so we cut off the last path fragment
         return getUniquePathFragment(paths, comparePath)
@@ -209,8 +209,8 @@ public class FileUtil {
     /// Looks for the shortest unique path in the list of paths
     ///
     /// @param paths       List of paths as Strings
-     /// @param comparePath The to be shortened path
-     /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
+    /// @param comparePath The to be shortened path
+    /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
                                           .filter(part -> comparePath.toString().contains(part))
@@ -220,7 +220,7 @@ public class FileUtil {
     /// Creates the minimal unique path substring for each file among multiple file paths.
     ///
     /// @param paths the file paths
-     /// @return the minimal unique path substring for each file path
+    /// @return the minimal unique path substring for each file path
     public static List<String> uniquePathSubstrings(List<String> paths) {
         List<Deque<String>> stackList = new ArrayList<>(paths.size());
         // prepare data structures
@@ -261,9 +261,9 @@ public class FileUtil {
     /// Copies a file.
     ///
     /// @param pathToSourceFile      Path Source file
-     /// @param pathToDestinationFile Path Destination file
-     /// @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
-     /// @return boolean Whether the copy succeeded or was stopped due to the file already existing.
+    /// @param pathToDestinationFile Path Destination file
+    /// @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
+    /// @return boolean Whether the copy succeeded or was stopped due to the file already existing.
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
         if (!Files.exists(pathToSourceFile)) {
@@ -291,7 +291,7 @@ public class FileUtil {
     /// /home/user/literature/important before /home/user/literature.
     ///
     /// @param file        the file to be shortened
-     /// @param directories directories to check
+    /// @param directories directories to check
     public static Path relativize(Path file, List<Path> directories) {
         if (!file.isAbsolute()) {
             return file;
@@ -363,8 +363,8 @@ public class FileUtil {
     /// Returns the list of linked files. The files have the absolute filename
     ///
     /// @param entries  list of BibTeX entries
-     /// @param fileDirs list of directories to try for expansion
-     /// @return list of files. May be empty
+    /// @param fileDirs list of directories to try for expansion
+    /// @return list of files. May be empty
     public static List<Path> getListOfLinkedFiles(@NonNull List<BibEntry> entries, @NonNull List<Path> fileDirs) {
         return entries.stream()
                       .flatMap(entry -> entry.getFiles().stream())
@@ -375,9 +375,9 @@ public class FileUtil {
     /// Determines filename provided by an entry in a database
     ///
     /// @param database        the database, where the entry is located
-     /// @param entry           the entry to which the file should be linked to
-     /// @param fileNamePattern the filename pattern
-     /// @return a suggested fileName
+    /// @param entry           the entry to which the file should be linked to
+    /// @param fileNamePattern the filename pattern
+    /// @return a suggested fileName
     public static Optional<String> createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
@@ -397,9 +397,9 @@ public class FileUtil {
     /// Determines directory name provided by an entry in a database
     ///
     /// @param database             the database, where the entry is located
-     /// @param entry                the entry to which the directory should be linked to
-     /// @param directoryNamePattern the dirname pattern
-     /// @return a suggested dirName
+    /// @param entry                the entry to which the directory should be linked to
+    /// @param directoryNamePattern the dirname pattern
+    /// @return a suggested dirName
     public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String directoryNamePattern) {
         String targetName = BracketedPattern.expandBrackets(directoryNamePattern, ';', entry, database);
 
@@ -416,8 +416,8 @@ public class FileUtil {
     /// Finds a file inside a directory structure. Will also look for the file inside nested directories.
     ///
     /// @param filename      the name of the file that should be found
-     /// @param rootDirectory the rootDirectory that will be searched
-     /// @return the path to the first file that matches the defined conditions
+    /// @param rootDirectory the rootDirectory that will be searched
+    /// @return the path to the first file that matches the defined conditions
     public static Optional<Path> findSingleFileRecursively(String filename, Path rootDirectory) {
         try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
             return pathStream
@@ -460,8 +460,8 @@ public class FileUtil {
     /// Converts a relative filename to an absolute one, if necessary.
     ///
     /// @param fileName  the filename (e.g., a .pdf file), may contain path separators
-     /// @param directory the directory which should be search starting point
-     /// @return an empty optional if the file does not exist, otherwise, the absolute path
+    /// @param directory the directory which should be search starting point
+    /// @return an empty optional if the file does not exist, otherwise, the absolute path
     public static Optional<Path> find(@NonNull String fileName, @NonNull Path directory) {
         if (detectBadFileName(fileName)) {
             LOGGER.error("Invalid characters in path for file {}", fileName);
@@ -496,8 +496,8 @@ public class FileUtil {
     /// Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
     ///
     /// @param filename    the name of the file that should be found
-     /// @param directories the directories that will be searched
-     /// @return a list including all found paths to files that match the defined conditions
+    /// @param directories the directories that will be searched
+    /// @return a list including all found paths to files that match the defined conditions
     public static List<Path> findListOfFiles(String filename, List<Path> directories) {
         List<Path> files = new ArrayList<>();
         for (Path dir : directories) {
@@ -516,7 +516,7 @@ public class FileUtil {
     /// Test if the file is a bib file by simply checking the extension to be ".bib"
     ///
     /// @param file The file to check
-     /// @return True if file extension is ".bib", false otherwise
+    /// @return True if file extension is ".bib", false otherwise
     public static boolean isBibFile(Path file) {
         return getFileExtension(file).filter("bib"::equals).isPresent();
     }
@@ -524,7 +524,7 @@ public class FileUtil {
     /// Test if the file is an image file by simply checking if its extension is an image extension
     ///
     /// @param file The file to check
-     /// @return true if file extension is an image, false otherwise
+    /// @return true if file extension is an image, false otherwise
     public static boolean isImage(Path file) {
         return getFileExtension(file).map(StandardFileType.IMAGE.getExtensions()::contains).orElse(false);
     }
@@ -532,7 +532,7 @@ public class FileUtil {
     /// Test if the file is a pdf file by simply checking the extension to be ".pdf"
     ///
     /// @param file The file to check
-     /// @return True if file extension is ".pdf", false otherwise
+    /// @return True if file extension is ".pdf", false otherwise
     public static boolean isPDFFile(Path file) {
         Optional<String> extension = FileUtil.getFileExtension(file);
         return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
@@ -546,8 +546,8 @@ public class FileUtil {
     /// Detect illegal characters in given filename.
     ///
     /// @param fileName the fileName to detect
-     /// @return Boolean whether there is an illegal name.
-     /// @see org.jabref.logic.util.io.FileNameCleaner#cleanFileName
+    /// @return Boolean whether there is an illegal name.
+    /// @see org.jabref.logic.util.io.FileNameCleaner#cleanFileName
     public static boolean detectBadFileName(String fileName) {
         // fileName could be a path, we want to check the fileName only (and don't care about the path)
         // Reason: Handling of "c:\temp.pdf" is difficult, because ":" is an illegal character in the file name,
@@ -572,8 +572,8 @@ public class FileUtil {
     /// with maxLength = 20 is shortened into verylo...isthis.pdf
     ///
     /// @param fileName  the given file name to be shortened
-     /// @param maxLength the maximum number of characters in the string after shortening (including the extension)
-     /// @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
+    /// @param maxLength the maximum number of characters in the string after shortening (including the extension)
+    /// @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
     public static String shortenFileName(String fileName, Integer maxLength) {
         if (fileName == null || maxLength == null || maxLength < ELLIPSIS_LENGTH) {
             return "";
@@ -635,7 +635,7 @@ public class FileUtil {
     /// - /c/Users/...          → C:\Users\...
     ///
     /// @param filePath the input file path
-     /// @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
+    /// @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
     public static Path convertCygwinPathToWindows(String filePath) {
         if (filePath == null) {
             return null;
@@ -663,8 +663,8 @@ public class FileUtil {
     /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
     ///
     /// @param path        the input file path
-     /// @param letterIndex the index driver letter, zero-based indexing
-     /// @return a windows-style path
+    /// @param letterIndex the index driver letter, zero-based indexing
+    /// @return a windows-style path
     private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {
         String driveLetter = path.substring(letterIndex, letterIndex + 1).toUpperCase();
         String windowsPath = path.substring(letterIndex + 1).replace("/", "\\\\");

@@ -113,7 +113,7 @@ public class ImportFormatReader {
     /// format that matches the given ID.
     ///
     /// @param cliId CLI-Id
-     /// @return Import Format or `null` if none matches
+    /// @return Import Format or `null` if none matches
     private Optional<Importer> getByCliId(String cliId) {
         for (Importer format : importers) {
             if (format.getId().equals(cliId)) {
@@ -143,7 +143,7 @@ public class ImportFormatReader {
     }
 
     /// @param format       The name of the format used
-     /// @param parserResult The resulting data
+    /// @param parserResult The resulting data
     public record ImportResult(String format, ParserResult parserResult) {
     }
 
@@ -192,8 +192,8 @@ public class ImportFormatReader {
     /// and keeping the import that seems the most promising
     ///
     /// @param data the string to import
-     /// @return an UnknownFormatImport with the imported entries and metadata
-     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
+    /// @return an UnknownFormatImport with the imported entries and metadata
+    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     public ImportResult importWithAutoDetection(@NonNull String data) throws ImportException {
         return importWithAutoDetection(
                 importer -> importer.importDatabase(data),
@@ -208,10 +208,10 @@ public class ImportFormatReader {
     /// Therefore, functions are passed.
     ///
     /// @param importDatabase     the function to import the entries with a formatter
-     /// @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
-     /// @param importUsingBibtex  used as fallback when the importers did not match
-     /// @return an UnknownFormatImport with the imported entries and metadata
-     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
+    /// @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
+    /// @param importUsingBibtex  used as fallback when the importers did not match
+    /// @return an UnknownFormatImport with the imported entries and metadata
+    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     private ImportResult importWithAutoDetection(
             CheckedFunction<Importer, ParserResult> importDatabase,
             CheckedFunction<Importer, Boolean> isRecognizedFormat,

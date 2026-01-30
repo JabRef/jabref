@@ -66,7 +66,7 @@ public final class CSLFormatUtils {
     /// <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">Additional Information</a>.
     ///
     /// @param html The HTML string to be transformed into OO-write ready HTML.
-     /// @return The formatted html string.
+    /// @return The formatted html string.
     public static String transformHTML(String html) {
         // Initial clean up of escaped characters
         html = StringEscapeUtils.unescapeHtml4(html);
@@ -115,7 +115,7 @@ public final class CSLFormatUtils {
     /// Thus, we manually format a citation to produce its alphanumeric form.
     ///
     /// @param entries the list of entries for which the alphanumeric citation is to be generated.
-     /// @return the alphanumeric citation (for a single entry or a group of entries).
+    /// @return the alphanumeric citation (for a single entry or a group of entries).
     public static String generateAlphanumericCitation(List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
         StringBuilder citation = new StringBuilder("[");
         for (int i = 0; i < entries.size(); i++) {
@@ -165,8 +165,8 @@ public final class CSLFormatUtils {
     /// **Precondition:** Use ONLY with numeric citation styles.
     ///
     /// @param citation      the numeric citation with an unresolved number.
-     /// @param currentNumber the correct number to update the citation with.
-     /// @return the bibliographic citation with resolved number.
+    /// @param currentNumber the correct number to update the citation with.
+    /// @return the bibliographic citation with resolved number.
     public static String updateSingleBibliographyNumber(String citation, int currentNumber) {
         Pattern pattern = Pattern.compile("([\\[(])?(\\d+)([])])?(\\.)?\\s*");
         Matcher matcher = pattern.matcher(citation);

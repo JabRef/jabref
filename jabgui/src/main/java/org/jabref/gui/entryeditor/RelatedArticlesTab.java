@@ -69,7 +69,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// Gets a StackPane of related article information to be displayed in the Related Articles tab
     ///
     /// @param entry The currently selected BibEntry on the JabRef UI.
-     /// @return A StackPane with related article information to be displayed in the Related Articles tab.
+    /// @return A StackPane with related article information to be displayed in the Related Articles tab.
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
         root.setId("related-articles-tab");
@@ -108,7 +108,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// Creates a VBox of the related article information to be used in the StackPane displayed in the Related Articles tab
     ///
     /// @param list List of BibEntries of related articles
-     /// @return VBox of related article descriptions to be displayed in the Related Articles tab
+    /// @return VBox of related article descriptions to be displayed in the Related Articles tab
     private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
         ScrollPane scrollPane = new ScrollPane();
 
@@ -177,7 +177,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// Returns a consent dialog used to ask permission to send data to Mr. DLib.
     ///
     /// @param entry Currently selected BibEntry. (required to allow reloading of pane if accepted)
-     /// @return StackPane returned to be placed into Related Articles tab.
+    /// @return StackPane returned to be placed into Related Articles tab.
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
         root.setId("related-articles-tab");

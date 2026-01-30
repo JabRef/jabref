@@ -278,8 +278,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Group name change is handled separately
     ///
     /// @param oldGroup Original Group
-     /// @param newGroup Edited group
-     /// @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
+    /// @param newGroup Edited group
+    /// @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
     boolean onlyMinorChanges(AbstractGroup oldGroup, AbstractGroup newGroup) {
         // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {

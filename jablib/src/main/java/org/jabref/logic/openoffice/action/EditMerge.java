@@ -92,7 +92,7 @@ public class EditMerge {
     }
 
     /// @param group       A list of consecutive citation groups only separated by spaces.
-     /// @param groupCursor A cursor covering the XTextRange of each entry in group (and the spaces between them)
+    /// @param groupCursor A cursor covering the XTextRange of each entry in group (and the spaces between them)
     private record JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
     }
 
@@ -134,8 +134,8 @@ public class EditMerge {
     /// Decide if group could be added to state.currentGroup
     ///
     /// @param group        The CitationGroup to test
-     /// @param currentRange The XTextRange corresponding to group.
-     /// @return false if cannot add, true if can.  If returned true, then state.cursorBetween and state.currentGroupCursor are expanded to end at the start of currentRange.
+    /// @param currentRange The XTextRange corresponding to group.
+    /// @return false if cannot add, true if can.  If returned true, then state.cursorBetween and state.currentGroupCursor are expanded to end at the start of currentRange.
     private static boolean checkAddToGroup(ScanState state, CitationGroup group, XTextRange currentRange) {
         if (state.currentGroup.isEmpty()) {
             return false;

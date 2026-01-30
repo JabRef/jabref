@@ -29,8 +29,8 @@ public class BibEntryAssert {
     /// contain a single entry
     ///
     /// @param clazz        the class where to call `getResourceAsStream`
-     /// @param resourceName the resource to read
-     /// @param entry        the entry to compare with
+    /// @param resourceName the resource to read
+    /// @param entry        the entry to compare with
     public static void assertEquals(Class<?> clazz, String resourceName, BibEntry entry)
             throws IOException {
         assertNotNull(clazz);
@@ -45,8 +45,8 @@ public class BibEntryAssert {
     /// contain a single entry
     ///
     /// @param clazz        the class where to call `getResourceAsStream`
-     /// @param resourceName the resource to read
-     /// @param asIsEntries  a list containing a single entry to compare with
+    /// @param resourceName the resource to read
+    /// @param asIsEntries  a list containing a single entry to compare with
     public static void assertEquals(Class<?> clazz, String resourceName, List<BibEntry> asIsEntries)
             throws IOException {
         assertNotNull(clazz);
@@ -77,7 +77,7 @@ public class BibEntryAssert {
     /// Reads a bibtex database from the given InputStream. The list is compared with the given list.
     ///
     /// @param expectedInputStream the inputStream reading the entry from
-     /// @param actualEntries       a list containing a single entry to compare with
+    /// @param actualEntries       a list containing a single entry to compare with
     public static void assertEquals(InputStream expectedInputStream, List<BibEntry> actualEntries)
             throws IOException {
         assertNotNull(expectedInputStream);
@@ -99,7 +99,7 @@ public class BibEntryAssert {
     /// compared to the given entry
     ///
     /// @param expected the inputStream reading the entry from
-     /// @param actual   the entry to compare with
+    /// @param actual   the entry to compare with
     public static void assertEquals(InputStream expected, BibEntry actual)
             throws IOException {
         assertEquals(expected, List.of(actual));
@@ -109,8 +109,8 @@ public class BibEntryAssert {
     /// filtered through importer to convert to a list of BibEntries.
     ///
     /// @param expectedIs   A BibtexImporter InputStream.
-     /// @param fileToImport The path to the file to be imported.
-     /// @param importer     The fileformat you want to use to read the passed file to get the list of expected BibEntries
+    /// @param fileToImport The path to the file to be imported.
+    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected BibEntries
     public static void assertEquals(InputStream expectedIs, Path fileToImport, Importer importer)
             throws IOException {
         assertEquals(getListFromInputStream(expectedIs), fileToImport, importer);
@@ -125,8 +125,8 @@ public class BibEntryAssert {
     /// list of BibEntries.
     ///
     /// @param expected     A BibtexImporter InputStream.
-     /// @param fileToImport The path to the file to be imported.
-     /// @param importer     The fileformat you want to use to read the passed file to get the list of expected BibEntries
+    /// @param fileToImport The path to the file to be imported.
+    /// @param importer     The fileformat you want to use to read the passed file to get the list of expected BibEntries
     public static void assertEquals(List<BibEntry> expected, Path fileToImport, Importer importer)
             throws IOException {
         List<BibEntry> actualEntries = importer.importDatabase(fileToImport)

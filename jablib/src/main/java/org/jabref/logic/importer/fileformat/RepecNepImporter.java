@@ -44,101 +44,101 @@ import org.slf4j.LoggerFactory;
 /// (and almost always have) the form given by the following semi-formal grammar:
 ///
 /// ```
- /// NEPMessage:
- ///       MessageSection NEPMessage
- ///       MessageSection
- ///
- /// MessageSection:
- ///       OverviewMessageSection
- ///       OtherMessageSection
- ///
- ///# we skip the overview
- /// OverviewMessageSection:
- ///       'In this issue we have: ' SectionSeparator OtherStuff
- ///
- /// OtherMessageSection:
- ///       SectionSeparator  OtherMessageSectionContent
- ///
- ///# we skip other stuff and read only full working paper references
- /// OtherMessageSectionContent:
- ///       WorkingPaper EmptyLine OtherMessageSectionContent
- ///       OtherStuff EmptyLine OtherMessageSectionContent
- ///       ''
- ///
- /// OtherStuff:
- ///       NonEmptyLine OtherStuff
- ///       NonEmptyLine
- ///
- /// NonEmptyLine:
- ///       a non-empty String that does not start with a number followed by a '.'
- ///
- ///# working papers are recognized by a number followed by a '.'
- ///# in a non-overview section
- /// WorkingPaper:
- ///       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
- ///       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
- ///
- /// TitleString:
- ///       a String that may span several lines and should be joined
- ///
- ///# there must be at least one author
- /// Authors:
- ///       Author '\n' Authors
- ///       Author '\n'
- ///
- ///# optionally, an institution is given for an author
- /// Author:
- ///       AuthorName
- ///       AuthorName '(' Institution ')'
- ///
- ///# there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
- /// AuthorName:
- ///       a non-empty String without '(' or ')' characters, not spanning more that one line
- ///
- /// Institution:
- ///       a non-empty String that may span several lines
- ///
- /// Abstract:
- ///       a (possibly empty) String that may span several lines
- ///
- /// AdditionalFields:
- ///       AdditionalField '\n' AdditionalFields
- ///       EmptyLine AdditionalFields
- ///       ''
- ///
- /// AdditionalField:
- ///       'Keywords:' KeywordList
- ///       'URL:' non-empty String
- ///       'Date:' DateString
- ///       'JEL:' JelClassificationList
- ///       'By': Authors
- ///
- /// KeywordList:
- ///        Keyword ',' KeywordList
- ///        Keyword ';' KeywordList
- ///        Keyword
- ///
- /// Keyword:
- ///        non-empty String that does not contain ',' (may contain whitespace)
- ///
- ///# if no date is given, the current year as given by the system clock is assumed
- /// DateString:
- ///        'yyyy-MM-dd'
- ///        'yyyy-MM'
- ///        'yyyy'
- ///
- /// JelClassificationList:
- ///        JelClassification JelClassificationList
- ///        JelClassification
- ///
- ///# the JEL Classifications are set into a new BIBTEX-field 'jel'
- ///# they will appear if you add it as a field to one of the BIBTex Entry sections
- /// JelClassification:
- ///        one of the allowed classes, see http://ideas.repec.org/j/
- ///
- /// SectionSeparator:
- ///       '\n-----------------------------'
- ///```
+/// NEPMessage:
+///       MessageSection NEPMessage
+///       MessageSection
+///
+/// MessageSection:
+///       OverviewMessageSection
+///       OtherMessageSection
+///
+/// # we skip the overview
+/// OverviewMessageSection:
+///       'In this issue we have: ' SectionSeparator OtherStuff
+///
+/// OtherMessageSection:
+///       SectionSeparator  OtherMessageSectionContent
+///
+/// # we skip other stuff and read only full working paper references
+/// OtherMessageSectionContent:
+///       WorkingPaper EmptyLine OtherMessageSectionContent
+///       OtherStuff EmptyLine OtherMessageSectionContent
+///       ''
+///
+/// OtherStuff:
+///       NonEmptyLine OtherStuff
+///       NonEmptyLine
+///
+/// NonEmptyLine:
+///       a non-empty String that does not start with a number followed by a '.'
+///
+/// # working papers are recognized by a number followed by a '.'
+/// # in a non-overview section
+/// WorkingPaper:
+///       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
+///       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
+///
+/// TitleString:
+///       a String that may span several lines and should be joined
+///
+/// # there must be at least one author
+/// Authors:
+///       Author '\n' Authors
+///       Author '\n'
+///
+/// # optionally, an institution is given for an author
+/// Author:
+///       AuthorName
+///       AuthorName '(' Institution ')'
+///
+/// # there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
+/// AuthorName:
+///       a non-empty String without '(' or ')' characters, not spanning more that one line
+///
+/// Institution:
+///       a non-empty String that may span several lines
+///
+/// Abstract:
+///       a (possibly empty) String that may span several lines
+///
+/// AdditionalFields:
+///       AdditionalField '\n' AdditionalFields
+///       EmptyLine AdditionalFields
+///       ''
+///
+/// AdditionalField:
+///       'Keywords:' KeywordList
+///       'URL:' non-empty String
+///       'Date:' DateString
+///       'JEL:' JelClassificationList
+///       'By': Authors
+///
+/// KeywordList:
+///        Keyword ',' KeywordList
+///        Keyword ';' KeywordList
+///        Keyword
+///
+/// Keyword:
+///        non-empty String that does not contain ',' (may contain whitespace)
+///
+/// # if no date is given, the current year as given by the system clock is assumed
+/// DateString:
+///        'yyyy-MM-dd'
+///        'yyyy-MM'
+///        'yyyy'
+///
+/// JelClassificationList:
+///        JelClassification JelClassificationList
+///        JelClassification
+///
+/// # the JEL Classifications are set into a new BIBTEX-field 'jel'
+/// # they will appear if you add it as a field to one of the BIBTex Entry sections
+/// JelClassification:
+///        one of the allowed classes, see http://ideas.repec.org/j/
+///
+/// SectionSeparator:
+///       '\n-----------------------------'
+/// ```
 public class RepecNepImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);

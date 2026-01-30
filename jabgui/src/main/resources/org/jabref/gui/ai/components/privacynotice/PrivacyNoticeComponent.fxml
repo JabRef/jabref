@@ -8,36 +8,19 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
-<fx:root
-        type="ScrollPane"
-        styleClass="ai-tab"
-        xmlns="http://javafx.com/javafx/17.0.2-ea"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent">
-    <VBox spacing="20.0"
-          styleClass="gdpr-notice"
-          fx:id="text">
-        <Label wrapText="true"
-               text="%Privacy notice"
-               styleClass="heading"/>
+<fx:root type="ScrollPane" styleClass="ai-tab"
+         xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent">
+    <VBox spacing="20.0" styleClass="gdpr-notice" fx:id="text">
+        <Label wrapText="true" text="%Privacy notice" styleClass="heading" />
         <Text text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). At present, all supported AI providers are JabRef external services. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider and as soon as you send a message or start summarizing, the text content of all PDFs attached to the entry is sent to the external service. By using this service, you agree to the privacy policy of the selected AI provider."/>
         <Text text="%In the preferences, you can turn AI functionality on and off at any time."/>
-        <GridPane
-                fx:id="aiPolicies"
-                hgap="4"
-                vgap="4"/>
-        <Text fx:id="embeddingModelText"
-              text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. Embedding models will automatically be downloaded in the background from Deep Java Library servers. The currently configured model has a size of %0."/>
-        <Hyperlink
-                wrapText="true"
-                onAction="#onDjlPrivacyPolicyClick"
-                styleClass="embeddedHyperlink"
-                text="%You can find information about the DJL privacy policy here."/>
+        <GridPane fx:id="aiPolicies" hgap="4" vgap="4" />
+        <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. Embedding models will automatically be downloaded in the background from Deep Java Library servers. The currently configured model has a size of %0." />
+        <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" styleClass="embeddedHyperlink" text="%You can find information about the DJL privacy policy here." />
         <HBox spacing="10.0">
-            <Button onAction="#onIAgreeButtonClick"
-                    text="%I agree"/>
-            <Button onAction="#hideAITabs"
-                    text="%Hide 'AI' tabs"/>
+            <Button onAction="#onIAgreeButtonClick" text="%I agree"/>
+            <Button onAction="#hideAITabs" text="%Hide 'AI' tabs"/>
         </HBox>
     </VBox>
 </fx:root>

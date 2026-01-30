@@ -48,7 +48,7 @@ class GitStatusCheckerTest {
               author = {initial-author},
               doi = {xya},
             }
-            
+
             @article{b,
               author = {initial-author},
               doi = {xyz},
@@ -60,7 +60,7 @@ class GitStatusCheckerTest {
               author = {initial-author},
               doi = {xya},
             }
-            
+
             @article{b,
               author = {remote-update},
               doi = {xyz},
@@ -72,7 +72,7 @@ class GitStatusCheckerTest {
               author = {local-update},
               doi = {xya},
             }
-            
+
             @article{b,
               author = {initial-author},
               doi = {xyz},

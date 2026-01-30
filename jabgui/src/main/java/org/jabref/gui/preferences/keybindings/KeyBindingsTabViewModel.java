@@ -83,8 +83,8 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     /// Searches for the term in the keybinding's localization, category, or key combination
     ///
     /// @param keyBinding keybinding to search in
-     /// @param searchTerm term to search for
-     /// @return true if the term is found in the keybinding
+    /// @param searchTerm term to search for
+    /// @return true if the term is found in the keybinding
     private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {
         if (keyBinding.getLocalization().toLowerCase().contains(searchTerm) ||
                 keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {

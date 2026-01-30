@@ -35,9 +35,9 @@ import com.sun.star.uno.Exception;
 /// Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
 ///
 /// @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
- /// These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
- /// In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
- /// For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
+/// These "additional" operations may or may not be visible at the level of code in the form of additional function calls.
+/// In some cases, the same macro-task may be achieved by two different orders of actions, which may look semantically the same overall, but one order may result into more UNO API calls.
+/// For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
 public class CSLCitationOOAdapter {
 
     private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;

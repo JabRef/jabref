@@ -48,7 +48,7 @@ public class UnoTextDocument {
     }
 
     /// @param doc The XTextDocument we want the frame title for. Null allowed.
-     /// @return The title or Optional.empty()
+    /// @return The title or Optional.empty()
     public static Optional<String> getFrameTitle(XTextDocument doc) {
         Optional<XFrame> frame = getCurrentController(doc).map(XController::getFrame);
         if (frame.isEmpty()) {

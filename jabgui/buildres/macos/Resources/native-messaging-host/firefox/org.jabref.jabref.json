@@ -3,8 +3,5 @@
   "description": "JabRef",
   "path": "/Applications/JabRef.app/Contents/Resources/jabrefHost.py",
   "type": "stdio",
-  "allowed_extensions": [
-    "browserextension@jabref.org",
-    "@jabfox"
-  ]
+  "allowed_extensions": ["browserextension@jabref.org", "@jabfox"]
 }

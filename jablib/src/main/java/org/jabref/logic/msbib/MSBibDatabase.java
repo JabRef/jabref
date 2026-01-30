@@ -48,7 +48,7 @@ public class MSBibDatabase {
     /// Directly converts the given entries.
     ///
     /// @param database The bib database
-     /// @param entries  List of {@link BibEntry}
+    /// @param entries  List of {@link BibEntry}
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         this();
         List<BibEntry> resolvedEntries;

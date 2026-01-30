@@ -311,10 +311,10 @@ public class PdfContentImporter extends PdfImporter {
     /// publisher-specific formats like Springer or IEEE, extracting data like series, volume, and conference titles.
     ///
     /// @param firstpageContents The raw content of the PDF's first page, which may contain metadata and main content.
-     /// @param lineSeparator     The line separator used to format and unify line breaks in the text content.
-     /// @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the default title parsing.
-     /// @return An {@link Optional} containing a {@link BibEntry} with the parsed bibliographic data if extraction
-     /// is successful. Otherwise, an empty {@link Optional}.
+    /// @param lineSeparator     The line separator used to format and unify line breaks in the text content.
+    /// @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the default title parsing.
+    /// @return An {@link Optional} containing a {@link BibEntry} with the parsed bibliographic data if extraction
+    /// is successful. Otherwise, an empty {@link Optional}.
     @VisibleForTesting
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, Optional<String> titleByFontSize) {
         String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);

@@ -53,7 +53,7 @@ public class ServerUtils {
     }
 
     /// @param id - also "demo" for the demo library
-     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
+    /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
     public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, SrvStateManager srvStateManager, ImportFormatPreferences importFormatPreferences) throws IOException {
         BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
         if ("demo".equals(id)) {

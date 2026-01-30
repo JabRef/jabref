@@ -1,17 +1,9 @@
 ---
 parent: Code Howtos
 ---
-
 # XMP Parsing
 
-Example
-XMP
-metadata
-from
-a
-PDF
-file (
-src/test/resources/org/jabref/logic/importer/fileformat/pdf/2024_SPLC_Becker.pdf):
+Example XMP metadata from a PDF file (src/test/resources/org/jabref/logic/importer/fileformat/pdf/2024_SPLC_Becker.pdf):
 
 ```xml
 <?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
@@ -50,16 +42,4 @@ src/test/resources/org/jabref/logic/importer/fileformat/pdf/2024_SPLC_Becker.pdf
 <?xpacket end="w"?>
 ```
 
-`org.apache.xmpbox.xml.DomXmpParser`
-cannot
-ignore
-unknown
-namespaces.
-Therefore,
-we
-need
-to
-exact
-the
-known
-elements.
+`org.apache.xmpbox.xml.DomXmpParser` cannot ignore unknown namespaces. Therefore, we need to exact the known elements.

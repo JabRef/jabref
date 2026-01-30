@@ -30,7 +30,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
     /// Imports the comments from a pdf specified by its path
     ///
     /// @param path a path to a pdf
-     /// @return a list with the all the annotations found in the file of the path
+    /// @return a list with the all the annotations found in the file of the path
     @Override
     public List<FileAnnotation> importAnnotations(final Path path) {
         if (!validatePath(path)) {

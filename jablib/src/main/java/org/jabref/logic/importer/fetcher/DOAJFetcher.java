@@ -47,7 +47,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     /// Convert a JSONObject containing a bibJSON entry to a BibEntry
     ///
     /// @param bibJsonEntry The JSONObject to convert
-     /// @return the converted BibEntry
+    /// @return the converted BibEntry
     public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
         // Fields that are directly accessible at the top level BibJson object
         List<Field> singleFields = List.of(StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH);

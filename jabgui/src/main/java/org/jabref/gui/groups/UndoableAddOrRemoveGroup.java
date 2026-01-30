@@ -35,8 +35,8 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
     /// Creates an object that can undo/redo an edit event.
     ///
     /// @param groupsRoot The global groups root.
-     /// @param editType   The type of editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN, REMOVE_NODE_AND_CHILDREN)
-     /// @param editedNode The edited node (which was added or will be removed). The node must be a descendant of node **groupsRoot**! This means that, in case of adding, you first have to add it to the tree, then call this constructor. When removing, you first have to call this constructor, then remove the node.
+    /// @param editType   The type of editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN, REMOVE_NODE_AND_CHILDREN)
+    /// @param editedNode The edited node (which was added or will be removed). The node must be a descendant of node **groupsRoot**! This means that, in case of adding, you first have to add it to the tree, then call this constructor. When removing, you first have to call this constructor, then remove the node.
     public UndoableAddOrRemoveGroup(GroupTreeNodeViewModel groupsRoot,
                                     GroupTreeNodeViewModel editedNode, int editType) {
         m_groupsRootHandle = groupsRoot;

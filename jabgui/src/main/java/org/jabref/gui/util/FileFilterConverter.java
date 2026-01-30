@@ -42,7 +42,7 @@ public class FileFilterConverter {
     /// Otherwise, it returns a generic filter.
     ///
     /// @param file The file to check.
-     /// @return The corresponding Extension Filter for the file type.
+    /// @return The corresponding Extension Filter for the file type.
     public static FileChooser.ExtensionFilter determineExtensionFilter(Path file) {
         if (FileUtil.isBibFile(file)) {
             return toExtensionFilter("BibTeX", StandardFileType.BIBTEX_DB);

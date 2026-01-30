@@ -28,8 +28,8 @@ public class MainTableFieldValueFormatter {
     /// unicode if possible.
     ///
     /// @param fields the fields argument of {@link BibEntryTableViewModel#getFields(OrFields)}.
-     /// @param entry  the BibEntry of {@link BibEntryTableViewModel}.
-     /// @return The formatted name field.
+    /// @param entry  the BibEntry of {@link BibEntryTableViewModel}.
+    /// @return The formatted name field.
     public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
         for (Field field : fields.getFields()) {
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES) && (displayStyle != DisplayStyle.AS_IS)) {
@@ -53,7 +53,7 @@ public class MainTableFieldValueFormatter {
     /// possible.
     ///
     /// @param nameToFormat The contents of the name field.
-     /// @return The formatted name field.
+    /// @return The formatted name field.
     private String formatFieldWithAuthorValue(final String nameToFormat) {
         if (nameToFormat == null) {
             return null;

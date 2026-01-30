@@ -169,7 +169,7 @@ public class GitHandler {
     /// Creates a commit on the currently checked out branch
     ///
     /// @param amend Whether to amend to the last commit (true), or not (false)
-     /// @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
+    /// @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
     public boolean createCommitOnCurrentBranch(String commitMessage, boolean amend) throws IOException, GitAPIException {
         boolean commitCreated = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
@@ -201,7 +201,7 @@ public class GitHandler {
     /// Merges the source branch into the target branch
     ///
     /// @param targetBranch the name of the branch that is merged into
-     /// @param sourceBranch the name of the branch that gets merged
+    /// @param sourceBranch the name of the branch that gets merged
     public void mergeBranches(String targetBranch, String sourceBranch, MergeStrategy mergeStrategy) throws IOException, GitAPIException {
         String currentBranch = this.getCurrentlyCheckedOutBranch();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
@@ -325,7 +325,7 @@ public class GitHandler {
     /// If a directory containing a .git folder is found, return that path.
     ///
     /// @param anyPathInsideRepo the file or directory path that is assumed to be located inside a Git repository
-     /// @return an optional containing the path to the Git repository root if found
+    /// @return an optional containing the path to the Git repository root if found
     public static Optional<Path> findRepositoryRoot(Path anyPathInsideRepo) {
         Path current = anyPathInsideRepo.toAbsolutePath();
         while (current != null) {

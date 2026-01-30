@@ -518,7 +518,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// Get boolean property.
     ///
     /// @param key The property key
-     /// @return the value
+    /// @return the value
     public boolean getBooleanCitProperty(String key) {
         return (Boolean) citProperties.get(key);
     }
@@ -538,7 +538,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// Get a style property.
     ///
     /// @param propName The property name.
-     /// @return The property value, or null if it doesn't exist.
+    /// @return The property value, or null if it doesn't exist.
     public Object getProperty(String propName) {
         return properties.get(propName);
     }
@@ -713,9 +713,9 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// going throw the uniquefication process.
     ///
     /// @param citationMarkerEntries           The list of entries providing the data.
-     /// @param inParenthesis                   Signals whether a parenthesized citation or an in-text citation is wanted.
-     /// @param nonUniqueCitationMarkerHandling THROWS : Should throw if finds that uniqueLetters provided do not make the entries unique.
-     /// @return The formatted citation. The result does not include the standard wrappers: OOFormat.setLocaleNone() and OOFormat.setCharStyle(). These are added by decorateCitationMarker()
+    /// @param inParenthesis                   Signals whether a parenthesized citation or an in-text citation is wanted.
+    /// @param nonUniqueCitationMarkerHandling THROWS : Should throw if finds that uniqueLetters provided do not make the entries unique.
+    /// @return The formatted citation. The result does not include the standard wrappers: OOFormat.setLocaleNone() and OOFormat.setCharStyle(). These are added by decorateCitationMarker()
     public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
                                        boolean inParenthesis,
                                        NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
@@ -807,7 +807,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// @return Names of fields containing authors: the first
-     /// non-empty field will be used.
+    /// non-empty field will be used.
     protected OrFields getAuthorFieldNames() {
         String authorFieldNamesString = this.getStringCitProperty(JStyle.AUTHOR_FIELD);
         return FieldFactory.parseOrFields(authorFieldNamesString);

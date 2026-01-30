@@ -475,8 +475,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private GitPreferences gitPreferences;
 
     /// @implNote The constructor was made public because dependency injection via constructor
-     /// required widespread refactoring, currently we are using reflection in some formatters
-     /// to gain access
+    /// required widespread refactoring, currently we are using reflection in some formatters
+    /// to gain access
     public JabRefCliPreferences() {
         try {
             Path preferencesPath = Path.of("jabref.xml");
@@ -832,9 +832,9 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     /// @deprecated Never ever add a call to this method. There should be only one
-     /// caller. All other usages should get the preferences passed (or injected). The
-     /// JabRef team leaves the `@deprecated` annotation to have IntelliJ listing
-     /// this method with a strike-through.
+    /// caller. All other usages should get the preferences passed (or injected). The
+    /// JabRef team leaves the `@deprecated` annotation to have IntelliJ listing
+    /// this method with a strike-through.
     @Deprecated
     public static JabRefCliPreferences getInstance() {
         if (JabRefCliPreferences.singleton == null) {
@@ -868,7 +868,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Check whether a key is set (differently from null).
     ///
     /// @param key The key to check.
-     /// @return true if the key is set, false otherwise.
+    /// @return true if the key is set, false otherwise.
     public boolean hasKey(String key) {
         return PREFS_NODE.get(key, null) != null;
     }
@@ -1118,7 +1118,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Imports Preferences from an XML file.
     ///
     /// @param path Path of file to import from
-     /// @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
+    /// @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
     @Override
     public void importPreferences(Path path) throws JabRefException {
         importPreferencesToBackingStore(path);

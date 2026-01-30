@@ -22,7 +22,7 @@ public class Password {
     private final IvParameterSpec ivSpec;
 
     /// @param phrase Phrase which should be encrypted or decrypted
-     /// @param key    Key which is used to improve symmetric encryption
+    /// @param key    Key which is used to improve symmetric encryption
     public Password(char[] phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
         this(new String(phrase), key);
     }

@@ -157,7 +157,7 @@ public class BibDatabase {
     /// Inserts the entry.
     ///
     /// @param entry       entry to insert
-     /// @param eventSource source the event is sent from
+    /// @param eventSource source the event is sent from
     public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
         insertEntries(List.of(entry), eventSource);
     }
@@ -207,7 +207,7 @@ public class BibDatabase {
     /// The entries are removed based on the id {@link BibEntry#getId()}
     ///
     /// @param toBeDeleted Entry to delete
-     /// @param eventSource Source the event is sent from
+    /// @param eventSource Source the event is sent from
     public synchronized void removeEntries(@NonNull List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Collection<String> idsToBeDeleted;
         if (toBeDeleted.size() > 10) {
@@ -391,8 +391,8 @@ public class BibDatabase {
     /// references.
     ///
     /// @param entriesToResolve A collection of BibtexEntries in which all strings of the form `#xxx#` will be resolved against the hash map of string references stored in the database.
-     /// @param inPlace          If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
-     /// @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
+    /// @param inPlace          If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
+    /// @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
     public List<BibEntry> resolveForStrings(@NonNull Collection<BibEntry> entriesToResolve, boolean inPlace) {
         List<BibEntry> results = new ArrayList<>(entriesToResolve.size());
 
@@ -405,10 +405,10 @@ public class BibDatabase {
     /// Take the given BibEntry and resolve any string references.
     ///
     /// @param entry   A BibEntry in which all strings of the form #xxx# will be resolved against the hash map of string references stored in the database.
-     /// @param inPlace If inPlace is true then the given BibEntry will be modified, if false then a copy is made using close made before  resolving the strings.
-     /// @return a BibEntry with all string references resolved. It is
-     /// dependent on the value of inPlace whether a copy is made or the
-     /// given BibtexEntries is modified.
+    /// @param inPlace If inPlace is true then the given BibEntry will be modified, if false then a copy is made using close made before  resolving the strings.
+    /// @return a BibEntry with all string references resolved. It is
+    /// dependent on the value of inPlace whether a copy is made or the
+    /// given BibtexEntries is modified.
     public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
         BibEntry resultingEntry;
         if (inPlace) {
@@ -601,12 +601,12 @@ public class BibDatabase {
     }
 
     /// @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
-     /// @implNote New entries are always added to the end of the list and always get a higher ID.
-     /// See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
-     /// {@link org.jabref.model.entry.IdGenerator IdGenerator},
-     /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
-     /// Therefore, using binary search to find the index.
-     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
+    /// @implNote New entries are always added to the end of the list and always get a higher ID.
+    /// See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
+    /// {@link org.jabref.model.entry.IdGenerator IdGenerator},
+    /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+    /// Therefore, using binary search to find the index.
+    /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
     public int indexOf(BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
         if (index >= 0) {

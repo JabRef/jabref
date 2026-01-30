@@ -2,109 +2,17 @@
 
 ## Why Semantic Merge?
 
-In
-JabRef,
-we
-aim
-to
-minimize
-user
-interruptions
-when
-collaborating
-on
-the
-same
-`.bib`
-library
-file
-using
-Git.
-To
-achieve
-this,
-we
-go
-beyond
-Git’s
-default
-line-based
-syntactic
-merging
-and
-implement
-our
-own
-semantic
-merge
-logic
-that
-understands
-the
-structure
-of
-BibTeX
-entries.
+In JabRef, we aim to minimize user interruptions when collaborating on the same `.bib` library file using Git. To achieve this, we go beyond Git’s default line-based syntactic merging and implement our own semantic merge logic that understands the structure of BibTeX entries.
 
-This
-means:
+This means:
 
-*
-Even
-if
-Git
-detects
-conflicting
-lines,
-*
-JabRef
-is
-able
-to
-recognize
-that
-both
-sides
-are
-editing
-the
-same
-BibTeX
-entry,
-*
-And
-determine—at
-the
-field
-level—whether
-there
-is
-an
-actual
-semantic
-conflict.
+* Even if Git detects conflicting lines,
+* JabRef is able to recognize that both sides are editing the same BibTeX entry,
+* And determine—at the field level—whether there is an actual semantic conflict.
 
 ## Merge Example
 
-The
-following
-example
-illustrates
-a
-case
-where
-Git
-detects
-a
-conflict,
-but
-JabRef
-is
-able
-to
-resolve
-it
-automatically.
+The following example illustrates a case where Git detects a conflict, but JabRef is able to resolve it automatically.
 
 ### Base Version
 
@@ -122,18 +30,7 @@ automatically.
 
 ### Bob's Side
 
-Bob
-reorders
-the
-entries
-and
-updates
-the
-author
-field
-of
-entry
-b:
+Bob reorders the entries and updates the author field of entry b:
 
 ```bibtex
 @article{b,
@@ -149,14 +46,7 @@ b:
 
 ### Alice's Side
 
-Alice
-modifies
-the
-author
-field
-of
-entry
-a:
+Alice modifies the author field of entry a:
 
 ```bibtex
 @article{a,
@@ -172,201 +62,40 @@ a:
 
 ### Merge Outcome
 
-When
-Alice
-runs
-git
-pull,
-Git
-sees
-that
-both
-branches
-have
-modified
-overlapping
-lines (
-due
-to
-reordering
-and
-content
-changes)
-and
-reports
-a
-syntactic
-conflict.
+When Alice runs git pull, Git sees that both branches have modified overlapping lines (due to reordering and content changes) and reports a syntactic conflict.
 
-However,
-JabRef
-is
-able
-to
-analyze
-the
-entries
-and
-determine
-that:
+However, JabRef is able to analyze the entries and determine that:
 
-*
-Entry
-a
-was
-modified
-only
-by
-Alice.
-*
-Entry
-b
-was
-modified
-only
-by
-Bob.
-*
-There
-is
-no
-conflict
-at
-the
-field
-level.
-*
-The
-order
-of
-entries
-in
-the
-file
-does
-not
-affect
-BibTeX
-semantics.
+* Entry a was modified only by Alice.
+* Entry b was modified only by Bob.
+* There is no conflict at the field level.
+* The order of entries in the file does not affect BibTeX semantics.
 
-Therefore,
-JabRef
-performs
-an
-automatic
-merge
-without
-requiring
-manual
-conflict
-resolution.
+Therefore, JabRef performs an automatic merge without requiring manual conflict resolution.
 
 ## Related Test Cases
 
-The
-semantic
-conflict
-detection
-and
-merge
-resolution
-logic
-is
-covered
-by:
+The semantic conflict detection and merge resolution logic is covered by:
 
-*
-`org.jabref.logic.git.merge.SemanticMergeAnalyzerTest#semanticEntryLevelConflicts`
-*
-`org.jabref.logic.git.merge.SemanticMergeAnalyzerTest#semanticFieldLevelConflicts`.
+* `org.jabref.logic.git.merge.SemanticMergeAnalyzerTest#semanticEntryLevelConflicts`
+* `org.jabref.logic.git.merge.SemanticMergeAnalyzerTest#semanticFieldLevelConflicts`.
 
 ## Conflict Scenarios
 
-The
-following
-table
-describes
-when
-semantic
-merge
-in
-JabRef
-should
-consider
-a
-situation
-as
-conflict
-or
-not
-during
-a
-three-way
-merge.
+The following table describes when semantic merge in JabRef should consider a situation as conflict or not during a three-way merge.
 
 ### Entry-level Conflict Cases (E-series)
 
-Each
-side (
-Base,
-Local,
-Remote)
-can
-take
-one
-of
-the
-following
-values:
+Each side (Base, Local, Remote) can take one of the following values:
 
-*
-`–`:
-entry
-does
-not
-exist (
-null)
-*
-`S`:
-same
-as
-base
-*
-`M`:
-modified (
-fields
-changed)
+* `–`: entry does not exist (null)
+* `S`: same as base
+* `M`: modified (fields changed)
 
->
-Note:
-Citation
-key
-is
-used
-as
-the
-entry
-identifier.
-Renaming
-a
-citation
-key
-is
-currently
-treated
-as
-deletion +
-addition
-and
-not
-supported
-as
-a
-standalone
-diff.
+> Note: Citation key is used as the entry identifier. Renaming a citation key is currently treated as deletion + addition and not supported as a standalone diff.
 
 | TestID | Base          | Local             | Remote            | Description                                                    | Common Scenario                                                                | Conflict |
-|--------|---------------|-------------------|-------------------|----------------------------------------------------------------|--------------------------------------------------------------------------------|----------|
+| ------ | ------------- | ----------------- | ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------- |
 | E01    | –             | –                 | –                 | All null                                                       | Entry absent on all sides                                                      | No       |
 | E02    | –             | –                 | M                 | Remote added entry                                             | Accept remote addition                                                         | No       |
 | E03    | –             | M                 | –                 | Local added entry                                              | Keep local addition                                                            | No       |
@@ -389,87 +118,12 @@ diff.
 
 ### Field-level Conflict Cases (F-series)
 
-Each
-individual
-field (
-such
-as
-title,
-author,
-etc.)
-may
-have
-one
-of
-the
-following
-statuses
-relative
-to
-the
-base
-version:
+Each individual field (such as title, author, etc.) may have one of the following statuses relative to the base version:
 
-*
-Unchanged:
-The
-field
-value
-is
-exactly
-the
-same
-as
-in
-the
-base
-version.
-*
-Changed:
-The
-field
-value
-is
-different
-from
-the
-base
-version.
-*
-Deleted:
-The
-field
-existed
-in
-the
-base
-version
-but
-is
-now
-missing (
-i.e.,
-null).
-*
-Added:
-The
-field
-did
-not
-exist
-in
-the
-base
-version
-but
-was
-added
-in
-the
-local
-or
-remote
-version.
+* Unchanged: The field value is exactly the same as in the base version.
+* Changed: The field value is different from the base version.
+* Deleted: The field existed in the base version but is now missing (i.e., null).
+* Added: The field did not exist in the base version but was added in the local or remote version.
 
 | TestID | Base                          | Local               | Remote              | Description                                 | Conflict |
 |--------|-------------------------------|---------------------|---------------------|---------------------------------------------|----------|

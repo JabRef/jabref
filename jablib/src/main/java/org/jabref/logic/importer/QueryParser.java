@@ -24,7 +24,7 @@ public class QueryParser {
     /// Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
     ///
     /// @param query The given query string
-     /// @return A complex query containing all fields of the query string
+    /// @return A complex query containing all fields of the query string
     public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String query) {
         try {
             StandardQueryParser parser = new StandardQueryParser();

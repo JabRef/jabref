@@ -8,7 +8,7 @@ import java.util.Optional;
 /// If "the local is strictly behind the remote and the file content is exactly the same as the remote" → fast-forward, no new commit is created;
 /// Otherwise:
 /// - BEHIND (local is an ancestor of remote): create a new single-parent commit (parent=remote) on top of remote;
-/// - DIVERGED: create a new dual-parent merge commit (parents=[local,remote]).
+/// - DIVERGED: create a new dual-parent merge commit (parents=[local, remote]).
 /// Notes: Because the statuses UP_TO_DATE / AHEAD / CONFLICT / UNTRACKED are already filtered out before prepareMerge by GitStatusChecker, they will not enter finalizeMerge.
 public final class BookkeepingResult {
     public enum Kind {

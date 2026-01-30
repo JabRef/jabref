@@ -230,7 +230,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     /// ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
     ///
     /// @param list       The ListView currently focused
-     /// @param keypressed The pressed character
+    /// @param keypressed The pressed character
 
     private void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {

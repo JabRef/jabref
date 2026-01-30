@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.Field;
 /// "patch" in the sense of "commands" to be applied to the source to get the target
 ///
 /// @param fieldPatches contains field-level modifications per citation key. citationKey -> field -> newValue (null = delete)
- /// @param newEntries   entries present in remote but not in base/local
+/// @param newEntries   entries present in remote but not in base/local
 public record MergePlan(
         Map<String, Map<Field, String>> fieldPatches,
         List<BibEntry> newEntries,

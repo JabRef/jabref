@@ -154,7 +154,7 @@ public class GitPullAction extends SimpleCommand {
     /// Prepares a merge plan for the given library and file path.
     ///
     /// @return An Optional containing the PullPlan if a merge is needed,
-     ///         or Optional.empty() if the local library is already up-to-date or ahead of the remote branch.
+    ///         or Optional.empty() if the local library is already up-to-date or ahead of the remote branch.
     private Optional<PullPlan> prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
         return gitSyncService.prepareMerge(databaseContext, bibPath);

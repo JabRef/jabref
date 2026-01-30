@@ -59,8 +59,8 @@ class PreferencesSearchHandler {
     /// Checks if a tab matches the given search query either by its name or by its controls.
     ///
     /// @param tab   The preferences tab to check.
-     /// @param query The search query.
-     /// @return True if the tab matches the query.
+    /// @param query The search query.
+    /// @return True if the tab matches the query.
     private boolean tabMatchesQuery(PreferencesTab tab, String query) {
         boolean tabNameMatches = tab.getSearchKeywords().stream()
                                     .anyMatch(keyword -> keyword.toLowerCase(Locale.ROOT).contains(query));
@@ -83,8 +83,8 @@ class PreferencesSearchHandler {
     /// - **TextField**: Matches if its content contains the query (case-insensitive).
     ///
     /// @param control The control to check.
-     /// @param query   The search query.
-     /// @return true if the control contains the query, otherwise false.
+    /// @param query   The search query.
+    /// @return true if the control contains the query, otherwise false.
     private boolean controlMatchesQuery(Control control, String query) {
         if (control instanceof Labeled labeled && labeled.getText() != null) {
             return labeled.getText().toLowerCase(Locale.ROOT).contains(query);
@@ -130,7 +130,7 @@ class PreferencesSearchHandler {
     /// Builds a map of controls for each preferences tab.
     ///
     /// @param tabs The list of preferences tabs.
-     /// @return A map of preferences tabs to their controls.
+    /// @return A map of preferences tabs to their controls.
     private ArrayListMultimap<PreferencesTab, Control> getPreferenceTabsControlsMap(List<PreferencesTab> tabs) {
         ArrayListMultimap<PreferencesTab, Control> controlMap = ArrayListMultimap.create();
         tabs.forEach(tab -> scanControls(tab.getBuilder(), controlMap, tab));
@@ -140,8 +140,8 @@ class PreferencesSearchHandler {
     /// Recursively scans nodes and collects all controls.
     ///
     /// @param node       The current node being scanned.
-     /// @param controlMap Map storing tabs and their corresponding controls.
-     /// @param tab        The PreferencesTab associated with the current node.
+    /// @param controlMap Map storing tabs and their corresponding controls.
+    /// @param tab        The PreferencesTab associated with the current node.
     private void scanControls(Node node, ArrayListMultimap<PreferencesTab, Control> controlMap, PreferencesTab tab) {
         if (node instanceof Control control) {
             controlMap.put(tab, control);

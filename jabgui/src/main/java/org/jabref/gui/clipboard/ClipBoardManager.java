@@ -63,10 +63,10 @@ public class ClipBoardManager {
     /// want to use it: `ClipBoardManager.addX11Support(TextInputControl input);`.
     ///
     /// @param input the TextInputControl (e.g., TextField, TextArea, and children) where adding this functionality.
-     /// @see <a href="https://www.uninformativ.de/blog/postings/2017-04-02/0/POSTING-en.html">Short summary for X11
-     /// clipboards</a>
-     /// @see <a href="https://unix.stackexchange.com/questions/139191/whats-the-difference-between-primary-selection-and-clipboard-buffer/139193#139193">Longer
-     /// text over clipboards</a>
+    /// @see <a href="https://www.uninformativ.de/blog/postings/2017-04-02/0/POSTING-en.html">Short summary for X11
+    /// clipboards</a>
+    /// @see <a href="https://unix.stackexchange.com/questions/139191/whats-the-difference-between-primary-selection-and-clipboard-buffer/139193#139193">Longer
+    /// text over clipboards</a>
     public static void addX11Support(TextInputControl input) {
         input.selectedTextProperty().addListener(
                 // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270

@@ -35,7 +35,7 @@ public class UnoBookmark {
     /// Get the XTextRange corresponding to the named bookmark.
     ///
     /// @param name The name of the bookmark to find.
-     /// @return The XTextRange for the bookmark, or Optional.empty().
+    /// @return The XTextRange for the bookmark, or Optional.empty().
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
             throws
             WrappedTargetException,
@@ -50,7 +50,7 @@ public class UnoBookmark {
     /// In LibreOffice the another name is in "{name}{number}" format.
     ///
     /// @return The XNamed interface of the bookmark.
-     /// result.getName() should be checked by the caller, because its name may differ from the one requested.
+    /// result.getName() should be checked by the caller, because its name may differ from the one requested.
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {

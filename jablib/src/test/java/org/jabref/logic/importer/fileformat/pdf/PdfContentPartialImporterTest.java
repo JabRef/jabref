@@ -53,17 +53,17 @@ class PdfContentPartialImporterTest {
         String firstPageContents = """
                 Corpus Linguistics – An International Handbook – Lüdeling, Anke,
                 Kytö, Merja (Eds.)
-                
+
                 Anke Lüdeling, Merja Kytö (Eds.)
-                
+
                 VOLUME 2
-                
+
                 This handbook provides an up-to-date survey of the field of corpus linguistics, a Handbücher zur Sprach- und
                 field whose methodology has revolutionized much of the empirical work done in Kommunikationswissenschaft / Handbooks
-                
+
                 of Linguistics and Communication Science
                 most fields of linguistic study over the past decade. (HSK) 29/2
-                
+
                 vii, 578 pages
                 Corpus linguistics investigates human language by starting out from large
                 """;
@@ -84,7 +84,7 @@ class PdfContentPartialImporterTest {
                 Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock
                 Losses and Stakeholder Opinions.
                 DOI
-                
+
                 Link to record in KAR
                 http://kar.kent.ac.uk/51043/
                 Document Version
@@ -105,22 +105,22 @@ class PdfContentPartialImporterTest {
         String firstPageContent = """
                 British Journal of Nutrition (2008), 99, 1–11 doi: 10.1017/S0007114507795296
                 q The Authors 2008
-                
+
                 Review Article
-                
+
                 Cocoa and health: a decade of research
-                
+
                 Karen A. Cooper1, Jennifer L. Donovan2, Andrew L. Waterhouse3 and Gary Williamson1*
                 1Nestlé Research Center, Vers-Chez-les-Blanc, PO Box 44, CH-1000 Lausanne 26, Switzerland
                 2Department of Psychiatry and Behavioural Sciences, Medical University of South Carolina, Charleston, SC 29425, USA
                 3Department of Viticulture & Enology, University of California, Davis, CA 95616, USA
-                
+
                 (Received 5 December 2006 – Revised 29 May 2007 – Accepted 31 May 2007)
-                
+
                 Abbreviations: FMD, flow-mediated dilation; NO, nitirc oxide.
-                
+
                 *Corresponding author: Dr Gary Williamson, fax þ41 21 785 8544, email gary.williamson@rdls.nestle.com
-                
+
                 British Journal of Nutrition
                 https://doi.org/10.1017/S0007114507795296 Published online by Cambridge University Press""";
 
@@ -139,14 +139,14 @@ class PdfContentPartialImporterTest {
         // This is from https://arxiv.org/abs/2408.06224
         String firstPageContent = """
                 A Multi-Year Grey Literature Review on AI-assisted Test Automation
-                
+
                 Filippo Riccaa, Alessandro Marchettob and Andrea Stoccoc
-                
+
                 aUniversity of Genoa, Via Balbi 5, Genova, 16126, Italy
                 bUniversity of Trento, Via Sommarive 9, Trento, 38123, Italy
                 cTechnical University of Munich, Boltzmannstraße 3, Munich, 85748, Germany
                 dfortiss GmbH, Guerickestraße 25, Munich, 80805, Germany
-                
+
                 Keywords:
                 Test Automation
                 Artificial Intelligence
@@ -154,12 +154,12 @@ class PdfContentPartialImporterTest {
                 Grey Literature
                 Automated Test Generation
                 Self-Healing Test Scripts
-                
+
                 *Corresponding author
                 filippo.ricca@unige.it (F. Ricca)
                 https://person.dibris.unige.it/ricca-filippo/ (F. Ricca)
                 ORCID(s): 0000-0002-3928-5408 (F. Ricca); 0000-0002-6833-896X (A. Marchetto); 0000-0001-8956-3894 (A. Stocco)
-                
+
                 arXiv:2408.06224v1 [cs.SE] 12 Aug 2024""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContent, "\n", Optional.empty()));

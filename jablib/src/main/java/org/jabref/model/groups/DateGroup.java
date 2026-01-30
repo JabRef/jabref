@@ -41,8 +41,8 @@ public class DateGroup extends AbstractGroup {
     /// If required parts are missing, returns {@link java.util.Optional#empty()}.
     ///
     /// @param d             the parsed date
-     /// @param dateKeyFormat sample format used only for its number of dashes
-     /// @return optional key string in the requested granularity
+    /// @param dateKeyFormat sample format used only for its number of dashes
+    /// @return optional key string in the requested granularity
     static Optional<String> getDateKey(Date d, String dateKeyFormat) {
         int numOfdashes = (int) dateKeyFormat.chars().filter(ch -> ch == '-').count();
         Optional<Integer> y = d.getYear();

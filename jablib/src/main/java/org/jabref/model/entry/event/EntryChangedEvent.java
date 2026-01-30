@@ -14,7 +14,7 @@ public class EntryChangedEvent extends EntriesEvent {
     }
 
     /// @param bibEntry `BibEntry` object the changes were applied on.
-     /// @param location Location affected by this event
+    /// @param location Location affected by this event
     public EntryChangedEvent(BibEntry bibEntry, EntriesEventSource location) {
         super(List.of(bibEntry), location);
     }

@@ -48,7 +48,7 @@ public class SlrGitHandler extends GitHandler {
     /// Calculates the diff between the HEAD and the previous commit of the sourceBranch.
     ///
     /// @param sourceBranch The name of the branch that is the target of the calculation
-     /// @return Returns the patch (diff) between the head of the sourceBranch and its previous commit HEAD^1
+    /// @return Returns the patch (diff) between the head of the sourceBranch and its previous commit HEAD^1
     String calculatePatchOfNewSearchResults(String sourceBranch) throws IOException, GitAPIException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<Ref> sourceBranchRef = getRefForBranch(sourceBranch);
@@ -88,7 +88,7 @@ public class SlrGitHandler extends GitHandler {
     /// order of fields in the yml file matters.
     ///
     /// @param patch the patch (diff) as a string
-     /// @return Returns a map where each file has its path as a key and the string contains the hunk of new results
+    /// @return Returns a map where each file has its path as a key and the string contains the hunk of new results
     Map<Path, String> parsePatchForAddedEntries(String patch) throws IOException, GitAPIException {
         String[] tokens = patch.split("\n");
         // Tracks for each file the related diff. Represents each file by its relative path

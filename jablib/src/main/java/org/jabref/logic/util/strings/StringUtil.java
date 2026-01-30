@@ -57,9 +57,9 @@ public class StringUtil {
     /// Quote special characters.
     ///
     /// @param toQuote   The String which may contain special characters.
-     /// @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
-     /// @param quoteChar The quoting character.
-     /// @return A String with every special character (including the quoting character itself) quoted.
+    /// @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
+    /// @param quoteChar The quoting character.
+    /// @return A String with every special character (including the quoting character itself) quoted.
     public static String quote(String toQuote, String specials, char quoteChar) {
         if (toQuote == null) {
             return "";
@@ -182,9 +182,9 @@ public class StringUtil {
     /// are not mangled.
     ///
     /// @param in         the string to wrap
-     /// @param wrapAmount the number of characters belonging to a line of text
-     /// @param newline    the newline character(s)
-     /// @return the wrapped string
+    /// @param wrapAmount the number of characters belonging to a line of text
+    /// @param newline    the newline character(s)
+    /// @return the wrapped string
     public static String wrap(String in, int wrapAmount, String newline) {
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
@@ -211,8 +211,8 @@ public class StringUtil {
     /// Wrapping is done using newline and tab character.
     ///
     /// @param line          the line of text to be wrapped and appended
-     /// @param wrapAmount    the number of characters belonging to a line of text
-     /// @param newlineString a string containing the newline character(s)
+    /// @param wrapAmount    the number of characters belonging to a line of text
+    /// @param newlineString a string containing the newline character(s)
     private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
         int length = result.length();
@@ -247,7 +247,7 @@ public class StringUtil {
     /// ':' (second dim).
     ///
     /// @param value The encoded String to be decoded.
-     /// @return The decoded String array.
+    /// @return The decoded String array.
     public static String[][] decodeStringDoubleArray(String value) {
         List<List<String>> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -294,7 +294,7 @@ public class StringUtil {
     /// a string label that should not be modified.
     ///
     /// @param s The string to modify.
-     /// @return The resulting string after wrapping capitals.
+    /// @return The resulting string after wrapping capitals.
     public static String putBracesAroundCapitals(String s) {
         boolean inString = false;
         boolean isBracing = false;
@@ -344,7 +344,7 @@ public class StringUtil {
     /// pairs of braces are removed.
     ///
     /// @param s The String to analyze.
-     /// @return A new String with braces removed.
+    /// @return A new String with braces removed.
     public static String removeBracesAroundCapitals(String s) {
         String current = s;
         String previous = s;
@@ -359,7 +359,7 @@ public class StringUtil {
     /// between the braces.
     ///
     /// @param s The String to analyze.
-     /// @return A new String with braces removed.
+    /// @return A new String with braces removed.
     private static String removeSingleBracesAroundCapitals(String s) {
         Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
         StringBuilder buf = new StringBuilder();
@@ -378,9 +378,9 @@ public class StringUtil {
     ///
     /// <h4>Example</h4>
     /// <pre>{@code
-     /// Legacy Macintosh \r -> OS.NEWLINE
-     /// Windows \r\n -> OS.NEWLINE
-     /// }</pre>
+    /// Legacy Macintosh \r -> OS.NEWLINE
+    /// Windows \r\n -> OS.NEWLINE
+    /// }</pre>
     ///
     /// @return a String with only OS.NEWLINE as line breaks
     public static String unifyLineBreaks(String s, String newline) {
@@ -391,7 +391,7 @@ public class StringUtil {
     /// Strings with escaped characters in curly braces at the beginning and end are respected, too
     ///
     /// @param toCheck The string to check
-     /// @return True, if the check was successful. False otherwise.
+    /// @return True, if the check was successful. False otherwise.
     public static boolean isInCurlyBrackets(String toCheck) {
         int count = 0;
         int brackets = 0;
@@ -437,8 +437,8 @@ public class StringUtil {
     /// From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
     ///
     /// @param str the String holding an Integer value
-     /// @return the int value of str
-     /// @throws NumberFormatException if str cannot be parsed to an int
+    /// @return the int value of str
+    /// @throws NumberFormatException if str cannot be parsed to an int
     public static int intValueOf(String str) {
         int idx = 0;
         int end;
@@ -466,7 +466,7 @@ public class StringUtil {
     /// From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
     ///
     /// @param str the String holding an Integer value
-     /// @return the int value of str or Optional.empty() if not possible
+    /// @return the int value of str or Optional.empty() if not possible
     public static Optional<Integer> intValueOfOptional(String str) {
         int idx = 0;
         int end;
@@ -499,7 +499,7 @@ public class StringUtil {
     /// URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
     ///
     /// @param in The String whose non-valid characters we want to remove.
-     /// @return The in String, stripped of non-valid characters.
+    /// @return The in String, stripped of non-valid characters.
     public static String stripNonValidXMLCharacters(String in) {
         if ((in == null) || in.isEmpty()) {
             return ""; // vacancy test.
@@ -570,7 +570,7 @@ public class StringUtil {
     /// Return a String with n spaces
     ///
     /// @param n Number of spaces
-     /// @return String with n spaces
+    /// @return String with n spaces
     public static String repeatSpaces(int n) {
         return repeat(Math.max(0, n), ' ');
     }
@@ -578,8 +578,8 @@ public class StringUtil {
     /// Return a String with n copies of the char c
     ///
     /// @param n Number of copies
-     /// @param c char to copy
-     /// @return String with n copies of c
+    /// @param c char to copy
+    /// @return String with n copies of c
     public static String repeat(int n, char c) {
         StringBuilder resultSB = new StringBuilder(n);
 
@@ -627,8 +627,8 @@ public class StringUtil {
     /// Unquote special characters.
     ///
     /// @param toUnquote The String which may contain quoted special characters.
-     /// @param quoteChar The quoting character.
-     /// @return A String with all quoted characters unquoted.
+    /// @param quoteChar The quoting character.
+    /// @return A String with all quoted characters unquoted.
     public static String unquote(String toUnquote, char quoteChar) {
         StringBuilder result = new StringBuilder();
         char c;
@@ -669,7 +669,7 @@ public class StringUtil {
     /// Whitespace, comma and semicolon are considered as separator between words.
     ///
     /// @param text the input
-     /// @return a list of words
+    /// @return a list of words
     public static List<String> getStringAsWords(String text) {
         return Arrays.asList(text.split("[\\s,;]+"));
     }
@@ -717,10 +717,10 @@ public class StringUtil {
     }
 
     /// Checks if the given string contains any whitespace characters. The supported whitespace characters
-    /// are the set of characters matched by `\s` in regular expressions, which are `[\t\n\x0B\f\r]`.
+    /// are the set of characters matched by `\s` in regular expressions, which are `[ \t\n\x0B\f\r]`.
     ///
     /// @param s The string to check
-     /// @return `True` if the given string does contain at least one whitespace character, `False` otherwise
+    /// @return `True` if the given string does contain at least one whitespace character, `False` otherwise
     public static boolean containsWhitespace(String s) {
         return s.chars().anyMatch(Character::isWhitespace);
     }

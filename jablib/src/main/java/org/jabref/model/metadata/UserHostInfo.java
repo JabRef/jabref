@@ -13,7 +13,7 @@ public record UserHostInfo(
     /// If the string does not contain a hyphen, the entire string is considered as the user and the host is empty.
     ///
     /// @param userHostString the user-host string
-     /// @return a new UserHostInfo
+    /// @return a new UserHostInfo
     public static UserHostInfo parse(String userHostString) {
         if (userHostString.contains("-")) {
             int index = userHostString.lastIndexOf('-');
@@ -41,7 +41,7 @@ public record UserHostInfo(
     /// Checks if this UserHostInfo has the same host as the given UserHostInfo.
     ///
     /// @param other the other UserHostInfo
-     /// @return true if the hosts are the same and not empty, false otherwise
+    /// @return true if the hosts are the same and not empty, false otherwise
     public boolean hasSameHost(UserHostInfo other) {
         return !host.isEmpty() && !other.host.isEmpty() && host.equals(other.host);
     }

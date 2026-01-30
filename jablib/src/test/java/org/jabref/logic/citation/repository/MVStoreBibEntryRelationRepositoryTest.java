@@ -91,7 +91,7 @@ class MVStoreBibEntryRelationRepositoryTest {
     /// and mapped as BibEntry will be serializable by the MVStore.
     ///
     /// @param entry should not be null
-     /// @return never empty
+    /// @return never empty
     private List<BibEntry> createRelations(BibEntry entry) {
         return entry
                 .getCitationKey()

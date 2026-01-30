@@ -38,7 +38,7 @@ public class ScholarArchiveQueryTransformer extends AbstractQueryTransformer {
     /// This method is for an exact year match.
     ///
     /// @param year the publication year to be searched in the Scholar Archive.
-     /// @return A string query segment formatted for the year search.
+    /// @return A string query segment formatted for the year search.
     @Override
     protected String handleYear(String year) {
         return "publication.startDate:[" + year + " TO " + year + "]";
@@ -48,7 +48,7 @@ public class ScholarArchiveQueryTransformer extends AbstractQueryTransformer {
     /// If only a start year is provided, the range will extend to the current year.
     ///
     /// @param yearRange the range of years to be searched in the Scholar Archive, usually in the format "startYear-endYear".
-     /// @return A string query segment formatted for the year range search.
+    /// @return A string query segment formatted for the year range search.
     @Override
     protected String handleYearRange(String yearRange) {
         parseYearRange(yearRange);

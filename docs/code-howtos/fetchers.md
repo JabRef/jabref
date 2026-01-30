@@ -1,69 +1,9 @@
 ---
 parent: Code Howtos
 ---
-
 # Fetchers
 
-Fetchers
-are
-the
-implementation
-of
-the [search using online services](https://docs.jabref.org/collect/import-using-online-bibliographic-database).
-Some
-fetchers
-require
-API
-keys
-to
-get
-them
-working.
-To
-get
-the
-fetchers
-running
-in
-a
-JabRef
-development
-setup,
-the
-keys
-need
-to
-be
-placed
-in
-the
-respective
-environment
-variable.
-The
-following
-table
-lists
-the
-respective
-fetchers,
-where
-to
-get
-the
-key
-from
-and
-the
-environment
-variable
-where
-the
-key
-has
-to
-be
-placed.
+Fetchers are the implementation of the [search using online services](https://docs.jabref.org/collect/import-using-online-bibliographic-database). Some fetchers require API keys to get them working. To get the fetchers running in a JabRef development setup, the keys need to be placed in the respective environment variable. The following table lists the respective fetchers, where to get the key from and the environment variable where the key has to be placed.
 
 | Service                                                                                                                                           | Key Source                                                                                                     | Environment Variable           | Rate Limit                                                          |
 |:--------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------|---------------------------------------------------------------------|
@@ -77,552 +17,83 @@ placed.
 | [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database#springer)                                            | [Springer Nature API portal](https://dev.springernature.com). Use the "Meta API" API key.                      | `SpringerNatureAPIKey`         | 5000 calls/day                                                      |
 | [Zentralblatt Math](https://www.zbmath.org)                                                                                                       | (none)                                                                                                         | (none)                         | Depending on the current network                                    |
 
-"
-Depending
-on
-the
-current
-network"
-means
-that
-it
-depends
-on
-whether
-your
-request
-is
-routed
-through
-a
-network
-having
-paid
-access.
-For
-instance,
-some
-universities
-have
-subscriptions
-to
-MathSciNet.
+"Depending on the current network" means that it depends on whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
 
-On
-Windows,
-you
-have
-to
-log
-off
-and
-log
-on
-to
-let
-IntelliJ
-know
-about
-the
-environment
-variable
-change.
-Execute
-the
-gradle
-task
-`processResources`
-in
-the
-group "
-others"
-within
-IntelliJ
-to
-ensure
-the
-values
-have
-been
-correctly
-written.
-Now,
-the
-fetcher
-tests
-should
-run
-without
-issues.
+On Windows, you have to log off and log on to let IntelliJ know about the environment variable change. Execute the gradle task `processResources` in the group "others" within IntelliJ to ensure the values have been correctly written. Now, the fetcher tests should run without issues.
 
-JabRef
-supports
-different
-kinds
-of
-fetchers:
+JabRef supports different kinds of fetchers:
 
-*
-`EntryBasedFetcher`:
-Completes
-an
-existing
-bibliographic
-entry
-with
-information
-retrieved
-by
-the
-fetcher
-*
-`FulltextFetcher`:
-Searches
-for
-a
-PDF
-for
-an
-exiting
-bibliography
-entry
-*
-`SearchBasedFetcher`:
-Searches
-providers
-using
-a
-given
-query
-and
-returns
-a
-set
-of (
-new)
-bibliography
-entry.
-The
-user-facing
-side
-is
-implemented
-in
-the
-UI
-described
-at [https://docs.jabref.org/collect/import-using-online-bibliographic-database](https://docs.jabref.org/collect/import-using-online-bibliographic-database).
+* `EntryBasedFetcher`: Completes an existing bibliographic entry with information retrieved by the fetcher
+* `FulltextFetcher`: Searches for a PDF for an exiting bibliography entry
+* `SearchBasedFetcher`: Searches providers using a given query and returns a set of (new) bibliography entry. The user-facing side is implemented in the UI described at [https://docs.jabref.org/collect/import-using-online-bibliographic-database](https://docs.jabref.org/collect/import-using-online-bibliographic-database).
 
-There
-are
-more
-fetchers
-supported
-by
-JabRef.
-Investigate
-the
-package
-`org.jabref.logic.importer`.
-Another
-possibility
-is
-to
-investigate
-the
-inheritance
-relation
-of
-`WebFetcher` (
-Ctrl+H
-in
-IntelliJ).
+There are more fetchers supported by JabRef. Investigate the package `org.jabref.logic.importer`. Another possibility is to investigate the inheritance relation of `WebFetcher` (Ctrl+H in IntelliJ).
 
 ## Fulltext Fetchers
 
-*
-all
-fulltext
-fetchers
-run
-in
-parallel
-*
-the
-result
-with
-the
-highest
-priority
-wins
-*
-`InterruptedException` |
-`ExecutionException` |
-`CancellationException`
-are
-ignored
+* all fulltext fetchers run in parallel
+* the result with the highest priority wins
+* `InterruptedException` | `ExecutionException` | `CancellationException` are ignored
 
 ### Trust Levels
 
-*
-`SOURCE` (
-highest):
-definitive
-URL
-for
-a
-particular
-paper
-*
-`PUBLISHER`:
-any
-publisher
-library
-*
-`PREPRINT`:
-any
-preprint
-library
-that
-might
-include
-non
-final
-publications
-of
-a
-paper
-*
-`META_SEARCH`:
-meta
-search
-engines
-*
-`UNKNOWN` (
-lowest):
-anything
-else
-not
-fitting
-the
-above
-categories
+* `SOURCE` (highest): definitive URL for a particular paper
+* `PUBLISHER`: any publisher library
+* `PREPRINT`: any preprint library that might include non final publications of a paper
+* `META_SEARCH`: meta search engines
+* `UNKNOWN` (lowest): anything else not fitting the above categories
 
 ### Current trust levels
 
-All
-fetchers
-are
-contained
-in
-the
-package
-`org.jabref.logic.importer.fetcher`.
-Here
-we
-list
-the
-trust
-levels
-of
-some
-of
-them:
+All fetchers are contained in the package `org.jabref.logic.importer.fetcher`. Here we list the trust levels of some of them:
 
-*
-DOI:
-SOURCE,
-as
-the
-DOI
-is
-always
-forwarded
-to
-the
-correct
-publisher
-page
-for
-the
-paper
-*
-ScienceDirect:
-Publisher
-*
-Springer:
-Publisher
-*
-ACS:
-Publisher
-*
-IEEE:
-Publisher
-*
-Google
-Scholar:
-META\_SEARCH,
-because
-it
-is
-a
-search
-engine
-*
-Arxiv:
-PREPRINT,
-because
-preprints
-are
-published
-there
-*
-OpenAccessDOI:
-META\_SEARCH
+* DOI: SOURCE, as the DOI is always forwarded to the correct publisher page for the paper
+* ScienceDirect: Publisher
+* Springer: Publisher
+* ACS: Publisher
+* IEEE: Publisher
+* Google Scholar: META\_SEARCH, because it is a search engine
+* Arxiv: PREPRINT, because preprints are published there
+* OpenAccessDOI: META\_SEARCH
 
 Reasoning:
 
-*
-A
-DOI
-uniquely
-identifies
-a
-paper.
-Per
-definition,
-a
-DOI
-leads
-to
-the
-right
-paper.
-Everything
-else
-is
-good
-guessing.
-*
-We
-assume
-the
-DOI
-resolution
-surely
-points
-to
-the
-correct
-paper
-and
-that
-publisher
-fetches
-may
-have
-errors:
-For
-instance,
-a
-title
-of
-a
-paper
-may
-lead
-to
-different
-publications
-of
-it.
-One
-the
-conference
-version,
-the
-other
-the
-journal
-version. -->
-the
-PDF
-could
-be
-chosen
-randomly
+* A DOI uniquely identifies a paper. Per definition, a DOI leads to the right paper. Everything else is good guessing.
+* We assume the DOI resolution surely points to the correct paper and that publisher fetches may have errors: For instance, a title of a paper may lead to different publications of it. One the conference version, the other the journal version. --> the PDF could be chosen randomly
 
-Code
-was
-first
-introduced
-at [PR#3882](https://github.com/JabRef/jabref/pull/3882).
+Code was first introduced at [PR#3882](https://github.com/JabRef/jabref/pull/3882).
 
 ## Background on embedding the keys in JabRef
 
-The
-keys
-are
-placed
-into
-the
-`build.properties`
-file.
+The keys are placed into the `build.properties` file.
 
 ```groovy
 springerNatureAPIKey=${springerNatureAPIKey}
 ```
 
-In
-`build.gradle`,
-these
-variables
-are
-filled:
+In `build.gradle`, these variables are filled:
 
 ```groovy
 "springerNatureAPIKey" : System.getenv('SpringerNatureAPIKey')
 ```
 
-The
-`BuildInfo`
-class
-reads
-from
-that
-file
-and
-the
-key
-needs
-to
-be
-put
-into
-the
-map
-of
-default
-API
-keys
-in
-`JabRefCliPreferences::getDefaultFetcherKeys`.
+The `BuildInfo` class reads from that file and the key needs to be put into the map of default API keys in `JabRefCliPreferences::getDefaultFetcherKeys`.
 
 ```java
 keys.put(SpringerFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
 ```
 
-The
-fetcher
-api
-key
-can
-then
-be
-obtained
-by
-calling
-the
-preferences.
+The fetcher api key can then be obtained by calling the preferences.
 
 ```java
 importerPreferences.getApiKey(SpringerFetcher.FETCHER_NAME);
 ```
 
-When
-executing
-`./gradlew run`,
-gradle
-executes
-`processResources`
-and
-populates
-`build/build.properties`
-accordingly.
-However,
-when
-working
-directly
-in
-the
-IDE,
-Eclipse
-keeps
-reading
-`build.properties`
-from
-`src/main/resources`.
-In
-IntelliJ,
-the
-task
-`JabRef Main`
-is
-executing
-`./gradlew processResources`
-before
-running
-JabRef
-from
-the
-IDE
-to
-ensure
-the
-`build.properties`
-is
-properly
-populated.
+When executing `./gradlew run`, gradle executes `processResources` and populates `build/build.properties` accordingly. However, when working directly in the IDE, Eclipse keeps reading `build.properties` from `src/main/resources`. In IntelliJ, the task `JabRef Main` is executing `./gradlew processResources` before running JabRef from the IDE to ensure the `build.properties` is properly populated.
 
 ## Committing and pushing changes to fetcher files
 
-Fetcher
-tests
-are
-run
-when
-a
-PR
-contains
-changes
-touching
-any
-file
-in
-the
-`src/main/java/org/jabref/logic/importer/fetcher/`
-directory.
-Since
-these
-tests
-rely
-on
-remote
-services,
-some
-of
-them
-may
-fail
-due
-to
-the
-network
-or
-the
-external
-server.
+Fetcher tests are run when a PR contains changes touching any file in the `src/main/java/org/jabref/logic/importer/fetcher/` directory.
+Since these tests rely on remote services, some of them may fail due to the network or the external server.
 
-To
-learn
-more
-about
-doing
-fetcher
-tests
-locally,
-see
-Fetchers
-in
-tests
-in [Testing](https://devdocs.jabref.org/code-howtos/testing.html).
+To learn more about doing fetcher tests locally, see Fetchers in tests in [Testing](https://devdocs.jabref.org/code-howtos/testing.html).

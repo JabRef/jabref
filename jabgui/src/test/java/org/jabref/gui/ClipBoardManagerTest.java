@@ -90,7 +90,7 @@ class ClipBoardManagerTest extends ApplicationTest {
     void copyStringBibEntryWithStringConstants() throws IOException {
         String expected = """
                 @String{grl = "Geophys. Res. Lett."}
-                
+
                 @Article{,
                   author  = {Claudepierre, S. G.},
                   journal = {grl},

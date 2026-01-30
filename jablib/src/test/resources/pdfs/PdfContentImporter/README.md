@@ -1,9 +1,1 @@
--
-Open
-`src/test/resources/org/jabref/logic/importer/pdfContentImporterTest-pdfs.bib`
-to
-see
-information
-on
-the
-PDFs
+- Open `src/test/resources/org/jabref/logic/importer/pdfContentImporterTest-pdfs.bib` to see information on the PDFs

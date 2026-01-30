@@ -9,76 +9,43 @@ javaPlatform {
 }
 
 // Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
-val os =
-    DefaultNativePlatform.getCurrentOperatingSystem()
-val arch =
-    DefaultNativePlatform.getCurrentArchitecture()
+val os = DefaultNativePlatform.getCurrentOperatingSystem()
+val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafx =
-    "25.0.2"
+val javafx = "25.0.2"
 
-val lucene =
-    "10.3.2"
+val lucene = "10.3.2"
 
-val pdfbox =
-    "3.0.6"
+val pdfbox = "3.0.6"
 
 dependencies {
-    api(
-        platform(
-            "ai.djl:bom:0.36.0"
-        )
-    )
-    api(
-        platform(
-            "dev.langchain4j:langchain4j-bom:1.10.0"
-        )
-    )
+    api(platform("ai.djl:bom:0.36.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.10.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
-    api(
-        enforcedPlatform(
-            "io.zonky.test.postgres:embedded-postgres-binaries-bom:18.1.0"
-        )
-    )
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.1.0"))
 
-    api(
-        platform(
-            "org.junit:junit-bom:6.0.2"
-        )
-    )
+    api(platform("org.junit:junit-bom:6.0.2"))
     api("org.junit.jupiter:junit-jupiter-api")
     api("org.junit.jupiter:junit-jupiter-params")
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-    api(
-        platform(
-            "org.glassfish.grizzly:grizzly-bom:4.0.2"
-        )
-    )
+    api(platform("org.glassfish.grizzly:grizzly-bom:4.0.2"))
     api("org.glassfish.grizzly:grizzly-framework")
     api("org.glassfish.grizzly:grizzly-http-server")
 
-    api(
-        platform(
-            "org.glassfish.jersey:jersey-bom:4.0.0"
-        )
-    )
+    api(platform("org.glassfish.jersey:jersey-bom:4.0.0"))
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
     api("org.glassfish.jersey.core:jersey-server")
     api("org.glassfish.jersey.inject:jersey-hk2")
     api("org.glassfish.jersey.test-framework:jersey-test-framework-core")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
 
-    api(
-        platform(
-            "tools.jackson:jackson-bom:3.0.3"
-        )
-    )
+    api(platform("tools.jackson:jackson-bom:3.0.3"))
     api("tools.jackson.core:jackson-core")
     api("tools.jackson.core:jackson-databind")
     api("tools.jackson.dataformat:jackson-dataformat-yaml")

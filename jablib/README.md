@@ -1,80 +1,19 @@
-#
-`jablib`
+# `jablib`
 
-`jablib`
-offers
-JabRef's
-model
-and
-logic
-code
-as
-a
-Java
-library.
-All
-code
-in
-`src/main/java`
-is
-published
-as
-a
-Maven
-artifact
-at
-`org.jabref:jablib`.
-Example
-code
-is
-made
-available
-at <https://github.com/JabRef/jabref/tree/main/jablib-examples>.
+`jablib` offers JabRef's model and logic code as a Java library.
+All code in `src/main/java` is published as a Maven artifact at `org.jabref:jablib`.
+Example code is made available at <https://github.com/JabRef/jabref/tree/main/jablib-examples>.
 
-You
-can
-browse
-JavaDoc
-at
-APIdia: [latest development version](https://apidia.net/java/JabRef/jablib/main)
-and [latest released version](https://apidia.net/java/JabRef/jablib/latest).
+You can browse JavaDoc at APIdia: [latest development version](https://apidia.net/java/JabRef/jablib/main) and [latest released version](https://apidia.net/java/JabRef/jablib/latest).
 
 ## Development information
 
 ### Publish on Maven Central
 
 1. [Get API username and password](https://central.sonatype.org/publish/generate-portal-token/)
-2.
-Modify
-`~/.gradle/gradle.properties`
-to
-contain
-your
-secrets.
-See <https://vanniktech.github.io/gradle-maven-publish-plugin/central/#secrets>.
-Especially
-have
-your
-private
-key
-stored
-in
-`singing.key`. [Hints are available](https://github.com/gradle/gradle/issues/15718#issuecomment-886246583).
-3.
-Publish
-a
-snapshot:
-`./gradlew :jablib:publishAllPublicationsToMavenCentralRepository`
-4.
-You
-will
-find
-the
-upload
-at <https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/jabref/jablib/>
+2. Modify `~/.gradle/gradle.properties` to contain your secrets. See <https://vanniktech.github.io/gradle-maven-publish-plugin/central/#secrets>.
+   Especially have your private key stored in `singing.key`. [Hints are available](https://github.com/gradle/gradle/issues/15718#issuecomment-886246583).
+3. Publish a snapshot: `./gradlew :jablib:publishAllPublicationsToMavenCentralRepository`
+4. You will find the upload at <https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/jabref/jablib/>
 
-The [Vanniktech Gradle Maven Publish Plugin](https://vanniktech.github.io/gradle-maven-publish-plugin/central/)
-is
-used
-for
-it.
+The [Vanniktech Gradle Maven Publish Plugin](https://vanniktech.github.io/gradle-maven-publish-plugin/central/) is used for it.

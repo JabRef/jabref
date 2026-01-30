@@ -37,7 +37,7 @@ class StudyCatalogToFetcherConverter {
     /// Transforms a list of libraryEntries into a list of SearchBasedFetcher instances.
     ///
     /// @param libraryEntries List of entries
-     /// @return List of fetcher instances
+    /// @return List of fetcher instances
     private List<SearchBasedFetcher> getFetchersFromLibraryEntries(List<StudyDatabase> libraryEntries) {
         return libraryEntries.parallelStream()
                              .map(this::createFetcherFromLibraryEntry)
@@ -48,7 +48,7 @@ class StudyCatalogToFetcherConverter {
     /// Transforms a library entry into a SearchBasedFetcher instance. This only works if the library entry specifies a supported fetcher.
     ///
     /// @param studyDatabase the entry that will be converted
-     /// @return An instance of the fetcher defined by the library entry.
+    /// @return An instance of the fetcher defined by the library entry.
     private SearchBasedFetcher createFetcherFromLibraryEntry(StudyDatabase studyDatabase) {
         Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         String libraryNameFromFetcher = studyDatabase.getName();

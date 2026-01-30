@@ -61,7 +61,7 @@ public class ApsFetcher implements FulltextFetcher {
     /// Convert a DOI into an appropriate APS id.
     ///
     /// @param doi A case insensitive DOI
-     /// @return A DOI cased as APS likes it
+    /// @return A DOI cased as APS likes it
     private Optional<String> getId(String doi) {
         // DOI is not case sensitive, but the id for the PDF URL is,
         // so we follow DOI.org redirects to get the proper id.

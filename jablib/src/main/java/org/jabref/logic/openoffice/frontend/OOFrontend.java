@@ -151,7 +151,7 @@ public class OOFrontend {
     }
 
     /// @param mapFootnotesToFootnoteMarks If true, sort reference marks in footnotes as if they appeared at the corresponding footnote mark.
-     /// @return citation groups sorted by their visual positions. Limitation: for two column layout visual (top-down, left-right) order does not match the expected (textual) order.
+    /// @return citation groups sorted by their visual positions. Limitation: for two column layout visual (top-down, left-right) order does not match the expected (textual) order.
     private List<CitationGroup> getVisuallySortedCitationGroups(XTextDocument doc,
                                                                 boolean mapFootnotesToFootnoteMarks,
                                                                 FunctionalTextViewCursor fcursor)
@@ -189,9 +189,9 @@ public class OOFrontend {
     /// On return `position` is collapsed, and is after the inserted space, or at the end of the reference mark.
     ///
     /// @param citationKeys     In storage order
-     /// @param pageInfos        In storage order
-     /// @param position         Collapsed to its end.
-     /// @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
+    /// @param pageInfos        In storage order
+    /// @param position         Collapsed to its end.
+    /// @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
                                              @NonNull List<Optional<OOText>> pageInfos,
@@ -322,8 +322,8 @@ public class OOFrontend {
     }
 
     /// @return A range for each footnote mark where the footnote contains at least one citation group. Purpose: We do not want markers of footnotes containing reference marks to overlap with reference marks. Overwriting these footnote marks might kill our reference marks in the footnote.
-     ///
-     /// Note: Here we directly communicate to the document, not through the backend. This is because mapping ranges to footnote marks does not depend on how do we mark or structure those ranges.
+    ///
+    /// Note: Here we directly communicate to the document, not through the backend. This is because mapping ranges to footnote marks does not depend on how do we mark or structure those ranges.
     public List<RangeForOverlapCheck<CitationGroupId>>
     footnoteMarkRanges(XTextDocument doc, List<RangeForOverlapCheck<CitationGroupId>> citationRanges) {
         // We partition by XText and use a single range from
@@ -418,7 +418,7 @@ public class OOFrontend {
     }
 
     /// @param requireSeparation Report range pairs that only share a boundary.
-     /// @param reportAtMost      Limit number of overlaps reported (0 for no limit)
+    /// @param reportAtMost      Limit number of overlaps reported (0 for no limit)
     public OOVoidResult<JabRefException> checkRangeOverlaps(XTextDocument doc,
                                                             List<RangeForOverlapCheck<CitationGroupId>> userRanges,
                                                             boolean requireSeparation,
@@ -449,16 +449,16 @@ public class OOFrontend {
     /// Called from: ManageCitationsDialogViewModel constructor.
     ///
     /// @return A list with entries corresponding to citations in the text, in arbitrary order (same order as from getJabRefReferenceMarkNames). Note: visual or alphabetic order could be more manageable for the user. We could provide these here, but switching between them needs change on GUI (adding a toggle or selector).
-     ///
-     /// Note: CitationEntry implements Comparable, where compareTo() and equals() are based on refMarkName.  The order used in the "Manage citations" dialog does not seem to use that.
-     ///
-     /// The 1st is labeled "Citation" (show citation in bold, and some context around it).
-     ///
-     /// The columns can be sorted by clicking on the column title.  For the "Citation" column, the sorting is based on the content, (the context before the citation), not on the citation itself.
-     ///
-     /// In the "Extra information ..." column some visual indication of the editable part could be helpful.
-     ///
-     /// Wish: selecting an entry (or a button in the line) in the GUI could move the cursor in the document to the entry.
+    ///
+    /// Note: CitationEntry implements Comparable, where compareTo() and equals() are based on refMarkName.  The order used in the "Manage citations" dialog does not seem to use that.
+    ///
+    /// The 1st is labeled "Citation" (show citation in bold, and some context around it).
+    ///
+    /// The columns can be sorted by clicking on the column title.  For the "Citation" column, the sorting is based on the content, (the context before the citation), not on the citation itself.
+    ///
+    /// In the "Extra information ..." column some visual indication of the editable part could be helpful.
+    ///
+    /// Wish: selecting an entry (or a button in the line) in the GUI could move the cursor in the document to the entry.
     public List<CitationEntry> getCitationEntries(XTextDocument doc)
             throws
             WrappedTargetException,
