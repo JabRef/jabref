@@ -381,14 +381,17 @@ public class MetaData {
 
     public void setGitAutoPullEnabled(boolean enabled) {
         setBooleanMetaData(GIT_AUTO_PULL, enabled);
+        removeLegacyGitEnabled();
     }
 
     public void setGitAutoCommitEnabled(boolean enabled) {
         setBooleanMetaData(GIT_AUTO_COMMIT, enabled);
+        removeLegacyGitEnabled();
     }
 
     public void setGitAutoPushEnabled(boolean enabled) {
         setBooleanMetaData(GIT_AUTO_PUSH, enabled);
+        removeLegacyGitEnabled();
     }
 
     private boolean isBooleanMetaDataEnabled(String key) {
@@ -405,6 +408,10 @@ public class MetaData {
 
     private boolean isLegacyGitEnabled() {
         return unknownMetaData.getOrDefault(LEGACY_GIT_ENABLED, List.of()).contains("true");
+    }
+
+    private void removeLegacyGitEnabled() {
+        removeUnknownMetaDataItem(LEGACY_GIT_ENABLED);
     }
 
     @Override
