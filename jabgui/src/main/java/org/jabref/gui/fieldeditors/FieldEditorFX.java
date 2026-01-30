@@ -26,9 +26,7 @@ public interface FieldEditorFX {
 
     void bindToEntry(BibEntry entry);
 
-    /**
-     * @implNote Decided to add undoAction and redoAction as parameter instead of passing a tabSupplier, {@link org.jabref.gui.DialogService} and {@link org.jabref.gui.StateManager} to the method.
-     */
+    /// @implNote Decided to add undoAction and redoAction as parameter instead of passing a tabSupplier, {@link org.jabref.gui.DialogService} and {@link org.jabref.gui.StateManager} to the method.
     default void establishBinding(TextInputControl textInputControl, StringProperty viewModelTextProperty, KeyBindingRepository keyBindingRepository, UndoAction undoAction, RedoAction redoAction) {
         Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);
 
@@ -136,15 +134,13 @@ public interface FieldEditorFX {
                  .requestFocus();
     }
 
-    /**
-     * Returns relative size of the field editor in terms of display space.
-     * <p>
-     * A value of 1 means that the editor gets exactly as much space as all other regular editors.
-     * <p>
-     * A value of 2 means that the editor gets twice as much space as regular editors.
-     *
-     * @return the relative weight of the editor in terms of display space
-     */
+    /// Returns relative size of the field editor in terms of display space.
+    ///
+    /// A value of 1 means that the editor gets exactly as much space as all other regular editors.
+    ///
+    /// A value of 2 means that the editor gets twice as much space as regular editors.
+    ///
+    /// @return the relative weight of the editor in terms of display space
     default double getWeight() {
         return 1;
     }

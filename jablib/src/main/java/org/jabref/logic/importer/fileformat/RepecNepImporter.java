@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,14 +52,14 @@ import org.slf4j.LoggerFactory;
 ///       OverviewMessageSection
 ///       OtherMessageSection
 ///
-///# we skip the overview
+/// # we skip the overview
 /// OverviewMessageSection:
 ///       'In this issue we have: ' SectionSeparator OtherStuff
 ///
 /// OtherMessageSection:
 ///       SectionSeparator  OtherMessageSectionContent
 ///
-///# we skip other stuff and read only full working paper references
+/// # we skip other stuff and read only full working paper references
 /// OtherMessageSectionContent:
 ///       WorkingPaper EmptyLine OtherMessageSectionContent
 ///       OtherStuff EmptyLine OtherMessageSectionContent
@@ -71,8 +72,8 @@ import org.slf4j.LoggerFactory;
 /// NonEmptyLine:
 ///       a non-empty String that does not start with a number followed by a '.'
 ///
-///# working papers are recognized by a number followed by a '.'
-///# in a non-overview section
+/// # working papers are recognized by a number followed by a '.'
+/// # in a non-overview section
 /// WorkingPaper:
 ///       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
 ///       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
@@ -80,17 +81,17 @@ import org.slf4j.LoggerFactory;
 /// TitleString:
 ///       a String that may span several lines and should be joined
 ///
-///# there must be at least one author
+/// # there must be at least one author
 /// Authors:
 ///       Author '\n' Authors
 ///       Author '\n'
 ///
-///# optionally, an institution is given for an author
+/// # optionally, an institution is given for an author
 /// Author:
 ///       AuthorName
 ///       AuthorName '(' Institution ')'
 ///
-///# there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
+/// # there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
 /// AuthorName:
 ///       a non-empty String without '(' or ')' characters, not spanning more that one line
 ///
@@ -120,7 +121,7 @@ import org.slf4j.LoggerFactory;
 /// Keyword:
 ///        non-empty String that does not contain ',' (may contain whitespace)
 ///
-///# if no date is given, the current year as given by the system clock is assumed
+/// # if no date is given, the current year as given by the system clock is assumed
 /// DateString:
 ///        'yyyy-MM-dd'
 ///        'yyyy-MM'
@@ -130,14 +131,14 @@ import org.slf4j.LoggerFactory;
 ///        JelClassification JelClassificationList
 ///        JelClassification
 ///
-///# the JEL Classifications are set into a new BIBTEX-field 'jel'
-///# they will appear if you add it as a field to one of the BIBTex Entry sections
+/// # the JEL Classifications are set into a new BIBTEX-field 'jel'
+/// # they will appear if you add it as a field to one of the BIBTex Entry sections
 /// JelClassification:
 ///        one of the allowed classes, see http://ideas.repec.org/j/
 ///
 /// SectionSeparator:
 ///       '\n-----------------------------'
-///```
+/// ```
 public class RepecNepImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);
@@ -174,7 +175,13 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        return isRecognizedFormat(new BufferedReader(reader));
+    }
+
+    @Override
     public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+        reader.mark(5_000);
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
@@ -184,6 +191,7 @@ public class RepecNepImporter extends Importer {
             startOfMessage.append(tmpLine);
             tmpLine = reader.readLine();
         }
+        reader.reset();
         return startOfMessage.toString().contains("NEP: New Economics Papers") || startOfMessage.toString().contains(
                 "nep.repec.org");
     }
@@ -203,20 +211,18 @@ public class RepecNepImporter extends Importer {
         this.lastLine = in.readLine();
     }
 
-    /**
-     * Read multiple lines.
-     * <p>
-     * <p>Reads multiple lines until either
-     * <ul>
-     * <li>an empty line</li>
-     * <li>the end of file</li>
-     * <li>the next working paper or</li>
-     * <li>a keyword</li>
-     * </ul>
-     * is found. Whitespace at start or end of lines is trimmed except for one blank character.</p>
-     *
-     * @return result
-     */
+    /// Read multiple lines.
+    ///
+    /// Reads multiple lines until either
+    ///
+    /// - an empty line
+    /// - the end of file
+    /// - the next working paper or
+    /// - a keyword
+    ///
+    /// is found. Whitespace at start or end of lines is trimmed except for one blank character.
+    ///
+    /// @return result
     private String readMultipleLines(BufferedReader in) throws IOException {
         StringBuilder result = new StringBuilder(this.lastLine.trim());
         readLine(in);
@@ -227,22 +233,18 @@ public class RepecNepImporter extends Importer {
         return result.toString();
     }
 
-    /**
-     * Implements grammar rule "TitleString".
-     *
-     * @throws IOException in case of error
-     */
+    /// Implements grammar rule "TitleString".
+    ///
+    /// @throws IOException in case of error
     private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
         this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1);
         be.setField(StandardField.TITLE, readMultipleLines(in));
     }
 
-    /**
-     * Implements grammar rule "Authors"
-     *
-     * @throws IOException in case of error
-     */
+    /// Implements grammar rule "Authors"
+    ///
+    /// @throws IOException in case of error
     private void parseAuthors(BibEntry be, BufferedReader in) throws IOException {
         // read authors and institutions
         List<String> authors = new ArrayList<>();
@@ -290,11 +292,9 @@ public class RepecNepImporter extends Importer {
         }
     }
 
-    /**
-     * Implements grammar rule "Abstract".
-     *
-     * @throws IOException in case of error
-     */
+    /// Implements grammar rule "Abstract".
+    ///
+    /// @throws IOException in case of error
     private void parseAbstract(BibEntry be, BufferedReader in) throws IOException {
         String theabstract = readMultipleLines(in);
 
@@ -303,10 +303,8 @@ public class RepecNepImporter extends Importer {
         }
     }
 
-    /**
-     * Implements grammar rule "AdditionalFields".
-     *
-     */
+    /// Implements grammar rule "AdditionalFields".
+    ///
     private void parseAdditionalFields(BibEntry be, boolean multilineUrlFieldAllowed, BufferedReader in)
             throws IOException {
 
@@ -354,10 +352,8 @@ public class RepecNepImporter extends Importer {
         }
     }
 
-    /**
-     * if line starts with a string of the form 'x. ' and we are not in the overview
-     * section, we have a working paper entry we are interested in
-     */
+    /// if line starts with a string of the form 'x. ' and we are not in the overview
+    /// section, we have a working paper entry we are interested in
     private boolean isStartOfWorkingPaper() {
         return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.trim().isEmpty();
     }

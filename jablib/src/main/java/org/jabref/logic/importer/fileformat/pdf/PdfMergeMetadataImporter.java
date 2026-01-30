@@ -33,12 +33,10 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Tries to import BibTeX data trying multiple {@link PdfImporter}s and merging the results.
- * See {@link PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
- * <p>
- * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
- */
+/// Tries to import BibTeX data trying multiple {@link PdfImporter}s and merging the results.
+/// See {@link PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
+///
+/// After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
 public class PdfMergeMetadataImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
@@ -69,14 +67,12 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
     }
 
-    /**
-     * Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
-     * <p>
-     * Algorithm:
-     * 1. Store all candidates (possible {@link BibEntry}ies) in a list. First elements in this list will have higher
-     * priority for merging, which means that more fields will be stored for first entries, rather than last.
-     * 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
-     */
+    /// Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
+    ///
+    /// Algorithm:
+    /// 1. Store all candidates (possible {@link BibEntry}ies) in a list. First elements in this list will have higher
+    /// priority for merging, which means that more fields will be stored for first entries, rather than last.
+    /// 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
         List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
@@ -133,13 +129,11 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return fetchedCandidates;
     }
 
-    /**
-     * @param candidate         The BibEntry to look for the field
-     * @param field             The field to look for
-     * @param fetcher           The fetcher to use
-     * @param fetchedIds        The already fetched ids (will be updated)
-     * @param fetchedCandidates New candidate (will be updated)
-     */
+    /// @param candidate         The BibEntry to look for the field
+    /// @param field             The field to look for
+    /// @param fetcher           The fetcher to use
+    /// @param fetchedIds        The already fetched ids (will be updated)
+    /// @param fetchedCandidates New candidate (will be updated)
     private void fetchData(BibEntry candidate, StandardField field, IdBasedFetcher fetcher, Set<String> fetchedIds, List<BibEntry> fetchedCandidates) {
         candidate.getField(field)
                  .filter(id -> !fetchedIds.contains(id))
@@ -166,9 +160,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return entry;
     }
 
-    /**
-     * Imports the BibTeX data from the given PDF file and relativized the paths of each linked file based on the context and the file preferences.
-     */
+    /// Imports the BibTeX data from the given PDF file and relativized the paths of each linked file based on the context and the file preferences.
     public ParserResult importDatabase(Path filePath,
                                        @NonNull BibDatabaseContext context,
                                        @NonNull FilePreferences filePreferences) throws IOException {

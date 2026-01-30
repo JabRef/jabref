@@ -11,17 +11,46 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the ability to remove XMP metadata from linked files. [#8277](https://github.com/JabRef/jabref/issues/8277)
+- Improved merge dialog decisions for the `month` field by using a new plausibility comparator. JabRef now prefers normalized months (e.g., `#jun#`) or integers over unnormalized strings. [#14457](https://github.com/JabRef/jabref/issues/14457)
+- We added web search capability to ScienceDirect using the [Scopus](https://www.scopus.com/) Search API, enabling users to search for academic literature directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
+- We fixed an issue where a redundant validation listener was causing duplicate error dialogs when invalid BibTeX source was detected in the SourceTab. [#14805](https://github.com/JabRef/jabref/issues/14805)
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
+- Consistency check is now aware of custom entry types, custom fields, and reports missing required fields. [#14257](https://github.com/JabRef/jabref/pull/14257)
+- We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
+- We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
+- REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
+- REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
+- REST-API: Allow import of supported formats via `POST http://localhost:23119/libraries/current/entries`. [#14896](https://github.com/JabRef/jabref/pull/14896)
 
 ### Changed
 
+- We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog. [#11791](https://github.com/JabRef/jabref/issues/11791)
+- REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
+- macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
+
 ### Fixed
 
+- We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
+- Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
+- We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
+- We fixed an issue where exporting group chat to JSON resulted in empty entries array. [#14647](https://github.com/JabRef/jabref/issues/14647)
 - We fixed an error on startup when using portable preferences. [#14729](https://github.com/JabRef/jabref/issues/14729)
 - We fixed an issue when warning for duplicate entries in the "New Entry" dialog. [#14662](https://github.com/JabRef/jabref/pull/14662)
+- We fixed the Quality > Automatically set file links button. Now if a file is moved, the button can relink the moved file to the broken linked file. [#9798](https://github.com/JabRef/jabref/issues/9798)
+- We fixed an issue where bulk import operations polluted the navigation history, making the Back/Forward buttons navigate through imported entries instead of only user-selected entries. [#13878](https://github.com/JabRef/jabref/issues/13878)
+- We fixed an issue where JabRef would not start on Linux ARM due to missing binaries for postgres-embedded [#14783](https://github.com/JabRef/jabref/issues/14783)
+- We fixed an issue when importing an entry to a library without groups, but group "Imported Entries" was automatically created.
+- We fixed an issue where journal abbreviations chose the wrong abbreviation when fuzzy matching. [#14850](https://github.com/JabRef/jabref/pull/14850)
+- We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
+- Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
+- Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
+- Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
 
 ### Removed
+
+- We removed keyboard shortcuts for toggling journal abbreviation (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>). [#14850](https://github.com/JabRef/jabref/pull/14850)
 
 ## [6.0-alpha.4] – 2025-12-25
 
@@ -35,7 +64,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added 15 non-standard BibLaTeX entry types (Audio, Image, Legal, ...) to the group "Non-standard types" group in the New Entry dialog and in the context menu. [#12963](https://github.com/JabRef/jabref/issues/12963)
 - We added a drop-down menu to those custom fields in the main table for which content selector values exists. [#14087](https://github.com/JabRef/jabref/issues/14087)
 - We added a "Jump to Field" dialog (`Ctrl+J`) to quickly search for and navigate to any field across all tabs. [#12276](https://github.com/JabRef/jabref/issues/12276).
-- We added "IEEE" as another option for parsing plain text citations. [#14233](github.com/JabRef/jabref/pull/14233)
+- We added "IEEE" as another option for parsing plain text citations. [#14233](https://github.com/JabRef/jabref/pull/14233)
 - We added automatic date-based groups that create year/month/day subgroups from an entry’s date fields. [#10822](https://github.com/JabRef/jabref/issues/10822)
 - We added `doi-to-bibtex` to `JabKit`. [#14244](https://github.com/JabRef/jabref/pull/14244)
 - We added `--provider=crossref` to `get-cited-works` at `JabKit`. [#14357](https://github.com/JabRef/jabref/pull/14357)

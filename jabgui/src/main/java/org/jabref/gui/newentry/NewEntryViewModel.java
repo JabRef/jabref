@@ -22,6 +22,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -68,6 +69,8 @@ public class NewEntryViewModel {
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
 
+    private final BookCoverFetcher bookCoverFetcher;
+
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
 
@@ -105,6 +108,8 @@ public class NewEntryViewModel {
         this.taskExecutor = taskExecutor;
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+
+        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         executing = new SimpleBooleanProperty(false);
         executedSuccessfully = new SimpleBooleanProperty(false);
@@ -233,6 +238,13 @@ public class NewEntryViewModel {
         return bibtexTextValidator.getValidationStatus().validProperty();
     }
 
+    private BibEntry withCoversDownloaded(BibEntry entry) {
+        if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
+            bookCoverFetcher.downloadCoversForEntry(entry);
+        }
+        return entry;
+    }
+
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
@@ -240,8 +252,10 @@ public class NewEntryViewModel {
             if (StringUtil.isBlank(text)) {
                 return Optional.empty();
             }
+
             CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
-            return fetcher.performSearchById(text);
+            return fetcher.performSearchById(text)
+                          .map(entry -> withCoversDownloaded(entry));
         }
     }
 
@@ -263,7 +277,8 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text);
+            return fetcher.performSearchById(text)
+                          .map(entry -> withCoversDownloaded(entry));
         }
     }
 

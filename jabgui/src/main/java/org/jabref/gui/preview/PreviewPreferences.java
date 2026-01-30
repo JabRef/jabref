@@ -27,13 +27,16 @@ public class PreviewPreferences {
     private final BooleanProperty showPreviewEntryTableTooltip;
     private final ObservableList<Path> bstPreviewLayoutPaths;
 
+    private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
+
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
                               TextBasedPreviewLayout customPreviewLayout,
                               String defaultCustomPreviewLayout,
                               boolean showPreviewAsExtraTab,
                               boolean showPreviewEntryTableTooltip,
-                              List<Path> bstPreviewLayoutPaths) {
+                              List<Path> bstPreviewLayoutPaths,
+                              boolean shouldDownloadCovers) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
         this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
@@ -41,6 +44,7 @@ public class PreviewPreferences {
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
+        this.shouldDownloadCovers.set(shouldDownloadCovers);
     }
 
     private PreviewPreferences(){
@@ -51,7 +55,8 @@ public class PreviewPreferences {
                 "",
                 false,
                 false,
-                List.of()
+                List.of(),
+                false
         );
     }
 
@@ -150,6 +155,19 @@ public class PreviewPreferences {
         this.showPreviewAsExtraTab.set(preferences.shouldShowPreviewAsExtraTab());
         this.showPreviewEntryTableTooltip.set(preferences.shouldShowPreviewEntryTableTooltip());
         this.bstPreviewLayoutPaths.setAll(preferences.getBstPreviewLayoutPaths());
+        this.shouldDownloadCovers.set(preferences.shouldDownloadCovers());
 
+    }
+
+    public boolean shouldDownloadCovers() {
+        return shouldDownloadCovers.get();
+    }
+
+    public BooleanProperty shouldDownloadCoversProperty() {
+        return shouldDownloadCovers;
+    }
+
+    public void setShouldDownloadCovers(boolean value) {
+        this.shouldDownloadCovers.set(value);
     }
 }

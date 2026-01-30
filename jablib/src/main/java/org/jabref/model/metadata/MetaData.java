@@ -32,8 +32,7 @@ import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 import com.tobiasdiez.easybind.optional.OptionalWrapper;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 
 @AllowedToUseLogic("because it needs access to citation pattern and cleanups")
 public class MetaData {
@@ -59,7 +58,7 @@ public class MetaData {
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
     public static final String BLG_FILE_PATH = "blgFilePath";
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
+
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
@@ -70,13 +69,13 @@ public class MetaData {
     private final Map<String, Path> blgFilePathMap = new HashMap<>();
     private Optional<Version> groupSearchSyntaxVersion = Optional.empty();
 
-    private Charset encoding;
-    private SaveOrder saveOrder;
-    private String defaultCiteKeyPattern;
-    private FieldFormatterCleanupActions saveActions;
-    private BibDatabaseMode mode;
+    @Nullable private Charset encoding;
+    @Nullable private SaveOrder saveOrder;
+    @Nullable private String defaultCiteKeyPattern;
+    @Nullable private FieldFormatterCleanupActions saveActions;
+    @Nullable private BibDatabaseMode mode;
     private boolean isProtected;
-    private String librarySpecificFileDirectory;
+    @Nullable private String librarySpecificFileDirectory;
 
     @NonNull
     private final ContentSelectors contentSelectors = new ContentSelectors();
@@ -84,11 +83,9 @@ public class MetaData {
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
-    private String versionDBStructure;
+    @Nullable private String versionDBStructure;
 
-    /**
-     * Constructs an empty metadata.
-     */
+    /// Constructs an empty metadata.
     public MetaData() {
         // Do nothing
     }
@@ -110,9 +107,7 @@ public class MetaData {
         return groupsRootBinding;
     }
 
-    /**
-     * Sets a new group root node. <b>WARNING </b>: This invalidates everything returned by getGroups() so far!!!
-     */
+    /// Sets a new group root node. **WARNING **: This invalidates everything returned by getGroups() so far!!!
     public void setGroups(@NonNull GroupTreeNode root) {
         groupsRoot.setValue(root);
         root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
@@ -130,9 +125,7 @@ public class MetaData {
         return this.groupSearchSyntaxVersion;
     }
 
-    /**
-     * @return the stored label patterns
-     */
+    /// @return the stored label patterns
     public AbstractCitationKeyPatterns getCiteKeyPatterns(@NonNull GlobalCitationKeyPatterns globalPatterns) {
         AbstractCitationKeyPatterns bibtexKeyPatterns = new DatabaseCitationKeyPatterns(globalPatterns);
 
@@ -143,11 +136,9 @@ public class MetaData {
         return bibtexKeyPatterns;
     }
 
-    /**
-     * Updates the stored key patterns to the given key patterns.
-     *
-     * @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
-     */
+    /// Updates the stored key patterns to the given key patterns.
+    ///
+    /// @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
     public void setCiteKeyPattern(@NonNull AbstractCitationKeyPatterns bibtexKeyPatterns) {
         CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
         Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
@@ -292,18 +283,14 @@ public class MetaData {
         postChange();
     }
 
-    /**
-     * Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
-     */
+    /// Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
     private void postChange() {
         if (isEventPropagationEnabled) {
             eventBus.post(new MetaDataChangedEvent(this));
         }
     }
 
-    /**
-     * Returns the encoding used during parsing.
-     */
+    /// Returns the encoding used during parsing.
     public Optional<Charset> getEncoding() {
         return Optional.ofNullable(encoding);
     }
@@ -312,9 +299,7 @@ public class MetaData {
         setEncoding(encoding, ChangePropagation.POST_EVENT);
     }
 
-    /**
-     * This method (with additional parameter) has been introduced to avoid event loops while saving a database.
-     */
+    /// This method (with additional parameter) has been introduced to avoid event loops while saving a database.
     public void setEncoding(@NonNull Charset encoding, ChangePropagation postChanges) {
         this.encoding = encoding;
         if (postChanges == ChangePropagation.POST_EVENT) {
@@ -326,16 +311,12 @@ public class MetaData {
         return encodingExplicitlySupplied;
     }
 
-    /**
-     * Sets the indication whether the encoding was set using "% Encoding: ..." or whether it was detected "magically"
-     */
+    /// Sets the indication whether the encoding was set using "% Encoding: ..." or whether it was detected "magically"
     public void setEncodingExplicitlySupplied(boolean encodingExplicitlySupplied) {
         this.encodingExplicitlySupplied = encodingExplicitlySupplied;
     }
 
-    /**
-     * If disabled {@link MetaDataChangedEvent} will not be posted.
-     */
+    /// If disabled {@link MetaDataChangedEvent} will not be posted.
     public void setEventPropagation(boolean enabled) {
         this.isEventPropagationEnabled = enabled;
     }

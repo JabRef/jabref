@@ -44,9 +44,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A single tab displayed in the EntryEditor holding several FieldEditors.
- */
+/// A single tab displayed in the EntryEditor holding several FieldEditors.
 abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);

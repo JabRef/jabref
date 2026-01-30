@@ -34,7 +34,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
+import org.jabref.logic.importer.ImportFormatReader.ImportResult;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -75,6 +75,9 @@ import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.Duplicate
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
+
+    private static final String FILENAME_FALLBACK = "downloaded.pdf";
+
     private final BibDatabaseContext targetBibDatabaseContext;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -258,15 +261,13 @@ public class ImportHandler {
         importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager));
     }
 
-    /**
-     * Imports an entry into the database with duplicate checking and handling.
-     * Creates a copy of the entry for processing - the original entry parameter is not modified.
-     * The copied entry may be modified during cleanup and duplicate handling.
-     *
-     * @param entry the entry to import (original will not be modified)
-     * @param decision the duplicate resolution strategy to apply
-     * @param tracker tracks the import status of the entry
-     */
+    /// Imports an entry into the database with duplicate checking and handling.
+    /// Creates a copy of the entry for processing - the original entry parameter is not modified.
+    /// The copied entry may be modified during cleanup and duplicate handling.
+    ///
+    /// @param entry    the entry to import (original will not be modified)
+    /// @param decision the duplicate resolution strategy to apply
+    /// @param tracker  tracks the import status of the entry
     private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
         // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
@@ -375,11 +376,9 @@ public class ImportHandler {
         }
     }
 
-    /**
-     * Generate keys for given entries.
-     *
-     * @param entries entries to generate keys for
-     */
+    /// Generate keys for given entries.
+    ///
+    /// @param entries entries to generate keys for
     private void generateKeys(List<BibEntry> entries) {
         if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
             return;
@@ -437,7 +436,7 @@ public class ImportHandler {
         LOGGER.trace("Checking if URL is a PDF: {}", data);
 
         if (URLUtil.isURL(data)) {
-            String fileName = data.substring(data.lastIndexOf('/') + 1);
+            String fileName = FileUtil.getFileNameFromUrl(data).orElse(FILENAME_FALLBACK);
             if (FileUtil.isPDFFile(Path.of(fileName))) {
                 try {
                     return handlePdfUrl(data);
@@ -465,8 +464,8 @@ public class ImportHandler {
                     preferences.getCitationKeyPatternPreferences(),
                     fileUpdateMonitor
             );
-            UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
-            return unknownFormatImport.parserResult().getDatabase().getEntries();
+            ImportResult importResult = importFormatReader.importWithAutoDetection(data);
+            return importResult.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return List.of();
@@ -504,7 +503,7 @@ public class ImportHandler {
             return List.of();
         }
         URLDownload urlDownload = new URLDownload(pdfUrl);
-        String filename = URLUtil.getFileNameFromUrl(pdfUrl);
+        String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse(FILENAME_FALLBACK);
         Path targetFile = targetDirectory.get().resolve(filename);
         try {
             urlDownload.toFile(targetFile);
@@ -540,7 +539,7 @@ public class ImportHandler {
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-            // We cannot add the new group here directly because we don't have access to the group node viewmoel stuff here
+            // We cannot add the new group here directly because we don't have access to the group node ViewModel stuff here
             // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()
