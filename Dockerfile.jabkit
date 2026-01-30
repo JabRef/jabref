@@ -1,5 +1,8 @@
 FROM gradle:jdk24-noble AS build
 
+LABEL org.opencontainers.image.title="jabkit"
+LABEL org.opencontainers.image.description="JabRef's CLI tool"
+
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
 ARG TAG_BUILD="false"
@@ -17,8 +20,6 @@ RUN mv jabkit/build/packages/*/* /dist
 # jpackage needs glibc; alpine does not work
 FROM debian:bookworm-slim AS runtime
 
-LABEL org.opencontainers.image.title="jabkit"
-LABEL org.opencontainers.image.description="JabRef's CLI tool"
 LABEL org.opencontainers.image.source=https://github.com/JabRef/jabref
 
 WORKDIR /work
