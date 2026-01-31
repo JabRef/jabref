@@ -659,7 +659,6 @@ jobs:
 
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
           comment-tag: download-link
-          mode: recreate
 
   notarize:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
