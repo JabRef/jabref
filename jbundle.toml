@@ -4,9 +4,9 @@ jvm_args = [
         "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        // https://github.com/uncomplicate/neanderthal/issues/55
+        # https://github.com/uncomplicate/neanderthal/issues/55
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        // Enable JEP 450: Compact Object Headers
+        # Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
         "-XX:+UseStringDeduplication"
     ]
