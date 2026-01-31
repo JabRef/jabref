@@ -14,6 +14,7 @@ import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
@@ -348,6 +349,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         exportToClipboardAction.execute();
     }
 
+    public WebEngine getEngine() {
+        return previewView.getEngine();
+    }
+    
     @Override
     public void invalidated(Observable observable) {
         update();
