@@ -22,6 +22,8 @@ runs:
         check-latest: true
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
+      env:
+        ACTIONS_STEP_DEBUG: true
     - name: Generate JBang cache key
       id: cache-key
       shell: bash
