@@ -236,14 +236,20 @@ jobs:
           echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
           echo "should-notarize=false" >> "$GITHUB_OUTPUT"
 
-          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" = "main" ]; then
-            echo "☁️ Push to \`main\` – will upload"
-            echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
-            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            if [[ "${{ github.ref_name }}" == "main" ]]; then
+              echo "☁️ Push to \`main\` – will upload"
+              echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
+              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi;
+            echo "⊘ Push to some branch not main – skipping upload"
+            echo "⊘ Push to some branch not main – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi;
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "☁️? Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}"
             echo "☁️= Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
