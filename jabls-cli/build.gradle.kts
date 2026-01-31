@@ -2,6 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 }
 
@@ -13,13 +14,13 @@ application{
     mainModule.set("org.jabref.jabls.cli")
 
     applicationDefaultJvmArgs = listOf(
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core",
+
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
-        "-XX:+UseZGC", "-XX:+ZUncommit",
-        "-XX:+UseStringDeduplication",
-
-        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
+        "-XX:+UseStringDeduplication"
     )
 }
 
