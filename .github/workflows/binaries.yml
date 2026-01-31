@@ -239,7 +239,7 @@ jobs:
             exit 0
           fi;
 
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
+          if [ "${{ github.event_name }}" = "push" ]; then
             echo "☁️ Push to \`main\` – will upload"
             echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
