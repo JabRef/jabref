@@ -605,14 +605,15 @@ jobs:
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
-    needs: [ conditions, build ]
-    if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
+    needs: [ conditions, disk-space-check, build ]
+    if: ${{ (github.event_name == 'pull_request') }}
     permissions:
       issues: write
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Comment PR
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
