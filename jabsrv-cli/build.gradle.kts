@@ -5,6 +5,9 @@ plugins {
     id("application")
 }
 
+group = "org.jabref.jabsrv"
+version = project.findProperty("projVersion") ?: "100.0.0"
+
 application{
     mainClass.set("org.jabref.http.server.cli.ServerCli")
     mainModule.set("org.jabref.jabsrv.cli")
