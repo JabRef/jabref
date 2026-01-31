@@ -148,4 +148,35 @@ class LatexParserTest {
 
         assertEquals(expectedCrossingResult2, crossingResult2);
     }
+
+    @Test
+    void sameFilePartiallyPopulatedDatabaseResolvesOnlyMissingEntries() throws URISyntaxException {
+        // Parse same input LaTeX file as the existing tests
+        Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
+
+        // Build expected parser result (same as existing test)
+        LatexParserResult expectedParserResult = new LatexParserResult(texFile);
+        expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
+        expectedParserResult.addKey(EINSTEIN, texFile, 4, 6, 18, "\\cite{Einstein1920}");
+        expectedParserResult.addKey(DARWIN, texFile, 5, 6, 16, "\\cite{Darwin1888}.");
+        expectedParserResult.addKey(EINSTEIN, texFile, 6, 20, 32, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
+        expectedParserResult.addKey(DARWIN, texFile, 7, 73, 83, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
+
+        // Create a partial database: Einstein exists, Darwin does not
+        BibDatabase partialDatabase = new BibDatabase();
+        partialDatabase.insertEntry(database.getEntryByCitationKey(EINSTEIN).get()); // only Einstein is present
+
+        LatexBibEntriesResolverResult actual =
+                new TexBibEntriesResolver(partialDatabase, importFormatPreferences, fileMonitor)
+                        .resolve(new LatexParserResults(parserResult));
+
+        LatexBibEntriesResolverResult expected =
+                new LatexBibEntriesResolverResult(new LatexParserResults(expectedParserResult));
+
+        // Expect resolver to add only Darwin, since Einstein is already in partialDatabase
+        expected.addEntry(database.getEntryByCitationKey(DARWIN).get());
+
+        assertEquals(expected, actual);
+    }
 }
