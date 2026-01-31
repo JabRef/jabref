@@ -29,14 +29,7 @@ public class PreviewPreferences {
 
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
 
-    public PreviewPreferences(List<PreviewLayout> layoutCycle,
-                              int layoutCyclePosition,
-                              TextBasedPreviewLayout customPreviewLayout,
-                              String defaultCustomPreviewLayout,
-                              boolean showPreviewAsExtraTab,
-                              boolean showPreviewEntryTableTooltip,
-                              List<Path> bstPreviewLayoutPaths,
-                              boolean shouldDownloadCovers) {
+    public PreviewPreferences(List<PreviewLayout> layoutCycle, int layoutCyclePosition, TextBasedPreviewLayout customPreviewLayout, String defaultCustomPreviewLayout, boolean showPreviewAsExtraTab, boolean showPreviewEntryTableTooltip, List<Path> bstPreviewLayoutPaths, boolean shouldDownloadCovers) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
         this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
@@ -45,6 +38,14 @@ public class PreviewPreferences {
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
         this.shouldDownloadCovers.set(shouldDownloadCovers);
+    }
+
+    private PreviewPreferences() {
+        this(List.of(), 0, new TextBasedPreviewLayout("", null, null), "", false, false, List.of(), false);
+    }
+
+    public static PreviewPreferences getDefault() {
+        return new PreviewPreferences();
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
@@ -72,9 +73,7 @@ public class PreviewPreferences {
     }
 
     public PreviewLayout getSelectedPreviewLayout() {
-        if (layoutCycle.isEmpty()
-                || layoutCyclePosition.getValue() < 0
-                || layoutCyclePosition.getValue() >= layoutCycle.size()) {
+        if (layoutCycle.isEmpty() || layoutCyclePosition.getValue() < 0 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
             return getCustomPreviewLayout();
         } else {
             return layoutCycle.get(layoutCyclePosition.getValue());
@@ -127,6 +126,17 @@ public class PreviewPreferences {
 
     public void setBstPreviewLayoutPaths(List<Path> bstPreviewLayoutPaths) {
         this.bstPreviewLayoutPaths.setAll(bstPreviewLayoutPaths);
+    }
+
+    public void setAll(PreviewPreferences preferences) {
+        this.layoutCycle.setAll(preferences.getLayoutCycle());
+        this.layoutCyclePosition.set(preferences.getLayoutCyclePosition());
+        this.customPreviewLayout.set(preferences.getCustomPreviewLayout());
+        this.defaultCustomPreviewLayout.set(preferences.getDefaultCustomPreviewLayout());
+        this.showPreviewAsExtraTab.set(preferences.shouldShowPreviewAsExtraTab());
+        this.showPreviewEntryTableTooltip.set(preferences.shouldShowPreviewEntryTableTooltip());
+        this.bstPreviewLayoutPaths.setAll(preferences.getBstPreviewLayoutPaths());
+        this.shouldDownloadCovers.set(preferences.shouldDownloadCovers());
     }
 
     public boolean shouldDownloadCovers() {
