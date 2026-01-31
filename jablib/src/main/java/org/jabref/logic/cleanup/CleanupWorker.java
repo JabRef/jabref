@@ -44,6 +44,8 @@ public class CleanupWorker {
             changes.addAll(job.cleanup(entry));
             if (job instanceof MoveFilesCleanup cleanup) {
                 failures.addAll(cleanup.getIoExceptions());
+            } else if (job instanceof XmpMetadataCleanup cleanup) {
+                failures.addAll(cleanup.getFailures());
             }
         }
         return changes;
@@ -94,6 +96,8 @@ public class CleanupWorker {
                     new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->
                     new FileLinksCleanup();
+            case REMOVE_XMP_METADATA ->
+                    new XmpMetadataCleanup(databaseContext, filePreferences);
             case ABBREVIATE_DEFAULT ->
                     new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DEFAULT, useFJournalField);
             case ABBREVIATE_DOTLESS ->

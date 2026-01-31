@@ -216,7 +216,7 @@ jobs:
             echo "🧾 macOS notarization"
             echo "🧾 macOS notarization" >> $GITHUB_STEP_SUMMARY
             echo "should-notarize=true" >> "$GITHUB_OUTPUT"
-            if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            if [[ "${GITHUB_REF}" == refs/tags/* || ( "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "main" ) ]]; then
               echo "☁️ will upload"
               echo "☁️ will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -232,10 +232,17 @@ jobs:
           echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
           echo "should-notarize=false" >> "$GITHUB_OUTPUT"
 
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" = "main" ]; then
             echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}"
             echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi;
+
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "☁️ Push to `main` – will upload"
+            echo "☁️ Push to `main` – will upload" >> $GITHUB_STEP_SUMMARY
+            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -598,14 +605,15 @@ jobs:
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
-    needs: [ conditions, build ]
-    if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
+    needs: [ conditions, disk-space-check, build ]
+    if: ${{ (github.event_name == 'pull_request') }}
     permissions:
       issues: write
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Comment PR
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |

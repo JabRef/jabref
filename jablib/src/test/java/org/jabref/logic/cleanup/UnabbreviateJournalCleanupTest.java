@@ -51,7 +51,10 @@ public class UnabbreviateJournalCleanupTest {
         List<FieldChange> changes = cleanup.cleanup(entry);
 
         assertEquals(List.of(), changes);
-        assertEquals(Optional.of("Unknown Journal"), entry.getField(StandardField.JOURNAL));
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Unknown Journal");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -63,7 +66,10 @@ public class UnabbreviateJournalCleanupTest {
         List<FieldChange> changes = cleanup.cleanup(entry);
 
         assertEquals(List.of(), changes);
-        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Journal of Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -81,7 +87,9 @@ public class UnabbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Journal of Foo");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -99,7 +107,9 @@ public class UnabbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Review Letters"), entry.getField(StandardField.JOURNALTITLE));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNALTITLE, "Review Letters");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -123,8 +133,10 @@ public class UnabbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.of("Review Letters"), entry.getField(StandardField.JOURNALTITLE));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Journal of Foo")
+                .withField(StandardField.JOURNALTITLE, "Review Letters");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -163,8 +175,10 @@ public class UnabbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
-        assertEquals(Optional.empty(), entry.getField(AMSField.FJOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Journal of Foo");
+        assertEquals(expectedEntry, entry);
+
         verify(repositoryMock, atLeastOnce()).get("J. Foo");
     }
 
@@ -183,7 +197,9 @@ public class UnabbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Physical Review Letters"), entry.getField(StandardField.JOURNALTITLE));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNALTITLE, "Physical Review Letters");
+        assertEquals(expectedEntry, entry);
     }
 
     @Test
@@ -203,6 +219,8 @@ public class UnabbreviateJournalCleanupTest {
         );
         assertEquals(expected, changes);
 
-        assertEquals(Optional.of("Journal of Foo"), entry.getField(StandardField.JOURNAL));
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Journal of Foo");
+        assertEquals(expectedEntry, entry);
     }
 }
