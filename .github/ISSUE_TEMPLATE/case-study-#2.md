@@ -1,5 +1,5 @@
 ---
-name: Technical Debt
+name: 'Case Study #2'
 about: Technical Debt
 title: ''
 labels: ''
