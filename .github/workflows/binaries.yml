@@ -20,6 +20,45 @@ on:
   merge_group:
   workflow_dispatch:
     inputs:
+      jvmDistribution:
+        description: "JDK distribution (setup-java)"
+        type: choice
+        default: corretto
+        options:
+          # These are the distributions listed at https://github.com/actions/setup-java/blob/main/README.md#supported-distributions
+          - adopt
+          - adopt-openj9
+          - corretto
+          - dragonwell
+          - graalvm
+          - jetbrains
+          - liberica
+          - microsoft
+          - oracle
+          - sapmachine
+          - semeru
+          - temurin
+          - zulu
+      jvmVendor:
+        description: "JDK vendor (gradle toolchain)"
+        type: choice
+        default: AMAZON
+        options:
+          # These are the vendors listed at https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html
+          - ADOPTIUM
+          - ADOPTOPENJDK
+          - AMAZON
+          - APPLE
+          - AZUL
+          - BELLSOFT
+          - GRAAL_VM
+          - HEWLETT_PACKARD
+          - IBM
+          - JETBRAINS
+          - MICROSOFT
+          - ORACLE
+          - SAP
+          - TENCENT
       useEaJdk:
         description: "Use early-access JDK and JavaFX"
         type: boolean
@@ -89,6 +128,7 @@ jobs:
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
+      jvmDistribution:  ${{ steps.binary.outputs.jvmDistribution }}
       useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
       jdkVersion: ${{ steps.binary.outputs.jdkVersion }}
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
@@ -104,6 +144,10 @@ jobs:
           LABEL_NAME: ${{ github.event.label.name }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
+          set -euo pipefail
+          set -x
+          PS4='+ ${LINENO}: '
+
           if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binaries" ]]; then
             echo "📦 build enabled"
             echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
@@ -133,8 +177,16 @@ jobs:
             echo "🛡️ JDK stable version used"
             echo "🛡️ JDK stable version used" >> "$GITHUB_STEP_SUMMARY"
             echo "useEaJdk=false" >> "$GITHUB_OUTPUT"
+            echo "JVM vendor: ${{ github.event.inputs.jvmVendor || '(unset)' }}"
+            echo "JVM vendor: ${{ github.event.inputs.jvmVendor || '(unset)' }}" >> "$GITHUB_STEP_SUMMARY"
           fi
-          # Enable testing of EA JDKs later even if not triggered by workflow dispatch
+
+          # The distribution to use at setup-java
+          echo "JVM distribution: ${{ github.event.inputs.jvmDistribution || 'corretto' }}"
+          echo "jvmDistribution=${{ github.event.inputs.jvmDistribution || 'corretto' }}" >> "$GITHUB_OUTPUT"
+
+          # Enable testing of EA JDKs later even if not triggered by workflow dispatch.
+          # One needs to set "useEaJdk=true" above even at the stable case to enable this.
           echo "jdkVersion=${{ github.event.inputs.jdkVersion || '26' }}" >> "$GITHUB_OUTPUT"
           echo "jdkVersionFlavour=${{ github.event.inputs.jdkVersionFlavour || 'stable' }}" >> "$GITHUB_OUTPUT"
           echo "javafxVersion=${{ github.event.inputs.javafxVersion || '26-ea+22' }}" >> "$GITHUB_OUTPUT"
@@ -168,7 +220,7 @@ jobs:
             echo "🧾 macOS notarization"
             echo "🧾 macOS notarization" >> $GITHUB_STEP_SUMMARY
             echo "should-notarize=true" >> "$GITHUB_OUTPUT"
-            if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            if [[ "${GITHUB_REF}" == refs/tags/* || ( "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "main" ) ]]; then
               echo "☁️ will upload"
               echo "☁️ will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -184,9 +236,22 @@ jobs:
           echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
           echo "should-notarize=false" >> "$GITHUB_OUTPUT"
 
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}"
-            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            if [[ "${{ github.ref_name }}" == "main" ]]; then
+              echo "☁️ Push to \`main\` – will upload"
+              echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
+              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi;
+            echo "⊘ Push to some branch not main – skipping upload"
+            echo "⊘ Push to some branch not main – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi;
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "☁️? Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}"
+            echo "☁️= Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -325,6 +390,17 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
 
+      - name: Patch used JDK
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
+        shell: bash
+        run: |
+          set -ex
+          PS4='+$LINENO: '
+          SED_I=(-i)
+          [[ '${{ startsWith(matrix.os, 'macos') }}' == 'true' ]] && SED_I=(-i '')
+          sed "${SED_I[@]}" "s/AMAZON/${{ inputs.jvmVendor }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+
       # region setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
@@ -348,6 +424,19 @@ jobs:
       # endregion
 
       - uses: ./.github/actions/setup-gradle
+        with:
+          distribution: ${{ needs.conditions.outputs.jvmDistribution }}
+      - name: Output current Java environment
+        shell: bash
+        run: |
+          set -x
+          echo $PATH
+          echo $JAVA_HOME
+          java -version
+          java -version >> $GITHUB_STEP_SUMMARY
+          javac -version
+          which jlink
+          jlink --version
 
       - name: Workaround for jpackage issue
         run: |
@@ -370,9 +459,6 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
-
-      - run: ./gradlew :jabgui:dependencies
-        shell: bash
 
       - name: jpackage JabGui
         shell: bash
@@ -526,14 +612,15 @@ jobs:
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
-    needs: [ conditions, build ]
-    if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
+    needs: [ conditions, disk-space-check, build ]
+    if: ${{ (github.event_name == 'pull_request') }}
     permissions:
       issues: write
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Comment PR
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
@@ -579,7 +666,6 @@ jobs:
 
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
           comment-tag: download-link
-          mode: recreate
 
   notarize:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts

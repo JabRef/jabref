@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,10 +55,11 @@ public class ReferImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         // look for the "%0 *" line;
         String str;
-        while ((str = reader.readLine()) != null) {
+        while ((str = bufferedReader.readLine()) != null) {
             if (Z_PATTERN.matcher(str).matches()) {
                 return true;
             }

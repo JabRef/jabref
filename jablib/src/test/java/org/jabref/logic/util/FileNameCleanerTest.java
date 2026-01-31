@@ -15,7 +15,10 @@ class FileNameCleanerTest {
             "illegalFilename______.txt, illegalFilename/?*<>|.txt",
             "illegalFileName_.txt, illegalFileName{.txt",
             "_The Evolution of Sentiment_ Analysis_.PDF, ?The Evolution of Sentiment} Analysis}.PDF",
-            "'The Evolution of Sentiment_ Analysis_A Review of Research Topics, Venues, and Top Cited Papers.PDF', 'The Evolution of Sentiment} Analysis}A Review of Research Topics, Venues, and Top Cited Papers.PDF'"
+            "'The Evolution of Sentiment_ Analysis_A Review of Research Topics, Venues, and Top Cited Papers.PDF', 'The Evolution of Sentiment} Analysis}A Review of Research Topics, Venues, and Top Cited Papers.PDF'",
+            "file_with_colon.txt, file:with:colon.txt",
+            "file_with_quote.txt, file\"with\"quote.txt",
+            "file_with_backslash.txt, file\\with\\backslash.txt"
     })
     void cleanFileName(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanFileName(input));

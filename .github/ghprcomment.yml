@@ -51,10 +51,6 @@
   message: >
     You introduced non-Markdown JavaDoc.
     Please use Markdown JavaDoc (`///`).
-
-
-    Note: This is a strong indication that you heavily used AI to create your code.
-    Please re-check our [AI usage policy](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md).
 - jobName: Checkstyle
   workflowName: 'Source Code Tests'
   message: >
