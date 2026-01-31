@@ -146,7 +146,7 @@ jobs:
         run: |
           set -euo pipefail
           set -x
-          PS4='+ ${BASH_SOURCE}:${LINENO}:${FUNCNAME[0]}: '
+          PS4='+ ${LINENO}: '
 
           if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binaries" ]]; then
             echo "📦 build enabled"
