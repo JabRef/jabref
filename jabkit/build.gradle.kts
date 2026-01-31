@@ -79,14 +79,16 @@ application {
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        // Enable JEP 450: Compact Object Headers
-        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
 
-        // Default garbage collector is sufficient for CLI APP
         // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseG1GC",
+        "-XX:+UseSerialGC"
         // "-XX:+UseStringDeduplication",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders"
     )
 }
 
