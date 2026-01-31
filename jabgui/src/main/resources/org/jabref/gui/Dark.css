@@ -210,3 +210,41 @@
     /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
     -fx-fill: #151924 !important;
 }
+
+
+/* The CAYW Popup fix here */
+.search-dialog {
+    -fx-background-color: -jr-background-alt;
+}
+
+.list-cell {
+    -fx-text-fill: #000000 !important;
+    -fx-fill: #e0e0e0 !important;
+}
+
+.list-cell:hover,
+.list-cell:selected {
+    -fx-background-color: #3a3a3a !important;
+    -fx-text-fill: #ffffff !important;
+}
+
+.list-cell .text,
+.list-cell .label,
+.list-cell .search-result-label,
+.list-cell .search-result-description {
+    -fx-text-fill: #e0e0e0 !important;
+    -fx-fill: #e0e0e0 !important;
+}
+
+.chip-style {
+    /*-fx-background-color: #272B38; */
+    -fx-border-radius: 15px;
+    -fx-border-color: 'white';
+    -fx-border-width: 1px;
+}
+
+.chip-style .button {
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+    -fx-background-color: transparent !important;
+}
