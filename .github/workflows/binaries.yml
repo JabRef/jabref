@@ -491,7 +491,9 @@ jobs:
           mkdir -p build/jbundle
           # TODO: something like jabgui/build/packages/ubuntu-22.04/JabRef/lib/runtime as --jlink-runtime path
           # jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages --output ./build/jbundle/jabgui
-          jbundle build --input . --gradle-project jabgui --output ./build/jbundle/jabgui
+          jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui --jvm-args \
+            "--add-modules jdk.incubator.vector --enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain --add-opens java.base/java.nio=org.apache.pdfbox.io --add-opens java.base/jdk.internal.ref=org.apache.pdfbox.io -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication"
+
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -589,7 +591,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --gradle-project jabkit --output ./build/jbundle/jabkit
+          jbundle build --no-appcds --input . --gradle-project jabkit --output ./build/jbundle/jabkit
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -647,7 +649,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --gradle-project jabls-cli --output ./build/jbundle/jabls
+          jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -684,7 +686,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv
+          jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
