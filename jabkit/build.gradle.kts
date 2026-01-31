@@ -10,7 +10,6 @@ plugins {
 group = "org.jabref.jabkit"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
-
 dependencies {
     implementation(project(":jablib"))
 
