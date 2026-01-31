@@ -476,7 +476,7 @@ jobs:
           ./gradlew :jabgui:run --args="--help"
 
       - name: Install jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        # if: ${{ (matrix.os == 'ubuntu-22.04') }}
         uses: baptiste0928/cargo-install@v3
         with:
           crate: jbundle
@@ -485,13 +485,17 @@ jobs:
           branch: avelino/issue-6-41-42
 
       - name: jbundle JabGui
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        # if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
           mkdir -p build/jbundle
+          ls -la jabgui/build/packages/${{ matrix.os }}
+          find jabgui/build/packages/${{ matrix.os }} -name "modules"
           # TODO: something like jabgui/build/packages/ubuntu-22.04/JabRef/lib/runtime as --jlink-runtime path
-          # jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages --output ./build/jbundle/jabgui
-          jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui --jvm-args "--add-modules jdk.incubator.vector --enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain --add-opens java.base/java.nio=org.apache.pdfbox.io --add-opens java.base/jdk.internal.ref=org.apache.pdfbox.io -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication"
+          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages/${{ matrix.os }}/lib/runtime --output ./build/jbundle/jabgui
+
+          # Not working - see https://github.com/avelino/jbundle/pull/43#issuecomment-3829338927
+          # jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui --jvm-args "--add-modules jdk.incubator.vector --enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain --add-opens java.base/java.nio=org.apache.pdfbox.io --add-opens java.base/jdk.internal.ref=org.apache.pdfbox.io -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication"
 
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
