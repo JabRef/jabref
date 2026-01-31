@@ -3,6 +3,7 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
