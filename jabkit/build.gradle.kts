@@ -78,7 +78,6 @@ application {
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core",
 
         // "-XX:+UseZGC", "-XX:+ZUncommit",
