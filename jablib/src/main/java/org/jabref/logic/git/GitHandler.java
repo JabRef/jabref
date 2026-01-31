@@ -192,6 +192,7 @@ public class GitHandler {
                    .setAmend(amend)
                    .setAllowEmpty(false)
                    .setMessage(commitMessage)
+                   .setSign(false)
                    .call();
             }
         }
