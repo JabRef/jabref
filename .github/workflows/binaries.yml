@@ -490,9 +490,9 @@ jobs:
         run: |
           mkdir -p build/jbundle
           ls -la jabgui/build/packages/${{ matrix.os }}
-          find jabgui/build/packages/${{ matrix.os }} -name "modules"
+          find jabgui/build/packages/${{ matrix.os }} -name "java"
           # TODO: something like jabgui/build/packages/ubuntu-22.04/JabRef/lib/runtime as --jlink-runtime path
-          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages/${{ matrix.os }}/lib/runtime --output ./build/jbundle/jabgui
+          jbundle build --input . --gradle-project jabgui --jlink-runtime build/packages/${{ matrix.os }}/lib/runtime --output ./build/jbundle/jabgui
 
           # Not working - see https://github.com/avelino/jbundle/pull/43#issuecomment-3829338927
           # jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui --jvm-args "--add-modules jdk.incubator.vector --enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain --add-opens java.base/java.nio=org.apache.pdfbox.io --add-opens java.base/jdk.internal.ref=org.apache.pdfbox.io -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication"
