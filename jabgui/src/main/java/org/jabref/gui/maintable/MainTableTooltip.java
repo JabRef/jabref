@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -19,37 +18,16 @@ public class MainTableTooltip extends Tooltip {
     private final PreviewViewer preview;
     private final GuiPreferences preferences;
     private final Label fieldValueLabel = new Label();
-    private final WebView webView;
 
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
 
-        this.webView = (WebView) preview.getContent();
+        preview.resizeForTooltipContent();
 
-        webView.setPrefWidth(600);
-        webView.setMaxWidth(600);
-        webView.setPrefHeight(10);
-        webView.setMinHeight(10);
-
-        webView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+        preview.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                Platform.runLater(() -> {
-                    Object result = webView.getEngine().executeScript(
-                            "var content = document.getElementById('content');" +
-                                    "content ? content.getBoundingClientRect().height : document.body.scrollHeight;"
-                    );
-
-                    if (result instanceof Number height) {
-                        double actualH = height.doubleValue() + 15;
-
-                        webView.setPrefHeight(actualH);
-                        webView.setMaxHeight(actualH);
-                        webView.setMinHeight(actualH);
-
-                        sizeToScene();
-                    }
-                });
+                Platform.runLater(this::sizeToScene);
             }
         });
     }
@@ -59,7 +37,7 @@ public class MainTableTooltip extends Tooltip {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
-            setGraphic(webView);
+            setGraphic(preview);
         } else {
             fieldValueLabel.setText(fieldValue);
             setGraphic(fieldValueLabel);

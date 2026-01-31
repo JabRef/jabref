@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -347,6 +348,35 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 taskExecutor,
                 preferences);
         exportToClipboardAction.execute();
+    }
+
+    public void resizeForTooltipContent() {
+        setFitToHeight(false);
+        setVbarPolicy(ScrollBarPolicy.NEVER);
+
+        previewView.setPrefWidth(600);
+        previewView.setMaxWidth(600);
+        previewView.setPrefHeight(10);
+        previewView.setMinHeight(10);
+
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                Platform.runLater(() -> {
+                    Object result = previewView.getEngine().executeScript(
+                            "var content = document.getElementById('content');" +
+                                    "content ? content.getBoundingClientRect().height : document.body.scrollHeight;"
+                    );
+
+                    if (result instanceof java.lang.Number height) {
+                        double actualH = height.doubleValue() + 15;
+
+                        previewView.setPrefHeight(actualH);
+                        previewView.setMaxHeight(actualH);
+                        previewView.setMinHeight(actualH);
+                    }
+                });
+            }
+        });
     }
 
     public WebEngine getEngine() {
