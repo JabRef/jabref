@@ -1,19 +1,28 @@
 package org.jabref.http.server.resources;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -121,6 +130,45 @@ public class EntryResource {
                         "<strong>Released on:</strong> " + releaseDate;
 
         return preview;
+    }
+
+    @POST
+    @Path("files")
+    @Consumes("application/pdf")
+    public void addFile(@PathParam("id") String id, @PathParam("entryId") String entryId, InputStream fileInputStream) throws IOException {
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
+        List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
+        if (entriesByCitationKey.isEmpty()) {
+            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+        }
+        // 0. Determine BibEntry
+        BibEntry entry = entriesByCitationKey.getFirst();
+
+        // 1. Determine target directory
+        Optional<java.nio.file.Path> targetDirOpt = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+        if (targetDirOpt.isEmpty()) {
+            throw new BadRequestException("Library must be saved or have a file directory configured to attach files.");
+        }
+        java.nio.file.Path targetDir = targetDirOpt.get();
+
+        // 2. Save stream to temporary file
+        // We must save to a temp file first because LinkedFileHandler requires an existing Path to generate the suggested filename based on content/metadata.
+        // We use the target directory to ensure we are on the same file system.
+        java.nio.file.Path tempFile = Files.createTempFile(targetDir, "jabref-upload", ".pdf");
+        Files.copy(fileInputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+
+        // 3. Create LinkedFile
+        LinkedFile linkedFile = new LinkedFile("", tempFile, "PDF");
+        LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
+
+        // 4. Rename to suggested pattern (e.g. Author - Title.pdf)
+        boolean renameSuccessful = fileHandler.renameToSuggestedName();
+        if (!renameSuccessful) {
+            throw new IOException("Failed to rename file to suggested pattern");
+        }
+
+        // 5. Add to entry
+        entry.addFile(linkedFile);
     }
 
     /// @param id - also "demo" for the Chocolate.bib file
