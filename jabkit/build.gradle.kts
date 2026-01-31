@@ -84,7 +84,7 @@ application {
 
         // "-XX:+UseZGC", "-XX:+ZUncommit",
         // "-XX:+UseG1GC",
-        "-XX:+UseSerialGC"
+        "-XX:+UseSerialGC",
         // "-XX:+UseStringDeduplication",
 
         // Enable JEP 450: Compact Object Headers
