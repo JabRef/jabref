@@ -12,10 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -48,11 +45,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
-    @FXML private TableView<SearchEngineItem> searchEngineTable;
-    @FXML private TableColumn<SearchEngineItem, String> searchEngineName;
-    @FXML private TableColumn<SearchEngineItem, String> searchEngineUrlTemplate;
-
     @FXML private VBox fetchersContainer;
+    @FXML private VBox searchEngineContainer;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
@@ -84,15 +78,17 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);
 
-        searchEngineName.setCellValueFactory(param -> param.getValue().nameProperty());
-        searchEngineName.setCellFactory(TextFieldTableCell.forTableColumn());
-        searchEngineName.setEditable(false);
+        // Bind search engine list to the UI container
+        InvalidationListener searchEngineListener = _ -> searchEngineContainer
+                .getChildren()
+                .setAll(viewModel.getSearchEngines()
+                                 .stream()
+                                 .map(this::createSearchEngineNode)
+                                 .toList());
 
-        searchEngineUrlTemplate.setCellValueFactory(param -> param.getValue().urlTemplateProperty());
-        searchEngineUrlTemplate.setCellFactory(TextFieldTableCell.forTableColumn());
-        searchEngineUrlTemplate.setEditable(true);
-
-        searchEngineTable.setItems(viewModel.getSearchEngines());
+        // Initialize the list and add listener for future updates
+        searchEngineListener.invalidated(null);
+        viewModel.getSearchEngines().addListener(searchEngineListener);
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
@@ -173,6 +169,25 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         configureButton.setVisible(item.isCustomizable());
 
         container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
+        return container;
+    }
+
+    private Node createSearchEngineNode(SearchEngineItem item) {
+        HBox container = new HBox(10);
+        container.setAlignment(Pos.CENTER_LEFT);
+
+        // 1. Label for the Name (e.g., "Google Scholar")
+        Label nameLabel = new Label();
+        nameLabel.textProperty().bind(item.nameProperty());
+        nameLabel.setMinWidth(120); // Keep alignment consistent
+        nameLabel.setPrefWidth(120);
+
+        // 2. TextField for the URL
+        TextField urlField = new TextField();
+        urlField.textProperty().bindBidirectional(item.urlTemplateProperty());
+        HBox.setHgrow(urlField, Priority.ALWAYS); // Grow to fill space
+
+        container.getChildren().addAll(nameLabel, urlField);
         return container;
     }
 
