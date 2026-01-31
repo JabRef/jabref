@@ -79,7 +79,7 @@ application {
         "-Xlog:disable",
 
         "--add-modules", "jdk.incubator.vector",
-        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core",
 
         // "-XX:+UseZGC", "-XX:+ZUncommit",
         // "-XX:+UseG1GC",
