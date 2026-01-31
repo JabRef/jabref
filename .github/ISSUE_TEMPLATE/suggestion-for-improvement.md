@@ -3,7 +3,6 @@ name: Suggestion for improvement
 about: Suggest an enhancement
 title: ''
 labels: ''
-type: 'feature'
 assignees: ''
 
 ---
