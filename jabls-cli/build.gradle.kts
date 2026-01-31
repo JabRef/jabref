@@ -13,13 +13,17 @@ application{
     mainModule.set("org.jabref.jabls.cli")
 
     applicationDefaultJvmArgs = listOf(
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
+
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        // https://github.com/uncomplicate/neanderthal/issues/55
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
-        "-XX:+UseZGC", "-XX:+ZUncommit",
-        "-XX:+UseStringDeduplication",
-
-        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
+        "-XX:+UseStringDeduplication"
     )
 }
 

@@ -4,11 +4,11 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 plugins {
     id("org.jabref.gradle.module")
     id("application")
+    id("com.gradleup.shadow") version("9.3.1")
 }
 
 group = "org.jabref.jabkit"
 version = project.findProperty("projVersion") ?: "100.0.0"
-
 
 dependencies {
     implementation(project(":jablib"))
@@ -78,14 +78,16 @@ application {
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        // Enable JEP 450: Compact Object Headers
-        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
 
-        // Default garbage collector is sufficient for CLI APP
         // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseG1GC",
+        "-XX:+UseSerialGC",
         // "-XX:+UseStringDeduplication",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders"
     )
 }
 
@@ -121,4 +123,8 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     jvmArgs(app.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
     args("--debug", "check-consistency", "--input=empty.bib")
+}
+
+tasks.shadowJar {
+    isZip64 = true
 }
