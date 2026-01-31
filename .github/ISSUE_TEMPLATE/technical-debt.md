@@ -1,6 +1,6 @@
 ---
-name: Suggestion for improvement
-about: Suggest an enhancement
+name: Technical Debt
+about: Technical Debt
 title: ''
 labels: ''
 assignees: ''
