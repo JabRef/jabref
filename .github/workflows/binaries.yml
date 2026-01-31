@@ -472,7 +472,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p build/jbundle
-          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages --output ./build/jbundle/jabgui
+          # TODO: something like jabgui/build/packages/ubuntu-22.04/JabRef/lib/runtime as --jlink-runtime path
+          # jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages --output ./build/jbundle/jabgui
+          jbundle build --input . --gradle-project jabgui --output ./build/jbundle/jabgui
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -570,7 +572,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --gradle-project jabkit --jlink-runtime jabkit/build/packages --output ./build/jbundle/jabkit
+          jbundle build --input . --gradle-project jabkit --output ./build/jbundle/jabkit
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -628,7 +630,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --gradle-project jabls-cli --jlink-runtime jabls-cli/build/packages --output ./build/jbundle/jabls
+          jbundle build --input . --gradle-project jabls-cli --output ./build/jbundle/jabls
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -665,7 +667,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --gradle-project jabsrv-cli --jlink-runtime jabsrv-cli/build/packages --output ./build/jbundle/jabsrv
+          jbundle build --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
