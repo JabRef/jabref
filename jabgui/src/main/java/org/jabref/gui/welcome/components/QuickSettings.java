@@ -1,5 +1,7 @@
 package org.jabref.gui.welcome.components;
 
+import java.net.URI;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -7,29 +9,46 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog;
 import org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog;
 import org.jabref.gui.welcome.quicksettings.MainFileDirectoryDialog;
 import org.jabref.gui.welcome.quicksettings.OnlineServicesDialog;
 import org.jabref.gui.welcome.quicksettings.PushApplicationDialog;
 import org.jabref.gui.welcome.quicksettings.ThemeDialog;
+import org.jabref.http.manager.HttpServerManager;
+import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.UiMessageHandler;
+import org.controlsfx.control.ToggleSwitch;
 
 public class QuickSettings extends VBox {
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final HttpServerManager httpServerManager;
+    private final StateManager stateManager;
+    private final RemotePreferences remotePreferences;
+    private final LanguageServerController languageServerController;
+    private final UiMessageHandler uiMessageHandler;
 
     private final Label header;
     private boolean isScrollEnabled = true;
 
-    public QuickSettings(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
+    public QuickSettings(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor, HttpServerManager httpServerManager, StateManager stateManager, LanguageServerController languageServerController, UiMessageHandler uiMessageHandler) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.httpServerManager = httpServerManager;
+        this.stateManager = stateManager;
+        this.languageServerController = languageServerController;
+        this.remotePreferences = preferences.getRemotePreferences();
+        this.uiMessageHandler = uiMessageHandler;
 
         getStyleClass().add("welcome-section");
 
@@ -57,6 +76,26 @@ public class QuickSettings extends VBox {
     }
 
     private VBox createContent() {
+        ToggleSwitch httpServerToggle = new ToggleSwitch(Localization.lang("Enable HTTP server"));
+        httpServerToggle.selectedProperty().bindBidirectional(remotePreferences.enableHttpServerProperty());
+        httpServerToggle.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue) {
+                startHttpServer();
+            } else {
+                stopHttpServer();
+            }
+        });
+
+        ToggleSwitch languageServerToggle = new ToggleSwitch(Localization.lang("Enable LSP server"));
+        languageServerToggle.selectedProperty().bindBidirectional(remotePreferences.enableLanguageServerProperty());
+        languageServerToggle.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue) {
+                startLanguageServer();
+            } else {
+                stopLanguageServer();
+            }
+        });
+
         Button mainFileDirButton = createButton(
                 Localization.lang("Set main file directory"),
                 IconTheme.JabRefIcons.FOLDER,
@@ -87,7 +126,10 @@ public class QuickSettings extends VBox {
                 IconTheme.JabRefIcons.TOGGLE_GROUPS,
                 this::showEntryTableConfigurationDialog);
 
-        VBox newContent = new VBox(mainFileDirButton,
+        VBox newContent = new VBox(
+                httpServerToggle,
+                languageServerToggle,
+                mainFileDirButton,
                 themeButton,
                 largeLibraryButton,
                 entryTableButton,
@@ -139,5 +181,23 @@ public class QuickSettings extends VBox {
 
     private void showEntryTableConfigurationDialog() {
         dialogService.showCustomDialogAndWait(new EntryTableConfigurationDialog(preferences));
+    }
+
+    private void startHttpServer() {
+        URI uri = remotePreferences.getHttpServerUri();
+        httpServerManager.start(preferences, stateManager, uri);
+    }
+
+    private void stopHttpServer() {
+        httpServerManager.stop();
+    }
+
+    private void startLanguageServer() {
+        CLIMessageHandler messageHandler = new CLIMessageHandler(uiMessageHandler, preferences);
+        languageServerController.start(messageHandler, remotePreferences.getLanguageServerPort());
+    }
+
+    private void stopLanguageServer() {
+        languageServerController.stop();
     }
 }
