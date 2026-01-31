@@ -191,6 +191,10 @@ public class WorkspacePreferences {
         return confirmHideTabBar.get();
     }
 
+    public boolean shouldConfirmHideTabBar() {
+        return confirmHideTabBar.get();
+    }
+
     public BooleanProperty hideTabBarProperty() {
         return confirmHideTabBar;
     }

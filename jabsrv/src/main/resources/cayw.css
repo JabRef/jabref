@@ -17,28 +17,22 @@
     -fx-fill: #666666;
 }
 
+.chip-style {
+    -fx-background-color: -jr-background-alt;
+    -fx-border-color: -jr-border;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+}
+
+
+.chip-style:hover {
+    -fx-background-color: #3a3d4f;
+}
+
 .chip-remove-button {
-    -fx-background-color: transparent;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #666;
-    -fx-padding: 0 0 0 5;
-    -fx-cursor: hand;
+    -fx-text-fill: -fx-light-text-color;
 }
 
 .chip-remove-button:hover {
-    -fx-text-fill: #d32f2f;
-}
-
-.chip-style {
-    -fx-background-color: #e3f2fd;
-    -fx-background-radius: 15;
-    -fx-border-color: #90caf9;
-    -fx-border-radius: 15;
-    -fx-border-width: 1;
-    -fx-cursor: hand;
-}
-
-.chip-style:hover {
-    -fx-background-color: #bbdefb;
+    -fx-text-fill: -jr-red;
 }

@@ -31,6 +31,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -494,8 +495,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void updateTabBarVisible() {
-        // When WelcomeTab is open, the tabbar should be visible
-        if (preferences.getWorkspacePreferences().shouldHideTabBar() && tabbedPane.getTabs().size() <= 1) {
+        WorkspacePreferences workspacePreferences = preferences.getWorkspacePreferences();
+
+        boolean hideTabBar = workspacePreferences.shouldHideTabBar()
+                && tabbedPane.getTabs().size() <= 1;
+
+        if (hideTabBar) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
                 tabbedPane.getStyleClass().add("hide-tab-bar");
             }

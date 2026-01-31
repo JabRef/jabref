@@ -1,5 +1,5 @@
 .root {
-    -jr-theme: #2c9490;
+    -jr-theme: #141824;
     -jr-accent: #255652;
     -jr-selected: -jr-accent;
     -jr-hover: #fff1;
@@ -19,7 +19,7 @@
     -jr-yellow: #b5b021;
     -jr-orange: #b77620;
 
-    -jr-base: #141824;
+    -jr-base: #ff0000;
 
     -jr-background-alt: #151924;
     -jr-menu-background: #141824;

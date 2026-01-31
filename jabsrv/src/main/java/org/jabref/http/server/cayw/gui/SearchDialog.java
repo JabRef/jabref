@@ -83,7 +83,10 @@ public class SearchDialog {
 
         Scene scene = new Scene(mainLayout, dialogWidth, dialogHeight);
 
-        scene.getStylesheets().add("cayw.css");
+        scene.getStylesheets().add(
+                getClass().getResource("/cayw.css").toExternalForm()
+        );
+
         mainLayout.getStyleClass().add("search-dialog");
         scrollPane.getStyleClass().add("scroll-pane");
 
