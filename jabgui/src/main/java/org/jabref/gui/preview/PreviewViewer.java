@@ -352,7 +352,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public WebEngine getEngine() {
         return previewView.getEngine();
     }
-    
+
     @Override
     public void invalidated(Observable observable) {
         update();
