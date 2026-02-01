@@ -3,8 +3,10 @@ package org.jabref.logic.importer.fetcher.citation.opencitations;
 import java.util.Optional;
 
 import com.google.gson.annotations.SerializedName;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 class CitationItem {
     @Nullable String oci;
     @Nullable String citing;
