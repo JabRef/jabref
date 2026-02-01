@@ -84,16 +84,18 @@ Follow the existing citation fetcher pattern used by SemanticScholarCitationFetc
 **Location**: `jablib/src/main/java/org/jabref/logic/importer/fetcher/citation/opencitations/`
 
 1. **`CitationResponse.java`**: Array wrapper for citation/reference responses
-2. **`CitationItem.java`**: Individual citation record with fields:
+2. **`CitationItem.java`**: Individual citation record with fields (package-private, no getters/setters):
    - `oci`: Open Citation Identifier
    - `citing`: PIDs of citing entity (space-separated: "omid:xxx doi:xxx pmid:xxx")
    - `cited`: PIDs of cited entity
    - `creation`: Publication date (ISO format: "YYYY-MM-DD")
    - `timespan`: Duration between publications (XSD format: "P1Y2M3D")
-   - `journal_sc`: Journal self-citation flag ("yes"/"no")
-   - `author_sc`: Author self-citation flag ("yes"/"no")
+   - `journal_sc`: Journal self-citation flag ("yes"/"no") - use @SerializedName("journal_sc")
+   - `author_sc`: Author self-citation flag ("yes"/"no") - use @SerializedName("author_sc")
 3. **`CountResponse.java`**: Single count value response
-   - `count`: Integer count value
+   - `count`: Integer count value (package-private)
+
+**Note**: Use package-private fields (no access modifier) instead of private fields to avoid getters/setters boilerplate.
 
 ### DOI Extraction Logic
 
@@ -175,23 +177,25 @@ jablib/src/test/java/org/jabref/logic/importer/fetcher/citation/opencitations/
 
 ```java
 public class CitationItem {
-    private String oci;              // Open Citation Identifier
-    private String citing;           // Space-separated PIDs of citing work
-    private String cited;            // Space-separated PIDs of cited work
-    private String creation;         // ISO date: "2015-03-09"
-    private String timespan;         // XSD duration: "P13Y9M9D"
+    String oci;              // Open Citation Identifier (package-private)
+    String citing;           // Space-separated PIDs of citing work
+    String cited;            // Space-separated PIDs of cited work
+    String creation;         // ISO date: "2015-03-09"
+    String timespan;         // XSD duration: "P13Y9M9D"
     
     @SerializedName("journal_sc")
-    private String journalSelfCitation;  // "yes" or "no"
+    String journalSelfCitation;  // "yes" or "no"
     
     @SerializedName("author_sc")
-    private String authorSelfCitation;   // "yes" or "no"
+    String authorSelfCitation;   // "yes" or "no"
     
-    // Getters, setters, and helper methods
+    // Helper methods (public)
     public String extractDoi();      // Extract DOI from citing/cited string
     public BibEntry toBibEntry();    // Convert to BibEntry using DoiFetcher
 }
 ```
+
+**Design Choice**: Use package-private fields (no access modifier) to reduce boilerplate. Gson can access package-private fields for JSON deserialization.
 
 ### No Interface Changes
 The `CitationFetcher` interface remains unchanged. OpenCitationsFetcher implements all existing methods.

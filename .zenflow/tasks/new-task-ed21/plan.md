@@ -60,9 +60,9 @@ Create the data model classes for OpenCitations API responses:
 - `CountResponse.java`: Wrapper for count responses
 
 Each class should:
-- Include Gson annotations where needed (e.g., @SerializedName)
-- Provide getters/setters
-- Add helper method in CitationItem to extract DOI from PID string
+- Use package-private fields (no access modifier) - no getters/setters needed
+- Include Gson annotations where needed (e.g., @SerializedName for "journal_sc", "author_sc")
+- Add public helper methods in CitationItem: extractDoi() and toBibEntry()
 
 **Verification**: Models should compile without errors and follow JabRef code style.
 
