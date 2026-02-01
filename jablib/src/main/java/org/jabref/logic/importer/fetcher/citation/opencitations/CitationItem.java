@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
 
 import com.google.gson.annotations.SerializedName;
 import org.jspecify.annotations.NullMarked;
@@ -26,33 +25,9 @@ class CitationItem {
 
     record IdentifierWithField(Field field, String value) {}
 
-    Optional<String> extractIdentifier(@Nullable String pidString, String prefix) {
-        if (pidString == null || pidString.isEmpty()) {
-            return Optional.empty();
-        }
-
-        String[] pids = pidString.split("\\s+");
-        for (String pid : pids) {
-            if (pid.startsWith(prefix + ":")) {
-                return Optional.of(pid.substring(prefix.length() + 1));
-            }
-        }
-        return Optional.empty();
-    }
-
     Optional<IdentifierWithField> extractBestIdentifier(@Nullable String pidString) {
         if (pidString == null || pidString.isEmpty()) {
             return Optional.empty();
-        }
-
-        Optional<String> doi = extractIdentifier(pidString, "doi");
-        if (doi.isPresent()) {
-            return Optional.of(new IdentifierWithField(StandardField.DOI, doi.get()));
-        }
-
-        Optional<String> pmid = extractIdentifier(pidString, "pmid");
-        if (pmid.isPresent()) {
-            return Optional.of(new IdentifierWithField(StandardField.PMID, pmid.get()));
         }
 
         String[] pids = pidString.split("\\s+");
