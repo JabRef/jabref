@@ -47,6 +47,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
 - Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
+- We fixed an issue where the "Imported entries" group was automatically selected when switching between library tabs. [#14948](https://github.com/JabRef/jabref/issues/14948)
 
 ### Removed
 
