@@ -25,7 +25,8 @@ class CitationItem {
     @SerializedName("author_sc")
     @Nullable String authorSelfCitation;
 
-    record IdentifierWithField(Field field, String value) {}
+    record IdentifierWithField(Field field, String value) {
+    }
 
     List<IdentifierWithField> extractIdentifiers(@Nullable String pidString) {
         if (pidString == null || pidString.isEmpty()) {
