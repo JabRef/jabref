@@ -1,17 +1,14 @@
 package org.jabref.logic.importer.fetcher.citation.opencitations;
 
-public class CountResponse {
-    private String count;
+import org.jspecify.annotations.Nullable;
 
-    public String getCount() {
-        return count;
-    }
+class CountResponse {
+    @Nullable String count;
 
-    public void setCount(String count) {
-        this.count = count;
-    }
-
-    public int getCountAsInt() {
+    int countAsInt() {
+        if (count == null) {
+            return 0;
+        }
         try {
             return Integer.parseInt(count);
         } catch (NumberFormatException e) {
