@@ -20,7 +20,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -120,6 +122,11 @@ public class GlobalSearchBar extends HBox {
         KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();
 
         searchField = SearchTextField.create(keyBindingRepository);
+        searchField.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+            if (isFocused) {
+                searchField.selectAll();
+            }
+        });
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
         stateManager.searchQueryProperty().bind(searchField.textProperty());
 
@@ -140,8 +147,7 @@ public class GlobalSearchBar extends HBox {
                     } else {
                         return Localization.lang("Found %0 results.", String.valueOf(matched));
                     }
-                }
-        ));
+                }));
 
         searchField.setTooltip(searchFieldTooltip);
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -179,12 +185,12 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
-                                                    .or(regexButton.focusedProperty())
-                                                    .or(caseSensitiveButton.focusedProperty())
-                                                    .or(fulltextButton.focusedProperty())
-                                                    .or(keepSearchString.focusedProperty())
-                                                    .or(filterModeButton.focusedProperty())
-                                                    .or(searchField.textProperty().isNotEmpty());
+                .or(regexButton.focusedProperty())
+                .or(caseSensitiveButton.focusedProperty())
+                .or(fulltextButton.focusedProperty())
+                .or(keepSearchString.focusedProperty())
+                .or(filterModeButton.focusedProperty())
+                .or(searchField.textProperty().isNotEmpty());
 
         regexButton.visibleProperty().unbind();
         regexButton.visibleProperty().bind(focusedOrActive);
@@ -345,8 +351,7 @@ public class GlobalSearchBar extends HBox {
         if (globalSearchResultDialog == null) {
             globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
         }
-        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query ->
-                stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query -> stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));
         updateSearchQuery();
         dialogService.showCustomDialogAndWait(globalSearchResultDialog);
         globalSearchActive.setValue(false);
@@ -363,9 +368,21 @@ public class GlobalSearchBar extends HBox {
         searchButton.visibleProperty().bind(searchField.editableProperty());
     }
 
-    /// Focuses the search field if it is not focused.
+    /// Focuses the search field if it is not focused and selects all text.
     @Override
     public void requestFocus() {
+        Scene scene = getScene();
+        if (scene == null) {
+            return;
+        }
+
+        Node focusOwner = scene.getFocusOwner();
+
+        // If focus is in a text input control (e.g., entry editor field), do NOT steal it
+        if (focusOwner instanceof TextInputControl) {
+            return;
+        }
+
         if (!searchField.isFocused()) {
             searchField.requestFocus();
         }
