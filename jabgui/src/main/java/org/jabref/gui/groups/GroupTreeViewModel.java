@@ -184,6 +184,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
     }
 
+    /// Creates the "Imported entries" group if enabled and missing
+    /// Selection is disabled to prevent focus theft when switching tabs
     private void addGroupImportEntries(GroupNodeViewModel parent) {
         if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             return;
@@ -201,7 +203,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
                 GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);
                 newSubgroup.moveTo(parent.getGroupNode(), 0);
-                selectedGroups.setAll(new GroupNodeViewModel(db, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
                 writeGroupChangesToMetaData();
             });
         }
