@@ -38,7 +38,7 @@ dependencies {
     api("org.glassfish.grizzly:grizzly-framework")
     api("org.glassfish.grizzly:grizzly-http-server")
 
-    api(platform("org.glassfish.jersey:jersey-bom:4.0.0"))
+    api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
     api("org.glassfish.jersey.core:jersey-server")
     api("org.glassfish.jersey.inject:jersey-hk2")
