@@ -10,7 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
-
+- Added documentation for the Systematic Literature Review (SLR) tool explaining how to define study parameters, research questions, queries, catalogs, and run a systematic review. [#12641](https://github.com/JabRef/jabref/issues/12641)
 - We added the ability to remove XMP metadata from linked files. [#8277](https://github.com/JabRef/jabref/issues/8277)
 - Improved merge dialog decisions for the `month` field by using a new plausibility comparator. JabRef now prefers normalized months (e.g., `#jun#`) or integers over unnormalized strings. [#14457](https://github.com/JabRef/jabref/issues/14457)
 - We added web search capability to ScienceDirect using the [Scopus](https://www.scopus.com/) Search API, enabling users to search for academic literature directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
@@ -1855,8 +1855,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening the menu 'Library properties' marked the library as modified [#6451](https://github.com/JabRef/jabref/issues/6451)
 - We fixed an issue when importing resulted in an exception [#7343](https://github.com/JabRef/jabref/issues/7343)
 - We fixed an issue where the field in the Field formatter dropdown selection were sorted in random order. [#7710](https://github.com/JabRef/jabref/issues/7710)
-[#12641](https://github.com/JabRef/jabref/issues/12641)
-- We added documentation for the Systematic Literature Review (SLR) tool explaining how to define study parameters, research questions, queries, catalogs, and run a systematic review.
 
 
 ### Removed
