@@ -153,7 +153,6 @@ public class OpenCitationsFetcher implements CitationFetcher {
         for (CitationItem.IdentifierWithField identifier : identifiers) {
             bibEntry.setField(identifier.field(), identifier.value());
         }
-        bibEntry.setChanged(true);
         return bibEntry;
     }
 }

@@ -87,6 +87,7 @@ Implement `OpenCitationsFetcher` class that implements `CitationFetcher` interfa
 ---
 
 ### [ ] Step: Register OpenCitations in CitationFetcherType Enum
+<!-- chat-id: 200a002d-9e74-4901-86ce-b612c34747fb -->
 
 Update `CitationFetcherType.java`:
 - Add `OPENCITATIONS("OpenCitations")` enum constant
