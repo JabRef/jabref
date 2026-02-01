@@ -68,7 +68,8 @@ Each class should:
 
 ---
 
-### [ ] Step: Implement OpenCitationsFetcher Core Class
+### [x] Step: Implement OpenCitationsFetcher Core Class
+<!-- chat-id: 865e269e-2295-42fb-9c5a-80f2e18e7d68 -->
 
 Implement `OpenCitationsFetcher` class that implements `CitationFetcher` interface:
 - Constructor accepting `ImporterPreferences`
