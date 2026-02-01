@@ -73,15 +73,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
             List<BibEntry> entries = new ArrayList<>();
             for (CitationItem item : citationItems) {
                 Optional<String> doi = item.citedDoi();
-                doi.ifPresent(doiString -> {
-                    try {
-                        BibEntry bibEntry = fetchBibEntryFromDoi(doiString);
-                        entries.add(bibEntry);
-                    } catch (FetcherException e) {
-                        LOGGER.warn("Could not fetch BibEntry for DOI: {}", doiString, e);
-                        entries.add(createMinimalBibEntry(doiString));
-                    }
-                });
+                doi.ifPresent(doiString -> entries.add(fetchBibEntryFromDoi(doiString)));
             }
 
             return entries;
@@ -117,15 +109,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
             List<BibEntry> entries = new ArrayList<>();
             for (CitationItem item : citationItems) {
                 Optional<String> doi = item.citingDoi();
-                doi.ifPresent(doiString -> {
-                    try {
-                        BibEntry bibEntry = fetchBibEntryFromDoi(doiString);
-                        entries.add(bibEntry);
-                    } catch (FetcherException e) {
-                        LOGGER.warn("Could not fetch BibEntry for DOI: {}", doiString, e);
-                        entries.add(createMinimalBibEntry(doiString));
-                    }
-                });
+                doi.ifPresent(doiString -> entries.add(fetchBibEntryFromDoi(doiString)));
             }
 
             return entries;
@@ -167,15 +151,19 @@ public class OpenCitationsFetcher implements CitationFetcher {
         }
     }
 
-    private BibEntry fetchBibEntryFromDoi(String doi) throws FetcherException {
-        return crossRefFetcher.performSearchById(doi)
-                              .orElseThrow(() -> new FetcherException("Could not fetch BibEntry for DOI: " + doi));
+    private BibEntry fetchBibEntryFromDoi(String doi) {
+        try {
+            return crossRefFetcher.performSearchById(doi)
+                                  .orElseGet(() -> createMinimalBibEntry(doi));
+        } catch (FetcherException e) {
+            LOGGER.warn("Could not fetch BibEntry for DOI: {}", doi, e);
+            return createMinimalBibEntry(doi);
+        }
     }
 
     private BibEntry createMinimalBibEntry(String doi) {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setField(StandardField.DOI, doi);
-        bibEntry.setChanged(true);
-        return bibEntry;
+        return new BibEntry()
+                .withField(StandardField.DOI, doi)
+                .withChanged(true);
     }
 }
