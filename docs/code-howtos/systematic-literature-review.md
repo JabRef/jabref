@@ -15,6 +15,7 @@ The Systematic Literature Review (SLR) tool in JabRef helps researchers conduct 
 ## Authors and Title
 
 In the **Authors and Title** tab:
+
 - Enter the **study title**.
 - Add at least one **author**.
 
@@ -23,6 +24,7 @@ Both fields are required before starting the survey.
 ## Research Questions
 
 In the **Research Questions** tab:
+
 - Define one or more research questions.
 - These questions guide the scope and purpose of the review.
 
@@ -31,12 +33,14 @@ Each question should be clear and specific to ensure a focused search process.
 ## Queries
 
 In the **Queries** tab:
+
 - Add search queries used to retrieve relevant publications.
 - Queries typically combine keywords using Boolean operators.
 
 ## Catalogs
 
 In the **Catalogs** tab:
+
 - Select one or more academic catalogs to search in.
 - Examples include:
   - ACM Portal
@@ -44,13 +48,13 @@ In the **Catalogs** tab:
   - DBLP
   - Crossref
   - IEEE Xplore
-- Choosing multiple catalogs increases coverage of the literature.
 
-These catalogs are used as data sources for retrieving publications.
+Choosing multiple catalogs increases coverage of the literature. These catalogs are used as data sources for retrieving publications.
 
 ## Finalize
 
 In the **Finalize** tab:
+
 - Select the directory where the study data will be stored.
 - JabRef creates the study structure in this folder.
 - Ensure all required fields are completed:
@@ -64,6 +68,7 @@ When everything is set, click **Start survey**.
 ## After Starting the Survey
 
 Once the survey starts:
+
 - JabRef runs the defined queries on the selected catalogs.
 - Results are collected and stored in the study.
 - References can then be:
@@ -87,6 +92,7 @@ This supports a structured and reproducible review workflow.
 ## Summary
 
 The SLR tool in JabRef helps structure the entire review process:
+
 1. Define study metadata  
 2. Add research questions  
 3. Create search queries  
