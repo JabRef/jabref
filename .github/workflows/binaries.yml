@@ -628,6 +628,7 @@ jobs:
           comment-tag: download-link
           mode: recreate
       - name: Create GitHub Summary
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         run: echo "The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>." >> "$GITHUB_STEP_SUMMARY"
       - name: echo PR data
         env:
@@ -654,14 +655,26 @@ jobs:
           bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!13109\b)\d+)'
           bodyRegexFlags: 'i'
           outputOnly: true
-      - name: Comment on issue
-        if: ${{ steps.get_issue_number.outputs.ticketNumber != '-1' }}
+      - name: Comment on issue (build available)
+        if: ${{ (steps.get_issue_number.outputs.ticketNumber != '-1') && (needs.disk-space-check.outputs.available == 'true') }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           message: >
             A pull request addressing the issue has been created.
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
+
+
+            For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
+          comment-tag: download-link
+      - name: Comment on issue (no build available)
+        if: ${{ (steps.get_issue_number.outputs.ticketNumber != '-1') && (needs.disk-space-check.outputs.available != 'true') }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          message: >
+            A pull request addressing the issue has been created.
+            You can try out the pull request by following the steps at [How to try out any JabRef pull request?](https://blog.jabref.org/2025/05/31/run-pr/).
 
 
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
