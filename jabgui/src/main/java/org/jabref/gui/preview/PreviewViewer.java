@@ -354,8 +354,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setFitToHeight(false);
         setVbarPolicy(ScrollBarPolicy.NEVER);
 
-        previewView.setPrefWidth(600);
-        previewView.setMaxWidth(600);
+        previewView.setPrefWidth(750);
+        previewView.setMaxWidth(750);
         previewView.setPrefHeight(10);
         previewView.setMinHeight(10);
 
