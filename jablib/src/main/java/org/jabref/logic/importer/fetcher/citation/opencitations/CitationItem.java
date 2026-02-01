@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.gson.annotations.SerializedName;
 import org.jspecify.annotations.NullMarked;
@@ -40,6 +41,8 @@ class CitationItem {
                 String value = pid.substring(colonIndex + 1);
                 Field field = FieldFactory.parseField(prefix);
                 identifiers.add(new IdentifierWithField(field, value));
+            } else {
+                identifiers.add(new IdentifierWithField(StandardField.NOTE, pid));
             }
         }
 
