@@ -18,6 +18,9 @@ import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.Spec;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -27,6 +30,9 @@ import static picocli.CommandLine.ParentCommand;
 @Command(name = "generate", description = "Generate citation keys for entries in a .bib file.")
 class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
+
+    @Spec
+    CommandSpec spec;
 
     @ParentCommand
     private CitationKeys parentCommand;
@@ -76,6 +82,8 @@ class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
+        validateParameters();
+
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
@@ -135,6 +143,21 @@ class GenerateCitationKeys implements Runnable {
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }
 
+    private void validateParameters() {
+        if (typePatterns != null) {
+            for (Map.Entry<String, String> entry : typePatterns.entrySet()) {
+                if (entry.getKey() == null || entry.getKey().isBlank()) {
+                    throw new ParameterException(spec.commandLine(),
+                            "Entry type name must not be empty for --type-pattern");
+                }
+                if (entry.getValue() == null || entry.getValue().isBlank()) {
+                    throw new ParameterException(spec.commandLine(),
+                            "Citation key pattern must not be empty for type: " + entry.getKey());
+                }
+            }
+        }
+    }
+
     private GlobalCitationKeyPatterns buildKeyPatterns(CitationKeyPatternPreferences existingPreferences) {
         GlobalCitationKeyPatterns patternsToUse = existingPreferences.getKeyPatterns().copy();
 
@@ -144,12 +167,6 @@ class GenerateCitationKeys implements Runnable {
 
         if (typePatterns != null) {
             for (Map.Entry<String, String> entry : typePatterns.entrySet()) {
-                if (entry.getKey() == null || entry.getKey().isBlank()) {
-                    throw new IllegalArgumentException("Entry type name must not be empty");
-                }
-                if (entry.getValue() == null || entry.getValue().isBlank()) {
-                    throw new IllegalArgumentException("Citation key pattern must not be empty for type: " + entry.getKey());
-                }
                 EntryType entryType = EntryTypeFactory.parse(entry.getKey());
                 patternsToUse.addCitationKeyPattern(entryType, entry.getValue());
             }

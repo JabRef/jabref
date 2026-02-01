@@ -1,6 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.Map;
+import java.util.HashMap;
 
 import org.jabref.model.entry.types.EntryType;
 
@@ -16,9 +16,7 @@ public class GlobalCitationKeyPatterns extends AbstractCitationKeyPatterns {
 
     public GlobalCitationKeyPatterns copy() {
         GlobalCitationKeyPatterns copy = new GlobalCitationKeyPatterns(this.defaultPattern);
-        for (Map.Entry<EntryType, CitationKeyPattern> entry : this.data.entrySet()) {
-            copy.data.put(entry.getKey(), entry.getValue());
-        }
+        copy.data = new HashMap<>(this.data);
         return copy;
     }
 
