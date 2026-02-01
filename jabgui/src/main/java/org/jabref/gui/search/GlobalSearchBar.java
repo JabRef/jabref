@@ -147,7 +147,8 @@ public class GlobalSearchBar extends HBox {
                     } else {
                         return Localization.lang("Found %0 results.", String.valueOf(matched));
                     }
-                }));
+                }
+        ));
 
         searchField.setTooltip(searchFieldTooltip);
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -185,12 +186,12 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
-                .or(regexButton.focusedProperty())
-                .or(caseSensitiveButton.focusedProperty())
-                .or(fulltextButton.focusedProperty())
-                .or(keepSearchString.focusedProperty())
-                .or(filterModeButton.focusedProperty())
-                .or(searchField.textProperty().isNotEmpty());
+                                                    .or(regexButton.focusedProperty())
+                                                    .or(caseSensitiveButton.focusedProperty())
+                                                    .or(fulltextButton.focusedProperty())
+                                                    .or(keepSearchString.focusedProperty())
+                                                    .or(filterModeButton.focusedProperty())
+                                                    .or(searchField.textProperty().isNotEmpty());
 
         regexButton.visibleProperty().unbind();
         regexButton.visibleProperty().bind(focusedOrActive);
@@ -351,7 +352,8 @@ public class GlobalSearchBar extends HBox {
         if (globalSearchResultDialog == null) {
             globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
         }
-        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query -> stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query ->
+                stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));
         updateSearchQuery();
         dialogService.showCustomDialogAndWait(globalSearchResultDialog);
         globalSearchActive.setValue(false);
@@ -368,7 +370,7 @@ public class GlobalSearchBar extends HBox {
         searchButton.visibleProperty().bind(searchField.editableProperty());
     }
 
-    /// Focuses the search field if it is not focused and selects all text.
+    /// Focuses the search field if it is not focused
     @Override
     public void requestFocus() {
         Scene scene = getScene();

@@ -83,15 +83,16 @@ import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 
-/// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on an entry in the table)
+/// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
+/// an entry in the table)
 ///
 /// It hosts the tabs (required, general, optional) and the buttons to the left.
 ///
-/// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling the text fields to update themselves if the change is made from somewhere else.
+/// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
+/// the text fields to update themselves if the change is made from somewhere else.
 ///
 /// The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
 public class EntryEditor extends BorderPane implements PreviewControls, AdaptVisibleTabs {
-
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
     private final PreviewPanel previewPanel;
@@ -104,44 +105,26 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private SourceTab sourceTab;
 
-    @FXML
-    private TabPane tabbed;
+    @FXML private TabPane tabbed;
 
-    @FXML
-    private Button typeChangeButton;
-    @FXML
-    private Button fetcherButton;
-    @FXML
-    private Label typeLabel;
+    @FXML private Button typeChangeButton;
+    @FXML private Button fetcherButton;
+    @FXML private Label typeLabel;
 
-    @Inject
-    private BuildInfo buildInfo;
-    @Inject
-    private DialogService dialogService;
-    @Inject
-    private TaskExecutor taskExecutor;
-    @Inject
-    private GuiPreferences preferences;
-    @Inject
-    private StateManager stateManager;
-    @Inject
-    private ThemeManager themeManager;
-    @Inject
-    private FileUpdateMonitor fileMonitor;
-    @Inject
-    private DirectoryMonitor directoryMonitor;
-    @Inject
-    private CountingUndoManager undoManager;
-    @Inject
-    private BibEntryTypesManager bibEntryTypesManager;
-    @Inject
-    private KeyBindingRepository keyBindingRepository;
-    @Inject
-    private JournalAbbreviationRepository journalAbbreviationRepository;
-    @Inject
-    private AiService aiService;
-    @Inject
-    private SearchCitationsRelationsService searchCitationsRelationsService;
+    @Inject private BuildInfo buildInfo;
+    @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private GuiPreferences preferences;
+    @Inject private StateManager stateManager;
+    @Inject private ThemeManager themeManager;
+    @Inject private FileUpdateMonitor fileMonitor;
+    @Inject private DirectoryMonitor directoryMonitor;
+    @Inject private CountingUndoManager undoManager;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
+    @Inject private KeyBindingRepository keyBindingRepository;
+    @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private AiService aiService;
+    @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
     private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
 
@@ -151,8 +134,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         this.redoAction = redoAction;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
 
         this.fileLinker = new ExternalFilesEntryLinker(
                 preferences.getExternalApplicationsPreferences(),
@@ -332,10 +315,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
     }
 
-    /**
-     * Returns true if the given node is part of this EntryEditor subtree.
-     * Used to ensure focus restoration only happens for editor fields.
-     */
+    /// Returns true if the given node is part of this EntryEditor subtree.
+    /// Used to ensure focus restoration only happens for editor fields.
     private boolean isNodeInsideEntryEditor(Node node) {
         Node current = node;
         while (current != null) {
@@ -474,7 +455,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 preferences,
                 taskExecutor,
                 bibEntryTypesManager,
-                searchCitationsRelationsService));
+                searchCitationsRelationsService
+        ));
         tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
         sourceTab = new SourceTab(
                 undoManager,
@@ -494,7 +476,9 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return tabs;
     }
 
-    /// The preferences allow to configure tabs to show (e.g.,"General", "Abstract") These should be shown. Already hard-coded ones (above and below this code block) should be removed. This method does this calculation.
+    /// The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
+    /// These should be shown. Already hard-coded ones (above and below this code block) should be removed.
+    /// This method does this calculation.
     ///
     /// @return Map of tab names and the fields to show in them.
     private Map<String, Set<Field>> getAdditionalUserConfiguredTabs() {
@@ -631,10 +615,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
                 fetcherMenuItem.setOnAction(event -> {
                     GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
-                    PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter = new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
-                            preferences.getImportFormatPreferences(),
-                            preferences.getFilePreferences(),
-                            tabSupplier.get().getBibDatabaseContext());
+                    PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
+                            new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
+                                    preferences.getImportFormatPreferences(),
+                                    preferences.getFilePreferences(),
+                                    tabSupplier.get().getBibDatabaseContext());
                     fetchAndMerge(pdfMergeMetadataImporter);
                 });
             } else {
@@ -660,7 +645,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 () -> {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
                     getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
-                }));
+                }
+        ));
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {
@@ -674,10 +660,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private Optional<FieldsEditorTab> getTabContainingField(Field field) {
         return tabbed.getTabs().stream()
-                .filter(FieldsEditorTab.class::isInstance)
-                .map(FieldsEditorTab.class::cast)
-                .filter(tab -> tab.getShownFields().contains(field))
-                .findFirst();
+                     .filter(FieldsEditorTab.class::isInstance)
+                     .map(FieldsEditorTab.class::cast)
+                     .filter(tab -> tab.getShownFields().contains(field))
+                     .findFirst();
     }
 
     @Override
@@ -710,8 +696,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Optional<Field> firstField = shownFields.stream().findFirst();
 
             boolean matchesFirstFieldId = firstField.map(Field::getName)
-                    .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
-                    .orElse(false);
+                                                    .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                                                    .orElse(false);
             if (matchesFirstFieldId) {
                 return true;
             }
@@ -745,11 +731,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         // Try field-based check first (preferred for standard field editors)
         if (!shownFields.isEmpty() && node.getId() != null) {
             Optional<Field> lastField = shownFields.stream()
-                    .reduce((first, second) -> second);
+                                                   .reduce((first, second) -> second);
 
             boolean matchesLastFieldId = lastField.map(Field::getName)
-                    .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
-                    .orElse(false);
+                                                  .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
+                                                  .orElse(false);
             if (matchesLastFieldId) {
                 return true;
             }
@@ -822,7 +808,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Collection<Field> shownFields = tab.getShownFields();
             if (!shownFields.isEmpty()) {
                 Optional<Field> lastField = shownFields.stream()
-                        .reduce((first, second) -> second);
+                                                       .reduce((first, second) -> second);
 
                 Field field = lastField.get();
                 String lastFieldId = field.getName();
@@ -904,7 +890,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         return node.isFocusTraversable() && node.isVisible() && !node.isDisabled() && node.isManaged();
     }
 
-    /// Tries to locate the editor grid (with style class "editorPane") inside the tab content to avoid including preview or other sibling panels when determining focus order boundaries.
+    /// Tries to locate the editor grid (with style class "editorPane") inside the tab content to avoid
+    /// including preview or other sibling panels when determining focus order boundaries.
     private Optional<Parent> findEditorGridParent(Parent root) {
         if (root.getStyleClass().contains("editorPane")) {
             return Optional.of(root);
