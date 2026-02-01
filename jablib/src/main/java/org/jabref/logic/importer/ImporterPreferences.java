@@ -25,6 +25,7 @@ public class ImporterPreferences {
     private final BooleanProperty importerEnabled;
     private final BooleanProperty generateNewKeyOnImport;
     private final BooleanProperty warnAboutDuplicatesOnImport;
+    private final BooleanProperty abbreviateJournalOnDownload;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final Map<String, String> defaultApiKeys;
@@ -39,6 +40,7 @@ public class ImporterPreferences {
                                boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
                                boolean warnAboutDuplicatesOnImport,
+                               boolean abbreviateJournalOnDownload,
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys,
                                Map<String, String> defaultApiKeys,
@@ -52,6 +54,7 @@ public class ImporterPreferences {
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
+        this.abbreviateJournalOnDownload = new SimpleBooleanProperty(abbreviateJournalOnDownload);
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
         this.defaultApiKeys = defaultApiKeys;
@@ -108,6 +111,18 @@ public class ImporterPreferences {
 
     public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
         this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
+    }
+
+    public boolean shouldJournalBeAbbreviatedOnDownload() {
+        return abbreviateJournalOnDownload.get();
+    }
+
+    public BooleanProperty abbreviateJournalOnDownloadProperty() {
+        return abbreviateJournalOnDownload;
+    }
+
+    public void setAbbreviateJournalOnDownloadProperty(boolean shouldJournalBeAbbreviated) {
+        this.abbreviateJournalOnDownload.set(shouldJournalBeAbbreviated);
     }
 
     public ObservableSet<FetcherApiKey> getApiKeys() {
