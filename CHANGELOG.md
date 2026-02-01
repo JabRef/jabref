@@ -48,6 +48,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
 - Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
 - We fixed an issue where the "Imported entries" group was automatically selected when switching between library tabs. [#14948](https://github.com/JabRef/jabref/issues/14948)
+- Endashes and emdashes are now supported in citation keys for the LibreOffice CSL integration. [#14961](https://github.com/JabRef/jabref/issues/14961)
+- We fixed an issue where JabRef would throw an `IllegalCharacterException` trying to download pdfs using links containing a colon (`:`). [#14975](https://github.com/JabRef/jabref/issues/14975)
 
 ### Removed
 
