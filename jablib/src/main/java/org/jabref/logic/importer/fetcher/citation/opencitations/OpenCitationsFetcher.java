@@ -83,9 +83,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
             List<BibEntry> entries = new ArrayList<>();
             for (CitationItem item : citationItems) {
                 List<CitationItem.IdentifierWithField> identifiers = identifierExtractor.apply(item);
-                if (!identifiers.isEmpty()) {
-                    entries.add(fetchBibEntryFromIdentifiers(identifiers));
-                }
+                entries.addAll(fetchBibEntriesFromIdentifiers(identifiers));
             }
 
             return entries;
@@ -127,35 +125,30 @@ public class OpenCitationsFetcher implements CitationFetcher {
         }
     }
 
-    private BibEntry fetchBibEntryFromIdentifiers(List<CitationItem.IdentifierWithField> identifiers) {
+    private List<BibEntry> fetchBibEntriesFromIdentifiers(List<CitationItem.IdentifierWithField> identifiers) {
+        List<BibEntry> entries = new ArrayList<>();
         for (CitationItem.IdentifierWithField identifier : identifiers) {
-            if (identifier.field().equals(StandardField.DOI)) {
-                try {
-                    Optional<BibEntry> bibEntry = crossRefFetcher.performSearchById(identifier.value());
-                    if (bibEntry.isPresent()) {
-                        BibEntry entry = bibEntry.get();
-                        for (CitationItem.IdentifierWithField id : identifiers) {
-                            if (!entry.hasField(id.field())) {
-                                entry.setField(id.field(), id.value());
-                            }
-                        }
-                        return entry;
-                    }
-                } catch (FetcherException e) {
-                    LOGGER.warn("Could not fetch BibEntry for DOI: {}", identifier.value(), e);
-                }
-                break;
-            }
+            entries.add(fetchBibEntryFromIdentifier(identifier));
         }
-        return createBibEntryFromIdentifiers(identifiers);
+        return entries;
     }
 
-    private BibEntry createBibEntryFromIdentifiers(List<CitationItem.IdentifierWithField> identifiers) {
-        BibEntry bibEntry = new BibEntry();
-        for (CitationItem.IdentifierWithField identifier : identifiers) {
-            bibEntry.setField(identifier.field(), identifier.value());
+    private BibEntry fetchBibEntryFromIdentifier(CitationItem.IdentifierWithField identifier) {
+        if (identifier.field().equals(StandardField.DOI)) {
+            try {
+                return crossRefFetcher.performSearchById(identifier.value())
+                                      .orElseGet(() -> createMinimalBibEntry(identifier));
+            } catch (FetcherException e) {
+                LOGGER.warn("Could not fetch BibEntry for DOI: {}", identifier.value(), e);
+                return createMinimalBibEntry(identifier);
+            }
         }
-        bibEntry.setChanged(true);
-        return bibEntry;
+        return createMinimalBibEntry(identifier);
+    }
+
+    private BibEntry createMinimalBibEntry(CitationItem.IdentifierWithField identifier) {
+        return new BibEntry()
+                .withField(identifier.field(), identifier.value())
+                .withChanged(true);
     }
 }
