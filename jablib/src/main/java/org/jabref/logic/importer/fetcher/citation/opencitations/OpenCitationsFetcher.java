@@ -17,10 +17,11 @@ import org.jabref.model.entry.field.StandardField;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class OpenCitationsFetcher implements CitationFetcher {
     public static final String FETCHER_NAME = "OpenCitations";
 
@@ -48,7 +49,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
     }
 
     @Override
-    public @NonNull List<@NonNull BibEntry> getReferences(@NonNull BibEntry entry) throws FetcherException {
+    public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
@@ -92,7 +93,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
     }
 
     @Override
-    public @NonNull List<@NonNull BibEntry> getCitations(@NonNull BibEntry entry) throws FetcherException {
+    public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
@@ -136,7 +137,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
     }
 
     @Override
-    public Optional<Integer> getCitationCount(@NonNull BibEntry entry) throws FetcherException {
+    public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return Optional.empty();
         }
