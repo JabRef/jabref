@@ -15,6 +15,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -60,7 +61,8 @@ public class OpenCitationsFetcher implements CitationFetcher {
     }
 
     private List<BibEntry> fetchCitationData(BibEntry entry, String endpoint, Function<CitationItem, List<CitationItem.IdentifierWithField>> identifierExtractor) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<DOI> doi = entry.getDOI();
+        if (doi.isEmpty()) {
             return List.of();
         }
 
@@ -129,8 +131,8 @@ public class OpenCitationsFetcher implements CitationFetcher {
 
     private BibEntry fetchBibEntryFromIdentifiers(List<CitationItem.IdentifierWithField> identifiers) {
         Optional<CitationItem.IdentifierWithField> doiIdentifier = identifiers.stream()
-                .filter(id -> id.field().equals(StandardField.DOI))
-                .findFirst();
+                                                                              .filter(id -> id.field().equals(StandardField.DOI))
+                                                                              .findFirst();
 
         if (doiIdentifier.isPresent()) {
             try {
