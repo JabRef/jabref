@@ -2,6 +2,10 @@ package org.jabref.logic.importer.fetcher.citation.opencitations;
 
 import java.util.Optional;
 
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+
 import com.google.gson.annotations.SerializedName;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -20,25 +24,56 @@ class CitationItem {
     @SerializedName("author_sc")
     @Nullable String authorSelfCitation;
 
-    Optional<String> extractDoi(@Nullable String pidString) {
+    record IdentifierWithField(Field field, String value) {}
+
+    Optional<String> extractIdentifier(@Nullable String pidString, String prefix) {
         if (pidString == null || pidString.isEmpty()) {
             return Optional.empty();
         }
 
         String[] pids = pidString.split("\\s+");
         for (String pid : pids) {
-            if (pid.startsWith("doi:")) {
-                return Optional.of(pid.substring(4));
+            if (pid.startsWith(prefix + ":")) {
+                return Optional.of(pid.substring(prefix.length() + 1));
             }
         }
         return Optional.empty();
     }
 
-    Optional<String> citingDoi() {
-        return extractDoi(citing);
+    Optional<IdentifierWithField> extractBestIdentifier(@Nullable String pidString) {
+        if (pidString == null || pidString.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<String> doi = extractIdentifier(pidString, "doi");
+        if (doi.isPresent()) {
+            return Optional.of(new IdentifierWithField(StandardField.DOI, doi.get()));
+        }
+
+        Optional<String> pmid = extractIdentifier(pidString, "pmid");
+        if (pmid.isPresent()) {
+            return Optional.of(new IdentifierWithField(StandardField.PMID, pmid.get()));
+        }
+
+        String[] pids = pidString.split("\\s+");
+        for (String pid : pids) {
+            int colonIndex = pid.indexOf(':');
+            if (colonIndex > 0) {
+                String prefix = pid.substring(0, colonIndex);
+                String value = pid.substring(colonIndex + 1);
+                Field field = FieldFactory.parseField(prefix);
+                return Optional.of(new IdentifierWithField(field, value));
+            }
+        }
+
+        return Optional.empty();
     }
 
-    Optional<String> citedDoi() {
-        return extractDoi(cited);
+    Optional<IdentifierWithField> citingIdentifier() {
+        return extractBestIdentifier(citing);
+    }
+
+    Optional<IdentifierWithField> citedIdentifier() {
+        return extractBestIdentifier(cited);
     }
 }
