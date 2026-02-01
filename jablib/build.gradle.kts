@@ -19,7 +19,7 @@ plugins {
     id("dev.jbang") version "0.4.0"
 
     id("net.ltgt.errorprone") version "5.0.0"
-    id("net.ltgt.nullaway") version "2.4.0"
+    id("net.ltgt.nullaway") version "3.0.0"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
