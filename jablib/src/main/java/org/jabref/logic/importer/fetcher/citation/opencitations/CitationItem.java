@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher.citation.opencitations;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -25,30 +26,31 @@ class CitationItem {
 
     record IdentifierWithField(Field field, String value) {}
 
-    Optional<IdentifierWithField> extractBestIdentifier(@Nullable String pidString) {
+    List<IdentifierWithField> extractIdentifiers(@Nullable String pidString) {
         if (pidString == null || pidString.isEmpty()) {
-            return Optional.empty();
+            return List.of();
         }
 
         String[] pids = pidString.split("\\s+");
+        List<IdentifierWithField> identifiers = new ArrayList<>();
         for (String pid : pids) {
             int colonIndex = pid.indexOf(':');
             if (colonIndex > 0) {
                 String prefix = pid.substring(0, colonIndex);
                 String value = pid.substring(colonIndex + 1);
                 Field field = FieldFactory.parseField(prefix);
-                return Optional.of(new IdentifierWithField(field, value));
+                identifiers.add(new IdentifierWithField(field, value));
             }
         }
 
-        return Optional.empty();
+        return identifiers;
     }
 
-    Optional<IdentifierWithField> citingIdentifier() {
-        return extractBestIdentifier(citing);
+    List<IdentifierWithField> citingIdentifiers() {
+        return extractIdentifiers(citing);
     }
 
-    Optional<IdentifierWithField> citedIdentifier() {
-        return extractBestIdentifier(cited);
+    List<IdentifierWithField> citedIdentifiers() {
+        return extractIdentifiers(cited);
     }
 }
