@@ -18,7 +18,8 @@ Do not make assumptions on important decisions — get clarification first.
 
 ## Workflow Steps
 
-### [ ] Step: Technical Specification
+### [x] Step: Technical Specification
+<!-- chat-id: 42e719eb-bed5-4e52-9b11-934c2e648256 -->
 
 Assess the task's difficulty, as underestimating it leads to poor outcomes.
 - easy: Straightforward implementation, trivial bug fix or feature
@@ -50,15 +51,72 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 
 ---
 
-### [ ] Step: Implementation
+### [x] Step: Create Response Model Classes
+<!-- chat-id: 4b2cab23-bca5-4a0b-aee5-8de9581a663e -->
 
-Implement the task according to the technical specification and general engineering best practices.
+Create the data model classes for OpenCitations API responses:
+- `CitationItem.java`: Individual citation record with OCI, citing/cited PIDs, creation date, timespan
+- `CitationResponse.java`: Array wrapper for citations/references
+- `CountResponse.java`: Wrapper for count responses
 
-1. Break the task into steps where possible.
-2. Implement the required changes in the codebase.
-3. Add and run relevant tests and linters.
-4. Perform basic manual verification if applicable.
-5. After completion, write a report to `{@artifacts_path}/report.md` describing:
-   - What was implemented
-   - How the solution was tested
-   - The biggest issues or challenges encountered
+Each class should:
+- Include Gson annotations where needed (e.g., @SerializedName)
+- Provide getters/setters
+- Add helper method in CitationItem to extract DOI from PID string
+
+**Verification**: Models should compile without errors and follow JabRef code style.
+
+---
+
+### [ ] Step: Implement OpenCitationsFetcher Core Class
+
+Implement `OpenCitationsFetcher` class that implements `CitationFetcher` interface:
+- Constructor accepting `ImporterPreferences`
+- `getName()` returning "OpenCitations"
+- URL construction methods for references, citations, and counts
+- Implement `getReferences()`: fetch outgoing references
+- Implement `getCitations()`: fetch incoming citations
+- Implement `getCitationCount()`: fetch citation count
+- DOI extraction and BibEntry conversion logic
+- Error handling for missing DOI, network errors, malformed responses
+- Optional API key support via ImporterPreferences
+
+**Verification**: Class compiles, implements all required interface methods.
+
+---
+
+### [ ] Step: Register OpenCitations in CitationFetcherType Enum
+
+Update `CitationFetcherType.java`:
+- Add `OPENCITATIONS("OpenCitations")` enum constant
+- Add case in `getCitationFetcher()` switch to instantiate `OpenCitationsFetcher`
+
+**Verification**: Enum compiles, factory method returns correct fetcher instance.
+
+---
+
+### [ ] Step: Implement Unit Tests
+
+Create `OpenCitationsFetcherTest.java` with test cases:
+- `testGetReferencesWithValidDoi()`: Test reference fetching with known DOI
+- `testGetCitationsWithValidDoi()`: Test citation fetching with known DOI  
+- `testGetCitationCount()`: Verify citation count retrieval
+- `testEmptyWhenNoDoi()`: Verify empty list when DOI missing
+- `testGetName()`: Verify fetcher name
+
+Mark test class with `@FetcherTest` annotation.
+
+**Verification**: Run `./gradlew :jablib:test --tests "*OpenCitations*"` - all tests pass.
+
+---
+
+### [ ] Step: Final Verification and Reporting
+
+1. Run full test suite for citation fetchers
+2. Verify code style compliance (if checkstyle configured)
+3. Manual smoke test with JabRef (if applicable)
+4. Write completion report to `{@artifacts_path}/report.md` with:
+   - Summary of what was implemented
+   - Test results
+   - Any challenges or issues encountered
+   - Known limitations (e.g., DOI-only support)
