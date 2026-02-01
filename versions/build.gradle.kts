@@ -34,7 +34,7 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-    api(platform("org.glassfish.grizzly:grizzly-bom:4.0.2"))
+    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
     api("org.glassfish.grizzly:grizzly-framework")
     api("org.glassfish.grizzly:grizzly-http-server")
 
