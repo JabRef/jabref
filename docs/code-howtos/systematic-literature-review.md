@@ -77,5 +77,4 @@ The SLR tool in JabRef helps structure the entire review process:
 3. Create search queries  
 4. Select catalogs  
 5. Run the survey and collect results  
-
 This makes literature reviews more systematic, transparent, and repeatable.
