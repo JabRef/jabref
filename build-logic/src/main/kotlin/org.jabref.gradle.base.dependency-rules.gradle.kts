@@ -14,6 +14,12 @@ javaModuleDependencies {
 jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
+
+        // Use a consistent set of versions (including all transitive versions) for all applications
+        providesVersions(":jabgui")
+        providesVersions(":jabkit")
+        providesVersions(":jabls-cli")
+        providesVersions(":jabsrv-cli")
     }
     conflictResolution {
         select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
@@ -76,6 +82,7 @@ jvmDependencyConflicts.patch {
 }
 
 extraJavaModuleInfo {
+    versionsProvidingConfiguration = "mainRuntimeClasspath"
     failOnAutomaticModules = true
     failOnModifiedDerivedModuleNames = true
     skipLocalJars = true
@@ -579,4 +586,34 @@ extraJavaModuleInfo {
     module("org.checkerframework:dataflow-nullaway", "org.checkerframework.dataflow") {
         exportAllPackages()
     }
+}
+
+// Configure consistent resolution across the whole project
+// https://github.com/gradlex-org/extra-java-module-info/issues/186
+val consistentResolutionAttribute = Attribute.of("consistent-resolution", String::class.java)
+
+configurations.consumable("allDependencies") {
+    sourceSets.all {
+        extendsFrom(
+            configurations[this.implementationConfigurationName],
+            configurations[this.compileOnlyConfigurationName],
+            configurations[this.runtimeOnlyConfigurationName],
+            configurations[this.annotationProcessorConfigurationName],
+        )
+    }
+    attributes {
+        attribute(consistentResolutionAttribute, "global")
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+        attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
+    }
+}
+
+configurations.getByName("mainRuntimeClasspath") {
+    attributes.attribute(consistentResolutionAttribute, "global")
+}
+
+configurations.getByName("javaModulesMergeJars") {
+    extendsFrom(configurations.getByName("mainRuntimeClasspath"))
 }
