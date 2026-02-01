@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -50,50 +51,21 @@ public class OpenCitationsFetcher implements CitationFetcher {
 
     @Override
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
-            return List.of();
-        }
-
-        String apiUrl = getApiUrl("references", entry);
-        LOGGER.debug("References URL: {}", apiUrl);
-
-        try {
-            URL url = URLUtil.create(apiUrl);
-            URLDownload urlDownload = new URLDownload(importerPreferences, url);
-            importerPreferences.getApiKey(getName())
-                               .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
-
-            String jsonResponse = urlDownload.asString();
-            CitationItem[] citationItems = GSON.fromJson(jsonResponse, CitationItem[].class);
-
-            if (citationItems == null || citationItems.length == 0) {
-                return List.of();
-            }
-
-            List<BibEntry> entries = new ArrayList<>();
-            for (CitationItem item : citationItems) {
-                List<CitationItem.IdentifierWithField> identifiers = item.citedIdentifiers();
-                if (!identifiers.isEmpty()) {
-                    entries.add(fetchBibEntryFromIdentifiers(identifiers));
-                }
-            }
-
-            return entries;
-        } catch (MalformedURLException e) {
-            throw new FetcherException("Malformed URL", e);
-        } catch (JsonSyntaxException e) {
-            throw new FetcherException("Could not parse JSON response from OpenCitations", e);
-        }
+        return fetchCitationData(entry, "references", CitationItem::citedIdentifiers);
     }
 
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
+        return fetchCitationData(entry, "citations", CitationItem::citingIdentifiers);
+    }
+
+    private List<BibEntry> fetchCitationData(BibEntry entry, String endpoint, Function<CitationItem, List<CitationItem.IdentifierWithField>> identifierExtractor) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
 
-        String apiUrl = getApiUrl("citations", entry);
-        LOGGER.debug("Citations URL: {}", apiUrl);
+        String apiUrl = getApiUrl(endpoint, entry);
+        LOGGER.debug("{} URL: {}", endpoint, apiUrl);
 
         try {
             URL url = URLUtil.create(apiUrl);
@@ -110,7 +82,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
 
             List<BibEntry> entries = new ArrayList<>();
             for (CitationItem item : citationItems) {
-                List<CitationItem.IdentifierWithField> identifiers = item.citingIdentifiers();
+                List<CitationItem.IdentifierWithField> identifiers = identifierExtractor.apply(item);
                 if (!identifiers.isEmpty()) {
                     entries.add(fetchBibEntryFromIdentifiers(identifiers));
                 }
