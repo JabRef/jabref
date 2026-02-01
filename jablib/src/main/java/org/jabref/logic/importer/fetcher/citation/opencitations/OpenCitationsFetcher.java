@@ -60,6 +60,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
         return fetchCitationData(entry, "citations", CitationItem::citingIdentifiers);
     }
 
+    /// API explained at <https://api.opencitations.net/index/v2#/references/{id}> and <https://api.opencitations.net/index/v2#/citations/{id}>
     private List<BibEntry> fetchCitationData(BibEntry entry, String endpoint, Function<CitationItem, List<CitationItem.IdentifierWithField>> identifierExtractor) throws FetcherException {
         Optional<DOI> doi = entry.getDOI();
         if (doi.isEmpty()) {
@@ -98,6 +99,36 @@ public class OpenCitationsFetcher implements CitationFetcher {
         }
     }
 
+    private BibEntry fetchBibEntryFromIdentifiers(List<CitationItem.IdentifierWithField> identifiers) {
+        Optional<CitationItem.IdentifierWithField> doiIdentifier = identifiers.stream()
+                                                                              .filter(id -> id.field().equals(StandardField.DOI))
+                                                                              .findFirst();
+
+        if (doiIdentifier.isPresent()) {
+            try {
+                Optional<BibEntry> fetchedEntry = crossRefFetcher.performSearchById(doiIdentifier.get().value());
+                if (fetchedEntry.isPresent()) {
+                    BibEntry entry = fetchedEntry.get();
+                    for (CitationItem.IdentifierWithField identifier : identifiers) {
+                        if (!entry.hasField(identifier.field())) {
+                            entry.setField(identifier.field(), identifier.value());
+                        }
+                    }
+                    return entry;
+                }
+            } catch (FetcherException e) {
+                LOGGER.warn("Could not fetch BibEntry for DOI: {}", doiIdentifier.get().value(), e);
+            }
+        }
+
+        BibEntry bibEntry = new BibEntry();
+        for (CitationItem.IdentifierWithField identifier : identifiers) {
+            bibEntry.setField(identifier.field(), identifier.value());
+        }
+        return bibEntry;
+    }
+
+    /// API explained at <https://api.opencitations.net/index/v2#/reference-count/{id}>
     @Override
     public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
@@ -127,34 +158,5 @@ public class OpenCitationsFetcher implements CitationFetcher {
         } catch (JsonSyntaxException e) {
             throw new FetcherException("Could not parse JSON response from OpenCitations", e);
         }
-    }
-
-    private BibEntry fetchBibEntryFromIdentifiers(List<CitationItem.IdentifierWithField> identifiers) {
-        Optional<CitationItem.IdentifierWithField> doiIdentifier = identifiers.stream()
-                                                                              .filter(id -> id.field().equals(StandardField.DOI))
-                                                                              .findFirst();
-
-        if (doiIdentifier.isPresent()) {
-            try {
-                Optional<BibEntry> fetchedEntry = crossRefFetcher.performSearchById(doiIdentifier.get().value());
-                if (fetchedEntry.isPresent()) {
-                    BibEntry entry = fetchedEntry.get();
-                    for (CitationItem.IdentifierWithField identifier : identifiers) {
-                        if (!entry.hasField(identifier.field())) {
-                            entry.setField(identifier.field(), identifier.value());
-                        }
-                    }
-                    return entry;
-                }
-            } catch (FetcherException e) {
-                LOGGER.warn("Could not fetch BibEntry for DOI: {}", doiIdentifier.get().value(), e);
-            }
-        }
-
-        BibEntry bibEntry = new BibEntry();
-        for (CitationItem.IdentifierWithField identifier : identifiers) {
-            bibEntry.setField(identifier.field(), identifier.value());
-        }
-        return bibEntry;
     }
 }
