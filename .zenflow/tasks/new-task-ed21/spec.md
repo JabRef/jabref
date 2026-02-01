@@ -197,6 +197,24 @@ public class CitationItem {
 
 **Design Choice**: Use package-private fields (no access modifier) to reduce boilerplate. Gson can access package-private fields for JSON deserialization.
 
+### CitationResponse Structure
+
+```java
+/// Used for GSON
+public class CitationResponse {
+    List<CitationItem> data;  // Package-private, no getter needed
+}
+```
+
+### CountResponse Structure
+
+```java
+/// Used for GSON
+public class CountResponse {
+    String count;  // Package-private, returned as string from API
+}
+```
+
 ### No Interface Changes
 The `CitationFetcher` interface remains unchanged. OpenCitationsFetcher implements all existing methods.
 
