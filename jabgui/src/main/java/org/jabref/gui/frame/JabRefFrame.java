@@ -53,8 +53,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.welcome.WelcomeTab;
-import org.jabref.http.manager.HttpServerManager;
-import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
@@ -554,10 +552,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 fileHistory,
                 Injector.instantiateModelOrService(BuildInfo.class),
-                preferences.getWorkspacePreferences(),
-                Injector.instantiateModelOrService(HttpServerManager.class),
-                Injector.instantiateModelOrService(LanguageServerController.class),
-                Injector.instantiateModelOrService(UiMessageHandler.class));
+                preferences.getWorkspacePreferences());
         tabbedPane.getTabs().add(welcomeTab);
         tabbedPane.getSelectionModel().select(welcomeTab);
     }

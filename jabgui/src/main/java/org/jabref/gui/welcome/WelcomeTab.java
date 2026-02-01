@@ -41,9 +41,6 @@ import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
 import org.jabref.gui.welcome.components.QuickSettings;
 import org.jabref.gui.welcome.components.Walkthroughs;
-import org.jabref.http.manager.HttpServerManager;
-import org.jabref.languageserver.controller.LanguageServerController;
-import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -77,9 +74,6 @@ public class WelcomeTab extends Tab {
     private final BuildInfo buildInfo;
     private final Stage stage;
     private final WorkspacePreferences workspacePreferences;
-    private final HttpServerManager httpServerManager;
-    private final UiMessageHandler uiMessageHandler;
-    private final LanguageServerController languageServerController;
 
     private final VBox main;
     private Walkthroughs walkthroughs;
@@ -99,10 +93,7 @@ public class WelcomeTab extends Tab {
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,
                       BuildInfo buildInfo,
-                      WorkspacePreferences workspacePreferences,
-                      HttpServerManager httpServerManager,
-                      LanguageServerController languageServerController,
-                      UiMessageHandler uiMessageHandler) {
+                      WorkspacePreferences workspacePreferences) {
         super(Localization.lang("Welcome"));
         setClosable(true);
         this.tabContainer = tabContainer;
@@ -119,9 +110,6 @@ public class WelcomeTab extends Tab {
         this.buildInfo = buildInfo;
         this.stage = stage;
         this.workspacePreferences = workspacePreferences;
-        this.httpServerManager = httpServerManager;
-        this.uiMessageHandler = uiMessageHandler;
-        this.languageServerController = languageServerController;
         this.recentLibrariesBox = new VBox();
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
@@ -191,7 +179,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createRightColumn() {
-        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor, httpServerManager, stateManager, languageServerController, uiMessageHandler);
+        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
         VBox rightColumn = new VBox(quickSettings, walkthroughs);
         rightColumn.getStyleClass().add("welcome-content-column");
