@@ -10,7 +10,7 @@ parent: Glossary
 
 **References** is a structured list of works cited in a scientific work.
 
-It is usually described as the outgoing references to other cited works appearing in the reference list or the 
+It is usually described as the outgoing references to other cited works appearing in the reference list.
 
 In JabRef, a bibliography usually corresponds to a **.bib file** (BibTeX or BibLaTeX format) that stores all entries used for citation and reference management.
 
