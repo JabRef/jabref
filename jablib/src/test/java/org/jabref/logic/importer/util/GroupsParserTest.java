@@ -33,8 +33,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -99,8 +99,7 @@ class GroupsParserTest {
         AbstractGroup thirdSubGrpLvl1 = new ExplicitGroup("3", GroupHierarchyType.INDEPENDENT, ',');
         rootNode.addSubgroup(thirdSubGrpLvl1);
 
-        GroupTreeNode parsedNode = GroupsParser
-                .importGroups(orderedData, ',', fileMonitor, metaData, "userAndHost").root();
+        GroupTreeNode parsedNode = GroupsParser.importGroups(orderedData, ',', fileMonitor, metaData, "userAndHost").root();
         assertEquals(rootNode.getChildren(), parsedNode.getChildren());
     }
 
@@ -221,14 +220,10 @@ class GroupsParserTest {
                 "1 ExplicitGroup:AnotherValidGroup;0;"
         );
 
-        GroupsParsingResult result = GroupsParser
-                .importGroups(data, ';', null, null, null);
+        GroupsParsingResult result = GroupsParser.importGroups(data, ';', null, null, null);
 
         assertNotNull(result.root());
-        assertEquals(2, result.root().getChildren().size());
-
-        assertFalse(result.errors().isEmpty(), "Errors list should not be empty when unknown groups exist");
-        assertEquals(1, result.errors().size(), "There should be exactly one parsing error");
-        assertTrue(result.errors().get(0).contains("UnknownGroupType"), "Error message should mention the problematic group type");
+        assertThat(result.root().getChildren()).hasSize(2);
+        assertThat(result.errors()).hasSize(1).first().asString().contains("UnknownGroupType");
     }
 }
