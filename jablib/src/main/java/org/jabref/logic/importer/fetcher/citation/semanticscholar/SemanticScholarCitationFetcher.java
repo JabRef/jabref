@@ -17,12 +17,13 @@ import org.jabref.model.entry.BibEntry;
 import com.google.gson.Gson;
 import kong.unirest.core.json.JSONObject;
 import org.jooq.lambda.Unchecked;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
-    public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
+    public static final String FETCHER_NAME = "Semantic Scholar";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholarCitationFetcher.class);
 
@@ -42,14 +43,14 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
                 + "&limit=1000";
     }
 
-    public @NonNull String getUrlForCitationCount(@NonNull BibEntry entry) {
+    public String getUrlForCitationCount(BibEntry entry) {
         return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
                 + "?fields=" + "citationCount"
                 + "&limit=1";
     }
 
     @Override
-    public @NonNull List<@NonNull BibEntry> getCitations(@NonNull BibEntry entry) throws FetcherException {
+    public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
@@ -74,7 +75,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public @NonNull List<@NonNull BibEntry> getReferences(@NonNull BibEntry entry) throws FetcherException {
+    public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
