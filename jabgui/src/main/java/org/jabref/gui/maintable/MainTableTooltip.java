@@ -25,7 +25,7 @@ public class MainTableTooltip extends Tooltip {
 
         preview.resizeForTooltipContent();
 
-        preview.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+        preview.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 Platform.runLater(this::sizeToScene);
             }
