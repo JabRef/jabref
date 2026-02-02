@@ -28,7 +28,7 @@ class GitPropertiesViewModelTest {
     }
 
     @Test
-    void testInitialStateIsFalse() {
+    void initialStateIsFalse() {
         viewModel.setValues();
         assertFalse(viewModel.autoCommitProperty().get());
         assertFalse(viewModel.autoPullProperty().get());
@@ -36,7 +36,7 @@ class GitPropertiesViewModelTest {
     }
 
     @Test
-    void testSetValuesReadsLegacyKey() {
+    void setValuesReadsLegacyKey() {
         metaData.putUnknownMetaDataItem(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
 
         viewModel.setValues();
@@ -47,7 +47,7 @@ class GitPropertiesViewModelTest {
     }
 
     @Test
-    void testSetValuesReadsGranularKeys() {
+    void setValuesReadsGranularKeys() {
         metaData.putUnknownMetaDataItem(GitPropertiesViewModel.GIT_AUTO_COMMIT, Collections.singletonList("true"));
 
         viewModel.setValues();
@@ -58,7 +58,7 @@ class GitPropertiesViewModelTest {
     }
 
     @Test
-    void testStoreSettingsWritesGranularKeys() {
+    void storeSettingsWritesGranularKeys() {
         // checks "Commit" and "Push"
         viewModel.autoCommitProperty().set(true);
         viewModel.autoPullProperty().set(false);
@@ -74,7 +74,7 @@ class GitPropertiesViewModelTest {
     }
 
     @Test
-    void testStoreSettingsRemovesLegacyKey() {
+    void storeSettingsRemovesLegacyKey() {
         metaData.putUnknownMetaDataItem(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
 
         viewModel.setValues();
