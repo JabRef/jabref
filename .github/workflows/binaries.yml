@@ -667,18 +667,6 @@ jobs:
 
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
           comment-tag: download-link
-      - name: Comment on issue (no build available)
-        if: ${{ (steps.get_issue_number.outputs.ticketNumber != '-1') && (needs.disk-space-check.outputs.available != 'true') }}
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
-          message: >
-            A pull request addressing the issue has been created.
-            You can try out the pull request by following the steps at [How to try out any JabRef pull request?](https://blog.jabref.org/2025/05/31/run-pr/).
-
-
-            For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
-          comment-tag: download-link
 
   notarize:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
@@ -745,3 +733,16 @@ jobs:
           name: ${{ matrix.displayName }}
           path: |
             ${{ matrix.path }}/build/packages/${{ matrix.os }}
+
+  upload-pr-nnumber:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v6
+        with:
+          name: pr_number
+          path: pr_number.txt
