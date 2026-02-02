@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      contents: write
+      issues: write
     timeout-minutes: 10
     steps:
       - name: Show GitHub context
