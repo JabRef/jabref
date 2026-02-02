@@ -77,7 +77,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             """;
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
-    private static final int HEIGHT_BUFFER = 15;
+    private static final int HEIGHT_BUFFER = 15; // Ensures that text is not cut off
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;

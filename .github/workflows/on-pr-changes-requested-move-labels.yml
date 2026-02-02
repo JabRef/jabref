@@ -32,9 +32,11 @@ jobs:
           fi
       - name: Apply label operations
         if: steps.check.outputs.continue == 'true'
-        run: |
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: ready-for-review"
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: awaiting-second-review"
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --add-label "status: changes-required"
+        run: >
+          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }}
+            --remove-label "status: ready-for-review"
+            --remove-label "status: awaiting-second-review"
+            --remove-label "status: to-be-merged"
+            --add-label "status: changes-required"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
