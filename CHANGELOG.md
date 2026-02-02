@@ -31,7 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 
 ### Fixed
-
+- Fixed a NullPointerException when resetting entry preview preferences. [#14410](https://github.com/JabRef/jabref/issues/14410)
 - We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
@@ -47,7 +47,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
 - Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
-- Fixed a NullPointerException when resetting entry preview preferences. [#14959](https://github.com/JabRef/jabref/pull/14959)
 
 ### Removed
 
