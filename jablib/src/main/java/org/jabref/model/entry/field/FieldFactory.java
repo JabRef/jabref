@@ -1,6 +1,5 @@
 package org.jabref.model.entry.field;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -212,16 +211,6 @@ public class FieldFactory {
         fields.addAll(EnumSet.allOf(SpecialField.class));
         fields.addAll(EnumSet.allOf(StandardField.class));
         return fields;
-    }
-
-    /// These are the fields JabRef always displays as default {@link org.jabref.logic.preferences.JabRefCliPreferences#setLanguageDependentDefaultValues()}
-    ///
-    /// A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
-    /// a separate preferences object
-    public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(List.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.EPRINTTYPE, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
-        defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
-        return defaultGeneralFields;
     }
 
     /// Note: User configurability is discussed at <a href="https://github.com/JabRef/jabref/issues/9840">#9840</a>.

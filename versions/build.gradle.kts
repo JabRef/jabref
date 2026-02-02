@@ -11,6 +11,7 @@ javaPlatform {
 // Based on https://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
+
 val javafx = "25.0.2"
 
 val lucene = "10.3.2"
@@ -33,11 +34,11 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-    api(platform("org.glassfish.grizzly:grizzly-bom:4.0.2"))
+    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
     api("org.glassfish.grizzly:grizzly-framework")
     api("org.glassfish.grizzly:grizzly-http-server")
 
-    api(platform("org.glassfish.jersey:jersey-bom:4.0.0"))
+    api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
     api("org.glassfish.jersey.core:jersey-server")
     api("org.glassfish.jersey.inject:jersey-hk2")
@@ -54,15 +55,14 @@ dependencies.constraints {
     api("org.openjfx:javafx-base:$javafx")
     api("org.openjfx:javafx-controls:$javafx")
     api("org.openjfx:javafx-fxml:$javafx")
-    api("org.openjfx:javafx-graphics:${javafx}")
+    api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
-    // from JavaFX25 onwards
     api("org.openjfx:jdk-jsobject:$javafx")
 
     api("cc.jilt:jilt:1.9")
 
-    api("com.dlsc.gemsfx:gemsfx:3.8.2")
+    api("com.dlsc.gemsfx:gemsfx:3.8.3")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")

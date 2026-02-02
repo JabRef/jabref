@@ -14,12 +14,12 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.35.0"
+    id("com.vanniktech.maven.publish") version "0.36.0"
 
     id("dev.jbang") version "0.4.0"
 
-    id("net.ltgt.errorprone") version "4.4.0"
-    id("net.ltgt.nullaway") version "2.3.0"
+    id("net.ltgt.errorprone") version "5.0.0"
+    id("net.ltgt.nullaway") version "3.0.0"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -332,7 +332,7 @@ val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDa
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
-val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
+val scopusApiKey = providers.environmentVariable("ScopusApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
 val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
@@ -354,7 +354,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("ieeeAPIKey", ieeeAPIKey)
     inputs.property("medlineApiKey", medlineApiKey)
     inputs.property("springerNatureAPIKey", springerNatureAPIKey)
-    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
+    inputs.property("scopusApiKey", scopusApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
     inputs.property("unpaywallEmail", unpaywallEmail)
 
@@ -370,7 +370,7 @@ tasks.named<ProcessResources>("processResources") {
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "medlineApiKey" to inputs.properties["medlineApiKey"],
-                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
+                "scopusApiKey" to inputs.properties["scopusApiKey"],
                 "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
                 "unpaywallEmail" to inputs.properties["unpaywallEmail"],

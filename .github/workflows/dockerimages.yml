@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   build:
-    if: ${{ github.repository_owner == 'JabRef' }}
+    if: github.repository == 'JabRef/jabref'
     strategy:
       matrix:
         component: [ jabkit, jabsrv ]

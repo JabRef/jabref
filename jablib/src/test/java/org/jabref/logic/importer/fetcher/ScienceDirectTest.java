@@ -29,7 +29,7 @@ class ScienceDirectTest {
 
     @BeforeEach
     void setUp() {
-        Optional<String> apiKey = Optional.of(new BuildInfo().scienceDirectApiKey);
+        Optional<String> apiKey = Optional.of(new BuildInfo().scopusApiKey);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(apiKey);
         finder = new ScienceDirect(importerPreferences);
