@@ -60,7 +60,7 @@ class GroupTreeViewModelTest {
                 false,
                 false,
                 false,
-                "Imported entries"
+                "imported entries"
         ));
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 EnumSet.noneOf(GroupViewMode.class),
@@ -212,7 +212,7 @@ class GroupTreeViewModelTest {
         String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
 
         assertEquals(0, prevModel.size());
-        assertEquals("Imported entries", actualGrpName);
+        assertEquals("imported entries", actualGrpName);
     }
 
     @Test

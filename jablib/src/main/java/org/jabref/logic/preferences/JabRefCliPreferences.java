@@ -509,7 +509,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);
 
         defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
-        defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
+        defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("imported entries"));
 
         // region: Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
