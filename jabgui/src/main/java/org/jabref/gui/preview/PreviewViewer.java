@@ -77,6 +77,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             """;
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
+    private static final int HEIGHT_BUFFER = 15;
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -368,7 +369,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     );
 
                     if (result instanceof java.lang.Number height) {
-                        double actualH = height.doubleValue() + 15;
+                        double actualH = height.doubleValue() + HEIGHT_BUFFER;
 
                         previewView.setPrefHeight(actualH);
                         previewView.setMaxHeight(actualH);
