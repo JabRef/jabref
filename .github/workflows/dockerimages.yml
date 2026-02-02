@@ -39,6 +39,10 @@ jobs:
             type=ref,event=tag
             type=edge,branch=main
             type=ref,event=pr
+          labels: |
+            org.opencontainers.image.source=https://github.com/JabRef/jabref
+            org.opencontainers.image.title=${{ matrix.component }}
+            org.opencontainers.image.description=${{ matrix.component == 'jabkit' && 'JabRef''s CLI tool' || 'JabRef''s HTTP server' }}
       - name: Login to GitHub Container Registry
         if: >
           (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
