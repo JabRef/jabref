@@ -14,7 +14,6 @@ application{
     mainModule.set("org.jabref.jabls.cli")
 
     applicationDefaultJvmArgs = listOf(
-        "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=com.sun.jna,org.apache.lucene.core",
 
         // Enable JEP 450: Compact Object Headers
