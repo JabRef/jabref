@@ -47,7 +47,7 @@ public class PreviewPreferences {
         this.shouldDownloadCovers.set(shouldDownloadCovers);
     }
 
-    private PreviewPreferences(){
+    private PreviewPreferences() {
         this(
                 List.of(),
                 0,
@@ -146,7 +146,7 @@ public class PreviewPreferences {
         this.bstPreviewLayoutPaths.setAll(bstPreviewLayoutPaths);
     }
 
-    public void setAll(PreviewPreferences preferences){
+    public void setAll(PreviewPreferences preferences) {
         this.layoutCycle.setAll(preferences.getLayoutCycle());
         this.layoutCyclePosition.set(preferences.getLayoutCyclePosition());
         this.customPreviewLayout.set(preferences.getCustomPreviewLayout());
