@@ -21,20 +21,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      contents: write
+      issues: write
     timeout-minutes: 10
     steps:
       - name: Show GitHub context
         env:
           PR_NUMBER: ${{ github.event.inputs.pr_number }}
-          WORKFLOW_RUN_ID: ${{ github.event.inputs.workflow_run_id }}
           EVENT_NAME: ${{ github.event_name }}
           WORKFLOW: ${{ github.event.workflow_run.name }}
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           echo "PR_NUMBER=${PR_NUMBER}"
-          echo "WORKFLOW_RUN_ID=${WORKFLOW_RUN_ID}"
           echo "EVENT_NAME=${EVENT_NAME}"
           echo "WORKFLOW=${WORKFLOW}"
           echo "RUN_ID=${RUN_ID}"
@@ -51,16 +49,17 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Read pr_number.txt
-        if: ${{ github.event_name != 'workflow_dispatch' }}
         id: read-pr_number
         run: |
           touch pr_number.txt
-          PR_NUMBER=$(cat pr_number.txt)
-          echo "Read PR number $PR_NUMBER"
+          PR_NUMBER=$(cat pr_number.txt)${{ github.event.inputs.pr_number }}
+          echo "Read PR number '$PR_NUMBER'"
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-          echo "PR #" >> $GITHUB_STEP_SUMMARY
+          echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
 
-      - id: pr_data
+      - name: Determine PR data
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') }}
+        id: pr_data
         env:
           PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
         uses: actions/github-script@v8
@@ -72,8 +71,8 @@ jobs:
             core.setOutput("pr_url", pr.html_url ?? "");
             core.setOutput("pr_body", pr.body ?? "");
 
-
       - name: Determine issue number
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') }}
         id: get_issue_number
         env:
           PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
@@ -97,7 +96,7 @@ jobs:
           echo "Determined issue [#$ticketNumber](https://github.com/JabRef/jabref/issues/$ticketNumber)" >> $GITHUB_STEP_SUMMARY
 
       - name: Comment on issue (no build available)
-        if: ${{ (steps.get_issue_number.outputs.ticketNumber != '') }}
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.get_issue_number.outputs.ticketNumber != '') }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
