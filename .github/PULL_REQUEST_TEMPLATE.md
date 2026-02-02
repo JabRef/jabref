@@ -1,6 +1,7 @@
 Closes _____
-<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD.
-     Example: Closes https://github.com/JabRef/jabref/issues/13109 OR Closes #13109 -->
+<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD - and then remove this comment block.
+     Examples: Closes https://github.com/JabRef/jabref/issues/13109
+               Closes #13109 -->
 
 <!-- REPLACE THIS BLOCK. PRs that leave this unchanged will be closed.
 
@@ -11,8 +12,7 @@ AI-assisted contributions are allowed only if reviewed, understood, and owned by
 Unreviewed, misleading, or misrepresented AI-generated submissions may be closed immediately and publicly labeled as such.
 
 If your work is not yet complete, open a **draft pull request** instead.
-In that case, briefly outline next steps and whether you are requesting feedback.
--->
+In that case, briefly outline next steps and whether you are requesting feedback. -->
 
 ### Steps to test
 
