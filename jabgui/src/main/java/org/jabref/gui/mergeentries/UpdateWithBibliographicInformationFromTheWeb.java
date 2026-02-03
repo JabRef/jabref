@@ -52,9 +52,9 @@ public class UpdateWithBibliographicInformationFromTheWeb extends SimpleCommand 
         mergedEntriesView.addSource(Localization.lang("Original Entry"), () -> originalEntry);
 
         for (EntryBasedFetcher webFetcher : webFetchers) {
-            mergedEntriesView.addSource(Localization.lang(webFetcher.getName()), () -> {
+            mergedEntriesView.addSource(webFetcher.getName(), () -> {
                 try {
-                    return webFetcher.performSearch(originalEntry).getFirst();
+                    return webFetcher.performSearch(originalEntry).stream().findFirst().orElse(null);
                 } catch (FetcherException e) {
                     return null;
                 }
