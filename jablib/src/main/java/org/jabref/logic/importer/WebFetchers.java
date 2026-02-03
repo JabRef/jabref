@@ -300,8 +300,6 @@ public class WebFetchers {
                 new UnpaywallFetcher(importerPreferences)
         );
 
-        assert fetchers.stream().allMatch(f -> f instanceof CustomizableKeyFetcher);
-
         return fetchers;
     }
 }
