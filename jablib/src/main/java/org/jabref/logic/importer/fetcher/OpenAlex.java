@@ -14,6 +14,7 @@ import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -43,6 +44,12 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
     private static final String URL_PATTERN = "https://api.openalex.org/works";
     private static final String NAME = "OpenAlex";
 
+    private final ImporterPreferences importerPreferences;
+
+    public OpenAlex(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
+
     @Override
     public String getName() {
         return NAME;
@@ -51,6 +58,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
+        importerPreferences.getApiKey(NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
         uriBuilder.addParameter("search", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         URL result = uriBuilder.build().toURL();
         LOGGER.debug("URL for query: {}", result);
