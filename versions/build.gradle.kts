@@ -45,7 +45,7 @@ dependencies {
     api("org.glassfish.jersey.test-framework:jersey-test-framework-core")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
 
-    api(platform("tools.jackson:jackson-bom:3.0.3"))
+    api(platform("tools.jackson:jackson-bom:3.0.4"))
     api("tools.jackson.core:jackson-core")
     api("tools.jackson.core:jackson-databind")
     api("tools.jackson.dataformat:jackson-dataformat-yaml")
