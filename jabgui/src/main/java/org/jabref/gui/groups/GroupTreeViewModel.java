@@ -725,7 +725,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void clearGroup(GroupNodeViewModel group) {
-        if (group.getGroupNode().getGroup() instanceof ExplicitGroup explicitGroup) {
+        if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
             List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
             group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
         }
