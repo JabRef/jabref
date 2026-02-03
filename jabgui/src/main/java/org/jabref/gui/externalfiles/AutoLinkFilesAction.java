@@ -106,10 +106,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
                         Localization.lang("Finished automatically setting external links."),
                         Localization.lang("Changed %0 entry(s).", result.getChangedEntries().size()),
                         Localization.lang("Affected entry(s): %0", result.getChangedEntries().stream()
-                                .map(BibEntry::getCitationKey)
-                                .flatMap(Optional::stream)
-                                .collect(Collectors.joining(", ")))
-                ));
+                                                                         .map(BibEntry::getCitationKey)
+                                                                         .flatMap(Optional::stream)
+                                                                         .collect(Collectors.joining(", ")))));
             }
         };
 
