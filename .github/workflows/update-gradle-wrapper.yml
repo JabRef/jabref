@@ -11,9 +11,12 @@ on:
 jobs:
   update-gradle-wrapper:
     if: github.repository == 'JabRef/jabref'
+    # ubuntu-slim does not offer Java (required by the update action)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Update Gradle Wrapper
         uses: gradle-update/update-gradle-wrapper-action@v2
         with:
