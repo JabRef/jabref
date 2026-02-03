@@ -100,8 +100,12 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
 
             entry.setField(StandardField.TITLE, item.optString("title"));
 
+            // TODO BibTeX vs. BibLaTeX
             if (item.has("publication_year")) {
                 entry.setField(StandardField.YEAR, String.valueOf(item.optInt("publication_year")));
+            }
+            if (item.has("publication_date")) {
+                entry.setField(StandardField.DATE, String.valueOf(item.optInt("publication_date")));
             }
 
             JSONObject ids = item.optJSONObject("ids");
