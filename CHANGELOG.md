@@ -24,7 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Allow import of supported formats via `POST http://localhost:23119/libraries/current/entries`. [#14896](https://github.com/JabRef/jabref/pull/14896)
-- We added the ability to update bibliographic information from web. [#14185](https://github.com/JabRef/jabref/issues/14185)
+- We added the ability to update bibliographic information based on the existing entry data. [#14185](https://github.com/JabRef/jabref/issues/14185)
 
 ### Changed
 

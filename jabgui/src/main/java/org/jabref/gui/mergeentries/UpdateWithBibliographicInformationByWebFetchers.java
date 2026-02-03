@@ -1,6 +1,6 @@
 package org.jabref.gui.mergeentries;
 
-import java.util.SortedSet;
+import java.util.Set;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -15,17 +15,17 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
-public class UpdateWithBibliographicInformationFromTheWeb extends SimpleCommand {
+public class UpdateWithBibliographicInformationByWebFetchers extends SimpleCommand {
 
     private final DialogService dialogService;
     private final GuiPreferences guiPreferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
 
-    public UpdateWithBibliographicInformationFromTheWeb(DialogService dialogService,
-                                                        GuiPreferences preferences,
-                                                        StateManager stateManager,
-                                                        TaskExecutor taskExecutor) {
+    public UpdateWithBibliographicInformationByWebFetchers(DialogService dialogService,
+                                                           GuiPreferences preferences,
+                                                           StateManager stateManager,
+                                                           TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.guiPreferences = preferences;
         this.stateManager = stateManager;
@@ -36,20 +36,19 @@ public class UpdateWithBibliographicInformationFromTheWeb extends SimpleCommand 
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
+        assert stateManager.getActiveDatabase().isPresent();
 
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
-        SortedSet<EntryBasedFetcher> webFetchers = WebFetchers.getEntryBasedFetchers(
+
+        MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
+        mergedEntriesView.addSource(Localization.lang("Original Entry"), () -> originalEntry);
+
+        Set<EntryBasedFetcher> webFetchers = WebFetchers.getEntryBasedFetchers(
                 guiPreferences.getImporterPreferences(),
                 guiPreferences.getImportFormatPreferences(),
                 guiPreferences.getFilePreferences(),
                 stateManager.getActiveDatabase().get()
         );
-        MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
-
-        mergedEntriesView.addSource(Localization.lang("Original Entry"), () -> originalEntry);
 
         for (EntryBasedFetcher webFetcher : webFetchers) {
             mergedEntriesView.addSource(webFetcher.getName(), () -> {
