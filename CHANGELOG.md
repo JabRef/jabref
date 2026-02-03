@@ -59,6 +59,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef would throw an `IllegalCharacterException` trying to download pdfs using links containing a colon (`:`). [#14975](https://github.com/JabRef/jabref/issues/14975)
 - Fixed groups sidebar not refreshing after importing a library. [#13684]
 - Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
+- Groups are now pseudonymized consistently when using JabKit pseudonymization. [#14117](https://github.com/JabRef/jabref/issues/14117)
+
+
+
 
 ### Removed
 
