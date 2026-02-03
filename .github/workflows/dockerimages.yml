@@ -24,6 +24,7 @@ jobs:
   build:
     if: github.repository == 'JabRef/jabref'
     strategy:
+      max-parallel: 1
       matrix:
         component: [ jabkit, jabsrv ]
     runs-on: ubuntu-latest
