@@ -10,6 +10,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -22,6 +25,8 @@ public class Pseudonymization {
     public record Result(BibDatabaseContext bibDatabaseContext, Map<String, String> valueMapping) {
     }
 
+    /// @param bibDatabaseContext
+    /// @return
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
         // TODO: Anonymize metadata
         // TODO: Anonymize strings
@@ -29,13 +34,18 @@ public class Pseudonymization {
         Map<Field, Map<String, Integer>> fieldToValueToIdMap = new HashMap<>();
         List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, fieldToValueToIdMap);
 
-        Map<String, String> valueMapping = new HashMap<>();
-        fieldToValueToIdMap.forEach((field, stringToIntMap) ->
-                stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
-
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
+
+        bibDatabaseContext.getMetaData().getGroups().ifPresent(groups -> {
+            Map<String, Integer> groupsMap = fieldToValueToIdMap.computeIfAbsent(StandardField.GROUPS, k -> new HashMap<>());
+            GroupTreeNode newGroups = pseudonymizeGroup(groups, groupsMap);
+            result.getMetaData().setGroups(newGroups);
+        });
+
+        Map<String, String> valueMapping = new HashMap<>();
+        fieldToValueToIdMap.forEach((field, stringToIntMap) -> stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
 
         return new Result(result, valueMapping);
     }
@@ -58,5 +68,24 @@ public class Pseudonymization {
             }
         }
         return newEntries;
+    }
+
+    /// @param node
+    /// @param groupNameToIdMap
+    /// @return
+
+    private static GroupTreeNode pseudonymizeGroup(GroupTreeNode node, Map<String, Integer> groupNameToIdMap) {
+        AbstractGroup oldGroup = node.getGroup();
+        AbstractGroup newGroup = oldGroup.deepCopy();
+
+        String name = oldGroup.getName();
+        Integer id = groupNameToIdMap.computeIfAbsent(name, k -> groupNameToIdMap.size() + 1);
+        newGroup.nameProperty().set("groups-" + id);
+
+        GroupTreeNode newNode = new GroupTreeNode(newGroup);
+        for (GroupTreeNode child : node.getChildren()) {
+            newNode.addChild(pseudonymizeGroup(child, groupNameToIdMap));
+        }
+        return newNode;
     }
 }
