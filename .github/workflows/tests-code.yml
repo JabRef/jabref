@@ -65,7 +65,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
         run: |
-          ./gradlew --no-configuration-cache :rewriteDryRun
+          ./gradlew --no-configuration-cache :rewriteRun
       - name: Output diff
         if: failure()
         run: |
