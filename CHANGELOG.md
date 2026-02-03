@@ -61,9 +61,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
 - Groups are now pseudonymized consistently when using JabKit pseudonymization. [#14117](https://github.com/JabRef/jabref/issues/14117)
 
-
-
-
 ### Removed
 
 - We removed keyboard shortcuts for toggling journal abbreviation (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>). [#14850](https://github.com/JabRef/jabref/pull/14850)
