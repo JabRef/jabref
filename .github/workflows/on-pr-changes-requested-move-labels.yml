@@ -27,8 +27,10 @@ jobs:
           if [ -f pr_number.txt ]; then
             echo "continue=true" >> "$GITHUB_OUTPUT"
             echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "continue=false" >> "$GITHUB_OUTPUT"
+            echo "No PR number existing" >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Apply label operations
         if: steps.check.outputs.continue == 'true'
