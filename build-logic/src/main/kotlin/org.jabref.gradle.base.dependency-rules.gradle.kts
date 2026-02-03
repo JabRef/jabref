@@ -14,6 +14,12 @@ javaModuleDependencies {
 jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
+
+        // Use a consistent set of versions (including all transitive versions) for all applications
+        providesVersions(":jabgui")
+        providesVersions(":jabkit")
+        providesVersions(":jabls-cli")
+        providesVersions(":jabsrv-cli")
     }
     conflictResolution {
         select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
@@ -24,8 +30,8 @@ jvmDependencyConflicts {
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
 jvmDependencyConflicts.patch {
-    listOf("base", "controls", "fxml", "graphics", "swing", "web", "media").forEach { jfxModule ->
-        module("org.openjfx:javafx-$jfxModule") {
+    listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
+        module("org.openjfx:$jfxModule") {
             addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
             addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
             addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
@@ -76,6 +82,7 @@ jvmDependencyConflicts.patch {
 }
 
 extraJavaModuleInfo {
+    versionsProvidingConfiguration = "mainRuntimeClasspath"
     failOnAutomaticModules = true
     failOnModifiedDerivedModuleNames = true
     skipLocalJars = true
@@ -222,10 +229,6 @@ extraJavaModuleInfo {
         requires("io.github.darvil.utils")
     }
     module("io.github.darvil82:utils", "io.github.darvil.utils") {
-        patchRealModule()
-        exportAllPackages()
-    }
-    module("io.github.adr:e-adr", "io.github.adr") {
         patchRealModule()
         exportAllPackages()
     }
@@ -475,6 +478,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
+
     module("org.openjfx:javafx-base", "javafx.base") {
         patchRealModule()
         // jabgui requires at least "javafx.collections"
@@ -499,8 +503,6 @@ extraJavaModuleInfo {
         requiresTransitive("java.desktop")
         requiresTransitive("jdk.unsupported")
     }
-
-    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty") {}
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()
@@ -581,7 +583,34 @@ extraJavaModuleInfo {
     module("com.github.kevinstern:software-and-algorithms", "software.and.algorithms")
 
     module("com.uber.nullaway:nullaway", "nullaway")
-    module("org.checkerframework:dataflow-nullaway", "org.checkerframework.dataflow") {
-        exportAllPackages()
+}
+
+// Configure consistent resolution across the whole project
+// https://github.com/gradlex-org/extra-java-module-info/issues/186
+val consistentResolutionAttribute = Attribute.of("consistent-resolution", String::class.java)
+
+configurations.consumable("allDependencies") {
+    sourceSets.all {
+        extendsFrom(
+            configurations[this.implementationConfigurationName],
+            configurations[this.compileOnlyConfigurationName],
+            configurations[this.runtimeOnlyConfigurationName],
+            configurations[this.annotationProcessorConfigurationName],
+        )
     }
+    attributes {
+        attribute(consistentResolutionAttribute, "global")
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+        attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
+    }
+}
+
+configurations.getByName("mainRuntimeClasspath") {
+    attributes.attribute(consistentResolutionAttribute, "global")
+}
+
+configurations.getByName("javaModulesMergeJars") {
+    extendsFrom(configurations.getByName("mainRuntimeClasspath"))
 }

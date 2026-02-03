@@ -335,7 +335,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     @FXML
     private void generateCleanupButton() {
-        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager);
+        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository);
         action.execute();
     }
 
