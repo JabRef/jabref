@@ -34,7 +34,7 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-    api(platform("org.glassfish.grizzly:grizzly-bom:4.0.2"))
+    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
     api("org.glassfish.grizzly:grizzly-framework")
     api("org.glassfish.grizzly:grizzly-http-server")
 
@@ -62,8 +62,8 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9")
 
-    api("com.dlsc.gemsfx:gemsfx:3.8.2")
-    api("com.dlsc.pdfviewfx:pdfviewfx:3.4.1")
+    api("com.dlsc.gemsfx:gemsfx:3.8.3")
+    api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0")
@@ -74,12 +74,12 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
-    api("com.google.errorprone:error_prone_core:2.44.0")
+    api("com.google.errorprone:error_prone_core:2.46.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.4.240")
-    api("com.konghq:unirest-java-core:4.7.1")
-    api("com.konghq:unirest-modules-gson:4.7.1")
+    api("com.konghq:unirest-java-core:4.7.4")
+    api("com.konghq:unirest-modules-gson:4.7.4")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.3.2")
     api("com.squareup.okio:okio-jvm:3.16.4")

@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
 - Consistency check is now aware of custom entry types, custom fields, and reports missing required fields. [#14257](https://github.com/JabRef/jabref/pull/14257)
+- We added support for [OpenCitations](https://opencitations.net/) both in the GUI (tab "Citations") and JabKit (`--get-cited-works`, `--get-citing-works`). [#14996](https://github.com/JabRef/jabref/pull/14996)
 - We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
 - REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
@@ -27,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog. [#11791](https://github.com/JabRef/jabref/issues/11791)
+- Checking for existence of the "Imported entries" group is now case-insensitive. [#14999](https://github.com/JabRef/jabref/pull/14999)
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 
@@ -44,9 +46,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue when importing an entry to a library without groups, but group "Imported Entries" was automatically created.
 - We fixed an issue where journal abbreviations chose the wrong abbreviation when fuzzy matching. [#14850](https://github.com/JabRef/jabref/pull/14850)
 - We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
+- We fixed an issue fetching DOI information when DOIs included URL-invalid characters (e.g., `10.1002/1098-108x(198905)8:3<343::aid-eat2260080310>3.0.co;2-c`). [#14996](https://github.com/JabRef/jabref/pull/14996)
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
+- Group selection now depends only on the user selection. [#14084](https://github.com/JabRef/jabref/issues/14084)
 - Fixed groups sidebar not refreshing after importing a library. [#13684](https://github.com/JabRef/jabref/issues/13684)
+- Improved tooltip responsiveness and removed empty space in entry preview. [#12351](https://github.com/JabRef/jabref/issues/12351)
+- We fixed an issue where the "Imported entries" group was automatically selected when switching between library tabs. [#14948](https://github.com/JabRef/jabref/issues/14948)
 - Endashes and emdashes are now supported in citation keys for the LibreOffice CSL integration. [#14961](https://github.com/JabRef/jabref/issues/14961)
 - We fixed an issue where JabRef would throw an `IllegalCharacterException` trying to download pdfs using links containing a colon (`:`). [#14975](https://github.com/JabRef/jabref/issues/14975)
 
