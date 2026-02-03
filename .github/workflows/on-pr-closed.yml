@@ -134,12 +134,7 @@ jobs:
       - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
         if: steps.check_assignee.outputs.assigned == 'no'
         run: |
-          set -e
-
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "📍 Assigned"
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "🔔 reminder-sent"
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "📌 Pinned"
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "FirstTimeCodeContribution"
+          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "📍 Assigned,🔔 reminder-sent,📌 Pinned,FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move issue to "Free to take" in "Good First Issues"
