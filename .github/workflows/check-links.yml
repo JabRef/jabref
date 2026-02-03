@@ -22,7 +22,8 @@ permissions:
 jobs:
   check-links:
     if: github.repository == 'JabRef/jabref'
-    runs-on: ubuntu-slim
+    # Does not work on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
