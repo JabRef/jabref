@@ -50,6 +50,7 @@ public enum StandardActions implements Action {
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
     MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0", "DOI/ISBN/..."), KeyBinding.MERGE_WITH_FETCHED_ENTRY),
     BATCH_MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0 (fully automated)", "DOI/ISBN/...")),
+    UPDATE_WITH_WEB_INFO(Localization.lang("Update with bibliographic information from the web via entry data")),
     ATTACH_FILE(Localization.lang("Attach file"), IconTheme.JabRefIcons.ATTACH_FILE),
     ATTACH_FILE_FROM_URL(Localization.lang("Attach file from URL"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     PRIORITY(Localization.lang("Priority"), IconTheme.JabRefIcons.PRIORITY),
