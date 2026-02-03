@@ -183,7 +183,7 @@ public class DOI implements Identifier {
 
     /// Tries to find a DOI/Short DOI inside the given text.
     ///
-    /// @param text the Text which might contain a DOI/Short DOI
+    /// @param text the text which might contain a DOI/Short DOI
     /// @return an Optional containing the DOI or an empty Optional
     public static Optional<DOI> findInText(String text) {
         Optional<DOI> result = Optional.empty();
@@ -236,7 +236,8 @@ public class DOI implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         // TODO: We need dependency injection here. It should never happen that this method is called.
-        //       Always, the user preferences should be honored --> #getExternalURIWithCustomBase
+        //       Always, the user preferences should be honored --> #getExternalURIWithCustomBase.
+        //       However, OpenAlex fetcher relies on this.
         return getExternalURIFromBase(RESOLVER);
     }
 
