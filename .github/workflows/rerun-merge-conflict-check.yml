@@ -8,7 +8,7 @@ on:
 jobs:
   rerun:
     if: github.repository == 'JabRef/jabref'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       actions: write
       contents: read

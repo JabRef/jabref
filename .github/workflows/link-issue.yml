@@ -7,7 +7,7 @@ on:
 jobs:
   determine_issue_number:
     name: Determine issue number
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: >
       (github.repository == 'JabRef/jabref') &&
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
@@ -62,7 +62,7 @@ jobs:
     name: Mark issue as in progress
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
@@ -94,7 +94,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
       pull-requests: write

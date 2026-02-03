@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   automerge:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.repository == 'JabRef/jabref'
     env:
       HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}

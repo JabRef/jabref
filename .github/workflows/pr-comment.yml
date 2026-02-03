@@ -23,7 +23,7 @@ on:
 jobs:
   comment:
     if: ${{ github.repository == 'JabRef/jabref' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       actions: read
       contents: write

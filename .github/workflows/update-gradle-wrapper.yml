@@ -11,7 +11,7 @@ on:
 jobs:
   update-gradle-wrapper:
     if: github.repository == 'JabRef/jabref'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
       - name: Update Gradle Wrapper

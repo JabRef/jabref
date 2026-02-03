@@ -14,7 +14,7 @@ on:
 jobs:
   collect_parameters:
     name: Collect parameters
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: >
       github.repository == 'JabRef/jabref' &&
       (
@@ -71,7 +71,7 @@ jobs:
   determine_issue_number:
     name: Determine issue number
     needs: collect_parameters
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
     outputs:
@@ -102,7 +102,7 @@ jobs:
 
   unassign_issue:
     name: Mark issue as available
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [ collect_parameters, determine_issue_number ]
     if: >
       (needs.determine_issue_number.outputs.issue_number != '') &&
@@ -171,7 +171,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
   comment_on_resolved_issue:
     name: Comment on resolved issue
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: determine_issue_number
     if: >
       (needs.determine_issue_number.outputs.issue_number != '') &&
@@ -190,7 +190,7 @@ jobs:
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
   remove_download_hint:
     name: Remove download hint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: determine_issue_number
     if: >
       (needs.determine_issue_number.outputs.issue_number != '') &&

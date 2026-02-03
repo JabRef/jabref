@@ -8,7 +8,7 @@ on:
 jobs:
   columns_and_labels:
     if: ${{ github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
       contents: read
