@@ -3,6 +3,9 @@ name: Rerun PR merge conflicts check
 on:
   schedule:
     - cron: "0 3 * * *"
+  pull_request:
+    paths:
+      - '.github/workflows/rerun-merge-conflict-check.yml'
   workflow_dispatch:
 
 jobs:

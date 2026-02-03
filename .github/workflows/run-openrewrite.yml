@@ -5,6 +5,9 @@ permissions:
   pull-requests: read
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/run-openrewrite.yml'
   workflow_dispatch:
     inputs:
       pr_number:

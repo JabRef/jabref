@@ -3,6 +3,9 @@ name: Mark and close stale change-request PRs
 on:
   schedule:
     - cron: "0 3 * * *"
+  pull_request:
+    paths:
+      - '.github/workflows/stale.yml'
   workflow_dispatch:
 
 permissions:
