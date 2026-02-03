@@ -3,12 +3,12 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 }
 
 group = "org.jabref.jabkit"
 version = project.findProperty("projVersion") ?: "100.0.0"
-
 
 dependencies {
     implementation(project(":jablib"))
@@ -78,14 +78,15 @@ application {
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        // Enable JEP 450: Compact Object Headers
-        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core",
 
-        // Default garbage collector is sufficient for CLI APP
         // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseG1GC",
+        "-XX:+UseSerialGC",
         // "-XX:+UseStringDeduplication",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders"
     )
 }
 
