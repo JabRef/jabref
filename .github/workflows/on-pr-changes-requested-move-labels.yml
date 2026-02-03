@@ -32,11 +32,11 @@ jobs:
           fi
       - name: Apply label operations
         if: steps.check.outputs.continue == 'true'
+        shell: bash -euxo pipefail {0}
         run: >
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }}
-            --remove-label "status: ready-for-review"
-            --remove-label "status: awaiting-second-review"
-            --remove-label "status: to-be-merged"
+          gh issue --repo ${{ github.repository }}
+            edit ${{ steps.check.outputs.pr_number }}
+            --remove-label "status: ready-for-review,status: awaiting-second-review,status: to-be-merged"
             --add-label "status: changes-required"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
