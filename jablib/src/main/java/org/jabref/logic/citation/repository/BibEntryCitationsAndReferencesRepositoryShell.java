@@ -1,5 +1,7 @@
 package org.jabref.logic.citation.repository;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -12,31 +14,69 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCitationsAndReferencesRepository {
+import com.google.common.annotations.VisibleForTesting;
+import org.h2.mvstore.MVStore;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private static final String CITATIONS_STORE = "citations";
-    private static final String REFERENCES_STORE = "references";
+@NullMarked
+public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCitationsAndReferencesRepository, AutoCloseable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryCitationsAndReferencesRepositoryShell.class);
+
+    private static final String CITATION_RELATIONS_STORE = "citation-relations.mv";
+
+    @Nullable // when testing constructor is used
+    private final MVStore mvStore;
 
     private final BibEntryRelationRepository citationsDao;
     private final BibEntryRelationRepository referencesDao;
 
+    public BibEntryCitationsAndReferencesRepositoryShell(Path citationsRelationsDirectory,
+                                                                   int storeTTL,
+                                                                   ImportFormatPreferences importFormatPreferences,
+                                                                   FieldPreferences fieldPreferences,
+                                                                   BibEntryTypesManager entryTypesManager,
+                                                                   ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
+        Path storePath = citationsRelationsDirectory.resolve(CITATION_RELATIONS_STORE);
+        try {
+            Files.createDirectories(storePath.getParent());
+            if (!Files.exists(storePath)) {
+                Files.createFile(storePath);
+            }
+        } catch (IOException e) {
+            LOGGER.error("An error occurred while opening {} storage", storePath, e);
+        }
+
+        mvStore = new MVStore.Builder()
+                .fileName(storePath.toAbsolutePath().toString())
+                .open();
+
+        this.referencesDao = new MVStoreBibEntryRelationRepository(mvStore, "references", storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences, citationFetcherTypeProperty);
+        this.citationsDao = new MVStoreBibEntryRelationRepository(mvStore, "citations", storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences, citationFetcherTypeProperty);
+    }
+
+    @VisibleForTesting
     public BibEntryCitationsAndReferencesRepositoryShell(
             BibEntryRelationRepository citationsDao,
             BibEntryRelationRepository referencesDao
     ) {
         this.citationsDao = citationsDao;
         this.referencesDao = referencesDao;
+        this.mvStore = null;
     }
 
     @Override
-    public void insertCitations(BibEntry entry, List<BibEntry> citations) {
+    public void addCitations(BibEntry entry, List<BibEntry> citations) {
         citationsDao.addRelations(
                 entry, Objects.requireNonNullElseGet(citations, List::of)
         );
     }
 
     @Override
-    public List<BibEntry> readCitations(BibEntry entry) {
+    public List<BibEntry> getCitations(@Nullable BibEntry entry) {
         if (entry == null) {
             return List.of();
         }
@@ -54,14 +94,14 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
     }
 
     @Override
-    public void insertReferences(BibEntry entry, List<BibEntry> references) {
+    public void addReferences(BibEntry entry, @Nullable List<BibEntry> references) {
         referencesDao.addRelations(
                 entry, Objects.requireNonNullElseGet(references, List::of)
         );
     }
 
     @Override
-    public List<BibEntry> readReferences(BibEntry entry) {
+    public List<BibEntry> getReferences(@Nullable BibEntry entry) {
         if (entry == null) {
             return List.of();
         }
@@ -80,21 +120,6 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
 
     @Override
     public void close() {
-        this.citationsDao.close();
-        this.referencesDao.close();
-    }
-
-    public static BibEntryCitationsAndReferencesRepositoryShell of(Path citationsRelationsDirectory,
-                                                                   int storeTTL,
-                                                                   ImportFormatPreferences importFormatPreferences,
-                                                                   FieldPreferences fieldPreferences,
-                                                                   BibEntryTypesManager entryTypesManager,
-                                                                   ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
-        Path citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
-        Path relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
-        return new BibEntryCitationsAndReferencesRepositoryShell(
-                new MVStoreBibEntryRelationRepository(citationsPath, CITATIONS_STORE, storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences, citationFetcherTypeProperty),
-                new MVStoreBibEntryRelationRepository(relationsPath, REFERENCES_STORE, storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences, citationFetcherTypeProperty)
-        );
+        this.mvStore.close();
     }
 }

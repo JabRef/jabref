@@ -39,13 +39,10 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     private final MVMap<String, LinkedHashSet<BibEntry>> relationsMap;
     private final MVMap<String, LocalDateTime> insertionTimeStampMap;
 
-    // should only be read for closing - all other maps initialized at constructor
-    private final MVStore store;
-
     private final ObjectProperty<CitationFetcherType> citationFetcherPropertyType;
 
     @VisibleForTesting
-    MVStoreBibEntryRelationRepository(Path path,
+    MVStoreBibEntryRelationRepository(MVStore mvStore,
                                       String mapName,
                                       int storeTTLInDays,
                                       BibEntryTypesManager entryTypesManager,
@@ -53,7 +50,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
                                       FieldPreferences fieldPreferences,
                                       ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
         this(
-                path,
+                mvStore,
                 mapName,
                 storeTTLInDays,
                 new BibEntryHashSetSerializer(entryTypesManager, importFormatPreferences, fieldPreferences),
@@ -62,29 +59,17 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     }
 
     @VisibleForTesting
-    MVStoreBibEntryRelationRepository(Path path,
+    MVStoreBibEntryRelationRepository(MVStore mvStore,
                                       String mapName,
                                       int storeTTLInDays,
                                       BasicDataType<LinkedHashSet<BibEntry>> serializer,
                                       ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
-        try {
-            Files.createDirectories(path.getParent());
-            if (!Files.exists(path)) {
-                Files.createFile(path);
-            }
-        } catch (IOException e) {
-            LOGGER.error("An error occurred while opening {} storage", mapName, e);
-        }
-
         this.storeTTLInDays = storeTTLInDays;
 
         MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration = new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(serializer);
         // We can rely on the auto commit features, because we have only one store reader
-        store = new MVStore.Builder()
-                .fileName(path.toAbsolutePath().toString())
-                .open();
-        this.relationsMap = store.openMap(mapName, mapConfiguration);
-        this.insertionTimeStampMap = store.openMap(mapName + MAP_SUFFIX_TIME_STAMP);
+        this.relationsMap = mvStore.openMap(mapName, mapConfiguration);
+        this.insertionTimeStampMap = mvStore.openMap(mapName + MAP_SUFFIX_TIME_STAMP);
         this.citationFetcherPropertyType = citationFetcherTypeProperty;
     }
 
@@ -140,10 +125,5 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
                     })
                     // No DOI existing - allow update
                     .orElse(true);
-    }
-
-    @Override
-    public void close() {
-        this.store.close();
     }
 }

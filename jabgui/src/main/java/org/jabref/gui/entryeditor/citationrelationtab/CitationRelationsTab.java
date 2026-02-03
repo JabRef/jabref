@@ -739,7 +739,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache)
             .consumeOnRunning(task -> prepareToSearchForRelations(citationComponents, task))
-            .onSuccess(fetchedList -> onSearchForRelationsSucceed(citationComponents,
+            .onSuccess(fetchedList -> onSearchForRelationsSucceed(
+                    citationComponents,
                     fetchedList,
                     observableList
             ))
