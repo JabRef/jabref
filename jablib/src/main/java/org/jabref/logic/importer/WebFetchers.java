@@ -288,14 +288,20 @@ public class WebFetchers {
 
     /// @return set containing customizable api key fetchers
     public static Set<CustomizableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        Set<CustomizableKeyFetcher> fetchers = new HashSet<>();
-        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
-        fetchers.add(new SpringerNatureWebFetcher(importerPreferences));
-        fetchers.add(new Scopus(importerPreferences));
-        fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
-        fetchers.add(new BiodiversityLibrary(importerPreferences));
-        fetchers.add(new MedlineFetcher(importerPreferences));
-        fetchers.add(new UnpaywallFetcher(importerPreferences));
+        Set<CustomizableKeyFetcher> fetchers = Set.of(
+                new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
+                new BiodiversityLibrary(importerPreferences),
+                new IEEE(importFormatPreferences, importerPreferences),
+                new MedlineFetcher(importerPreferences),
+                new OpenAlex(importerPreferences),
+                new SemanticScholar(importerPreferences),
+                new Scopus(importerPreferences),
+                new SpringerNatureWebFetcher(importerPreferences),
+                new UnpaywallFetcher(importerPreferences)
+        );
+
+        assert fetchers.stream().allMatch(f -> f instanceof CustomizableKeyFetcher);
+
         return fetchers;
     }
 }
