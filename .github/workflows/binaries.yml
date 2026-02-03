@@ -133,6 +133,10 @@ jobs:
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Determine conditions
         id: binary
         shell: bash

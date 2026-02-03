@@ -73,6 +73,10 @@ jobs:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Is PR from forked?
         if: ${{ github.event_name != 'workflow_dispatch' && steps.read-pr_number.outputs.pr_number != '' }}
         id: isCrossRepository

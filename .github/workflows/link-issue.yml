@@ -102,6 +102,10 @@ jobs:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Add label "📌 Pinned"
         run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
         env:

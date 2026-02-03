@@ -34,7 +34,8 @@ jobs:
           package_file: jablib/src/test/latex/Texlivefile
   check-latex:
     needs: [ cache ]
-    runs-on: ubuntu-slim
+    # texlive doesn't run on ubuntu-slim
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:

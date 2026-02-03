@@ -119,6 +119,10 @@ jobs:
           gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-assignee ${{ github.event.pull_request.user.login }} || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Check assignees
         id: check_assignee
         run: |

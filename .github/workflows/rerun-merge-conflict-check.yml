@@ -15,8 +15,10 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
+      - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          show-progress: 'false'
+          packages: jq
+          version: 1.0
       - name: Trigger "On PR opened/updated (check)" for all open PRs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

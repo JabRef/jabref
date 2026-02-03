@@ -207,6 +207,10 @@ jobs:
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
       - name: Install clparse
         run: sudo mv /tmp/clparse /usr/local/bin/clparse
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Check CHANGELOG.md diff
         run: |
           diff \

@@ -88,6 +88,10 @@ jobs:
     if: "${{ github.event.label.name == 'good first issue' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: "good first issue"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -98,6 +102,10 @@ jobs:
     if: github.event.label.name == 'needs-refinement' && github.repository_owner == 'JabRef'
     runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: needs-refinement
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -109,6 +117,10 @@ jobs:
     if: "${{ github.event.label.name == 'status: freeze' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: "status: freeze"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
