@@ -114,7 +114,7 @@ class CitationStyleGeneratorTest {
     @Test
     void aPABibliography() {
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
-        CitationStyle style = STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get();
+        CitationStyle style = STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER).getFirst();
 
         // if the apa.csl citation style changes this has to be modified
@@ -665,7 +665,7 @@ class CitationStyleGeneratorTest {
                 TEXT_OUTPUT_FORMAT,
                 testEntryContext,
                 ENTRY_TYPES_MANAGER).getFirst();
-        assertEquals(expected, citation);
+        assertEquals(expected, citation, "Failed for " + cslFileName);
     }
 
     static Stream<Arguments> doiFieldMapping() {
