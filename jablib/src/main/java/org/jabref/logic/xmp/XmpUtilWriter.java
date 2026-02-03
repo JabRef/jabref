@@ -298,6 +298,39 @@ public class XmpUtilWriter {
         Files.delete(newFile);
     }
 
+    /// Removes all XMP metadata associated with the given PDF file.
+    ///
+    /// @param path The file from which metadata has to be removed.
+    /// @throws IOException          If the file could not be read from or written to.
+    /// @throws TransformerException If the XMP metadata could not be removed.
+    public static void removeXmpMetadata(Path path) throws IOException, TransformerException {
+        // Read from another file
+        // Reason: Apache PDFBox does not support writing while the file is opened
+        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+        Path newFile = Files.createTempFile("JabRef", "pdf");
+        FileUtil.copyFile(path, newFile, true);
+        try (PDDocument document = Loader.loadPDF(newFile.toFile())) {
+            if (document.isEncrypted()) {
+                throw new EncryptedPdfsNotSupportedException();
+            }
+            PDDocumentCatalog catalog = document.getDocumentCatalog();
+            if (catalog.getMetadata() != null) {
+                catalog.setMetadata(null);
+            }
+            document.save(path.toFile());
+        } catch (IOException e) {
+            LOGGER.debug("Could not remove XMP metadata", e);
+            throw new TransformerException(
+                    "Could not remove XMP metadata: " + e.getLocalizedMessage(), e);
+        } finally {
+            try {
+                Files.deleteIfExists(newFile);
+            } catch (IOException e) {
+                LOGGER.debug("Could not delete temporary PDF {}", newFile, e);
+            }
+        }
+    }
+
     private BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
         if (database == null) {
             return defaultEntry;

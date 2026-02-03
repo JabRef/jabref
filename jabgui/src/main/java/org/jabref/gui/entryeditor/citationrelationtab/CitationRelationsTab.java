@@ -394,7 +394,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .withText(CitationFetcherType::getName)
                 .install(fetcherCombo);
         styleTopBarNode(fetcherCombo, 75.0);
-        fetcherCombo.setValue(entryEditorPreferences.getCitationFetcherType());
+        fetcherCombo.valueProperty().bindBidirectional(entryEditorPreferences.citationFetcherTypeProperty());
 
         // Create abort buttons for both sides
         Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
@@ -457,16 +457,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                 return;
             }
 
-            // Fetcher can only be changed for the citing search.
-            // Therefore, we handle this part only.
-
-            // Cancel any running searches so they don't continue with the old fetcher
-            if (citingTask != null && !citingTask.isCancelled()) {
-                citingTask.cancel();
-            }
-            entryEditorPreferences.setCitationFetcherType(newValue);
-            // switch the fetcher will not trigger refresh from the remote
+            // switch the fetcher will not trigger refresh from the remote, therefore we trigger it explicitly.
             searchForRelations(citingComponents, citedByComponents, false);
+            searchForRelations(citedByComponents, citingComponents, false);
         });
 
         // Create SplitPane to hold all nodes above
@@ -650,6 +643,16 @@ public class CitationRelationsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         citationsRelationsTabViewModel.bindToEntry(entry);
 
+        // TODO: All this should go to ViewModel
+        if (citingTask != null && !citingTask.isCancelled()) {
+            citingTask.cancel();
+            citingTask = null;
+        }
+        if (citedByTask != null && !citedByTask.isCancelled()) {
+            citedByTask.cancel();
+            citedByTask = null;
+        }
+
         SplitPane splitPane = getPaneAndStartSearch(entry);
         splitPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         splitPane.setMinSize(0, 0);
@@ -728,7 +731,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
         citationComponents.listView().setItems(observableList);
 
-        // TODO: It should not be possible to cancel a search task that is already running for same tab
         if (citationComponents.searchType() == CitationFetcher.SearchType.CITES && citingTask != null && !citingTask.isCancelled()) {
             citingTask.cancel();
         } else if (citationComponents.searchType() == CitationFetcher.SearchType.CITED_BY && citedByTask != null && !citedByTask.isCancelled()) {
@@ -765,13 +767,13 @@ public class CitationRelationsTab extends EntryEditorTab {
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
-                citingTask = BackgroundTask.wrap(
+                this.citingTask = BackgroundTask.wrap(
                         () -> this.searchCitationsRelationsService.searchCites(entry, bypassCache)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
-                citedByTask = BackgroundTask.wrap(
+                this.citedByTask = BackgroundTask.wrap(
                         () -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache)
                 );
                 yield citedByTask;

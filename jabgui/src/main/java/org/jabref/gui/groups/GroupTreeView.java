@@ -215,7 +215,10 @@ public class GroupTreeView extends BorderPane {
         // for larger group structures.
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
             LOGGER.debug("Run group search {}", searchField.getText());
+            // Ensure that group selection is changed only by the user
+            final List<GroupNodeViewModel> previouslySelectedGroup = new ArrayList<>(viewModel.selectedGroupsProperty());
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
+            viewModel.selectedGroupsProperty().setAll(previouslySelectedGroup);
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
@@ -627,7 +630,8 @@ public class GroupTreeView extends BorderPane {
                                 new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group))),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
-                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group)),
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_CLEAR, new ContextAction(StandardActions.GROUP_ENTRIES_CLEAR, group))
         );
 
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
@@ -724,7 +728,8 @@ public class GroupTreeView extends BorderPane {
                                 group.isEditable() && group.hasSubgroups() && group.canAddEntriesIn()
                                         || group.isRoot();
                         case GROUP_ENTRIES_ADD,
-                             GROUP_ENTRIES_REMOVE ->
+                             GROUP_ENTRIES_REMOVE,
+                             GROUP_ENTRIES_CLEAR ->
                                 group.canAddEntriesIn();
                         default ->
                                 true;
@@ -767,6 +772,8 @@ public class GroupTreeView extends BorderPane {
                         viewModel.addSelectedEntries(group);
                 case GROUP_ENTRIES_REMOVE ->
                         viewModel.removeSelectedEntries(group);
+                case GROUP_ENTRIES_CLEAR ->
+                        viewModel.clearGroup(group);
             }
             groupTree.refresh();
         }
