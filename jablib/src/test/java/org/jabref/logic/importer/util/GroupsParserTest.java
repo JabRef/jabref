@@ -34,7 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -211,19 +210,22 @@ class GroupsParserTest {
     }
 
     @Test
-    void importGroupsCollectsErrorsForUnknownGroup() {
+    void importGroupsSkipsUnknownGroupAndReportsError() {
         List<String> data = List.of(
                 "0 AllEntriesGroup:",
                 "1 ExplicitGroup:ValidGroup;0;",
-                "1 UnknownGroupType:BrokenGroup;0;",
+                "1 DirectoryGroup:BrokenGroup;0;C:/temp;1;;;;",
                 "1 ExplicitGroup:AnotherValidGroup;0;"
         );
 
-        GroupsParsingResult result = GroupsParser.importGroups(data, ';', null, null, null);
+        GroupsParsingResult result = GroupsParser.importGroups(data, ';', fileMonitor, metaData, "userAndHost");
 
-        assertNotNull(result.root());
-        assertEquals(2, result.root().getChildren().size());
+        GroupTreeNode expectedRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ';'));
+        expectedRoot.addSubgroup(new ExplicitGroup("ValidGroup", GroupHierarchyType.INDEPENDENT, ';'));
+        expectedRoot.addSubgroup(new ExplicitGroup("AnotherValidGroup", GroupHierarchyType.INDEPENDENT, ';'));
+
+        assertEquals(expectedRoot.getChildren(), result.root().getChildren());
         assertEquals(1, result.errors().size());
-        assertTrue(result.errors().getFirst().contains("UnknownGroupType"));
+        assertTrue(result.errors().getFirst().contains("DirectoryGroup"));
     }
 }
