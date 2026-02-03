@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -34,18 +37,21 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.jspecify.annotations.NonNull;
+import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Fetcher for OpenAlex Works API
 /// Docs: <a href="https://docs.openalex.org/api-entities/works"> OpenAlex API Docs</a>
-public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetcher, FulltextFetcher, EntryBasedFetcher {
+@NullMarked
+public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetcher, FulltextFetcher, EntryBasedFetcher, CitationFetcher {
+
+    public static final String FETCHER_NAME = "OpenAlex";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAlex.class);
 
     private static final String URL_PATTERN = "https://api.openalex.org/works";
-    private static final String NAME = "OpenAlex";
 
     private final ImporterPreferences importerPreferences;
 
@@ -55,24 +61,24 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
 
     @Override
     public String getName() {
-        return NAME;
+        return FETCHER_NAME;
     }
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
-        importerPreferences.getApiKey(NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
         uriBuilder.addParameter("search", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         URL result = uriBuilder.build().toURL();
         LOGGER.debug("URL for query: {}", result);
         return result;
     }
 
-    private Optional<URL> buildApiUrl(BibEntry entry) throws MalformedURLException {
+    private Optional<URL> getUrl(BibEntry entry, List<String> fieldsToSelect) throws MalformedURLException {
         Optional<DOI> doiOpt = entry.getField(StandardField.DOI)
                                     .flatMap(DOI::findInText);
         if (doiOpt.isPresent()) {
-            return Optional.of(getUrl("/" + doiOpt.get().getExternalURI()));
+            return Optional.of(getUrl("/" + doiOpt.get().getExternalURI(), fieldsToSelect));
         }
         Optional<String> urlOpt = entry.getField(StandardField.URL);
         if (urlOpt.isPresent()) {
@@ -88,7 +94,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                         tail = tail.substring(0, queryIdx);
                     }
                     if (!tail.isBlank()) {
-                        return Optional.of(getUrl("/" + tail));
+                        return Optional.of(getUrl("/" + tail, fieldsToSelect));
                     }
                 }
             } catch (MalformedURLException ignored) {
@@ -98,10 +104,15 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         return Optional.empty();
     }
 
-    private URL getUrl(String tail) throws MalformedURLException {
+    private URL getUrl(String tail, List<String> fieldsToSelect) throws MalformedURLException {
         try {
             URIBuilder uriBuilder = new URIBuilder(URL_PATTERN + tail);
-            importerPreferences.getApiKey(NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
+            importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
+            String fieldList = fieldsToSelect.stream()
+                                             .collect(Collectors.joining(","));
+            if (!fieldList.isEmpty()) {
+                uriBuilder.addParameter("select", fieldList);
+            }
             return uriBuilder.build().toURL();
         } catch (URISyntaxException | MalformedURLException exception) {
             throw new MalformedURLException(exception.getMessage());
@@ -178,9 +189,14 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                 entry.setField(StandardField.NUMBER, biblio.optString("issue"));
                 String first = biblio.optString("first_page");
                 String last = biblio.optString("last_page");
-                if (!first.isBlank() || !last.isBlank()) {
-                    String pages = first + (first.isBlank() || last.isBlank() ? "" : "--") + last;
-                    entry.setField(StandardField.PAGES, pages);
+                boolean firstAvailable = StringUtil.isNotBlank(first);
+                boolean lastAvailable = StringUtil.isNotBlank(last);
+                if (firstAvailable && lastAvailable) {
+                    entry.setField(StandardField.PAGES, first + "--" + last);
+                } else if (firstAvailable) {
+                    entry.setField(StandardField.PAGES, first);
+                } else if (lastAvailable) {
+                    entry.setField(StandardField.PAGES, last);
                 }
             }
 
@@ -216,48 +232,48 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                                              }
                                              return obj.optString("author_position");
                                          })
-                                         .filter(s -> s != null && !s.isBlank())
+                                         .filter(StringUtil::isNotBlank)
                                          .collect(Collectors.joining(" and "));
     }
 
-    @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
-        Objects.requireNonNull(entry);
-        // Build an OpenAlex API URL from DOI or OpenAlex ID/URL
-        Optional<URL> apiUrl = buildApiUrl(entry);
+    private Optional<JSONObject> getWorkObject(BibEntry entry, List<String> fieldsToSelect) throws FetcherException {
+        Optional<URL> apiUrl;
+        try {
+            apiUrl = getUrl(entry, fieldsToSelect);
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Could not create URL", e);
+        }
         if (apiUrl.isEmpty()) {
             return Optional.empty();
         }
 
-        // Query the single work object and try to extract a PDF URL
-        JSONObject work;
         try (ProgressInputStream stream = getUrlDownload(apiUrl.get()).asInputStream()) {
-            work = JsonReader.toJsonObject(stream);
+            return Optional.of(JsonReader.toJsonObject(stream));
         } catch (Exception e) {
             throw new FetcherException(apiUrl.get(), "Failed to query OpenAlex for fulltext", e);
         }
+    }
 
-        // Get pdf_url from primary_location
-        JSONObject primaryLocation = work.optJSONObject("primary_location");
-        if (primaryLocation != null) {
-            String pdfUrl = primaryLocation.optString("pdf_url", "");
-            if (!pdfUrl.isBlank()) {
-                try {
-                    return Optional.of(URLUtil.create(pdfUrl));
-                } catch (MalformedURLException e) {
-                    throw new MalformedURLException(e.getMessage());
-                }
-            }
+    @Override
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+        try {
+            return getWorkObject(entry, List.of("primary_location"))
+                    .map(work -> work.optJSONObject("primary_location"))
+                    .filter(Objects::nonNull)
+                    .map(primaryLocation -> primaryLocation.optString("pdf_url", ""))
+                    .filter(StringUtil::isNotBlank)
+                    .map(Unchecked.function(pdfUrl -> URLUtil.create(pdfUrl)));
+        } catch (RuntimeException e) {
+            LOGGER.warn("Malformed URL", e);
+            throw (MalformedURLException) e.getCause();
         }
-
-        return Optional.empty();
     }
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();
         if (title.isEmpty()) {
-            return new ArrayList<>();
+            return List.of();
         }
         return performSearch(title.get());
     }
@@ -266,4 +282,62 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     public TrustLevel getTrustLevel() {
         return TrustLevel.META_SEARCH;
     }
+
+    // region CitationFetcher
+
+    private Stream<BibEntry> workUrlsToBibEntryStream(JSONArray workUrlArray) {
+        return IntStream.range(0, workUrlArray.length())
+                        .mapToObj(workUrlArray::getString)
+                        .map(Unchecked.function(workUrl -> getUrl(workUrl, List.of())))
+                        .map(Unchecked.function(url -> {
+                            try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
+                                return jsonItemToBibEntry(JsonReader.toJsonObject(stream));
+                            }
+                        }));
+    }
+
+    @Override
+    public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
+        try {
+            return getWorkObject(entry, List.of("referenced_works"))
+                    .map(work -> work.optJSONArray("referenced_works"))
+                    .filter(Objects::nonNull)
+                    .stream()
+                    .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
+                    .toList();
+        } catch (RuntimeException e) {
+            LOGGER.warn("Malformed URL", e);
+            throw new FetcherException("Malformed URL", e.getCause());
+        }
+    }
+
+    @Override
+    public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
+        try {
+            return getWorkObject(entry, List.of("cited_by_api_url"))
+                    .map(work -> work.optString("cited_by_api_url"))
+                    .filter(Objects::nonNull)
+                    .map(Unchecked.function(apiUrl -> new URI(apiUrl).toURL()))
+                    .map(Unchecked.function(url -> {
+                        try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
+                            return JsonReader.toJsonArray(stream);
+                        }
+                    }))
+                    .stream()
+                    .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
+                    .toList();
+        } catch (RuntimeException e) {
+            LOGGER.warn("Malformed URL", e);
+            throw new FetcherException("Malformed URL", e.getCause());
+        }
+    }
+
+    @Override
+    public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
+        return getWorkObject(entry, List.of("cited_by_count"))
+                .map(work -> work.optInt("cited_by_count"))
+                .filter(Objects::nonNull);
+    }
+
+    // endregion
 }
