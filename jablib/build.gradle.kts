@@ -372,6 +372,7 @@ tasks.named<ProcessResources>("processResources") {
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "medlineApiKey" to inputs.properties["medlineApiKey"],
+                "openAlexApiKey" to inputs.properties["openAlexApiKey"],
                 "scopusApiKey" to inputs.properties["scopusApiKey"],
                 "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
