@@ -29,7 +29,7 @@ jobs:
 
       - name: Checkout PR branch
         run: |
-          gh pr checkout ${{ inputs.pr_number }}
+          gh pr checkout ${{ inputs.pr_number || github.event.pull_request.number }}
         env:
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
 
