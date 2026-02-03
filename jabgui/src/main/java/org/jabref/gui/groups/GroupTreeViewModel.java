@@ -724,6 +724,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
         //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
     }
 
+    public void clearGroup(GroupNodeViewModel group) {
+        GroupTreeNode groupNode = group.getGroupNode();
+        if (groupNode.getGroup() instanceof ExplicitGroup) {
+            List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
+            groupNode.removeEntriesFromGroup(entriesInGroup);
+        }
+    }
+
     public void sortAlphabeticallyRecursive(GroupTreeNode group) {
         group.sortChildren(compAlphabetIgnoreCase, true);
     }
