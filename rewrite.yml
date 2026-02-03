@@ -109,6 +109,7 @@ recipeList:
 
   - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
   - org.openrewrite.java.migrate.lang.StringFormatted
+  - org.openrewrite.java.migrate.lang.SwitchCaseAssignmentsToSwitchExpression
   - org.openrewrite.java.migrate.lang.SwitchCaseReturnsToSwitchExpression
   - org.openrewrite.java.migrate.lang.SwitchExpressionYieldToArrow
   - org.openrewrite.java.migrate.net.JavaNetAPIs
