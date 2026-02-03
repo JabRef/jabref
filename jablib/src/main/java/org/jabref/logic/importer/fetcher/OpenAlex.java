@@ -23,6 +23,7 @@ import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.search.query.BaseQueryNode;
@@ -95,20 +96,22 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             DoiCleanup DoiCleanup = new DoiCleanup();
             BibEntry entry = new BibEntry();
 
-            // Type
             entry.setType(EntryTypeFactory.parse(item.getString("type")));
 
-            // Title
             entry.setField(StandardField.TITLE, item.optString("title"));
 
-            // Year
             if (item.has("publication_year")) {
                 entry.setField(StandardField.YEAR, String.valueOf(item.optInt("publication_year")));
             }
 
-            // DOI
-            if (item.has("publication_year")) {
-                entry.setField(StandardField.DOI, item.optString("doi"));
+            JSONObject ids = item.optJSONObject("ids");
+            if (ids != null) {
+                if (ids.has("doi")) {
+                    entry.setField(StandardField.DOI, ids.optString("doi"));
+                }
+                if (ids.has("pmid")) {
+                    entry.setField(StandardField.PMID, ids.optString("pmid"));
+                }
             }
 
             String url = item.optString("id");

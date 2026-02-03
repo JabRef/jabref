@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where journal abbreviations chose the wrong abbreviation when fuzzy matching. [#14850](https://github.com/JabRef/jabref/pull/14850)
 - We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
 - We fixed an issue fetching DOI information when DOIs included URL-invalid characters (e.g., `10.1002/1098-108x(198905)8:3<343::aid-eat2260080310>3.0.co;2-c`). [#14996](https://github.com/JabRef/jabref/pull/14996)
+- We fixed an issue of OpenAlexFetcher not including the DOI.
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
 - Group selection now depends only on the user selection. [#14084](https://github.com/JabRef/jabref/issues/14084)
