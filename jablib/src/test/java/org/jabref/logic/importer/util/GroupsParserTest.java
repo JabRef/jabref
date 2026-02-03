@@ -33,7 +33,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -223,7 +222,8 @@ class GroupsParserTest {
         GroupsParsingResult result = GroupsParser.importGroups(data, ';', null, null, null);
 
         assertNotNull(result.root());
-        assertThat(result.root().getChildren()).hasSize(2);
-        assertThat(result.errors()).hasSize(1).first().asString().contains("UnknownGroupType");
+        assertEquals(2, result.root().getChildren().size());
+        assertEquals(1, result.errors().size());
+        assertTrue(result.errors().getFirst().contains("UnknownGroupType"));
     }
 }

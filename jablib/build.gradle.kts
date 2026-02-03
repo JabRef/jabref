@@ -225,8 +225,6 @@ dependencies {
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
 
-    testImplementation("org.assertj:assertj-core:3.27.7")
-
     // Highly recommended builder generator - https://github.com/skinny85/jilt
     // Keep it for tests only
     testCompileOnly("cc.jilt:jilt")
@@ -571,7 +569,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     // Required for LocalizationConsistencyTest
     requires.add("org.testfx.junit5")
-    requires.add("org.assertj.core")
+//    requires.add("org.assertj.core")
 
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
