@@ -232,6 +232,8 @@ public class DOI implements Identifier {
 
     /// Return a URI presentation for the DOI/Short DOI
     ///
+    /// TODO: Bad design, because Optional is used for Exception handling. Should be rewritten to throw a malformed URL exception.
+    ///
     /// @return an encoded URI representation of the DOI/Short DOI
     @Override
     public Optional<URI> getExternalURI() {
@@ -258,7 +260,7 @@ public class DOI implements Identifier {
 
     /// Return an ASCII URL presentation for the DOI/Short DOI
     ///
-    /// @return an encoded URL representation of the DOI/Short DOI
+    /// @return an encoded URL representation of the DOI/Short DOI. Empty string in the case of an error.
     public String getURIAsASCIIString() {
         return getExternalURI().map(URI::toASCIIString).orElse("");
     }

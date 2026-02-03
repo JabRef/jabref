@@ -78,7 +78,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         Optional<DOI> doiOpt = entry.getField(StandardField.DOI)
                                     .flatMap(DOI::findInText);
         if (doiOpt.isPresent()) {
-            return Optional.of(getUrl("/" + doiOpt.get().getExternalURI(), fieldsToSelect));
+            return Optional.of(getUrl("/" + doiOpt.get().getURIAsASCIIString(), fieldsToSelect));
         }
         Optional<String> urlOpt = entry.getField(StandardField.URL);
         if (urlOpt.isPresent()) {
@@ -241,7 +241,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         try {
             apiUrl = getUrl(entry, fieldsToSelect);
         } catch (MalformedURLException e) {
-            throw new FetcherException("Could not create URL", e);
+            throw new FetcherException("Could not create URL for work resource for BibEntry {}", entry.getKeyAuthorTitleYear(10), e);
         }
         if (apiUrl.isEmpty()) {
             return Optional.empty();
@@ -288,7 +288,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     private Stream<BibEntry> workUrlsToBibEntryStream(JSONArray workUrlArray) {
         return IntStream.range(0, workUrlArray.length())
                         .mapToObj(workUrlArray::getString)
-                        .map(Unchecked.function(workUrl -> getUrl(workUrl, List.of())))
+                        .map(Unchecked.function(workUrl -> getUrl("/" + workUrl, List.of())))
                         .map(Unchecked.function(url -> {
                             try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
                                 return jsonItemToBibEntry(JsonReader.toJsonObject(stream));
@@ -306,8 +306,11 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                     .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
                     .toList();
         } catch (RuntimeException e) {
-            LOGGER.warn("Malformed URL", e);
-            throw new FetcherException("Malformed URL", e.getCause());
+            LOGGER.warn("Could not get references", e);
+            if (e.getCause() instanceof FetcherException fetcherException) {
+                throw fetcherException;
+            }
+            throw new FetcherException("Could not get references", e.getCause());
         }
     }
 
@@ -316,7 +319,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         try {
             return getWorkObject(entry, List.of("cited_by_api_url"))
                     .map(work -> work.optString("cited_by_api_url"))
-                    .filter(Objects::nonNull)
+                    .filter(url -> !StringUtil.isNullOrEmpty(url))
                     .map(Unchecked.function(apiUrl -> new URI(apiUrl).toURL()))
                     .map(Unchecked.function(url -> {
                         try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
@@ -327,8 +330,11 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                     .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
                     .toList();
         } catch (RuntimeException e) {
-            LOGGER.warn("Malformed URL", e);
-            throw new FetcherException("Malformed URL", e.getCause());
+            LOGGER.warn("Could not get citations", e);
+            if (e.getCause() instanceof FetcherException fetcherException) {
+                throw fetcherException;
+            }
+            throw new FetcherException("Could not get citations", e.getCause());
         }
     }
 
