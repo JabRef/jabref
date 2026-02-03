@@ -49,7 +49,7 @@ public class UpdateWithBibliographicInformationFromTheWeb extends SimpleCommand 
         );
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
 
-        mergedEntriesView.addSource(Localization.lang("Original"), () -> originalEntry);
+        mergedEntriesView.addSource(Localization.lang("Original Entry"), () -> originalEntry);
 
         for (EntryBasedFetcher webFetcher : webFetchers) {
             mergedEntriesView.addSource(Localization.lang(webFetcher.getName()), () -> {
