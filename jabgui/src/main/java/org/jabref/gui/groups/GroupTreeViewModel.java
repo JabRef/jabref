@@ -673,12 +673,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
             int groupsWithSameName = 0;
             String name = group.getGroupNode().getGroup().getName();
-            Optional<GroupTreeNode> rootGroup = currentDatabase.get().getMetaData().getGroups();
+            BibDatabaseContext bibDatabaseContext = currentDatabase.get();
+            Optional<GroupTreeNode> rootGroup = bibDatabaseContext.getMetaData().getGroups();
             if (rootGroup.isPresent()) {
                 groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
             }
             if (groupsWithSameName < 2) {
-                List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
+                List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(bibDatabaseContext.getEntries());
                 group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
             }
         }
