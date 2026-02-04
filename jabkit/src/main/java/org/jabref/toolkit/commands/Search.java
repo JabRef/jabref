@@ -74,7 +74,7 @@ class Search implements Runnable {
             return;
         }
 
-        try (PostgreServer postgreServer = new PostgreServer()) {
+        try (PostgreServer postgreServer = PostgreServer.createWithoutWatchdog()) {
             IndexManager.clearOldSearchIndices();
 
             SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();

@@ -36,7 +36,7 @@ public class BibFieldsIndexerTest {
     @BeforeEach
     void setUp() {
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
-        postgreServer = new PostgreServer();
+        postgreServer = PostgreServer.createWithoutWatchdog();
     }
 
     @AfterEach

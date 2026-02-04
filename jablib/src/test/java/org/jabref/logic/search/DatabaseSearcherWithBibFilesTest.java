@@ -90,7 +90,7 @@ class DatabaseSearcherWithBibFilesTest {
 
     @BeforeEach
     void setUp() {
-        postgreServer = new PostgreServer();
+        postgreServer = PostgreServer.createWithoutWatchdog();
     }
 
     @AfterEach

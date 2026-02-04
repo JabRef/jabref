@@ -58,7 +58,7 @@ public class DatabaseSearcherTest {
         databaseContext = spy(new BibDatabaseContext());
         when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
 
-        postgreServer = new PostgreServer();
+        postgreServer = PostgreServer.createWithoutWatchdog();
     }
 
     @AfterEach

@@ -1,14 +1,24 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.sql.DataSource;
 
 import org.jabref.model.search.PostgreConstants;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
+import org.apache.commons.io.FileUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -19,28 +29,81 @@ import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
 @NullMarked
 public class PostgreServer implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
-    private final EmbeddedPostgres embeddedPostgres;
-    private final DataSource dataSource;
+    private static final String DATA_DIR_PREFIX = "jabref-embedded-pg-";
+    private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir", System.getProperty("user.home", ".")));
+    private static final String POSTMASTER_PID_FILENAME = "postmaster.pid";
+    private static final String JABREF_MARKER_FILENAME = ".jabref-embedded-pg";
+    private static final int ORPHAN_TERMINATION_TIMEOUT_SECONDS = 3;
 
+    private final Path dataDirectory;
+    private @Nullable EmbeddedPostgres embeddedPostgres;
+    private @Nullable DataSource dataSource;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+    private @Nullable PostgreWatchdog watchdog;
+
+    /// Creates a PostgreServer with the watchdog enabled.
+    /// Use {@link #createWithoutWatchdog()} for CLI and test contexts where lifecycle is managed externally.
     public PostgreServer() {
-        EmbeddedPostgres embeddedPostgres;
+        this(true);
+    }
+
+    private PostgreServer(boolean enableWatchdog) {
+        cleanupOrphanedInstances();
+
+        this.dataDirectory = TEMP_DIR.resolve(DATA_DIR_PREFIX + ProcessHandle.current().pid());
+
+        EmbeddedPostgres embeddedPostgresInstance = null;
         try {
-            embeddedPostgres = EmbeddedPostgres.builder()
-                                               .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
-                                               .start();
-            LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
+            if (Files.exists(dataDirectory)) {
+                FileUtils.deleteDirectory(dataDirectory.toFile());
+            }
+            Files.createDirectories(dataDirectory);
+            embeddedPostgresInstance = EmbeddedPostgres.builder()
+                                                       .setDataDirectory(dataDirectory.toFile())
+                                                       .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
+                                                       .start();
+            Files.createFile(dataDirectory.resolve(JABREF_MARKER_FILENAME));
+            LOGGER.info("Postgres server started on port {}, data dir: {}",
+                    embeddedPostgresInstance.getPort(), dataDirectory);
         } catch (IOException e) {
             LOGGER.error("Could not start Postgres server", e);
+            if (embeddedPostgresInstance != null) {
+                try {
+                    embeddedPostgresInstance.close();
+                } catch (IOException closeException) {
+                    LOGGER.debug("Failed to close partially initialized Postgres", closeException);
+                }
+            }
+            try {
+                FileUtils.deleteDirectory(dataDirectory.toFile());
+            } catch (IOException cleanupException) {
+                LOGGER.debug("Failed to clean partially initialized data directory {}", dataDirectory, cleanupException);
+            }
             this.embeddedPostgres = null;
             this.dataSource = null;
             return;
         }
 
-        this.embeddedPostgres = embeddedPostgres;
-        this.dataSource = embeddedPostgres.getPostgresDatabase();
+        this.embeddedPostgres = embeddedPostgresInstance;
+        this.dataSource = embeddedPostgresInstance.getPostgresDatabase();
+
+        if (enableWatchdog) {
+            long postgresPid = readPostgresPid();
+            if (postgresPid > 0) {
+                this.watchdog = new PostgreWatchdog();
+                this.watchdog.start(ProcessHandle.current().pid(), postgresPid, dataDirectory);
+            }
+        }
+
         addTrigramExtension();
         createScheme();
         addFunctions();
+    }
+
+    /// Creates a PostgreServer without the watchdog.
+    /// Intended for CLI mode and tests, where the lifecycle is managed via try-with-resources or {@code @AfterEach}.
+    public static PostgreServer createWithoutWatchdog() {
+        return new PostgreServer(false);
     }
 
     private void createScheme() {
@@ -92,12 +155,126 @@ public class PostgreServer implements AutoCloseable {
 
     @Override
     public void close() {
+        if (closed.getAndSet(true)) {
+            return;
+        }
+        if (watchdog != null) {
+            watchdog.stop();
+        }
         if (embeddedPostgres != null) {
             try {
                 embeddedPostgres.close();
             } catch (IOException e) {
                 LOGGER.error("Could not shutdown Postgres server", e);
             }
+        }
+    }
+
+    private long readPostgresPid() {
+        Path postmasterPidPath = dataDirectory.resolve(POSTMASTER_PID_FILENAME);
+        if (!Files.exists(postmasterPidPath)) {
+            return -1;
+        }
+        try {
+            List<String> lines = Files.readAllLines(postmasterPidPath);
+            if (!lines.isEmpty()) {
+                return Long.parseLong(lines.getFirst().trim());
+            }
+        } catch (IOException | NumberFormatException e) {
+            LOGGER.warn("Could not read postmaster.pid", e);
+        }
+        return -1;
+    }
+
+    static void cleanupOrphanedInstances() {
+        Path tempDirectory = TEMP_DIR;
+        if (!Files.isDirectory(tempDirectory)) {
+            return;
+        }
+        long currentPid = ProcessHandle.current().pid();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(tempDirectory, DATA_DIR_PREFIX + "*")) {
+            for (Path staleDirectory : stream) {
+                if (!Files.isDirectory(staleDirectory)) {
+                    continue;
+                }
+                if (!Files.exists(staleDirectory.resolve(JABREF_MARKER_FILENAME))) {
+                    continue;
+                }
+                String directoryName = staleDirectory.getFileName().toString();
+                if (!directoryName.startsWith(DATA_DIR_PREFIX)) {
+                    continue;
+                }
+                String pidString = directoryName.substring(DATA_DIR_PREFIX.length());
+                long ownerPid;
+                try {
+                    ownerPid = Long.parseLong(pidString);
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+
+                if (ownerPid == currentPid) {
+                    continue;
+                }
+
+                ProcessHandle ownerHandle = ProcessHandle.of(ownerPid)
+                                                         .filter(ProcessHandle::isAlive)
+                                                         .orElse(null);
+                if (ownerHandle != null) {
+                    continue;
+                }
+
+                Path postmasterPidPath = staleDirectory.resolve(POSTMASTER_PID_FILENAME);
+                if (Files.exists(postmasterPidPath)) {
+                    killOrphanedPostgres(postmasterPidPath);
+                }
+
+                try {
+                    FileUtils.deleteDirectory(staleDirectory.toFile());
+                    LOGGER.info("Cleaned up stale postgres data directory: {}", staleDirectory);
+                } catch (IOException e) {
+                    LOGGER.warn("Could not delete stale postgres data directory {}", staleDirectory, e);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not scan for orphaned PostgreSQL instances", e);
+        }
+    }
+
+    private static void killOrphanedPostgres(Path postmasterPidFile) {
+        try {
+            List<String> lines = Files.readAllLines(postmasterPidFile);
+            if (lines.isEmpty()) {
+                return;
+            }
+            long postgresPid = Long.parseLong(lines.getFirst().trim());
+            ProcessHandle.of(postgresPid)
+                         .ifPresent(processHandle -> {
+                             boolean isPostgres = processHandle.info()
+                                                               .command()
+                                                               .map(Path::of)
+                                                               .map(Path::getFileName)
+                                                               .map(Path::toString)
+                                                               .map("postgres"::equals)
+                                                               .orElse(false);
+                             if (!isPostgres) {
+                                 LOGGER.warn("Skipping cleanup for PID {} because it does not look like PostgreSQL", postgresPid);
+                                 return;
+                             }
+                             LOGGER.info("Killing orphaned PostgreSQL process (PID: {})", postgresPid);
+                             processHandle.destroy();
+                             try {
+                                 processHandle.onExit().get(ORPHAN_TERMINATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                             } catch (InterruptedException e) {
+                                 Thread.currentThread().interrupt();
+                                 processHandle.descendants().forEach(ProcessHandle::destroyForcibly);
+                                 processHandle.destroyForcibly();
+                             } catch (ExecutionException | TimeoutException e) {
+                                 processHandle.descendants().forEach(ProcessHandle::destroyForcibly);
+                                 processHandle.destroyForcibly();
+                             }
+                         });
+        } catch (IOException | NumberFormatException e) {
+            LOGGER.warn("Could not read postmaster.pid for cleanup", e);
         }
     }
 }

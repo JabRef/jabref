@@ -94,6 +94,10 @@ public class Launcher {
 
             PostgreServer postgreServer = new PostgreServer();
             Injector.setModelOrService(PostgreServer.class, postgreServer);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                LOGGER.debug("Executing PostgreSQL shutdown hook");
+                postgreServer.close();
+            }, "jabref-postgres-shutdown")); // addShutdownHook requires a Thread instance
 
             CSLStyleLoader.loadInternalStyles();
 
