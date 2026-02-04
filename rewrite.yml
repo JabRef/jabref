@@ -102,8 +102,8 @@ recipeList:
   # We voted against it
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
-  - org.openrewrite.java.joda.time.JodaTimeRecipe
-  - org.openrewrite.java.joda.time.NoJodaTime
+  # - org.openrewrite.java.joda.time.JodaTimeRecipe
+  # - org.openrewrite.java.joda.time.NoJodaTime
 
   - org.openrewrite.java.migrate.guava.NoMapsAndSetsWithExpectedSize
 
@@ -121,7 +121,7 @@ recipeList:
 
   - org.openrewrite.java.RemoveObjectsIsNull
 
-  - org.openrewrite.java.recipes.ReplaceNullWithDoesNotExist
+  # - org.openrewrite.java.recipes.ReplaceNullWithDoesNotExist
 
  # - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 
