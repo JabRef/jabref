@@ -18,6 +18,8 @@ jobs:
         with:
           persist-credentials: false
       - name: Update Gradle Wrapper
+        # See https://github.com/JabRef/jabref/pull/15034
+        if: false
         uses: gradle-update/update-gradle-wrapper-action@v2
         with:
           labels: dependencies
