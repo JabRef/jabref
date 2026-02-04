@@ -33,6 +33,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.search.query.BaseQueryNode;
 
+import com.google.common.annotations.VisibleForTesting;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -64,6 +65,29 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         return FETCHER_NAME;
     }
 
+    @VisibleForTesting
+    Optional<String> extractOpenAlexId(String url) {
+        try {
+            URL u = new URL(url);
+
+            if (!"openalex.org".equalsIgnoreCase(u.getHost())) {
+                return Optional.empty();
+            }
+
+            String path = u.getPath();          // "/works/W4408614692" or "/W4408614692"
+            if (path.isBlank() || "/".equals(path)) {
+                return Optional.empty();
+            }
+
+            String[] segments = path.split("/");
+            String id = segments[segments.length - 1];
+
+            return id.isBlank() ? Optional.empty() : Optional.of(id);
+        } catch (MalformedURLException e) {
+            return Optional.empty();
+        }
+    }
+
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
@@ -80,28 +104,14 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         if (doiOpt.isPresent()) {
             return Optional.of(getUrl("/" + doiOpt.get().getURIAsASCIIString(), fieldsToSelect));
         }
-        Optional<String> urlOpt = entry.getField(StandardField.URL);
-        if (urlOpt.isPresent()) {
-            String url = urlOpt.get();
-            String lower = url.toLowerCase();
-            try {
-                int idx = lower.indexOf("openalex.org/");
-                if (idx >= 0) {
-                    String tail = url.substring(idx + "openalex.org/".length());
-                    LOGGER.debug("URL for query: {}", tail);
-                    int queryIdx = tail.indexOf('?');
-                    if (queryIdx >= 0) {
-                        tail = tail.substring(0, queryIdx);
-                    }
-                    if (!tail.isBlank()) {
-                        return Optional.of(getUrl("/" + tail, fieldsToSelect));
-                    }
-                }
-            } catch (MalformedURLException ignored) {
-                throw new IllegalArgumentException("Invalid OpenAlex URL: " + url);
-            }
+        try {
+            return entry.getField(StandardField.URL)
+                        .flatMap(this::extractOpenAlexId)
+                        .map(Unchecked.function(id -> getUrl("/" + id, fieldsToSelect)));
+        } catch (RuntimeException ignored) {
+            LOGGER.debug("Invalid OpenAlex URL");
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     private URIBuilder getUriBuilder(String tail, List<String> fieldsToSelect) throws MalformedURLException {
