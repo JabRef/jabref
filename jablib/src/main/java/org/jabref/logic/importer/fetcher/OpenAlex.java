@@ -99,15 +99,20 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     }
 
     private Optional<URL> getUrl(BibEntry entry, List<String> fieldsToSelect) throws MalformedURLException {
-        Optional<DOI> doiOpt = entry.getField(StandardField.DOI)
-                                    .flatMap(DOI::findInText);
-        if (doiOpt.isPresent()) {
-            return Optional.of(getUrl("/" + doiOpt.get().getURIAsASCIIString(), fieldsToSelect));
-        }
         try {
-            return entry.getField(StandardField.URL)
-                        .flatMap(this::extractOpenAlexId)
-                        .map(Unchecked.function(id -> getUrl("/" + id, fieldsToSelect)));
+            // Supported identifiers for lookup are listed at https://docs.openalex.org/api-entities/works/work-object#ids
+            return entry.getField(StandardField.DOI)
+                        .flatMap(DOI::findInText)
+                        .map(Unchecked.function(doi -> getUrl("/" + doi.getURIAsASCIIString(), fieldsToSelect)))
+
+                        .or(() -> entry.getField(StandardField.PMID)
+                                       // URL: See https://docs.openalex.org/api-entities/works/get-a-single-work#external-ids
+                                       .map(Unchecked.function(pmid -> getUrl("/pmid:" + pmid, fieldsToSelect))))
+
+                        // Fallback: OpenAlex identifier from URL
+                        .or(() -> entry.getField(StandardField.URL)
+                                       .flatMap(this::extractOpenAlexId)
+                                       .map(Unchecked.function(id -> getUrl("/" + id, fieldsToSelect))));
         } catch (RuntimeException ignored) {
             LOGGER.debug("Invalid OpenAlex URL");
             return Optional.empty();
