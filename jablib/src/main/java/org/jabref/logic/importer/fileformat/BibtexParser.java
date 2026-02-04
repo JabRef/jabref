@@ -363,8 +363,7 @@ public class BibtexParser implements Parser {
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
             LOGGER.warn("Could not parse entry", ex);
 
-            String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
-                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
+            String errorMessage = Localization.lang("Error occurred when parsing entry: '%0'. \n\n JabRef skipped the entry", ex.getMessage());
 
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
             int safePos = ex.getRecoveryPosition();
@@ -384,9 +383,8 @@ public class BibtexParser implements Parser {
             }
 
             String brokenBody = chunk.substring(0, cut);
-            String brokenEntryText = commentsAndEntryTypeDefinition + brokenBody;
 
-            lastBrokenEntryText = brokenEntryText;
+            lastBrokenEntryText = commentsAndEntryTypeDefinition + brokenBody;
 
             // roll back to the start
             for (int i = 0; i < consumed; i++) {
