@@ -80,6 +80,12 @@
     -jr-match-4-odd: derive(-jr-black, 10%);
     -jr-match-4-even: -jr-background-alt;
     -jr-match-4-text-color: derive(-jr-match-3-text-color, -15%);
+
+    /* CAYW styles*/
+    -jr-white: #ffffff;
+    -jr-light-gray: #e0e0e0;
+    -jr-dark-gray: #3a3a3a;
+    -jr-black: #000000;
 }
 
 .unchanged {
@@ -218,28 +224,27 @@
 }
 
 .list-cell {
-    -fx-text-fill: #000000 !important;
-    -fx-fill: #e0e0e0 !important;
+    -fx-text-fill: -jr-black !important;
+    -fx-fill: -jr-light-gray !important;
 }
 
 .list-cell:hover,
 .list-cell:selected {
-    -fx-background-color: #3a3a3a !important;
-    -fx-text-fill: #ffffff !important;
+    -fx-background-color: -jr-dark-gray !important;
+    -fx-text-fill: -jr-white !important;
 }
 
 .list-cell .text,
 .list-cell .label,
 .list-cell .search-result-label,
 .list-cell .search-result-description {
-    -fx-text-fill: #e0e0e0 !important;
-    -fx-fill: #e0e0e0 !important;
+    -fx-text-fill: -jr-white !important;
+    -fx-fill: -jr-white !important;
 }
 
 .chip-style {
-    /*-fx-background-color: #272B38; */
     -fx-border-radius: 15px;
-    -fx-border-color: 'white';
+    -fx-border-color: -jr-white;
     -fx-border-width: 1px;
 }
 
