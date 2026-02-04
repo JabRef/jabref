@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class OpenAlexCitationsTest {
+class OpenAlexCitationFetcherTest {
 
     private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey);
 
