@@ -2003,10 +2003,18 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void storeFileHistory(FileHistory history) {
-        putStringList(RECENT_DATABASES, history.stream()
-                                               .map(Path::toAbsolutePath)
-                                               .map(Path::toString)
-                                               .toList());
+        Path basePath = Path.of(".").toAbsolutePath();
+        if (getInternalPreferences().isMemoryStickMode()) {
+            putStringList(RECENT_DATABASES, history.stream()
+                                                   .map(path -> basePath.relativize(path))
+                                                   .map(Path::toString)
+                                                   .toList());
+        } else {
+            putStringList(RECENT_DATABASES, history.stream()
+                                                   .map(Path::toAbsolutePath)
+                                                   .map(Path::toString)
+                                                   .toList());
+        }
     }
 
     // endregion
