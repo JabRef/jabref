@@ -232,7 +232,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     /// @param sourceButton the header button to setup
     /// @param column       the column this button is heading
     private void setupSourceButtonAction(ToggleButton sourceButton, int column) {
-        sourceButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        sourceButton.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
                 optionsGrid.getChildrenUnmodifiable().stream()
                            .filter(node -> GridPane.getColumnIndex(node) == column)
@@ -318,7 +318,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
                     getChildren().add(doiButton);
 
-                    doiButton.setOnAction(event -> {
+                    doiButton.setOnAction(_ -> {
                         DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
                         doiButton.setDisable(true);
                         addSource(Localization.lang("From DOI"), () -> {
