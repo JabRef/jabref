@@ -612,7 +612,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --no-appcds --input . --gradle-project jabkit --output ./build/jbundle/jabkit
+          jbundle build --input . --gradle-project jabkit --output ./build/jbundle/jabkit
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash

@@ -14,7 +14,7 @@ jvm_args = [
 # profile = "cli"
 
 # Required to have jlink working
-appcds = true
+# appcds = true
 
 # see https://jbundle.avelino.run/user-guide/configuration#maximum-performance-linux
 # set to "false" for speedup during build
