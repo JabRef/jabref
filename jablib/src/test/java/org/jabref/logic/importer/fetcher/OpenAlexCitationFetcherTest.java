@@ -36,16 +36,6 @@ class OpenAlexCitationFetcherTest {
     }
 
     @Test
-    void getCitationsWithDoi() throws FetcherException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.DOI, "10.1016/j.jksuci.2024.102118");
-
-        List<BibEntry> citations = fetcher.getCitations(entry);
-
-        assertNotEquals(List.of(), citations);
-    }
-
-    @Test
     void getReferencesWithDoi() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.DOI, "10.1016/j.jksuci.2024.102118");
@@ -53,5 +43,15 @@ class OpenAlexCitationFetcherTest {
         List<BibEntry> references = fetcher.getReferences(entry);
 
         assertNotEquals(List.of(), references);
+    }
+
+    @Test
+    void getCitationsWithDoi() throws FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.DOI, "10.1016/j.jksuci.2024.102118");
+
+        List<BibEntry> citations = fetcher.getCitations(entry);
+
+        assertNotEquals(List.of(), citations);
     }
 }
