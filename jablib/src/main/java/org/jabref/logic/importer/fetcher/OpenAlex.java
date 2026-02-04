@@ -307,6 +307,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     // region CitationFetcher
 
     private Stream<BibEntry> workUrlsToBibEntryStream(JSONArray workUrlArray) {
+        // TODO: This could be batched - see https://github.com/JabRef/jabref/pull/15023#issuecomment-3846630255
         return IntStream.range(0, workUrlArray.length())
                         .mapToObj(workUrlArray::getString)
                         .map(Unchecked.function(workUrl -> getUrl("/" + workUrl, List.of())))
