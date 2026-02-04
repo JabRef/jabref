@@ -43,7 +43,7 @@ public class AutomaticDateGroup extends AutomaticGroup {
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        LinkedHashSet<GroupTreeNode> out = new LinkedHashSet<GroupTreeNode>();
+        LinkedHashSet<GroupTreeNode> out = new LinkedHashSet<>();
 
         DateGroup.extractDate(field, entry).ifPresent(date -> {
             switch (granularity) {
