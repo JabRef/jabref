@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -105,7 +104,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         return Optional.empty();
     }
 
-    private URL getUrl(String tail, List<String> fieldsToSelect) throws MalformedURLException {
+    private URIBuilder getUriBuilder(String tail, List<String> fieldsToSelect) throws MalformedURLException {
         try {
             URIBuilder uriBuilder = new URIBuilder(URL_PATTERN + tail);
             importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
@@ -114,7 +113,15 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             if (!fieldList.isEmpty()) {
                 uriBuilder.addParameter("select", fieldList);
             }
-            return uriBuilder.build().toURL();
+            return uriBuilder;
+        } catch (URISyntaxException exception) {
+            throw new MalformedURLException(exception.getMessage());
+        }
+    }
+
+    private URL getUrl(String tail, List<String> fieldsToSelect) throws MalformedURLException {
+        try {
+            return getUriBuilder(tail, fieldsToSelect).build().toURL();
         } catch (URISyntaxException | MalformedURLException exception) {
             throw new MalformedURLException(exception.getMessage());
         }
@@ -317,6 +324,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     @Override
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
         try {
+            LOGGER.trace("Getting references for entry: {}", entry.getKeyAuthorTitleYear(10));
             return getWorkObject(entry, List.of("referenced_works"))
                     .map(work -> work.optJSONArray("referenced_works"))
                     .filter(Objects::nonNull)
@@ -335,6 +343,9 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
         try {
+            /* Officially, `cited_by_api_url` is to be used to get citations.
+             * However, this URL may be missing */
+            /*
             return getWorkObject(entry, List.of("cited_by_api_url"))
                     .map(work -> work.optString("cited_by_api_url"))
                     .filter(url -> !StringUtil.isNullOrEmpty(url))
@@ -342,6 +353,31 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                     .map(Unchecked.function(url -> {
                         try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
                             return JsonReader.toJsonArray(stream);
+                        }
+                    }))
+                    .stream()
+                    .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
+                    .toList();
+             */
+
+            // Instead, we perform a search for works that cite the given work's ID
+            return getWorkObject(entry, List.of("id"))
+                    .map(work -> work.optString("id"))
+                    .filter(Objects::nonNull)
+                    .map(Unchecked.function(id ->
+                            getUriBuilder("", List.of())
+                                    .addParameter("filter", "cites:" + id)
+                                    .build()
+                                    .toURL()
+                    ))
+                    .map(Unchecked.function(url -> {
+                        try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
+                            JSONObject response = JsonReader.toJsonObject(stream);
+                            return response.getJSONArray("results");
+                        } catch (RuntimeException e) {
+                            String redactedUrl = FetcherException.getRedactedUrl(url.toString());
+                            LOGGER.warn("Could not fetch work at URL: {}", redactedUrl, e);
+                            throw e;
                         }
                     }))
                     .stream()
