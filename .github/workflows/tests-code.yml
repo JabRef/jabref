@@ -149,7 +149,8 @@ jobs:
 
   changelog:
     name: CHANGELOG.md
-    runs-on: ubuntu-slim
+    # JBang needs a JDK
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
