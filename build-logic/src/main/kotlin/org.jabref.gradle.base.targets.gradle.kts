@@ -26,12 +26,12 @@ javaModulePackaging {
             if (ibm) emptyList() else listOf("--generate-cds-archive")
         }
     )
-    target("ubuntu-22.04") {
+    target("ubuntu-24.04") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "deb", "rpm")
     }
-    target("ubuntu-22.04-arm") {
+    target("ubuntu-24.04-arm") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "deb", "rpm")
