@@ -749,15 +749,15 @@ public class CitationRelationsTab extends EntryEditorTab {
                 hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
                 String labelText;
                 if (citationComponents.searchType() == CitationFetcher.SearchType.CITES) {
-                    labelText = Localization.lang("Error while fetching cited entries: %0", exception.getMessage());
+                    labelText = Localization.lang("Error while fetching cited entries: %0", exception.getLocalizedMessage());
                 } else {
-                    labelText = Localization.lang("Error while fetching citing entries: %0", exception.getMessage());
+                    labelText = Localization.lang("Error while fetching citing entries: %0", exception.getLocalizedMessage());
                 }
                 Label placeholder = new Label(labelText);
                 placeholder.setWrapText(true);
                 citationComponents.listView().setPlaceholder(placeholder);
                 citationComponents.refreshButton().setVisible(true);
-                dialogService.notify(exception.getMessage());
+                dialogService.notify(exception.getLocalizedMessage());
             })
             .executeWith(taskExecutor);
     }
