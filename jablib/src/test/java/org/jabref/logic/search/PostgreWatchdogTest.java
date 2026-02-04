@@ -38,7 +38,12 @@ class PostgreWatchdogTest {
         assertTrue(script.contains("$jabrefPid = 321"), "Windows script should embed JabRef PID");
         assertTrue(script.contains("$postgresPid = 654"), "Windows script should embed Postgres PID");
         assertTrue(script.contains("$dataDir = \"C:/temp/jabref\""), "Windows script should reference the data directory");
-        assertTrue(script.contains("Remove-Item -Path \"C:/temp/watchdog.ps1\""), "Windows script should delete itself");
+        assertTrue(script.contains("$scriptPath = \"C:/temp/watchdog.ps1\""), "Windows script should reference the script path");
+        assertTrue(script.contains("*postgres*"), "Windows script should validate process is postgres");
+        assertTrue(script.contains("Wait-Process -Id $jabrefPid"), "Windows script should wait for JabRef to exit");
+        assertTrue(script.contains("taskkill /PID $postgresPid"), "Windows script should attempt graceful shutdown first");
+        assertTrue(script.contains("taskkill /T /F /PID $postgresPid"), "Windows script should force kill as last resort");
+        assertTrue(script.contains("Remove-Item -Path $scriptPath"), "Windows script should delete itself");
     }
 
     @Test

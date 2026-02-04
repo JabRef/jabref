@@ -134,23 +134,44 @@ public class PostgreWatchdog {
                 $jabrefPid = %d
                 $postgresPid = %d
                 $dataDir = "%s"
-                
+                $scriptPath = "%s"
+                # Validate the process is actually postgres before proceeding
+                try {
+                    $proc = Get-Process -Id $postgresPid -ErrorAction Stop
+                    if ($proc.ProcessName -notlike '*postgres*') {
+                        exit 0
+                    }
+                } catch {
+                    exit 0
+                }
                 # Wait until the main JabRef process exits
                 Wait-Process -Id $jabrefPid -ErrorAction SilentlyContinue
-                
-                # Forcibly terminate the PostgreSQL process and its children
-                & taskkill /T /F /PID $postgresPid 2>$null
-                
+                # Gracefully terminate the PostgreSQL process
+                & taskkill /PID $postgresPid 2>$null
+                # Wait up to 5 seconds for it to shut down
+                for ($i = 0; $i -lt 5; $i++) {
+                    try {
+                        Get-Process -Id $postgresPid -ErrorAction Stop | Out-Null
+                    } catch {
+                        break
+                    }
+                    Start-Sleep -Seconds 1
+                }
+                # If it's still running, forcibly kill the process and its children
+                try {
+                    Get-Process -Id $postgresPid -ErrorAction Stop | Out-Null
+                    & taskkill /T /F /PID $postgresPid 2>$null
+                } catch {
+                    # Process already exited
+                }
                 # Give a moment for file locks to be released
                 Start-Sleep -Seconds 1
-                
                 # Clean up the data directory
                 if (Test-Path $dataDir) {
                     Remove-Item -Path $dataDir -Recurse -Force -ErrorAction SilentlyContinue
                 }
-                
                 # Self-delete the watchdog script
-                Remove-Item -Path "%s" -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path $scriptPath -Force -ErrorAction SilentlyContinue
                 """.formatted(jabrefPid, postgresPid, escapedDataDirectory, escapedScriptPath);
     }
 
