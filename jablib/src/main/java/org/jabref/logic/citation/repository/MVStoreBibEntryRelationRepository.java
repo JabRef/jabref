@@ -1,8 +1,5 @@
 package org.jabref.logic.citation.repository;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
