@@ -16,7 +16,7 @@ import org.jabref.testutils.category.FetcherTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +42,16 @@ class OpenAlexCitationFetcherTest {
 
         List<BibEntry> citations = fetcher.getCitations(entry);
 
-        assertFalse(citations.isEmpty());
+        assertNotEquals(List.of(), citations);
+    }
+
+    @Test
+    void getReferencesWithDoi() throws FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.DOI, "10.1016/j.jksuci.2024.102118");
+
+        List<BibEntry> references = fetcher.getReferences(entry);
+
+        assertNotEquals(List.of(), references);
     }
 }
