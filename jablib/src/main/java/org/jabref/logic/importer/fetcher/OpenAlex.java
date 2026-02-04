@@ -340,6 +340,12 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         }
     }
 
+    private Stream<BibEntry> workArrayToBibEntryStream(JSONArray workUrlArray) {
+        return IntStream.range(0, workUrlArray.length())
+                        .mapToObj(workUrlArray::getJSONObject)
+                        .map(Unchecked.function(jsonItem -> jsonItemToBibEntry(jsonItem)));
+    }
+
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
         try {
@@ -381,7 +387,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                         }
                     }))
                     .stream()
-                    .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
+                    .flatMap(worksArray -> workArrayToBibEntryStream(worksArray))
                     .toList();
         } catch (RuntimeException e) {
             LOGGER.warn("Could not get citations", e);
