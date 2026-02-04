@@ -28,18 +28,19 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
 
     private static final String CITATION_RELATIONS_STORE = "citation-relations.mv";
 
-    @Nullable // when testing constructor is used
+    // when testing constructor is used
+    @Nullable
     private final MVStore mvStore;
 
     private final BibEntryRelationRepository citationsDao;
     private final BibEntryRelationRepository referencesDao;
 
     public BibEntryCitationsAndReferencesRepositoryShell(Path citationsRelationsDirectory,
-                                                                   int storeTTL,
-                                                                   ImportFormatPreferences importFormatPreferences,
-                                                                   FieldPreferences fieldPreferences,
-                                                                   BibEntryTypesManager entryTypesManager,
-                                                                   ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
+                                                         int storeTTL,
+                                                         ImportFormatPreferences importFormatPreferences,
+                                                         FieldPreferences fieldPreferences,
+                                                         BibEntryTypesManager entryTypesManager,
+                                                         ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
         Path storePath = citationsRelationsDirectory.resolve(CITATION_RELATIONS_STORE);
         try {
             Files.createDirectories(storePath.getParent());
