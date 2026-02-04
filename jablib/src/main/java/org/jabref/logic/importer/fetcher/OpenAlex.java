@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -292,6 +293,23 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                         .map(Unchecked.function(url -> {
                             try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
                                 return jsonItemToBibEntry(JsonReader.toJsonObject(stream));
+                            } catch (FetcherClientException e) {
+                                String redactedUrl = FetcherException.getRedactedUrl(url.toString());
+                                if (e.getHttpResponse().isPresent()) {
+                                    int code = e.getHttpResponse().get().statusCode();
+                                    if (code == 404) {
+                                        LOGGER.trace("Work not found at URL: {}", redactedUrl);
+                                    } else {
+                                        LOGGER.debug("Could not fetch work at URL: {}", redactedUrl, e);
+                                    }
+                                } else {
+                                    LOGGER.debug("Could not fetch work at URL: {}", redactedUrl, e);
+                                }
+                                return new BibEntry().withField(StandardField.URL, redactedUrl).withChanged(true);
+                            } catch (RuntimeException e) {
+                                String redactedUrl = FetcherException.getRedactedUrl(url.toString());
+                                LOGGER.debug("Could not fetch work at URL: {}", redactedUrl, e);
+                                return new BibEntry().withField(StandardField.URL, redactedUrl).withChanged(true);
                             }
                         }));
     }
