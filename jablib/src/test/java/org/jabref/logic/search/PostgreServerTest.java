@@ -1,13 +1,17 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -213,6 +217,190 @@ class PostgreServerTest {
         try (PostgreServer secondServer = PostgreServer.createWithoutWatchdog()) {
             assertFalse(Files.exists(staleDirectory), "Stale directory should be cleaned on new server start");
             assertNotNull(secondServer.getConnection(), "Second server should be functional");
+        }
+    }
+
+    @Test
+    void cleanupKillsRealOrphanedPostgresProcess() throws Exception {
+        // Core issue #12844 scenario: JabRef died, leaving an orphaned postgres process.
+        // Cleanup should detect the dead owner and kill the real postgres process.
+        // Note: directory deletion is tested separately — in this test the EmbeddedPostgres
+        // Java object holds an epg-lock FileLock that prevents deletion within the same JVM.
+        // In a real crash scenario the owning JVM would be dead and the lock released.
+        long deadOwnerPid = 99990L;
+        Path staleDataDir = SYSTEM_TEMP_DIRECTORY.resolve("jabref-embedded-pg-" + deadOwnerPid);
+
+        if (Files.exists(staleDataDir)) {
+            FileUtils.deleteDirectory(staleDataDir.toFile());
+        }
+        Files.createDirectories(staleDataDir);
+
+        // Start a real postgres in this directory (simulating an orphaned instance)
+        EmbeddedPostgres orphanedPostgres = EmbeddedPostgres.builder()
+                .setDataDirectory(staleDataDir.toFile())
+                .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
+                .start();
+        // Place the JabRef marker so cleanup recognizes this as ours
+        Files.createFile(staleDataDir.resolve(".jabref-embedded-pg"));
+
+        // Read the real postgres PID
+        Path postmasterPidPath = staleDataDir.resolve("postmaster.pid");
+        assertTrue(Files.exists(postmasterPidPath), "postmaster.pid should exist after starting postgres");
+        long postgresPid = Long.parseLong(Files.readAllLines(postmasterPidPath).getFirst().trim());
+        assertTrue(ProcessHandle.of(postgresPid).map(ProcessHandle::isAlive).orElse(false),
+                "Orphaned postgres should be alive before cleanup");
+
+        try {
+            // Cleanup should detect dead owner and kill the real postgres process
+            PostgreServer.cleanupOrphanedInstances();
+
+            // Give a brief moment for process exit to be visible to the OS
+            Thread.sleep(500);
+            assertFalse(ProcessHandle.of(postgresPid).map(ProcessHandle::isAlive).orElse(false),
+                    "Orphaned postgres process should be killed by cleanup");
+        } finally {
+            try {
+                orphanedPostgres.close();
+            } catch (IOException ignored) {
+                // May fail if already killed by cleanup
+            }
+            if (Files.exists(staleDataDir)) {
+                FileUtils.deleteDirectory(staleDataDir.toFile());
+            }
+        }
+    }
+
+    @Test
+    void newServerStartsSuccessfullyAfterOrphanCleanup() throws Exception {
+        // End-to-end: orphaned postgres exists, new JabRef instance kills it and starts fresh.
+        // We close the EmbeddedPostgres object first to release the epg-lock FileLock
+        // (simulating what happens when the owning JVM dies), then verify cleanup + new server.
+        long deadOwnerPid = 99989L;
+        Path staleDataDir = SYSTEM_TEMP_DIRECTORY.resolve("jabref-embedded-pg-" + deadOwnerPid);
+
+        if (Files.exists(staleDataDir)) {
+            FileUtils.deleteDirectory(staleDataDir.toFile());
+        }
+        Files.createDirectories(staleDataDir);
+
+        EmbeddedPostgres orphanedPostgres = EmbeddedPostgres.builder()
+                .setDataDirectory(staleDataDir.toFile())
+                .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
+                .start();
+
+        long postgresPid = Long.parseLong(
+                Files.readAllLines(staleDataDir.resolve("postmaster.pid")).getFirst().trim());
+
+        // Close the EmbeddedPostgres to release epg-lock (simulates dead JVM releasing file locks).
+        // This also stops postgres, but we recreate the stale state below.
+        orphanedPostgres.close();
+
+        // Recreate stale directory state as if postgres was an orphan left behind
+        if (!Files.exists(staleDataDir)) {
+            Files.createDirectories(staleDataDir);
+        }
+        Path markerPath = staleDataDir.resolve(".jabref-embedded-pg");
+        if (!Files.exists(markerPath)) {
+            Files.createFile(markerPath);
+        }
+        Files.writeString(staleDataDir.resolve("postmaster.pid"), Long.toString(postgresPid));
+
+        try {
+            // Starting a new PostgreServer triggers cleanup, then starts fresh
+            try (PostgreServer newServer = PostgreServer.createWithoutWatchdog()) {
+                assertFalse(Files.exists(staleDataDir),
+                        "Orphaned data directory should be cleaned up on new server start");
+                assertNotNull(newServer.getConnection(), "New server should provide a working connection");
+            }
+        } finally {
+            if (Files.exists(staleDataDir)) {
+                FileUtils.deleteDirectory(staleDataDir.toFile());
+            }
+        }
+    }
+
+    @Test
+    void serverRecoversAfterPostgresCrash() throws Exception {
+        // Simulate postgres crashing mid-session: kill the process, then verify
+        // JabRef can close gracefully and start a new server
+        Path dataDir = SYSTEM_TEMP_DIRECTORY.resolve("jabref-embedded-pg-" + ProcessHandle.current().pid());
+
+        PostgreServer server = PostgreServer.createWithoutWatchdog();
+        Path postmasterPidPath = dataDir.resolve("postmaster.pid");
+        assertTrue(Files.exists(postmasterPidPath), "postmaster.pid should exist");
+        long postgresPid = Long.parseLong(Files.readAllLines(postmasterPidPath).getFirst().trim());
+
+        // Kill postgres externally (simulating an unexpected crash)
+        ProcessHandle.of(postgresPid).ifPresent(ProcessHandle::destroyForcibly);
+        // Wait for process to actually exit
+        ProcessHandle.of(postgresPid).ifPresent(ph -> {
+            try {
+                ph.onExit().get(5, java.util.concurrent.TimeUnit.SECONDS);
+            } catch (Exception ignored) {
+                // Process will be gone
+            }
+        });
+
+        // Close should handle the already-dead postgres gracefully
+        assertDoesNotThrow(() -> server.close(), "close() should not throw when postgres is already dead");
+
+        // Starting a new server should succeed
+        try (PostgreServer newServer = PostgreServer.createWithoutWatchdog()) {
+            Connection connection = newServer.getConnection();
+            assertNotNull(connection, "New server should provide a working connection after crash recovery");
+            ResultSet rs = connection.createStatement().executeQuery("SELECT 1");
+            assertTrue(rs.next(), "Should be able to execute queries on recovered server");
+            assertEquals(1, rs.getInt(1));
+        }
+    }
+
+    @Test
+    void cleanupDeletesDirectoryWithTransientFileLockUsingRetry() throws Exception {
+        long deadOwnerPid = 99996L;
+        Path staleDirectory = SYSTEM_TEMP_DIRECTORY.resolve("jabref-embedded-pg-" + deadOwnerPid);
+
+        if (Files.exists(staleDirectory)) {
+            FileUtils.deleteDirectory(staleDirectory.toFile());
+        }
+        Files.createDirectories(staleDirectory);
+        Files.createFile(staleDirectory.resolve(".jabref-embedded-pg"));
+        Files.writeString(staleDirectory.resolve("postmaster.pid"), "88886\n");
+
+        // Simulate Windows file locking: hold a lock on a file in the directory,
+        // then release it after a delay (mimics Windows releasing handles after process death)
+        Path lockedFile = staleDirectory.resolve("pg_wal_lock_simulation");
+        FileChannel channel = FileChannel.open(lockedFile,
+                StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        FileLock lock = channel.lock();
+
+        Thread releaser = new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+                lock.release();
+                channel.close();
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        releaser.start();
+
+        try {
+            // cleanupOrphanedInstances should retry deletion until the lock is released
+            PostgreServer.cleanupOrphanedInstances();
+
+            assertFalse(Files.exists(staleDirectory),
+                    "Directory should be deleted after retry succeeds when file lock is released");
+        } finally {
+            releaser.join(5000);
+            if (lock.isValid()) {
+                lock.release();
+            }
+            if (channel.isOpen()) {
+                channel.close();
+            }
+            if (Files.exists(staleDirectory)) {
+                FileUtils.deleteDirectory(staleDirectory.toFile());
+            }
         }
     }
 }

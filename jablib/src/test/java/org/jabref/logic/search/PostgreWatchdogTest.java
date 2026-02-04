@@ -16,15 +16,19 @@ class PostgreWatchdogTest {
 
     @Test
     void unixScriptContainsExpectedPlaceholders() {
+        // Use Path.toString() for expected values so assertions work on both Unix and Windows
         Path dataDirectory = Path.of("/tmp/jabref");
         Path scriptPath = Path.of("/tmp/watchdog.sh");
 
         String script = PostgreWatchdog.buildUnixWatchdogScript(123, 456, dataDirectory, scriptPath);
 
+        String expectedDataDir = dataDirectory.toString().replace("\\", "\\\\");
+        String expectedScriptPath = scriptPath.toString().replace("\\", "\\\\");
+
         assertTrue(script.contains("JABREF_PID=123"), "Unix script should embed JabRef PID");
         assertTrue(script.contains("POSTGRES_PID=456"), "Unix script should embed Postgres PID");
-        assertTrue(script.contains("DATA_DIR=\"/tmp/jabref\""), "Unix script should include data directory path");
-        assertTrue(script.contains("SCRIPT_PATH=\"/tmp/watchdog.sh\""), "Unix script should include script path");
+        assertTrue(script.contains("DATA_DIR=\"" + expectedDataDir + "\""), "Unix script should include data directory path");
+        assertTrue(script.contains("SCRIPT_PATH=\"" + expectedScriptPath + "\""), "Unix script should include script path");
         assertTrue(script.contains("rm -f \"$SCRIPT_PATH\""), "Unix script should remove itself at the end");
     }
 
@@ -35,10 +39,14 @@ class PostgreWatchdogTest {
 
         String script = PostgreWatchdog.buildWindowsWatchdogScript(321, 654, dataDirectory, scriptPath);
 
+        // Use Path.toString() for expected values so assertions work on both Unix and Windows
+        String expectedDataDir = dataDirectory.toString();
+        String expectedScriptPath = scriptPath.toString();
+
         assertTrue(script.contains("$jabrefPid = 321"), "Windows script should embed JabRef PID");
         assertTrue(script.contains("$postgresPid = 654"), "Windows script should embed Postgres PID");
-        assertTrue(script.contains("$dataDir = \"C:/temp/jabref\""), "Windows script should reference the data directory");
-        assertTrue(script.contains("$scriptPath = \"C:/temp/watchdog.ps1\""), "Windows script should reference the script path");
+        assertTrue(script.contains("$dataDir = \"" + expectedDataDir + "\""), "Windows script should reference the data directory");
+        assertTrue(script.contains("$scriptPath = \"" + expectedScriptPath + "\""), "Windows script should reference the script path");
         assertTrue(script.contains("*postgres*"), "Windows script should validate process is postgres");
         assertTrue(script.contains("Wait-Process -Id $jabrefPid"), "Windows script should wait for JabRef to exit");
         assertTrue(script.contains("taskkill /PID $postgresPid"), "Windows script should attempt graceful shutdown first");

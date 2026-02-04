@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -227,15 +228,42 @@ public class PostgreServer implements AutoCloseable {
                     killOrphanedPostgres(postmasterPidPath);
                 }
 
-                try {
-                    FileUtils.deleteDirectory(staleDirectory.toFile());
-                    LOGGER.info("Cleaned up stale postgres data directory: {}", staleDirectory);
-                } catch (IOException e) {
-                    LOGGER.warn("Could not delete stale postgres data directory {}", staleDirectory, e);
-                }
+                deleteDirectoryWithRetry(staleDirectory);
             }
         } catch (IOException e) {
             LOGGER.warn("Could not scan for orphaned PostgreSQL instances", e);
+        }
+    }
+
+    /**
+     * Attempts to delete a directory with retries to handle Windows file locking.
+     * On Windows, file locks may not be released immediately after a process is killed,
+     * so we retry with increasing delays to give the OS time to release handles.
+     */
+    private static void deleteDirectoryWithRetry(Path directory) {
+        int maxAttempts = 5;
+        long baseDelayMillis = 500;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                FileUtils.deleteDirectory(directory.toFile());
+                LOGGER.info("Cleaned up stale postgres data directory: {}", directory);
+                return;
+            } catch (IOException e) {
+                if (attempt < maxAttempts) {
+                    LOGGER.debug("Directory deletion attempt {}/{} failed for {}, retrying after delay",
+                            attempt, maxAttempts, directory);
+                    try {
+                        Thread.sleep(baseDelayMillis * attempt);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        LOGGER.warn("Could not delete stale postgres data directory {}", directory, e);
+                        return;
+                    }
+                } else {
+                    LOGGER.warn("Could not delete stale postgres data directory {} after {} attempts", directory, maxAttempts, e);
+                }
+            }
         }
     }
 
@@ -248,28 +276,47 @@ public class PostgreServer implements AutoCloseable {
             long postgresPid = Long.parseLong(lines.getFirst().trim());
             ProcessHandle.of(postgresPid)
                          .ifPresent(processHandle -> {
-                             boolean isPostgres = processHandle.info()
-                                                               .command()
-                                                               .map(Path::of)
-                                                               .map(Path::getFileName)
-                                                               .map(Path::toString)
-                                                               .map("postgres"::equals)
-                                                               .orElse(false);
+                             ProcessHandle.Info info = processHandle.info();
+                             // Check command name first; fall back to commandLine if unavailable
+                             // (Windows often returns empty for command() due to access restrictions)
+                             boolean isPostgres = info.command()
+                                                      .map(cmd -> {
+                                                          String name = Path.of(cmd).getFileName().toString();
+                                                          return "postgres".equals(name) || "postgres.exe".equals(name);
+                                                      })
+                                                      .orElseGet(() -> info.commandLine()
+                                                                           .map(cmdLine -> cmdLine.contains("postgres"))
+                                                                           .orElse(false));
                              if (!isPostgres) {
                                  LOGGER.warn("Skipping cleanup for PID {} because it does not look like PostgreSQL", postgresPid);
                                  return;
                              }
                              LOGGER.info("Killing orphaned PostgreSQL process (PID: {})", postgresPid);
+                             // Collect descendants BEFORE killing the main process, because on Windows
+                             // child processes become orphans and may no longer appear as descendants
+                             List<ProcessHandle> descendants = processHandle.descendants().toList();
                              processHandle.destroy();
                              try {
                                  processHandle.onExit().get(ORPHAN_TERMINATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                              } catch (InterruptedException e) {
                                  Thread.currentThread().interrupt();
-                                 processHandle.descendants().forEach(ProcessHandle::destroyForcibly);
                                  processHandle.destroyForcibly();
                              } catch (ExecutionException | TimeoutException e) {
-                                 processHandle.descendants().forEach(ProcessHandle::destroyForcibly);
                                  processHandle.destroyForcibly();
+                             }
+                             // Kill all descendants and wait for them to exit — on Windows,
+                             // file locks persist until processes fully terminate
+                             descendants.forEach(ProcessHandle::destroyForcibly);
+                             CompletableFuture<?>[] descendantExits = descendants.stream()
+                                     .map(ProcessHandle::onExit)
+                                     .toArray(CompletableFuture[]::new);
+                             try {
+                                 CompletableFuture.allOf(descendantExits)
+                                                  .get(ORPHAN_TERMINATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                             } catch (InterruptedException e) {
+                                 Thread.currentThread().interrupt();
+                             } catch (ExecutionException | TimeoutException e) {
+                                 LOGGER.debug("Some postgres descendants did not exit within timeout");
                              }
                          });
         } catch (IOException | NumberFormatException e) {
