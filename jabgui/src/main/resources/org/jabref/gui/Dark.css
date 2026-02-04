@@ -218,38 +218,39 @@
 }
 
 
+/* The CAYW Popup fix here - using only existing variables */
 /* The CAYW Popup fix here */
 .search-dialog {
     -fx-background-color: -jr-background-alt;
 }
 
 .list-cell {
-    -fx-text-fill: -jr-black !important;
-    -fx-fill: -jr-light-gray !important;
+    -fx-text-fill: -fx-dark-text-color;
+    -fx-fill: -fx-light-text-color;
 }
 
 .list-cell:hover,
 .list-cell:selected {
-    -fx-background-color: -jr-dark-gray !important;
-    -fx-text-fill: -jr-white !important;
+    -fx-background-color: derive(-fx-control-inner-background, 10%);
+    -fx-text-fill: -fx-light-text-color;
 }
 
 .list-cell .text,
 .list-cell .label,
-.list-cell .search-result-label,
-.list-cell .search-result-description {
-    -fx-text-fill: -jr-white !important;
-    -fx-fill: -jr-white !important;
+.search-result-label,
+.search-result-description {
+    -fx-text-fill: -fx-light-text-color;
+    -fx-fill: -fx-light-text-color;
 }
 
 .chip-style {
     -fx-border-radius: 15px;
-    -fx-border-color: -jr-white;
+    -fx-border-color: -jr-separator;
     -fx-border-width: 1px;
 }
 
 .chip-style .button {
-    -fx-border-color: transparent !important;
-    -fx-border-width: 0 !important;
-    -fx-background-color: transparent !important;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
 }
