@@ -261,7 +261,13 @@ jobs:
 
   tests-windows:
     name: "Unit tests (Windows)"
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
+    if: >
+      github.repository_owner == 'JabRef' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'pull_request' && startsWith(github.event.pull_request.title, 'Update Gradle Wrapper'))
+      )
     runs-on: windows-latest
     strategy:
       matrix:
