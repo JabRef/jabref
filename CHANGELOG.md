@@ -21,8 +21,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for [OpenCitations](https://opencitations.net/) and [OpenAlex](https://docs.openalex.org/) both in the GUI (tab "Citations") and JabKit (`--get-cited-works`, `--get-citing-works`). [#14996](https://github.com/JabRef/jabref/pull/14996)
 - We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
-- We added API key configuration support for [OpenAlex](https://openalex.org/).
-- We added API key configuration support for SemanticScholar.
+- We added API key configuration support for [OpenAlex](https://openalex.org/). [#15023](https://github.com/JabRef/jabref/pull/15023)
+- We added API key configuration support for SemanticScholar. [#15023](https://github.com/JabRef/jabref/pull/15023)
 - REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Allow import of supported formats via `POST http://localhost:23119/libraries/current/entries`. [#14896](https://github.com/JabRef/jabref/pull/14896)
@@ -51,7 +51,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where journal abbreviations chose the wrong abbreviation when fuzzy matching. [#14850](https://github.com/JabRef/jabref/pull/14850)
 - We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
 - We fixed an issue fetching DOI information when DOIs included URL-invalid characters (e.g., `10.1002/1098-108x(198905)8:3<343::aid-eat2260080310>3.0.co;2-c`). [#14996](https://github.com/JabRef/jabref/pull/14996)
-- We fixed an issue of OpenAlexFetcher not including the DOI.
+- We fixed an issue of OpenAlexFetcher not including the DOI. [#15023](https://github.com/JabRef/jabref/pull/15023)
+- We fixed an issue displaying a fetcher error in the citations tab. [#15023](https://github.com/JabRef/jabref/pull/15023)
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
 - Group selection now depends only on the user selection. [#14084](https://github.com/JabRef/jabref/issues/14084)
