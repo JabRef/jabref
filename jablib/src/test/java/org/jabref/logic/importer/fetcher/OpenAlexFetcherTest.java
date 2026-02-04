@@ -49,7 +49,7 @@ class OpenAlexFetcherTest {
     void setUp() {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(MedlineFetcher.FETCHER_NAME)).thenReturn(API_KEY);
+        when(importerPreferences.getApiKey(OpenAlex.FETCHER_NAME)).thenReturn(API_KEY);
         fetcher = new OpenAlex(importerPreferences);
     }
 
