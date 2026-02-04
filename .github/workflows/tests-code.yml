@@ -42,7 +42,8 @@ jobs:
 
   checkstyle:
     name: Checkstyle
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -87,7 +88,8 @@ jobs:
         run: git diff --exit-code
 
   format-javadoc:
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
