@@ -105,9 +105,9 @@ public final class MergeEntriesHelper {
         }
 
         return PlausibilityComparatorFactory.INSTANCE.getPlausibilityComparator(field)
-                .map(comparator -> comparator.compare(fetcherValue, libraryValue.get()))
-                .filter(result -> result == ComparisonResult.LEFT_BETTER)
-                .map(_ -> true)
-                .orElse(false);
+                                                     .map(comparator -> comparator.compare(fetcherValue, libraryValue.get()))
+                                                     .filter(result -> result == ComparisonResult.LEFT_BETTER)
+                                                     .map(_ -> true)
+                                                     .orElse(false);
     }
 }
