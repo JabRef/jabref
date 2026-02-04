@@ -24,7 +24,7 @@ concurrency:
 jobs:
   cache:
     if: ${{ github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -34,6 +34,7 @@ jobs:
           package_file: jablib/src/test/latex/Texlivefile
   check-latex:
     needs: [ cache ]
+    # texlive doesn't run on ubuntu-slim
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

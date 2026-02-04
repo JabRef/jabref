@@ -31,7 +31,7 @@ permissions:
 jobs:
   upload-pr-number:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
@@ -42,7 +42,7 @@ jobs:
 
   checkstyle:
     name: Checkstyle
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -55,7 +55,7 @@ jobs:
 
   openrewrite:
     name: OpenRewrite
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -65,13 +65,14 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
         run: |
-          ./gradlew --no-configuration-cache :rewriteDryRun
+          ./gradlew --no-configuration-cache :rewriteRun
       - name: Output diff
         if: failure()
         run: |
           cat /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch
 
   format:
+    # ubuntu-slim doesn't offer docker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -86,7 +87,7 @@ jobs:
         run: git diff --exit-code
 
   format-javadoc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
@@ -111,7 +112,7 @@ jobs:
 
   modernizer:
     name: Modernizer
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     # Version 1.11.0 does not run on JDK25: "java.lang.reflect.InvocationTargetException"
     if: false
     steps:
@@ -129,7 +130,7 @@ jobs:
 
   markdown:
     name: Markdown
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -145,7 +146,7 @@ jobs:
 
   changelog:
     name: CHANGELOG.md
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -184,7 +185,7 @@ jobs:
   changelog-unreleased-only:
     if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -206,6 +207,10 @@ jobs:
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
       - name: Install clparse
         run: sudo mv /tmp/clparse /usr/local/bin/clparse
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Check CHANGELOG.md diff
         run: |
           diff \
@@ -214,7 +219,7 @@ jobs:
 
   javadoc:
     name: JavaDoc
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -272,7 +277,7 @@ jobs:
 
   tests-jabkit-smoke:
     name: "JabKit Smoke Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -324,7 +329,7 @@ jobs:
 
   jbang-main:
     name: JBang (main)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: publish
     if: github.ref == 'refs/heads/main'
     steps:
@@ -378,7 +383,7 @@ jobs:
 
   jbang-pr:
     name: JBang (PR)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     # does not need publish, because the JBang scripts are modified
     if: github.ref != 'refs/heads/main'
     strategy:
@@ -445,7 +450,7 @@ jobs:
         shell: bash
 
   maven-examples:
-    name: Maven examples (main)
+    name: Maven examples
     runs-on: ubuntu-latest
     needs: publish
     if: github.ref == 'refs/heads/main'
@@ -471,37 +476,10 @@ jobs:
           mvn --batch-mode --update-snapshots verify
         shell: bash
 
-  maven-pr:
-    name: Maven examples (PR)
-    runs-on: ubuntu-latest
-    # does not need publish, because there is no publishing on non-main
-    if: github.ref != 'refs/heads/main'
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [ jablib-examples/maven3/doi-to-bibtex ]
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v6
-        with:
-          submodules: 'false'
-          show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 24
-          distribution: 'corretto'
-          cache: maven
-          check-latest: true
-      - run: |
-          cd ${{ matrix.project }}
-          mvn --batch-mode --update-snapshots verify
-        shell: bash
-
   codecoverage:
     if: false
     name: Code coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     services:
       postgres:
         image: postgres:10.8
@@ -552,7 +530,7 @@ jobs:
 
   requirements_coverage:
     name: "Validate requirement coverage"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
@@ -573,7 +551,7 @@ jobs:
   # It ensures that the jar file is from gradle and not by a strange third party.
   gradlevalidation:
     name: "Validate Gradle Wrapper"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:

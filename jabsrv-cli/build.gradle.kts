@@ -2,21 +2,24 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 }
+
+group = "org.jabref.jabsrv"
+version = project.findProperty("projVersion") ?: "100.0.0"
 
 application{
     mainClass.set("org.jabref.http.server.cli.ServerCli")
     mainModule.set("org.jabref.jabsrv.cli")
 
     applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core",
+
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
-        "-XX:+UseZGC", "-XX:+ZUncommit",
-        "-XX:+UseStringDeduplication",
-
-        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
+        "-XX:+UseStringDeduplication"
     )
 }
 

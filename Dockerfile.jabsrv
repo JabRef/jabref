@@ -1,4 +1,4 @@
-FROM gradle:jdk24-noble AS build
+FROM gradle:jdk25-noble AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
@@ -15,11 +15,11 @@ RUN mkdir /dist
 RUN mv jabsrv-cli/build/packages/*/* /dist
 
 # jpackage needs glibc; alpine does not work
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 
-LABEL org.opencontainers.image.title="jabsrv" \
-      org.opencontainers.image.description="JabRef's HTTP server" \
-      org.opencontainers.image.source=https://github.com/JabRef/jabref
+LABEL org.opencontainers.image.title="jabsrv"
+LABEL org.opencontainers.image.description="JabRef's HTTP server"
+LABEL org.opencontainers.image.source="https://github.com/JabRef/jabref"
 
 WORKDIR /work
 
