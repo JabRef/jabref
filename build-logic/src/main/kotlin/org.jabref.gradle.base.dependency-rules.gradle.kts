@@ -583,9 +583,6 @@ extraJavaModuleInfo {
     module("com.github.kevinstern:software-and-algorithms", "software.and.algorithms")
 
     module("com.uber.nullaway:nullaway", "nullaway")
-    module("org.checkerframework:dataflow-nullaway", "org.checkerframework.dataflow") {
-        exportAllPackages()
-    }
 }
 
 // Configure consistent resolution across the whole project

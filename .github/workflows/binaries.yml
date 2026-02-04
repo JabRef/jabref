@@ -119,7 +119,7 @@ concurrency:
 
 jobs:
   conditions:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
@@ -133,6 +133,10 @@ jobs:
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Determine conditions
         id: binary
         shell: bash
@@ -269,7 +273,7 @@ jobs:
 
   disk-space-check:
     needs: conditions
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
     steps:
@@ -755,7 +759,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Comment PR
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
@@ -873,7 +877,7 @@ jobs:
             ${{ matrix.path }}/build/packages/${{ matrix.os }}
 
   upload-pr-nnumber:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       actions: write

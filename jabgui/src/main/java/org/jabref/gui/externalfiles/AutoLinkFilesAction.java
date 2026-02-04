@@ -102,14 +102,13 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     undoManager.addEdit(nc);
                 }
 
-                dialogService.notify(String.format("%s %s\n%s",
+                dialogService.notify("%s %s\n%s".formatted(
                         Localization.lang("Finished automatically setting external links."),
                         Localization.lang("Changed %0 entry(s).", result.getChangedEntries().size()),
                         Localization.lang("Affected entry(s): %0", result.getChangedEntries().stream()
                                                                          .map(BibEntry::getCitationKey)
                                                                          .flatMap(Optional::stream)
-                                                                         .collect(Collectors.joining(", ")))
-                ));
+                                                                         .collect(Collectors.joining(", ")))));
             }
         };
 
