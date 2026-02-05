@@ -7,13 +7,17 @@ permissions:
 
 jobs:
   automerge:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.repository == 'JabRef/jabref'
     env:
       HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
       USER:      ${{ github.event.pull_request.user.login }}
       TITLE:     ${{ github.event.pull_request.title }}
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Determine if job should run
         id: shouldrun
         shell: bash

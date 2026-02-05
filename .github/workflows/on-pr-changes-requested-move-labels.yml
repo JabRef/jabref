@@ -8,7 +8,7 @@ on:
 jobs:
   apply-labels:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       actions: write
       contents: write
@@ -36,9 +36,6 @@ jobs:
         if: steps.check.outputs.continue == 'true'
         shell: bash -euxo pipefail {0}
         run: >
-          gh issue --repo ${{ github.repository }}
-            edit ${{ steps.check.outputs.pr_number }}
-            --remove-label "status: ready-for-review,status: awaiting-second-review,status: to-be-merged"
-            --add-label "status: changes-required"
+          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: ready-for-review,status: awaiting-second-review,status: to-be-merged" --add-label "status: changes-required"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

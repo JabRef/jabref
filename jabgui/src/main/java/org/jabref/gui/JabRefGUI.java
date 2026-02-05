@@ -464,6 +464,7 @@ public class JabRefGUI extends Application {
             LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
 
             // Shutdown everything in parallel to prevent causing non-shutdown of something in case of issues
+
             executor.submit(() -> {
                 LOGGER.trace("Closing citations and relations search service");
                 citationsAndRelationsSearchService.close();

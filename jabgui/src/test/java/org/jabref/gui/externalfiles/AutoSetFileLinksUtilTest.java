@@ -206,7 +206,7 @@ class AutoSetFileLinksUtilTest {
                     String citationKey = "thisIsACitationKey";
 
                     // File and folder before moving
-                    String fileName = String.format("%s_foobar.pdf", citationKey);
+                    String fileName = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = root.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -243,7 +243,7 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileName = String.format("%s_foobar.pdf", citationKey);
+                    String fileName = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -258,7 +258,7 @@ class AutoSetFileLinksUtilTest {
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
-                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(String.format("A/B/%s", fileName)), "PDF"));
+                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/B/%s".formatted(fileName)), "PDF"));
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(expect, actual);
                 }
@@ -281,10 +281,10 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileNameA = String.format("%s_foobar.pdf", citationKey);
+                    String fileNameA = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileNameA);
                     Files.createFile(fileA);
-                    String fileNameB = String.format("%s.pdf", citationKey);
+                    String fileNameB = "%s.pdf".formatted(citationKey);
                     Path fileB = folderB.resolve(fileNameB);
                     Files.createFile(fileB);
 
@@ -301,8 +301,8 @@ class AutoSetFileLinksUtilTest {
                     // Check auto-link result
 
                     List<LinkedFile> expect = List.of(
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameA)), "PDF"),
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameB)), "PDF")
+                            new LinkedFile("", Path.of("A/B/%s".formatted(fileNameA)), "PDF"),
+                            new LinkedFile("", Path.of("A/B/%s".formatted(fileNameB)), "PDF")
                     );
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(Set.copyOf(expect), Set.copyOf(actual));
@@ -326,10 +326,10 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileNameA = String.format("%s_foobar.pdf", citationKey);
+                    String fileNameA = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileNameA);
                     Files.createFile(fileA);
-                    String fileNameB = String.format("%s.pdf", citationKey);
+                    String fileNameB = "%s.pdf".formatted(citationKey);
                     Path fileB = folderB.resolve(fileNameB);
                     Files.createFile(fileB);
 
@@ -347,8 +347,8 @@ class AutoSetFileLinksUtilTest {
                     // Check auto-link result
 
                     List<LinkedFile> expect = List.of(
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameA)), "PDF"),
-                            new LinkedFile("", Path.of(String.format("A/B/%s", fileNameB)), "PDF")
+                            new LinkedFile("", Path.of("A/B/%s".formatted(fileNameA)), "PDF"),
+                            new LinkedFile("", Path.of("A/B/%s".formatted(fileNameB)), "PDF")
                     );
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(Set.copyOf(expect), Set.copyOf(actual));
@@ -370,7 +370,7 @@ class AutoSetFileLinksUtilTest {
                     String citationKey = "thisIsACitationKey";
 
                     // File and folder before moving
-                    String fileName = String.format("%s_foobar.pdf", citationKey);
+                    String fileName = "%s_foobar.pdf".formatted(citationKey);
                     Path fileA = root.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -401,7 +401,7 @@ class AutoSetFileLinksUtilTest {
                     String citationKey = "thisIsACitationKey";
 
                     // File and folder before moving
-                    String fileName = String.format("%s.pdf", citationKey);
+                    String fileName = "%s.pdf".formatted(citationKey);
                     Path fileA = root.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -438,7 +438,7 @@ class AutoSetFileLinksUtilTest {
                     Files.createDirectory(folderA);
                     Path folderB = folderA.resolve("B");
                     Files.createDirectory(folderB);
-                    String fileName = String.format("%s.pdf", citationKey);
+                    String fileName = "%s.pdf".formatted(citationKey);
                     Path fileA = folderB.resolve(fileName);
                     Files.createFile(fileA);
 
@@ -453,7 +453,7 @@ class AutoSetFileLinksUtilTest {
                     util.linkAssociatedFiles(entries, onLinkedFilesUpdated);
 
                     // Check auto-link result
-                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of(String.format("A/B/%s", fileName)), "PDF"));
+                    List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/B/%s".formatted(fileName)), "PDF"));
                     List<LinkedFile> actual = entryA.getFiles();
                     assertEquals(expect, actual);
                 }
