@@ -60,15 +60,11 @@ public class QuickSettings extends VBox {
     }
 
     private VBox createContent() {
-        ToggleSwitch httpServerToggle = new ToggleSwitch(Localization.lang("Enable HTTP server"));
+        ToggleSwitch httpServerToggle = new ToggleSwitch(Localization.lang("Enable HTTP server (for browser extension)"));
         httpServerToggle.selectedProperty().bindBidirectional(preferences.getRemotePreferences().enableHttpServerProperty());
         httpServerToggle.setMaxWidth(Double.MAX_VALUE);
         httpServerToggle.setPadding(new Insets(5));
 
-        ToggleSwitch languageServerToggle = new ToggleSwitch(Localization.lang("Enable LSP server"));
-        languageServerToggle.selectedProperty().bindBidirectional(preferences.getRemotePreferences().enableLanguageServerProperty());
-        languageServerToggle.setMaxWidth(Double.MAX_VALUE);
-        languageServerToggle.setPadding(new Insets(5));
 
         Button mainFileDirButton = createButton(
                 Localization.lang("Set main file directory"),
@@ -102,7 +98,6 @@ public class QuickSettings extends VBox {
 
         VBox newContent = new VBox(
                 httpServerToggle,
-                languageServerToggle,
                 mainFileDirButton,
                 themeButton,
                 largeLibraryButton,
