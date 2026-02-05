@@ -124,6 +124,7 @@ public class JabRefGUI extends Application {
             openWindow();
 
             startBackgroundTasks();
+            setupHttpServerEnabledListener();
 
             if (!fileUpdateMonitor.isActive()) {
                 dialogService.showErrorDialogAndWait(
@@ -443,6 +444,17 @@ public class JabRefGUI extends Application {
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
+    }
+
+    private void setupHttpServerEnabledListener() {
+        RemotePreferences remotePreferences = preferences.getRemotePreferences();
+        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> {
+            // stop in all cases, because the port might have changed
+            httpServerManager.stop();
+            if (newValue) {
+                httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+            }
+        });
     }
 
     @Override
