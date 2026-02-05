@@ -5,13 +5,14 @@
 .gitmodules
 .gitpod.yml
 
-
 .devcontainer/
 .dockerignore
 .github/
 .moderne
 .sdkmanrc
 .vscode
+
+build-logic/.gradle/
 
 jablib-examples
 
@@ -21,9 +22,9 @@ Dockerfile.*
 flatpak
 snap
 
-*/bin
-*/build
-*/out
+**/bin
+**/build
+**/out
 
 docs/
 
