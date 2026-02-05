@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,40 +139,47 @@ public class EntryResource {
     @POST
     @Path("files")
     @Consumes("application/pdf")
-    public void addFile(@PathParam("id") String id, @PathParam("entryId") String entryId, InputStream fileInputStream) throws IOException {
+    public Response addFile(@PathParam("id") String id, @PathParam("entryId") String entryId, InputStream fileInputStream) throws IOException {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
             throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
         }
-        // 0. Determine BibEntry
+
+        // 1. Determine BibEntry
         BibEntry entry = entriesByCitationKey.getFirst();
 
-        // 1. Determine target directory
+        // 2. Determine target directory
         Optional<java.nio.file.Path> targetDirOpt = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+
         if (targetDirOpt.isEmpty()) {
             throw new BadRequestException("Library must be saved or have a file directory configured to attach files.");
         }
         java.nio.file.Path targetDir = targetDirOpt.get();
 
-        // 2. Save stream to temporary file
-        // We must save to a temp file first because LinkedFileHandler requires an existing Path to generate the suggested filename based on content/metadata.
-        // We use the target directory to ensure we are on the same file system.
-        java.nio.file.Path tempFile = Files.createTempFile(targetDir, "jabref-upload", ".pdf");
+        // 3. Save stream to temporary file
+        String timestamp = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
+        java.nio.file.Path tempFile = Files.createTempFile(targetDir, "jabref-upload-" + timestamp + "-", ".pdf");
         Files.copy(fileInputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
-        // 3. Create LinkedFile
-        LinkedFile linkedFile = new LinkedFile("", tempFile, "PDF");
-        LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
+        // 4. Create LinkedFile
+        LinkedFile linkedFile = new LinkedFile(tempFile.getFileName().toString(), tempFile, "PDF");
 
-        // 4. Rename to suggested pattern (e.g. Author - Title.pdf)
+        // 5. Rename to suggested pattern (e.g. Author - Title.pdf)
+        LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
         boolean renameSuccessful = fileHandler.renameToSuggestedName();
         if (!renameSuccessful) {
-            throw new IOException("Failed to rename file to suggested pattern");
+            LOGGER.warn("Renaming to suggested name failed. Keeping temp filename.");
         }
 
-        // 5. Add to entry
+        // 6. Add to entry
         entry.addFile(linkedFile);
+
+        if (renameSuccessful) {
+            return Response.noContent().build();
+        } else {
+            return Response.ok("File uploaded but could not be renamed to suggested pattern.").build();
+        }
     }
 
     /// @param id - also "demo" for the Chocolate.bib file
