@@ -65,7 +65,6 @@ public class QuickSettings extends VBox {
         httpServerToggle.setMaxWidth(Double.MAX_VALUE);
         httpServerToggle.setPadding(new Insets(5));
 
-
         Button mainFileDirButton = createButton(
                 Localization.lang("Set main file directory"),
                 IconTheme.JabRefIcons.FOLDER,
