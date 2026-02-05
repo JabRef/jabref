@@ -1,4 +1,5 @@
-FROM gradle:jdk25-noble AS build
+# Using JBang instead of gradle:jdk25-noble, because we use a different JDK anyway
+FROM jbangdev/jbang:0.136.0-java-21 AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
@@ -6,13 +7,41 @@ ARG TAG_BUILD="false"
 
 WORKDIR /build
 
+COPY gradlew .
+COPY gradle gradle
+
+RUN ./gradlew --help
+
+COPY settings.gradle.kts .
+COPY build.gradle.kts .
+COPY gradle.properties .
+COPY build-logic/ build-logic/
+COPY build-support/ build-support/
+COPY jablib/build.gradle.kts jablib/
+COPY jabsrv/build.gradle.kts jabsrv/
+COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
+COPY jabls/build.gradle.kts jabls/
+COPY jabls-cli/build.gradle.kts jabls-cli/
+COPY jabkit/build.gradle.kts jabkit/
+COPY jabgui/build.gradle.kts jabgui/
+COPY test-support test-support
+COPY versions versions
+
+# Cache gradle and build-logic
+RUN ./gradlew --no-daemon :build-logic:jar
+
+COPY jablib/ jablib/
+RUN ./gradlew --no-daemon :jablib:compileJava
+
 COPY . .
 
-RUN gradle --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
+# Cache JabKit dependencies
+RUN ./gradlew --no-daemon :jabkit:dependencies --configuration runtimeClasspath
 
-RUN mkdir /dist
+RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage && \
+    mkdir /dist && \
+    mv jabkit/build/packages/*/* /dist
 
-RUN mv jabkit/build/packages/*/* /dist
 
 # jpackage needs glibc; alpine does not work
 FROM debian:trixie-slim AS runtime
