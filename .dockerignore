@@ -95,9 +95,6 @@ flatpak/JabRef-portable_linux.tar.gz
 # Gradle
 # generated when `gradlew --gui` is called
 ui/
-# for workspace specific gradle properties
-gradle.properties
-
 
 # IntelliJ IDEA
 .idea
