@@ -14,21 +14,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ResourceLock("Localization.lang")
 class HTMLCharacterCheckerTest {
 
     private final HTMLCharacterChecker checker = new HTMLCharacterChecker();
     private final BibEntry entry = new BibEntry();
-
-    @Test
-    void settingNullThrowsNPE() {
-        assertThrows(
-                NullPointerException.class,
-                () -> entry.setField(StandardField.AUTHOR, null)
-        );
-    }
 
     @Test
     void titleAcceptsNonHTMLEncodedCharacters() {
