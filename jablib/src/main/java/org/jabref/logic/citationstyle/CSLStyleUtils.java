@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -53,7 +54,18 @@ public final class CSLStyleUtils {
         }
 
         // Check if absolute path (meaning: external CSL file) - and exists
-        Path filePath = Path.of(styleFile);
+        Path filePath;
+        try {
+            filePath = Path.of(styleFile);
+        } catch (InvalidPathException e) {
+            LOGGER.info("Malformed path detected in preferences. Attempting to sanitize.");
+            styleFile = styleFile.replaceFirst("^[/\\\\]+", "");
+            try {
+                filePath = Path.of(styleFile);
+            } catch (InvalidPathException ex) {
+                  return Optional.empty();
+            }
+        }
         if (filePath.isAbsolute() && Files.exists(filePath)) {
             try (InputStream inputStream = Files.newInputStream(filePath)) {
                 return createCitationStyleFromSource(inputStream, styleFile, false);
