@@ -7,6 +7,42 @@ ARG TAG_BUILD="false"
 
 WORKDIR /build
 
+# Use JDK from Docker Hub instead of Gradle's Toolchain downloader
+COPY --from=amazoncorretto:25-alpine-jdk /usr/lib/jvm/default-jvm /usr/lib/jvm/default-jvm
+ENV JAVA_HOME=/usr/lib/jvm/default-jvm
+ENV PATH=/usr/lib/jvm/default-jvm/bin:$PATH
+
+# Required for gradle
+# Copied from https://github.com/gradle/docker-gradle/blob/ad71465de5a693db1922926211712c49cb36902b/jdk-lts-and-current-graal/Dockerfile
+RUN set -o errexit -o nounset \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        # common utilities
+        make \
+        curl \
+        wget \
+        tar \
+        \
+        # Gradle & Dockerfile dependencies
+        binutils \
+        ca-certificates \
+        fontconfig \
+        locales \
+        p11-kit \
+        tzdata \
+        unzip \
+        \
+        # build dependencies
+        gcc \
+        libc-dev \
+        libz-dev \
+        zlib1g-dev \
+    && rm --recursive --force /var/lib/apt/lists/*
+
+RUN file /usr/lib/jvm/default-jvm/bin/java && ldd /usr/lib/jvm/default-jvm/bin/java || true
+
+
 COPY gradlew .
 COPY gradle gradle
 
