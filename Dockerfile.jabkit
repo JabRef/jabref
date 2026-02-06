@@ -1,5 +1,4 @@
-# Using JBang instead of gradle:jdk25-noble, because we use a different JDK anyway
-FROM jbangdev/jbang:0.136.0-java-21 AS build
+FROM amazoncorretto:25-alpine-jdk as build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
@@ -7,41 +6,10 @@ ARG TAG_BUILD="false"
 
 WORKDIR /build
 
-# Use JDK from Docker Hub instead of Gradle's Toolchain downloader
-COPY --from=amazoncorretto:25-alpine-jdk /usr/lib/jvm/default-jvm /usr/lib/jvm/default-jvm
-ENV JAVA_HOME=/usr/lib/jvm/default-jvm
-ENV PATH=/usr/lib/jvm/default-jvm/bin:$PATH
+COPY --from=jbangdev/jbang:0.136.0-java-21 /jbang-0.136.0/ /jbang/
 
-# Required for gradle
-# Copied from https://github.com/gradle/docker-gradle/blob/ad71465de5a693db1922926211712c49cb36902b/jdk-lts-and-current-graal/Dockerfile
-RUN set -o errexit -o nounset \
-    && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get update \
-    && apt-get install --yes --no-install-recommends \
-        # common utilities
-        make \
-        curl \
-        wget \
-        tar \
-        \
-        # Gradle & Dockerfile dependencies
-        binutils \
-        ca-certificates \
-        fontconfig \
-        locales \
-        p11-kit \
-        tzdata \
-        unzip \
-        \
-        # build dependencies
-        gcc \
-        libc-dev \
-        libz-dev \
-        zlib1g-dev \
-    && rm --recursive --force /var/lib/apt/lists/*
-
-RUN file /usr/lib/jvm/default-jvm/bin/java && ldd /usr/lib/jvm/default-jvm/bin/java || true
-
+ENV PATH="${PATH}:/jbang/bin"
+ENV JBANG_DIR="/jbang/.jbang"
 
 COPY gradlew .
 COPY gradle gradle
@@ -53,13 +21,13 @@ COPY build.gradle.kts .
 COPY gradle.properties .
 COPY build-logic/ build-logic/
 COPY build-support/ build-support/
+COPY jabgui/build.gradle.kts jabgui/
+COPY jabkit/build.gradle.kts jabkit/
 COPY jablib/build.gradle.kts jablib/
-COPY jabsrv/build.gradle.kts jabsrv/
-COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
 COPY jabls/build.gradle.kts jabls/
 COPY jabls-cli/build.gradle.kts jabls-cli/
-COPY jabkit/build.gradle.kts jabkit/
-COPY jabgui/build.gradle.kts jabgui/
+COPY jabsrv/build.gradle.kts jabsrv/
+COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
 COPY test-support test-support
 COPY versions versions
 
@@ -67,9 +35,6 @@ COPY versions versions
 RUN ./gradlew --no-daemon :build-logic:jar
 
 COPY . .
-
-# Cache JabKit dependencies
-RUN ./gradlew --no-daemon :jabkit:dependencies --configuration runtimeClasspath
 
 RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage && \
     mkdir /dist && \

@@ -1,11 +1,15 @@
-# Using JBang instead of gradle:jdk25-noble, because we use a different JDK anyway
-FROM jbangdev/jbang:0.136.0-java-21 AS build
+FROM amazoncorretto:25-alpine-jdk as build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
 ARG TAG_BUILD="false"
 
 WORKDIR /build
+
+COPY --from=jbangdev/jbang:0.136.0-java-21 /jbang-0.136.0/ /jbang/
+
+ENV PATH="${PATH}:/jbang/bin"
+ENV JBANG_DIR="/jbang/.jbang"
 
 COPY gradlew .
 COPY gradle gradle
@@ -17,13 +21,13 @@ COPY build.gradle.kts .
 COPY gradle.properties .
 COPY build-logic/ build-logic/
 COPY build-support/ build-support/
+COPY jabgui/build.gradle.kts jabgui/
+COPY jabkit/build.gradle.kts jabkit/
 COPY jablib/build.gradle.kts jablib/
-COPY jabsrv/build.gradle.kts jabsrv/
-COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
 COPY jabls/build.gradle.kts jabls/
 COPY jabls-cli/build.gradle.kts jabls-cli/
-COPY jabkit/build.gradle.kts jabkit/
-COPY jabgui/build.gradle.kts jabgui/
+COPY jabsrv/build.gradle.kts jabsrv/
+COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
 COPY test-support test-support
 COPY versions versions
 
@@ -31,9 +35,6 @@ COPY versions versions
 RUN ./gradlew --no-daemon :build-logic:jar
 
 COPY . .
-
-# Cache JabSrv-CLI dependencies
-RUN ./gradlew --no-daemon :jabsrv-cli:dependencies --configuration runtimeClasspath
 
 RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage && \
     mkdir /dist && \
