@@ -30,9 +30,6 @@ COPY versions versions
 # Cache gradle and build-logic
 RUN ./gradlew --no-daemon :build-logic:jar
 
-COPY jablib/ jablib/
-RUN ./gradlew --no-daemon :jablib:compileJava
-
 COPY . .
 
 # Cache JabSrv-CLI dependencies
