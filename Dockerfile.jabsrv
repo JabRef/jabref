@@ -1,4 +1,4 @@
-FROM amazoncorretto:25-alpine-jdk as build
+FROM amazoncorretto:25-jdk AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
