@@ -545,12 +545,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 25
-          distribution: 'corretto'
-          check-latest: true
       - uses: ./.github/actions/setup-gradle
       - run: ./gradlew traceRequirements
       - if: always()
