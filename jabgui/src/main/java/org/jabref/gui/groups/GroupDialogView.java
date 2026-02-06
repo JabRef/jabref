@@ -84,6 +84,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton searchRadioButton;
     @FXML private RadioButton autoRadioButton;
     @FXML private RadioButton texRadioButton;
+    @FXML private RadioButton entryTypeRadioButton;
 
     // Option Groups
     @FXML private TextField keywordGroupSearchTerm;
