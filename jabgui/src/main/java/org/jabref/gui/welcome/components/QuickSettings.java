@@ -1,5 +1,6 @@
 package org.jabref.gui.welcome.components;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -17,6 +18,8 @@ import org.jabref.gui.welcome.quicksettings.PushApplicationDialog;
 import org.jabref.gui.welcome.quicksettings.ThemeDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+
+import org.controlsfx.control.ToggleSwitch;
 
 public class QuickSettings extends VBox {
     private final GuiPreferences preferences;
@@ -57,6 +60,11 @@ public class QuickSettings extends VBox {
     }
 
     private VBox createContent() {
+        ToggleSwitch httpServerToggle = new ToggleSwitch(Localization.lang("Enable HTTP server (for browser extension)"));
+        httpServerToggle.selectedProperty().bindBidirectional(preferences.getRemotePreferences().enableHttpServerProperty());
+        httpServerToggle.setMaxWidth(Double.MAX_VALUE);
+        httpServerToggle.setPadding(new Insets(5));
+
         Button mainFileDirButton = createButton(
                 Localization.lang("Set main file directory"),
                 IconTheme.JabRefIcons.FOLDER,
@@ -87,7 +95,9 @@ public class QuickSettings extends VBox {
                 IconTheme.JabRefIcons.TOGGLE_GROUPS,
                 this::showEntryTableConfigurationDialog);
 
-        VBox newContent = new VBox(mainFileDirButton,
+        VBox newContent = new VBox(
+                httpServerToggle,
+                mainFileDirButton,
                 themeButton,
                 largeLibraryButton,
                 entryTableButton,

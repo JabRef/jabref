@@ -13,8 +13,9 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
-  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
+  OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 
@@ -42,7 +43,8 @@ jobs:
 
   checkstyle:
     name: Checkstyle
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -87,7 +89,8 @@ jobs:
         run: git diff --exit-code
 
   format-javadoc:
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
@@ -146,7 +149,8 @@ jobs:
 
   changelog:
     name: CHANGELOG.md
-    runs-on: ubuntu-slim
+    # JBang needs a JDK
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -219,7 +223,8 @@ jobs:
 
   javadoc:
     name: JavaDoc
-    runs-on: ubuntu-slim
+    # Sometimes takes longer than 15 minutes, therefore not ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -258,7 +263,13 @@ jobs:
 
   tests-windows:
     name: "Unit tests (Windows)"
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
+    if: >
+      github.repository_owner == 'JabRef' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'pull_request' && startsWith(github.event.pull_request.title, 'Update Gradle Wrapper'))
+      )
     runs-on: windows-latest
     strategy:
       matrix:
@@ -535,14 +546,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 25
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+      - uses: ./.github/actions/setup-gradle
       - run: ./gradlew traceRequirements
       - if: always()
         run: cat build/reports/tracing.txt
