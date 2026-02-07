@@ -158,8 +158,8 @@ To run an example test from IntelliJ, we let IntelliJ create a launch configurat
 Locate the class `LocalizationConsistencyTest`:
 Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
-Enter `LocalizationConsistencyTest`.
-Now, `localization consistency test` should appear first:
+Enter `localization consistency test`.
+Now, `LocalizationConsistencyTest` should appear first:
 
 {% figure caption:"IntelliJ search for class “LocalizationConsistencyTest”" %}
 ![IntelliJ search for class "LocalizationConsistencyTest"](12-08-locate-LocalizationConsistencyTest.png)
@@ -175,9 +175,9 @@ Hover on the green play button on `findMissingLocalizationKeys`:
 
 Then, click on it.
 A popup menu opens.
-Choose the first entry "Run LocalizationConsistencyTest.testfindMissingLocalizationKeys" and click on it.
+Choose the first entry "Run LocalizationConsistencyTest.findMissingLocalizationKeys" and click on it.
 
-{% figure caption:"Run LocalizationConsistencyTest.testfindMissingLocalizationKeys" %}
+{% figure caption:"Run LocalizationConsistencyTest.findMissingLocalizationKeys" %}
 ![Popup menu - Run testfindMissingLocalizationKeys](12-10-run-single-test-launch-config.png)
 {% endfigure %}
 
