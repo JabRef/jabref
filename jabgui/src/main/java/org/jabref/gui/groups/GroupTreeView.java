@@ -604,6 +604,7 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
@@ -617,7 +618,6 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 new Menu(Localization.lang("Sort"), null,
                         factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT,
