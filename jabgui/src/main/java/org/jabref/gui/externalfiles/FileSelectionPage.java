@@ -35,8 +35,6 @@ import org.controlsfx.dialog.WizardPane;
 public class FileSelectionPage extends WizardPane {
 
     private final UnlinkedFilesDialogViewModel viewModel;
-
-    // --- FIX 1: Define the missing property ---
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
 
     private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
@@ -61,7 +59,6 @@ public class FileSelectionPage extends WizardPane {
         setupBindings();
     }
 
-    // --- FIX 2: Expose the property getter ---
     public BooleanProperty invalidProperty() {
         return invalidProperty;
     }
@@ -142,8 +139,7 @@ public class FileSelectionPage extends WizardPane {
                         FXCollections.observableArrayList());
             }
         });
-
-        // This works now because we defined invalidProperty()
+        
         invalidProperty().bind(
                 Bindings.isEmpty(viewModel.checkedFileListProperty())
                         .or(viewModel.taskActiveProperty())
