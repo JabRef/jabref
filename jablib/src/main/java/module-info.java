@@ -124,6 +124,8 @@ open module org.jabref.jablib {
     exports org.jabref.logic.bibtex.comparator.plausibility;
 
     requires java.base;
+    // Required for Jilt-generated Builder classes using @Generated annotation
+    requires static java.compiler;
 
     requires javafx.base;
     requires javafx.graphics; // because of javafx.scene.paint.Color
@@ -271,6 +273,7 @@ open module org.jabref.jablib {
     requires org.antlr.antlr4.runtime;
     requires org.jooq.jool;
     requires org.libreoffice.uno;
+    requires static jilt;
     requires transitive org.jspecify;
     // endregion
 }

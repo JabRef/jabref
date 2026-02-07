@@ -226,7 +226,10 @@ dependencies {
     testImplementation("org.testfx:testfx-junit5")
 
     // Highly recommended builder generator - https://github.com/skinny85/jilt
-    // Keep it for tests only
+    // Added for main source to enable Builder pattern for BibEntry
+    compileOnly("cc.jilt:jilt")
+    annotationProcessor("cc.jilt:jilt")
+
     testCompileOnly("cc.jilt:jilt")
     testAnnotationProcessor("cc.jilt:jilt")
 

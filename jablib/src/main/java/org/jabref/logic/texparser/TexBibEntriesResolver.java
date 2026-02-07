@@ -67,7 +67,11 @@ public class TexBibEntriesResolver {
 
     private BibEntry addCrossReferencingData(BibEntry entry, BibDatabase bibDatabase) {
         bibDatabase.getReferencedEntry(entry).ifPresent(refEntry ->
-                refEntry.getFields().forEach(field -> entry.getFieldMap().putIfAbsent(field, refEntry.getFieldOrAlias(field).orElse(""))));
+                refEntry.getFields().forEach(field -> {
+                    if (!entry.hasField(field)) {
+                        entry.setField(field, refEntry.getFieldOrAlias(field).orElse(""));
+                    }
+                }));
 
         return entry;
     }
