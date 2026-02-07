@@ -58,12 +58,13 @@ public final class CSLStyleUtils {
         try {
             filePath = Path.of(styleFile);
         } catch (InvalidPathException e) {
-            LOGGER.info("Malformed path detected in preferences. Attempting to sanitize.");
+            LOGGER.info("Malformed path detected in preferences: {}. Attempting to fix.", styleFile);
             styleFile = styleFile.replaceFirst("^[/\\\\]+", "");
             try {
                 filePath = Path.of(styleFile);
             } catch (InvalidPathException ex) {
-                  return Optional.empty();
+                LOGGER.warn("Could not recover invalid CSL style path: {}", styleFile, ex);
+                return Optional.empty();
             }
         }
         if (filePath.isAbsolute() && Files.exists(filePath)) {
@@ -141,10 +142,8 @@ public final class CSLStyleUtils {
                             String hangingIndent = reader.getAttributeValue(null, "hanging-indent");
                             usesHangingIndent = "true".equals(hangingIndent);
                         }
-                        case "citation" ->
-                                hasCitation = true;
-                        case "info" ->
-                                inInfo = true;
+                        case "citation" -> hasCitation = true;
+                        case "info" -> inInfo = true;
                         case "title" -> {
                             if (inInfo) {
                                 title = reader.getElementText();

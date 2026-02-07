@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -203,5 +204,13 @@ class CSLStyleUtilsTest {
                 Arguments.of(true, MLA),
                 Arguments.of(false, JOURNAL_OF_CLINICAL_ETHICS)
         );
+    }
+
+    @Test
+    void createCitationStyleFromFileHandlesMalformedUNCPath() {
+        String malformedPath = "////ieee.csl";
+        Optional<CitationStyle> style = CSLStyleUtils.createCitationStyleFromFile(malformedPath);
+        assertTrue(style.isPresent(), "The style should be successfully loaded after fixing the path");
+        assertEquals("ieee.csl", style.get().getFilePath());
     }
 }
