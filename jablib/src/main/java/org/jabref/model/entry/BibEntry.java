@@ -796,12 +796,12 @@ public class BibEntry {
         return putKeywords(keywordList, keywordDelimiter);
     }
 
-    /// @return an unmodifiable snapshot of the field values
+    /// @return an unmodifiable view of the field values
     public Collection<String> getFieldValues() {
-        return List.copyOf(fields.values());
+        return Collections.unmodifiableCollection(fields.values());
     }
 
-    /// @return an unmodifiable snapshot of the field map
+    /// @return an unmodifiable view of the field map
     public Map<Field, String> getFieldMap() {
         return Collections.unmodifiableMap(fields);
     }
