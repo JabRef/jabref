@@ -9,6 +9,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+- We fixed an issue where JabRef would fail to start if the registry contained malformed CSL preview paths. [#14630](https://github.com/JabRef/jabref/issues/14630)
+
 ### Added
 
 - We added the ability to remove XMP metadata from linked files. [#8277](https://github.com/JabRef/jabref/issues/8277)
@@ -1869,7 +1871,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening the menu 'Library properties' marked the library as modified [#6451](https://github.com/JabRef/jabref/issues/6451)
 - We fixed an issue when importing resulted in an exception [#7343](https://github.com/JabRef/jabref/issues/7343)
 - We fixed an issue where the field in the Field formatter dropdown selection were sorted in random order. [#7710](https://github.com/JabRef/jabref/issues/7710)
-- We fixed an issue where JabRef would fail to start if the registry contained malformed CSL preview paths. [#14630](https://github.com/JabRef/jabref/issues/14630)
 
 ### Removed
 
