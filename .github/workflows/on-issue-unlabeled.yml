@@ -9,7 +9,7 @@ jobs:
   handle_Assigned_and_FirstTimeCodeContribution:
     name: "📍 Assigned or FirstTimeCodeContribution"
     if: ${{ (github.event.label.name == '📍 Assigned' || github.event.label.name == 'FirstTimeCodeContribution') && github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:

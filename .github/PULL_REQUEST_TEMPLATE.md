@@ -18,7 +18,7 @@ In that case, briefly outline next steps and whether you are requesting feedback
 ### Steps to test
 
 <!-- Describe how reviewers can test this fix/feature. Ideally, think of how you would guide a beginner user of JabRef to try out your change. -->
-<!-- You can add screenshots or videos (using Loom - https://www.loom.com or by just adding .mp4 files). -->
+<!-- Add screenshots (preferred) or videos (using Loom - https://www.loom.com or by just adding .mp4 files). -->
 <!-- (REPLACE THIS PARAGRAPH) -->
 
 <!-- YOU HAVE TO MODIFY THE ABOVE TEXT TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
@@ -38,5 +38,6 @@ Keep ALL the items. Replace the dots inside [.] and mark them as follows:
 - [.] I manually tested my changes in running JabRef (always required)
 - [.] I added JUnit tests for changes (if applicable)
 - [.] I added screenshots in the PR description (if change is visible to the user)
+- [.] I added a screenshot in the PR description showing a library with a single entry with me as author and as title the issue number.
 - [.] I described the change in `CHANGELOG.md` in a way that is understandable for the average user (if change is visible to the user)
 - [.] I checked the [user documentation](https://docs.jabref.org/): Is the information available and up to date? If not, I created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, I submitted a pull request updating file(s) in <https://github.com/JabRef/user-documentation/tree/main/en>.

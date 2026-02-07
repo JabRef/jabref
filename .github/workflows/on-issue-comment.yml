@@ -7,7 +7,7 @@ on:
 jobs:
   assign:
     if: ${{ github.repository == 'JabRef/jabref' || github.repository == 'JabRef/jabref-koppor' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       issues: write
