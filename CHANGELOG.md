@@ -26,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Allow import of supported formats via `POST http://localhost:23119/libraries/current/entries`. [#14896](https://github.com/JabRef/jabref/pull/14896)
+- We added the option to enable/disable the HTTP-Server for the browser extension to the Quick Settings on the Welcome screen [#14902](https://github.com/JabRef/jabref/issues/14902)
 - We added the ability to update bibliographic information based on the existing entry data. [#14185](https://github.com/JabRef/jabref/issues/14185)
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
 
@@ -36,7 +37,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Batch update for bibliographic information now uses heuristics to update the field.
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
-- We changed unlinked files dialog to a proper one. [#12709](https://github.com/JabRef/jabref/issues/12709#issuecomment-3831169893)
+- We changed unlinked files dialog to a proper one. [#12709](https://github.com/JabRef/jabref/issues/12709)
+
 ### Fixed
 
 - We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
