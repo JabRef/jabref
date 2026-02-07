@@ -483,45 +483,25 @@ jobs:
           git: https://github.com/avelino/jbundle/
           branch: main
 
+      - name: ShadowJar JabGui
+        shell: bash
+        run: ./gradlew :jabgui:ShadowJar
       - name: jbundle JabGui (Linux)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
           mkdir -p build/jbundle
-          ls -la jabgui/build/packages/${{ matrix.os }}
-          find jabgui/build/packages/${{ matrix.os }} -name "java"
-          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages/${{ matrix.os }}/JabRef/lib/runtime --output ./build/jbundle/jabgui
-
-          # Not working - see https://github.com/avelino/jbundle/pull/43#issuecomment-3829338927
-          # jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui --jvm-args "--add-modules jdk.incubator.vector --enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain --add-opens java.base/java.nio=org.apache.pdfbox.io --add-opens java.base/jdk.internal.ref=org.apache.pdfbox.io -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication"
-      - name: jbundle JabGui (macOS Intel)
-        # if: ${{ startsWith(matrix.os, 'macos') }}
-        if: ${{ false }}
+          jbundle build --input jabgui/build/libs/jabgui-*-all.jar --output ./build/jbundle/jabgui-${{ matrix.displayName }}
+      - name: jbundle JabGui filename fix (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
         shell: bash
         run: |
-          mkdir -p build/jbundle
-          ls -la jabgui/build/packages/${{ matrix.os }}
-          find jabgui/build/packages/${{ matrix.os }} -name "java"
-          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages/${{ matrix.os }}/JabRef.app/Contents/runtime --output ./build/jbundle/jabgui
-
-          # Not working - see https://github.com/avelino/jbundle/pull/43#issuecomment-3829338927
-          # jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui --jvm-args "--add-modules jdk.incubator.vector --enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain --add-opens java.base/java.nio=org.apache.pdfbox.io --add-opens java.base/jdk.internal.ref=org.apache.pdfbox.io -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication"
-      - name: jbundle JabGui (Windows)
-        if: ${{ false }}
-        shell: bash
-        run: |
-          mkdir -p build/jbundle
-          ls -la jabgui/build/packages/${{ matrix.os }}
-          find jabgui/build/packages/${{ matrix.os }} -name "java"
-          # jbundle build --input . --gradle-project jabgui --jlink-runtime build/packages/${{ matrix.os }}/runtime --output ./build/jbundle/jabgui
-
+          mv build/jbundle/jabgui-${{ matrix.displayName }} build/jbundle/jabgui-${{ matrix.displayName }}.exe
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
           build/jbundle/jabgui --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
