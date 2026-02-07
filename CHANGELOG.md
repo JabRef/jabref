@@ -32,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We refactored `BibEntry` to improve encapsulation and maintainability: deprecated `withX()` methods in favor of `BibEntryBuilder`, enforced defensive copying on `getFieldMap()` and `getFieldValues()`, and extracted cross-reference field mapping logic to `FieldMappingRegistry`. [#14067](https://github.com/JabRef/jabref/issues/14067)
 - We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog. [#11791](https://github.com/JabRef/jabref/issues/11791)
 - Checking for existence of the "Imported entries" group is now case-insensitive. [#14999](https://github.com/JabRef/jabref/pull/14999)
 - Batch update for bibliographic information now uses heuristics to update the field.
