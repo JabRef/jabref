@@ -127,8 +127,7 @@ public class FileSelectionPage extends WizardPane {
 
                 ((BorderPane) getContent()).setCenter(contentPane);
             } else {
-                EasyBind.bindContent(viewModel.checkedFileListProperty(),
-                        FXCollections.observableArrayList());
+                EasyBind.bindContent(viewModel.checkedFileListProperty(), FXCollections.observableArrayList());
             }
         });
 
@@ -160,14 +159,10 @@ public class FileSelectionPage extends WizardPane {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.SELECT_ALL,
-                new TreeContextAction(StandardActions.SELECT_ALL)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.UNSELECT_ALL,
-                new TreeContextAction(StandardActions.UNSELECT_ALL)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.EXPAND_ALL,
-                new TreeContextAction(StandardActions.EXPAND_ALL)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COLLAPSE_ALL,
-                new TreeContextAction(StandardActions.COLLAPSE_ALL)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.SELECT_ALL, new TreeContextAction(StandardActions.SELECT_ALL)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.UNSELECT_ALL, new TreeContextAction(StandardActions.UNSELECT_ALL)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.EXPAND_ALL, new TreeContextAction(StandardActions.EXPAND_ALL)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COLLAPSE_ALL, new TreeContextAction(StandardActions.COLLAPSE_ALL)));
 
         return contextMenu;
     }
