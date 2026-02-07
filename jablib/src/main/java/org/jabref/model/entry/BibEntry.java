@@ -195,7 +195,6 @@ public class BibEntry {
         if (files != null && !files.isEmpty()) {
             this.fields.put(StandardField.FILE, FileFieldWriter.getStringRepresentation(files));
         }
-        this.changed = false;
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
