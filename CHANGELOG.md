@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Batch update for bibliographic information now uses heuristics to update the field.
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
+- We refactored `BibEntry` to improve encapsulation and maintainability: deprecated `withX()` methods in favor of `BibEntryBuilder`, enforced defensive copying on `getFieldMap()` and `getFieldValues()`, and extracted cross-reference field mapping logic to `FieldMappingRegistry`. [#14067](https://github.com/JabRef/jabref/issues/14067)
 
 ### Fixed
 
