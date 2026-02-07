@@ -142,8 +142,10 @@ public final class CSLStyleUtils {
                             String hangingIndent = reader.getAttributeValue(null, "hanging-indent");
                             usesHangingIndent = "true".equals(hangingIndent);
                         }
-                        case "citation" -> hasCitation = true;
-                        case "info" -> inInfo = true;
+                        case "citation" ->
+                                hasCitation = true;
+                        case "info" ->
+                                inInfo = true;
                         case "title" -> {
                             if (inInfo) {
                                 title = reader.getElementText();
