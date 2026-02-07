@@ -83,9 +83,7 @@ public class FileSelectionPage extends WizardPane {
         fileCountLabel.setStyle("-fx-font-weight: bold;");
 
         unlinkedFilesList = new CheckTreeView<>();
-        new ViewModelTreeCellFactory<FileNodeViewModel>()
-                .withText(FileNodeViewModel::getDisplayTextWithEditDate)
-                .install(unlinkedFilesList);
+        new ViewModelTreeCellFactory<FileNodeViewModel>().withText(FileNodeViewModel::getDisplayTextWithEditDate).install(unlinkedFilesList);
 
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList.setContextMenu(createContextMenu());
@@ -116,20 +114,14 @@ public class FileSelectionPage extends WizardPane {
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
 
-        unlinkedFilesList.rootProperty().bind(
-                EasyBind.map(viewModel.treeRootProperty(),
-                        fileNode -> fileNode.map(fileNodeViewModel ->
-                                                    new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren))
-                                            .orElse(null))
-        );
+        unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(), fileNode -> fileNode.map(fileNodeViewModel -> new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren)).orElse(null)));
 
         EasyBind.subscribe(unlinkedFilesList.rootProperty(), root -> {
             if (root != null) {
                 ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
                 root.setExpanded(true);
 
-                EasyBind.bindContent(viewModel.checkedFileListProperty(),
-                        unlinkedFilesList.getCheckModel().getCheckedItems());
+                EasyBind.bindContent(viewModel.checkedFileListProperty(), unlinkedFilesList.getCheckModel().getCheckedItems());
 
                 updateFileCount(root);
 
@@ -139,11 +131,8 @@ public class FileSelectionPage extends WizardPane {
                         FXCollections.observableArrayList());
             }
         });
-        
-        invalidProperty().bind(
-                Bindings.isEmpty(viewModel.checkedFileListProperty())
-                        .or(viewModel.taskActiveProperty())
-        );
+
+        invalidProperty().bind(Bindings.isEmpty(viewModel.checkedFileListProperty()).or(viewModel.taskActiveProperty()));
 
         selectAllButton.disableProperty().bind(viewModel.taskActiveProperty());
         unselectAllButton.disableProperty().bind(viewModel.taskActiveProperty());
