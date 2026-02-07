@@ -85,3 +85,5 @@ jobs:
           build-args: |
             VERSION=${{ steps.gitversion.outputs.AssemblySemVer }}
             VERSION_INFO=${{ steps.gitversion.outputs.InformationalVersion }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
