@@ -1,4 +1,7 @@
-FROM amazoncorretto:25-jdk AS build
+FROM maven:3.9.12-amazoncorretto-25-debian AS build
+
+# Is not debian-based
+# FROM amazoncorretto:25-jdk AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
@@ -14,7 +17,7 @@ ENV JBANG_DIR="/jbang/.jbang"
 COPY gradlew .
 COPY gradle gradle
 
-RUN ./gradlew --help
+RUN ./gradlew || true
 
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
