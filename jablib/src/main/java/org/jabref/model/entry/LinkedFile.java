@@ -41,14 +41,26 @@ public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
 
-    // We have to mark these properties as transient because they can't be serialized directly
+    // We have to mark the followin properties as transient because they can't be serialized directly
+
     private transient StringProperty description = new SimpleStringProperty();
+
     private transient StringProperty link = new SimpleStringProperty();
+
     // This field is a {@link StringProperty}, and not an {@link ObjectProperty<FileType>}, as {@link LinkedFile} might
     // be a URI, where a file type might not be present.
     private transient StringProperty fileType = new SimpleStringProperty();
+
     private transient StringProperty sourceURL = new SimpleStringProperty();
 
+    /// @param description The description of the linked file
+    /// @param link        The path or URL to the linked file
+    /// @param fileType    The file type of the linked file. See [org.jabref.logic.util.StandardFileType] for common file types.
+    public LinkedFile(String description, String link, FileType fileType) {
+        this(description, link, fileType.getName());
+    }
+
+    /// Better use [LinkedFile(String description, String link, FileType fileType)] constructor
     public LinkedFile(String description, Path link, String fileType) {
         this(description, link.toString(), fileType);
     }
@@ -57,13 +69,7 @@ public class LinkedFile implements Serializable {
         this(description, link.toString(), fileType, sourceUrl);
     }
 
-    public LinkedFile(String description, String link, FileType fileType) {
-        this(description, link, fileType.getName());
-    }
-
-    /**
-     * Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
-     */
+    /// Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
     public LinkedFile(String description, String link, String fileType, String sourceUrl) {
         this.description.setValue(description);
         setLink(link);
@@ -87,9 +93,7 @@ public class LinkedFile implements Serializable {
         this(description, link.toString(), fileType, sourceUrl);
     }
 
-    /**
-     * Constructs a new LinkedFile with an empty file type and an empty description
-     */
+    /// Constructs a new LinkedFile with an empty file type and an empty description
     public LinkedFile(Path link) {
         this("", link, "");
     }
@@ -168,9 +172,7 @@ public class LinkedFile implements Serializable {
         return false;
     }
 
-    /**
-     * Writes serialized object to ObjectOutputStream, automatically called
-     */
+    /// Writes serialized object to ObjectOutputStream, automatically called
     @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeUTF(getFileType());
@@ -180,9 +182,7 @@ public class LinkedFile implements Serializable {
         out.flush();
     }
 
-    /**
-     * Reads serialized object from {@link ObjectInputStream}, automatically called
-     */
+    /// Reads serialized object from {@link ObjectInputStream}, automatically called
     @Serial
     private void readObject(ObjectInputStream in) throws IOException {
         fileType = new SimpleStringProperty(in.readUTF());
@@ -191,12 +191,10 @@ public class LinkedFile implements Serializable {
         sourceURL = new SimpleStringProperty(in.readUTF());
     }
 
-    /**
-     * Checks if the given String is an online link
-     *
-     * @param toCheck The String to check
-     * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
-     */
+    /// Checks if the given String is an online link
+    ///
+    /// @param toCheck The String to check
+    /// @return `true`, if it starts with "http://", "https://" or contains "www."; `false` otherwise
     public static boolean isOnlineLink(String toCheck) {
         String normalizedFilePath = toCheck.trim().toLowerCase();
         return URL_PATTERN.matcher(normalizedFilePath).matches();
@@ -225,11 +223,9 @@ public class LinkedFile implements Serializable {
         return isOnlineLink(link.get());
     }
 
-    /**
-     * Extracts the file name, including basename and extension, from the link.
-     *
-     * @return extracted file name
-     */
+    /// Extracts the file name, including basename and extension, from the link.
+    ///
+    /// @return extracted file name
     public Optional<String> getFileName() {
         String linkedName = link.get();
         if (isOnlineLink(linkedName)) {

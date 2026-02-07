@@ -451,11 +451,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         });
     }
 
-    /**
-     * Fetches available models for the currently selected AI provider.
-     * Attempts to fetch models dynamically from the API, falling back to hardcoded models if fetch fails.
-     * This method runs asynchronously using a BackgroundTask and updates the chatModelsList when complete.
-     */
+    /// Fetches available models for the currently selected AI provider.
+    /// Attempts to fetch models dynamically from the API, falling back to hardcoded models if fetch fails.
+    /// This method runs asynchronously using a BackgroundTask and updates the chatModelsList when complete.
     public void refreshAvailableModels() {
         AiProvider provider = selectedAiProvider.get();
         if (provider == null) {

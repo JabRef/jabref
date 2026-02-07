@@ -133,10 +133,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return filterText;
     }
 
-    /**
-     * Gets invoked if the user selects a different group.
-     * We need to notify the {@link StateManager} about this change so that the main table gets updated.
-     */
+    /// Gets invoked if the user selects a different group.
+    /// We need to notify the {@link StateManager} about this change so that the main table gets updated.
     private void onSelectedGroupChanged(ObservableList<GroupNodeViewModel> newValue) {
         if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
             // Switch of database occurred -> do nothing
@@ -152,9 +150,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * Opens "New Group Dialog" and add the resulting group to the root
-     */
+    /// Opens "New Group Dialog" and add the resulting group to the root
     public void addNewGroupToRoot() {
         if (currentDatabase.isPresent()) {
             addNewSubgroup(rootGroup.get(), GroupDialogHeader.GROUP);
@@ -163,10 +159,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Gets invoked if the user changes the active database.
-     * We need to get the new group tree and update the view
-     */
+    /// Gets invoked if the user changes the active database.
+    /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
         if (newDatabase.isPresent()) {
             GroupNodeViewModel newRoot = newDatabase
@@ -190,6 +184,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
     }
 
+    /// Creates the "Imported entries" group if enabled and missing.
+    /// Selection is disabled to prevent focus theft when switching tabs.
     private void addGroupImportEntries(GroupNodeViewModel parent) {
         if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             return;
@@ -200,22 +196,19 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                     .getChildren()
                                     .stream()
                                     .map(GroupTreeNode::getGroup)
-                                    .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equals(groupName));
+                                    .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equalsIgnoreCase(groupName));
         if (!groupExists) {
             currentDatabase.ifPresent(db -> {
                 char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
                 AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
                 GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);
                 newSubgroup.moveTo(parent.getGroupNode(), 0);
-                selectedGroups.setAll(new GroupNodeViewModel(db, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
                 writeGroupChangesToMetaData();
             });
         }
     }
 
-    /**
-     * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
-     */
+    /// Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
     public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
@@ -248,12 +241,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return oldGroup.getClass().equals(newGroup.getClass());
     }
 
-    /**
-     * Adds JabRef suggested groups under the "All Entries" parent node.
-     * Assumes the parent is already validated as "All Entries" by the caller.
-     *
-     * @param parent The "All Entries" parent node.
-     */
+    /// Adds JabRef suggested groups under the "All Entries" parent node.
+    /// Assumes the parent is already validated as "All Entries" by the caller.
+    ///
+    /// @param parent The "All Entries" parent node.
     public void addSuggestedGroups(GroupNodeViewModel parent) {
         currentDatabase.ifPresent(database -> {
             GroupTreeNode rootNode = parent.getGroupNode();
@@ -284,14 +275,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * Check if it is necessary to show a group modified, reassign entry dialog <br>
-     * Group name change is handled separately
-     *
-     * @param oldGroup Original Group
-     * @param newGroup Edited group
-     * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
-     */
+    /// Check if it is necessary to show a group modified, reassign entry dialog <br>
+    /// Group name change is handled separately
+    ///
+    /// @param oldGroup Original Group
+    /// @param newGroup Edited group
+    /// @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
     boolean onlyMinorChanges(AbstractGroup oldGroup, AbstractGroup newGroup) {
         // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {
@@ -334,9 +323,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return true;
     }
 
-    /**
-     * Opens "Edit Group Dialog" and changes the given group to the edited one.
-     */
+    /// Opens "Edit Group Dialog" and changes the given group to the edited one.
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
@@ -607,9 +594,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Removes the specified group and its subgroups (after asking for confirmation).
-     */
+    /// Removes the specified group and its subgroups (after asking for confirmation).
     public void removeGroupAndSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
         if (selectedGroups.size() <= 1) {
@@ -644,9 +629,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Removes the specified group (after asking for confirmation).
-     */
+    /// Removes the specified group (after asking for confirmation).
     public void removeGroupNoSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
         if (selectedGroups.size() <= 1) {
@@ -739,6 +722,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // TODO: Add undo
         // if (!undo.isEmpty()) {
         //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+    }
+
+    public void clearGroup(GroupNodeViewModel group) {
+        GroupTreeNode groupNode = group.getGroupNode();
+        if (groupNode.getGroup() instanceof ExplicitGroup) {
+            List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
+            groupNode.removeEntriesFromGroup(entriesInGroup);
+        }
     }
 
     public void sortAlphabeticallyRecursive(GroupTreeNode group) {

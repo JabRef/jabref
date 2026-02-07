@@ -495,11 +495,9 @@ public class AiPreferences {
         this.ragMinScore.set(ragMinScore);
     }
 
-    /**
-     * Listen to changes of preferences that are related to embeddings generation.
-     *
-     * @param runnable The runnable that should be executed when the preferences change.
-     */
+    /// Listen to changes of preferences that are related to embeddings generation.
+    ///
+    /// @param runnable The runnable that should be executed when the preferences change.
     public void addListenerToEmbeddingsParametersChange(Runnable runnable) {
         embeddingModel.addListener((observableValue, oldValue, newValue) -> {
             if (newValue != oldValue) {
@@ -578,9 +576,7 @@ public class AiPreferences {
         this.apiKeyChangeListener = apiKeyChangeListener;
     }
 
-    /**
-     * Notify that the API key has been updated.
-     */
+    /// Notify that the API key has been updated.
     public void apiKeyUpdated() {
         apiKeyChangeListener.run();
     }

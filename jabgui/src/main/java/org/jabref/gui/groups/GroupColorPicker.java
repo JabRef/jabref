@@ -15,9 +15,7 @@ public class GroupColorPicker {
         return generateColor(siblingColors, null);
     }
 
-    /**
-     * Algorithm optimized for colors, not for gray-scale (where it does not work)
-     */
+    /// Algorithm optimized for colors, not for gray-scale (where it does not work)
     public static Color generateColor(List<Color> siblingColors, @Nullable Color parentColor) {
         if (siblingColors.isEmpty()) {
             if (parentColor == null) {

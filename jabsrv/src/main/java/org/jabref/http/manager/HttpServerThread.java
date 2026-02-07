@@ -14,9 +14,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This thread wrapper is required to be able to interrupt the http server, e.g. when JabRef is closing down the http server should shutdown as well.
- */
+/// This thread wrapper is required to be able to interrupt the http server, e.g. when JabRef is closing down the http server should shutdown as well.
 @NullMarked
 public class HttpServerThread extends Thread {
 
@@ -32,6 +30,7 @@ public class HttpServerThread extends Thread {
     @Nullable
     private HttpServer httpServer;
 
+    /// @param uiMessageHandler - non-null for GUI usage
     public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uiMessageHandler = uiMessageHandler;

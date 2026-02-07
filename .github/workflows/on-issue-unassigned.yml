@@ -2,8 +2,8 @@ name: On issue unassigned
 
 on:
   issues:
-     types:
-       - unassigned
+    types:
+      - unassigned
 
 jobs:
   columns_and_labels:
@@ -51,11 +51,6 @@ jobs:
       - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
         if: steps.check_assignee.outputs.assigned == 'no'
         run: |
-          set -e
-
-          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "🔔 reminder-sent"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "📌 Pinned"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned,🔔 reminder-sent,📌 Pinned,FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

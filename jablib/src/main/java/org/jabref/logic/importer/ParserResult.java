@@ -22,6 +22,7 @@ import org.jabref.model.metadata.MetaData;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
@@ -87,6 +88,7 @@ public class ParserResult {
         this.metaData = md;
     }
 
+    @NonNull
     public Set<BibEntryType> getEntryTypes() {
         return entryTypes;
     }
@@ -95,15 +97,13 @@ public class ParserResult {
         return Optional.ofNullable(file);
     }
 
-    public void setPath(Path path) {
+    public void setPath(@Nullable Path path) {
         file = path;
     }
 
-    /**
-     * Add a parser warning.
-     *
-     * @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
-     */
+    /// Add a parser warning.
+    ///
+    /// @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
     public void addWarning(@NonNull String s) {
         addWarning(Range.NULL_RANGE, s);
     }

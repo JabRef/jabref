@@ -1,6 +1,7 @@
 package org.jabref.gui.frame;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,9 +31,12 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.ImportException;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -103,11 +107,9 @@ public class JabRefFrameViewModel {
         }
     }
 
-    /**
-     * Quit JabRef
-     *
-     * @return true if the user chose to quit; false otherwise
-     */
+    /// Quit JabRef
+    ///
+    /// @return true if the user chose to quit; false otherwise
     public boolean close() {
         // Ask if the user really wants to close, if there are still background tasks running
         // The background tasks may make changes themselves that need saving.
@@ -145,14 +147,12 @@ public class JabRefFrameViewModel {
         return true;
     }
 
-    /**
-     * Handles commands submitted by the command line or by the remote host to be executed in the ui
-     * Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
-     *
-     * Does NOT handle focus - this is done in JabRefFrame
-     *
-     * @param uiCommands to be handled
-     */
+    /// Handles commands submitted by the command line or by the remote host to be executed in the ui
+    /// Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
+    ///
+    /// Does NOT handle focus - this is done in JabRefFrame
+    ///
+    /// @param uiCommands to be handled
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
@@ -171,9 +171,19 @@ public class JabRefFrameViewModel {
                       .forEach(command -> openDatabaseAction.get().openFiles(command.toImport()));
 
             uiCommands.stream()
-                      .filter(UiCommand.AppendToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.AppendToCurrentLibrary.class::cast)
-                      .map(UiCommand.AppendToCurrentLibrary::toAppend)
+                      .filter(UiCommand.AppendFilesToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.AppendFilesToCurrentLibrary.class::cast)
+                      .map(UiCommand.AppendFilesToCurrentLibrary::toAppend)
+                      .filter(Objects::nonNull)
+                      .findAny().ifPresent(toAppend -> {
+                          LOGGER.debug("Append to current library {} requested", toAppend);
+                          waitForLoadingFinished(() -> appendToCurrentLibrary(toAppend));
+                      });
+
+            uiCommands.stream()
+                      .filter(UiCommand.AppendStreamToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.AppendStreamToCurrentLibrary.class::cast)
+                      .map(UiCommand.AppendStreamToCurrentLibrary::toAppend)
                       .filter(Objects::nonNull)
                       .findAny().ifPresent(toAppend -> {
                           LOGGER.debug("Append to current library {} requested", toAppend);
@@ -285,28 +295,45 @@ public class JabRefFrameViewModel {
         }
     }
 
+    /// Supports both BibTeX and non-BibTeX
     private void appendToCurrentLibrary(List<Path> libraries) {
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                fileUpdateMonitor
+        );
+
         List<ParserResult> parserResults = new ArrayList<>();
-        try {
-            for (Path file : libraries) {
-                parserResults.add(OpenDatabase.loadDatabase(
-                        file,
-                        preferences.getImportFormatPreferences(),
-                        fileUpdateMonitor));
+        for (Path file : libraries) {
+            if (FileUtil.isBibFile(file)) {
+                try {
+                    parserResults.add(OpenDatabase.loadDatabase(
+                            file,
+                            preferences.getImportFormatPreferences(),
+                            fileUpdateMonitor));
+                } catch (IOException e) {
+                    LOGGER.error("Could not open bib file {}", libraries, e);
+                    return;
+                }
+            } else {
+                try {
+                    ImportFormatReader.ImportResult importResult;
+                    importResult = importFormatReader.importWithAutoDetection(file);
+                    addParserResult(importResult.parserResult());
+                } catch (ImportException ex) {
+                    parserResults.add(ParserResult.fromError(ex));
+                }
             }
-        } catch (IOException e) {
-            LOGGER.error("Could not open bib file {}", libraries, e);
-            return;
         }
 
-        // Remove invalid databases
         List<ParserResult> invalidDatabases = parserResults.stream()
                                                            .filter(ParserResult::isInvalid)
                                                            .toList();
         final List<ParserResult> failed = new ArrayList<>(invalidDatabases);
         parserResults.removeAll(invalidDatabases);
 
-        // Add parserResult to the currently opened tab
+        // Add successful parserResults to the currently opened tab
         for (ParserResult parserResult : parserResults) {
             addParserResult(parserResult);
         }
@@ -317,6 +344,33 @@ public class JabRefFrameViewModel {
                     parserResult.getErrorMessage();
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
+    }
+
+    /// Imports a single library, BibTeX and non-BibTeX
+    ///
+    /// Similar code as [org.jabref.gui.importer.actions.ImportCommand]
+    private void appendToCurrentLibrary(Reader library) {
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                fileUpdateMonitor
+        );
+        ImportFormatReader.ImportResult importResult;
+        try {
+            // TODO: Think of wrapping in BackgroundTask - similar to org.jabref.gui.importer.actions.ImportCommand.importMultipleFiles
+            importResult = importFormatReader.importWithAutoDetection(library);
+        } catch (Throwable ex) {
+            LOGGER.warn("Could not import", ex);
+            UiTaskExecutor.runAndWaitInJavaFXThread(
+                    () -> dialogService.showWarningDialogAndWait(
+                            Localization.lang("Import error"),
+                            Localization.lang("Please check your library file for wrong syntax.")
+                                    + "\n\n"
+                                    + ex.getLocalizedMessage()));
+            return;
+        }
+        addParserResult(importResult.parserResult());
     }
 
     private void addParserResult(ParserResult parserResult) {
@@ -372,7 +426,7 @@ public class JabRefFrameViewModel {
         LOGGER.trace("Waiting for state changes...");
 
         future.thenRun(() -> {
-            LOGGER.debug("All tabs loaded. Jumping to entry.");
+            LOGGER.debug("All tabs loaded.");
             for (ObservableBooleanValue obs : loadings) {
                 obs.removeListener(listener);
             }
