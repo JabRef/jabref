@@ -54,19 +54,15 @@ public final class CSLStyleUtils {
         }
 
         // Check if absolute path (meaning: external CSL file) - and exists
+        styleFile = styleFile.replaceFirst("^[/\\\\]+", "");
         Path filePath;
         try {
             filePath = Path.of(styleFile);
+            LOGGER.info("Attempting to load CSL style from file path: {}", filePath);
         } catch (InvalidPathException e) {
-            LOGGER.info("Malformed path detected in preferences: {}. Attempting to fix.", styleFile);
-            styleFile = styleFile.replaceFirst("^[/\\\\]+", "");
-            try {
-                filePath = Path.of(styleFile);
-            } catch (InvalidPathException ex) {
-                LOGGER.warn("Could not recover invalid CSL style path: {}", styleFile, ex);
+                 LOGGER.warn("Could not recover invalid CSL style path: {}", styleFile, e);
                 return Optional.empty();
             }
-        }
         if (filePath.isAbsolute() && Files.exists(filePath)) {
             try (InputStream inputStream = Files.newInputStream(filePath)) {
                 return createCitationStyleFromSource(inputStream, styleFile, false);
