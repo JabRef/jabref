@@ -159,7 +159,7 @@ class CSLFormatUtilsTest {
                 // Non-numeric, parentheses, commas, full stops, slashes, hyphens, colons, italics
                 Arguments.of(
                         "Smith, B., Jones, B., & Williams, J. (2016). Title of the test entry. <i>BibTeX Journal</i>, <i>34</i>(3), 45–67. https://doi.org/10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric type "[1]", brackets, newlines
@@ -181,8 +181,8 @@ class CSLFormatUtilsTest {
 
                 // Semicolons
                 Arguments.of(
-                        "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 July;34(3):45–67. Available from: https://github.com/JabRef<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
+                        "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 Jul;34(3):45–67. Available from: https://github.com/JabRef<p></p>",
+                        STYLE_LIST.stream().filter(e -> "NLM Style Guide (Vancouver): Citing Medicine 2nd edition (citation-sequence)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
