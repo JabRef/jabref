@@ -30,9 +30,10 @@ jobs:
     permissions:
       pull-requests: read
     outputs:
-      pr_number: ${{ steps.pick.outputs.pr_number }}
-      pr_url:    ${{ steps.pick.outputs.pr_url }}
-      pr_body:   ${{ steps.pick.outputs.pr_body }}
+      pr_number:  ${{ steps.pick.outputs.pr_number }}
+      pr_url:     ${{ steps.pick.outputs.pr_url }}
+      pr_body:    ${{ steps.pick.outputs.pr_body }}
+      pr_user:    ${{ steps.pick.outputs.pr_user }}
     steps:
       - id: from_dispatch
         if: github.event_name == 'workflow_dispatch'
@@ -47,12 +48,14 @@ jobs:
             core.setOutput("pr_number", String(pr.number));
             core.setOutput("pr_url", pr.html_url ?? "");
             core.setOutput("pr_body", pr.body ?? "");
+            core.setOutput("user_login", pr.user?.login ?? "");
       - name: Pick outputs
         id: pick
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "pr_number=${{ steps.from_dispatch.outputs.pr_number }}" >> "$GITHUB_OUTPUT"
             echo "pr_url=${{ steps.from_dispatch.outputs.pr_url }}"       >> "$GITHUB_OUTPUT"
+            echo "pr_user=${{ steps.from_dispatch.outputs.pr_user }}"       >> "$GITHUB_OUTPUT"
             cat >> "$GITHUB_OUTPUT" <<'EOF'
           pr_body<<BODY
           ${{ steps.from_dispatch.outputs.pr_body }}
@@ -61,6 +64,7 @@ jobs:
           else
             echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
             echo "pr_url=${{ github.event.pull_request.html_url }}"  >> "$GITHUB_OUTPUT"
+            echo "pr_user=${{ github.event.pull_request.user.login }}"  >> "$GITHUB_OUTPUT"
             cat >> "$GITHUB_OUTPUT" <<'EOF'
           pr_body<<BODY
           ${{ github.event.pull_request.body }}
@@ -115,8 +119,11 @@ jobs:
       - uses: actions/checkout@v6
       - name: Remove assignee
         run: |
+          set -euo pipefail
+          set -x
+
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-assignee ${{ github.event.pull_request.user.login }} || true
+          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-assignee ${{ needs.collect_parameters.outputs.pr_user }} || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: awalsh128/cache-apt-pkgs-action@latest
