@@ -483,7 +483,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
 
-        // 20.
+                // 20.
         /*
         Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
 
