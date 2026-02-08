@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -235,8 +236,25 @@ public class FrameDndHandler {
         if (!dragboard.hasFiles()) {
             return List.of();
         } else {
-            return dragboard.getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
+            return dragboard.getFiles().stream()
+                            .map(File::toPath)
+                            .flatMap(path -> {
+                                // Resolve shortcuts to their target files
+                                if (FileUtil.isShortcutFile(path)) {
+                                    return FileUtil.resolveWindowsShortcut(path)
+                                                  .filter(FileUtil::isBibFile)
+                                                  .stream();
+                                } else if (FileUtil.isBibFile(path)) {
+                                    return Stream.of(path);
+                                }
+                                return Stream.empty();
+                            })
+                            .collect(Collectors.toList());
         }
+    }
+
+    private boolean isAcceptedFile(Path path) {
+        return FileUtil.isBibFile(path) || FileUtil.isShortcutFile(path);
     }
 
     private boolean hasGroups(Dragboard dragboard) {

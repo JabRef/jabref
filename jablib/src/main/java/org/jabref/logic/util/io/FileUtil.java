@@ -521,6 +521,69 @@ public class FileUtil {
         return getFileExtension(file).filter("bib"::equals).isPresent();
     }
 
+    /// Test if the file is a shortcut file by simply checking the extension to be ".lnk"
+    ///
+    /// @param file The file to check
+    /// @return True if file extension is ".lnk", false otherwise
+    public static boolean isShortcutFile(Path file) {
+        return getFileExtension(file).filter("lnk"::equals).isPresent();
+    }
+
+    /// Resolves a Windows shortcut (.lnk) file to its target path.
+    /// Only works on Windows systems. On other systems or if resolution fails, returns empty Optional.
+    ///
+    /// @param shortcutPath The path to the .lnk file
+    /// @return Optional containing the target path, or empty if resolution fails
+    public static Optional<Path> resolveWindowsShortcut(Path shortcutPath) {
+        if (!isShortcutFile(shortcutPath)) {
+            return Optional.empty();
+        }
+
+        // Only attempt on Windows
+        if (!OS.WINDOWS) {
+            LOGGER.debug("Shortcut resolution only supported on Windows");
+            return Optional.empty();
+        }
+
+        try {
+            // Use PowerShell to resolve the shortcut target
+            ProcessBuilder pb = new ProcessBuilder(
+                "powershell", "-NoProfile", "-Command",
+                "$ws = New-Object -ComObject WScript.Shell; " +
+                "$shortcut = $ws.CreateShortcut('" + shortcutPath.toAbsolutePath().toString().replace("'", "''") + "'); " +
+                "Write-Output $shortcut.TargetPath"
+            );
+
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            String targetPath;
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(process.getInputStream()))) {
+                targetPath = reader.readLine();
+            }
+
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0 && targetPath != null && !targetPath.trim().isEmpty()) {
+                Path resolvedPath = Path.of(targetPath.trim());
+                if (Files.exists(resolvedPath)) {
+                    LOGGER.debug("Resolved shortcut {} to {}", shortcutPath, resolvedPath);
+                    return Optional.of(resolvedPath);
+                } else {
+                    LOGGER.warn("Shortcut target does not exist: {}", resolvedPath);
+                    return Optional.empty();
+                }
+            } else {
+                LOGGER.warn("Failed to resolve shortcut: {} (exit code: {})", shortcutPath, exitCode);
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Exception while resolving shortcut: {}", shortcutPath, e);
+            return Optional.empty();
+        }
+    }
+
     /// Test if the file is an image file by simply checking if its extension is an image extension
     ///
     /// @param file The file to check
