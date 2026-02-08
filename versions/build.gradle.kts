@@ -122,7 +122,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
-    api("org.apache.httpcomponents.client5:httpclient5:5.5")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.3")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
