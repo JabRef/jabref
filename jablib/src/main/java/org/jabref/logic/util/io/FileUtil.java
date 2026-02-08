@@ -548,10 +548,10 @@ public class FileUtil {
         try {
             // Use PowerShell to resolve the shortcut target
             ProcessBuilder pb = new ProcessBuilder(
-                "powershell", "-NoProfile", "-Command",
-                "$ws = New-Object -ComObject WScript.Shell; " +
-                "$shortcut = $ws.CreateShortcut('" + shortcutPath.toAbsolutePath().toString().replace("'", "''") + "'); " +
-                "Write-Output $shortcut.TargetPath"
+                    "powershell", "-NoProfile", "-Command",
+                    "$ws = New-Object -ComObject WScript.Shell; " +
+                            "$shortcut = $ws.CreateShortcut('" + shortcutPath.toAbsolutePath().toString().replace("'", "''") + "'); " +
+                            "Write-Output $shortcut.TargetPath"
             );
 
             pb.redirectErrorStream(true);
@@ -582,6 +582,17 @@ public class FileUtil {
             LOGGER.warn("Exception while resolving shortcut: {}", shortcutPath, e);
             return Optional.empty();
         }
+    }
+
+    public static List<Path> resolveWindowsShortcuts(List<Path> paths) {
+        return paths.stream()
+                    .flatMap(path -> {
+                        if (isShortcutFile(path)) {
+                            return resolveWindowsShortcut(path).stream();
+                        }
+                        return Stream.of(path);
+                    })
+                    .toList();
     }
 
     /// Test if the file is an image file by simply checking if its extension is an image extension
