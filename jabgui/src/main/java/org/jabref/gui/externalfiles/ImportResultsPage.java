@@ -86,25 +86,18 @@ public class ImportResultsPage extends WizardPane {
 
         colStatus = new TableColumn<>(Localization.lang("Status"));
         colStatus.setCellValueFactory(cellData -> cellData.getValue().icon());
-        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>()
-                .withGraphic(JabRefIcon::getGraphicNode));
+        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(JabRefIcon::getGraphicNode));
         colStatus.setResizable(true);
         colStatus.setPrefWidth(60);
 
         colFile = new TableColumn<>(Localization.lang("File"));
         colFile.setCellValueFactory(cellData -> cellData.getValue().file());
-        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                .withGraphic(this::createEllipsisLabel)
-                .withTooltip(item -> item)
-                .install(colFile);
+        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>().withGraphic(this::createEllipsisLabel).withTooltip(item -> item).install(colFile);
         colFile.setResizable(true);
 
         colMessage = new TableColumn<>(Localization.lang("Message"));
         colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
-        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                .withGraphic(this::createEllipsisLabel)
-                .withTooltip(item -> item)
-                .install(colMessage);
+        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>().withGraphic(this::createEllipsisLabel).withTooltip(item -> item).install(colMessage);
         colMessage.setResizable(true);
 
         resultsTable.getColumns().addAll(colStatus, colFile, colMessage);
@@ -129,29 +122,19 @@ public class ImportResultsPage extends WizardPane {
                 Platform.runLater(() -> {
                     ((BorderPane) getContent()).setCenter(contentPane);
                     updateSummary();
-                    if (getScene() != null && getScene().getWindow() != null) {
-                        getScene().getWindow().sizeToScene();
-                    }
                 });
             }
         });
 
-        exportButton.disableProperty().bind(
-                Bindings.isEmpty(viewModel.resultTableItems())
-                        .or(viewModel.taskActiveProperty())
-        );
+        exportButton.disableProperty().bind(Bindings.isEmpty(viewModel.resultTableItems()).or(viewModel.taskActiveProperty()));
     }
 
     private void updateSummary() {
         int totalCount = viewModel.resultTableItems().size();
-        long successCount = viewModel.resultTableItems().stream()
-                                     .filter(item -> item.message().get().toLowerCase().contains("success"))
-                                     .count();
+        long successCount = viewModel.resultTableItems().stream().filter(item -> item.message().get().toLowerCase().contains("success")).count();
         long failCount = totalCount - successCount;
 
-        String summaryText = Localization.lang("Import completed: %0 successful, %1 failed",
-                String.valueOf(successCount),
-                String.valueOf(failCount));
+        String summaryText = Localization.lang("Import completed: %0 successful, %1 failed", String.valueOf(successCount), String.valueOf(failCount));
 
         summaryLabel.setText(summaryText);
     }
