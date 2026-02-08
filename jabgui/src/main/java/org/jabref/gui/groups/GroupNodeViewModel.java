@@ -37,10 +37,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticDateGroup;
+import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGroup;
+import org.jabref.model.groups.EntryTypeGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
@@ -462,6 +464,10 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof DateGroup) {
             return false;
+        } else if (group instanceof AutomaticEntryTypeGroup) {
+            return false;
+        } else if (group instanceof EntryTypeGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -477,6 +483,7 @@ public class GroupNodeViewModel {
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 AutomaticEntryTypeGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -505,7 +512,9 @@ public class GroupNodeViewModel {
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
-                 DateGroup _ ->
+                 DateGroup _,
+                 AutomaticEntryTypeGroup _,
+                 EntryTypeGroup _ ->
                     false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -530,7 +539,9 @@ public class GroupNodeViewModel {
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 AutomaticEntryTypeGroup _,
                  DateGroup _,
+                 EntryTypeGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -550,13 +561,15 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _,
-                 DateGroup _ ->
+                 DateGroup _,
+                 EntryTypeGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 AutomaticEntryTypeGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->

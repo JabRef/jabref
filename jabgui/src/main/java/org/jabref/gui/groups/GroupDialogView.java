@@ -210,6 +210,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
+        entryTypeRadioButton.selectedProperty().bindBidirectional(viewModel.typeEntryTypeProperty());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());
