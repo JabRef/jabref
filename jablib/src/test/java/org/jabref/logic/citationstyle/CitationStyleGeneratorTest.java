@@ -534,7 +534,7 @@ class CitationStyleGeneratorTest {
 
                 // 23.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, 9issue, Article Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue), Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -545,7 +545,7 @@ class CitationStyleGeneratorTest {
                         "apa.csl"),
                 // 24.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + pages. Bib(La)TeX Journal, 9issue, Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue + pages. Bib(La)TeX Journal, (9issue), Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -557,7 +557,7 @@ class CitationStyleGeneratorTest {
                         "apa.csl"),
                 // 25.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, 3number, Article Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, (3number), Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -569,7 +569,7 @@ class CitationStyleGeneratorTest {
                         "apa.csl"),
                 // 26.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + number + pages. Bib(La)TeX Journal, 3number, Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue + number + pages. Bib(La)TeX Journal, (3number), Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -628,7 +628,7 @@ class CitationStyleGeneratorTest {
 
                 // 31.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, 3number, Article Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, (3number), Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -640,7 +640,7 @@ class CitationStyleGeneratorTest {
 
                 // 32.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + number + pages. Bib(La)TeX Journal, 3number, Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + number + pages. Bib(La)TeX Journal, (3number), Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -654,7 +654,7 @@ class CitationStyleGeneratorTest {
                 // 32.
                 // Not rendering the "issue" field here is sufficient for APA Style (7th edition). Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, 3number.\n",
+                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, (3number).\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -667,7 +667,7 @@ class CitationStyleGeneratorTest {
                 // 33.
                 // Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + number + pages. Bib(La)TeX Journal, 3number, 45–67.\n",
+                        "Foo, B. (n.d.). issue + number + pages. Bib(La)TeX Journal, (3number), 45–67.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
