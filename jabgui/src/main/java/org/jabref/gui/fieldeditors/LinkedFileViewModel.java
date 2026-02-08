@@ -380,6 +380,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         int currentDirIndex = -1;
         Path currentFileDir = currentFile.getParent();
         for (int i = 0; i < possibleDirPaths.size(); i++) {
+            if (currentFileDir == null) {
+                break;
+            }
             Path dir = possibleDirPaths.get(i);
             if (dir != null && (dir.equals(currentFileDir) || currentFileDir.startsWith(dir))) {
                 currentDirIndex = i;

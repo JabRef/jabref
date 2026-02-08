@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -97,6 +98,7 @@ class LinkedFileViewModelFileRotationTest {
         viewModel.moveToNextPossibleDirectory();
 
         assertTrue(Files.exists(bibDir.resolve("test.pdf")));
+        assertFalse(Files.exists(fileInLib));
     }
 
     @Test
@@ -113,6 +115,7 @@ class LinkedFileViewModelFileRotationTest {
         viewModel.moveToNextPossibleDirectory();
 
         assertTrue(Files.exists(userDir.resolve("test.pdf")));
+        assertFalse(Files.exists(fileInBib));
     }
 
     @Test
@@ -128,6 +131,7 @@ class LinkedFileViewModelFileRotationTest {
 
         viewModel.moveToNextPossibleDirectory();
         assertTrue(Files.exists(bibDir.resolve("test.pdf")));
+        assertFalse(Files.exists(fileInUser));
     }
 
     @Test
@@ -162,6 +166,7 @@ class LinkedFileViewModelFileRotationTest {
 
         viewModel.moveToNextPossibleDirectory();
         assertTrue(Files.exists(userDir.resolve("test.pdf")));
+        assertFalse(Files.exists(fileRandom));
     }
 
     @Test
@@ -200,5 +205,20 @@ class LinkedFileViewModelFileRotationTest {
 
         assertTrue(Files.exists(userDir.resolve("test.pdf")));
         assertFalse(Files.exists(userDir.resolve("x/y/z/test.pdf")));
+    }
+
+    @Test
+    void moveToNextFileWithoutParentDoesNotThrowNPE() throws IOException {
+        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
+
+        Path fileWithoutParent = Path.of("test.pdf");
+        Files.createFile(fileWithoutParent);
+
+        LinkedFile linkedFile = new LinkedFile("desc", fileWithoutParent, "pdf");
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+
+        assertDoesNotThrow(viewModel::moveToNextPossibleDirectory);
     }
 }
