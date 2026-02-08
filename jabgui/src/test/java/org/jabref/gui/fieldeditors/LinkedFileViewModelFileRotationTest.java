@@ -169,9 +169,11 @@ class LinkedFileViewModelFileRotationTest {
         List<Path> dirs = List.of(userDir, libDir, bibDir);
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
-        Path nestedFileInUser = userDir.resolve("x/y/z/test.pdf");
-        Files.createDirectories(nestedFileInUser);
-        LinkedFile linkedFile = new LinkedFile("desc", nestedFileInUser, "pdf");
+        Path nestedDir = userDir.resolve("x/y/z");
+        Files.createDirectories(nestedDir);
+        Path testFile = nestedDir.resolve("test.pdf");
+        Files.createFile(testFile);
+        LinkedFile linkedFile = new LinkedFile("desc", testFile, "pdf");
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
 
@@ -186,9 +188,11 @@ class LinkedFileViewModelFileRotationTest {
         List<Path> dirs = List.of(userDir, libDir, bibDir);
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
-        Path nestedFile = tempDir.resolve("x/y/z/test.pdf");
-        Files.createDirectories(nestedFile);
-        LinkedFile linkedFile = new LinkedFile("desc", nestedFile, "pdf");
+        Path nestedDir = tempDir.resolve("x/y/z");
+        Files.createDirectories(nestedDir);
+        Path testFile = nestedDir.resolve("test.pdf");
+        Files.createFile(testFile);
+        LinkedFile linkedFile = new LinkedFile("desc", testFile, "pdf");
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
 
