@@ -54,11 +54,14 @@ public class ContextAction extends SimpleCommand {
                             );
 
                     case MOVE_FILE_TO_FOLDER,
-                         MOVE_FILE_TO_FOLDER_AND_RENAME ->
+                         MOVE_FILE_TO_FOLDER_AND_RENAME,
+                         OPEN_FILE,
+                         OPEN_FOLDER,
+                         RENAME_FILE_TO_NAME,
+                         DELETE_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
-                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                            && !linkedFile.isGeneratedPathSameAsOriginal(),
+                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
                                     nonNullDependencies(
                                             linkedFile.getFile().linkProperty(),
                                             entryFieldsObservable
@@ -79,19 +82,6 @@ public class ContextAction extends SimpleCommand {
                                     () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
                                     nonNullDependencies(
                                             linkedFile.getFile().sourceUrlProperty(),
-                                            entryFieldsObservable
-                                    )
-                            );
-
-                    case OPEN_FILE,
-                         OPEN_FOLDER,
-                         RENAME_FILE_TO_NAME,
-                         DELETE_FILE ->
-                            Bindings.createBooleanBinding(
-                                    () -> !linkedFile.getFile().isOnlineLink()
-                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
-                                    nonNullDependencies(
-                                            linkedFile.getFile().linkProperty(),
                                             entryFieldsObservable
                                     )
                             );
@@ -126,7 +116,7 @@ public class ContextAction extends SimpleCommand {
             case RENAME_FILE_TO_NAME ->
                     linkedFile.askForNameAndRename();
             case MOVE_FILE_TO_FOLDER ->
-                    linkedFile.moveToDefaultDirectory();
+                    linkedFile.moveToNextPossibleDirectory();
             case MOVE_FILE_TO_FOLDER_AND_RENAME ->
                     linkedFile.moveToDefaultDirectoryAndRename();
             case DELETE_FILE ->

@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -194,6 +195,47 @@ public class BibDatabaseContext {
         }
 
         return new ArrayList<>(fileDirs);
+    }
+
+    /// Look up all configured file directories of this database.
+    /// The returned list has a fixed size and preserves positional meaning.
+    ///
+    /// The directories are returned in the following order:
+    /// <ol>
+    /// - user-specific directory
+    /// - library-specific directory
+    /// - BIB file directory or main file directory (depending on preferences)
+    /// </ol>
+    ///
+    /// Each element in the list may be null if the corresponding directory has not been configured.
+    ///
+    /// @param preferences The file directory preferences
+    /// @return fixed-size list of length 3 containing absolute paths or null
+    public List<@Nullable Path> getAllFileDirectories(FilePreferences preferences) {
+        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath);
+        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
+
+        Optional<Path> bibOrMainFileDirectory;
+
+        // BIB file directory or main file directory (according to (global) preferences)
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
+            bibOrMainFileDirectory = getDatabasePath().map(dbPath -> {
+                Path parentPath = dbPath.getParent();
+                if (parentPath == null) {
+                    parentPath = Path.of(System.getProperty("user.dir"));
+                    LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
+                }
+                return parentPath.toAbsolutePath();
+            });
+        } else {
+            bibOrMainFileDirectory = preferences.getMainFileDirectory();
+        }
+
+        return Arrays.asList(
+                userFileDirectory.orElse(null),
+                librarySpecificFileDirectory.orElse(null),
+                bibOrMainFileDirectory.orElse(null)
+        );
     }
 
     /// Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}

@@ -158,7 +158,7 @@ class ContextActionTest {
 
         action.execute();
 
-        verify(fileViewModel).moveToDefaultDirectory();
+        verify(fileViewModel).moveToNextPossibleDirectory();
     }
 
     @Test

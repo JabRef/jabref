@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
@@ -323,34 +324,80 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public void moveToDefaultDirectory() {
+    public void moveToNextPossibleDirectory() {
         if (linkedFile.isOnlineLink()) {
             // Cannot move remote links
             return;
         }
 
-        // Get target folder
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
-        if (fileDir.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist."));
+        Optional<Path> currentFile = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+
+        if (currentFile.isEmpty()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("File not found"),
+                    Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        }
+
+        Optional<Path> destinationDir = getNextTargetPath(currentFile.get());
+        if (destinationDir.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("No suitable file directory found."));
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-        if (file.isPresent()) {
-            // Found the linked file, so move it
-            try {
-                linkedFileHandler.moveToDefaultDirectory();
-            } catch (IOException exception) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Move file"),
-                        Localization.lang("Could not move file '%0'.", file.get().toString()),
-                        exception);
-            }
-        } else {
-            // File doesn't exist, so we can't move it.
-            dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        try {
+            linkedFileHandler.moveToDirectory(destinationDir.get());
+        } catch (IOException exception) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Move file"),
+                    Localization.lang("Could not move file '%0'.", currentFile.get().toString()),
+                    exception);
         }
+    }
+
+    /// Finds the next valid directory to which a linked file can be moved.
+    ///
+    /// A **valid directory** is one that:
+    /// - is configured
+    /// - is **not** the directory where the file is currently present
+    ///
+    /// @param currentFile the file that is being moved
+    /// @return the {@link Path} to which the file can be moved
+    private Optional<Path> getNextTargetPath(Path currentFile) {
+        List<Path> possibleDirPaths = databaseContext.getAllFileDirectories(preferences.getFilePreferences());
+
+        if (possibleDirPaths.stream().allMatch(Objects::isNull)) {
+            return Optional.empty();
+        }
+
+        // Current dir index (file's current directory) is -1 if it's not in any Jabref directory, otherwise, it is 0 for User, 1 for Library, 2 for BIB
+        int currentDirIndex = -1;
+        Path currentFileDir = currentFile.getParent();
+        for (int i = 0; i < possibleDirPaths.size(); i++) {
+            Path dir = possibleDirPaths.get(i);
+            if (dir != null && (dir.equals(currentFileDir) || currentFileDir.startsWith(dir))) {
+                currentDirIndex = i;
+                break;
+            }
+        }
+
+        // Move according to the preference order in a loop (User -> Library -> BIB) and skip directories that are not configured
+        int startIndex = (currentDirIndex + 1) % possibleDirPaths.size();
+        for (int i = 0; i < possibleDirPaths.size(); i++) {
+            int candidateIndex = (startIndex + i) % possibleDirPaths.size();
+            Path candidate = possibleDirPaths.get(candidateIndex);
+            if (candidate != null && candidateIndex != currentDirIndex) {
+                if (currentDirIndex >= 0) {
+                    // Relativize if the file was present in a configured directory in order to mirror directory structure
+                    Path currentPath = possibleDirPaths.get(currentDirIndex);
+                    Path relativePath = currentPath.relativize(currentFile);
+                    if (relativePath.getParent() != null) {
+                        return Optional.of(candidate.resolve(relativePath.getParent()).normalize());
+                    }
+                }
+                return Optional.of(candidate);
+            }
+        }
+        return Optional.empty();
     }
 
     /// Gets the filename for the current linked file and compares it to the new suggested filename.
@@ -400,7 +447,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void moveToDefaultDirectoryAndRename() {
-        moveToDefaultDirectory();
+        moveToNextPossibleDirectory();
         renameToSuggestion();
     }
 
