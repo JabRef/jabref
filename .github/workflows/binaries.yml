@@ -594,12 +594,12 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --input . --gradle-project jabkit --output ./build/jbundle/jabkit
+          jbundle build --input . --gradle-project jabkit --output ./build/jbundle/jabkit-${{ matrix.displayName }}
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          build/jbundle/jabkit --help
+          build/jbundle/jabkit--${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         uses: actions/upload-artifact@v6
@@ -648,16 +648,19 @@ jobs:
         run: |
           set -e
           ${{ matrix.archivePortableJabLS }}
+      - name: ShadowJar jabls-cli
+        shell: bash
+        run: ./gradlew :jabls-cli:ShadowJar
       - name: jbundle jabls-cli
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls
+          jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls-${{ matrix.displayName }}
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          build/jbundle/jabls --help
+          build/jbundle/jabls-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         uses: actions/upload-artifact@v6
@@ -685,16 +688,19 @@ jobs:
       - name: jpackage jabsrv-cli
         shell: bash
         run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:jpackage
+      - name: ShadowJar jabsrv-cli
+        shell: bash
+        run: ./gradlew :jabsrv-cli:ShadowJar
       - name: jbundle jabsrv-cli
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv
+          jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv-${{ matrix.displayName }}
       - name: Test jbundle binary (smoke test)
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          build/jbundle/jabsrv --help
+          build/jbundle/jabsrv-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         uses: actions/upload-artifact@v6
