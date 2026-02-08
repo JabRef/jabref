@@ -36,6 +36,7 @@ jobs:
       pr_user:    ${{ steps.pick.outputs.pr_user }}
     steps:
       - id: from_dispatch
+        name: Collect from dispatch
         if: github.event_name == 'workflow_dispatch'
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
@@ -48,7 +49,7 @@ jobs:
             core.setOutput("pr_number", String(pr.number));
             core.setOutput("pr_url", pr.html_url ?? "");
             core.setOutput("pr_body", pr.body ?? "");
-            core.setOutput("user_login", pr.user?.login ?? "");
+            core.setOutput("pr_user", pr.user?.login ?? "");
       - name: Pick outputs
         id: pick
         run: |
