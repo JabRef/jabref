@@ -9,6 +9,7 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -43,8 +44,9 @@ public class UnlinkedFilesWizard {
         Platform.runLater(() -> {
             if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
                 stage.setResizable(true);
-                stage.setWidth(750);
-                stage.setHeight(650);
+                stage.setWidth(650);
+                stage.setHeight(550);
+                stage.getIcons().addAll(IconTheme.getLogoSetFX());
             }
         });
 
@@ -62,16 +64,9 @@ public class UnlinkedFilesWizard {
     }
 
     private void initializeWizard() {
-        this.bibDatabaseContext = stateManager.getActiveDatabase()
-                                              .orElseThrow(() -> new NullPointerException("No active library"));
+        this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("No active library"));
 
-        viewModel = new UnlinkedFilesDialogViewModel(
-                dialogService,
-                undoManager,
-                fileUpdateMonitor,
-                preferences,
-                stateManager,
-                taskExecutor);
+        viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferences, stateManager, taskExecutor);
 
         page1 = new SearchConfigurationPage(viewModel, bibDatabaseContext, preferences);
         page2 = new FileSelectionPage(viewModel);
@@ -92,16 +87,13 @@ public class UnlinkedFilesWizard {
 
     private void saveConfiguration() {
         if (viewModel.selectedExtensionProperty().get() != null) {
-            preferences.getUnlinkedFilesDialogPreferences()
-                       .setUnlinkedFilesSelectedExtension(viewModel.selectedExtensionProperty().get().getName());
+            preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(viewModel.selectedExtensionProperty().get().getName());
         }
         if (viewModel.selectedDateProperty().get() != null) {
-            preferences.getUnlinkedFilesDialogPreferences()
-                       .setUnlinkedFilesSelectedDateRange(viewModel.selectedDateProperty().get());
+            preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(viewModel.selectedDateProperty().get());
         }
         if (viewModel.selectedSortProperty().get() != null) {
-            preferences.getUnlinkedFilesDialogPreferences()
-                       .setUnlinkedFilesSelectedSort(viewModel.selectedSortProperty().get());
+            preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(viewModel.selectedSortProperty().get());
         }
     }
 }
