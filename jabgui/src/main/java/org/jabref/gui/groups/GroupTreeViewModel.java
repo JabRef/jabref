@@ -730,7 +730,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (groupNode.getGroup() instanceof ExplicitGroup) {
             boolean confirmation = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Clear group"),
-                    Localization.lang("Clear group \"%0\"?", group.getDisplayName()));
+                    Localization.lang("Clear group \"%0\"?", group.getDisplayName()),
+                    Localization.lang("Clear"));
             if (confirmation) {
                 List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
                 groupNode.removeEntriesFromGroup(entriesInGroup);
