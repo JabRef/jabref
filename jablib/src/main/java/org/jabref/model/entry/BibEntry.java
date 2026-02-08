@@ -571,12 +571,12 @@ public class BibEntry {
     /// Set a field, and notify listeners about the change.
     ///
     /// @param field       The field to set
-    /// @param value       The value to set
+    /// @param value       The value to set - "null" for clear. Useful for cleaner code at fetchers.
     /// @param eventSource Source the event is sent from
     public Optional<FieldChange> setField(@NonNull Field field,
-                                          @NonNull String value,
+                                          @Nullable String value,
                                           @NonNull EntriesEventSource eventSource) {
-        if (value.isEmpty()) {
+        if (StringUtil.isNullOrEmpty(value)) {
             return clearField(field);
         }
 
@@ -603,8 +603,8 @@ public class BibEntry {
     /// Set a field, and notify listeners about the change.
     ///
     /// @param field The field to set.
-    /// @param value The value to set.
-    public Optional<FieldChange> setField(Field field, String value) {
+    /// @param value The value to set - "null" for clear. Useful for cleaner code at fetchers.
+    public Optional<FieldChange> setField(Field field, @Nullable String value) {
         return setField(field, value, EntriesEventSource.LOCAL);
     }
 

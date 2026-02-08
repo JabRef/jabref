@@ -50,7 +50,7 @@ concurrency:
 
 jobs:
   detect_changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.repository == 'JabRef/jabref'
     outputs:
       changed: ${{ steps.changed.outputs.any_changed }}

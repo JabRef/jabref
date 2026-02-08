@@ -15,15 +15,18 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Improved merge dialog decisions for the `month` field by using a new plausibility comparator. JabRef now prefers normalized months (e.g., `#jun#`) or integers over unnormalized strings. [#14457](https://github.com/JabRef/jabref/issues/14457)
 - We added web search capability to ScienceDirect using the [Scopus](https://www.scopus.com/) Search API, enabling users to search for academic literature directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
 - We fixed an issue where a redundant validation listener was causing duplicate error dialogs when invalid BibTeX source was detected in the SourceTab. [#14805](https://github.com/JabRef/jabref/issues/14805)
-- We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
+- We added support for selecting citation fetchers in the Citations tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
 - Consistency check is now aware of custom entry types, custom fields, and reports missing required fields. [#14257](https://github.com/JabRef/jabref/pull/14257)
-- We added support for [OpenCitations](https://opencitations.net/) both in the GUI (tab "Citations") and JabKit (`--get-cited-works`, `--get-citing-works`). [#14996](https://github.com/JabRef/jabref/pull/14996)
+- We added support for [OpenCitations](https://opencitations.net/) and [OpenAlex](https://docs.openalex.org/) both in the GUI (tab "Citations") and JabKit (`--get-cited-works`, `--get-citing-works`). [#14996](https://github.com/JabRef/jabref/pull/14996)
 - We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
+- We added API key configuration support for [OpenAlex](https://openalex.org/). [#15023](https://github.com/JabRef/jabref/pull/15023)
+- We added API key configuration support for SemanticScholar. [#15023](https://github.com/JabRef/jabref/pull/15023)
 - REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Allow import of supported formats via `POST http://localhost:23119/libraries/current/entries`. [#14896](https://github.com/JabRef/jabref/pull/14896)
+- We added the option to enable/disable the HTTP-Server for the browser extension to the Quick Settings on the Welcome screen [#14902](https://github.com/JabRef/jabref/issues/14902)
 - We added the ability to update bibliographic information based on the existing entry data. [#14185](https://github.com/JabRef/jabref/issues/14185)
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
 
@@ -31,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog. [#11791](https://github.com/JabRef/jabref/issues/11791)
 - Checking for existence of the "Imported entries" group is now case-insensitive. [#14999](https://github.com/JabRef/jabref/pull/14999)
+- Batch update for bibliographic information now uses heuristics to update the field.
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 
@@ -49,6 +53,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where journal abbreviations chose the wrong abbreviation when fuzzy matching. [#14850](https://github.com/JabRef/jabref/pull/14850)
 - We fixed an issue where JaRef would not correctly remember the opened side panels in the preferences [#14818](https://github.com/JabRef/jabref/issues/14818)
 - We fixed an issue fetching DOI information when DOIs included URL-invalid characters (e.g., `10.1002/1098-108x(198905)8:3<343::aid-eat2260080310>3.0.co;2-c`). [#14996](https://github.com/JabRef/jabref/pull/14996)
+- We fixed an issue of OpenAlexFetcher not including the DOI. [#15023](https://github.com/JabRef/jabref/pull/15023)
+- We fixed an issue displaying a fetcher error in the citations tab. [#15023](https://github.com/JabRef/jabref/pull/15023)
 - Updates of the pre-selected fetchers are now followed at the Web fetchers. [#14768](https://github.com/JabRef/jabref/pull/14768)
 - Restart search button in citation-relation panel now refreshes using external services. [#14757](https://github.com/JabRef/jabref/issues/14757)
 - Group selection now depends only on the user selection. [#14084](https://github.com/JabRef/jabref/issues/14084)
