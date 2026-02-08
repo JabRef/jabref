@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Batch update for bibliographic information now uses heuristics to update the field.
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
+- We moved the "Rename subgroup" below "Edit group" and rename to "Rename group". [#15041](https://github.com/JabRef/jabref/issues/15041)
 
 ### Fixed
 
