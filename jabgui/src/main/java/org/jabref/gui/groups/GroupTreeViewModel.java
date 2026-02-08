@@ -728,8 +728,15 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void clearGroup(GroupNodeViewModel group) {
         GroupTreeNode groupNode = group.getGroupNode();
         if (groupNode.getGroup() instanceof ExplicitGroup) {
-            List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
-            groupNode.removeEntriesFromGroup(entriesInGroup);
+            boolean confirmation = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Clear group"),
+                    Localization.lang("Clear group \"%0\"?", group.getDisplayName()));
+            if (confirmation) {
+                List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
+                groupNode.removeEntriesFromGroup(entriesInGroup);
+                dialogService.notify(Localization.lang("Cleared group \"%0\".", group.getDisplayName()));
+                writeGroupChangesToMetaData();
+            }
         }
     }
 
