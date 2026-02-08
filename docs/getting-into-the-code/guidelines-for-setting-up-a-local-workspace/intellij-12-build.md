@@ -158,7 +158,7 @@ To run an example test from IntelliJ, we let IntelliJ create a launch configurat
 Locate the class `LocalizationConsistencyTest`:
 Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
-Enter `localization consistency test`.
+Enter `localizationconsistencytest`.
 Now, `LocalizationConsistencyTest` should appear first:
 
 {% figure caption:"IntelliJ search for class “LocalizationConsistencyTest”" %}
