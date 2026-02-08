@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   generate-and-pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
