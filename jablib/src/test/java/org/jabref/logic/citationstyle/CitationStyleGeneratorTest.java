@@ -567,7 +567,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.NUMBER, "3number"),
                         "apa.csl"),
-                //26.
+                // 26.
                 Arguments.of(
                         "Foo, B. (n.d.). eid + issue + number + pages. Bib(La)TeX Journal, 3number, Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
