@@ -261,7 +261,7 @@ class CSLFormatUtilsTest {
         return Stream.of(
                 Arguments.of(
                         "(Smith et al., 2016)",
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -281,7 +281,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "(1)",
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "NLM Style Guide (Vancouver): Citing Medicine 2nd edition (citation-sequence)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -383,7 +383,7 @@ class CSLFormatUtilsTest {
         return Stream.of(
                 Arguments.of(
                         "(Garcia & Lee, 2021; Smith & Johnson, 2020)",
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
@@ -403,7 +403,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "(1,2)",
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "NLM Style Guide (Vancouver): Citing Medicine 2nd edition (citation-sequence)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
