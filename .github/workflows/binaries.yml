@@ -502,7 +502,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          build/jbundle/jabgui --help
+          build/jbundle/jabgui--${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
         uses: actions/upload-artifact@v6
         with:
