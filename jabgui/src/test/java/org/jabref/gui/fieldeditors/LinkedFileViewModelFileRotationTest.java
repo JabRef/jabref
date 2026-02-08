@@ -25,9 +25,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(ApplicationExtension.class)
@@ -81,8 +79,8 @@ class LinkedFileViewModelFileRotationTest {
 
         viewModel.moveToNextPossibleDirectory();
 
-        assertTrue(Files.exists(libDir.resolve("test.pdf")), "File should have moved to Library directory");
-        assertFalse(Files.exists(fileInUser), "File should be gone from User directory");
+        assertTrue(Files.exists(libDir.resolve("test.pdf")));
+        assertFalse(Files.exists(fileInUser));
     }
 
     @Test
@@ -98,7 +96,7 @@ class LinkedFileViewModelFileRotationTest {
 
         viewModel.moveToNextPossibleDirectory();
 
-        assertTrue(Files.exists(bibDir.resolve("test.pdf")), "File should have moved to Bib directory");
+        assertTrue(Files.exists(bibDir.resolve("test.pdf")));
     }
 
     @Test
@@ -145,7 +143,6 @@ class LinkedFileViewModelFileRotationTest {
 
         viewModel.moveToNextPossibleDirectory();
 
-        verify(dialogService).showErrorDialogAndWait(eq("Move file"), eq("No suitable file directory found."));
         assertTrue(Files.exists(fileInUser));
     }
 

@@ -330,17 +330,30 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return;
         }
 
+        List<Path> possibleDirPaths = databaseContext.getAllFileDirectories(preferences.getFilePreferences());
+
+        if (possibleDirPaths.stream().allMatch(Objects::isNull)) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No directory found"),
+                    Localization.lang("Configure a file directory to move file(s).")
+            );
+        }
+
         Optional<Path> currentFile = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (currentFile.isEmpty()) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
-                    Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+                    Localization.lang("Could not find file '%0'.", linkedFile.getLink())
+            );
         }
 
-        Optional<Path> destinationDir = getNextTargetPath(currentFile.get());
+        Optional<Path> destinationDir = getNextTargetPath(currentFile.get(), possibleDirPaths);
         if (destinationDir.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("No suitable file directory found."));
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No directory found"),
+                    Localization.lang("Configure another directory to move file(s).")
+            );
             return;
         }
 
@@ -362,13 +375,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     ///
     /// @param currentFile the file that is being moved
     /// @return the {@link Path} to which the file can be moved
-    private Optional<Path> getNextTargetPath(Path currentFile) {
-        List<Path> possibleDirPaths = databaseContext.getAllFileDirectories(preferences.getFilePreferences());
-
-        if (possibleDirPaths.stream().allMatch(Objects::isNull)) {
-            return Optional.empty();
-        }
-
+    private Optional<Path> getNextTargetPath(Path currentFile, List<Path> possibleDirPaths) {
         // Current dir index (file's current directory) is -1 if it's not in any Jabref directory, otherwise, it is 0 for User, 1 for Library, 2 for BIB
         int currentDirIndex = -1;
         Path currentFileDir = currentFile.getParent();
@@ -387,7 +394,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             Path candidate = possibleDirPaths.get(candidateIndex);
             if (candidate != null && candidateIndex != currentDirIndex) {
                 if (currentDirIndex >= 0) {
-                    // Relativize if the file was present in a configured directory in order to mirror directory structure
+                    // Relativize the path because the file was present in a configured directory in order to mirror directory structure
                     Path currentPath = possibleDirPaths.get(currentDirIndex);
                     Path relativePath = currentPath.relativize(currentFile);
                     if (relativePath.getParent() != null) {
