@@ -13,9 +13,12 @@ import org.jabref.model.citation.CitationContextList;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class LlmCitationContextExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LlmCitationContextExtractor.class);
@@ -110,7 +113,7 @@ public class LlmCitationContextExtractor {
         List<CitationContext> contexts = new ArrayList<>();
 
         String[] lines = response.split("\n");
-        String currentMarker = null;
+        @Nullable String currentMarker = null;
         StringBuilder currentContext = new StringBuilder();
 
         for (String line : lines) {

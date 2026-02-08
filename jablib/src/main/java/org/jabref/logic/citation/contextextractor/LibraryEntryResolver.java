@@ -19,22 +19,36 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class LibraryEntryResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryEntryResolver.class);
 
     private static final double DOI_MATCH_CONFIDENCE = 1.0;
     private static final double EXACT_CITATION_KEY_CONFIDENCE = 0.95;
+    private static final double CASE_INSENSITIVE_KEY_CONFIDENCE_FACTOR = 0.95;
     private static final double HIGH_TITLE_SIMILARITY_CONFIDENCE = 0.85;
     private static final double MEDIUM_TITLE_SIMILARITY_CONFIDENCE = 0.70;
     private static final double AUTHOR_YEAR_TITLE_CONFIDENCE = 0.75;
     private static final double DUPLICATE_CHECK_CONFIDENCE = 0.80;
+    private static final double HIGH_CONFIDENCE_THRESHOLD = 0.8;
+    private static final double MEDIUM_CONFIDENCE_THRESHOLD = 0.5;
+    private static final double VERY_HIGH_TITLE_SIMILARITY = 0.95;
 
     private static final double TITLE_SIMILARITY_THRESHOLD = 0.85;
     private static final double AUTHOR_SIMILARITY_THRESHOLD = 0.75;
+    private static final double AUTHOR_YEAR_MIN_SCORE = 0.6;
+    private static final double YEAR_SCORE_WEIGHT = 0.3;
+    private static final double AUTHOR_SCORE_WEIGHT = 0.4;
+    private static final double TITLE_SCORE_WEIGHT = 0.3;
+    private static final double TITLE_MIN_SIMILARITY = 0.5;
+    private static final double MARKER_AUTHOR_SIMILARITY_THRESHOLD = 0.7;
+    private static final int MIN_MATCHED_FIELDS_FOR_SCORE = 2;
 
     private final BibDatabase database;
     private final BibDatabaseMode databaseMode;
@@ -147,7 +161,7 @@ public class LibraryEntryResolver {
             for (BibEntry entry2 : database.getEntries()) {
                 Optional<String> entryKey = entry2.getCitationKey();
                 if (entryKey.isPresent() && entryKey.get().toLowerCase(Locale.ROOT).equals(lowerMarker)) {
-                    return Optional.of(new MatchedEntry(entry2, EXACT_CITATION_KEY_CONFIDENCE * 0.95, MatchType.CITATION_KEY));
+                    return Optional.of(new MatchedEntry(entry2, EXACT_CITATION_KEY_CONFIDENCE * CASE_INSENSITIVE_KEY_CONFIDENCE_FACTOR, MatchType.CITATION_KEY));
                 }
             }
         }
@@ -161,7 +175,7 @@ public class LibraryEntryResolver {
         }
 
         String referenceTitle = reference.title().get().toLowerCase(Locale.ROOT);
-        BibEntry bestMatch = null;
+        @Nullable BibEntry bestMatch = null;
         double bestSimilarity = 0;
 
         for (BibEntry entry : database.getEntries()) {
@@ -180,9 +194,9 @@ public class LibraryEntryResolver {
         }
 
         if (bestMatch != null) {
-            double confidence = bestSimilarity >= 0.95 ? HIGH_TITLE_SIMILARITY_CONFIDENCE :
-                                bestSimilarity >= 0.85 ? MEDIUM_TITLE_SIMILARITY_CONFIDENCE :
-                                bestSimilarity * 0.8;
+            double confidence = bestSimilarity >= VERY_HIGH_TITLE_SIMILARITY ? HIGH_TITLE_SIMILARITY_CONFIDENCE :
+                                bestSimilarity >= TITLE_SIMILARITY_THRESHOLD ? MEDIUM_TITLE_SIMILARITY_CONFIDENCE :
+                                bestSimilarity * HIGH_CONFIDENCE_THRESHOLD;
             return Optional.of(new MatchedEntry(bestMatch, confidence, MatchType.TITLE));
         }
 
@@ -197,12 +211,12 @@ public class LibraryEntryResolver {
         String referenceAuthor = extractFirstAuthorLastName(reference.authors().get()).toLowerCase(Locale.ROOT);
         String referenceYear = reference.year().get();
 
-        BibEntry bestMatch = null;
+        @Nullable BibEntry bestMatch = null;
         double bestScore = 0;
 
         for (BibEntry entry : database.getEntries()) {
             double score = calculateAuthorYearMatchScore(referenceAuthor, referenceYear, reference.title(), entry);
-            if (score > bestScore && score >= 0.6) {
+            if (score > bestScore && score >= AUTHOR_YEAR_MIN_SCORE) {
                 bestScore = score;
                 bestMatch = entry;
             }
@@ -222,7 +236,7 @@ public class LibraryEntryResolver {
 
         Optional<String> entryYear = entry.getField(StandardField.YEAR);
         if (entryYear.isPresent() && entryYear.get().equals(referenceYear)) {
-            score += 0.3;
+            score += YEAR_SCORE_WEIGHT;
             matchedFields++;
         }
 
@@ -231,7 +245,7 @@ public class LibraryEntryResolver {
             String entryFirstAuthor = extractFirstAuthorLastName(entryAuthor.get()).toLowerCase(Locale.ROOT);
             double authorSimilarity = stringSimilarity.similarity(referenceAuthor, entryFirstAuthor);
             if (authorSimilarity >= AUTHOR_SIMILARITY_THRESHOLD) {
-                score += 0.4 * authorSimilarity;
+                score += AUTHOR_SCORE_WEIGHT * authorSimilarity;
                 matchedFields++;
             }
         }
@@ -243,14 +257,14 @@ public class LibraryEntryResolver {
                         referenceTitle.get().toLowerCase(Locale.ROOT),
                         entryTitle.get().toLowerCase(Locale.ROOT)
                 );
-                if (titleSimilarity >= 0.5) {
-                    score += 0.3 * titleSimilarity;
+                if (titleSimilarity >= TITLE_MIN_SIMILARITY) {
+                    score += TITLE_SCORE_WEIGHT * titleSimilarity;
                     matchedFields++;
                 }
             }
         }
 
-        return matchedFields >= 2 ? score : 0;
+        return matchedFields >= MIN_MATCHED_FIELDS_FOR_SCORE ? score : 0;
     }
 
     private Optional<MatchedEntry> findByDuplicateCheck(ReferenceEntry reference) {
@@ -361,7 +375,7 @@ public class LibraryEntryResolver {
             String markerAuthor = matcher.group(1).toLowerCase(Locale.ROOT);
             String markerYear = matcher.group(2);
 
-            BibEntry bestMatch = null;
+            @Nullable BibEntry bestMatch = null;
             double bestScore = 0;
 
             for (BibEntry entry : database.getEntries()) {
@@ -376,7 +390,7 @@ public class LibraryEntryResolver {
                     String firstAuthor = extractFirstAuthorLastName(entryAuthor.get()).toLowerCase(Locale.ROOT);
                     double similarity = stringSimilarity.similarity(markerAuthor, firstAuthor);
 
-                    if (similarity > bestScore && similarity >= 0.7) {
+                    if (similarity > bestScore && similarity >= MARKER_AUTHOR_SIMILARITY_THRESHOLD) {
                         bestScore = similarity;
                         bestMatch = entry;
                     }
@@ -421,15 +435,15 @@ public class LibraryEntryResolver {
         }
 
         public boolean isHighConfidence() {
-            return confidence >= 0.8;
+            return confidence >= HIGH_CONFIDENCE_THRESHOLD;
         }
 
         public boolean isMediumConfidence() {
-            return confidence >= 0.5 && confidence < 0.8;
+            return confidence >= MEDIUM_CONFIDENCE_THRESHOLD && confidence < HIGH_CONFIDENCE_THRESHOLD;
         }
 
         public boolean isLowConfidence() {
-            return confidence < 0.5;
+            return confidence < MEDIUM_CONFIDENCE_THRESHOLD;
         }
     }
 

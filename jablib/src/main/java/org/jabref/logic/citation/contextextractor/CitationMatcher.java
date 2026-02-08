@@ -12,9 +12,12 @@ import org.jabref.model.citation.ReferenceEntry;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CitationMatcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationMatcher.class);
@@ -35,8 +38,16 @@ public class CitationMatcher {
     private static final String WHITESPACE_PATTERN = "\\s+";
 
     private static final double AUTHOR_SIMILARITY_THRESHOLD = 0.7;
-
     private static final double TEXT_SIMILARITY_THRESHOLD = 0.6;
+    private static final double MARKER_SIMILARITY_WEIGHT = 0.8;
+    private static final double NUMERIC_MATCH_CONFIDENCE = 0.95;
+    private static final double HIGH_CONFIDENCE_THRESHOLD = 0.8;
+    private static final double MEDIUM_CONFIDENCE_THRESHOLD = 0.5;
+    private static final double YEAR_EXACT_MATCH_SCORE = 0.4;
+    private static final double YEAR_PARTIAL_MATCH_SCORE = 0.2;
+    private static final double AUTHOR_MATCH_WEIGHT = 0.6;
+    private static final double FALLBACK_MARKER_WEIGHT = 0.4;
+    private static final int TWO_DIGIT_YEAR_CENTURY_CUTOFF = 50;
 
     private final StringSimilarity stringSimilarity;
     private final AuthorListParser authorListParser;
@@ -170,7 +181,7 @@ public class CitationMatcher {
         }
 
         double markerSimilarity = stringSimilarity.similarity(normalizedMarker, referenceMarker);
-        maxScore = Math.max(maxScore, markerSimilarity * 0.8);
+        maxScore = Math.max(maxScore, markerSimilarity * MARKER_SIMILARITY_WEIGHT);
 
         return maxScore;
     }
@@ -280,9 +291,9 @@ public class CitationMatcher {
         if (reference.year().isPresent()) {
             String refYear = reference.year().get();
             if (refYear.equals(markerYear)) {
-                score += 0.4;
+                score += YEAR_EXACT_MATCH_SCORE;
             } else if (refYear.endsWith(markerYear.substring(Math.max(0, markerYear.length() - 2)))) {
-                score += 0.2;
+                score += YEAR_PARTIAL_MATCH_SCORE;
             }
         }
 
@@ -291,11 +302,11 @@ public class CitationMatcher {
             String firstAuthor = extractFirstAuthorLastName(refAuthors);
 
             double authorSimilarity = stringSimilarity.similarity(markerAuthor, firstAuthor);
-            score += authorSimilarity * 0.6;
+            score += authorSimilarity * AUTHOR_MATCH_WEIGHT;
         } else {
             String refMarker = normalizeMarker(reference.marker()).toLowerCase(Locale.ROOT);
             double markerSimilarity = stringSimilarity.similarity(markerAuthor, refMarker);
-            score += markerSimilarity * 0.4;
+            score += markerSimilarity * FALLBACK_MARKER_WEIGHT;
         }
 
         return score;
@@ -336,7 +347,7 @@ public class CitationMatcher {
     private String normalizeYear(String year) {
         if (year.length() == 2) {
             int yearNum = Integer.parseInt(year);
-            if (yearNum > 50) {
+            if (yearNum > TWO_DIGIT_YEAR_CENTURY_CUTOFF) {
                 return "19" + year;
             } else {
                 return "20" + year;
@@ -346,7 +357,7 @@ public class CitationMatcher {
     }
 
     private Optional<ReferenceEntry> findBestFuzzyMatch(String normalizedMarker, List<ReferenceEntry> references) {
-        ReferenceEntry bestMatch = null;
+        @Nullable ReferenceEntry bestMatch = null;
         double bestScore = TEXT_SIMILARITY_THRESHOLD;
 
         for (ReferenceEntry reference : references) {
@@ -366,15 +377,15 @@ public class CitationMatcher {
             MatchType matchType
     ) {
         public boolean isHighConfidence() {
-            return confidence >= 0.8;
+            return confidence >= HIGH_CONFIDENCE_THRESHOLD;
         }
 
         public boolean isMediumConfidence() {
-            return confidence >= 0.5 && confidence < 0.8;
+            return confidence >= MEDIUM_CONFIDENCE_THRESHOLD && confidence < HIGH_CONFIDENCE_THRESHOLD;
         }
 
         public boolean isLowConfidence() {
-            return confidence < 0.5;
+            return confidence < MEDIUM_CONFIDENCE_THRESHOLD;
         }
     }
 
@@ -400,7 +411,7 @@ public class CitationMatcher {
 
         Optional<ReferenceEntry> numericMatch = matchNumericMarker(normalizedMarker, references);
         if (numericMatch.isPresent()) {
-            return Optional.of(new MatchResult(numericMatch.get(), 0.95, MatchType.NUMERIC_INDEX));
+            return Optional.of(new MatchResult(numericMatch.get(), NUMERIC_MATCH_CONFIDENCE, MatchType.NUMERIC_INDEX));
         }
 
         Optional<ReferenceEntry> authorYearMatch = matchAuthorYearMarker(normalizedMarker, references);

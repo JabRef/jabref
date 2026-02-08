@@ -8,12 +8,26 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.citation.ReferenceEntry;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class PdfReferenceParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfReferenceParser.class);
+
+    private static final int MIN_REFERENCE_LENGTH = 20;
+    private static final int MIN_REFERENCES_FOR_FORMAT_DETECTION = 3;
+    private static final int MIN_AUTHOR_LENGTH = 2;
+    private static final int MAX_AUTHOR_LENGTH = 500;
+    private static final int MIN_TITLE_LENGTH = 10;
+    private static final int MAX_TITLE_LENGTH = 500;
+    private static final int MIN_YEAR = 1900;
+    private static final int MAX_YEAR = 2030;
+    private static final int MIN_JOURNAL_LENGTH = 3;
+    private static final int MIN_ITALIC_JOURNAL_LENGTH = 5;
 
     private static final String NUMERIC_BRACKETED_REGEX = "\\[\\d{1,3}\\]";
     private static final String NUMERIC_DOTTED_REGEX = "(?:^|\\n)\\d{1,3}\\.\\s";
@@ -125,7 +139,7 @@ public class PdfReferenceParser {
 
         return references.stream()
                          .map(String::trim)
-                         .filter(r -> r.length() > 20)
+                         .filter(r -> r.length() > MIN_REFERENCE_LENGTH)
                          .toList();
     }
 
@@ -134,13 +148,13 @@ public class PdfReferenceParser {
         int numericDotted = countMatches(text, NUMERIC_DOTTED_PATTERN);
         int authorKey = countMatches(text, AUTHOR_KEY_PATTERN);
 
-        if (numericBracketed >= 3) {
+        if (numericBracketed >= MIN_REFERENCES_FOR_FORMAT_DETECTION) {
             return ReferenceFormat.NUMERIC_BRACKETED;
         }
-        if (numericDotted >= 3) {
+        if (numericDotted >= MIN_REFERENCES_FOR_FORMAT_DETECTION) {
             return ReferenceFormat.NUMERIC_DOTTED;
         }
-        if (authorKey >= 3) {
+        if (authorKey >= MIN_REFERENCES_FOR_FORMAT_DETECTION) {
             return ReferenceFormat.AUTHOR_KEY;
         }
         return ReferenceFormat.AUTHOR_YEAR;
@@ -312,7 +326,7 @@ public class PdfReferenceParser {
         Matcher matcher = AUTHORS_PATTERN.matcher(cleanedText);
         if (matcher.find()) {
             String authors = matcher.group(1).trim();
-            if (authors.length() > 2 && authors.length() < 500) {
+            if (authors.length() > MIN_AUTHOR_LENGTH && authors.length() < MAX_AUTHOR_LENGTH) {
                 return Optional.of(normalizeAuthors(authors));
             }
         }
@@ -414,8 +428,8 @@ public class PdfReferenceParser {
         return -1;
     }
 
-    private boolean isValidTitle(String title) {
-        if (title == null || title.length() < 10 || title.length() > 500) {
+    private boolean isValidTitle(@Nullable String title) {
+        if (title == null || title.length() < MIN_TITLE_LENGTH || title.length() > MAX_TITLE_LENGTH) {
             return false;
         }
 
@@ -428,13 +442,13 @@ public class PdfReferenceParser {
 
     private Optional<String> extractYear(String text) {
         Matcher matcher = YEAR_PATTERN.matcher(text);
-        String lastYear = null;
+        @Nullable String lastYear = null;
 
         while (matcher.find()) {
             String year = matcher.group(1);
             int yearInt = Integer.parseInt(year);
 
-            if (yearInt >= 1900 && yearInt <= 2030) {
+            if (yearInt >= MIN_YEAR && yearInt <= MAX_YEAR) {
                 lastYear = year;
             }
         }
@@ -451,7 +465,7 @@ public class PdfReferenceParser {
                     .replaceFirst("^In\\s+", "")
                     .replaceFirst("^Proceedings\\s+of\\s+(the\\s+)?", "")
                     .trim();
-            if (journal.length() > 3) {
+            if (journal.length() > MIN_JOURNAL_LENGTH) {
                 return Optional.of(journal);
             }
         }
@@ -459,7 +473,7 @@ public class PdfReferenceParser {
         Matcher italicMatcher = Pattern.compile("[*_]([^*_]+)[*_]").matcher(text);
         if (italicMatcher.find()) {
             String potential = italicMatcher.group(1).trim();
-            if (potential.length() > 5 && !potential.contains(".")) {
+            if (potential.length() > MIN_ITALIC_JOURNAL_LENGTH && !potential.contains(".")) {
                 return Optional.of(potential);
             }
         }

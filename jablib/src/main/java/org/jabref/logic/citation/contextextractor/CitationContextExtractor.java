@@ -8,7 +8,14 @@ import java.util.regex.Pattern;
 import org.jabref.model.citation.CitationContext;
 import org.jabref.model.citation.CitationContextList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class CitationContextExtractor {
+
+    private static final int DEFAULT_CONTEXT_SENTENCES_BEFORE = 1;
+    private static final int DEFAULT_CONTEXT_SENTENCES_AFTER = 1;
+    private static final int FALLBACK_CONTEXT_RADIUS = 200;
 
     private static final Pattern AUTHOR_YEAR_PATTERN = Pattern.compile(
             "\\(([A-Z][a-zA-Z'\\-]+(?:\\s+(?:and|&)\\s+[A-Z][a-zA-Z'\\-]+)*(?:\\s+et\\s+al\\.?)?)(?:[,\\s]+)(\\d{4}[a-z]?)\\)",
@@ -36,7 +43,7 @@ public class CitationContextExtractor {
     private final int contextSentencesAfter;
 
     public CitationContextExtractor() {
-        this(1, 1);
+        this(DEFAULT_CONTEXT_SENTENCES_BEFORE, DEFAULT_CONTEXT_SENTENCES_AFTER);
     }
 
     public CitationContextExtractor(int contextSentencesBefore, int contextSentencesAfter) {
@@ -92,8 +99,8 @@ public class CitationContextExtractor {
         }
 
         if (sentenceIndex == -1) {
-            int start = Math.max(0, citationPosition - 200);
-            int end = Math.min(text.length(), citationPosition + 200);
+            int start = Math.max(0, citationPosition - FALLBACK_CONTEXT_RADIUS);
+            int end = Math.min(text.length(), citationPosition + FALLBACK_CONTEXT_RADIUS);
             return text.substring(start, end).trim();
         }
 
