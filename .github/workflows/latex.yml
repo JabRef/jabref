@@ -40,9 +40,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #  IEEE paper
+          #  IEEE papers
           - directory: jablib/src/test/latex/pdfs/IEEE
             tex: ieee-paper
+            engine: pdflatex
+            bibengine: bibtex
+          - directory: jablib/src/test/latex/pdfs/IEEE
+            tex: ieee-paper-reference-text
             engine: pdflatex
             bibengine: bibtex
           # minimal search examples
