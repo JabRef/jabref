@@ -27,7 +27,6 @@ public class Pseudonymization {
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
         // TODO: Anonymize metadata
         // TODO: Anonymize strings
-
         Map<String, String> groupNameMapping = new HashMap<>();
         bibDatabaseContext.getMetaData().getGroups().ifPresent(root ->
                 pseudonymizeGroupsRecursive(root, groupNameMapping)
@@ -43,6 +42,7 @@ public class Pseudonymization {
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
+        result.setMetaData(bibDatabaseContext.getMetaData());
 
         return new Result(result, valueMapping);
     }
