@@ -1,7 +1,7 @@
 <!--
 1. ADDRESS all given instructions or tasks down below.
 2. REMOVE all HTML Comments before you open the pull-request (PR).
-OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER NOTICE.
+   OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER NOTICE.
 -->
 
 <!--
