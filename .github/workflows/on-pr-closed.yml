@@ -4,6 +4,8 @@ on:
   pull_request_target:
     types: [ closed ]
 
+  # Manual trigger to unassign a contributor and take necessary follow-up actions
+  # Do not call if PR was successfully merged
   workflow_dispatch:
     inputs:
       pr_number:
@@ -204,9 +206,8 @@ jobs:
     name: Remove download hint
     runs-on: ubuntu-slim
     needs: determine_issue_number
-    if: >
-      (needs.determine_issue_number.outputs.issue_number != '') &&
-      (github.event_name != 'workflow_dispatch')
+    # Link is removed in both cases (merged and closed)
+    if: needs.determine_issue_number.outputs.issue_number != ''
     permissions:
       contents: read
       issues: write
