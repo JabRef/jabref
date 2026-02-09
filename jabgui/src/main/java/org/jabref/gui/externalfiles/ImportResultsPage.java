@@ -131,7 +131,7 @@ public class ImportResultsPage extends WizardPane {
 
     private void updateSummary() {
         int totalCount = viewModel.resultTableItems().size();
-        long successCount = viewModel.resultTableItems().stream().filter(item -> item.message().get().toLowerCase().contains("success")).count();
+        long successCount = viewModel.resultTableItems().stream().filter(ImportFilesResultItemViewModel::isSuccess).count();
         long failCount = totalCount - successCount;
 
         String summaryText = Localization.lang("Import completed: %0 successful, %1 failed", String.valueOf(successCount), String.valueOf(failCount));
