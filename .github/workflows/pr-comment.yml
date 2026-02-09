@@ -158,7 +158,7 @@ jobs:
 
           if [[ -n "$COMMENTS" ]]; then
             echo "Bot comments - adding label changes-required"
-            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments" --add-label "status: changes-required"
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else
             echo "No bot comments - removing label changes-required and adding no-bot-comments"
