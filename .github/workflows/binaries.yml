@@ -480,6 +480,13 @@ jobs:
       - name: ShadowJar JabGui
         shell: bash
         run: ./gradlew :jabgui:ShadowJar
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: JabGui JAR (${{ matrix.displayName }})
+          path: |
+            jabgui/build/libs/*-all.jar
 
       - name: Install jbundle
         # if: ${{ (matrix.os == 'ubuntu-22.04') }}
@@ -590,6 +597,13 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: ./gradlew :jabkit:ShadowJar
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: JabKit JAR (${{ matrix.displayName }})
+          path: |
+            jabkit/build/lib/*-all*.jar
       - name: jbundle jabkit
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -628,13 +642,6 @@ jobs:
           name: JabKit (${{ matrix.displayName }})
           path: |
             jabkit/build/packages/${{ matrix.os }}
-      - name: Upload JabKit ShadowJar artifacts
-        if: ${{ (github.event.inputs.upload-as-artifact || 'false' == 'true') && (matrix.os == 'ubuntu-22.04') }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: JabKit ShadowJar
-          path: |
-            jabkit/build/libs/*-all.jar
 
       - name: jpackage jabls-cli
         shell: bash
@@ -651,6 +658,13 @@ jobs:
       - name: ShadowJar jabls-cli
         shell: bash
         run: ./gradlew :jabls-cli:ShadowJar
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: JabLs (${{ matrix.displayName }})
+          path: |
+            jabls-cli/build/libs/-*all.jar
       - name: jbundle jabls-cli
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -691,6 +705,13 @@ jobs:
       - name: ShadowJar jabsrv-cli
         shell: bash
         run: ./gradlew :jabsrv-cli:ShadowJar
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: JabLs (${{ matrix.displayName }})
+          path: |
+            jabsrv-cli/build/libs/-*all.jar
       - name: jbundle jabsrv-cli
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
