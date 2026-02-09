@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -37,6 +38,7 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -163,12 +165,17 @@ public class OpenDatabaseAction extends SimpleCommand {
     ///
     /// @param filesToOpen the filesToOpen, may be null or not existing
     public void openFiles(List<Path> filesToOpen) {
+        // Resolve any shortcuts to their targets
+        List<Path> resolvedFiles = filesToOpen.stream()
+                                              .map(FileUtil::resolveIfShortcut)
+                                              .collect(Collectors.toList());
+
         LibraryTab toRaise = null;
-        int initialCount = filesToOpen.size();
+        int initialCount = resolvedFiles.size();
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Path> iterator = resolvedFiles.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
@@ -188,10 +195,10 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
-        if (!filesToOpen.isEmpty()) {
+        if (!resolvedFiles.isEmpty()) {
             assert fileUpdateMonitor != null;
             FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
-            filesToOpen.forEach(theFile -> {
+            resolvedFiles.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
                 fileHistory.newFile(theFile);

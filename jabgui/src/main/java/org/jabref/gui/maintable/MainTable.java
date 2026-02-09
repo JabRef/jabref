@@ -539,7 +539,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         boolean success = false;
 
         if (event.getDragboard().hasFiles()) {
-            List<Path> files = FileUtil.resolveWindowsShortcuts(event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList()));
+            List<Path> files = event.getDragboard().getFiles().stream()
+                                    .map(File::toPath)
+                                    .map(FileUtil::resolveIfShortcut)
+                                    .collect(Collectors.toList());
 
             // Depending on the pressed modifier, move/copy/link files to drop target
             // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
@@ -570,7 +573,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         boolean success = false;
 
         if (event.getDragboard().hasFiles()) {
-            List<Path> files = FileUtil.resolveWindowsShortcuts(event.getDragboard().getFiles().stream().map(File::toPath).toList());
+            List<Path> files = event.getDragboard().getFiles().stream()
+                                    .map(File::toPath)
+                                    .map(FileUtil::resolveIfShortcut)
+                                    .toList();
             importHandler
                     .importFilesInBackground(files, event.getTransferMode())
                     .executeWith(taskExecutor);
