@@ -221,7 +221,7 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_SORT_ENTRIES(Localization.lang("Sort subgroups by # of entries (descending)")),
     GROUP_SUBGROUP_SORT_ENTRIES_REVERSE(Localization.lang("Sort subgroups by # of entries (ascending)")),
     GROUP_ENTRIES_ADD(Localization.lang("Add selected entries to this group")),
-    GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
+    GROUP_RENAME(Localization.lang("Rename group"), KeyBinding.GROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
     GROUP_ENTRIES_CLEAR(Localization.lang("Clear group")),
 
