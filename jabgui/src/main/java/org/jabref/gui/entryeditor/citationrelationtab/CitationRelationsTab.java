@@ -364,9 +364,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         String citationKey = entry.getCitationKey().orElse("this entry");
 
         Label citingLabel = new Label(Localization.lang("References cited in %0", citationKey));
-        styleLabel(citingLabel, Localization.lang("Also called \"backward citations\""));
+        styleLabel(citingLabel, Localization.lang("Also called \"backward citations\""), 250.00);
+        citingLabel.setMinWidth(100);
+        citingLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
+        HBox.setHgrow(citingLabel, javafx.scene.layout.Priority.ALWAYS);
         Label citedByLabel = new Label(Localization.lang("References that cite %0", citationKey));
-        styleLabel(citedByLabel, Localization.lang("Also called \"forward citations\""));
+        styleLabel(citedByLabel, Localization.lang("Also called \"forward citations\""), 80.00);
+        citedByLabel.setMinWidth(100);
+        citedByLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
+        HBox.setHgrow(citedByLabel, javafx.scene.layout.Priority.ALWAYS);
 
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
@@ -610,14 +616,14 @@ public class CitationRelationsTab extends EntryEditorTab {
     ///
     /// @param label       label to style
     /// @param tooltipText tooltip text
-    private void styleLabel(Label label, String tooltipText) {
+    private void styleLabel(Label label, String tooltipText, double rightanchor) {
         label.setStyle("-fx-padding: 5px");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         AnchorPane.setTopAnchor(label, 0.0);
         AnchorPane.setLeftAnchor(label, 0.0);
         AnchorPane.setBottomAnchor(label, 0.0);
-        AnchorPane.setRightAnchor(label, 0.0);
+        AnchorPane.setRightAnchor(label, rightanchor);
     }
 
     /// Method to style refresh buttons
