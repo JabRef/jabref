@@ -39,7 +39,9 @@ public class UnlinkedFilesWizard {
     }
 
     public void show() {
-        initializeWizard();
+        if (!initializeWizard()) {
+            return;
+        }
 
         Platform.runLater(() -> {
             if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
@@ -63,8 +65,15 @@ public class UnlinkedFilesWizard {
         }
     }
 
-    private void initializeWizard() {
-        this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("No active library"));
+    private boolean initializeWizard() {
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+        if (activeDatabase.isEmpty()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No library selected"),
+                    Localization.lang("Please open or select a library before searching for unlinked files."));
+            return false;
+        }
+        this.bibDatabaseContext = activeDatabase.get();
 
         viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferences, stateManager, taskExecutor);
 
@@ -83,6 +92,8 @@ public class UnlinkedFilesWizard {
         wizard = new Wizard();
         wizard.setTitle(Localization.lang("Search for unlinked local files"));
         wizard.setFlow(new Wizard.LinearFlow(page1, page2, page3));
+
+        return true;
     }
 
     private void saveConfiguration() {
