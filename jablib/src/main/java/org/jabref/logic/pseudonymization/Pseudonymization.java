@@ -11,7 +11,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
