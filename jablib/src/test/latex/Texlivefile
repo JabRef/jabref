@@ -1,6 +1,5 @@
 scheme-basic
 
-balance
 biber
 biblatex
 bigintcalc
@@ -24,6 +23,7 @@ pbalance
 pdfcomment
 pdfescape
 pdftexcmds
+preprint
 psnfss
 refcount
 rerunfilecheck
