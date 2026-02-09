@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
@@ -75,10 +76,10 @@ public class Pseudonymization {
         if (!node.isRoot()) {
             String oldName = node.getName();
             String newName = "Group-" + (groupMapping.size() + 1);
-
-            node.getGroup().setName(newName);
+            node.getGroup().nameProperty().set(newName);
             groupMapping.put(oldName, newName);
         }
+
         for (GroupTreeNode child : node.getChildren()) {
             pseudonymizeGroupsRecursive(child, groupMapping);
         }
