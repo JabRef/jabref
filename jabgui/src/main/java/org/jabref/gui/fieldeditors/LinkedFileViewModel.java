@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
@@ -330,9 +329,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return;
         }
 
-        List<Path> possibleDirPaths = databaseContext.getAllFileDirectories(preferences.getFilePreferences());
+        List<Optional<Path>> possibleDirPaths = databaseContext.getAllFileDirectories(preferences.getFilePreferences()).asOrderedList();
 
-        if (possibleDirPaths.stream().allMatch(Objects::isNull)) {
+        if (possibleDirPaths.stream().allMatch(Optional::isEmpty)) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("No directory found"),
                     Localization.lang("Configure a file directory to move file(s).")
@@ -375,7 +374,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     ///
     /// @param currentFile the file that is being moved
     /// @return the {@link Path} to which the file can be moved
-    private Optional<Path> getNextTargetPath(Path currentFile, List<Path> possibleDirPaths) {
+    private Optional<Path> getNextTargetPath(Path currentFile, List<Optional<Path>> possibleDirPaths) {
         // Current dir index (file's current directory) is -1 if it's not in any Jabref directory, otherwise, it is 0 for User, 1 for Library, 2 for BIB
         int currentDirIndex = -1;
         Path currentFileDir = currentFile.getParent();
@@ -383,8 +382,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (currentFileDir == null) {
                 break;
             }
-            Path dir = possibleDirPaths.get(i);
-            if (dir != null && (dir.equals(currentFileDir) || currentFileDir.startsWith(dir))) {
+            Optional<Path> dir = possibleDirPaths.get(i);
+            if (dir.isPresent() && (dir.get().equals(currentFileDir) || currentFileDir.startsWith(dir.get()))) {
                 currentDirIndex = i;
                 break;
             }
@@ -394,17 +393,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
         int startIndex = (currentDirIndex + 1) % possibleDirPaths.size();
         for (int i = 0; i < possibleDirPaths.size(); i++) {
             int candidateIndex = (startIndex + i) % possibleDirPaths.size();
-            Path candidate = possibleDirPaths.get(candidateIndex);
-            if (candidate != null && candidateIndex != currentDirIndex) {
+            Optional<Path> candidate = possibleDirPaths.get(candidateIndex);
+            if (candidate.isPresent() && candidateIndex != currentDirIndex) {
                 if (currentDirIndex >= 0) {
                     // Relativize the path because the file was present in a configured directory in order to mirror directory structure
-                    Path currentPath = possibleDirPaths.get(currentDirIndex);
+                    Path currentPath = possibleDirPaths.get(currentDirIndex).get();
                     Path relativePath = currentPath.relativize(currentFile);
                     if (relativePath.getParent() != null) {
-                        return Optional.of(candidate.resolve(relativePath.getParent()).normalize());
+                        return Optional.of(candidate.get().resolve(relativePath.getParent()).normalize());
                     }
                 }
-                return Optional.of(candidate);
+                return candidate;
             }
         }
         return Optional.empty();

@@ -3,8 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -13,6 +12,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.FileDirectories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
@@ -69,7 +69,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextRotatesFromUserToLibrary() throws IOException {
-        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path fileInUser = userDir.resolve("test.pdf");
@@ -86,7 +86,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextRotatesFromLibraryToBib() throws IOException {
-        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path fileInLib = libDir.resolve("test.pdf");
@@ -103,7 +103,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextRotatesFromBibToUser() throws IOException {
-        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path fileInBib = bibDir.resolve("test.pdf");
@@ -120,7 +120,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextSkipsNullDirectory() throws IOException {
-        List<Path> dirs = Arrays.asList(userDir, null, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.empty(), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path fileInUser = userDir.resolve("test.pdf");
@@ -136,7 +136,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextShowsErrorIfNoOtherDirectoryConfigured() throws IOException {
-        List<Path> dirs = Arrays.asList(userDir, null, null);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.empty(), Optional.empty());
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path fileInUser = userDir.resolve("test.pdf");
@@ -152,7 +152,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextMovesToUserIfFileNotInAnyDirectory() throws IOException {
-        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path randomDir = tempDir.resolve("random");
@@ -171,7 +171,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextMirrorsDirectoryStructure() throws IOException {
-        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path nestedDir = userDir.resolve("x/y/z");
@@ -190,7 +190,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextDoesNotMirrorDirectoryStructureWhenFileNotInConfiguredDirectory() throws IOException {
-        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path nestedDir = tempDir.resolve("x/y/z");
@@ -209,7 +209,7 @@ class LinkedFileViewModelFileRotationTest {
 
     @Test
     void moveToNextFileWithoutParentDoesNotThrowNPE() throws IOException {
-        List<Path> dirs = List.of(userDir, libDir, bibDir);
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
         Path fileWithoutParent = Path.of("test.pdf");
