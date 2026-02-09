@@ -736,7 +736,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
                 groupNode.removeEntriesFromGroup(entriesInGroup);
                 dialogService.notify(Localization.lang("Cleared group \"%0\".", group.getDisplayName()));
-                writeGroupChangesToMetaData();
             }
         }
     }
