@@ -477,17 +477,6 @@ jobs:
         run: |
           ./gradlew :jabgui:run --args="--help"
 
-      - name: ShadowJar JabGui
-        shell: bash
-        run: ./gradlew :jabgui:ShadowJar
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: JabGui JAR (${{ matrix.displayName }})
-          path: |
-            jabgui/build/libs/*-all.jar
-
       - name: Install jbundle
         # if: ${{ (matrix.os == 'ubuntu-22.04') }}
         uses: baptiste0928/cargo-install@v3
@@ -499,14 +488,16 @@ jobs:
         shell: bash
         run: |
           mkdir -p build/jbundle
-          jbundle build --input jabgui/build/libs/jabgui-*-all.jar --output ./build/jbundle/jabgui-${{ matrix.displayName }}
+          # jar does not work becaus or iconli issues
+          # We re-use the generated jlink runtime
+          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages/${{ matrix.os }}/JabRef/lib/runtime --output ./build/jbundle/jabgui-${{ matrix.displayName }}
       - name: jbundle JabGui filename fix (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         shell: bash
         run: |
           mv build/jbundle/jabgui-${{ matrix.displayName }} build/jbundle/jabgui-${{ matrix.displayName }}.exe
       - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ matrix.os != 'windows-latest' }}
         shell: bash
         run: |
           build/jbundle/jabgui-${{ matrix.displayName }} --help
