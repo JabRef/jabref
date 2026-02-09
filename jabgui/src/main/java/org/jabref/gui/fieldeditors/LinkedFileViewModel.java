@@ -378,14 +378,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
         // Current dir index (file's current directory) is -1 if it's not in any Jabref directory, otherwise, it is 0 for User, 1 for Library, 2 for BIB
         int currentDirIndex = -1;
         Path currentFileDir = currentFile.getParent();
-        for (int i = 0; i < possibleDirPaths.size(); i++) {
-            if (currentFileDir == null) {
-                break;
-            }
-            Optional<Path> dir = possibleDirPaths.get(i);
-            if (dir.isPresent() && (dir.get().equals(currentFileDir) || currentFileDir.startsWith(dir.get()))) {
-                currentDirIndex = i;
-                break;
+        if (currentFileDir != null) {
+            for (int i = 0; i < possibleDirPaths.size(); i++) {
+                Optional<Path> dir = possibleDirPaths.get(i);
+                if (dir.isPresent() && (dir.get().equals(currentFileDir) || currentFileDir.startsWith(dir.get()))) {
+                    currentDirIndex = i;
+                    break;
+                }
             }
         }
 
