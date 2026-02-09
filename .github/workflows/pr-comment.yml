@@ -8,7 +8,7 @@ name: Comment on PR
 on:
   workflow_run:
     # note when updating via a PR and testing - `workflow_run` executes from the `main` branch and not the PR branch
-    workflows: [ "Source Code Tests", "On PR opened/updated (check)", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md" ]
+    workflows: [ "Source Code Tests", "On PR opened/updated", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md" ]
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
     types: [ completed ]
   workflow_dispatch:
@@ -158,12 +158,12 @@ jobs:
 
           if [[ -n "$COMMENTS" ]]; then
             echo "Bot comments - adding label changes-required"
-            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
-            echo "Added label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments" --add-label "status: changes-required"
+            echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else
-            echo "No bot comments - removing label changes-required"
-            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required"
-            echo "Removed label \"status: changes-required\"" >> $GITHUB_STEP_SUMMARY
+            echo "No bot comments - removing label changes-required and adding no-bot-comments"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required" --add-label "status: no-bot-comments"
+            echo "No bot comments - removed label changes-required and added no-bot-comments" >> $GITHUB_STEP_SUMMARY
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
