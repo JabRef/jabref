@@ -1,14 +1,17 @@
 package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.jspecify.annotations.NonNull;
@@ -67,6 +70,9 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--generate-before-saving", description = "Generate citation keys before saving")
     private Boolean generateBeforeSaving;
 
+    @Option(names = "--entry-type-pattern", description = "Set a key pattern for a specific entry type")
+    private Map<String, String> typePatterns;
+
     @Override
     public void run() {
         Optional<ParserResult> parserResult = JabKit.importFile(
@@ -119,10 +125,18 @@ class GenerateCitationKeys implements Runnable {
                 keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
-                existingPreferences.getKeyPatterns(),
+                typePatterns != null ? prepareKeyPatterns(existingPreferences) : existingPreferences.getKeyPatterns(),
                 pattern != null ? pattern : existingPreferences.getDefaultPattern(),
                 keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
         );
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
+    }
+
+    private GlobalCitationKeyPatterns prepareKeyPatterns(CitationKeyPatternPreferences existingPreferences) {
+        GlobalCitationKeyPatterns keyPatterns = existingPreferences.getKeyPatterns();
+        typePatterns.forEach((type, pattern) -> {
+            keyPatterns.addCitationKeyPattern(EntryTypeFactory.parse(type), pattern);
+        });
+        return keyPatterns;
     }
 }
