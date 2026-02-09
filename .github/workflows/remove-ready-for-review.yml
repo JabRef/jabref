@@ -1,0 +1,64 @@
+name: Auto-remove ready-for-review
+
+on:
+  pull_request:
+    types: [ready_for_review]
+
+jobs:
+  guard-review:
+    runs-on: ubuntu-slim
+    permissions:
+      pull-requests: write
+      checks: read
+      contents: read
+
+    steps:
+      - name: Evaluate state
+        id: eval
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR=${{ github.event.pull_request.number }}
+
+          # check running CI
+          running=$(gh pr checks "$PR" --json state -q '.[] | select(.state=="IN_PROGRESS" or .state=="QUEUED") | length' | wc -l)
+          if [ "$running" -gt 0 ] || [ "$label" -gt 0 ]; then
+            echo "ci_running=true" >> $GITHUB_OUTPUT
+          else
+            echo "ci_running=false" >> $GITHUB_OUTPUT
+          fi
+
+          # check label
+          label=$(gh pr view "$PR" --json labels -q '.labels[].name' | grep -c "^status: changes-required$" || true)
+          if [ "$label" -gt 0 ]; then
+            echo "changes_required=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes_required=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Convert to draft
+        if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr ready --undo
+
+      - name: Post comment (CI)
+        if: ${{ steps.eval.outputs.ci_running == 'true' }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: >
+            Do not mark a PR as ready-for-review while the CI is running.
+            CI checks need to be completed and passed.
+          comment-tag: ci_running
+          mode: recreate
+
+      - name: Post comment (changes required)
+        if: ${{ steps.eval.outputs.changes_required == 'true' }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            Do not mark a PR as ready-for-review if changes are required.
+            Address the changes first.
+          comment-tag: changes_required
+          mode: recreate
