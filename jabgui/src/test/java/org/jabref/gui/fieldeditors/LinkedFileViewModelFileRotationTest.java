@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,13 +22,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(ApplicationExtension.class)
@@ -67,55 +74,33 @@ class LinkedFileViewModelFileRotationTest {
         Files.createDirectories(bibDir);
     }
 
-    @Test
-    void moveToNextRotatesFromUserToLibrary() throws IOException {
-        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
-        when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
-
-        Path fileInUser = userDir.resolve("test.pdf");
-        Files.createFile(fileInUser);
-        LinkedFile linkedFile = new LinkedFile("desc", fileInUser, "pdf");
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-
-        viewModel.moveToNextPossibleDirectory();
-
-        assertTrue(Files.exists(libDir.resolve("test.pdf")));
-        assertFalse(Files.exists(fileInUser));
+    static Stream<Arguments> rotationCases() {
+        return Stream.of(
+                Arguments.of("user", "lib"),
+                Arguments.of("lib", "bib"),
+                Arguments.of("bib", "user")
+        );
     }
 
-    @Test
-    void moveToNextRotatesFromLibraryToBib() throws IOException {
+    @ParameterizedTest
+    @MethodSource("rotationCases")
+    void moveToNextRotates(String sourceDirectoryName, String targetDirectoryName) throws IOException {
         FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
         when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
 
-        Path fileInLib = libDir.resolve("test.pdf");
-        Files.createFile(fileInLib);
-        LinkedFile linkedFile = new LinkedFile("desc", fileInLib, "pdf");
+        Path sourceDirectory = tempDir.resolve(sourceDirectoryName);
+        Path targetDirectory = tempDir.resolve(targetDirectoryName);
+
+        Path fileInSource = sourceDirectory.resolve("test.pdf");
+        Files.createFile(fileInSource);
+        LinkedFile linkedFile = new LinkedFile("desc", fileInSource, "pdf");
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
 
         viewModel.moveToNextPossibleDirectory();
 
-        assertTrue(Files.exists(bibDir.resolve("test.pdf")));
-        assertFalse(Files.exists(fileInLib));
-    }
-
-    @Test
-    void moveToNextRotatesFromBibToUser() throws IOException {
-        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
-        when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
-
-        Path fileInBib = bibDir.resolve("test.pdf");
-        Files.createFile(fileInBib);
-        LinkedFile linkedFile = new LinkedFile("desc", fileInBib, "pdf");
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-
-        viewModel.moveToNextPossibleDirectory();
-
-        assertTrue(Files.exists(userDir.resolve("test.pdf")));
-        assertFalse(Files.exists(fileInBib));
+        assertTrue(Files.exists(targetDirectory.resolve("test.pdf")));
+        assertFalse(Files.exists(fileInSource));
     }
 
     @Test
@@ -147,7 +132,31 @@ class LinkedFileViewModelFileRotationTest {
 
         viewModel.moveToNextPossibleDirectory();
 
+        verify(dialogService).showErrorDialogAndWait(
+                eq(Localization.lang("No directory found")),
+                eq(Localization.lang("Configure another directory to move file(s)."))
+        );
         assertTrue(Files.exists(fileInUser));
+    }
+
+    @Test
+    void moveToNextShowsErrorIfNoDirectoryConfigured() throws IOException {
+        FileDirectories dirs = new FileDirectories(Optional.empty(), Optional.empty(), Optional.empty());
+        when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
+
+        Path file = tempDir.resolve("test.pdf");
+        Files.createFile(file);
+        LinkedFile linkedFile = new LinkedFile("", file, "pdf");
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+
+        viewModel.moveToNextPossibleDirectory();
+
+        verify(dialogService).showErrorDialogAndWait(
+                eq(Localization.lang("No directory found")),
+                eq(Localization.lang("Configure a file directory to move file(s)."))
+        );
+        assertTrue(Files.exists(file));
     }
 
     @Test
