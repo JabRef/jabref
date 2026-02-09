@@ -55,7 +55,7 @@ public class SearchConfigurationPage extends WizardPane {
         this.viewModel = viewModel;
         this.validationVisualizer = new ControlsFxVisualizer();
 
-        setHeaderText(Localization.lang("Configure Search"));
+        setHeaderText(Localization.lang("Configure search"));
         setupUI(bibDatabaseContext, preferences);
         setupValidation();
     }
@@ -93,7 +93,7 @@ public class SearchConfigurationPage extends WizardPane {
         int row = 0;
 
         ///Directory selection
-        Label dirLabel = new Label(Localization.lang("Directory") + ":");
+        Label dirLabel = new Label(Localization.lang("Directory"));
         grid.add(dirLabel, 0, row);
 
         HBox directoryBox = new HBox(5);
@@ -119,7 +119,7 @@ public class SearchConfigurationPage extends WizardPane {
         row++;
 
         /// File type filter
-        Label fileTypeLabel = new Label(Localization.lang("File type") + ":");
+        Label fileTypeLabel = new Label(Localization.lang("File type"));
         grid.add(fileTypeLabel, 0, row);
 
         fileTypeCombo = new ComboBox<>();
@@ -137,8 +137,8 @@ public class SearchConfigurationPage extends WizardPane {
 
         row++;
 
-        ///  Date filter
-        Label dateLabel = new Label(Localization.lang("Last edited") + ":");
+        /// Date filter
+        Label dateLabel = new Label(Localization.lang("Last edited"));
         grid.add(dateLabel, 0, row);
 
         fileDateCombo = new ComboBox<>();
@@ -156,7 +156,7 @@ public class SearchConfigurationPage extends WizardPane {
         row++;
 
         /// Sort order
-        Label sortLabel = new Label(Localization.lang("Sort by") + ":");
+        Label sortLabel = new Label(Localization.lang("Sort by"));
         grid.add(sortLabel, 0, row);
 
         fileSortCombo = new ComboBox<>();
