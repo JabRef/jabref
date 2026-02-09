@@ -1,4 +1,4 @@
-name: On PR opened/updated (check)
+name: On PR opened/updated
 
 on:
   # _target is required
