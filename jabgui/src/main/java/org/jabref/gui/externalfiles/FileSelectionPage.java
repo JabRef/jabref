@@ -128,6 +128,7 @@ public class FileSelectionPage extends WizardPane {
                 ((BorderPane) getContent()).setCenter(contentPane);
             } else {
                 EasyBind.bindContent(viewModel.checkedFileListProperty(), FXCollections.observableArrayList());
+                ((BorderPane) getContent()).setCenter(progressPane);
             }
         });
 
@@ -171,6 +172,7 @@ public class FileSelectionPage extends WizardPane {
     public void onEnteringPage(Wizard wizard) {
         // Start search if not already done
         if (viewModel.treeRootProperty().get().isEmpty()) {
+            ((BorderPane) getContent()).setCenter(progressPane);
             viewModel.startSearch();
         }
 
