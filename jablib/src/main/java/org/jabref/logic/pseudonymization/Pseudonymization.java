@@ -59,8 +59,14 @@ public class Pseudonymization {
             for (Field field : entry.getFields()) {
                 String fieldContent = entry.getField(field).get();
                 if (field.equals(StandardField.GROUPS)) {
-                    String newGroupName = groupMapping.getOrDefault(fieldContent, fieldContent);
-                    newEntry.setField(field, newGroupName);
+                    String[] groups = fieldContent.split(",");
+                    List<String> pseudonymizedGroups = new ArrayList<>();
+
+                    for (String group : groups) {
+                        String trimmedGroup = group.trim();
+                        pseudonymizedGroups.add(groupMapping.getOrDefault(trimmedGroup, trimmedGroup));
+                    }
+                    newEntry.setField(field, String.join(", ", pseudonymizedGroups));
                 } else {
                     Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, k -> new HashMap<>());
                     Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
