@@ -119,6 +119,8 @@ concurrency:
 
 jobs:
   conditions:
+    # Dependency updates should only run in the main repo
+    if: ${{ github.repository == 'JabRef/jabref' || github.actor != 'dependabot[bot]' || github.ref_name != 'main' }}
     runs-on: ubuntu-slim
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
