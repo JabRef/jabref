@@ -57,7 +57,6 @@ public class ContextAction extends SimpleCommand {
                          MOVE_FILE_TO_FOLDER_AND_RENAME,
                          OPEN_FILE,
                          OPEN_FOLDER,
-                         RENAME_FILE_TO_NAME,
                          DELETE_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
@@ -82,6 +81,16 @@ public class ContextAction extends SimpleCommand {
                                     () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
                                     nonNullDependencies(
                                             linkedFile.getFile().sourceUrlProperty(),
+                                            entryFieldsObservable
+                                    )
+                            );
+                    case RENAME_FILE_TO_NAME ->
+                            Bindings.createBooleanBinding(
+                                    () -> !linkedFile.getFile().isOnlineLink()
+                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
+                                            && !linkedFile.isGeneratedPathSameAsOriginal(),
+                                    nonNullDependencies(
+                                            linkedFile.getFile().linkProperty(),
                                             entryFieldsObservable
                                     )
                             );
