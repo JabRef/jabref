@@ -490,7 +490,7 @@ jobs:
           mkdir -p build/jbundle
           # jar does not work becaus or iconli issues
           # We re-use the generated jlink runtime
-          jbundle build --input . --gradle-project jabgui --jlink-runtime jabgui/build/packages/${{ matrix.os }}/JabRef/lib/runtime --output ./build/jbundle/jabgui-${{ matrix.displayName }}
+          jbundle build --input . --gradle-project jabgui --output ./build/jbundle/jabgui-${{ matrix.displayName }}
       - name: jbundle JabGui filename fix (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         shell: bash
