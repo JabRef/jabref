@@ -8,9 +8,11 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
@@ -161,14 +163,14 @@ public class BibDatabaseContext {
     /// @param preferences The fileDirectory preferences
     /// @return List of existing absolute paths
     public List<Path> getFileDirectories(FilePreferences preferences) {
-        List<Path> result = new ArrayList<>();
+        SequencedSet<Path> result = new LinkedHashSet<>();
         FileDirectories directories = getAllFileDirectories(preferences);
 
         directories.userDirectory().ifPresent(result::add);
         directories.libraryDirectory().ifPresent(result::add);
         directories.fallbackDirectory().ifPresent(result::add);
 
-        return result;
+        return new ArrayList<>(result);
     }
 
     /// Look up all configured file directories of this database.
