@@ -604,7 +604,7 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          build/jbundle/jabkit--${{ matrix.displayName }} --help
+          build/jbundle/jabkit-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
         if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
         uses: actions/upload-artifact@v6
