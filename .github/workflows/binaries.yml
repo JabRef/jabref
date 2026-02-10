@@ -600,6 +600,11 @@ jobs:
           name: JabKit JAR (${{ matrix.displayName }})
           path: |
             jabkit/build/libs/*-all*.jar
+      - name: Upload jabkit ShadowJar to builds.jabref.org (Linux)
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: jbundle jabkit
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
@@ -621,11 +626,6 @@ jobs:
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabkit ShadowJar to builds.jabref.org (Linux)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkkit to builds.jabref.org (Windows)
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
