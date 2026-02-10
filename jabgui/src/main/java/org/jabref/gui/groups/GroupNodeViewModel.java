@@ -484,6 +484,7 @@ public class GroupNodeViewModel {
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
                  AutomaticEntryTypeGroup _,
+                 EntryTypeGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->

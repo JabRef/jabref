@@ -100,7 +100,7 @@
                         </tooltip>
                     </RadioButton>
                     <RadioButton fx:id="entryTypeRadioButton" toggleGroup="$type" wrapText="true"
-                                 text="%Entry Type">
+                                 text="%Entry type">
                         <tooltip>
                             <Tooltip text="%Automatically create groups by entry type"/>
                         </tooltip>
