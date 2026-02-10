@@ -158,12 +158,10 @@ open module org.jabref {
     // endregion
 
     // region: Lucene
-
-    // In case the version is updated
-    //   - Also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
-    //   - Update jabgui/src/main/resources/META-INF/services/org.apache.lucene.codecs.Codec
+    /*
+     * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
+     */
     uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
-
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;

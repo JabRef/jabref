@@ -70,7 +70,6 @@ dependencies {
     implementation ("org.apache.pdfbox:xmpbox")
 
     implementation("org.apache.lucene:lucene-core")
-    implementation("org.apache.lucene:lucene-codecs")
     implementation("org.apache.lucene:lucene-queryparser")
     implementation("org.apache.lucene:lucene-queries")
     implementation("org.apache.lucene:lucene-analysis-common")
