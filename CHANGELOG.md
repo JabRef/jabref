@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
 - We added API key configuration support for [OpenAlex](https://openalex.org/). [#15023](https://github.com/JabRef/jabref/pull/15023)
+- We added a warning if the citation command does not contain the expected placeholders. [#15063](https://github.com/JabRef/jabref/pull/15063)
 - We added API key configuration support for SemanticScholar. [#15023](https://github.com/JabRef/jabref/pull/15023)
 - REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
