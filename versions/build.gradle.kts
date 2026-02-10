@@ -126,6 +126,7 @@ dependencies.constraints {
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.3")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
+    api("org.apache.lucene:lucene-codecs:$lucene")
     api("org.apache.lucene:lucene-highlighter:$lucene")
     api("org.apache.lucene:lucene-queries:$lucene")
     api("org.apache.lucene:lucene-queryparser:$lucene")
