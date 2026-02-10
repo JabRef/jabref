@@ -414,10 +414,6 @@ jobs:
           website: jdk.java.net
           release: EA
           version: ${{ needs.conditions.outputs.jdkVersionFlavour }}
-      - name: Expose JAVA_HOME
-        if: ${{ needs.conditions.outputs.useEaJdk }}
-        id: java
-        run: echo "java_home=$JAVA_HOME" >> "$GITHUB_OUTPUT"
       - name: Tell gradle to use JDK EA and JavaFX EA
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         shell: bash
