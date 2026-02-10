@@ -592,14 +592,14 @@ jobs:
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: pwsh
         run: |
-          get-childitem -Path 'jabkit/build/lib/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
+          get-childitem -Path 'jabkit/build/libs/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v6
         with:
           name: JabKit JAR (${{ matrix.displayName }})
           path: |
-            jabkit/build/lib/*-all*.jar
+            jabkit/build/libs/*-all*.jar
       - name: jbundle jabkit
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
