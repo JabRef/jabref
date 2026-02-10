@@ -505,7 +505,7 @@ jobs:
         run: |
           build/jbundle/jabgui-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -610,7 +610,7 @@ jobs:
         run: |
           build/jbundle/jabkit--${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -671,7 +671,7 @@ jobs:
         run: |
           build/jbundle/jabls-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -718,7 +718,7 @@ jobs:
         run: |
           build/jbundle/jabsrv-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -728,7 +728,7 @@ jobs:
         run: |
           ./gradlew :jabsrv-cli:run --args="--help"
 
-      - name: Upload jbundles to builds.jabref.org
+      - name: Upload jbundle artifacts to builds.jabref.org
         if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.disk-space-check.outputs.available == 'true') }}
         shell: bash
         run: |
