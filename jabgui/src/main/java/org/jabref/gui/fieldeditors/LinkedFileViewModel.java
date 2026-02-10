@@ -336,6 +336,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("No directory found"),
                     Localization.lang("Configure a file directory to move file(s).")
             );
+            return;
         }
 
         Optional<Path> currentFile = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
@@ -345,6 +346,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("File not found"),
                     Localization.lang("Could not find file '%0'.", linkedFile.getLink())
             );
+            return;
         }
 
         Optional<Path> destinationDir = getNextTargetPath(currentFile.get(), possibleDirPaths);
