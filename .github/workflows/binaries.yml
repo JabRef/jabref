@@ -471,7 +471,7 @@ jobs:
       - name: Smoke test JabGui
         shell: bash
         run: |
-          ./gradlew :jabgui:run --args="--help"
+          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:run --args="--help"
 
       - name: Install jbundle
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
@@ -578,7 +578,7 @@ jobs:
       - name: Smoke test JabKit
         shell: bash
         run: |
-          ./gradlew :jabkit:run --args="--help"
+          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:run --args="--help"
       - name: Package JabKit application image
         shell: bash
         run: |
@@ -587,7 +587,12 @@ jobs:
       - name: ShadowJar JabKit
         if: ${{ (matrix.os == 'ubuntu-22.04') }}
         shell: bash
-        run: ./gradlew :jabkit:ShadowJar
+        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:ShadowJar
+      - name: Rename files
+        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        shell: pwsh
+        run: |
+          get-childitem -Path 'jabkit/build/lib/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v6
@@ -640,7 +645,7 @@ jobs:
       - name: Smoke test jabls-cli
         shell: bash
         run: |
-          ./gradlew :jabls-cli:run --args="--help"
+          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:run --args="--help"
       - name: Package jabls-cli application image
         shell: bash
         run: |
@@ -648,7 +653,7 @@ jobs:
           ${{ matrix.archivePortableJabLS }}
       - name: ShadowJar jabls-cli
         shell: bash
-        run: ./gradlew :jabls-cli:ShadowJar
+        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:ShadowJar
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v6
@@ -695,7 +700,7 @@ jobs:
         run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:jpackage
       - name: ShadowJar jabsrv-cli
         shell: bash
-        run: ./gradlew :jabsrv-cli:ShadowJar
+        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:ShadowJar
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v6
@@ -722,7 +727,7 @@ jobs:
       - name: Smoke test jabsrv-cli
         shell: bash
         run: |
-          ./gradlew :jabsrv-cli:run --args="--help"
+          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:run --args="--help"
 
       - name: Upload jbundle artifacts to builds.jabref.org
         if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.disk-space-check.outputs.available == 'true') }}
@@ -730,10 +735,14 @@ jobs:
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
+
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
             --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/jbundle && rsync" \
             -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-            ./build/jbundle/ \
+            --include='jabgui/build/jbundle/*' \
+            --include='jabkit/build/jbundle/*' \
+            --include='jabsrc-cli/build/jbundle/*' \
+            --include='jabls-cli/build/jbundle/*' \
             jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/jbundle/ || true
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
