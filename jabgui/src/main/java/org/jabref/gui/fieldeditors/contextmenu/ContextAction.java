@@ -53,14 +53,11 @@ public class ContextAction extends SimpleCommand {
                                     )
                             );
 
-                    case MOVE_FILE_TO_FOLDER,
-                         MOVE_FILE_TO_FOLDER_AND_RENAME,
-                         OPEN_FILE,
-                         OPEN_FOLDER,
-                         DELETE_FILE ->
+                    case RENAME_FILE_TO_NAME ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
-                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
+                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
+                                            && !linkedFile.isGeneratedPathSameAsOriginal(),
                                     nonNullDependencies(
                                             linkedFile.getFile().linkProperty(),
                                             entryFieldsObservable
@@ -84,11 +81,15 @@ public class ContextAction extends SimpleCommand {
                                             entryFieldsObservable
                                     )
                             );
-                    case RENAME_FILE_TO_NAME ->
+
+                    case OPEN_FILE,
+                         OPEN_FOLDER,
+                         MOVE_FILE_TO_FOLDER,
+                         MOVE_FILE_TO_FOLDER_AND_RENAME,
+                         DELETE_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
-                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                            && !linkedFile.isGeneratedPathSameAsOriginal(),
+                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
                                     nonNullDependencies(
                                             linkedFile.getFile().linkProperty(),
                                             entryFieldsObservable
