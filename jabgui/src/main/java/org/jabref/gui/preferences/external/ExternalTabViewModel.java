@@ -49,6 +49,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final Validator terminalCommandValidator;
     private final Validator fileBrowserCommandValidator;
+    private final Validator citeCommandValidator;
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
@@ -88,6 +89,15 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("External programs"),
                         Localization.lang("Custom applications"),
                         Localization.lang("Please specify a file browser."))));
+
+        citeCommandValidator = new FunctionBasedValidator<>(
+                citeCommandProperty,
+                input -> {
+                    int indexKey1 = input.indexOf(CitationCommandString.CITE_KEY1);
+                    int indexKey2 = input.indexOf(CitationCommandString.CITE_KEY2);
+                    return indexKey1 >= 0 && indexKey2 >= 0 && indexKey2 >= (indexKey1 + CitationCommandString.CITE_KEY1.length());
+                },
+                ValidationMessage.warning(Localization.lang("The cite command should contain '%0' and '%1'.", CitationCommandString.CITE_KEY1, CitationCommandString.CITE_KEY2)));
     }
 
     @Override
@@ -137,6 +147,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return fileBrowserCommandValidator.getValidationStatus();
     }
 
+    public ValidationStatus citeCommandValidationStatus() {
+        return citeCommandValidator.getValidationStatus();
+    }
+
     @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
@@ -148,6 +162,8 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         if (useCustomFileBrowserProperty.getValue()) {
             validator.addValidators(fileBrowserCommandValidator);
         }
+
+        validator.addValidators(citeCommandValidator);
 
         ValidationStatus validationStatus = validator.getValidationStatus();
         if (!validationStatus.isValid()) {
