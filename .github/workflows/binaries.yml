@@ -128,6 +128,7 @@ jobs:
       tagbuild: ${{ steps.binary.outputs.tagbuild }}
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
+      should-jbundle: ${{ steps.binary.outputs.should-jbundle }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
       jvmDistribution:  ${{ steps.binary.outputs.jvmDistribution }}
       useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
@@ -213,8 +214,10 @@ jobs:
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "⊘ tag bulid" >> $GITHUB_STEP_SUMMARY
+            echo "🏷️ tag build" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=true" >> "$GITHUB_OUTPUT"
+            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ no tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=false" >> "$GITHUB_OUTPUT"
@@ -246,11 +249,15 @@ jobs:
               echo "☁️ Push to \`main\` – will upload"
               echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+              echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi;
             echo "⊘ Push to some branch not main – skipping upload"
             echo "⊘ Push to some branch not main – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi;
 
@@ -258,6 +265,7 @@ jobs:
             echo "☁️? Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}"
             echo "☁️= Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
+            echo "should-jbundle=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -267,10 +275,14 @@ jobs:
             echo "☁️ Label 'dev: binaries' found – will upload"
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ Label 'dev: binaries' not found – skipping upload"
             echo "⊘ Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
           fi
 
   disk-space-check:
@@ -474,14 +486,14 @@ jobs:
           ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:run --args="--help"
 
       - name: Install jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         uses: baptiste0928/cargo-install@v3
         with:
           crate: jbundle
           git: https://github.com/avelino/jbundle/
           branch: main
       - name: jbundle JabGui (Linux)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           mkdir -p build/jbundle
@@ -495,13 +507,13 @@ jobs:
         run: |
           mv build/jbundle/jabgui-${{ matrix.displayName }} build/jbundle/jabgui-${{ matrix.displayName }}.exe
       - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         # if: ${{ matrix.os != 'windows-latest' }}
         shell: bash
         run: |
           build/jbundle/jabgui-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -606,17 +618,17 @@ jobs:
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
       - name: jbundle jabkit
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           jbundle build --input . --gradle-project jabkit --output ./build/jbundle/jabkit-${{ matrix.displayName }}
       - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           build/jbundle/jabkit-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -662,17 +674,17 @@ jobs:
           path: |
             jabls-cli/build/libs/-*all.jar
       - name: jbundle jabls-cli
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls-${{ matrix.displayName }}
       - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           build/jbundle/jabls-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -709,17 +721,17 @@ jobs:
           path: |
             jabsrv-cli/build/libs/-*all.jar
       - name: jbundle jabsrv-cli
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv-${{ matrix.displayName }}
       - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           build/jbundle/jabsrv-${{ matrix.displayName }} --help
       - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ matrix.displayName }}
@@ -730,7 +742,7 @@ jobs:
           ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:run --args="--help"
 
       - name: Upload jbundle artifacts to builds.jabref.org
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.disk-space-check.outputs.available == 'true') }}
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.disk-space-check.outputs.available == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
