@@ -3,6 +3,8 @@ package org.jabref.logic.importer.fetcher.citation.crossref;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -191,5 +193,27 @@ public class CrossRefCitationFetcher implements CitationFetcher {
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
         }
+    }
+
+    @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
+        if (doi.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = API_URL + doi.get().asString();
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create references API URI", e);
+            return Optional.empty();
+        }
+    }
+
+    /// CrossRef does not support fetching citations for a given entry.
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return Optional.empty();
     }
 }
