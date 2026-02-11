@@ -538,12 +538,17 @@ jobs:
           componentShort: jabls
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
           InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
           archivePortable: ${{ matrix.archivePortableJabLS }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
       - uses: ./.github/actions/package
         name: Package JabRef HTTP Server
         # background: true
@@ -552,11 +557,15 @@ jobs:
           componentShort: jabsrv
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
           InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
-          archivePortable: NONE
+          archivePortable: 'NONE'
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
           upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
 
@@ -577,9 +586,10 @@ jobs:
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
           archivePortable: ${{ matrix.archivePortable }}
-          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
+          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
       - uses: ./.github/actions/package
         name: Package JabKit
         with:
@@ -587,12 +597,17 @@ jobs:
           componentShort: jabkit
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
           InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
           archivePortable: ${{ matrix.archivePortableJabKit }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
