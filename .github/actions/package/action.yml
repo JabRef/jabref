@@ -67,6 +67,7 @@ runs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}.deb
       - name: Upload ${{ inputs.component }} packages to GitHub
+        # background: true
         if: ${{ inputs.upload-as-artifact == 'true' }}
         uses: actions/upload-artifact@v6
         with:
@@ -74,6 +75,7 @@ runs:
           path: |
             ${{ inputs.component }}/build/packages/${{ inputs.os }}
       - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
+        # background: true
         if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) }}
         shell: bash
         run: |
@@ -89,23 +91,6 @@ runs:
         if: ${{ (inputs.os == 'ubuntu-22.04') }}
         shell: bash
         run: ./gradlew -PeaJdkBuild="${{ inputs.useEaJdk }}" -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:shadowJar
-      - name: Rename ShadowJar
-        if: ${{ (inputs.os == 'ubuntu-22.04') }}
-        shell: pwsh
-        run: |
-          get-childitem -Path '${{ inputs.component }}/build/libs/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
-      - name: Upload ShadowJar to GitHub
-        if: ${{ (inputs.upload-as-artifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
-          path: |
-            ${{ inputs.component }}/build/libs/-*all.jar
-      - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
-        if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
 
       - name: jbundle ${{ inputs.component }}
         if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.should-jbundle == 'true') }}
@@ -124,12 +109,14 @@ runs:
         run: |
           build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} --help
       - name: Upload jbundle artifact to GitHub
+        # background: true
         if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.upload-as-artifact == 'true') && (inputs.should-jbundle == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ inputs.displayName }}
           path: build/jbundle/${{ inputs.componentShort }}*
       - name: Upload jbundle artifact to builds.jabref.org
+        # background: true
         if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.diskSpaceAvailable == 'true') && (inputs.should-jbundle == 'true') }}
         shell: bash
         run: |
@@ -138,3 +125,24 @@ runs:
             -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
             build/jbundle/${{ inputs.component }}-${{ inputs.displayName }}* \
             jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle/ || true
+
+      # After jbundle, because jbundle needs original filename
+      - name: Rename ShadowJar
+        if: ${{ (inputs.os == 'ubuntu-22.04') }}
+        shell: pwsh
+        run: |
+          get-childitem -Path '${{ inputs.component }}/build/libs/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
+      - name: Upload ShadowJar to GitHub
+        # background: true
+        if: ${{ (inputs.upload-as-artifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
+          path: |
+            ${{ inputs.component }}/build/libs/-*all.jar
+      - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
+        # background: true
+        if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
