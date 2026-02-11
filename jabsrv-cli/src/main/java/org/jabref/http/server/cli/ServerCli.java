@@ -19,7 +19,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import picocli.CommandLine;
 
 @AllowedToUseStandardStreams("This is a CLI application. It resides in the package http.server to be close to the other http server related classes.")
-@CommandLine.Command(name = "server", mixinStandardHelpOptions = true, description = "JabSrv - JabRef HTTP server")
+@CommandLine.Command(name = "jabsrv", mixinStandardHelpOptions = true, description = "JabSrv - JabRef HTTP server")
 public class ServerCli implements Callable<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerCli.class);
 
