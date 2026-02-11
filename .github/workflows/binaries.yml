@@ -456,8 +456,8 @@ jobs:
           jlink --version
 
       # jablib is used by all components - thus, compile it first
-      - name: Compile jablib
-        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jablib:compileJava
+      - name: jablib jar
+        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jablib:jar
 
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
@@ -509,7 +509,7 @@ jobs:
       - name: Workaround for jpackage issue
         run: |
           cd jabgui
-          cp buildres/linux/JabRef.png . # Linux
+          cp buildres/linux/JabRef.png .   # Linux
           cp buildres/windows/JabRef.ico . # Windows
 
       - uses: ./.github/actions/package
@@ -541,7 +541,7 @@ jobs:
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
-          archivePortable: ${{ matrix.archivePortableJabLS }}
+          archivePortable: ${{ matrix.archivePortableJabKit }}
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
 
       - uses: ./.github/actions/package
