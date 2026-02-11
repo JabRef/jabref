@@ -535,6 +535,7 @@ jobs:
           component: jabls-cli
           componentShort: jabls
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.gitversion.outputs.branchname }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}
@@ -554,6 +555,7 @@ jobs:
           component: jabsrv-cli
           componentShort: jabsrv
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.gitversion.outputs.branchname }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}
@@ -574,6 +576,7 @@ jobs:
           component: jabgui
           componentShort: jabgui
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.gitversion.outputs.branchname }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}
@@ -593,6 +596,7 @@ jobs:
           component: jabkit
           componentShort: jabkit
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.gitversion.outputs.branchname }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}

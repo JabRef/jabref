@@ -8,6 +8,8 @@ inputs:
     required: true
   useEaJdk:
     required: true
+  branchName:
+    required: true
   AssemblySemVer:
     required: true
   Major:
