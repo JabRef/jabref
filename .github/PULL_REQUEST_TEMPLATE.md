@@ -17,10 +17,10 @@ Closes _____
    <!--
    LINK the issue with the PR by using the "Closes" keyword.
          
-      Examples:
-         Closes https://github.com/JabRef/jabref/issues/13109
-         Closes #13109
-    -->
+   Examples:
+     Closes https://github.com/JabRef/jabref/issues/13109
+     Closes #13109
+   -->
 
 ### PR Description
 
