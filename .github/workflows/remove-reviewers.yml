@@ -1,7 +1,7 @@
 name: Auto-remove review request
 
 on:
-  pull_request:
+  pull_request_target:
     types: [review_requested]
 
 jobs:
