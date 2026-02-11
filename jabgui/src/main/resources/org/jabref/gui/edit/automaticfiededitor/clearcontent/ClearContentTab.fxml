@@ -38,7 +38,6 @@
         </HBox>
             <HBox spacing="8.0" GridPane.rowIndex="2" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS">
                 <ComboBox fx:id="fieldComboBox" prefHeight="36.0" editable="true" HBox.hgrow="ALWAYS" />
-                <CheckBox fx:id="showOnlySetFieldsCheckBox" text="%Show only set fields"/>
             </HBox>
             <HBox spacing="8.0" GridPane.rowIndex="3" GridPane.columnSpan="3">
                 <Button fx:id="clearButton" text="%Clear field content" onAction="#onClear">

@@ -1,7 +1,10 @@
 package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -45,6 +48,8 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
         super(bibDatabase, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
 
+        getSetFieldsOnly().stream().findFirst().ifPresent(fromField::set);
+
         toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
             if (StringUtil.isBlank(field.getName())) {
                 return ValidationMessage.error("Field name cannot be empty");
@@ -59,6 +64,13 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
         canSwap = BooleanBinding.booleanExpression(toFieldValidationStatus().validProperty())
                                 .and(overwriteFieldContentProperty());
+    }
+
+    public Set<Field> getSetFieldsOnly() {
+        return getAllFields().stream()
+                             .filter(field -> selectedEntries.stream()
+                                                             .anyMatch(entry -> entry.getField(field).isPresent() && !entry.getField(field).get().isBlank()))
+                             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public ValidationStatus toFieldValidationStatus() {

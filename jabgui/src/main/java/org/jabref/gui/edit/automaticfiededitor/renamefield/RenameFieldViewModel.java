@@ -1,6 +1,9 @@
 package org.jabref.gui.edit.automaticfiededitor.renamefield;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -42,6 +45,8 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
         super(database, stateManager);
         this.selectedEntries = selectedEntries;
 
+        getSetFieldsOnly().stream().findFirst().ifPresent(selectedField::set);
+        
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> StringUtil.isNotBlank(field.getName()),
                 ValidationMessage.error("Field cannot be empty"));
         fieldNameValidator = new FunctionBasedValidator<>(newFieldName, fieldName -> {
@@ -54,6 +59,13 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
         });
 
         canRename = Bindings.and(fieldValidationStatus().validProperty(), fieldNameValidationStatus().validProperty());
+    }
+
+    public Set<Field> getSetFieldsOnly() {
+        return getAllFields().stream()
+                             .filter(field -> selectedEntries.stream()
+                                                             .anyMatch(entry -> entry.getField(field).isPresent() && !entry.getField(field).get().isBlank()))
+                             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public ValidationStatus fieldValidationStatus() {

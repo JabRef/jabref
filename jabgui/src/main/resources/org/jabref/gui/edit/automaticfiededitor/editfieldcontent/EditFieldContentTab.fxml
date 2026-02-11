@@ -16,6 +16,8 @@
         <ComboBox fx:id="fieldComboBox" editable="true" HBox.hgrow="ALWAYS"/>
         <TextField fx:id="fieldValueTextField" promptText="%Set or append content" HBox.hgrow="ALWAYS"/>
     </HBox>
+    <CheckBox fx:id="showOnlySetFieldsCheckBox" mnemonicParsing="false" text="%Show only set fields"/>
+
     <CheckBox fx:id="overwriteFieldContentCheckBox" mnemonicParsing="false" text="%Overwrite field content"/>
     <HBox styleClass="actions">
         <Button fx:id="setValueButton" mnemonicParsing="false" onAction="#setFieldValue" text="%Set"/>

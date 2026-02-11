@@ -15,7 +15,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
 
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
@@ -39,19 +38,13 @@ public class ClearContentTabView extends AbstractAutomaticFieldEditorTabView imp
         viewModel = new ClearContentViewModel(stateManager);
 
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
-        fieldComboBox.getItems().setAll(viewModel.getAllFields());
+
+        Set<Field> setFields = viewModel.getSetFieldsOnly();
+        fieldComboBox.getItems().setAll(setFields);
+
         if (!fieldComboBox.getItems().isEmpty()) {
             fieldComboBox.getSelectionModel().selectFirst();
         }
-
-        EasyBind.subscribe(showOnlySetFieldsCheckBox.selectedProperty(), selected -> {
-            Set<Field> items = selected ? viewModel.getSetFieldsOnly()
-                                        : viewModel.getAllFields();
-            fieldComboBox.getItems().setAll(items);
-            if (!items.isEmpty()) {
-                fieldComboBox.getSelectionModel().selectFirst();
-            }
-        });
 
         clearButton.disableProperty().bind(fieldComboBox.valueProperty().isNull());
 

@@ -1,8 +1,11 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -47,6 +50,8 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         super(database, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
 
+        getSetFieldsOnly().stream().findFirst().ifPresent(selectedField::set);
+
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> {
             if (StringUtil.isBlank(field.getName())) {
                 return ValidationMessage.error("Field name cannot be empty");
@@ -57,6 +62,13 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         });
 
         canAppend = Bindings.and(overwriteFieldContentProperty(), fieldValidationStatus().validProperty());
+    }
+
+    public Set<Field> getSetFieldsOnly() {
+        return getAllFields().stream()
+                             .filter(field -> selectedEntries.stream()
+                                                             .anyMatch(entry -> entry.getField(field).isPresent() && !entry.getField(field).get().isBlank()))
+                             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public ValidationStatus fieldValidationStatus() {

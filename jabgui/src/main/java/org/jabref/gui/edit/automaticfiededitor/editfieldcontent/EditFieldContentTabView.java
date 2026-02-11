@@ -27,6 +27,9 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     public Button setValueButton;
 
     @FXML
+    private CheckBox showOnlySetFieldsCheckBox;
+
+    @FXML
     private ComboBox<Field> fieldComboBox;
 
     @FXML
@@ -59,9 +62,16 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         viewModel = new EditFieldContentViewModel(database, selectedEntries, stateManager);
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
-        fieldComboBox.getItems().setAll(viewModel.getAllFields());
+        showOnlySetFieldsCheckBox.setSelected(true);
 
-        fieldComboBox.getSelectionModel().selectFirst();
+        EasyBind.subscribe(showOnlySetFieldsCheckBox.selectedProperty(), selected -> {
+            java.util.Collection<Field> items = selected ? viewModel.getSetFieldsOnly()
+                                                         : viewModel.getAllFields();
+            fieldComboBox.getItems().setAll(items);
+            if (!fieldComboBox.getItems().isEmpty()) {
+                fieldComboBox.getSelectionModel().selectFirst();
+            }
+        });
 
         fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
         EasyBind.listen(fieldComboBox.getEditor().textProperty(), _ -> fieldComboBox.commitValue());
