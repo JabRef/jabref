@@ -514,6 +514,12 @@ jobs:
           cp buildres/linux/JabRef.png .   # Linux
           cp buildres/windows/JabRef.ico . # Windows
 
+      # Save disk space
+      # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+      - run: rm -rf /usr/local/lib/android/sdk
+      - run: rm -rf /usr/local/.ghcup
+      - run: rm -rf /usr/share/swift
+
       # Both JabRef Language Server and JabRef HTTP Server are required by the GUI
       # They are independent from each other and could be build in parallel.
       # - wait: jablib-jar
