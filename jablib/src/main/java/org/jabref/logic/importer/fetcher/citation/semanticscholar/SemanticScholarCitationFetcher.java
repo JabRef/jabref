@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -148,6 +150,36 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
             return Optional.empty();
         }
         return Optional.of(paperDetails.getCitationCount());
+    }
+
+    @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = getAPIUrl("references", entry);
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create references API URI", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = getAPIUrl("citations", entry);
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create citations API URI", e);
+            return Optional.empty();
+        }
     }
 
     @Override
