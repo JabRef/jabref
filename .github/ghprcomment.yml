@@ -191,11 +191,11 @@
     The title of the pull request must not start with "Fix for issue xyz".
     Please use a concise one-line summary that explains what the fix or change actually does.
     Example of a good title: "Prevent crash when importing malformed BibTeX entries".
-- jobName: 'Mandatory Checks present'
+- jobName: 'Mandatory Checklist present'
   workflowName: 'Check PR Format'
   always: true
   message: >
-    You have removed the "Mandatory Checks" section from your pull request description.
+    You have removed the section "Checklist" from your pull request description.
     Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
 - jobName: 'PR checklist OK'
   workflowName: 'Check PR Format'
