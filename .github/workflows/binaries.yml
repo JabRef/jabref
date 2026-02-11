@@ -483,7 +483,7 @@ jobs:
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Setup rsync (macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
