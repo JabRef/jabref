@@ -69,7 +69,7 @@ runs:
         mv -f jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}.deb
     - name: Upload ${{ inputs.component }} packages to GitHub
       # background: true
-      if: ${{ inputs.upload-as-artifact == 'true' }}
+      if: ${{ inputs.upload-as-artifact == 'true' && (inputs.archivePortable != 'NONE') }}
       uses: actions/upload-artifact@v6
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
@@ -77,13 +77,14 @@ runs:
           ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.*
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
       # background: true
-      if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) }}
+      if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) && (inputs.archivePortable != 'NONE') }}
       shell: bash
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
       # background: true
-      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') }}
+      # jabsrv-cli doesn't have any installer and no archivePortable; thus we do not upload
+      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') && (inputs.archivePortable != 'NONE') }}
       shell: cmd
       # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
       run: |
