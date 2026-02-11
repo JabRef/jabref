@@ -37,17 +37,6 @@ jobs:
             echo "changes_required=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Remove reviewer
-        if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          reviewer="${{ github.event.requested_reviewer.login }}"
-          gh api \
-            -X DELETE \
-            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
-            -f reviewers[]="$reviewer"
-
       - name: Post comment (CI)
         if: ${{ steps.eval.outputs.ci_running == 'true' }}
         uses: thollander/actions-comment-pull-request@v3
@@ -67,3 +56,14 @@ jobs:
             Address the changes first.
           comment-tag: changes_required
           mode: recreate
+
+      - name: Remove reviewer
+        if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewer="${{ github.event.requested_reviewer.login }}"
+          gh api \
+            -X DELETE \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
+            -f reviewers[]="$reviewer"
