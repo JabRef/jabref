@@ -66,6 +66,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Endashes and emdashes are now supported in citation keys for the LibreOffice CSL integration. [#14961](https://github.com/JabRef/jabref/issues/14961)
 - We fixed an issue where JabRef would throw an `IllegalCharacterException` trying to download pdfs using links containing a colon (`:`). [#14975](https://github.com/JabRef/jabref/issues/14975)
 - Fixed UI overlap in Citation Relations tab when entry titles are very long. [#15047](https://github.com/JabRef/jabref/issues/15047)
+- Fixed capitalization errors in the Automatic Field Editor. [#15068](https://github.com/JabRef/jabref/issues/15068)
 
 ### Removed
 
