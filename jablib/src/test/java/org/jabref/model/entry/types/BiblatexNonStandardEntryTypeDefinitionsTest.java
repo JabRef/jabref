@@ -13,17 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class BiblatexNonStandardEntryTypeDefinitionsTest {
 
     @Test
-    void allContainsFifteenTypes() {
+    void allContainsTwelveTypes() {
         assertNotNull(BiblatexNonStandardEntryTypeDefinitions.ALL);
-        assertEquals(15, BiblatexNonStandardEntryTypeDefinitions.ALL.size());
+        assertEquals(12, BiblatexNonStandardEntryTypeDefinitions.ALL.size());
     }
 
     @Test
     void allContainsAllNonStandardTypes() {
         Set<BiblatexNonStandardEntryType> expectedTypes = Set.of(
                 BiblatexNonStandardEntryType.Artwork, BiblatexNonStandardEntryType.Audio, BiblatexNonStandardEntryType.Bibnote,
-                BiblatexNonStandardEntryType.Commentary, BiblatexNonStandardEntryType.Image, BiblatexNonStandardEntryType.Jurisdiction,
-                BiblatexNonStandardEntryType.Legislation, BiblatexNonStandardEntryType.Legal, BiblatexNonStandardEntryType.Letter,
+                BiblatexNonStandardEntryType.Commentary, BiblatexNonStandardEntryType.Image, BiblatexNonStandardEntryType.Letter,
                 BiblatexNonStandardEntryType.Movie, BiblatexNonStandardEntryType.Music, BiblatexNonStandardEntryType.Performance,
                 BiblatexNonStandardEntryType.Review, BiblatexNonStandardEntryType.Standard, BiblatexNonStandardEntryType.Video
         );

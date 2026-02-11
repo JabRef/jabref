@@ -1,7 +1,7 @@
 name: Auto-remove ready-for-review
 
 on:
-  pull_request:
+  pull_request_target:
     types: [ready_for_review]
 
 jobs:
@@ -13,6 +13,7 @@ jobs:
       contents: read
 
     steps:
+      - uses: actions/checkout@v6
       - name: Evaluate state
         id: eval
         env:
@@ -36,13 +37,6 @@ jobs:
             echo "changes_required=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Convert to draft
-        if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr ready --undo
-
       - name: Post comment (CI)
         if: ${{ steps.eval.outputs.ci_running == 'true' }}
         uses: thollander/actions-comment-pull-request@v3
@@ -62,3 +56,10 @@ jobs:
             Address the changes first.
           comment-tag: changes_required
           mode: recreate
+
+      - name: Convert to draft
+        if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr ready --undo "${{ github.event.pull_request.number }}"
