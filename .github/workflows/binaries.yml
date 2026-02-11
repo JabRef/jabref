@@ -545,7 +545,7 @@ jobs:
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
 
       - uses: ./.github/actions/package
-        name: Package JabLS-CLI
+        name: Package JabRef Language Server
         with:
           component: jabls-cli
           componentShort: jabls
@@ -559,7 +559,7 @@ jobs:
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
 
       - uses: ./.github/actions/package
-        name: Package JabSrv-CLI
+        name: Package JabRef HTTP Server
         with:
           component: jabsrv-cli
           componentShort: jabsrv
