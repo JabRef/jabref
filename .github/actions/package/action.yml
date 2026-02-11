@@ -104,7 +104,7 @@ runs:
       if: false
       shell: bash
       run: |
-        mv build/jbundle/${{ inputs.component }}-${{ inputs.displayName }} build/jbundle/${{ inputs.component }}-${{ inputs.displayName }}.exe
+        mv build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}.exe
     - name: Test jbundle binary (smoke test)
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.should-jbundle == 'true') }}
       shell: bash
@@ -125,7 +125,7 @@ runs:
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
           --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle && rsync" \
           -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-          build/jbundle/${{ inputs.component }}-${{ inputs.displayName }}* \
+          build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}* \
           jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle/
 
     # After jbundle, because jbundle needs original filename
