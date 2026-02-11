@@ -517,18 +517,16 @@ jobs:
       # Both JabRef Language Server and JabRef HTTP Server are required by the GUI
       # They are independent from each other and could be build in parallel.
       # - wait: jablib-jar
+      # - parallel:
       - name: jabls jar
         id: jabls-jar
-        # background: true
         run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls:jar
       - name: jabsrv jar
         id: jabsrv-jar
-        # background: true
         run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv:jar
 
-      # - wait: [ jabls-jar, jabsrv-jar ]
       # jars already exists - thus, these calls will build on the jar result (hopefully).
-      # Can be run in parallel.
+
       - uses: ./.github/actions/package
         name: Package JabRef Language Server
         id: jabls-cli
@@ -568,8 +566,6 @@ jobs:
           suffix: ${{ matrix.suffix }}
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
           upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
-
-      # JabGUI and JabKit are independent from each other and could be build in parallel.
       - uses: ./.github/actions/package
         name: Package JabGUI
         id: jabgui
@@ -592,6 +588,7 @@ jobs:
           upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
       - uses: ./.github/actions/package
         name: Package JabKit
+        # background: true
         with:
           component: jabkit
           componentShort: jabkit
