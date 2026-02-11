@@ -455,11 +455,9 @@ jobs:
           which jlink
           jlink --version
 
-      - name: Workaround for jpackage issue
-        run: |
-          cd jabgui
-          cp buildres/linux/JabRef.png . # Linux
-          cp buildres/windows/JabRef.ico . # Windows
+      # jablib is used by all components - thus, compile it first
+      - name: Compile jablib
+        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jablib:compileJava
 
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
@@ -507,6 +505,12 @@ jobs:
         with:
           packages: pigz
           version: 1.0
+
+      - name: Workaround for jpackage issue
+        run: |
+          cd jabgui
+          cp buildres/linux/JabRef.png . # Linux
+          cp buildres/windows/JabRef.ico . # Windows
 
       - uses: ./.github/actions/package
         name: Package JabGUI
