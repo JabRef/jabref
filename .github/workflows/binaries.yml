@@ -351,7 +351,7 @@ jobs:
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
             --rsync-path="mkdir -p /var/www/builds.jabref.org/www/pull/14950/merge/${{ matrix.displayName }}/jbundle && rsync" \
             -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-            --include='**/jbundle/*' --exclude="*" \
+            build/jbundle/ \
             jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/pull/14950/merge/${{ matrix.displayName }}/jbundle/ || true
 
 
