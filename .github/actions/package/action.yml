@@ -51,6 +51,7 @@ runs:
         ${{ inputs.archivePortable }}
     - name: Rename files
       shell: pwsh
+      if: ${{ inputs.archivePortable != 'NONE' }}
       run: |
         get-childitem -Path '${{ inputs.component }}/build/packages/*/*' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
     - name: Repack deb file for Debian
