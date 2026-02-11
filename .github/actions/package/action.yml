@@ -80,7 +80,7 @@ runs:
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) }}
       shell: bash
       run: |
-        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/*.* || true
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
       # background: true
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') }}
