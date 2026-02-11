@@ -39,8 +39,9 @@ Closes _____
    <!--
       1. Describe how reviewers can test this fix/feature.
          Ideally, think of how you would guide a beginner user of JabRef to try out your change.
-      2. Add screenshots (preferred) or videos (using Loom - https://www.loom.com or by just adding .mp4 files).
-      -->
+      2. Add screenshots (preferred) or videos.
+         (E.g. using Loom - https://www.loom.com or by just adding .mp4 files).
+         -->
 
 ### Checklist
 
