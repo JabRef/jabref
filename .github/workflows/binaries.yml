@@ -331,30 +331,6 @@ jobs:
           echo "Link: https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
           echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>" >> $GITHUB_STEP_SUMMARY
 
-  rsync-test:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Setup SSH key
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-      - run: |
-          mkdir -p build/jbundle
-          touch build/jbundle/jabls-linux-amd64
-          touch build/jbundle/jabgui-linux-amd64
-      - name: Upload jbundle artifacts to builds.jabref.org
-        shell: bash
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
-            --rsync-path="mkdir -p /var/www/builds.jabref.org/www/pull/14950/merge/${{ matrix.displayName }}/jbundle && rsync" \
-            -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-            build/jbundle/ \
-            jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/pull/14950/merge/${{ matrix.displayName }}/jbundle/ || true
-
-
   build:
     needs: [ conditions, disk-space-check ]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
@@ -763,7 +739,7 @@ jobs:
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
             --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle && rsync" \
             -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-            --include='**/jbundle/*' --exclude="*" \
+            build/jbundle/ \
             jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle/ || true
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
