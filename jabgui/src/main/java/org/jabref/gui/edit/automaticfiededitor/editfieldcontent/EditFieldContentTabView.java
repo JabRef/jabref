@@ -1,5 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -11,6 +12,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -48,7 +50,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public EditFieldContentTabView(BibDatabase database, StateManager stateManager) {
-        this.selectedEntries = stateManager.getSelectedEntries();
+        this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
         this.stateManager = stateManager;
 
@@ -65,8 +67,10 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         showOnlySetFieldsCheckBox.setSelected(true);
 
         EasyBind.subscribe(showOnlySetFieldsCheckBox.selectedProperty(), selected -> {
-            java.util.Collection<Field> items = selected ? viewModel.getSetFieldsOnly()
-                                                         : viewModel.getAllFields();
+            java.util.Collection<Field> items = selected
+                                                ? FieldHelper.getSetFieldsOnly(selectedEntries, viewModel.getAllFields())
+                                                : viewModel.getAllFields();
+
             fieldComboBox.getItems().setAll(items);
             if (!fieldComboBox.getItems().isEmpty()) {
                 fieldComboBox.getSelectionModel().selectFirst();

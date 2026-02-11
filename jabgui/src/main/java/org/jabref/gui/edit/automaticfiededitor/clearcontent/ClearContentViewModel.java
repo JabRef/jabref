@@ -1,10 +1,9 @@
 package org.jabref.gui.edit.automaticfiededitor.clearcontent;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
@@ -17,20 +16,15 @@ import org.jabref.model.entry.field.FieldFactory;
 public class ClearContentViewModel {
     public static final int TAB_INDEX = 2;
     private final StateManager stateManager;
+    private final List<BibEntry> selectedEntries;
 
-    public ClearContentViewModel(StateManager stateManager) {
+    public ClearContentViewModel(List<BibEntry> selectedEntries, StateManager stateManager) {
         this.stateManager = stateManager;
+        this.selectedEntries = new ArrayList<>(selectedEntries);
     }
 
     public Set<Field> getAllFields() {
         return FieldFactory.getAllFieldsWithOutInternal();
-    }
-
-    public Set<Field> getSetFieldsOnly() {
-        return stateManager.getSelectedEntries().stream()
-                           .flatMap(entry -> entry.getFields().stream()
-                                                  .filter(f -> entry.getField(f).isPresent() && !entry.getField(f).get().isBlank()))
-                           .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void clearField(Field field) {

@@ -1,10 +1,7 @@
 package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -14,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompoundEdit;
@@ -48,7 +46,10 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
         super(bibDatabase, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
 
-        getSetFieldsOnly().stream().findFirst().ifPresent(fromField::set);
+        FieldHelper.getSetFieldsOnly(this.selectedEntries, getAllFields())
+                   .stream()
+                   .findFirst()
+                   .ifPresent(fromField::set);
 
         toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
             if (StringUtil.isBlank(field.getName())) {
@@ -64,13 +65,6 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
         canSwap = BooleanBinding.booleanExpression(toFieldValidationStatus().validProperty())
                                 .and(overwriteFieldContentProperty());
-    }
-
-    public Set<Field> getSetFieldsOnly() {
-        return getAllFields().stream()
-                             .filter(field -> selectedEntries.stream()
-                                                             .anyMatch(entry -> entry.getField(field).isPresent() && !entry.getField(field).get().isBlank()))
-                             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public ValidationStatus toFieldValidationStatus() {

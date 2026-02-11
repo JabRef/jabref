@@ -1,9 +1,7 @@
 package org.jabref.gui.edit.automaticfiededitor.renamefield;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -14,6 +12,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompoundEdit;
@@ -43,10 +42,11 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
     public RenameFieldViewModel(List<BibEntry> selectedEntries, BibDatabase database, StateManager stateManager) {
         super(database, stateManager);
-        this.selectedEntries = selectedEntries;
+        this.selectedEntries = new ArrayList<>(selectedEntries);
 
-        getSetFieldsOnly().stream().findFirst().ifPresent(selectedField::set);
-        
+        FieldHelper.getSetFieldsOnly(selectedEntries, getAllFields())
+                   .stream().findFirst().ifPresent(selectedField::set);
+
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> StringUtil.isNotBlank(field.getName()),
                 ValidationMessage.error("Field cannot be empty"));
         fieldNameValidator = new FunctionBasedValidator<>(newFieldName, fieldName -> {
@@ -59,13 +59,6 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
         });
 
         canRename = Bindings.and(fieldValidationStatus().validProperty(), fieldNameValidationStatus().validProperty());
-    }
-
-    public Set<Field> getSetFieldsOnly() {
-        return getAllFields().stream()
-                             .filter(field -> selectedEntries.stream()
-                                                             .anyMatch(entry -> entry.getField(field).isPresent() && !entry.getField(field).get().isBlank()))
-                             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public ValidationStatus fieldValidationStatus() {

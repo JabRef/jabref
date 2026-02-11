@@ -12,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -71,22 +72,19 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     private void initializeFromAndToComboBox() {
-        fromFieldComboBox.getItems().setAll(viewModel.getSetFieldsOnly());
-
-        toFieldComboBox.getItems().setAll(viewModel.getAllFields());
-
+        // From
+        fromFieldComboBox.getItems().setAll(FieldHelper.getSetFieldsOnly(selectedEntries, viewModel.getAllFields()));
         fromFieldComboBox.setConverter(FIELD_STRING_CONVERTER);
-
-        toFieldComboBox.setConverter(FIELD_STRING_CONVERTER);
-
+        fromFieldComboBox.valueProperty().bindBidirectional(viewModel.fromFieldProperty());
+        EasyBind.listen(fromFieldComboBox.getEditor().textProperty(), observable -> fromFieldComboBox.commitValue());
         if (!fromFieldComboBox.getItems().isEmpty()) {
             fromFieldComboBox.getSelectionModel().selectFirst();
         }
 
-        fromFieldComboBox.valueProperty().bindBidirectional(viewModel.fromFieldProperty());
+        // To
+        toFieldComboBox.getItems().setAll(viewModel.getAllFields());
+        toFieldComboBox.setConverter(FIELD_STRING_CONVERTER);
         toFieldComboBox.valueProperty().bindBidirectional(viewModel.toFieldProperty());
-
-        EasyBind.listen(fromFieldComboBox.getEditor().textProperty(), observable -> fromFieldComboBox.commitValue());
         EasyBind.listen(toFieldComboBox.getEditor().textProperty(), observable -> toFieldComboBox.commitValue());
     }
 
