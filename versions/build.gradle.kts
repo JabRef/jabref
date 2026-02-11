@@ -60,7 +60,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-web:$javafx")
     api("org.openjfx:jdk-jsobject:$javafx")
 
-    api("cc.jilt:jilt:1.9")
+    api("cc.jilt:jilt:1.9.1")
 
     api("com.dlsc.gemsfx:gemsfx:3.8.3")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
