@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fetcher.citation.opencitations;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,6 +159,38 @@ public class OpenCitationsFetcher implements CitationFetcher {
             throw new FetcherException("Malformed URL", e);
         } catch (JsonSyntaxException e) {
             throw new FetcherException("Could not parse JSON response from OpenCitations", e);
+        }
+    }
+
+    @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        Optional<DOI> doi = entry.getDOI();
+        if (doi.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = API_BASE_URL + "/references/doi:" + doi.get().asString();
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create references API URI", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        Optional<DOI> doi = entry.getDOI();
+        if (doi.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = API_BASE_URL + "/citations/doi:" + doi.get().asString();
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create citations API URI", e);
+            return Optional.empty();
         }
     }
 }
