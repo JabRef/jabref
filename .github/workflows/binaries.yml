@@ -477,77 +477,6 @@ jobs:
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
 
-      - name: jpackage JabGui
-        shell: bash
-        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
-      - name: Smoke test JabGui
-        shell: bash
-        run: |
-          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:run --args="--help"
-
-      - name: Install jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: jbundle
-          git: https://github.com/avelino/jbundle/
-          branch: main
-      - name: jbundle JabGui (Linux)
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          mkdir -p build/jbundle
-          # "jar" does not work becaus or iconli issues
-          # We do not re-use the generated jlink runtime
-          jbundle build --input . --gradle-project jabgui --output ./build/jbundle/jabgui-${{ matrix.displayName }}
-      - name: jbundle JabGui filename fix (Windows)
-        # if: ${{ matrix.os == 'windows-latest' }}
-        if: false
-        shell: bash
-        run: |
-          mv build/jbundle/jabgui-${{ matrix.displayName }} build/jbundle/jabgui-${{ matrix.displayName }}.exe
-      - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        # if: ${{ matrix.os != 'windows-latest' }}
-        shell: bash
-        run: |
-          build/jbundle/jabgui-${{ matrix.displayName }} --help
-      - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: jbundle-${{ matrix.displayName }}
-          path: build/jbundle/jabgui*
-
-      - name: Install pigz and cache (Linux)
-        if: startsWith(matrix.os, 'ubuntu')
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: pigz
-          version: 1.0
-      - name: Package JabGui application image
-        shell: bash
-        run: |
-          set -e
-          ${{ matrix.archivePortable }}
-      - name: Rename files
-        shell: pwsh
-        run: |
-          get-childitem -Path 'jabgui/build/packages/*/*' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
-      - name: Repack deb file for Debian
-        if: (startsWith(matrix.os, 'ubuntu'))
-        shell: bash
-        run: |
-          cd jabgui/build/packages/${{ matrix.os }}
-          ls -l
-          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
-          rm jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
-          zstd -d < control.tar.zst | xz > control.tar.xz
-          zstd -d < data.tar.zst | xz > data.tar.xz
-          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb debian-binary control.tar.xz data.tar.xz
-          rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
-
       - name: Setup SSH key
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         run: |
@@ -565,183 +494,82 @@ jobs:
         # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
         run: choco install rsync --version=6.4.4
 
-      - name: Upload jabgui to builds.jabref.org (Linux, macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && ((startsWith(matrix.os, 'macos') && (needs.conditions.outputs.should-notarize != 'true')) || startsWith(matrix.os, 'ubuntu')) }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
-      - name: Upload jabgui to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        shell: cmd
-        # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+      - name: Install jbundle
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
+        uses: baptiste0928/cargo-install@v3
         with:
-          name: JabGui (${{ matrix.displayName }})
-          path: |
-            jabgui/build/packages/${{ matrix.os }}
+          crate: jbundle
+          git: https://github.com/avelino/jbundle/
+          branch: main
+      - name: Install pigz and cache (Linux)
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pigz
+          version: 1.0
 
-      - name: jpackage JabKit
-        shell: bash
-        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Smoke test JabKit
-        shell: bash
-        run: |
-          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:run --args="--help"
-      - name: Package JabKit application image
-        shell: bash
-        run: |
-          set -e
-          ${{ matrix.archivePortableJabKit }}
-      - name: ShadowJar JabKit
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
-        shell: bash
-        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:ShadowJar
-      - name: Rename files
-        if: ${{ (matrix.os == 'ubuntu-22.04') }}
-        shell: pwsh
-        run: |
-          get-childitem -Path 'jabkit/build/libs/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+      - uses: ./.github/actions/package
+        name: Package JabGUI
         with:
-          name: JabKit JAR (${{ matrix.displayName }})
-          path: |
-            jabkit/build/libs/*-all*.jar
-      - name: Upload jabkit ShadowJar to builds.jabref.org (Linux)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
-      - name: jbundle jabkit
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          jbundle build --input . --gradle-project jabkit --output ./build/jbundle/jabkit-${{ matrix.displayName }}
-      - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          build/jbundle/jabkit-${{ matrix.displayName }} --help
-      - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: jbundle-${{ matrix.displayName }}
-          path: build/jbundle/jabkit*
-      - name: Upload jabkit to builds.jabref.org (Linux, macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
-      - name: Upload jabkkit to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        shell: cmd
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: JabKit (${{ matrix.displayName }})
-          path: |
-            jabkit/build/packages/${{ matrix.os }}
+          component: jabgui
+          componentShort: jabgui
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortable }}
+          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
 
-      - name: jpackage jabls-cli
-        shell: bash
-        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:jpackage
-      - name: Smoke test jabls-cli
-        shell: bash
-        run: |
-          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:run --args="--help"
-      - name: Package jabls-cli application image
-        shell: bash
-        run: |
-          set -e
-          ${{ matrix.archivePortableJabLS }}
-      - name: ShadowJar jabls-cli
-        shell: bash
-        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:ShadowJar
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+      - uses: ./.github/actions/package
+        name: Package JabKit
         with:
-          name: JabLs (${{ matrix.displayName }})
-          path: |
-            jabls-cli/build/libs/-*all.jar
-      - name: jbundle jabls-cli
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls-${{ matrix.displayName }}
-      - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          build/jbundle/jabls-${{ matrix.displayName }} --help
-      - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: jbundle-${{ matrix.displayName }}
-          path: build/jbundle/jabls*
-      - name: Upload jabls-cli to builds.jabref.org (Linux, macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
-      - name: Upload jabls-cli to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        shell: cmd
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/ || true
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: JabLs (${{ matrix.displayName }})
-          path: |
-            jabls-cli/build/packages/${{ matrix.os }}
+          component: jabkit
+          componentShort: jabkit
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortableJabLS }}
+          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
 
-      - name: jpackage jabsrv-cli
-        shell: bash
-        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:jpackage
-      - name: ShadowJar jabsrv-cli
-        shell: bash
-        run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:ShadowJar
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+      - uses: ./.github/actions/package
+        name: Package JabLS-CLI
         with:
-          name: JabLs (${{ matrix.displayName }})
-          path: |
-            jabsrv-cli/build/libs/-*all.jar
-      - name: jbundle jabsrv-cli
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv-${{ matrix.displayName }}
-      - name: Test jbundle binary (smoke test)
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          build/jbundle/jabsrv-${{ matrix.displayName }} --help
-      - name: Upload jbundle artifacts
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (github.event.inputs.upload-as-artifact || 'false' == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: jbundle-${{ matrix.displayName }}
-          path: build/jbundle/jabsrv*
-      - name: Smoke test jabsrv-cli
-        shell: bash
-        run: |
-          ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:run --args="--help"
+          component: jabls-cli
+          componentShort: jabls
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortableJabLS }}
+          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
 
-      - name: Upload jbundle artifacts to builds.jabref.org
+      - uses: ./.github/actions/package
+        name: Package JabSrv-CLI
+        with:
+          component: jabsrv-cli
+          componentShort: jabsrv
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: NONE
+          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
+
+      - name: Upload all jbundle artifacts to builds.jabref.org
         if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.disk-space-check.outputs.available == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
         shell: bash
         run: |
