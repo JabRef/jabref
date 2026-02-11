@@ -74,19 +74,20 @@ runs:
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
         path: |
-          ${{ inputs.component }}/build/packages/${{ inputs.os }}
+          ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.*
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
       # background: true
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) }}
       shell: bash
       run: |
-        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/*.* || true
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
+      # background: true
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') }}
       shell: cmd
       # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
       run: |
-        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.* jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
 
     - name: ShadowJar ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
