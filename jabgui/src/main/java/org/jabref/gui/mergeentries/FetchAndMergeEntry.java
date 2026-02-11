@@ -102,7 +102,7 @@ public class FetchAndMergeEntry {
                                                              } else if (exception instanceof FetcherServerException) {
                                                                  dialogService.notify(Localization.lang("Server not available"));
                                                              } else {
-                                                                 dialogService.notify(Localization.lang("Error occurred %0", exception.getMessage()));
+                                                                 dialogService.notify(Localization.lang("Error while fetching from %0", idBasedFetcher.getName()));
                                                              }
                                                          })
                                                          .executeWith(taskExecutor),
