@@ -26,9 +26,11 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
@@ -368,6 +370,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         Label citedByLabel = new Label(Localization.lang("References that cite %0", citationKey));
         styleLabel(citedByLabel, Localization.lang("Also called \"forward citations\""));
 
+        // Add context menus to labels for opening API URLs
+        citingLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITES));
+        citedByLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITED_BY));
+
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
         CheckListView<CitationRelationItem> citedByListView = new CheckListView<>();
@@ -618,6 +624,36 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane.setLeftAnchor(label, 0.0);
         AnchorPane.setBottomAnchor(label, 0.0);
         AnchorPane.setRightAnchor(label, 0.0);
+    }
+
+    /// Creates a context menu for citation relation labels with an option to open the API URL in browser
+    ///
+    /// @param entry      the BibEntry to get the API URL for
+    /// @param searchType the type of search (CITES for references, CITED_BY for citations)
+    /// @return a ContextMenu with the "Open API URL in browser" option
+    private ContextMenu createCitationContextMenu(BibEntry entry, CitationFetcher.SearchType searchType) {
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem openApiUrl = new MenuItem(Localization.lang("Open API URL in browser"));
+        openApiUrl.setOnAction(_ -> {
+            Optional<URI> uri = searchType == CitationFetcher.SearchType.CITES
+                                ? searchCitationsRelationsService.getReferencesApiUri(entry)
+                                : searchCitationsRelationsService.getCitationsApiUri(entry);
+
+            uri.ifPresentOrElse(
+                    apiUri -> {
+                        try {
+                            NativeDesktop.openBrowser(apiUri, preferences.getExternalApplicationsPreferences());
+                        } catch (IOException e) {
+                            dialogService.notify(Localization.lang("Unable to open link."));
+                        }
+                    },
+                    () -> dialogService.notify(Localization.lang("No API URL available."))
+            );
+        });
+
+        contextMenu.getItems().add(openApiUrl);
+        return contextMenu;
     }
 
     /// Method to style refresh buttons
