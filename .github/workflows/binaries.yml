@@ -512,6 +512,37 @@ jobs:
           cp buildres/linux/JabRef.png .   # Linux
           cp buildres/windows/JabRef.ico . # Windows
 
+      # Both JabRef Language Server and JabRef HTTP Server are required by the GUI
+      # They are independent from each other and could be build in parallel.
+      - uses: ./.github/actions/package
+        name: Package JabRef Language Server
+        with:
+          component: jabls-cli
+          componentShort: jabls
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortableJabLS }}
+          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
+      - uses: ./.github/actions/package
+        name: Package JabRef HTTP Server
+        with:
+          component: jabsrv-cli
+          componentShort: jabsrv
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: NONE
+          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
+
+      # JabGUI and JabKit are independent from each other and could be build in parallel.
       - uses: ./.github/actions/package
         name: Package JabGUI
         with:
@@ -529,7 +560,6 @@ jobs:
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
-
       - uses: ./.github/actions/package
         name: Package JabKit
         with:
@@ -543,48 +573,6 @@ jobs:
           displayName: ${{ matrix.displayName }}
           archivePortable: ${{ matrix.archivePortableJabKit }}
           should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
-
-      - uses: ./.github/actions/package
-        name: Package JabRef Language Server
-        with:
-          component: jabls-cli
-          componentShort: jabls
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
-          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
-          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-          os: ${{ matrix.os }}
-          displayName: ${{ matrix.displayName }}
-          archivePortable: ${{ matrix.archivePortableJabLS }}
-          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
-
-      - uses: ./.github/actions/package
-        name: Package JabRef HTTP Server
-        with:
-          component: jabsrv-cli
-          componentShort: jabsrv
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
-          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
-          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-          os: ${{ matrix.os }}
-          displayName: ${{ matrix.displayName }}
-          archivePortable: NONE
-          should-jbundle: ${{ needs.conditions.outputs.should-jbundle }}
-          upload-as-artifact: "${{ github.event.inputs.upload-as-artifact }}"
-
-      - name: Upload all jbundle artifacts to builds.jabref.org
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.disk-space-check.outputs.available == 'true') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        shell: bash
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
-            --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle && rsync" \
-            -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-            build/jbundle/ \
-            jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle/ || true
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}

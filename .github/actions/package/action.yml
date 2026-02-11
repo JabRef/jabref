@@ -66,16 +66,35 @@ runs:
           ar -m -c -a sdsd jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}.deb
+      - name: Upload ${{ inputs.component }} packages to GitHub
+        if: ${{ inputs.upload-as-artifact == 'true' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
+          path: |
+            ${{ inputs.component }}/build/packages/${{ inputs.os }}
+      - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
+        if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
+      - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
+        if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') }}
+        shell: cmd
+        # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
+
       - name: ShadowJar ${{ inputs.component }}
         if: ${{ (inputs.os == 'ubuntu-22.04') }}
         shell: bash
         run: ./gradlew -PeaJdkBuild="${{ inputs.useEaJdk }}" -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:shadowJar
-      - name: Rename shadow jar file
+      - name: Rename ShadowJar
         if: ${{ (inputs.os == 'ubuntu-22.04') }}
         shell: pwsh
         run: |
           get-childitem -Path '${{ inputs.component }}/build/libs/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
-      - name: Upload artifacts
+      - name: Upload ShadowJar to GitHub
         if: ${{ (inputs.upload-as-artifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
         uses: actions/upload-artifact@v6
         with:
@@ -86,7 +105,8 @@ runs:
         if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
+
       - name: jbundle ${{ inputs.component }}
         if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.should-jbundle == 'true') }}
         shell: bash
@@ -103,27 +123,18 @@ runs:
         shell: bash
         run: |
           build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} --help
-      - name: Upload jbundle artifacts
+      - name: Upload jbundle artifact to GitHub
         if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.upload-as-artifact == 'true') && (inputs.should-jbundle == 'true') }}
         uses: actions/upload-artifact@v6
         with:
           name: jbundle-${{ inputs.displayName }}
           path: build/jbundle/${{ inputs.componentShort }}*
-      - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
-        if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) }}
+      - name: Upload jbundle artifact to builds.jabref.org
+        if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.diskSpaceAvailable == 'true') && (inputs.should-jbundle == 'true') }}
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
-      - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
-        if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') }}
-        shell: cmd
-        # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/ || true
-      - name: Upload artifacts
-        if: ${{ inputs.upload-as-artifact == 'true' }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
-          path: |
-            ${{ inputs.component }}/build/packages/${{ inputs.os }}
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
+            --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle && rsync" \
+            -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
+            build/jbundle/${{ inputs.component }}-${{ inputs.displayName }}* \
+            jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/${{ matrix.displayName }}/jbundle/ || true
