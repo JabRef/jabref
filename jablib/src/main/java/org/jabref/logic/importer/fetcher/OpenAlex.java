@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -417,6 +418,34 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
         return getWorkObject(entry, List.of("cited_by_count"))
                 .map(work -> work.optInt("cited_by_count"))
                 .filter(Objects::nonNull);
+    }
+
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        try {
+            return getWorkObject(entry, List.of("id"))
+                    .map(work -> work.optString("id"))
+                    .filter(Objects::nonNull)
+                    .map(Unchecked.function(id ->
+                            getUriBuilder("", List.of())
+                                    .addParameter("filter", "cites:" + id)
+                                    .build()
+                    ));
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not create citations API URI", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        try {
+            return getUrl(entry, List.of())
+                    .map(Unchecked.function(URL::toURI));
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Could not create references API URI", e);
+            return Optional.empty();
+        }
     }
 
     // endregion
