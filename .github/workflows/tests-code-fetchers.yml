@@ -11,7 +11,7 @@ on:
       - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
       - 'src/main/java/org/jabref/logic/crawler/**'
       - 'src/test/java/org/jabref/logic/crawler/**'
-      - '.github/workflows/tests-fetchers.yml'
+      - '.github/workflows/tests-code-fetchers.yml'
       - 'build.gradle'
   pull_request:
     paths:
@@ -21,7 +21,7 @@ on:
       - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
       - 'src/main/java/org/jabref/logic/crawler/**'
       - 'src/test/java/org/jabref/logic/crawler/**'
-      - '.github/workflows/tests-fetchers.yml'
+      - '.github/workflows/tests-code-fetchers.yml'
       - 'build.gradle'
   schedule:
     # run on each Monday
@@ -33,6 +33,7 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
   MedlineApiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
+  OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
 
 concurrency:
@@ -46,7 +47,7 @@ jobs:
   fetchertests:
     if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
     name: Fetcher tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@v6

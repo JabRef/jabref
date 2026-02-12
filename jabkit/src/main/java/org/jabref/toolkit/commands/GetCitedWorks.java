@@ -35,7 +35,7 @@ class GetCitedWorks implements Callable<Integer> {
             converter = CitationFetcherTypeConverter.class,
             description = "Metadata provider: ${COMPLETION-CANDIDATES}"
     )
-    private CitationFetcherType citationFetcherType = CitationFetcherType.CROSSREF;
+    private CitationFetcherType citationFetcherType = CitationFetcherType.OPEN_CITATIONS;
 
     @CommandLine.Parameters(description = "DOI to check")
     private String doi;
@@ -50,15 +50,14 @@ class GetCitedWorks implements Callable<Integer> {
                 LOGGER::info,
                 new CurrentThreadTaskExecutor());
 
-        CitationFetcher citationFetcher = CitationFetcherType
-                .getCitationFetcher(
-                        citationFetcherType,
-                        preferences.getImporterPreferences(),
-                        preferences.getImportFormatPreferences(),
-                        preferences.getCitationKeyPatternPreferences(),
-                        preferences.getGrobidPreferences(),
-                        aiService
-                );
+        CitationFetcher citationFetcher = CitationFetcherType.getCitationFetcher(
+                citationFetcherType,
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getGrobidPreferences(),
+                aiService
+        );
 
         List<BibEntry> entries;
 

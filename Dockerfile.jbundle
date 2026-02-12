@@ -1,0 +1,87 @@
+# syntax=docker/dockerfile:1
+
+FROM debian:unstable AS build
+
+# Canonical's Ubuntu Rust image
+# Has issues with "passwd" package
+# FROM ubuntu/rust:1.84-25.04_edge
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get update
+
+RUN apt-get install -y --no-install-recommends \
+      curl git
+
+RUN apt-get install -y --no-install-recommends \
+      passwd
+
+RUN apt-get install -y --no-install-recommends \
+      adduser debianutils
+
+RUN apt-get install -y --no-install-recommends \
+      ca-certificates
+
+RUN apt-get install -y --no-install-recommends \
+       openssh-client
+
+WORKDIR /work/jabref
+COPY . .
+
+# WORKDIR /work
+# RUN git clone --recursive https://github.com/JabRef/jabref.git
+# WORKDIR /work/jabref
+# RUN git checkout jbundle
+
+# JabRef uses Amazon Corretto as JDK
+RUN apt-get install -y --no-install-recommends \
+       wget gnupg
+RUN wget -O - https://apt.corretto.aws/corretto.key | gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | tee /etc/apt/sources.list.d/corretto.list
+RUN apt-get update
+RUN apt-get install -y java-25-amazon-corretto-jdk
+
+# ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+# ENV PATH="${JAVA_HOME}/bin:${PATH}"
+# WORKDIR /work/jabref
+# RUN ./gradlew :jabkit:ShadowJar
+
+RUN apt-get install -y --no-install-recommends \
+      fakeroot
+
+# RUN ./gradlew :jabgui:jpackage
+RUN ./gradlew :jabkit:jpackage
+RUN ./gradlew :jabls-cli:jpackage
+RUN ./gradlew :jabsrv-cli:jpackage
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential pkg-config \
+      cargo rustc \
+      libssl-dev
+
+RUN cargo install --git https://github.com/avelino/jbundle/ --branch avelino/issue-6-41-42 jbundle
+
+RUN ~/.cargo/bin/jbundle build --input . --output ./build/jabkit --gradle-project jabkit --jlink-runtime jabgui/build/packages
+
+RUN ~/.cargo/bin/jbundle build --input . --output ./build/jabkit --gradle-project jabkit
+
+FROM debian:stable-slim AS runtime
+
+LABEL org.opencontainers.image.title="JabRef all-in-one"
+LABEL org.opencontainers.image.description="JabRef's components JabKit, REST-API, and Language Server in one image"
+LABEL org.opencontainers.image.source=https://github.com/JabRef/jabref
+
+WORKDIR /work
+
+COPY --from=build /work/build/ /jabref
+
+# LSP Server
+EXPOSE 2087
+
+# native messaging
+EXPOSE 6050
+
+# HTTP Server
+EXPOSE 23119
+
+ENTRYPOINT ["/jabref/jabkit"]
