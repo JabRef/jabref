@@ -499,7 +499,7 @@ jobs:
         id: jablib-jar
         # wait: gitversion
         # background: true
-        run: ./gradlew :jablib:jar
+        run: gradle :jablib:jar
         env:
           VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
@@ -522,14 +522,14 @@ jobs:
       - name: jabls jar
         # background: true
         id: jabls-jar
-        run: ./gradlew :jabls:jar
+        run: gradle :jabls:jar
         env:
           VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
       - name: jabsrv jar
         # background: true
         id: jabsrv-jar
-        run: ./gradlew :jabsrv:jar
+        run: gradle :jabsrv:jar
         env:
           VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}

@@ -56,6 +56,6 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run fetcher tests
-        run: ./gradlew fetcherTest
+        run: gradle fetcherTest
         env:
           CI: "true"
