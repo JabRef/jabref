@@ -135,7 +135,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
         LOGGER.debug("Citation count URL: {}", apiUrl);
 
         try {
-            URL url = new URI(apiUrl).toURL();  // Changed from URI.create()
+            URL url = new URI(apiUrl).toURL();
             URLDownload urlDownload = new URLDownload(importerPreferences, url);
             importerPreferences.getApiKey(getName())
                                .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
