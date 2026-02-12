@@ -24,9 +24,9 @@ inputs:
     required: true
   archivePortable:
     required: true
-  should-jbundle:
+  shouldJbundle:
     required: true
-  upload-as-artifact:
+  uploadAsArtifact:
     required: true
   archForDebianRepack:
     required: true
@@ -75,7 +75,7 @@ runs:
         mv -f jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}.deb
     - name: Upload ${{ inputs.component }} packages to GitHub
       # background: true
-      if: ${{ inputs.upload-as-artifact == 'true' && (inputs.archivePortable != 'NONE') }}
+      if: ${{ inputs.uploadAsArtifact == 'true' && (inputs.archivePortable != 'NONE') }}
       uses: actions/upload-artifact@v6
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
@@ -110,7 +110,7 @@ runs:
         get-childitem -Path '${{ inputs.component }}/build/libs/*-all.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
     - name: Upload ShadowJar to GitHub
       # background: true
-      if: ${{ (inputs.upload-as-artifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
+      if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
       uses: actions/upload-artifact@v6
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
@@ -124,7 +124,7 @@ runs:
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
 
     - name: jbundle ${{ inputs.component }}
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.should-jbundle == 'true') }}
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
       shell: bash
       run: |
         jbundle build --no-appcds --input . --gradle-project ${{ inputs.component }} --output ./build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}
@@ -140,20 +140,20 @@ runs:
       run: |
         mv build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}.exe
     - name: Test jbundle binary (smoke test)
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.should-jbundle == 'true') }}
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
       shell: bash
       run: |
         build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} --help
     - name: Upload jbundle artifact to GitHub
       # background: true
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.upload-as-artifact == 'true') && (inputs.should-jbundle == 'true') }}
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.uploadAsArtifact == 'true') && (inputs.shouldJbundle == 'true') }}
       uses: actions/upload-artifact@v6
       with:
         name: jbundle-${{ inputs.displayName }}
         path: build/jbundle/${{ inputs.componentShort }}*
     - name: Upload jbundle artifact to builds.jabref.org
       # background: true
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.diskSpaceAvailable == 'true') && (inputs.should-jbundle == 'true') }}
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.diskSpaceAvailable == 'true') && (inputs.shouldJbundle == 'true') }}
       shell: bash
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
