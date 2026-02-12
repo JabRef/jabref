@@ -26,26 +26,21 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
     public Button copyContentButton;
+    private final List<BibEntry> selectedEntries;
+    private final BibDatabase database;
+    private final StateManager stateManager;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     @FXML
     private Button moveContentButton;
-
     @FXML
     private Button swapContentButton;
-
     @FXML
     private ComboBox<Field> fromFieldComboBox;
     @FXML
     private ComboBox<Field> toFieldComboBox;
-
     @FXML
     private CheckBox overwriteFieldContentCheckBox;
-
     private CopyOrMoveFieldContentTabViewModel viewModel;
-    private final List<BibEntry> selectedEntries;
-    private final BibDatabase database;
-    private final StateManager stateManager;
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public CopyOrMoveFieldContentTabView(BibDatabase database, StateManager stateManager) {
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());

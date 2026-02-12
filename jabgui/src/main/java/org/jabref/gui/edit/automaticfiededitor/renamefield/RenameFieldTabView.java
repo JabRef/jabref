@@ -25,18 +25,17 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
+    private final List<BibEntry> selectedEntries;
+    private final BibDatabase database;
+    private final StateManager stateManager;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     @FXML
     private Button renameButton;
     @FXML
     private ComboBox<Field> fieldComboBox;
     @FXML
     private TextField newFieldNameTextField;
-    private final List<BibEntry> selectedEntries;
-    private final BibDatabase database;
-    private final StateManager stateManager;
     private RenameFieldViewModel viewModel;
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public RenameFieldTabView(BibDatabase database, StateManager stateManager) {
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());

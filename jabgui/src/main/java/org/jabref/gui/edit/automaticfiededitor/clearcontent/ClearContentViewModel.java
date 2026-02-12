@@ -29,9 +29,8 @@ public class ClearContentViewModel {
 
     public void clearField(Field field) {
         NamedCompoundEdit edits = new NamedCompoundEdit("CLEAR_SELECTED_FIELD");
-        List<BibEntry> selected = stateManager.getSelectedEntries();
         int affectedEntriesCount = 0;
-        for (BibEntry entry : selected) {
+        for (BibEntry entry : this.selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(field);
             if (oldFieldValue.isPresent()) {
                 entry.clearField(field)

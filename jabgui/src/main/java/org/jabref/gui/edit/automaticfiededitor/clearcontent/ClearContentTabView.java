@@ -24,11 +24,11 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class ClearContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
 
+    private final List<BibEntry> selectedEntries;
+    private final StateManager stateManager;
     @FXML private ComboBox<Field> fieldComboBox;
     @FXML private CheckBox showOnlySetFieldsCheckBox;
     @FXML private Button clearButton;
-    private final List<BibEntry> selectedEntries;
-    private final StateManager stateManager;
     private ClearContentViewModel viewModel;
 
     public ClearContentTabView(StateManager stateManager) {

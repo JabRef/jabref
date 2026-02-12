@@ -27,27 +27,19 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
     public Button setValueButton;
-
-    @FXML
-    private CheckBox showOnlySetFieldsCheckBox;
-
-    @FXML
-    private ComboBox<Field> fieldComboBox;
-
-    @FXML
-    private TextField fieldValueTextField;
-
-    @FXML
-    private CheckBox overwriteFieldContentCheckBox;
-
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
-
-    private EditFieldContentViewModel viewModel;
-
     private final StateManager stateManager;
-
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+    @FXML
+    private CheckBox showOnlySetFieldsCheckBox;
+    @FXML
+    private ComboBox<Field> fieldComboBox;
+    @FXML
+    private TextField fieldValueTextField;
+    @FXML
+    private CheckBox overwriteFieldContentCheckBox;
+    private EditFieldContentViewModel viewModel;
 
     public EditFieldContentTabView(BibDatabase database, StateManager stateManager) {
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
