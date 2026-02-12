@@ -106,12 +106,15 @@ permissions:
   pull-requests: write
 
 env:
-  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
-  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
-  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   GRADLE_OPTS: -Xmx4g -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
+
+  # API keys
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
@@ -600,6 +603,10 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
       - uses: ./.github/actions/package
         name: Package JabRef HTTP Server
         # background: true
@@ -621,6 +628,10 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
       - uses: ./.github/actions/package
         name: Package JabGUI
         id: jabgui
@@ -643,6 +654,10 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
       - uses: ./.github/actions/package
         name: Package JabKit
         # background: true
@@ -664,6 +679,10 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}

@@ -135,4 +135,5 @@ jobs:
             tagbuild="false"
           fi
           gradle -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
+        # no API keys included
       # endregion
