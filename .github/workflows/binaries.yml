@@ -406,21 +406,23 @@ jobs:
         # background: true
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
-      - name: Normalize branch name
-        id: normalize
-        shell: bash
-        run: |
-          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
-          branch="${branch%-merge}"   # removes suffix only if present
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
-      - name: Output URL
+
+      - name: Setup SSH key
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
-        shell: bash
-        id: url
         run: |
-          echo "Link: https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/"
-          echo "Link: <https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/>" >> $GITHUB_STEP_SUMMARY
-          echo "url=https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/" >> "$GITHUB_OUTPUT"
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Setup rsync (macOS)
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        run: brew install rsync
+      - name: Setup rsync (Windows)
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
+        # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
+        # We cannot use "setup-rsync", because that does not work on Windows
+        # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
+        # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
+        run: choco install rsync --version=6.4.4
 
       - name: Patch used JDK
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
@@ -469,12 +471,65 @@ jobs:
           which jlink
           jlink --version
 
+      - name: Normalize branch name
+        id: normalize
+        # wait: gitversion
+        shell: bash
+        run: |
+          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
+          branch="${branch%-merge}"   # removes suffix only if present
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - name: Output URL
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        id: url
+        run: |
+          echo "Link: https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/"
+          echo "Link: <https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/>" >> $GITHUB_STEP_SUMMARY
+          echo "url=https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/" >> "$GITHUB_OUTPUT"
+      - name: Create backlink to PR at builds.jabref.org
+        # background: true
+        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
+        run: |
+          echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/${{ matrix.displayName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/${{ matrix.displayName }}/
+
       # jablib is used by all components - thus, compile it first
       - name: jablib jar
         id: jablib-jar
         # wait: gitversion
         # background: true
         run: ./gradlew :jablib:jar
+        env:
+          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
+
+      # Save disk space
+      # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+      - run: sudo rm -rf /usr/local/lib/android/sdk
+        # background: true
+        if: startsWith(matrix.os, 'ubuntu')
+      - run: sudo rm -rf /usr/local/.ghcup
+        # background: true
+        if: startsWith(matrix.os, 'ubuntu')
+      - run: sudo rm -rf /usr/share/swift
+        # background: true
+        if: startsWith(matrix.os, 'ubuntu')
+
+      # Both JabRef Language Server and JabRef HTTP Server are required by the GUI
+      # They are independent from each other and could be build in parallel.
+      # - wait: jablib-jar # plus "normalize"
+      - name: jabls jar
+        # background: true
+        id: jabls-jar
+        run: ./gradlew :jabls:jar
+        env:
+          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
+      - name: jabsrv jar
+        # background: true
+        id: jabsrv-jar
+        run: ./gradlew :jabsrv:jar
         env:
           VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
@@ -494,23 +549,6 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
-
-      - name: Setup SSH key
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-      - name: Setup rsync (macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
-        run: brew install rsync
-      - name: Setup rsync (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
-        # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
-        # We cannot use "setup-rsync", because that does not work on Windows
-        # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
-        # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
-        run: choco install rsync --version=6.4.4
 
       - name: Install jbundle
         if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
@@ -532,33 +570,8 @@ jobs:
           cp buildres/linux/JabRef.png .   # Linux
           cp buildres/windows/JabRef.ico . # Windows
 
-      # Save disk space
-      # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
-      - run: sudo rm -rf /usr/local/lib/android/sdk
-        if: startsWith(matrix.os, 'ubuntu')
-      - run: sudo rm -rf /usr/local/.ghcup
-        if: startsWith(matrix.os, 'ubuntu')
-      - run: sudo rm -rf /usr/share/swift
-        if: startsWith(matrix.os, 'ubuntu')
-
-      # Both JabRef Language Server and JabRef HTTP Server are required by the GUI
-      # They are independent from each other and could be build in parallel.
-      # - wait: jablib-jar
-      # - parallel:
-      - name: jabls jar
-        id: jabls-jar
-        run: ./gradlew :jabls:jar
-        env:
-          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
-      - name: jabsrv jar
-        id: jabsrv-jar
-        run: ./gradlew :jabsrv:jar
-        env:
-          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
-
       # jars already exists - thus, these calls will build on the jar result (hopefully).
+      # - wait: [ jabls-jar, jabsrv-jar ]
 
       - uses: ./.github/actions/package
         name: Package JabRef Language Server
