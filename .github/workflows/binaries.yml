@@ -492,7 +492,7 @@ jobs:
         if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
         run: |
           echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/${{ matrix.displayName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/${{ matrix.displayName }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
 
       # jablib is used by all components - thus, compile it first
       - name: jablib jar
