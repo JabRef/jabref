@@ -399,11 +399,16 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+
       - name: Install GitVersion
+        id: pre-gitversion
+        # background: true
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
+        # wait: pre-gitversion
+        # background: true
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
 
@@ -418,7 +423,7 @@ jobs:
           sed "${SED_I[@]}" "s/AMAZON/${{ inputs.jvmVendor }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
 
-      # region setup JDK EA and JavaFX EA
+      # Setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         uses: oracle-actions/setup-java@v1
@@ -438,7 +443,6 @@ jobs:
           sed "${SED_I[@]}" "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed "${SED_I[@]}" "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed "${SED_I[@]}" "s|val javafx = .*|val javafx = \"${{ needs.conditions.outputs.javafxVersion }}\"|" versions/build.gradle.kts
-      # endregion
 
       - uses: ./.github/actions/setup-gradle
         with:
@@ -458,6 +462,7 @@ jobs:
       # jablib is used by all components - thus, compile it first
       - name: jablib jar
         id: jablib-jar
+        # wait: gitversion
         # background: true
         run: ./gradlew -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jablib:jar
 
