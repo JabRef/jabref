@@ -31,18 +31,14 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
+    private static final String PAPER_FIELDS = "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url";
+
     private static final Gson GSON = new Gson();
 
     private final ImporterPreferences importerPreferences;
 
     public SemanticScholarCitationFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
-    }
-
-    public String getAPIUrl(String entryPoint, BibEntry entry) {
-        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString() + "/" + entryPoint
-                + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
-                + "&limit=1000";
     }
 
     public String getUrlForCitationCount(BibEntry entry) {
@@ -53,39 +49,42 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getCitationsApiUri(entry);
+        if (apiUri.isEmpty()) {
             return List.of();
         }
 
         URL citationsUrl;
         try {
-            citationsUrl = URLUtil.create(getAPIUrl("citations", entry));
-            LOGGER.debug("Cited URL {} ", citationsUrl);
+            citationsUrl = apiUri.get().toURL();
+            LOGGER.debug("Citations URL: {}", citationsUrl);
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
-        URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
 
+        URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
-        CitationsResponse citationsResponse = GSON
-                .fromJson(urlDownload.asString(), CitationsResponse.class);
+        CitationsResponse citationsResponse = GSON.fromJson(urlDownload.asString(), CitationsResponse.class);
 
         return citationsResponse.getData()
-                                .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
-                                .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
+                                .stream()
+                                .filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
+                                .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry())
+                                .toList();
     }
 
     @Override
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getReferencesApiUri(entry);
+        if (apiUri.isEmpty()) {
             return List.of();
         }
 
         URL referencesUrl;
         try {
-            referencesUrl = URLUtil.create(getAPIUrl("references", entry));
-            LOGGER.debug("Citing URL {} ", referencesUrl);
+            referencesUrl = apiUri.get().toURL();
+            LOGGER.debug("References URL: {}", referencesUrl);
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
@@ -96,25 +95,24 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         ReferencesResponse referencesResponse = GSON.fromJson(response, ReferencesResponse.class);
 
         if (referencesResponse.getData() == null) {
-            // Get error message from citingPaperInfo.openAccessPdf.disclaimer
             JSONObject responseObject = new JSONObject(response);
             Optional.ofNullable(responseObject.optJSONObject("citingPaperInfo"))
                     .flatMap(citingPaperInfo -> Optional.ofNullable(citingPaperInfo.optJSONObject("openAccessPdf")))
                     .flatMap(openAccessPdf -> Optional.ofNullable(openAccessPdf.optString("disclaimer")))
                     .ifPresent(Unchecked.consumer(disclaimer -> {
-                                LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
-                                if (disclaimer.contains("references")) {
-                                    throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
-                                }
-                            }
-                    ));
+                        LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
+                        if (disclaimer.contains("references")) {
+                            throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
+                        }
+                    }));
             return List.of();
         }
 
         return referencesResponse.getData()
                                  .stream()
                                  .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
-                                 .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
+                                 .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry())
+                                 .toList();
     }
 
     @Override
@@ -159,7 +157,9 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
 
         try {
-            String apiUrl = getAPIUrl("references", entry);
+            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString() + "/references"
+                    + "?fields=" + PAPER_FIELDS
+                    + "&limit=1000";
             return Optional.of(new URI(apiUrl));
         } catch (URISyntaxException e) {
             LOGGER.debug("Could not create references API URI", e);
@@ -174,7 +174,9 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
 
         try {
-            String apiUrl = getAPIUrl("citations", entry);
+            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString() + "/citations"
+                    + "?fields=" + PAPER_FIELDS
+                    + "&limit=1000";
             return Optional.of(new URI(apiUrl));
         } catch (URISyntaxException e) {
             LOGGER.debug("Could not create citations API URI", e);
