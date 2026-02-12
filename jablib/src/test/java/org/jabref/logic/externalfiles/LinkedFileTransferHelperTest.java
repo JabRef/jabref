@@ -54,7 +54,8 @@ class LinkedFileTransferHelperTest {
 
         // expectedLink = fileTestConfiguration.targetContext.getDatabase().getEntries().getFirst().getFiles();
 
-        assertEquals(fileTestConfiguration.targetContext.getDatabase().getEntries().getFirst(), actualEntry);
+        BibEntry exptectedEntry = fileTestConfiguration.targetContext.getDatabase().getEntries().getFirst();
+        assertEquals(exptectedEntry, actualEntry);
     }
 
     static Stream<Arguments> check() {
