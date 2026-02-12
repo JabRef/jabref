@@ -340,12 +340,22 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
         try {
             LOGGER.trace("Getting references for entry: {}", entry.getKeyAuthorTitleYear(10));
-            return getWorkObject(entry, List.of("referenced_works"))
-                    .map(work -> work.optJSONArray("referenced_works"))
-                    .filter(Objects::nonNull)
-                    .stream()
-                    .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
-                    .toList();
+
+            Optional<URI> apiUri = getReferencesApiUri(entry);
+            if (apiUri.isEmpty()) {
+                return List.of();
+            }
+
+            try (ProgressInputStream stream = getUrlDownload(apiUri.get().toURL()).asInputStream()) {
+                JSONObject work = JsonReader.toJsonObject(stream);
+                JSONArray referencedWorks = work.optJSONArray("referenced_works");
+                if (referencedWorks == null) {
+                    return List.of();
+                }
+                return workUrlsToBibEntryStream(referencedWorks).toList();
+            } catch (IOException | ParseException e) {
+                throw new FetcherException("Could not fetch references from OpenAlex", e);
+            }
         } catch (RuntimeException e) {
             LOGGER.warn("Could not get references", e);
             if (e.getCause() instanceof FetcherException fetcherException) {
@@ -382,28 +392,18 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
              */
 
             // Instead, we perform a search for works that cite the given work's ID
-            return getWorkObject(entry, List.of("id"))
-                    .map(work -> work.optString("id"))
-                    .filter(Objects::nonNull)
-                    .map(Unchecked.function(id ->
-                            getUriBuilder("", List.of())
-                                    .addParameter("filter", "cites:" + id)
-                                    .build()
-                                    .toURL()
-                    ))
-                    .map(Unchecked.function(url -> {
-                        try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
-                            JSONObject response = JsonReader.toJsonObject(stream);
-                            return response.getJSONArray("results");
-                        } catch (RuntimeException e) {
-                            String redactedUrl = FetcherException.getRedactedUrl(url.toString());
-                            LOGGER.warn("Could not fetch work at URL: {}", redactedUrl, e);
-                            throw e;
-                        }
-                    }))
-                    .stream()
-                    .flatMap(worksArray -> workArrayToBibEntryStream(worksArray))
-                    .toList();
+            Optional<URI> apiUri = getCitationsApiUri(entry);
+            if (apiUri.isEmpty()) {
+                return List.of();
+            }
+
+            try (ProgressInputStream stream = getUrlDownload(apiUri.get().toURL()).asInputStream()) {
+                JSONObject response = JsonReader.toJsonObject(stream);
+                JSONArray results = response.getJSONArray("results");
+                return workArrayToBibEntryStream(results).toList();
+            } catch (IOException | ParseException e) {
+                throw new FetcherException("Could not fetch citations from OpenAlex", e);
+            }
         } catch (RuntimeException e) {
             LOGGER.warn("Could not get citations", e);
             if (e.getCause() instanceof FetcherException fetcherException) {
@@ -440,7 +440,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     @Override
     public Optional<URI> getReferencesApiUri(BibEntry entry) {
         try {
-            return getUrl(entry, List.of())
+            return getUrl(entry, List.of("referenced_works"))
                     .map(Unchecked.function(URL::toURI));
         } catch (MalformedURLException e) {
             LOGGER.debug("Could not create references API URI", e);
