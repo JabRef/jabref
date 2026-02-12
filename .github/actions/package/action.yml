@@ -38,11 +38,17 @@ runs:
   steps:
     - name: jpackage ${{ inputs.component }}
       shell: bash
-      run: ./gradlew -i -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:jpackage
+      run: ./gradlew -i :${{ inputs.component }}:jpackage
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        ./gradlew -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:run --args="--help"
+        ./gradlew :${{ inputs.component }}:run --args="--help"
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
     - name: Package ${{ inputs.component }} application image
       shell: bash
       if: ${{ inputs.archivePortable != 'NONE' }}
@@ -93,13 +99,21 @@ runs:
     - name: ShadowJar ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
       shell: bash
-      run: ./gradlew -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:shadowJar
+      run: ./gradlew :${{ inputs.component }}:shadowJar
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
 
     - name: jbundle ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.should-jbundle == 'true') }}
       shell: bash
       run: |
         jbundle build --no-appcds --input . --gradle-project ${{ inputs.component }} --output ./build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}
+      # Version information passed as environment variables, because jbundle does not support Gradle properties
+      # See https://github.com/avelino/jbundle/issues/59
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
     - name: jbundle JabGui filename fix (Windows)
       # if: ${{ inputs.os == 'windows-latest' }}
       if: false

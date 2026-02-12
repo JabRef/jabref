@@ -8,7 +8,10 @@ plugins {
 }
 
 group = "org.jabref.jabkit"
-version = project.findProperty("projVersion") ?: "100.0.0"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
 // See https://bugs.openjdk.org/browse/JDK-8342623
 val target = java.toolchain.languageVersion.get().asInt()
