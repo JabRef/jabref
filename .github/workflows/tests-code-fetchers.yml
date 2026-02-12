@@ -47,7 +47,8 @@ jobs:
   fetchertests:
     if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
     name: Fetcher tests
-    runs-on: ubuntu-slim
+    # On ubuntu-slim, it takes more than 15 minutes
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
