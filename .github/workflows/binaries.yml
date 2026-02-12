@@ -309,7 +309,7 @@ jobs:
         shell: bash
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          TARGET="/var/www/builds.jabref.org/www/pull/$PR_NUMBER"
+          TARGET="/var/www/builds.jabref.org/www/pull-$PR_NUMBER"
           SSH_OPTS="-p 9922 -i sshkey -o StrictHostKeyChecking=no"
           HOST="jrrsync@build-upload.jabref.org"
           if ssh $SSH_OPTS "$HOST" "test -d '$TARGET'"; then
