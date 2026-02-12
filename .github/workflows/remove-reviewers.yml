@@ -22,9 +22,8 @@ jobs:
           PR=${{ github.event.pull_request.number }}
 
           # check running CI
-          running=$(gh pr checks "$PR" --json state -q '.[] | select(.state=="IN_PROGRESS" or .state=="QUEUED") | length' | wc -l)
-          if [ "$running" -gt 0 ] || [ "$label" -gt 0 ]; then
-            echo "ci_running=true" >> $GITHUB_OUTPUT
+          running=$( gh pr checks "$PR" --json name,state -q '[.[] | select((.name=="Binaries" or .name=="Source Code Tests") and (.state=="IN_PROGRESS" or .state=="QUEUED"))] | length' )
+          if [ "$running" -gt 0 ] || [ "$label" -gt 0 ]; then echo "ci_running=true" >> $GITHUB_OUTPUT
           else
             echo "ci_running=false" >> $GITHUB_OUTPUT
           fi
