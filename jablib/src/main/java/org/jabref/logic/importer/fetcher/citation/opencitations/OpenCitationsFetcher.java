@@ -127,16 +127,15 @@ public class OpenCitationsFetcher implements CitationFetcher {
     /// API explained at <https://api.opencitations.net/index/v2#/reference-count/{id}>
     @Override
     public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
-        Optional<DOI> doi = entry.getDOI();
-        if (doi.isEmpty()) {
+        if (entry.getDOI().isEmpty()) {
             return Optional.empty();
         }
 
-        String apiUrl = API_BASE_URL + "/citation-count/doi:" + doi.get().asString();
+        String apiUrl = API_BASE_URL + "/citation-count/doi:" + entry.getDOI().get().asString();
         LOGGER.debug("Citation count URL: {}", apiUrl);
 
         try {
-            URL url = URI.create(apiUrl).toURL();
+            URL url = new URI(apiUrl).toURL();  // Changed from URI.create()
             URLDownload urlDownload = new URLDownload(importerPreferences, url);
             importerPreferences.getApiKey(getName())
                                .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
@@ -150,7 +149,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
 
             int count = countResponse.countAsInt();
             return count > 0 ? Optional.of(count) : Optional.empty();
-        } catch (MalformedURLException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         } catch (JsonSyntaxException e) {
             throw new FetcherException("Could not parse JSON response from OpenCitations", e);
