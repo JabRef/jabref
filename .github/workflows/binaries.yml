@@ -710,7 +710,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-            The build of this PR is available at <${{ needs.build.outputs.url }}>/merge>.
+            The build of this PR is available at <${{ needs.build.outputs.url }}>.
           comment-tag: download-link
           mode: recreate
       - name: Create GitHub Summary
