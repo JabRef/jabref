@@ -13,7 +13,6 @@ import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
@@ -41,10 +40,20 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         this.importerPreferences = importerPreferences;
     }
 
-    public String getUrlForCitationCount(BibEntry entry) {
-        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
-                + "?fields=" + "citationCount"
-                + "&limit=1";
+    public Optional<URI> getCitationCountApiUri(BibEntry entry) {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString()
+                    + "?fields=citationCount"
+                    + "&limit=1";
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create citation count API URI", e);
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -117,15 +126,18 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
     @Override
     public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getCitationCountApiUri(entry);
+        if (apiUri.isEmpty()) {
             return Optional.empty();
         }
+
         URL referencesUrl;
         try {
-            referencesUrl = URLUtil.create(getUrlForCitationCount(entry));
+            referencesUrl = apiUri.get().toURL();
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
+
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         String result;
