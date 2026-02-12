@@ -24,10 +24,11 @@ import static org.mockito.Mockito.mock;
 class LinkedFileTransferHelperTest {
     private @TempDir Path tempDir;
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
     // @CsvSource could also be used, but there is no strong typing
     @MethodSource
-    void check(FileTestConfigurationBuilder fileTestConfigurationBuilder,
+    void check(String testName,
+               FileTestConfigurationBuilder fileTestConfigurationBuilder,
                BibTestConfigurationBuilder sourceBibTestConfigurationBuilder,
                BibTestConfigurationBuilder targetBibTestConfigurationBuilder) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
@@ -56,12 +57,12 @@ class LinkedFileTransferHelperTest {
         assertEquals(fileTestConfiguration.targetContext.getDatabase().getEntries().getFirst(), actualEntry);
     }
 
-    static Stream<Arguments> check() throws IOException {
+    static Stream<Arguments> check() {
         return Stream.of(
                 // region shouldStoreFilesRelativeToBibFile
 
-                // file next to .bib file should be copied
                 Arguments.of(
+                        "file next to .bib file should be copied",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .shouldStoreFilesRelativeToBibFile(true)
@@ -78,8 +79,8 @@ class LinkedFileTransferHelperTest {
                                 .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB)
                 ),
 
-                // Directory not reachable with different paths - file copying with directory structure
                 Arguments.of(
+                        "Directory not reachable with different paths - file copying with directory structure",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .shouldStoreFilesRelativeToBibFile(true)
@@ -96,8 +97,8 @@ class LinkedFileTransferHelperTest {
                                 .fileLinkMode(TestFileLinkMode.RELATIVE_TO_BIB)
                 ),
 
-                // targetDirIsParentOfSourceDir
                 Arguments.of(
+                        "targetDirIsParentOfSourceDir",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .shouldStoreFilesRelativeToBibFile(true)
@@ -117,8 +118,8 @@ class LinkedFileTransferHelperTest {
 
                 // region not shouldStoreFilesRelativeToBibFile
 
-                // File in main file directory linked as is
                 Arguments.of(
+                        "File in main file directory linked as is",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .mainFileDir("main-file-dir")
@@ -136,8 +137,8 @@ class LinkedFileTransferHelperTest {
                                 .fileLinkMode(TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR)
                 ),
 
-                // same library-specific directory
                 Arguments.of(
+                        "same library-specific directory",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .mainFileDir("main-file-dir")
@@ -157,8 +158,8 @@ class LinkedFileTransferHelperTest {
                                 .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR)
                 ),
 
-                // same user-specific file-directory
                 Arguments.of(
+                        "same user-specific file-directory",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .mainFileDir("main-file-dir")
@@ -180,8 +181,8 @@ class LinkedFileTransferHelperTest {
                                 .fileLinkMode(TestFileLinkMode.RELATIVE_TO_USER_SPECIFIC_DIR)
                 ),
 
-                // copied from (now unreachable) library-specific dir to other library-specific dir
                 Arguments.of(
+                        "copied from (now unreachable) library-specific dir to other library-specific dir",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .mainFileDir("main-file-dir")
@@ -202,8 +203,8 @@ class LinkedFileTransferHelperTest {
                                 .fileLinkMode(TestFileLinkMode.RELATIVE_TO_LIBRARY_SPECIFIC_DIR)
                 ),
 
-                // copied from (unreachable) user-specific dir to other library-specific dir (no user-specific existing there)
                 Arguments.of(
+                        "copied from (unreachable) user-specific dir to other library-specific dir (no user-specific existing there)",
                         FileTestConfigurationBuilder
                                 .fileTestConfiguration()
                                 .mainFileDir("main-file-dir")
