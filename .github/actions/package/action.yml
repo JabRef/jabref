@@ -6,8 +6,6 @@ inputs:
     required: true
   componentShort:
     required: true
-  useEaJdk:
-    required: true
   branchName:
     required: true
   AssemblySemVer:
@@ -40,11 +38,11 @@ runs:
   steps:
     - name: jpackage ${{ inputs.component }}
       shell: bash
-      run: ./gradlew -i -PeaJdkBuild="${{ inputs.useEaJdk }}" -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:jpackage
+      run: ./gradlew -i -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:jpackage
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        ./gradlew -PeaJdkBuild="${{ inputs.useEaJdk }}" -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:run --args="--help"
+        ./gradlew -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:run --args="--help"
     - name: Package ${{ inputs.component }} application image
       shell: bash
       if: ${{ inputs.archivePortable != 'NONE' }}
@@ -95,7 +93,7 @@ runs:
     - name: ShadowJar ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
       shell: bash
-      run: ./gradlew -PeaJdkBuild="${{ inputs.useEaJdk }}" -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:shadowJar
+      run: ./gradlew -PprojVersion="${{ inputs.AssemblySemVer }}" -PprojVersionInfo="${{ inputs.InformationalVersion }}" :${{ inputs.component }}:shadowJar
 
     - name: jbundle ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.should-jbundle == 'true') }}
@@ -139,7 +137,7 @@ runs:
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
       shell: pwsh
       run: |
-        get-childitem -Path '${{ inputs.component }}/build/libs/*-all*.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
+        get-childitem -Path '${{ inputs.component }}/build/libs/*-all.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
     - name: Upload ShadowJar to GitHub
       # background: true
       if: ${{ (inputs.upload-as-artifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
