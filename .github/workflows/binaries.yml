@@ -550,6 +550,13 @@ jobs:
 
       # jars already exists - thus, these calls will build on the jar result (hopefully).
 
+      - name: Normalize branch name
+        id: normalize
+        run: |
+          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
+          branch="${branch%-merge}"   # removes suffix only if present
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
       - uses: ./.github/actions/package
         name: Package JabRef Language Server
         id: jabls-cli
@@ -558,7 +565,7 @@ jobs:
           component: jabls-cli
           componentShort: jabls
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
-          branchName: ${{ steps.gitversion.outputs.EscapedBranchName }}
+          branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}
@@ -578,7 +585,7 @@ jobs:
           component: jabsrv-cli
           componentShort: jabsrv
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
-          branchName: ${{ steps.gitversion.outputs.EscapedBranchName }}
+          branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}
@@ -599,7 +606,7 @@ jobs:
           component: jabgui
           componentShort: jabgui
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
-          branchName: ${{ steps.gitversion.outputs.EscapedBranchName }}
+          branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}
@@ -619,7 +626,7 @@ jobs:
           component: jabkit
           componentShort: jabkit
           useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
-          branchName: ${{ steps.gitversion.outputs.EscapedBranchName }}
+          branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
           Minor: ${{ steps.gitversion.outputs.Minor }}
