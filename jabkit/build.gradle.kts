@@ -10,6 +10,18 @@ plugins {
 group = "org.jabref.jabkit"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
+// See https://bugs.openjdk.org/browse/JDK-8342623
+val target = java.toolchain.languageVersion.get().asInt()
+if (target >= 26) {
+    dependencies {
+        implementation("org.openjfx:jdk-jsobject")
+    }
+} else {
+    configurations.all {
+        exclude(group = "org.openjfx", module = "jdk-jsobject")
+    }
+}
+
 dependencies {
     implementation(project(":jablib"))
 

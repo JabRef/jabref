@@ -85,7 +85,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
 
     @Override
     public String getTabName() {
-        return Localization.lang("Copy or Move content");
+        return Localization.lang("Copy or move content");
     }
 
     @FXML
