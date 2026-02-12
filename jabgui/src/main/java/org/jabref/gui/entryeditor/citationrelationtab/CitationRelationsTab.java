@@ -645,6 +645,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         try {
                             NativeDesktop.openBrowser(apiUri, preferences.getExternalApplicationsPreferences());
                         } catch (IOException e) {
+                            LOGGER.warn("Could not open API URL in browser: {}", apiUri, e);
                             dialogService.notify(Localization.lang("Unable to open link."));
                         }
                     },
