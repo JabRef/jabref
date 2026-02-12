@@ -78,14 +78,15 @@ public class CrossRefCitationFetcher implements CitationFetcher {
         if (doi.isEmpty()) {
             findDoiForEntry(clonedEntry);
         }
-        if (doi.isEmpty()) {
+
+        Optional<URI> uri = getReferencesApiUri(clonedEntry);
+        if (uri.isEmpty()) {
             return List.of();
         }
 
         final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(importerPreferences.getDefaultPlainCitationParser(), citationKeyPatternPreferences, grobidPreferences, importFormatPreferences, aiService);
 
-        String url = API_URL + doi.get().asString();
-        try (InputStream stream = new URLDownload(url).asInputStream()) {
+        try (InputStream stream = new URLDownload(uri.get().toString()).asInputStream()) {
             JsonNode node = mapper.readTree(stream);
             LOGGER.atDebug()
                   .addKeyValue("payload", node)
