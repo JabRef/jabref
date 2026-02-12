@@ -336,12 +336,6 @@ jobs:
             echo "⛔ not enough disk space – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Output URL
-        if: steps.diskspace.outputs.available == 'true'
-        shell: bash
-        run: |
-          echo "Link: https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
-          echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>" >> $GITHUB_STEP_SUMMARY
 
   build:
     needs: [ conditions, disk-space-check ]
@@ -411,6 +405,19 @@ jobs:
         # background: true
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
+      - name: Normalize branch name
+        id: normalize
+        shell: bash
+        run: |
+          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
+          branch="${branch%-merge}"   # removes suffix only if present
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - name: Output URL
+        if: ${{ needs.disk-space-check.outputs.available }}
+        shell: bash
+        run: |
+          echo "Link: https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
+          echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>" >> $GITHUB_STEP_SUMMARY
 
       - name: Patch used JDK
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
@@ -549,14 +556,6 @@ jobs:
           VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
 
       # jars already exists - thus, these calls will build on the jar result (hopefully).
-
-      - name: Normalize branch name
-        id: normalize
-        shell: bash
-        run: |
-          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
-          branch="${branch%-merge}"   # removes suffix only if present
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       - uses: ./.github/actions/package
         name: Package JabRef Language Server
