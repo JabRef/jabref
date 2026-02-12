@@ -32,20 +32,22 @@ inputs:
     required: true
   suffix:
     required: true
+  gradleCommand:
+    required: true
 
 runs:
   using: composite
   steps:
     - name: jpackage ${{ inputs.component }}
       shell: bash
-      run: gradle -i :${{ inputs.component }}:jpackage
+      run: ${{ inputs.gradleCommand }} -i :${{ inputs.component }}:jpackage
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        gradle :${{ inputs.component }}:run --args="--help"
+        ${{ inputs.gradleCommand }} :${{ inputs.component }}:run --args="--help"
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
@@ -99,7 +101,7 @@ runs:
     - name: ShadowJar ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
       shell: bash
-      run: gradle :${{ inputs.component }}:shadowJar
+      run: ${{ inputs.gradleCommand }} :${{ inputs.component }}:shadowJar
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
@@ -128,7 +130,7 @@ runs:
       shell: bash
       run: |
         jbundle build --no-appcds --input . --gradle-project ${{ inputs.component }} --output ./build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}
-      # Version information passed as environment variables, because jbundle does not support Gradle properties
+      # Version information passed as environment variables, because jbundle does not support gradle properties
       # See https://github.com/avelino/jbundle/issues/59
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
