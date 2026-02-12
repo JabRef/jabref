@@ -38,14 +38,14 @@ runs:
   steps:
     - name: jpackage ${{ inputs.component }}
       shell: bash
-      run: gradle -i :${{ inputs.component }}:jpackage
+      run: ./gradlew -i :${{ inputs.component }}:jpackage
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        gradle :${{ inputs.component }}:run --args="--help"
+        ./gradlew :${{ inputs.component }}:run --args="--help"
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
@@ -99,7 +99,7 @@ runs:
     - name: ShadowJar ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
       shell: bash
-      run: gradle :${{ inputs.component }}:shadowJar
+      run: ./gradlew :${{ inputs.component }}:shadowJar
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
