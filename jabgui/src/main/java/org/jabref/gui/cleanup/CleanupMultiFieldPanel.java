@@ -3,9 +3,9 @@ package org.jabref.gui.cleanup;
 import java.util.EnumSet;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
 
@@ -13,13 +13,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
 public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
-    @FXML private CheckBox cleanupDoi;
-    @FXML private CheckBox cleanupEprint;
-    @FXML private CheckBox cleanupUrl;
-    @FXML private CheckBox cleanupBibLaTeX;
-    @FXML private CheckBox cleanupBibTeX;
-    @FXML private CheckBox cleanupTimestampToCreationDate;
-    @FXML private CheckBox cleanupTimestampToModificationDate;
+    @FXML private MultiFieldsCleanupPanel multiFieldsCleanupPanel;
 
     private final CleanupMultiFieldViewModel viewModel;
     private final CleanupDialogViewModel dialogViewModel;
@@ -38,18 +32,14 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     }
 
     private void bindProperties() {
-        cleanupDoi.selectedProperty().bindBidirectional(viewModel.doiSelected);
-        cleanupEprint.selectedProperty().bindBidirectional(viewModel.eprintSelected);
-        cleanupUrl.selectedProperty().bindBidirectional(viewModel.urlSelected);
-        cleanupBibTeX.selectedProperty().bindBidirectional(viewModel.bibTexSelected);
-        cleanupBibLaTeX.selectedProperty().bindBidirectional(viewModel.bibLaTexSelected);
-        cleanupTimestampToCreationDate.selectedProperty().bindBidirectional(viewModel.timestampToCreationSelected);
-        cleanupTimestampToModificationDate.selectedProperty().bindBidirectional(viewModel.timestampToModificationSelected);
+        multiFieldsCleanupPanel.selectedJobsProperty().bindBidirectional(viewModel.activeJobs);
     }
 
     @Override
     public CleanupTabSelection getSelectedTab() {
-        EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
-        return CleanupTabSelection.ofJobs(CleanupMultiFieldViewModel.MULTI_FIELD_JOBS, selectedJobs);
+        EnumSet<CleanupPreferences.CleanupStep> activeSteps = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
+        activeSteps.addAll(viewModel.activeJobs.get());
+
+        return CleanupTabSelection.ofJobs(viewModel.allJobs, activeSteps);
     }
 }
