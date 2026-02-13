@@ -270,9 +270,9 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
             return;
         }
 
-        String entryTypeName = viewModel.entryTypeToAddProperty().get().trim();
+        String entryTypeName = viewModel.entryTypeToAddProperty().getValue();
         for (EntryTypeViewModel existingEntryType : entryTypesTable.getItems()) {
-            if (existingEntryType.entryType().get().getType().getName().equalsIgnoreCase(entryTypeName)) {
+            if (existingEntryType.entryType().getValue().getType().getName().equalsIgnoreCase(entryTypeName)) {
                 this.entryTypesTable.getSelectionModel().select(existingEntryType);
                 this.entryTypesTable.scrollTo(existingEntryType);
                 return;
