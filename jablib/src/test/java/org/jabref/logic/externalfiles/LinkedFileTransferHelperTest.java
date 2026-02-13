@@ -1,6 +1,7 @@
 package org.jabref.logic.externalfiles;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
@@ -137,7 +138,6 @@ class LinkedFileTransferHelperTest {
                                 .pdfFileDir("main-file-dir/sub-dir")
                                 .fileLinkMode(TestFileLinkMode.RELATIVE_TO_MAIN_FILE_DIR)
                 ),
-
 
                 Arguments.of(
                         "same library-specific directory",

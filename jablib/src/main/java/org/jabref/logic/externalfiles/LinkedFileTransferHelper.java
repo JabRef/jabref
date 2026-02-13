@@ -163,6 +163,7 @@ public class LinkedFileTransferHelper {
                     .filter(Files::exists)
                     .flatMap(Unchecked.function(Files::walk))
                     .filter(p -> p.endsWith(path))
+                    .sorted()
                     .findFirst();
         } catch (UncheckedIOException ex) {
             LOGGER.warn("Could not search for file {} in {}", path, directories, ex);
