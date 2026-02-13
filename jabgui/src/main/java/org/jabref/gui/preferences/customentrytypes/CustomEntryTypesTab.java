@@ -89,7 +89,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         addNewField.disableProperty().bind(viewModel.selectedEntryTypeProperty().isNull());
 
-        addNewEntryType.setOnAction(event -> viewModel.addNewCustomEntryType());
+        addNewEntryType.setOnAction(event -> addEntryType());
         addNewField.setOnAction(event -> viewModel.addNewField());
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
