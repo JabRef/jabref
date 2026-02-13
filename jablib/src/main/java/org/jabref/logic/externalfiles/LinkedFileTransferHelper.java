@@ -100,9 +100,16 @@ public class LinkedFileTransferHelper {
 
             // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
             List<Path> directories = targetContext.getFileDirectories(filePreferences);
-            Optional<Path> otherPlaceFile = findInSubDirs(linkedFileAsPath.getFileName(), directories);
+            // first check on the path directly and if not found then try based on filename
+            Optional<Path> otherPlaceFile = findInSubDirs(linkedFileAsPath, directories);
+            // If the path contains directory components, try searching for just the filename as a fallback.
+            // This handles cases where the file was moved to a different subdirectory structure in the target.
+            if (otherPlaceFile.isEmpty() && (linkedFileAsPath.getNameCount() > 1)) {
+                otherPlaceFile = findInSubDirs(linkedFileAsPath.getFileName(), directories);
+            }
+
             if (otherPlaceFile.isPresent()) {
-                LOGGER.debug("Found in other place", otherPlaceFile);
+                LOGGER.debug("Found in other place {}", otherPlaceFile);
                 String newLink = FileUtil.relativize(otherPlaceFile.get(), directories).toString();
                 LOGGER.debug("Setting new link {}", newLink);
                 linkedFile.setLink(newLink);
@@ -152,15 +159,17 @@ public class LinkedFileTransferHelper {
         }
     }
 
-    private static Optional<Path> findInSubDirs(Path fileName, List<Path> directories) {
+    private static Optional<Path> findInSubDirs(Path path, List<Path> directories) {
         try {
             return directories
                     .stream()
-                    .flatMap(Unchecked.function(dir -> Files.walk(dir)))
-                    .filter(path -> path.getFileName().equals(fileName))
+                    .filter(Files::exists)
+                    .flatMap(Unchecked.function(Files::walk))
+                    .filter(p -> p.endsWith(path))
+                    .sorted()
                     .findFirst();
         } catch (UncheckedIOException ex) {
-            LOGGER.warn("Could not search for file {} in {}", fileName, directories, ex);
+            LOGGER.warn("Could not search for file {} in {}", path, directories, ex);
             return Optional.empty();
         }
     }
