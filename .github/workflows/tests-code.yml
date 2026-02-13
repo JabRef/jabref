@@ -116,8 +116,6 @@ jobs:
   modernizer:
     name: Modernizer
     runs-on: ubuntu-slim
-    # Version 1.11.0 does not run on JDK25: "java.lang.reflect.InvocationTargetException"
-    if: false
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
