@@ -266,6 +266,19 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addEntryType() {
+        if (!viewModel.entryTypeValidationStatus().isValid()) {
+            return;
+        }
+
+        String entryTypeName = viewModel.entryTypeToAddProperty().get().trim();
+        for (EntryTypeViewModel existingEntryType : entryTypesTable.getItems()) {
+            if (existingEntryType.entryType().get().getType().getName().equalsIgnoreCase(entryTypeName)) {
+                this.entryTypesTable.getSelectionModel().select(existingEntryType);
+                this.entryTypesTable.scrollTo(existingEntryType);
+                return;
+            }
+        }
+
         EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
         this.entryTypesTable.getSelectionModel().select(newlyAdded);
         this.entryTypesTable.scrollTo(newlyAdded);
