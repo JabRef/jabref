@@ -44,6 +44,21 @@ public class OpenCitationsFetcher implements CitationFetcher {
         return FETCHER_NAME;
     }
 
+    private Optional<URI> getApiUrl(String endpoint, BibEntry entry) {
+        Optional<DOI> doi = entry.getDOI();
+        if (doi.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = API_BASE_URL + "/" + endpoint + "/doi:" + doi.get().asString();
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create API URI for endpoint: {}", endpoint, e);
+            return Optional.empty();
+        }
+    }
+
     @Override
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
         Optional<URI> apiUri = getReferencesApiUri(entry);
@@ -127,15 +142,15 @@ public class OpenCitationsFetcher implements CitationFetcher {
     /// API explained at <https://api.opencitations.net/index/v2#/reference-count/{id}>
     @Override
     public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getApiUrl("citation-count", entry);
+        if (apiUri.isEmpty()) {
             return Optional.empty();
         }
 
-        String apiUrl = API_BASE_URL + "/citation-count/doi:" + entry.getDOI().get().asString();
-        LOGGER.debug("Citation count URL: {}", apiUrl);
+        LOGGER.debug("Citation count URL: {}", apiUri.get());
 
         try {
-            URL url = new URI(apiUrl).toURL();
+            URL url = apiUri.get().toURL();
             URLDownload urlDownload = new URLDownload(importerPreferences, url);
             importerPreferences.getApiKey(getName())
                                .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
@@ -149,7 +164,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
 
             int count = countResponse.countAsInt();
             return count > 0 ? Optional.of(count) : Optional.empty();
-        } catch (URISyntaxException | MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         } catch (JsonSyntaxException e) {
             throw new FetcherException("Could not parse JSON response from OpenCitations", e);
@@ -158,33 +173,11 @@ public class OpenCitationsFetcher implements CitationFetcher {
 
     @Override
     public Optional<URI> getReferencesApiUri(BibEntry entry) {
-        Optional<DOI> doi = entry.getDOI();
-        if (doi.isEmpty()) {
-            return Optional.empty();
-        }
-
-        try {
-            String apiUrl = API_BASE_URL + "/references/doi:" + doi.get().asString();
-            return Optional.of(new URI(apiUrl));
-        } catch (URISyntaxException e) {
-            LOGGER.debug("Could not create references API URI", e);
-            return Optional.empty();
-        }
+        return getApiUrl("references", entry);
     }
 
     @Override
     public Optional<URI> getCitationsApiUri(BibEntry entry) {
-        Optional<DOI> doi = entry.getDOI();
-        if (doi.isEmpty()) {
-            return Optional.empty();
-        }
-
-        try {
-            String apiUrl = API_BASE_URL + "/citations/doi:" + doi.get().asString();
-            return Optional.of(new URI(apiUrl));
-        } catch (URISyntaxException e) {
-            LOGGER.debug("Could not create citations API URI", e);
-            return Optional.empty();
-        }
+        return getApiUrl("citations", entry);
     }
 }
