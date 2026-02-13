@@ -376,10 +376,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
         HBox.setHgrow(citedByLabel, javafx.scene.layout.Priority.ALWAYS);
 
-        // Add context menus to labels for opening API URLs
-        citingLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITES));
-        citedByLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITED_BY));
-
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
         CheckListView<CitationRelationItem> citedByListView = new CheckListView<>();
@@ -407,6 +403,10 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .install(fetcherCombo);
         styleTopBarNode(fetcherCombo, 75.0);
         fetcherCombo.valueProperty().bindBidirectional(entryEditorPreferences.citationFetcherTypeProperty());
+
+        // Add context menus to labels for opening API URLs
+        citingLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITES));
+        citedByLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITED_BY));
 
         // Create abort buttons for both sides
         Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
@@ -638,22 +638,37 @@ public class CitationRelationsTab extends EntryEditorTab {
         ContextMenu contextMenu = new ContextMenu();
 
         MenuItem openApiUrl = new MenuItem(Localization.lang("Open API URL in browser"));
+
+        /// Create a binding that checks if URI is available
+        BooleanBinding uriAvailable = Bindings.createBooleanBinding(
+                () -> {
+                    Optional<URI> uri = searchType == CitationFetcher.SearchType.CITES
+                                        ? searchCitationsRelationsService.getReferencesApiUri(entry)
+                                        : searchCitationsRelationsService.getCitationsApiUri(entry);
+                    return uri.isPresent();
+                },
+                fetcherCombo.valueProperty() /// revaluate when fetcher changes
+        );
+
+        /// Disable the menu item when URI is not available
+        openApiUrl.disableProperty().bind(uriAvailable.not());
+
+        /// Set action to open browser (only executes when enabled)
         openApiUrl.setOnAction(_ -> {
             Optional<URI> uri = searchType == CitationFetcher.SearchType.CITES
                                 ? searchCitationsRelationsService.getReferencesApiUri(entry)
                                 : searchCitationsRelationsService.getCitationsApiUri(entry);
 
-            uri.ifPresentOrElse(
-                    apiUri -> {
-                        try {
-                            NativeDesktop.openBrowser(apiUri, preferences.getExternalApplicationsPreferences());
-                        } catch (IOException e) {
-                            LOGGER.warn("Could not open API URL in browser: {}", apiUri, e);
-                            dialogService.notify(Localization.lang("Unable to open link."));
-                        }
-                    },
-                    () -> dialogService.notify(Localization.lang("No API URL available."))
-            );
+            /// URI should always be present because menu item is disabled otherwise
+            /// check for safety
+            uri.ifPresent(apiUri -> {
+                try {
+                    NativeDesktop.openBrowser(apiUri, preferences.getExternalApplicationsPreferences());
+                } catch (IOException e) {
+                    LOGGER.warn("Could not open API URL in browser: {}", apiUri, e);
+                    dialogService.notify(Localization.lang("Unable to open link."));
+                }
+            });
         });
 
         contextMenu.getItems().add(openApiUrl);
