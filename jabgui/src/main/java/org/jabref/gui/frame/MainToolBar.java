@@ -42,6 +42,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -63,7 +64,6 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand backCommand;
     private SimpleCommand forwardCommand;
     private final CountingUndoManager undoManager;
-    private final InfoCenterPane infoCenterPane;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private PopOver entryFromIdPopOver;
@@ -82,7 +82,6 @@ public class MainToolBar extends ToolBar {
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        CountingUndoManager undoManager,
-                       InfoCenterPane infoCenterPane,
                        JournalAbbreviationRepository journalAbbreviationRepository) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -96,7 +95,6 @@ public class MainToolBar extends ToolBar {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
-        this.infoCenterPane = infoCenterPane;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         createToolBar();
@@ -160,7 +158,7 @@ public class MainToolBar extends ToolBar {
                         factory.createIconButton(StandardActions.HELP, new SimpleCommand() {
                             @Override
                             public void execute() {
-                                infoCenterPane.setShowInfoCenter(true);
+                                Injector.instantiateModelOrService(InfoCenterPane.class).setShowInfoCenter(true);
                             }
                         })
                 ),

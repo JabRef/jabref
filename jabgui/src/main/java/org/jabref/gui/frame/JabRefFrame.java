@@ -66,7 +66,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
@@ -234,7 +233,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 clipBoardManager,
                 undoManager,
-                Injector.instantiateModelOrService(InfoCenterPane.class),
                 journalAbbreviationRepository);
 
         MainMenu mainMenu = new MainMenu(
