@@ -1,0 +1,191 @@
+name: Package JabRef Component
+description: Package JabRef Component
+
+inputs:
+  component:
+    required: true
+  componentShort:
+    required: true
+  branchName:
+    required: true
+  AssemblySemVer:
+    required: true
+  Major:
+    required: true
+  Minor:
+    required: true
+  InformationalVersion:
+    required: true
+  diskSpaceAvailable:
+    required: true
+  os:
+    required: true
+  displayName:
+    required: true
+  archivePortable:
+    required: true
+  shouldJbundle:
+    required: true
+  uploadAsArtifact:
+    required: true
+  archForDebianRepack:
+    required: true
+  suffix:
+    required: true
+  gradleCommand:
+    required: true
+
+  # API keys
+  astrophysicsDataSystemApiKey:
+    required: true
+  biodiversityHeritageApiKey:
+    required: true
+  ieeeApiKey:
+    required: true
+  springerNatureApiKey:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: jpackage ${{ inputs.component }}
+      shell: bash
+      run: ${{ inputs.gradleCommand }} -i :${{ inputs.component }}:jpackage
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
+        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
+        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
+        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
+        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    - name: Smoke test ${{ inputs.component }}
+      shell: bash
+      run: |
+        ${{ inputs.gradleCommand }} :${{ inputs.component }}:run --args="--help"
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
+        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
+        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
+        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
+        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    - name: Package ${{ inputs.component }} application image
+      shell: bash
+      if: ${{ inputs.archivePortable != 'NONE' }}
+      run: |
+        set -e
+        ${{ inputs.archivePortable }}
+    - name: Rename files
+      shell: pwsh
+      if: ${{ inputs.archivePortable != 'NONE' }}
+      run: |
+        get-childitem -Path '${{ inputs.component }}/build/packages/*/*' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
+    - name: Repack deb file for Debian
+      if: ${{ (startsWith(inputs.os, 'ubuntu')) && (inputs.component == 'jabgui') }}
+      shell: bash
+      run: |
+        cd ${{ inputs.component }}/build/packages/${{ inputs.os }}
+        ls -l
+        ar x jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}.deb
+        rm jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}.deb
+        zstd -d < control.tar.zst | xz > control.tar.xz
+        zstd -d < data.tar.zst | xz > data.tar.xz
+        ar -m -c -a sdsd jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb debian-binary control.tar.xz data.tar.xz
+        rm debian-binary control.tar.* data.tar.*
+        mv -f jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}.deb
+    - name: Upload ${{ inputs.component }} packages to GitHub
+      # background: true
+      if: ${{ inputs.uploadAsArtifact == 'true' && (inputs.archivePortable != 'NONE') }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
+        path: |
+          ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.*
+    - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
+      # background: true
+      if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) && (inputs.archivePortable != 'NONE') }}
+      shell: bash
+      run: |
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
+    - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
+      # background: true
+      # jabsrv-cli doesn't have any installer and no archivePortable; thus we do not upload
+      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') && (inputs.archivePortable != 'NONE') }}
+      shell: cmd
+      # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
+      run: |
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.* jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
+
+    - name: ShadowJar ${{ inputs.component }}
+      if: ${{ (inputs.os == 'ubuntu-22.04') }}
+      shell: bash
+      run: ${{ inputs.gradleCommand }} :${{ inputs.component }}:shadowJar
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
+        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
+        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
+        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
+        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    - name: Rename ShadowJar
+      if: ${{ (inputs.os == 'ubuntu-22.04') }}
+      shell: pwsh
+      run: |
+        get-childitem -Path '${{ inputs.component }}/build/libs/*-all.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
+    - name: Upload ShadowJar to GitHub
+      # background: true
+      if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
+        path: |
+          ${{ inputs.component }}/build/libs/*-all.jar
+    - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
+      # background: true
+      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
+      shell: bash
+      run: |
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
+
+    - name: jbundle ${{ inputs.component }}
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
+      shell: bash
+      run: |
+        jbundle build --no-appcds --input . --gradle-project ${{ inputs.component }} --output ./build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}
+      # Version information passed as environment variables, because jbundle does not support gradle properties
+      # See https://github.com/avelino/jbundle/issues/59
+      env:
+        VERSION: ${{ inputs.AssemblySemVer }}
+        VERSION_INFO: ${{ inputs.InformationalVersion }}
+        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
+        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
+        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
+        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    - name: jbundle JabGui filename fix (Windows)
+      # if: ${{ inputs.os == 'windows-latest' }}
+      if: false
+      shell: bash
+      run: |
+        mv build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}.exe
+    - name: Test jbundle binary (smoke test)
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
+      shell: bash
+      run: |
+        build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} --help
+    - name: Upload jbundle artifact to GitHub
+      # background: true
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.uploadAsArtifact == 'true') && (inputs.shouldJbundle == 'true') }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: jbundle-${{ inputs.displayName }}
+        path: build/jbundle/${{ inputs.componentShort }}*
+    - name: Upload jbundle artifact to builds.jabref.org
+      # background: true
+      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.diskSpaceAvailable == 'true') && (inputs.shouldJbundle == 'true') }}
+      shell: bash
+      run: |
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
+          --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/jbundle && rsync" \
+          -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
+          build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}* \
+          jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/jbundle/
