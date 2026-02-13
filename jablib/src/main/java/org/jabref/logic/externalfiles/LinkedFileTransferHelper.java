@@ -61,6 +61,7 @@ public class LinkedFileTransferHelper {
 
             Path linkedFileAsPath = Path.of(linkedFile.getLink());
             if (linkedFileAsPath.isAbsolute()) {
+                LOGGER.trace("File {} is an absolute path, skipping", linkedFileAsPath);
                 // In case the file is an absolute path, there is no need to adjust anything
                 // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
                 linkedFiles.add(linkedFile);
@@ -71,6 +72,7 @@ public class LinkedFileTransferHelper {
             // Condition works, because absolute paths are already skipped
             Optional<Path> targetPrimaryPathOpt = getPrimaryPath(targetContext, filePreferences);
             if (targetPrimaryPathOpt.isEmpty()) {
+                LOGGER.trace("Target context does not have a primary directory, skipping file {}", linkedFileAsPath);
                 linkedFiles.add(linkedFile);
                 continue;
             }
@@ -78,7 +80,7 @@ public class LinkedFileTransferHelper {
 
             Optional<Path> sourcePathOpt = linkedFile.findIn(transferInformation.bibDatabaseContext(), filePreferences);
             if (sourcePathOpt.isEmpty()) {
-                // In case file does not exist, just keep the broken link
+                LOGGER.trace("File does not exist, just keep the broken link");
                 linkedFiles.add(linkedFile);
                 continue;
             }
