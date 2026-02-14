@@ -65,6 +65,9 @@ jobs:
 
 
             Happy coding! 🚀
+
+
+            At this point in time, you have raised {{ prs_total }} pull requests of which {{ prs_merged_percentage }}% ({{ prs_merged }}) have been merged.
           assigned_text: >
             Thank you for your continued work in JabRef.
             At this point, you probably already know the basics and the important links.
