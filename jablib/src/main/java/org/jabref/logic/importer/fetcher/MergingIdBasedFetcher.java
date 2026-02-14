@@ -104,6 +104,8 @@ public class MergingIdBasedFetcher {
 
         Set<Field> updatedFields = updateFieldsFromSource(fetchedEntry, mergedEntry);
 
+        fetchedEntry.getCitationKey().ifPresent(mergedEntry::setCitationKey);
+
         return new FetcherResult(entryFromLibrary, mergedEntry,
                 !updatedFields.isEmpty(), updatedFields);
     }
@@ -134,4 +136,3 @@ public class MergingIdBasedFetcher {
         });
     }
 }
-
