@@ -7,7 +7,10 @@ plugins {
 }
 
 group = "org.jabref.jabsrv"
-version = project.findProperty("projVersion") ?: "100.0.0"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
 application{
     mainClass.set("org.jabref.http.server.cli.ServerCli")
