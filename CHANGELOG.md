@@ -39,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 - Moved "Rename subgroup" below "Edit group" and renamed it to "Rename group". [#15041](https://github.com/JabRef/jabref/issues/15041)
+- We hanged the bibliographic information update process to show a notification instead of a blocking dialog in case of errors. [#15097](https://github.com/JabRef/jabref/issues/15097)
 
 ### Fixed
 
@@ -107,7 +108,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- Changed the bibliographic information update process to show a notification instead of a blocking dialog in case of errors. [#15097](https://github.com/JabRef/jabref/issues/15097)
 - We changed AI export logging to debug level (notifications and follow-up question generation). Logs are now emitted only in [debug mode](https://docs.jabref.org/advanced/commandline#debug-mode-debug). [#14645](https://github.com/JabRef/jabref/issues/14645)
 - We replaced the standard ComboBox with a SearchableComboBox and added a free text field in custom Entry Types. [#14082](https://github.com/JabRef/jabref/issues/14082)
 - In case of invalid BibTeX in the source tab, a notification is displayed (instead of an exception). [#14504](https://github.com/JabRef/jabref/pull/14504)
