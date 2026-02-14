@@ -27,16 +27,12 @@ class ClearContentViewModelTest {
 
     @BeforeEach
     void setup() {
-        entryA = new BibEntry(BibEntry.DEFAULT_TYPE)
-                .withField(StandardField.YEAR, "2015")
-                .withField(StandardField.DATE, "2014");
-        entryB = new BibEntry(BibEntry.DEFAULT_TYPE)
-                .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.AUTHOR, "Author");
+        entryA = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.YEAR, "2015").withField(StandardField.DATE, "2014");
+        entryB = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.YEAR, "2020").withField(StandardField.AUTHOR, "Author");
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entryA, entryB));
 
         bibDatabase = new BibDatabase();
-        clearContentViewModel = new ClearContentViewModel(stateManager);
+        clearContentViewModel = new ClearContentViewModel(stateManager.getSelectedEntries(), stateManager);
     }
 
     @Test
