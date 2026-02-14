@@ -18,7 +18,7 @@
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.apache.commons:commons-lang3:3.20.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.3
-//DEPS org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0
+//DEPS org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0

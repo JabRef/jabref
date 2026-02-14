@@ -53,7 +53,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run checkstyle using gradle
-        run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+        run: gradle checkstyleMain checkstyleTest checkstyleJmh
 
   openrewrite:
     name: OpenRewrite
@@ -67,7 +67,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
         run: |
-          ./gradlew --no-configuration-cache :rewriteRun
+          gradle --no-configuration-cache :rewriteRun
       - name: Output diff
         if: failure()
         run: |
@@ -116,8 +116,6 @@ jobs:
   modernizer:
     name: Modernizer
     runs-on: ubuntu-slim
-    # Version 1.11.0 does not run on JDK25: "java.lang.reflect.InvocationTargetException"
-    if: false
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -129,7 +127,7 @@ jobs:
         run: |
           # enable failing of this task if modernizer complains
           # sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle.kts
-          ./gradlew modernizer
+          gradle modernizer
 
   markdown:
     name: Markdown
@@ -232,7 +230,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - run: ./gradlew javadoc
+      - run: gradle javadoc
 
   tests:
     name: "Unit tests – ${{ matrix.module }}"
@@ -248,7 +246,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
-        run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
       - name: Prepare format failed test results
@@ -282,7 +280,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
-        run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
 
@@ -296,7 +294,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - run: ./gradlew :jabkit:runJabKitPortableSmokeTest
+      - run: gradle :jabkit:runJabKitPortableSmokeTest
 
   databasetests:
     if: (github.repository_owner == 'JabRef')
@@ -323,7 +321,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run tests on PostgreSQL
-        run: ./gradlew :jablib:databaseTest --rerun-tasks
+        run: gradle :jablib:databaseTest --rerun-tasks
         env:
           CI: "true"
           DBMS: "postgresql"
@@ -524,7 +522,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
+        run: xvfb-run --auto-servernum gradle jacocoTestReport
         env:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -547,7 +545,7 @@ jobs:
         with:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - run: ./gradlew traceRequirements
+      - run: gradle traceRequirements
       - if: always()
         run: cat build/reports/tracing.txt
 

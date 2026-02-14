@@ -7,7 +7,10 @@ plugins {
 }
 
 group = "org.jabref.languageserver"
-version = project.findProperty("projVersion") ?: "100.0.0"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
 application{
     mainClass.set("org.jabref.languageserver.cli.ServerCli")
@@ -21,6 +24,18 @@ application{
 
         "-XX:+UseStringDeduplication"
     )
+}
+
+// See https://bugs.openjdk.org/browse/JDK-8342623
+val target = java.toolchain.languageVersion.get().asInt()
+if (target >= 26) {
+    dependencies {
+        implementation("org.openjfx:jdk-jsobject")
+    }
+} else {
+    configurations.all {
+        exclude(group = "org.openjfx", module = "jdk-jsobject")
+    }
 }
 
 dependencies {

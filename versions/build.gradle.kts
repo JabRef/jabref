@@ -20,7 +20,7 @@ val pdfbox = "3.0.6"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.10.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.11.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
@@ -60,7 +60,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-web:$javafx")
     api("org.openjfx:jdk-jsobject:$javafx")
 
-    api("cc.jilt:jilt:1.9")
+    api("cc.jilt:jilt:1.9.1")
 
     api("com.dlsc.gemsfx:gemsfx:3.8.3")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
@@ -148,7 +148,7 @@ dependencies.constraints {
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2-1")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.10")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.1")
     api("org.jspecify:jspecify:1.0.0")
