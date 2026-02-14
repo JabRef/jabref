@@ -32,6 +32,8 @@ public class MultiFieldsCleanupViewModel {
 
     private final SetProperty<CleanupPreferences.CleanupStep> selectedJobs = new SimpleSetProperty<>(FXCollections.observableSet());
 
+    private boolean updating = false;
+
     public MultiFieldsCleanupViewModel() {
         bibTexSelected.addListener((_, _, newVal) -> {
             if (newVal) {
@@ -62,28 +64,44 @@ public class MultiFieldsCleanupViewModel {
         addStepListener(timestampToCreationSelected, CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
         addStepListener(timestampToModificationSelected, CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
 
-        selectedJobs.addListener((SetChangeListener<? super CleanupPreferences.CleanupStep>) change -> {
-            if (change.wasAdded()) {
-                CleanupPreferences.CleanupStep addedStep = change.getElementAdded();
-
-                if (!MULTI_FIELD_JOBS.contains(addedStep)) {
-                    selectedJobs.remove(addedStep);
-                }
-
-                setBooleanPropertyForStep(addedStep, true);
+        selectedJobs.addListener((SetChangeListener<CleanupPreferences.CleanupStep>) change -> {
+            if (updating) {
+                return;
             }
-            if (change.wasRemoved()) {
-                setBooleanPropertyForStep(change.getElementRemoved(), false);
+
+            try {
+                updating = true;
+                if (change.wasAdded()) {
+                    CleanupPreferences.CleanupStep addedStep = change.getElementAdded();
+                    if (!MULTI_FIELD_JOBS.contains(addedStep)) {
+                        throw new UnsupportedOperationException(addedStep + ": is unsupported by multi field jobs");
+                    }
+                    setBooleanPropertyForStep(addedStep, true);
+                }
+                if (change.wasRemoved()) {
+                    setBooleanPropertyForStep(change.getElementRemoved(), false);
+                }
+            } finally {
+                updating = false;
             }
         });
     }
 
     private void addStepListener(BooleanProperty property, CleanupPreferences.CleanupStep step) {
         property.addListener((_, _, newVal) -> {
-            if (newVal) {
-                selectedJobs.add(step);
-            } else {
-                selectedJobs.remove(step);
+            if (updating) {
+                return;
+            }
+
+            try {
+                updating = true;
+                if (newVal) {
+                    selectedJobs.add(step);
+                } else {
+                    selectedJobs.remove(step);
+                }
+            } finally {
+                updating = false;
             }
         });
     }
@@ -104,15 +122,8 @@ public class MultiFieldsCleanupViewModel {
                     timestampToCreationSelected.set(isSelected);
             case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
                     timestampToModificationSelected.set(isSelected);
-            default -> { /* Ignore steps that are not managed by these checkboxes */ }
+            default -> { /* Ignore steps that are not managed by checkboxes */ }
         }
-    }
-
-    public EnumSet<CleanupPreferences.CleanupStep> getSelectedJobs() {
-        if (selectedJobs.isEmpty()) {
-            return EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
-        }
-        return EnumSet.copyOf(selectedJobs.get());
     }
 
     public SetProperty<CleanupPreferences.CleanupStep> selectedJobsProperty() {

@@ -41,11 +41,7 @@ public class MultiFieldsCleanupPanel extends VBox {
         cleanupTimestampToCreationDate.selectedProperty().bindBidirectional(viewModel.timestampToCreationSelected);
         cleanupTimestampToModificationDate.selectedProperty().bindBidirectional(viewModel.timestampToModificationSelected);
     }
-
-    public EnumSet<CleanupPreferences.CleanupStep> getSelectedJobs() {
-        return viewModel.getSelectedJobs();
-    }
-
+    
     public SetProperty<CleanupPreferences.CleanupStep> selectedJobsProperty() {
         return viewModel.selectedJobsProperty();
     }
