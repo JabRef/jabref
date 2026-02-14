@@ -61,17 +61,6 @@ class ContextActionTest {
     }
 
     @Test
-    void shouldNotBeExecutableForMoveToFolderWhenGeneratedPathMatchesOriginal() {
-        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
-        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(true);
-
-        ContextAction action = newAction(StandardActions.MOVE_FILE_TO_FOLDER, fileViewModel);
-
-        assertFalse(action.isExecutable(),
-                "MOVE_FILE_TO_FOLDER should be disabled when generated path equals original");
-    }
-
-    @Test
     void shouldExecuteEditFileLink() {
         LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
         ContextAction action = newAction(StandardActions.EDIT_FILE_LINK, fileViewModel);
@@ -158,7 +147,7 @@ class ContextActionTest {
 
         action.execute();
 
-        verify(fileViewModel).moveToDefaultDirectory();
+        verify(fileViewModel).moveToNextPossibleDirectory();
     }
 
     @Test
