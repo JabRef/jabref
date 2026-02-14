@@ -20,12 +20,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
@@ -120,6 +122,11 @@ public class GlobalSearchBar extends HBox {
         KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();
 
         searchField = SearchTextField.create(keyBindingRepository);
+        searchField.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+            if (isFocused) {
+                searchField.selectAll();
+            }
+        });
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
         stateManager.searchQueryProperty().bind(searchField.textProperty());
 
@@ -363,9 +370,21 @@ public class GlobalSearchBar extends HBox {
         searchButton.visibleProperty().bind(searchField.editableProperty());
     }
 
-    /// Focuses the search field if it is not focused.
+    /// Focuses the search field if it is not focused
     @Override
     public void requestFocus() {
+        Scene scene = getScene();
+        if (scene == null) {
+            return;
+        }
+
+        Node focusOwner = scene.getFocusOwner();
+
+        // If focus is in a text input control (e.g., entry editor field), do NOT steal it
+        if (focusOwner instanceof TextInputControl) {
+            return;
+        }
+
         if (!searchField.isFocused()) {
             searchField.requestFocus();
         }
