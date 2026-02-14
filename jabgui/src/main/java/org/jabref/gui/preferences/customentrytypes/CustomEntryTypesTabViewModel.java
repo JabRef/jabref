@@ -33,6 +33,7 @@ import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -137,13 +138,30 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public EntryTypeViewModel addNewCustomEntryType() {
-        EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
-        BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), List.of());
-        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
-        this.entryTypesWithFields.add(viewModel);
-        this.entryTypeToAdd.setValue("");
+        String newEntryString = entryTypeToAdd.getValue().trim();
 
-        return viewModel;
+        boolean exists = entryTypesManager.getAllTypes(
+                                                  preferences.getLibraryPreferences().getDefaultBibDatabaseMode()).
+                                          stream().
+                                          anyMatch(type -> type.getType().getName().equalsIgnoreCase(newEntryString));
+
+        if (exists) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Duplicate entry type"),
+                    Localization.lang("The entry type '%0' already exists.", newEntryString)
+            );
+            return null;
+        } else {
+            BibEntryType newType = new BibEntryType(EntryTypeFactory.parse(newEntryString),
+                    new ArrayList<>(),
+                    List.of()
+            );
+            EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(newType, isMultiline);
+            this.entryTypesWithFields.add(viewModel);
+            this.entryTypeToAdd.setValue("");
+
+            return viewModel;
+        }
     }
 
     public void removeEntryType(EntryTypeViewModel focusedItem) {
