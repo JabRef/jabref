@@ -15,6 +15,9 @@ public interface WebFetcher {
     /// Returns the localized name of this fetcher.
     /// The title can be used to display the fetcher in the menu and in the side pane.
     ///
+    /// TODO: This name is also used for identifying the fetcher in preferences for API keys.
+    ///       Thus, any switch of the language will "remove" API keys.
+    ///
     /// @return the localized name
     String getName();
 

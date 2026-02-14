@@ -3,12 +3,27 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 }
 
 group = "org.jabref.jabkit"
-version = project.findProperty("projVersion") ?: "100.0.0"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
+// See https://bugs.openjdk.org/browse/JDK-8342623
+val target = java.toolchain.languageVersion.get().asInt()
+if (target >= 26) {
+    dependencies {
+        implementation("org.openjfx:jdk-jsobject")
+    }
+} else {
+    configurations.all {
+        exclude(group = "org.openjfx", module = "jdk-jsobject")
+    }
+}
 
 dependencies {
     implementation(project(":jablib"))
@@ -78,14 +93,15 @@ application {
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        // Enable JEP 450: Compact Object Headers
-        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core",
 
-        // Default garbage collector is sufficient for CLI APP
         // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseG1GC",
+        "-XX:+UseSerialGC",
         // "-XX:+UseStringDeduplication",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders"
     )
 }
 

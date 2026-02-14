@@ -8,7 +8,7 @@ import com.github.tomtung.latex2unicode.LaTeX2Unicode;
 import fastparse.Parsed;
 import org.jspecify.annotations.NonNull;
 
-/// Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class
+/// Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class.
 public class LatexToUnicodeAdapter {
 
     private static final Pattern UNDERSCORE_MATCHER = Pattern.compile("_(?!\\{)");
@@ -17,10 +17,10 @@ public class LatexToUnicodeAdapter {
 
     private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
 
-    /// Attempts to resolve all LaTeX in the String.
+    /// Attempts to resolve all LaTeX in the given string.
     ///
-    /// @param inField a String containing LaTeX
-    /// @return a String with LaTeX resolved into Unicode, or the original String if the LaTeX could not be parsed
+    /// @param inField a string containing LaTeX
+    /// @return a string with LaTeX resolved into Unicode, or the original string if the LaTeX could not be parsed.
     public static String format(@NonNull String inField) {
         return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
     }

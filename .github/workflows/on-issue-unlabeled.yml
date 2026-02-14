@@ -9,7 +9,7 @@ jobs:
   handle_Assigned_and_FirstTimeCodeContribution:
     name: "📍 Assigned or FirstTimeCodeContribution"
     if: ${{ (github.event.label.name == '📍 Assigned' || github.event.label.name == 'FirstTimeCodeContribution') && github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
@@ -44,11 +44,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
         run: |
-          set -e
-
-          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "🔔 reminder-sent"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "📌 Pinned"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned,🔔 reminder-sent,📌 Pinned,FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

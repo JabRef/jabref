@@ -70,19 +70,19 @@ class AboutDialogViewTest extends ApplicationTest {
     }
 
     @Test
-    void testAboutDialogHeading() {
+    void aboutDialogHeading() {
         verifyThat(".about-heading", isVisible());
     }
 
     @Test
-    void testCopyVersionButton() {
+    void copyVersionButton() {
         verifyThat("Copy Version", isVisible());
         clickOn("Copy Version");
         verify(clipBoardManager).setContent(anyString());
     }
 
     @Test
-    void testCloseButton() {
+    void closeButton() {
         verifyThat("Close", isVisible());
         clickOn("Close");
     }
@@ -103,7 +103,7 @@ class AboutDialogViewTest extends ApplicationTest {
                 // as the width required by the 10pt text.
                 // If actualWidth < prefWidth, JavaFX will truncate the text.
                 assertTrue(actualWidth >= prefWidth,
-                        String.format("Button [%s] is truncated! Actual: %.2f, Pref: %.2f",
+                        "Button [%s] is truncated! Actual: %.2f, Pref: %.2f".formatted(
                                 button.getText(), actualWidth, prefWidth));
             });
             // for debugging purpises

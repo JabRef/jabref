@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @Execution(ExecutionMode.SAME_THREAD)
 class BibEntryCitationsAndReferencesRepositoryShellTest {
 
@@ -55,15 +58,10 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         public boolean containsKey(BibEntry entry) {
             return this.relations.containsKey(entry);
         }
-
-        @Override
-        public void close() {
-            // do nothing
-        }
     }
 
     @Test
-    void repositoryShouldWriteAndReadCitationsToAndFromExpectedDAO() {
+    void repositoryShouldWriteAndGetCitationsToAndFromExpectedDAO() {
         // GIVEN
         BibEntry bibEntry = createBibEntry();
         List<BibEntry> citations = createRelations(bibEntry);
@@ -76,15 +74,15 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         Assertions.assertFalse(citations.isEmpty());
 
         // WHEN
-        bibEntryRelationsRepository.insertCitations(bibEntry, citations);
+        bibEntryRelationsRepository.addCitations(bibEntry, citations);
 
         // THEN
-        Assertions.assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
-        Assertions.assertEquals(citations, bibEntryRelationsRepository.readCitations(bibEntry));
+        assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
+        assertEquals(citations, bibEntryRelationsRepository.getCitations(bibEntry));
     }
 
     @Test
-    void repositoryShouldWriteAndReadReferencesToAndFromExpectedDAO() {
+    void repositoryShouldWriteAndGetReferencesToAndFromExpectedDAO() {
         // GIVEN
         BibEntry bibEntry = createBibEntry();
         List<BibEntry> references = createRelations(bibEntry);
@@ -97,10 +95,10 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         Assertions.assertFalse(references.isEmpty());
 
         // WHEN
-        bibEntryRelationsRepository.insertCitations(bibEntry, references);
+        bibEntryRelationsRepository.addCitations(bibEntry, references);
 
         // THEN
-        Assertions.assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
-        Assertions.assertEquals(references, bibEntryRelationsRepository.readCitations(bibEntry));
+        assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
+        assertEquals(references, bibEntryRelationsRepository.getCitations(bibEntry));
     }
 }

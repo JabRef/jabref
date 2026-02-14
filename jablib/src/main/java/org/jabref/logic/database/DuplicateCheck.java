@@ -328,7 +328,6 @@ public class DuplicateCheck {
     public Optional<BibEntry> containsDuplicate(final BibDatabase database,
                                                 final BibEntry entry,
                                                 final BibDatabaseMode bibDatabaseMode) {
-
         return database.getEntries().stream().filter(other -> isDuplicate(entry, other, bibDatabaseMode)).findFirst();
     }
 }

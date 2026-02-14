@@ -3,25 +3,32 @@ name: Rerun PR merge conflicts check
 on:
   schedule:
     - cron: "0 3 * * *"
+  pull_request:
+    paths:
+      - '.github/workflows/rerun-merge-conflict-check.yml'
   workflow_dispatch:
 
 jobs:
   rerun:
     if: github.repository == 'JabRef/jabref'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       actions: write
       contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
+      - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          show-progress: 'false'
-      - name: Trigger "On PR opened/updated (check)" for all open PRs
+          packages: jq
+          version: 1.0
+      - name: Trigger "On PR opened/updated" for all open PRs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          workflow_name="On PR opened/updated (check)"
+          set -euo pipefail
+          set -x
+          workflow_name="On PR opened/updated"
 
           gh pr list --state open --json number --jq '.[] | "\(.number)"' |
           while read pr; do

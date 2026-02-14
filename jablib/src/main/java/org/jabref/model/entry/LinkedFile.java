@@ -41,24 +41,32 @@ public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
 
-    // We have to mark these properties as transient because they can't be serialized directly
+    // We have to mark the following properties as transient because they can't be serialized directly
+
     private transient StringProperty description = new SimpleStringProperty();
+
     private transient StringProperty link = new SimpleStringProperty();
+
     // This field is a {@link StringProperty}, and not an {@link ObjectProperty<FileType>}, as {@link LinkedFile} might
     // be a URI, where a file type might not be present.
     private transient StringProperty fileType = new SimpleStringProperty();
+
     private transient StringProperty sourceURL = new SimpleStringProperty();
 
+    /// @param description The description of the linked file
+    /// @param link        The path or URL to the linked file
+    /// @param fileType    The file type of the linked file. See [org.jabref.logic.util.StandardFileType] for common file types.
+    public LinkedFile(String description, String link, FileType fileType) {
+        this(description, link, fileType.getName());
+    }
+
+    /// Better use [LinkedFile(String description, String link, FileType fileType)] constructor
     public LinkedFile(String description, Path link, String fileType) {
         this(description, link.toString(), fileType);
     }
 
     public LinkedFile(String description, Path link, String fileType, String sourceUrl) {
         this(description, link.toString(), fileType, sourceUrl);
-    }
-
-    public LinkedFile(String description, String link, FileType fileType) {
-        this(description, link, fileType.getName());
     }
 
     /// Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.

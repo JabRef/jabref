@@ -125,6 +125,7 @@ public class DatabaseMerger {
                     // target does not contain any groups, so we can just use the new groups
                     () -> target.setGroups(newGroups));
         });
+        target.groupsBinding().invalidate();
     }
 
     private void mergeContentSelectors(MetaData target, MetaData other) {

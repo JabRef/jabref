@@ -19,9 +19,13 @@ import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// A node in the groups tree that holds exactly one AbstractGroup.
 public class GroupTreeNode extends TreeNode<GroupTreeNode> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNode.class);
 
     private static final String PATH_DELIMITER = " > ";
     private ObjectProperty<AbstractGroup> groupProperty = new SimpleObjectProperty<>();
@@ -285,9 +289,10 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     /// Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
     public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
-        if (getGroup() instanceof GroupEntryChanger) {
-            return ((GroupEntryChanger) getGroup()).remove(entries);
+        if (getGroup() instanceof GroupEntryChanger entryChanger) {
+            return entryChanger.remove(entries);
         } else {
+            LOGGER.warn("Tried to remove entries from a group that does not support entry changing: {}", getGroup().getName());
             return List.of();
         }
     }

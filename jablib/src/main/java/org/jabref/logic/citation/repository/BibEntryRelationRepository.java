@@ -17,6 +17,4 @@ public interface BibEntryRelationRepository {
     default boolean shouldUpdate(BibEntry entry) {
         return true;
     }
-
-    void close();
 }

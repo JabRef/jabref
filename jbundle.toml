@@ -1,0 +1,24 @@
+java_version = 25
+target = "linux-x64"
+jvm_args = [
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        # https://github.com/uncomplicate/neanderthal/issues/55
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        # Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+        "-XX:+UseStringDeduplication"
+    ]
+
+# profile = "cli"
+
+# Required to have jlink working
+appcds = true
+
+# See https://jbundle.avelino.run/user-guide/configuration#maximum-performance-linux
+# A special JDK is needed - see https://wiki.openjdk.org/spaces/crac/overview
+crac = false
+
+# set to "false" for speedup during build
+shrink = true

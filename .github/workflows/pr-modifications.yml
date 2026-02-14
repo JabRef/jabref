@@ -26,7 +26,7 @@ jobs:
           startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
         )
       )
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
@@ -46,7 +46,7 @@ jobs:
           startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
         )
       )
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -70,7 +70,7 @@ jobs:
   unmodified_submodules:
     name: Submodules not modified
     if: github.event.pull_request.user.login != 'dependabot[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
       - name: Get all submodule changes
@@ -100,7 +100,7 @@ jobs:
           startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
         )
       )
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - if: github.head_ref == 'main'
         uses: actions/github-script@v8
@@ -109,7 +109,7 @@ jobs:
             core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
 
   upload-pr-number:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt

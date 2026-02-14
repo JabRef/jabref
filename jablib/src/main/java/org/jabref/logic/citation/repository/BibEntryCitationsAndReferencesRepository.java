@@ -7,18 +7,18 @@ import org.jabref.model.entry.BibEntry;
 public interface BibEntryCitationsAndReferencesRepository {
 
     /// Insert "cited by"
-    void insertCitations(BibEntry entry, List<BibEntry> citations);
+    void addCitations(BibEntry entry, List<BibEntry> citations);
 
-    List<BibEntry> readCitations(BibEntry entry);
+    List<BibEntry> getCitations(BibEntry entry);
 
     boolean containsCitations(BibEntry entry);
 
     boolean isCitationsUpdatable(BibEntry entry);
 
     /// Insert "citing"
-    void insertReferences(BibEntry entry, List<BibEntry> citations);
+    void addReferences(BibEntry entry, List<BibEntry> citations);
 
-    List<BibEntry> readReferences(BibEntry entry);
+    List<BibEntry> getReferences(BibEntry entry);
 
     boolean containsReferences(BibEntry entry);
 

@@ -54,6 +54,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexApaEntryType;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
@@ -256,7 +257,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             otherEntries = new ArrayList<>(BiblatexEntryTypeDefinitions.ALL);
             otherEntries.removeAll(recommendedEntries);
             otherEntries.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
-            otherEntries.addAll(BiblatexAPAEntryTypeDefinitions.ALL);
         } else {
             recommendedEntries = BibtexEntryTypeDefinitions.RECOMMENDED;
             otherEntries = new ArrayList<>(BiblatexEntryTypeDefinitions.ALL);
@@ -277,6 +277,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (isBiblatexMode) {
             addEntriesToPane(entryNonStandard, BiblatexNonStandardEntryTypeDefinitions.ALL);
+            addEntriesToPane(entryNonStandard, BiblatexAPAEntryTypeDefinitions.ALL);
         } else {
             entryNonStandardTitle.setVisible(false);
         }
@@ -536,6 +537,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (type instanceof BiblatexNonStandardEntryType entryType) {
             return descriptionOfNonStandardEntryType(entryType);
         }
+        if (type instanceof BiblatexApaEntryType entryType) {
+            return descriptionOfApaEntryType(entryType);
+        }
         return null;
     }
 
@@ -626,12 +630,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("Commentaries which have a status different from regular books, such as legal commentaries.");
             case Image ->
                     Localization.lang("Images, pictures, photographs, and similar media.");
-            case Jurisdiction ->
-                    Localization.lang("Court decisions, court recordings, and similar things.");
-            case Legislation ->
-                    Localization.lang("Laws, bills, legislative proposals, and similar things.");
-            case Legal ->
-                    Localization.lang("Legal documents such as treaties.");
             case Letter ->
                     Localization.lang("Personal correspondence such as letters, emails, memoranda, etc.");
             case Movie ->
@@ -646,6 +644,23 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Localization.lang("National and international standards issued by a standards body such as the International Organization for Standardization.");
             case Video ->
                     Localization.lang("Audiovisual recordings, typically on dvd, vhs cassette, or similar media.");
+        };
+    }
+
+    private static @NonNull String descriptionOfApaEntryType(BiblatexApaEntryType type) {
+        // These descriptions are based on biblatex-apa documentation, section 4.2.4.
+        // See [https://mirrors.ctan.org/macros/latex/contrib/biblatex-contrib/biblatex-apa/biblatex-apa.pdf].
+        return switch (type) {
+            case Jurisdiction ->
+                    Localization.lang("Court decisions, court recordings, and similar things.");
+            case Legislation ->
+                    Localization.lang("Laws, bills, legislative proposals, and similar things.");
+            case Legadminmaterial ->
+                    Localization.lang("Legislative and administrative material such as hearings, reports, and documents.");
+            case Constitution ->
+                    Localization.lang("National and international constitutions.");
+            case Legal ->
+                    Localization.lang("Legal documents such as treaties.");
         };
     }
 

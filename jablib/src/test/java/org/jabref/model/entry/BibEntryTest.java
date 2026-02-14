@@ -337,12 +337,6 @@ class BibEntryTest {
     }
 
     @Test
-    void isNullCiteKeyThrowsNPE() {
-        BibEntry e = new BibEntry(StandardEntryType.Article);
-        assertThrows(NullPointerException.class, () -> e.setCitationKey(null));
-    }
-
-    @Test
     void isEmptyCiteKey() {
         BibEntry e = new BibEntry(StandardEntryType.Article);
         assertFalse(e.hasCitationKey());

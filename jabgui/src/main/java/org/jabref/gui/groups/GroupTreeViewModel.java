@@ -184,6 +184,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
     }
 
+    /// Creates the "Imported entries" group if enabled and missing.
+    /// Selection is disabled to prevent focus theft when switching tabs.
     private void addGroupImportEntries(GroupNodeViewModel parent) {
         if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             return;
@@ -194,14 +196,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                     .getChildren()
                                     .stream()
                                     .map(GroupTreeNode::getGroup)
-                                    .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equals(groupName));
+                                    .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equalsIgnoreCase(groupName));
         if (!groupExists) {
             currentDatabase.ifPresent(db -> {
                 char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
                 AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
                 GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);
                 newSubgroup.moveTo(parent.getGroupNode(), 0);
-                selectedGroups.setAll(new GroupNodeViewModel(db, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
                 writeGroupChangesToMetaData();
             });
         }
@@ -613,7 +614,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
 
-            ArrayList<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
                 removeGroupsAndSubGroupsFromEntries(eachNode);
                 eachNode.getGroupNode().removeFromParent();
@@ -648,7 +649,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_WITHOUT_CHILDREN);
             // panel.getUndoManager().addEdit(undo);
 
-            ArrayList<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
             selectedGroupNodes.forEach(eachNode -> {
                 removeGroupsAndSubGroupsFromEntries(eachNode);
                 eachNode.getGroupNode().removeFromParent();
@@ -672,12 +673,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
             int groupsWithSameName = 0;
             String name = group.getGroupNode().getGroup().getName();
-            Optional<GroupTreeNode> rootGroup = currentDatabase.get().getMetaData().getGroups();
+            BibDatabaseContext bibDatabaseContext = currentDatabase.get();
+            Optional<GroupTreeNode> rootGroup = bibDatabaseContext.getMetaData().getGroups();
             if (rootGroup.isPresent()) {
                 groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
             }
             if (groupsWithSameName < 2) {
-                List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
+                List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(bibDatabaseContext.getEntries());
                 group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
             }
         }
@@ -721,6 +723,21 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // TODO: Add undo
         // if (!undo.isEmpty()) {
         //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+    }
+
+    public void clearGroup(GroupNodeViewModel group) {
+        GroupTreeNode groupNode = group.getGroupNode();
+        if (groupNode.getGroup() instanceof ExplicitGroup) {
+            boolean confirmation = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("This removes all entries from the group '%0'.", group.getDisplayName()),
+                    Localization.lang("Clear group \"%0\"?", group.getDisplayName()),
+                    Localization.lang("Clear"));
+            if (confirmation) {
+                List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
+                groupNode.removeEntriesFromGroup(entriesInGroup);
+                dialogService.notify(Localization.lang("Cleared group \"%0\".", group.getDisplayName()));
+            }
+        }
     }
 
     public void sortAlphabeticallyRecursive(GroupTreeNode group) {

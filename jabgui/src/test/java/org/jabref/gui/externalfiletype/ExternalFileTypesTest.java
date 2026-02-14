@@ -119,4 +119,20 @@ class ExternalFileTypesTest {
 
         assertEquals("[testEntry, tst, text/plain, emacs, CLOSE]", Arrays.toString(type.toStringArray()));
     }
+
+    @Test
+    void getExternalFileTypeByLinkedFileWithUnknownTypeAndOnlineLink() {
+        LinkedFile testfile = new LinkedFile("Springer Paper", "https://link.springer.com/content/pdf/10.1007%2F978-3-032-00652-3_11.pdf", "unknown");
+
+        assertEquals(Optional.of(StandardExternalFileType.PDF),
+                ExternalFileTypes.getExternalFileTypeByLinkedFile(testfile, true, externalApplicationsPreferences));
+    }
+
+    @Test
+    void getExternalFileTypeByLinkedFileWithUrlContainingColonInPath() {
+        LinkedFile testfile = new LinkedFile("Paper", "https://doi.org/10.1007/978-3-032-00652-3_11.pdf", "");
+
+        assertEquals(Optional.of(StandardExternalFileType.PDF),
+                ExternalFileTypes.getExternalFileTypeByLinkedFile(testfile, true, externalApplicationsPreferences));
+    }
 }

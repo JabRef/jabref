@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,6 +15,7 @@ import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
@@ -75,6 +77,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             """;
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
+    private static final int HEIGHT_BUFFER = 15; // Ensures that text is not cut off
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -346,6 +349,39 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 taskExecutor,
                 preferences);
         exportToClipboardAction.execute();
+    }
+
+    public void resizeForTooltipContent() {
+        setFitToHeight(false);
+        setVbarPolicy(ScrollBarPolicy.NEVER);
+
+        previewView.setPrefWidth(750);
+        previewView.setMaxWidth(750);
+        previewView.setPrefHeight(10);
+        previewView.setMinHeight(10);
+
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                Platform.runLater(() -> {
+                    Object result = previewView.getEngine().executeScript(
+                            "var content = document.getElementById('content');" +
+                                    "content ? content.getBoundingClientRect().height : document.body.scrollHeight;"
+                    );
+
+                    if (result instanceof java.lang.Number height) {
+                        double actualH = height.doubleValue() + HEIGHT_BUFFER;
+
+                        previewView.setPrefHeight(actualH);
+                        previewView.setMaxHeight(actualH);
+                        previewView.setMinHeight(actualH);
+                    }
+                });
+            }
+        });
+    }
+
+    public WebEngine getEngine() {
+        return previewView.getEngine();
     }
 
     @Override

@@ -118,8 +118,21 @@ public class ExternalFileTypes {
             }
 
             // No type could be found from mime type. Try based on the extension:
-            return FileUtil.getFileExtension(linkedFile.getLink())
-                           .flatMap(extension -> getExternalFileTypeByExt(extension, externalApplicationsPreferences));
+            String linkPath = linkedFile.getLink();
+            Optional<String> extensionOpt;
+
+            if (linkedFile.isOnlineLink()) {
+                // For URLs, extract filename from URL path first to avoid InvalidPathException
+                // URLs contain ":" which is illegal in Windows file paths (e.g., "http://")
+                // See https://github.com/JabRef/jabref/issues/14975
+                extensionOpt = FileUtil.getFileNameFromUrl(linkPath)
+                                       .flatMap(FileUtil::getFileExtension);
+            } else {
+                // For local files, get extension directly
+                extensionOpt = FileUtil.getFileExtension(linkPath);
+            }
+
+            return extensionOpt.flatMap(extension -> getExternalFileTypeByExt(extension, externalApplicationsPreferences));
         } else {
             return type;
         }

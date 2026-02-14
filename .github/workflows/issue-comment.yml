@@ -1,0 +1,109 @@
+# Description: This workflow is triggered when the "Binaries" workflow completes.
+# Since this pull request has write permissions on the target repo, we should **NOT** execute any untrusted code.
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+# Based on https://github.com/spring-projects/spring-security/pull/15477/files
+
+name: Comment on Issue (after successful binary build)
+
+on:
+  workflow_run:
+    workflows: [ "Binaries" ]
+    types: [ completed ]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number'
+        required: true
+
+jobs:
+  comment:
+    if: ${{ github.repository == 'JabRef/jabref' }}
+    runs-on: ubuntu-slim
+    permissions:
+      actions: read
+      issues: write
+    timeout-minutes: 10
+    steps:
+      - name: Show GitHub context
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "PR_NUMBER=${PR_NUMBER}"
+          echo "EVENT_NAME=${EVENT_NAME}"
+          echo "WORKFLOW=${WORKFLOW}"
+          echo "RUN_ID=${RUN_ID}"
+          echo "RUN_NUMBER=${RUN_NUMBER}"
+          echo "Workflow $WORKFLOW" >> $GITHUB_STEP_SUMMARY
+
+      - name: Download PR number
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: actions/download-artifact@v7
+        continue-on-error: true
+        with:
+          name: pr_number
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Read pr_number.txt
+        id: read-pr_number
+        run: |
+          touch pr_number.txt
+          PR_NUMBER=$(cat pr_number.txt)${{ github.event.inputs.pr_number }}
+          echo "Read PR number '$PR_NUMBER'"
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
+
+      - name: Determine PR data
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') }}
+        id: pr_data
+        env:
+          PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const prNumber = Number(process.env.PR_NUMBER);
+            const {data: pr} = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            core.setOutput("pr_url", pr.html_url ?? "");
+            core.setOutput("pr_body", pr.body ?? "");
+
+      - name: Determine issue number
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') }}
+        id: get_issue_number
+        env:
+          PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
+          PR_URL:    ${{ steps.pr_data.outputs.pr_url }}
+          PR_BODY:   ${{ steps.pr_data.outputs.pr_body }}
+        run: |
+          echo "PR Number: $PR_NUMBER"
+          echo "PR URL: $PR_URL"
+          echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
+          cat <<EOF
+          PR Body:
+          $PR_BODY
+          EOF
+          ticketNumber=$(printf '%s\n' "$PR_BODY" \
+            | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
+            | grep -Eo '[0-9]+' \
+            | grep -Ev '^13109$' \
+            | head -n1 || true)
+
+          echo "ticketNumber=$ticketNumber" >> "$GITHUB_OUTPUT"
+          echo "Determined issue [#$ticketNumber](https://github.com/JabRef/jabref/issues/$ticketNumber)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment on issue (no build available)
+        if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.get_issue_number.outputs.ticketNumber != '') }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          message: >
+            A pull request addressing the issue has been created.
+            You can try out the pull request by following the steps at [How to try out any JabRef pull request?](https://blog.jabref.org/2025/05/31/run-pr/).
+
+
+            For any feedback, add a comment to the pull request at ${{ steps.pr_data.outputs.pr_url }}.
+          comment-tag: download-link

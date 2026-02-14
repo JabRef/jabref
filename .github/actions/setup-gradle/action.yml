@@ -22,6 +22,12 @@ runs:
         check-latest: true
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
+      with:
+        gradle-version: current
+      env:
+        GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+    - name: Setup TestLens
+      uses: testlens-app/setup-testlens@v1.6.1
     - name: Generate JBang cache key
       id: cache-key
       shell: bash

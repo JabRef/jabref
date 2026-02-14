@@ -8,7 +8,7 @@ on:
 jobs:
   mark-pr-ready-for-review:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       actions: write
       contents: write
@@ -30,6 +30,10 @@ jobs:
           else
             echo "continue=false" >> "$GITHUB_OUTPUT"
           fi
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Mark PR ready for review
         if: steps.check.outputs.continue == 'true'
         run: |

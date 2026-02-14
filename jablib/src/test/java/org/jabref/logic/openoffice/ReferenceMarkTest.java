@@ -63,6 +63,16 @@ class ReferenceMarkTest {
                 Arguments.of(
                         "JABREF_Я2025 CID_2 def456",
                         List.of("Я2025"), List.of(2), "def456"
+                ),
+
+                // Endashes and emdashes
+                Arguments.of(
+                        "JABREF_DeutscherParitaetischerWohlfahrtsverband–Gesamtverband2016 CID_3 kku224",
+                        List.of("DeutscherParitaetischerWohlfahrtsverband–Gesamtverband2016"), List.of(3), "kku224"
+                ),
+                Arguments.of(
+                        "JABREF_Em—dash CID_2 iijhy4",
+                        List.of("Em—dash"), List.of(2), "iijhy4"
                 )
         );
     }

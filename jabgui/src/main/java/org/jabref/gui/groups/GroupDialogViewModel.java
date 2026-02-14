@@ -44,6 +44,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticDateGroup;
+import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -83,6 +84,7 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeAutoProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty typeEntryTypeProperty = new SimpleBooleanProperty();
 
     // Option Groups
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
@@ -384,6 +386,8 @@ public class GroupDialogViewModel {
                         currentDatabase.getMetaData(),
                         preferences.getFilePreferences().getUserAndHost()
                 );
+            } else if (Boolean.TRUE.equals((typeEntryTypeProperty.getValue()))) {
+                resultingGroup = new AutomaticEntryTypeGroup(groupName, groupHierarchySelectedProperty.getValue());
             } else if (Boolean.TRUE.equals(dateRadioButtonSelectedProperty.getValue())) {
                 resultingGroup = new AutomaticDateGroup(
                         groupName,
@@ -484,6 +488,8 @@ public class GroupDialogViewModel {
                     dateGroupFieldProperty.setValue(group.getField());
                     dateGroupOptionProperty.setValue(group.getGranularity());
                     dateGroupIncludeEmptyProperty.setValue(false);
+                } else if (editedGroup.getClass() == AutomaticEntryTypeGroup.class) {
+                    typeEntryTypeProperty.setValue(Boolean.TRUE);
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
                 typeTexProperty.setValue(true);
@@ -615,6 +621,10 @@ public class GroupDialogViewModel {
 
     public BooleanProperty typeTexProperty() {
         return typeTexProperty;
+    }
+
+    public BooleanProperty typeEntryTypeProperty() {
+        return typeEntryTypeProperty;
     }
 
     public StringProperty keywordGroupSearchTermProperty() {

@@ -10,6 +10,7 @@ concurrency:
 
 jobs:
   release:
+    # ubuntu-slim does not contain wget (and we don't have time for apt-get install wget during the release phase)
     runs-on: ubuntu-latest
     steps:
       - name: Get binaries from builds.jabref.org

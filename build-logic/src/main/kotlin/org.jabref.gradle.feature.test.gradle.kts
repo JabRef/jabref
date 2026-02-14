@@ -2,7 +2,7 @@ plugins {
     id("java")
     id("org.gradlex.java-module-testing")
     // Hint from https://stackoverflow.com/a/46533151/873282
-    id("com.adarshr.test-logger")
+    // id("com.adarshr.test-logger")
 }
 
 testing {
@@ -24,6 +24,7 @@ tasks.withType<Test>().configureEach {
     forkEvery = 100
 }
 
+/*
 testlogger {
     // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
 
@@ -35,6 +36,7 @@ testlogger {
     showCauses = true
     showStackTraces = true
 }
+*/
 
 configurations.testCompileOnly {
     extendsFrom(configurations.compileOnly.get())

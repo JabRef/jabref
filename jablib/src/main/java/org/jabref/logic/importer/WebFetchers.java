@@ -166,7 +166,7 @@ public class WebFetchers {
         searchBasedFetchers.add(new DBLPFetcher(importFormatPreferences));
         searchBasedFetchers.add(new SpringerNatureWebFetcher(importerPreferences));
         searchBasedFetchers.add(new CrossRef());
-        searchBasedFetchers.add(new OpenAlex());
+        searchBasedFetchers.add(new OpenAlex(importerPreferences));
         searchBasedFetchers.add(new CiteSeer());
         searchBasedFetchers.add(new DOAJFetcher(importFormatPreferences));
         searchBasedFetchers.add(new IEEE(importFormatPreferences, importerPreferences));
@@ -233,7 +233,7 @@ public class WebFetchers {
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
 
         set.add(new MathSciNet(importFormatPreferences));
-        set.add(new OpenAlex());
+        set.add(new OpenAlex(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new SemanticScholar(importerPreferences));
         set.add(new SsrnFetcher(importFormatPreferences));
@@ -278,7 +278,7 @@ public class WebFetchers {
         // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());
         // OpenAlex provides OA locations and direct PDF links via its API
-        fetchers.add(new OpenAlex());
+        fetchers.add(new OpenAlex(importerPreferences));
         fetchers.add(new ResearchGate(importFormatPreferences));
         fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new UnpaywallFetcher(importerPreferences));
@@ -288,14 +288,18 @@ public class WebFetchers {
 
     /// @return set containing customizable api key fetchers
     public static Set<CustomizableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
-        Set<CustomizableKeyFetcher> fetchers = new HashSet<>();
-        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
-        fetchers.add(new SpringerNatureWebFetcher(importerPreferences));
-        fetchers.add(new Scopus(importerPreferences));
-        fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
-        fetchers.add(new BiodiversityLibrary(importerPreferences));
-        fetchers.add(new MedlineFetcher(importerPreferences));
-        fetchers.add(new UnpaywallFetcher(importerPreferences));
+        Set<CustomizableKeyFetcher> fetchers = Set.of(
+                new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
+                new BiodiversityLibrary(importerPreferences),
+                new IEEE(importFormatPreferences, importerPreferences),
+                new MedlineFetcher(importerPreferences),
+                new OpenAlex(importerPreferences),
+                new SemanticScholar(importerPreferences),
+                new Scopus(importerPreferences),
+                new SpringerNatureWebFetcher(importerPreferences),
+                new UnpaywallFetcher(importerPreferences)
+        );
+
         return fetchers;
     }
 }

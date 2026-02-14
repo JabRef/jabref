@@ -21,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ public class FulltextFetchers {
     // Timeout in seconds
     private static final int FETCHER_TIMEOUT = 10;
 
-    private final Set<FulltextFetcher> finders = new HashSet<>();
+    private final Set<FulltextFetcher> fetchers;
 
     private final Predicate<String> isPDF = url -> {
         try {
@@ -48,8 +49,9 @@ public class FulltextFetchers {
         this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences));
     }
 
-    FulltextFetchers(Set<FulltextFetcher> fetcher) {
-        finders.addAll(fetcher);
+    @VisibleForTesting
+    FulltextFetchers(Set<FulltextFetcher> fetchers) {
+        this.fetchers = new HashSet<>(fetchers);
     }
 
     public Optional<URL> findFullTextPDF(BibEntry entry) {
@@ -61,7 +63,7 @@ public class FulltextFetchers {
             findDoiForEntry(clonedEntry);
         }
 
-        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
+        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, fetchers), FETCHER_TIMEOUT, TimeUnit.SECONDS);
 
         return result.stream()
                      .map(FulltextFetchers::getResults)

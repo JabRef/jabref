@@ -1,4 +1,9 @@
 *.aux
+*.bbl
+*.bib
+*.blg
 *.dep
+*.fls
+*.fdb*
 *.out
 *.pdf
