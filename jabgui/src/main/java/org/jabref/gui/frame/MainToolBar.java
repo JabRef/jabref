@@ -42,6 +42,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
+import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.PopOver;
@@ -152,7 +154,14 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        createTaskIndicator()),
+                        createTaskIndicator(),
+                        factory.createIconButton(StandardActions.HELP, new SimpleCommand() {
+                            @Override
+                            public void execute() {
+                                Injector.instantiateModelOrService(InfoCenterPane.class).setShowInfoCenter(true);
+                            }
+                        })
+                ),
 
                 new Separator(Orientation.VERTICAL),
 
