@@ -107,6 +107,8 @@ open module org.jabref.jablib {
     exports org.jabref.logic.crawler;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
+    exports org.jabref.logic.citation.contextextractor;
+    exports org.jabref.model.citation;
     exports org.jabref.model.paging;
     exports org.jabref.logic.git;
     exports org.jabref.logic.git.conflicts;
@@ -123,8 +125,6 @@ open module org.jabref.jablib {
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
 
-    requires java.base;
-
     requires javafx.base;
     requires javafx.graphics; // because of javafx.scene.paint.Color
     requires afterburner.fx;
@@ -134,7 +134,6 @@ open module org.jabref.jablib {
     requires java.desktop;
 
     // SQL
-    requires java.sql;
     requires java.sql.rowset;
 
     // region: Logging

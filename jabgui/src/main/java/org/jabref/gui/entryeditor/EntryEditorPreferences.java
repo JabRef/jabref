@@ -60,6 +60,7 @@ public class EntryEditorPreferences {
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
     private final ObjectProperty<CitationFetcherType> citationFetcherType;
     private final BooleanProperty shouldShowSciteTab;
+    private final BooleanProperty shouldShowCitationContextTab;
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
 
@@ -79,6 +80,7 @@ public class EntryEditorPreferences {
                 JournalPopupEnabled.DISABLED,         // Fetch journal information online to show
                 CitationFetcherType.SEMANTIC_SCHOLAR, // Citation Fetcher Type
                 true,                                 // Show tab 'Citation information'
+                true,                                 // Show tab 'Citation contexts'
                 true,                                 // Show user comments field
                 0.5                                   // Preview Width Divider Position
         );
@@ -98,6 +100,7 @@ public class EntryEditorPreferences {
                                   JournalPopupEnabled journalPopupEnabled,
                                   CitationFetcherType citationFetcherType,
                                   boolean showSciteTab,
+                                  boolean showCitationContextTab,
                                   boolean showUserCommentsFields,
                                   double previewWidthDividerPosition) {
 
@@ -115,6 +118,7 @@ public class EntryEditorPreferences {
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
         this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
+        this.shouldShowCitationContextTab = new SimpleBooleanProperty(showCitationContextTab);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
@@ -168,6 +172,7 @@ public class EntryEditorPreferences {
         this.enablementStatus.set(preferences.shouldEnableJournalPopup());
         this.citationFetcherType.set(preferences.getCitationFetcherType());
         this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
+        this.shouldShowCitationContextTab.set(preferences.shouldShowCitationContextTab());
         this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
         this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
@@ -338,6 +343,18 @@ public class EntryEditorPreferences {
 
     public void setShouldShowSciteTab(boolean shouldShowSciteTab) {
         this.shouldShowSciteTab.set(shouldShowSciteTab);
+    }
+
+    public boolean shouldShowCitationContextTab() {
+        return this.shouldShowCitationContextTab.get();
+    }
+
+    public BooleanProperty shouldShowCitationContextTabProperty() {
+        return this.shouldShowCitationContextTab;
+    }
+
+    public void setShouldShowCitationContextTab(boolean shouldShowCitationContextTab) {
+        this.shouldShowCitationContextTab.set(shouldShowCitationContextTab);
     }
 
     public boolean shouldShowUserCommentsFields() {
