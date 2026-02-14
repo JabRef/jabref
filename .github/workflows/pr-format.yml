@@ -43,6 +43,44 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  no-html-comments:
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
+    name: No HTML comments
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+
+      - name: Check for existence of section "Checklist"
+        id: check_mandatory_section
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+
+          if echo "$BODY" | grep -q "<!--"; then
+            echo "❌ HTML comments present"
+            exit 1
+          else
+            echo "✅ No HTML comments found"
+            exit 0
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   mandatory-checks-section-exists:
     if: >
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
@@ -55,7 +93,7 @@ jobs:
           startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
         )
       )
-    name: Mandatory Checks present
+    name: Mandatory Checklist present
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
@@ -64,17 +102,17 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
 
-      - name: Check for existence of Mandatory Checks section
+      - name: Check for existence of section "Checklist"
         id: check_mandatory_section
         run: |
           set -e
 
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
 
-          if echo "$BODY" | grep -q "### Mandatory checks"; then
-            echo "✅ '### Mandatory checks' section found."
+          if echo "$BODY" | grep -q "### Checklist"; then
+            echo "✅ '### Checklist' section found."
           else
-            echo "❌ '### Mandatory checks' section is missing!"
+            echo "❌ '### Checklist' section is missing!"
             exit 1
           fi
         env:
@@ -94,6 +132,7 @@ jobs:
       )
     name: PR checklist OK
     runs-on: ubuntu-slim
+    needs: [ mandatory-checks-section-exists ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -105,14 +144,8 @@ jobs:
         run: |
           set -e
 
-          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | grep -A5000 '### Mandatory checks')
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | grep -A20 '### Checklist')
           echo "Found body: $BODY"
-
-          # Ensure the section exists
-          if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checks"; then
-              echo "❌ '### Mandatory checks' section is missing!"
-              exit 1
-          fi
 
           BOXES=$(printf '%s\n' "$BODY" | grep "^- \[")
           echo "Found boxes: $BOXES"
@@ -126,8 +159,8 @@ jobs:
 
           LINE_COUNT=$(echo "$BOXES" | wc -l)
 
-          if [ "$LINE_COUNT" -ne 6 ]; then
-            echo "❌ Found $LINE_COUNT lines instead of 6 required lines"
+          if [ "$LINE_COUNT" -ne 7 ]; then
+            echo "❌ Found $LINE_COUNT lines instead of 7 required lines"
             exit 1
           fi
 

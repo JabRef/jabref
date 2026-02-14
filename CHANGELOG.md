@@ -22,12 +22,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability to copy selected text from AI chat interface. [#14655](https://github.com/JabRef/jabref/issues/14655)
 - We added cover images for books, which will display in entry previews if available, and can be automatically downloaded when adding an entry via ISBN. [#10120](https://github.com/JabRef/jabref/issues/10120)
 - We added API key configuration support for [OpenAlex](https://openalex.org/). [#15023](https://github.com/JabRef/jabref/pull/15023)
+- We added a warning if the citation command does not contain the expected placeholders. [#15063](https://github.com/JabRef/jabref/pull/15063)
 - We added API key configuration support for SemanticScholar. [#15023](https://github.com/JabRef/jabref/pull/15023)
 - REST-API: Added more commands (`selectentries`, `open`, `focus`). [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Added the possibility to trigger the import dialog. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - REST-API: Allow import of supported formats via `POST http://localhost:23119/libraries/current/entries`. [#14896](https://github.com/JabRef/jabref/pull/14896)
+- We added the option to enable/disable the HTTP-Server for the browser extension to the Quick Settings on the Welcome screen [#14902](https://github.com/JabRef/jabref/issues/14902)
 - We added the ability to update bibliographic information based on the existing entry data. [#14185](https://github.com/JabRef/jabref/issues/14185)
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
+- We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
 
 ### Changed
 
@@ -36,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Batch update for bibliographic information now uses heuristics to update the field.
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
+- Moved "Rename subgroup" below "Edit group" and renamed it to "Rename group". [#15041](https://github.com/JabRef/jabref/issues/15041)
 
 ### Fixed
 
@@ -64,6 +68,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Imported entries" group was automatically selected when switching between library tabs. [#14948](https://github.com/JabRef/jabref/issues/14948)
 - Endashes and emdashes are now supported in citation keys for the LibreOffice CSL integration. [#14961](https://github.com/JabRef/jabref/issues/14961)
 - We fixed an issue where JabRef would throw an `IllegalCharacterException` trying to download pdfs using links containing a colon (`:`). [#14975](https://github.com/JabRef/jabref/issues/14975)
+- `--help` works now at JabSrv. [#15085](https://github.com/JabRef/jabref/pull/15085)
+- Fixed UI overlap in Citation Relations tab when entry titles are very long. [#15047](https://github.com/JabRef/jabref/issues/15047)
+- Fixed capitalization errors in the Automatic Field Editor. [#15068](https://github.com/JabRef/jabref/issues/15068)
 
 ### Removed
 

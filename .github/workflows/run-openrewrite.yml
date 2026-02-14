@@ -38,7 +38,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
 
       - name: Run rewrite
-        run: ./gradlew rewriteRun
+        run: gradle --no-configuration-cache :rewriteRun
 
       - name: Commit and push changes
         run: |
