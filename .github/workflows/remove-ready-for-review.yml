@@ -61,6 +61,6 @@ jobs:
       - name: Convert to draft
         if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN_COMMENT_ON_PR }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN_ADAPT_REVIEW }}
         run: |
           gh pr ready --undo "${{ github.event.pull_request.number }}"

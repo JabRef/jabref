@@ -5,7 +5,7 @@ on:
     types: [review_requested]
 
 jobs:
-  guard-review:
+  guard-reviewers:
     runs-on: ubuntu-slim
     if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     permissions:
@@ -60,7 +60,7 @@ jobs:
       - name: Remove reviewer
         if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN_COMMENT_ON_PR }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN_ADAPT_REVIEW }}
         run: |
           reviewer="${{ github.event.requested_reviewer.login }}"
           gh api \
