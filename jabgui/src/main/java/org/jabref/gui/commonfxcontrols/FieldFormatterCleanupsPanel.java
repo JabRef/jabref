@@ -5,6 +5,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -77,6 +78,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
                 .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(field -> Localization.lang("Remove formatter for %0", FieldTextMapper.getDisplayName(field)))
                 .withOnMouseClickedEvent(_ -> _ -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem()))
+                .withContentAlignment(Pos.CENTER)
                 .install(actionsColumn);
 
         viewModel.selectedCleanupProperty().setValue(cleanupsList.getSelectionModel());
