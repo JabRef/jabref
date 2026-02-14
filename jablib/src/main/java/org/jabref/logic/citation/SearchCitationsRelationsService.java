@@ -1,5 +1,6 @@
 package org.jabref.logic.citation;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -115,5 +116,13 @@ public class SearchCitationsRelationsService {
 
     public void close() {
         relationsRepository.close();
+    }
+
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return citationFetcher.getReferencesApiUri(entry);
+    }
+
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return citationFetcher.getCitationsApiUri(entry);
     }
 }
