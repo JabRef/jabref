@@ -421,6 +421,17 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     }
 
     @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        try {
+            return getUrl(entry, List.of("referenced_works"))
+                    .map(Unchecked.function(URL::toURI));
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Could not create references API URI", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Optional<URI> getCitationsApiUri(BibEntry entry) {
         try {
             return getWorkObject(entry, List.of("id"))
@@ -433,17 +444,6 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                     ));
         } catch (FetcherException e) {
             LOGGER.debug("Could not create citations API URI", e);
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<URI> getReferencesApiUri(BibEntry entry) {
-        try {
-            return getUrl(entry, List.of("referenced_works"))
-                    .map(Unchecked.function(URL::toURI));
-        } catch (MalformedURLException e) {
-            LOGGER.debug("Could not create references API URI", e);
             return Optional.empty();
         }
     }
