@@ -176,7 +176,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         HBox container = new HBox(10);
         container.setAlignment(Pos.CENTER_LEFT);
 
-        // 1. Label for the Name (e.g., "Google Scholar")
+        // 1. Label for the name (e.g., "Google Scholar")
         Label nameLabel = new Label();
         nameLabel.textProperty().bind(item.nameProperty());
         nameLabel.setMinWidth(120); // Keep alignment consistent
