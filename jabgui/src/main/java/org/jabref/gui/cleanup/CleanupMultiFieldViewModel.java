@@ -10,11 +10,14 @@ import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel;
 import org.jabref.logic.cleanup.CleanupPreferences;
 
 public class CleanupMultiFieldViewModel {
-    public final EnumSet<CleanupPreferences.CleanupStep> allJobs;
     public final SetProperty<CleanupPreferences.CleanupStep> activeJobs = new SimpleSetProperty<>(FXCollections.observableSet());
+    public final EnumSet<CleanupPreferences.CleanupStep> allSupportedJobs;
 
     public CleanupMultiFieldViewModel(CleanupPreferences preferences) {
-        allJobs = MultiFieldsCleanupPanel.getAllJobs();
-        activeJobs.set(preferences.getObservableActiveJobs());
+        this.allSupportedJobs = MultiFieldsCleanupPanel.getAllJobs();
+
+        EnumSet<CleanupPreferences.CleanupStep> initialSet = EnumSet.copyOf(preferences.getObservableActiveJobs());
+        initialSet.retainAll(allSupportedJobs);
+        activeJobs.addAll(initialSet);
     }
 }

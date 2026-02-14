@@ -38,8 +38,10 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     @Override
     public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> activeSteps = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
-        activeSteps.addAll(viewModel.activeJobs.get());
+        if (!viewModel.activeJobs.isEmpty()) {
+            activeSteps.addAll(viewModel.activeJobs.get());
+        }
 
-        return CleanupTabSelection.ofJobs(viewModel.allJobs, activeSteps);
+        return CleanupTabSelection.ofJobs(viewModel.allSupportedJobs, activeSteps);
     }
 }
