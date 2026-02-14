@@ -42,6 +42,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -293,5 +294,29 @@ public class UnlinkedFilesDialogViewModel {
 
     public SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty() {
         return checkedFileListProperty;
+    }
+
+    public ObservableList<BibEntry> getRelatedEntriesForFiles(Path file) {
+        ObservableList<BibEntry> relatedEntries = FXCollections.observableArrayList();
+        String fileName = file.getFileName().toString();
+        int dotIndex = fileName.indexOf('.');
+        int spaceIndex = fileName.indexOf(' ');
+        int separatorIndex = 0;
+        if (dotIndex != -1 || spaceIndex != -1) {
+            if (dotIndex == -1) {
+                separatorIndex = spaceIndex;
+            } else if (spaceIndex == -1) {
+                separatorIndex = dotIndex;
+            } else {
+                separatorIndex = Math.min(dotIndex, spaceIndex);
+            }
+        }
+        String citationKeyCandidate = fileName.substring(0, separatorIndex);
+
+        List<BibEntry> relatedEntriesList =
+                bibDatabase.getDatabase().getEntriesByCitationKey(citationKeyCandidate);
+
+        relatedEntries.setAll(relatedEntriesList);
+        return relatedEntries;
     }
 }
