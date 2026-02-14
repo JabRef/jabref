@@ -1,7 +1,7 @@
 name: On isuse comment
 
 on:
-  issue_text:
+  issue_comment:
     types: [ created, edited ]
 
 jobs:
@@ -74,6 +74,8 @@ jobs:
             At this point in time, you have raised {{ prs_total }} pull requests of which {{ prs_merged_percentage }}% ({{ prs_merged }}) have been merged.
           # If this is updated, also update the number at unassign-issues.yml
           days_until_unassign: 14
+          self_unassigned_text: |
+            @{{ handle }} has been unassigned from this issue.
           unassigned_text: |
             ### 📋 Assignment Update
 
