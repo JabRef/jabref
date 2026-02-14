@@ -1,5 +1,6 @@
 package org.jabref.gui.commonfxcontrols;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
@@ -118,7 +119,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
                 selected -> viewModel.cleanupsDisableProperty().setValue(!selected));
 
         cleanupsEnabled.managedProperty().bind(viewModel.cleanupEnabledManagedProperty());
-        cleanupsEnabled.visibleProperty().bind(viewModel.cleanupEnabledManagedProperty().not());
+        cleanupsEnabled.visibleProperty().bind(viewModel.cleanupEnabledManagedProperty());
 
         cleanupsList.itemsProperty().bind(viewModel.cleanupsListProperty());
         addableFields.itemsProperty().bind(viewModel.availableFieldsProperty());
@@ -143,7 +144,11 @@ public class FieldFormatterCleanupsPanel extends VBox {
     }
 
     public void setShowCleanupEnabledButton(Boolean enable) {
-        viewModel.cleanupEnabledManagedProperty().setValue(!enable);
+        viewModel.cleanupEnabledManagedProperty().setValue(enable);
+    }
+
+    public BooleanProperty cleanupsDisableProperty() {
+        return viewModel.cleanupsDisableProperty();
     }
 
     public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
