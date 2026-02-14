@@ -5,10 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -21,7 +19,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.libraryproperties.git.GitPropertiesViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -263,22 +260,20 @@ public class OpenDatabaseAction extends SimpleCommand {
             }
 
             try {
-                Map<String, List<String>> metaData = parserResult.getMetaData().getUnknownMetaData();
-
-                boolean shouldPull = metaData.getOrDefault(GitPropertiesViewModel.GIT_AUTO_PULL, Collections.emptyList()).contains("true");
-                boolean legacyEnabled = metaData.getOrDefault(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.emptyList()).contains("true");
-
-                if (shouldPull || legacyEnabled) {
+                if (parserResult.getMetaData().isGitAutoPullEnabled()) {
                     Optional<GitHandler> gitHandler = GitHandler.fromAnyPath(fileToLoad, preferences.getGitPreferences());
+
                     if (gitHandler.isPresent()) {
                         UiTaskExecutor.runInJavaFXThread(() ->
-                                dialogService.notify(Localization.lang("Git: Pulling latest changes...")));
+                                dialogService.notify(Localization.lang("Git: Pulling latest changes.")));
 
                         gitHandler.get().pullOnCurrentBranch();
 
-                        parserResult = OpenDatabase.loadDatabase(fileToLoad,
+                        parserResult = OpenDatabase.loadDatabase(
+                                fileToLoad,
                                 preferences.getImportFormatPreferences(),
-                                fileUpdateMonitor);
+                                fileUpdateMonitor
+                        );
                     }
                 }
             } catch (Exception e) {

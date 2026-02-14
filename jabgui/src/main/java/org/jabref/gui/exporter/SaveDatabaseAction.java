@@ -249,7 +249,7 @@ public class SaveDatabaseAction {
                                   try {
                                       if (shouldCommit) {
                                           // We include the path to make it easier for non-git users to see what's going on
-                                          String commitMsg = Localization.lang("Update references");
+                                          String commitMsg = Localization.lang("Automatic update via JabRef: %0", targetPath.getFileName().toString());
                                           gitHandler.createCommitOnCurrentBranch(commitMsg, false);
                                       }
 
@@ -263,7 +263,7 @@ public class SaveDatabaseAction {
                                           }
                                       }
                                   } catch (Exception e) {
-                                      LOGGER.error("Git auto-save failed", e);
+                                      LOGGER.error("Git auto-commit failed", e);
                                   }
                               });
                 }
