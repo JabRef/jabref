@@ -162,38 +162,30 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         return Optional.of(paperDetails.getCitationCount());
     }
 
-    @Override
-    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+    private Optional<URI> getApiUrl(String endpoint, BibEntry entry) {
         if (entry.getDOI().isEmpty()) {
             return Optional.empty();
         }
 
         try {
-            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString() + "/references"
+            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString() + endpoint
                     + "?fields=" + PAPER_FIELDS
                     + "&limit=1000";
             return Optional.of(new URI(apiUrl));
         } catch (URISyntaxException e) {
-            LOGGER.debug("Could not create references API URI", e);
+            LOGGER.debug("Could not create API URI for endpoint {}: {}", endpoint, e);
             return Optional.empty();
         }
     }
 
     @Override
-    public Optional<URI> getCitationsApiUri(BibEntry entry) {
-        if (entry.getDOI().isEmpty()) {
-            return Optional.empty();
-        }
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return getApiUrl("/references", entry);
+    }
 
-        try {
-            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString() + "/citations"
-                    + "?fields=" + PAPER_FIELDS
-                    + "&limit=1000";
-            return Optional.of(new URI(apiUrl));
-        } catch (URISyntaxException e) {
-            LOGGER.debug("Could not create citations API URI", e);
-            return Optional.empty();
-        }
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return getApiUrl("/citations", entry);
     }
 
     @Override
