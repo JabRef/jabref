@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
+import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
@@ -19,6 +20,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     @FXML private CheckBox protect;
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
+    @FXML private MultiFieldsCleanupPanel multiFieldsCleanupPanel;
 
     @Inject private CliPreferences preferences;
 
@@ -48,5 +50,6 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
         saveOrderConfigPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
 
         fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());
+        multiFieldsCleanupPanel.selectedJobsProperty().bindBidirectional(viewModel.multiFieldCleanupsPropertyProperty());
     }
 }
