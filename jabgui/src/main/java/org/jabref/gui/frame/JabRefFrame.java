@@ -330,6 +330,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
+                    case TOGGLE_GROUPS_INTERFACE:
+                        sidePane.getToggleCommandFor(SidePaneType.GROUPS).execute();
+                        event.consume();
+                        break;
+                    case OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION:
+                        sidePane.getToggleCommandFor(SidePaneType.OPEN_OFFICE).execute();
+                        event.consume();
+                        break;
+                    case WEB_SEARCH:
+                        sidePane.getToggleCommandFor(SidePaneType.WEB_SEARCH).execute();
+                        event.consume();
+                        break;
                     case FOCUS_ENTRY_TABLE:
                         getCurrentLibraryTab().getMainTable().requestFocus();
                         event.consume();
