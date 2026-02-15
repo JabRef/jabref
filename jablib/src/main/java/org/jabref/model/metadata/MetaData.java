@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 
 import javafx.beans.property.ObjectProperty;
@@ -18,6 +19,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
@@ -40,7 +42,8 @@ public class MetaData {
     public static final String META_FLAG = "jabref-meta: ";
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
-    public static final String SAVE_ACTIONS = "saveActions";
+    public static final String FIELDFORMATTERCLEANUPACTIONS = "fieldFormatterCleanupActions";
+    public static final String MULTIFIELDCLEANUPACTIONS = "multiFieldCleanupActions";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
@@ -72,7 +75,8 @@ public class MetaData {
     @Nullable private Charset encoding;
     @Nullable private SaveOrder saveOrder;
     @Nullable private String defaultCiteKeyPattern;
-    @Nullable private FieldFormatterCleanupActions saveActions;
+    @Nullable private FieldFormatterCleanupActions fieldFormatterCleanupActions;
+    @Nullable private Set<CleanupPreferences.CleanupStep> multiFieldCleanups;
     @Nullable private BibDatabaseMode mode;
     private boolean isProtected;
     @Nullable private String librarySpecificFileDirectory;
@@ -164,12 +168,21 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<FieldFormatterCleanupActions> getSaveActions() {
-        return Optional.ofNullable(saveActions);
+    public Optional<FieldFormatterCleanupActions> getFieldFormatterCleanupActions() {
+        return Optional.ofNullable(fieldFormatterCleanupActions);
     }
 
-    public void setSaveActions(@NonNull FieldFormatterCleanupActions saveActions) {
-        this.saveActions = saveActions;
+    public void setFieldFormatterCleanupActions(@NonNull FieldFormatterCleanupActions fieldFormatterCleanupActions) {
+        this.fieldFormatterCleanupActions = fieldFormatterCleanupActions;
+        postChange();
+    }
+
+    public Optional<Set<CleanupPreferences.CleanupStep>> getMultiFieldCleanups() {
+        return Optional.ofNullable(multiFieldCleanups);
+    }
+
+    public void setMultiFieldCleanups(Set<CleanupPreferences.CleanupStep> multiFieldCleanups) {
+        this.multiFieldCleanups = multiFieldCleanups;
         postChange();
     }
 
@@ -273,8 +286,13 @@ public class MetaData {
         postChange();
     }
 
-    public void clearSaveActions() {
-        saveActions = null;
+    public void clearFieldFormatterActions() {
+        fieldFormatterCleanupActions = null;
+        postChange();
+    }
+
+    public void clearMultiFieldCleanups() {
+        multiFieldCleanups = null;
         postChange();
     }
 
@@ -374,7 +392,8 @@ public class MetaData {
                 && Objects.equals(userFileDirectory, that.userFileDirectory)
                 && Objects.equals(latexFileDirectory, that.latexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, that.saveActions)
+                && Objects.equals(fieldFormatterCleanupActions, that.fieldFormatterCleanupActions)
+                && Objects.equals(multiFieldCleanups, that.multiFieldCleanups)
                 && (mode == that.mode)
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
@@ -384,12 +403,12 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
+                latexFileDirectory, defaultCiteKeyPattern, fieldFormatterCleanupActions, multiFieldCleanups, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", fieldFormatterCleanupActions=" + fieldFormatterCleanupActions + ", multiFieldCleanups=" + multiFieldCleanups + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {
