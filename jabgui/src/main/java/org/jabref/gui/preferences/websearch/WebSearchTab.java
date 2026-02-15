@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -93,6 +94,14 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         searchEngineUrlTemplate.setEditable(true);
 
         searchEngineTable.setItems(viewModel.getSearchEngines());
+        searchEngineTable.setFixedCellSize(30);
+        searchEngineTable.prefHeightProperty().bind(
+                Bindings.size(viewModel.getSearchEngines())
+                        .multiply(searchEngineTable.getFixedCellSize())
+                        .add(28));
+
+        searchEngineTable.minHeightProperty().bind(searchEngineTable.prefHeightProperty());
+        searchEngineTable.maxHeightProperty().bind(searchEngineTable.prefHeightProperty());
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
