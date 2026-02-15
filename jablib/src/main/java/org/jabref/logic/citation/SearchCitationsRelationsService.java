@@ -1,5 +1,6 @@
 package org.jabref.logic.citation;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +58,7 @@ public class SearchCitationsRelationsService {
                     aiService);
         });
 
-        this.relationsRepository = BibEntryCitationsAndReferencesRepositoryShell.of(
+        this.relationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
                 Directories.getCitationsRelationsDirectory(),
                 importerPreferences.getCitationsRelationsStoreTTL(),
                 importFormatPreferences,
@@ -82,9 +83,9 @@ public class SearchCitationsRelationsService {
                         || relationsRepository.isReferencesUpdatable(referencing);
         if (isFetchingAllowed) {
             List<BibEntry> referencedBy = citationFetcher.getReferences(referencing);
-            relationsRepository.insertReferences(referencing, referencedBy);
+            relationsRepository.addReferences(referencing, referencedBy);
         }
-        return relationsRepository.readReferences(referencing);
+        return relationsRepository.getReferences(referencing);
     }
 
     /// If the store was empty and nothing was fetch in any case (empty fetch, or error) then yes => empty list
@@ -97,9 +98,9 @@ public class SearchCitationsRelationsService {
                         || relationsRepository.isCitationsUpdatable(cited);
         if (isFetchingAllowed) {
             List<BibEntry> citedBy = citationFetcher.getCitations(cited);
-            relationsRepository.insertCitations(cited, citedBy);
+            relationsRepository.addCitations(cited, citedBy);
         }
-        return relationsRepository.readCitations(cited);
+        return relationsRepository.getCitations(cited);
     }
 
     public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue) throws FetcherException {
@@ -115,5 +116,13 @@ public class SearchCitationsRelationsService {
 
     public void close() {
         relationsRepository.close();
+    }
+
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return citationFetcher.getReferencesApiUri(entry);
+    }
+
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return citationFetcher.getCitationsApiUri(entry);
     }
 }

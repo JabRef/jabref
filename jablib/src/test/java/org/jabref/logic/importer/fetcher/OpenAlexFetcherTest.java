@@ -11,9 +11,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.search.query.SearchQueryVisitor;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -25,10 +29,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class OpenAlexFetcherTest {
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey);
+
     private OpenAlex fetcher;
+
     private final BibEntry NERF = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Haithem Turki and Deva Ramanan and Mahadev Satyanarayanan")
             .withField(StandardField.YEAR, "2022")
@@ -38,7 +47,10 @@ class OpenAlexFetcherTest {
 
     @BeforeEach
     void setUp() {
-        fetcher = new OpenAlex();
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKey(OpenAlex.FETCHER_NAME)).thenReturn(API_KEY);
+        fetcher = new OpenAlex(importerPreferences);
     }
 
     @Test

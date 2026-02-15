@@ -169,7 +169,7 @@ public class GroupTreeView extends BorderPane {
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
         groupTree.setOnKeyPressed(event -> {
-            if (event.getCode().toString().equals(KeyBinding.GROUP_SUBGROUP_RENAME.getDefaultKeyBinding())) {
+            if (event.getCode().toString().equals(KeyBinding.GROUP_RENAME.getDefaultKeyBinding())) {
                 TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
                 if (selectedItem != null && selectedItem.getParent() != null) {
                     viewModel.editGroup(selectedItem.getValue());
@@ -215,7 +215,10 @@ public class GroupTreeView extends BorderPane {
         // for larger group structures.
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
             LOGGER.debug("Run group search {}", searchField.getText());
+            // Ensure that group selection is changed only by the user
+            final List<GroupNodeViewModel> previouslySelectedGroup = new ArrayList<>(viewModel.selectedGroupsProperty());
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
+            viewModel.selectedGroupsProperty().setAll(previouslySelectedGroup);
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
@@ -601,6 +604,7 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                factory.createMenuItem(StandardActions.GROUP_RENAME, new ContextAction(StandardActions.GROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
@@ -614,7 +618,6 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 new Menu(Localization.lang("Sort"), null,
                         factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT,
@@ -627,7 +630,8 @@ public class GroupTreeView extends BorderPane {
                                 new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group))),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
-                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group)),
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_CLEAR, new ContextAction(StandardActions.GROUP_ENTRIES_CLEAR, group))
         );
 
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
@@ -706,7 +710,7 @@ public class GroupTreeView extends BorderPane {
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
                         case GROUP_EDIT,
-                             GROUP_SUBGROUP_RENAME ->
+                             GROUP_RENAME ->
                                 group.isEditable();
                         case GROUP_REMOVE,
                              GROUP_REMOVE_WITH_SUBGROUPS,
@@ -724,7 +728,8 @@ public class GroupTreeView extends BorderPane {
                                 group.isEditable() && group.hasSubgroups() && group.canAddEntriesIn()
                                         || group.isRoot();
                         case GROUP_ENTRIES_ADD,
-                             GROUP_ENTRIES_REMOVE ->
+                             GROUP_ENTRIES_REMOVE,
+                             GROUP_ENTRIES_CLEAR ->
                                 group.canAddEntriesIn();
                         default ->
                                 true;
@@ -741,7 +746,7 @@ public class GroupTreeView extends BorderPane {
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
                 case GROUP_EDIT,
-                     GROUP_SUBGROUP_RENAME ->
+                     GROUP_RENAME ->
                         viewModel.editGroup(group);
                 case GROUP_GENERATE_EMBEDDINGS ->
                         viewModel.generateEmbeddings(group);
@@ -767,6 +772,8 @@ public class GroupTreeView extends BorderPane {
                         viewModel.addSelectedEntries(group);
                 case GROUP_ENTRIES_REMOVE ->
                         viewModel.removeSelectedEntries(group);
+                case GROUP_ENTRIES_CLEAR ->
+                        viewModel.clearGroup(group);
             }
             groupTree.refresh();
         }
