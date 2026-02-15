@@ -1,9 +1,8 @@
 ---
-name: Suggestion for improvement
-about: Suggest an enhancement
+name: 'Case Study #2'
+about: Technical Debt
 title: ''
 labels: ''
-type: 'feature'
 assignees: ''
 
 ---
