@@ -1,8 +1,15 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
+import java.util.Comparator;
+import java.util.TreeSet;
+
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class ExternalFileTypesTabViewModelTest {
 
@@ -94,5 +102,18 @@ public class ExternalFileTypesTabViewModelTest {
 
         ObservableList<ExternalFileTypeItemViewModel> emptyFileTypes = externalFileTypesTabViewModel.getFileTypes();
         assertEquals(0, emptyFileTypes.size());
+    }
+
+    @Test
+    void resetPreferencesRestoresDefaultExternalFileTypesInTab() {
+        ObservableSet<ExternalFileType> defaultFileTypes = FXCollections.observableSet(
+                new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
+        defaultFileTypes.addAll(ExternalFileTypes.getDefaultExternalFileTypes());
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(defaultFileTypes);
+
+        externalFileTypesTabViewModel.setValues();
+
+        assertEquals(ExternalFileTypes.getDefaultExternalFileTypes().size(),
+                externalFileTypesTabViewModel.getFileTypes().size());
     }
 }
