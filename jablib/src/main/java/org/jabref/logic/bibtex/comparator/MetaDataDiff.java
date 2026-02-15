@@ -25,7 +25,8 @@ public class MetaDataDiff {
         LATEX_FILE_DIRECTORY,
         MODE,
         PROTECTED,
-        SAVE_ACTIONS,
+        FIELDFORMATTERCLEANUPACTIONS,
+        MULTIFIELDCLEANUPACTIONS,
         SAVE_SORT_ORDER,
         USER_FILE_DIRECTORY
     }
@@ -108,7 +109,8 @@ public class MetaDataDiff {
         addToListIfDiff(changes, DifferenceType.USER_FILE_DIRECTORY, originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories());
         addToListIfDiff(changes, DifferenceType.LATEX_FILE_DIRECTORY, originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories());
         addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());
-        addToListIfDiff(changes, DifferenceType.SAVE_ACTIONS, originalMetaData.getSaveActions(), newMetaData.getSaveActions());
+        addToListIfDiff(changes, DifferenceType.FIELDFORMATTERCLEANUPACTIONS, originalMetaData.getFieldFormatterCleanupActions(), newMetaData.getFieldFormatterCleanupActions());
+        addToListIfDiff(changes, DifferenceType.MULTIFIELDCLEANUPACTIONS, originalMetaData.getMultiFieldCleanups(), newMetaData.getMultiFieldCleanups());
         addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
         addToListIfDiff(changes, DifferenceType.LIBRARY_SPECIFIC_FILE_DIRECTORY, originalMetaData.getLibrarySpecificFileDirectory(), newMetaData.getLibrarySpecificFileDirectory());
         addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());

@@ -192,8 +192,10 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                     Localization.lang("LaTeX file directory");
             case DEFAULT_KEY_PATTERN ->
                     Localization.lang("Default pattern");
-            case SAVE_ACTIONS ->
-                    Localization.lang("Save actions");
+            case FIELDFORMATTERCLEANUPACTIONS ->
+                    Localization.lang("Field formatter cleanups");
+            case MULTIFIELDCLEANUPACTIONS ->
+                    Localization.lang("Multi-field cleanups");
             case MODE ->
                     Localization.lang("Library mode");
             case LIBRARY_SPECIFIC_FILE_DIRECTORY ->
