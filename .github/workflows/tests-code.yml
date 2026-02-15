@@ -13,8 +13,9 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
-  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
+  OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 
@@ -42,7 +43,8 @@ jobs:
 
   checkstyle:
     name: Checkstyle
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -51,7 +53,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run checkstyle using gradle
-        run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+        run: gradle checkstyleMain checkstyleTest checkstyleJmh
 
   openrewrite:
     name: OpenRewrite
@@ -65,7 +67,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
         run: |
-          ./gradlew --no-configuration-cache :rewriteRun
+          gradle --no-configuration-cache :rewriteRun
       - name: Output diff
         if: failure()
         run: |
@@ -87,7 +89,8 @@ jobs:
         run: git diff --exit-code
 
   format-javadoc:
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
@@ -113,8 +116,6 @@ jobs:
   modernizer:
     name: Modernizer
     runs-on: ubuntu-slim
-    # Version 1.11.0 does not run on JDK25: "java.lang.reflect.InvocationTargetException"
-    if: false
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -126,7 +127,7 @@ jobs:
         run: |
           # enable failing of this task if modernizer complains
           # sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle.kts
-          ./gradlew modernizer
+          gradle modernizer
 
   markdown:
     name: Markdown
@@ -146,7 +147,8 @@ jobs:
 
   changelog:
     name: CHANGELOG.md
-    runs-on: ubuntu-slim
+    # JBang needs a JDK
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -219,7 +221,8 @@ jobs:
 
   javadoc:
     name: JavaDoc
-    runs-on: ubuntu-slim
+    # Sometimes takes longer than 15 minutes, therefore not ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -227,7 +230,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - run: ./gradlew javadoc
+      - run: gradle javadoc
 
   tests:
     name: "Unit tests – ${{ matrix.module }}"
@@ -243,7 +246,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
-        run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
       - name: Prepare format failed test results
@@ -258,7 +261,13 @@ jobs:
 
   tests-windows:
     name: "Unit tests (Windows)"
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
+    if: >
+      github.repository_owner == 'JabRef' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'pull_request' && startsWith(github.event.pull_request.title, 'Update Gradle Wrapper'))
+      )
     runs-on: windows-latest
     strategy:
       matrix:
@@ -271,7 +280,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run ${{ matrix.module }} tests
-        run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
 
@@ -285,7 +294,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
-      - run: ./gradlew :jabkit:runJabKitPortableSmokeTest
+      - run: gradle :jabkit:runJabKitPortableSmokeTest
 
   databasetests:
     if: (github.repository_owner == 'JabRef')
@@ -312,7 +321,7 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run tests on PostgreSQL
-        run: ./gradlew :jablib:databaseTest --rerun-tasks
+        run: gradle :jablib:databaseTest --rerun-tasks
         env:
           CI: "true"
           DBMS: "postgresql"
@@ -513,7 +522,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
+        run: xvfb-run --auto-servernum gradle jacocoTestReport
         env:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -535,15 +544,8 @@ jobs:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 25
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - run: ./gradlew traceRequirements
+      - uses: ./.github/actions/setup-gradle
+      - run: gradle traceRequirements
       - if: always()
         run: cat build/reports/tracing.txt
 

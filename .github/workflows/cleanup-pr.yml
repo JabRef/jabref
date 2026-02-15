@@ -7,7 +7,8 @@ on:
 jobs:
   cleanup:
     if: github.event.pull_request.head.repo.full_name == 'JabRef/jabref'
-    runs-on: ubuntu-slim
+    # Some steps need Docker
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write

@@ -448,6 +448,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             if (doiString.isPresent() && ArXivFetcher.isManualDoi(doiString.get())) {
                 query = "doi:" + doiString.get();
             } else {
+                // TODO: Use org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer
                 Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
                 Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
                 query = String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));

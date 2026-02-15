@@ -22,11 +22,13 @@ jobs:
         with:
           packages: jq
           version: 1.0
-      - name: Trigger "On PR opened/updated (check)" for all open PRs
+      - name: Trigger "On PR opened/updated" for all open PRs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          workflow_name="On PR opened/updated (check)"
+          set -euo pipefail
+          set -x
+          workflow_name="On PR opened/updated"
 
           gh pr list --state open --json number --jq '.[] | "\(.number)"' |
           while read pr; do
