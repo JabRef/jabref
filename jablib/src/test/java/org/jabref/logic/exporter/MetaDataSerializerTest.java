@@ -1,6 +1,7 @@
 package org.jabref.logic.exporter;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
@@ -63,14 +65,26 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    void serializeSingleSaveAction() {
-        FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
+    void serializeSingleFieldFormatterCleanupAction() {
+        FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
-        metaData.setSaveActions(saveActions);
+        metaData.setFieldFormatterCleanupActions(fieldFormatterCleanupActions);
 
         Map<String, String> expectedSerialization = new TreeMap<>();
-        expectedSerialization.put("saveActions",
+        expectedSerialization.put("fieldFormatterCleanupActions",
                 "enabled;" + OS.NEWLINE + "title[lower_case]" + OS.NEWLINE + ";");
+        assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
+    void serializeSingleMultiFieldCleanup() {
+        Set<CleanupPreferences.CleanupStep> fieldFormatterCleanupActions = new HashSet<>();
+        fieldFormatterCleanupActions.add(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP);
+        metaData.setMultiFieldCleanups(fieldFormatterCleanupActions);
+
+        Map<String, String> expectedSerialization = new TreeMap<>();
+        expectedSerialization.put("multiFieldCleanupActions",
+                "DO_NOT_CONVERT_TIMESTAMP" + OS.NEWLINE + ";");
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
