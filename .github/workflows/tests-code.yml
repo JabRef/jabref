@@ -291,6 +291,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
+          fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
       - name: Detect changed windows-related classes
@@ -370,6 +371,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
+          fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
       - name: Detect changed jablib classes
