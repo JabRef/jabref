@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.http.server.cayw.gui.CitationProperties;
 
 import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
@@ -29,14 +29,33 @@ public class NatbibFormatter implements CAYWFormatter {
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
         String command = queryParams.getCommand().orElse(defaultCommand);
 
-        List<BibEntry> bibEntries = caywEntries.stream()
-                                               .map(CAYWEntry::bibEntry)
-                                               .toList();
+        boolean anyHasProperties = caywEntries.stream()
+                                              .anyMatch(e -> e.citationProperties().hasProperties());
 
-        return "\\%s{%s}".formatted(command,
-                bibEntries.stream()
-                          .map(BibEntry::getCitationKey)
+        if (!anyHasProperties) {
+            return "\\%s{%s}".formatted(command,
+                    caywEntries.stream()
+                               .map(e -> e.bibEntry().getCitationKey())
+                               .flatMap(Optional::stream)
+                               .collect(Collectors.joining(",")));
+        }
+
+        return caywEntries.stream()
+                          .map(e -> formatEntry(e, command))
                           .flatMap(Optional::stream)
-                          .collect(Collectors.joining(",")));
+                          .collect(Collectors.joining(""));
+    }
+
+    private Optional<String> formatEntry(CAYWEntry entry, String command) {
+        return entry.bibEntry().getCitationKey().map(key -> {
+            CitationProperties props = entry.citationProperties();
+            String prenote = props.getPrefix().orElse("");
+            String postnote = props.getPostnote().orElse("");
+
+            if (prenote.isEmpty() && postnote.isEmpty()) {
+                return "\\%s{%s}".formatted(command, key);
+            }
+            return "\\%s[%s][%s]{%s}".formatted(command, prenote, postnote, key);
+        });
     }
 }
