@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.http.server.cayw.gui.CitationProperties;
 
 import jakarta.ws.rs.core.MediaType;
 
@@ -19,13 +19,23 @@ public class PandocFormatter implements CAYWFormatter {
 
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
-        List<BibEntry> bibEntries = caywEntries.stream()
-                                               .map(CAYWEntry::bibEntry)
-                                               .toList();
+        return "[%s]".formatted(caywEntries.stream()
+                                           .map(this::formatEntry)
+                                           .flatMap(Optional::stream)
+                                           .collect(Collectors.joining("; ")));
+    }
 
-        return "[%s]".formatted(bibEntries.stream()
-                                          .map(entry -> entry.getCitationKey().map("@%s"::formatted))
-                                          .flatMap(Optional::stream)
-                                          .collect(Collectors.joining("; ")));
+    private Optional<String> formatEntry(CAYWEntry entry) {
+        return entry.bibEntry().getCitationKey().map(key -> {
+            CitationProperties props = entry.citationProperties();
+            StringBuilder sb = new StringBuilder();
+
+            props.getPrefix().ifPresent(p -> sb.append(p).append(" "));
+            sb.append(props.isOmitAuthor() ? "-@" : "@").append(key);
+            props.getFormattedLocator().ifPresent(l -> sb.append(", ").append(l));
+            props.getSuffix().ifPresent(s -> sb.append(", ").append(s));
+
+            return sb.toString();
+        });
     }
 }
