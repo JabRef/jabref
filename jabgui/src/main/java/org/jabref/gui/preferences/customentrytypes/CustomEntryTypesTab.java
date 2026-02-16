@@ -101,6 +101,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
             visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
             visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
         });
+
+        // Disable add button when duplicate entry type name exists
+        addNewEntryTypeButton.disableProperty().bind(viewModel.addButtonDisabledProperty());
+
     }
 
     private void setupEntryTypesTable() {

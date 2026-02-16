@@ -13,6 +13,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -58,6 +60,13 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final Validator fieldValidator;
     private final Set<Field> multiLineFields = new HashSet<>();
 
+    // Property to control add button disabled state
+    private final BooleanProperty addButtonDisabled = new SimpleBooleanProperty(false);
+
+    public BooleanProperty addButtonDisabledProperty() {
+        return addButtonDisabled;
+    }
+
     Predicate<Field> isMultiline = field -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
     public CustomEntryTypesTabViewModel(BibDatabaseMode mode,
@@ -80,6 +89,9 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                 input -> StringUtil.isNotBlank(input) && !input.contains(" "),
                 ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name."))
         );
+        entryTypeToAdd.addListener((observable, oldValue, newValue) -> {
+            addButtonDisabled.set(entryTypeExists(newValue));
+        });
     }
 
     @Override
@@ -212,5 +224,22 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus fieldValidationStatus() {
         return fieldValidator.getValidationStatus();
+    }
+
+    /**
+     * Checks if entry type with given name already exists (case-insensitive).
+     */
+    private boolean entryTypeExists(String typeName) {
+        if (typeName == null || typeName.trim().isEmpty()) {
+            return false;
+        }
+
+        String normalizedName = typeName.trim().toLowerCase();
+
+        // Check in current entry types list (both custom and standard are here)
+        boolean exists = entryTypesWithFields.stream()
+                                             .anyMatch(vm -> vm.entryType().getValue().getType().getName().toLowerCase().equals(normalizedName));
+
+        return exists;
     }
 }
