@@ -2,22 +2,40 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 }
+
+group = "org.jabref.jabsrv"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
 application{
     mainClass.set("org.jabref.http.server.cli.ServerCli")
     mainModule.set("org.jabref.jabsrv.cli")
 
     applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core",
+
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
-        "-XX:+UseZGC", "-XX:+ZUncommit",
-        "-XX:+UseStringDeduplication",
-
-        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
+        "-XX:+UseStringDeduplication"
     )
+}
+
+// See https://bugs.openjdk.org/browse/JDK-8342623
+val target = java.toolchain.languageVersion.get().asInt()
+if (target >= 26) {
+    dependencies {
+        implementation("org.openjfx:jdk-jsobject")
+    }
+} else {
+    configurations.all {
+        exclude(group = "org.openjfx", module = "jdk-jsobject")
+    }
 }
 
 dependencies {

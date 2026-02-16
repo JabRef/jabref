@@ -23,7 +23,9 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 
 public class FieldFormatterCleanupsPanelViewModel {
-//    private final BooleanProperty cleanupsDisabledProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty cleanupEnabledManagedProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<FieldFormatterCleanup> cleanupsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()), Comparator.comparing(FieldTextMapper::getDisplayName)));
@@ -69,9 +71,13 @@ public class FieldFormatterCleanupsPanelViewModel {
         cleanupsListProperty.remove(cleanup);
     }
 
-//    public BooleanProperty cleanupsDisabledProperty() {
-//        return cleanupsDisabledProperty;
-//    }
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
+
+    public BooleanProperty cleanupEnabledManagedProperty() {
+        return cleanupEnabledManagedProperty;
+    }
 
     public ListProperty<FieldFormatterCleanup> cleanupsListProperty() {
         return cleanupsListProperty;

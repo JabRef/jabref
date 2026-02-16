@@ -546,7 +546,7 @@ public class ImportHandler {
                                          .flatMap(grp -> grp.getChildren()
                                                             .stream()
                                                             .filter(node -> node.getGroup() instanceof ExplicitGroup
-                                                                    && node.getGroup().getName().equals(groupName))
+                                                                    && node.getGroup().getName().equalsIgnoreCase(groupName))
                                                             .findFirst())
                                          .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
