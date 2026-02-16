@@ -51,7 +51,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KeywordsEditor extends HBox implements FieldEditorFX {
+public class KeywordsEditor extends TagsEditor {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
     private static HashBiMap<String, String> mscmap;
@@ -93,6 +93,8 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
                           FieldCheckers fieldCheckers) {
+
+        super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
 
         ViewLoader.view(this)
                   .root(this)
@@ -227,16 +229,6 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
-    }
-
-    @Override
-    public Parent getNode() {
-        return this;
-    }
-
-    @Override
-    public double getWeight() {
-        return 2;
     }
 
     private class TagContextAction extends SimpleCommand {
