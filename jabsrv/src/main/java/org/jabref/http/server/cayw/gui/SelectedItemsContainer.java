@@ -76,7 +76,8 @@ public class SelectedItemsContainer extends FlowPane {
             getChildren().addAll(label, removeButton);
 
             this.setOnMouseClicked(e -> {
-                // TODO: Handle the click event and show custom fields like prefix/suffix etc.
+                CitationPropertiesPopup popup = new CitationPropertiesPopup(entry);
+                popup.showBelow(this);
             });
         }
 
