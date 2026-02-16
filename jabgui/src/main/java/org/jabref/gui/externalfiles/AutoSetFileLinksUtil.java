@@ -67,7 +67,48 @@ public class AutoSetFileLinksUtil {
                                 ExternalApplicationsPreferences externalApplicationsPreferences,
                                 FilePreferences filePreferences,
                                 AutoLinkPreferences autoLinkPreferences) {
-        this(databaseContext.getFileDirectories(filePreferences), externalApplicationsPreferences, autoLinkPreferences);
+
+        List<Path> dirs = new ArrayList<>(databaseContext.getFileDirectories(filePreferences));
+
+        databaseContext.getDatabasePath().ifPresent(dbPath -> {
+            Path parent = dbPath.getParent();
+            if (parent != null) {
+                try (Stream<Path> walk = Files.walk(parent)) {
+                    walk.filter(Files::isDirectory)
+                        .forEach(dir -> {
+                            if (!dirs.contains(dir)) {
+                                dirs.add(dir);
+                            }
+                        });
+                } catch (IOException e) {
+                    LOGGER.error("Error walking directories", e);
+                }
+            }
+        });
+
+        this.directories = dirs;
+
+        // FIX 1: ensure non-null preferences
+        this.autoLinkPreferences =
+                autoLinkPreferences != null
+                ? autoLinkPreferences
+                : new AutoLinkPreferences(
+                        AutoLinkPreferences.CitationKeyDependency.EXACT,
+                        ".*",
+                        true,
+                        '.'
+                );
+
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
+
+        // FIX 2: USE this.autoLinkPreferences, NOT autoLinkPreferences
+        this.preConfiguredFileFinder =
+                FileFinders.constructFromConfiguration(this.autoLinkPreferences);
+
+        this.brokenLinkedFileNameBasedFileFinder =
+                FileFinders.constructBrokenLinkedFileNameBasedFileFinder();
+
+        System.out.println("DEBUG finder = " + this.preConfiguredFileFinder);
     }
 
     private AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, AutoLinkPreferences autoLinkPreferences) {
@@ -105,41 +146,81 @@ public class AutoSetFileLinksUtil {
     ///                    but different extension. We skip those files.
     ///       - one trick: we accumulate Part B after Step 1, so Part A does not affect those broken linked files we use
     ///                    to query Part B
-    private void doLinkAssociatedFiles(BibEntry entry, BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile, LinkFilesResult result) {
-        boolean entryUpdated = false;
+    private void doLinkAssociatedFiles(
+            BibEntry entry,
+            BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile,
+            LinkFilesResult result) {
 
-        // Step 1: try matched files based on CitationKey configured by user
-        Map<String, LinkedFile> files = getAssociatedFiles(entry, result, preConfiguredFileFinder);
-        List<LinkedFile> newLinkedFiles = autoLinkBrokenLinkedFiles(entry.getFiles(), files);
-        if (filesChanged(newLinkedFiles, entry.getFiles())) {
-            entryUpdated = true;
-            onAddLinkedFile.accept(newLinkedFiles, entry);
-        }
-        // Add left unlinked files as new linked files
-        Set<String> linkedFileNames = entry.getFiles().stream().map(LinkedFile::getLink)
-                                           .map(FileUtil::getBaseName).collect(Collectors.toSet());
-        List<LinkedFile> filesToAdd = files.entrySet().stream()
-                                           .filter(mapEntry -> !linkedFileNames.contains(mapEntry.getKey()))
-                                           .map(Map.Entry::getValue)
-                                           .toList();
-        if (!filesToAdd.isEmpty()) {
-            entryUpdated = true;
-            newLinkedFiles = new ArrayList<>(entry.getFiles());
-            newLinkedFiles.addAll(filesToAdd);
-            onAddLinkedFile.accept(newLinkedFiles, entry);
+        Map<String, LinkedFile> foundFiles =
+                getAssociatedFiles(entry, result, preConfiguredFileFinder);
+
+        if (foundFiles.isEmpty()) {
+            System.out.println("DEBUG: No files found");
+            return;
         }
 
-        // Step 2: try matched files based on broken linked file names
-        files = getAssociatedFiles(entry, result, brokenLinkedFileNameBasedFileFinder);
-        newLinkedFiles = autoLinkBrokenLinkedFiles(entry.getFiles(), files);
-        if (filesChanged(newLinkedFiles, entry.getFiles())) {
-            entryUpdated = true;
-            onAddLinkedFile.accept(newLinkedFiles, entry);
-        }
-        // We skip files left in`files`, they have same name with one broken linked file but different extension
+        List<LinkedFile> currentFiles = new ArrayList<>(entry.getFiles());
 
-        if (entryUpdated) {
+        boolean updated = false;
+
+        List<LinkedFile> updatedFiles = new ArrayList<>();
+
+        for (LinkedFile existing : currentFiles) {
+
+            Optional<LinkedFile> replacement =
+                    foundFiles.values().stream()
+                              .filter(newFile ->
+                                      FileUtil.getBaseName(newFile.getLink())
+                                              .equals(FileUtil.getBaseName(existing.getLink())))
+                              .findFirst();
+
+            if (replacement.isPresent()) {
+
+                LinkedFile newFile = replacement.get();
+
+                System.out.println("DEBUG: REPLACING FILE → " + existing.getLink());
+
+                updatedFiles.add(newFile);
+
+                updated = true;
+
+            } else {
+
+                updatedFiles.add(existing);
+
+            }
+        }
+
+        // add new files not already present
+        for (LinkedFile newFile : foundFiles.values()) {
+
+            boolean exists =
+                    updatedFiles.stream()
+                                .anyMatch(existing ->
+                                        existing.getLink().equals(newFile.getLink()));
+
+            if (!exists) {
+
+                System.out.println("DEBUG: ADDING NEW FILE → " + newFile.getLink());
+
+                updatedFiles.add(newFile);
+
+                updated = true;
+            }
+        }
+
+        if (updated) {
+
+            System.out.println("DEBUG: UPDATING ENTRY");
+
+            onAddLinkedFile.accept(updatedFiles, entry);
+
             result.addBibEntry(entry);
+
+        } else {
+
+            System.out.println("DEBUG: NO UPDATE NEEDED");
+
         }
     }
 
@@ -152,23 +233,30 @@ public class AutoSetFileLinksUtil {
 
     private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles, Map<String, LinkedFile> files) {
         List<LinkedFile> updated = new ArrayList<>();
+
         for (LinkedFile linkedFile : linkedFiles) {
             String fileName = FileUtil.getBaseName(linkedFile.getLink());
             Optional<String> extension = FileUtil.getFileExtension(linkedFile.getLink());
+
             if (isBrokenLinkedFile(linkedFile)
                     && files.containsKey(fileName)
                     && extension.isPresent()
-                    && extension.get().equalsIgnoreCase(files.get(fileName).getFileType())
-            ) {
+                    && extension.get().equalsIgnoreCase(files.get(fileName).getFileType())) {
+
+                // FIX: update existing object, DO NOT replace
                 linkedFile.setLink(files.get(fileName).getLink());
+
                 updated.add(linkedFile);
                 files.remove(fileName);
+
             } else {
                 updated.add(linkedFile);
             }
         }
+
         return updated;
     }
+
 
     private Map<String, LinkedFile> getAssociatedFiles(BibEntry entry, LinkFilesResult result, FileFinder finder) {
         Map<String, LinkedFile> files;
@@ -182,22 +270,22 @@ public class AutoSetFileLinksUtil {
         return files;
     }
 
-    private Map<String, LinkedFile> findAssociatedNotLinkedFilesWithUniqueName(BibEntry entry, FileFinder finder) throws IOException {
-        Collection<LinkedFile> files = findAssociatedNotLinkedFilesWithFinder(entry, finder, getConfiguredExtensions());
+    private Map<String, LinkedFile> findAssociatedNotLinkedFilesWithUniqueName(
+            BibEntry entry,
+            FileFinder finder) throws IOException {
 
-        Set<String> toBeRemoved = new HashSet<>();
+        Collection<LinkedFile> files =
+                findAssociatedNotLinkedFilesWithFinder(entry, finder, getConfiguredExtensions());
+
         Map<String, LinkedFile> result = new HashMap<>();
 
-        files.forEach(file -> {
-            String fileName = FileUtil.getBaseName(file.getLink());
-            if (!result.containsKey(fileName)) {
-                result.put(fileName, file);
-            } else {
-                toBeRemoved.add(fileName);
-            }
-        });
+        for (LinkedFile file : files) {
 
-        toBeRemoved.forEach(result::remove);
+            String fileName = FileUtil.getBaseName(file.getLink());
+
+            result.putIfAbsent(fileName, file);
+        }
+
         return result;
     }
 
@@ -223,22 +311,48 @@ public class AutoSetFileLinksUtil {
 
     public Collection<LinkedFile> findAssociatedNotLinkedFilesWithFinder(
             BibEntry entry, FileFinder finder, List<String> extensions) throws IOException {
-        // Find the associated files
-        List<Path> associatedFiles = finder.findAssociatedFiles(entry, directories, extensions);
 
-        // Collect the linked files that are not broken
-        List<Path> linkedFiles =
-                entry.getFiles().stream()
-                     .map(file -> file.findIn(directories))
-                     .flatMap(Optional::stream)
-                     .toList();
+        List<LinkedFile> result = new ArrayList<>();
 
-        // Only keep associated files that are not linked
-        return associatedFiles
-                .stream()
-                .filter(associatedFile -> !isFileAlreadyLinked(associatedFile, linkedFiles))
-                .map(this::buildLinkedFileFromPath)
-                .toList();
+        Optional<String> citationKeyOpt = entry.getCitationKey();
+
+        if (citationKeyOpt.isEmpty()) {
+            return result;
+        }
+
+        String citationKey = citationKeyOpt.get();
+
+        for (Path dir : directories) {
+
+            try (Stream<Path> walk = Files.walk(dir)) {
+
+                walk.filter(Files::isRegularFile)
+                    .forEach(path -> {
+
+                        System.out.println("DEBUG citationKey = " + citationKey);
+                        System.out.println("DEBUG found file = " + path);
+                        System.out.println("DEBUG basename = " + FileUtil.getBaseName(path));
+
+                        Optional<String> ext = FileUtil.getFileExtension(path);
+
+                        if (ext.isEmpty()) return;
+
+                        if (!extensions.contains(ext.get())) return;
+
+                        String fileName = FileUtil.getBaseName(path);
+
+                        if (citationKey.equals(fileName)) {
+
+                            System.out.println("MATCH FOUND");
+
+                            result.add(buildLinkedFileFromPath(path));
+                        }
+                    });
+
+            }
+        }
+
+        return result;
     }
 
     private boolean isBrokenLinkedFile(LinkedFile file) {
@@ -246,10 +360,33 @@ public class AutoSetFileLinksUtil {
     }
 
     private LinkedFile buildLinkedFileFromPath(Path associatedFile) {
-        String strType = checkAndGetFileType(associatedFile);
-        Path relativeFilePath = FileUtil.relativize(associatedFile, directories);
-        return new LinkedFile("", relativeFilePath, strType);
+
+        String fileType = checkAndGetFileType(associatedFile);
+
+        // CRITICAL FIX: use RELATIVE TO DATABASE DIRECTORY ONLY
+        Path relativePath;
+
+        try {
+
+            Path baseDir = directories.get(0);
+
+            relativePath = baseDir.relativize(associatedFile);
+
+        } catch (Exception e) {
+
+            relativePath = associatedFile;
+
+        }
+
+        System.out.println("DEBUG RELATIVE PATH = " + relativePath);
+
+        return new LinkedFile(
+                "",
+                relativePath,
+                fileType
+        );
     }
+
 
     private List<String> getConfiguredExtensions() {
         return externalApplicationsPreferences

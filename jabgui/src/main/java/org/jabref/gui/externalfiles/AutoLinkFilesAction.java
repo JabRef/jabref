@@ -19,6 +19,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -53,25 +54,60 @@ public class AutoLinkFilesAction extends SimpleCommand {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         final List<BibEntry> entries = stateManager.getSelectedEntries();
 
+        AutoLinkPreferences autoLinkPrefs = preferences.getAutoLinkPreferences();
+
+        if (autoLinkPrefs == null) {
+            autoLinkPrefs = new AutoLinkPreferences(
+                    AutoLinkPreferences.CitationKeyDependency.EXACT,
+                    "",
+                    true,
+                    '_'
+            );
+
+            System.out.println("DEBUG: Created fallback AutoLinkPreferences");
+        }
+
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
-                preferences.getAutoLinkPreferences());
+                autoLinkPrefs);
+
         final NamedCompoundEdit nc = new NamedCompoundEdit(Localization.lang("Automatically set file links"));
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
-            final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
-                // lambda for gui actions that are relevant when setting the linked file entry when ui is opened
-                String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
-                String oldVal = entry.getField(StandardField.FILE).orElse(null);
-                UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
-                nc.addEdit(fieldChange); // push to undo manager is in succeeded
+            final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated =
+                    (newLinkedFiles, entry) -> {
 
-                // Wait because there are several rounds in one auto-link operation
-                // The later round depends on the updated bibEntry of the previous round
-                UiTaskExecutor.runAndWaitInJavaFXThread(() -> entry.setFiles(newLinkedFiles));
-            };
+                        String newVal =
+                                FileFieldWriter.getStringRepresentation(newLinkedFiles);
+
+                        String oldVal =
+                                entry.getField(StandardField.FILE).orElse(null);
+
+                        UndoableFieldChange change =
+                                new UndoableFieldChange(
+                                        entry,
+                                        StandardField.FILE,
+                                        oldVal,
+                                        newVal);
+
+                        nc.addEdit(change);
+
+                        UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
+
+                            entry.setFiles(newLinkedFiles);
+
+                            entry.setField(
+                                    StandardField.FILE,
+                                    FileFieldWriter.getStringRepresentation(newLinkedFiles)
+                            );
+
+                            System.out.println("DEBUG: FILE FIELD UPDATED → " +
+                                    FileFieldWriter.getStringRepresentation(newLinkedFiles));
+                        });
+
+                    };
 
             @Override
             protected AutoSetFileLinksUtil.LinkFilesResult call() {
