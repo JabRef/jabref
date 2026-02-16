@@ -13,14 +13,14 @@ public class LastPage implements LayoutFormatter {
         if (s == null) {
             return "";
         }
-        //Replaces fancy characters as '-'
+        // Replaces fancy characters as '-'
         String normalized = s.trim()
                              .replace('–', '-')
                              .replace('—', '-');
-        //Splits in two parts
+        // Splits in two parts
 
         String[] pageParts = normalized.split("\\s*-{1,2}\\s*", 2);
-        //Returns Second part as last page
+        // Returns second part as last page
         if (pageParts.length == 2) {
             return pageParts[1].trim();
         } else if (pageParts.length >= 1) {

@@ -13,12 +13,12 @@ public class FirstPage implements LayoutFormatter {
         if (s == null) {
             return "";
         }
-        //Replaces fancy characters as '-'
+        // Replaces fancy characters as '-'
         String normalized = s.trim()
                              .replace('–', '-')
                              .replace('—', '-');
 
-        //Splits the numbers in two parts, shows only first
+        // Splits the numbers in two parts, shows only first
         String[] pageParts = normalized.split("\\s*-{1,2}\\s*", 2);
 
         if (pageParts.length == 2) {
