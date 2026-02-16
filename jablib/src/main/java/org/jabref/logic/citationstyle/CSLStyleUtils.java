@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -53,14 +54,19 @@ public final class CSLStyleUtils {
         }
 
         // Check if absolute path (meaning: external CSL file) - and exists
-        Path filePath = Path.of(styleFile);
-        if (filePath.isAbsolute() && Files.exists(filePath)) {
-            try (InputStream inputStream = Files.newInputStream(filePath)) {
-                return createCitationStyleFromSource(inputStream, styleFile, false);
-            } catch (IOException e) {
-                LOGGER.error("Error reading source file", e);
-                return Optional.empty();
+        try {
+            Path filePath = Path.of(styleFile);
+            if (filePath.isAbsolute() && Files.exists(filePath)) {
+                try (InputStream inputStream = Files.newInputStream(filePath)) {
+                    return createCitationStyleFromSource(inputStream, styleFile, false);
+                } catch (IOException e) {
+                    LOGGER.error("Error reading source file", e);
+                    return Optional.empty();
+                }
             }
+        } catch (InvalidPathException e) {
+            LOGGER.error("Error while parsing the path of the source file", e);
+            return Optional.empty();
         }
 
         // If not an absolute path, treat as internal resource
