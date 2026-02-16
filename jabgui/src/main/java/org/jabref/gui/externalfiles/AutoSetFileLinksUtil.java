@@ -108,7 +108,6 @@ public class AutoSetFileLinksUtil {
         this.brokenLinkedFileNameBasedFileFinder =
                 FileFinders.constructBrokenLinkedFileNameBasedFileFinder();
 
-        System.out.println("DEBUG finder = " + this.preConfiguredFileFinder);
     }
 
     private AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, AutoLinkPreferences autoLinkPreferences) {
@@ -155,7 +154,6 @@ public class AutoSetFileLinksUtil {
                 getAssociatedFiles(entry, result, preConfiguredFileFinder);
 
         if (foundFiles.isEmpty()) {
-            System.out.println("DEBUG: No files found");
             return;
         }
 
@@ -178,11 +176,14 @@ public class AutoSetFileLinksUtil {
 
                 LinkedFile newFile = replacement.get();
 
-                System.out.println("DEBUG: REPLACING FILE → " + existing.getLink());
+                // ONLY replace if existing file is broken
+                if (isBrokenLinkedFile(existing)) {
+                    existing.setLink(newFile.getLink());
+                    existing.setFileType(newFile.getFileType());
+                    updated = true;
+                }
 
-                updatedFiles.add(newFile);
-
-                updated = true;
+                updatedFiles.add(existing);
 
             } else {
 
@@ -201,8 +202,6 @@ public class AutoSetFileLinksUtil {
 
             if (!exists) {
 
-                System.out.println("DEBUG: ADDING NEW FILE → " + newFile.getLink());
-
                 updatedFiles.add(newFile);
 
                 updated = true;
@@ -211,15 +210,11 @@ public class AutoSetFileLinksUtil {
 
         if (updated) {
 
-            System.out.println("DEBUG: UPDATING ENTRY");
-
             onAddLinkedFile.accept(updatedFiles, entry);
 
             result.addBibEntry(entry);
 
         } else {
-
-            System.out.println("DEBUG: NO UPDATE NEEDED");
 
         }
     }
@@ -329,10 +324,6 @@ public class AutoSetFileLinksUtil {
                 walk.filter(Files::isRegularFile)
                     .forEach(path -> {
 
-                        System.out.println("DEBUG citationKey = " + citationKey);
-                        System.out.println("DEBUG found file = " + path);
-                        System.out.println("DEBUG basename = " + FileUtil.getBaseName(path));
-
                         Optional<String> ext = FileUtil.getFileExtension(path);
 
                         if (ext.isEmpty()) return;
@@ -342,9 +333,6 @@ public class AutoSetFileLinksUtil {
                         String fileName = FileUtil.getBaseName(path);
 
                         if (citationKey.equals(fileName)) {
-
-                            System.out.println("MATCH FOUND");
-
                             result.add(buildLinkedFileFromPath(path));
                         }
                     });
@@ -363,22 +351,20 @@ public class AutoSetFileLinksUtil {
 
         String fileType = checkAndGetFileType(associatedFile);
 
-        // CRITICAL FIX: use RELATIVE TO DATABASE DIRECTORY ONLY
-        Path relativePath;
+        Path relativePath = associatedFile;
 
         try {
+            Optional<Path> matchingDirectory = directories.stream()
+                                                          .filter(dir -> associatedFile.startsWith(dir))
+                                                          .findFirst();
 
-            Path baseDir = directories.get(0);
+            if (matchingDirectory.isPresent()) {
+                relativePath = matchingDirectory.get().relativize(associatedFile);
+            }
 
-            relativePath = baseDir.relativize(associatedFile);
-
-        } catch (Exception e) {
-
-            relativePath = associatedFile;
-
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Could not relativize path {}", associatedFile, e);
         }
-
-        System.out.println("DEBUG RELATIVE PATH = " + relativePath);
 
         return new LinkedFile(
                 "",
@@ -386,7 +372,6 @@ public class AutoSetFileLinksUtil {
                 fileType
         );
     }
-
 
     private List<String> getConfiguredExtensions() {
         return externalApplicationsPreferences

@@ -64,7 +64,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     '_'
             );
 
-            System.out.println("DEBUG: Created fallback AutoLinkPreferences");
         }
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
