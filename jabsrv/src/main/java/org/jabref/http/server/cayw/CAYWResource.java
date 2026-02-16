@@ -25,6 +25,7 @@ import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.cayw.format.CAYWFormatter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
+import org.jabref.http.server.cayw.gui.CitationProperties;
 import org.jabref.http.server.cayw.gui.SearchDialog;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
@@ -255,7 +256,7 @@ public class CAYWResource {
         String label = entry.getCitationKey().orElse("");
         String shortLabel = label;
         String description = entry.getField(StandardField.TITLE).orElse(entry.getAuthorTitleYear());
-        return new CAYWEntry(entry, label, shortLabel, description);
+        return new CAYWEntry(entry, label, shortLabel, description, new CitationProperties());
     }
 
     private boolean matches(CAYWEntry entry, String searchText) {
