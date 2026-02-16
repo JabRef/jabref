@@ -28,6 +28,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.HBox;
@@ -40,6 +41,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.fieldeditors.LinkedEntriesEditorViewModel;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
@@ -189,17 +191,35 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         unlinkedFilesList.setCellFactory(_ -> new CheckBoxTreeCell<>() {
             private final ComboBox<BibEntry> relatedEntries = new ComboBox<>();
             private final Label entryLink = new Label();
+            private final Button jumpToEntryButton = new Button();
             private final HBox cellContent = new HBox();
             private final HBox leftSide = new HBox();
+            private final HBox jumpIcon = new HBox();
 
             {
                 cellContent.setSpacing(10);
                 leftSide.setSpacing(5);
+                jumpIcon.setSpacing(5);
+
                 new ViewModelListCellFactory<BibEntry>()
                         .withText(entry -> entry.getCitationKey().orElse("(new)"))
                         .install(relatedEntries);
                 HBox.setHgrow(leftSide, Priority.ALWAYS);
                 relatedEntries.setPrefWidth(200);
+
+                entryLink.getStyleClass().add("hyperlink");
+                jumpToEntryButton.setGraphic(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+                jumpToEntryButton.getStyleClass().add("icon-button");
+                jumpToEntryButton.setTooltip(new Tooltip(Localization.lang("Jump to entry")));
+                jumpToEntryButton.setOnAction(_ -> {
+                    BibEntry selectedEntry = relatedEntries.getValue();
+                    if (selectedEntry != null) {
+                        stateManager.activeTabProperty().get().ifPresent(tab -> {
+                            tab.clearAndSelect(selectedEntry);
+                            tab.showAndEdit(selectedEntry);
+                        });
+                    }
+                });
             }
 
             @Override
@@ -236,7 +256,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                         } else if (fileRelatedEntries.size() > 1) {
                             relatedEntries.setPromptText(Localization.lang("Select entry to link"));
                             relatedEntries.setItems(fileRelatedEntries);
-                            cellContent.getChildren().add(relatedEntries);
+                            jumpIcon.getChildren().clear();
+                            jumpIcon.getChildren().addAll(relatedEntries, jumpToEntryButton);
+                            cellContent.getChildren().add(jumpIcon);
                         }
                     }
                     setGraphic(cellContent);
