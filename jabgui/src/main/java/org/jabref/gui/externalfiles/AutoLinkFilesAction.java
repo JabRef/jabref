@@ -63,7 +63,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     true,
                     '_'
             );
-
         }
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
@@ -105,7 +104,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                             System.out.println("DEBUG: FILE FIELD UPDATED → " +
                                     FileFieldWriter.getStringRepresentation(newLinkedFiles));
                         });
-
                     };
 
             @Override

@@ -107,7 +107,6 @@ public class AutoSetFileLinksUtil {
 
         this.brokenLinkedFileNameBasedFileFinder =
                 FileFinders.constructBrokenLinkedFileNameBasedFileFinder();
-
     }
 
     private AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, AutoLinkPreferences autoLinkPreferences) {
@@ -184,11 +183,9 @@ public class AutoSetFileLinksUtil {
                 }
 
                 updatedFiles.add(existing);
-
             } else {
 
                 updatedFiles.add(existing);
-
             }
         }
 
@@ -213,7 +210,6 @@ public class AutoSetFileLinksUtil {
             onAddLinkedFile.accept(updatedFiles, entry);
 
             result.addBibEntry(entry);
-
         } else {
 
         }
@@ -243,7 +239,6 @@ public class AutoSetFileLinksUtil {
 
                 updated.add(linkedFile);
                 files.remove(fileName);
-
             } else {
                 updated.add(linkedFile);
             }
@@ -251,7 +246,6 @@ public class AutoSetFileLinksUtil {
 
         return updated;
     }
-
 
     private Map<String, LinkedFile> getAssociatedFiles(BibEntry entry, LinkFilesResult result, FileFinder finder) {
         Map<String, LinkedFile> files;
@@ -326,9 +320,11 @@ public class AutoSetFileLinksUtil {
 
                         Optional<String> ext = FileUtil.getFileExtension(path);
 
-                        if (ext.isEmpty()) return;
+                        if (ext.isEmpty())
+                            return;
 
-                        if (!extensions.contains(ext.get())) return;
+                        if (!extensions.contains(ext.get()))
+                            return;
 
                         String fileName = FileUtil.getBaseName(path);
 
@@ -336,7 +332,6 @@ public class AutoSetFileLinksUtil {
                             result.add(buildLinkedFileFromPath(path));
                         }
                     });
-
             }
         }
 
@@ -361,7 +356,6 @@ public class AutoSetFileLinksUtil {
             if (matchingDirectory.isPresent()) {
                 relativePath = matchingDirectory.get().relativize(associatedFile);
             }
-
         } catch (IllegalArgumentException e) {
             LOGGER.debug("Could not relativize path {}", associatedFile, e);
         }
