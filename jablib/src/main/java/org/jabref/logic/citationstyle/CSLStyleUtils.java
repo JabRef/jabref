@@ -54,19 +54,20 @@ public final class CSLStyleUtils {
         }
 
         // Check if absolute path (meaning: external CSL file) - and exists
+        Path filePath;
         try {
-            Path filePath = Path.of(styleFile);
-            if (filePath.isAbsolute() && Files.exists(filePath)) {
-                try (InputStream inputStream = Files.newInputStream(filePath)) {
-                    return createCitationStyleFromSource(inputStream, styleFile, false);
-                } catch (IOException e) {
-                    LOGGER.error("Error reading source file", e);
-                    return Optional.empty();
-                }
-            }
+            filePath = Path.of(styleFile);
         } catch (InvalidPathException e) {
             LOGGER.error("Error while parsing the path of the source file", e);
             return Optional.empty();
+        }
+        if (filePath.isAbsolute() && Files.exists(filePath)) {
+            try (InputStream inputStream = Files.newInputStream(filePath)) {
+                return createCitationStyleFromSource(inputStream, styleFile, false);
+            } catch (IOException e) {
+                LOGGER.error("Error reading source file", e);
+                return Optional.empty();
+            }
         }
 
         // If not an absolute path, treat as internal resource
