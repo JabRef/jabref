@@ -74,7 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - `--help` works now at JabSrv. [#15085](https://github.com/JabRef/jabref/pull/15085)
 - Fixed UI overlap in Citation Relations tab when entry titles are very long. [#15047](https://github.com/JabRef/jabref/issues/15047)
 - Fixed capitalization errors in the Automatic Field Editor. [#15068](https://github.com/JabRef/jabref/issues/15068)
-- - We fixed an issue where auto-linking files did not update the BibEntry file list when associated files were found [#15084](https://github.com/JabRef/jabref/issues/15084)
+- We fixed an issue where auto-linking files did not update the BibEntry file list when associated files were found [#15084](https://github.com/JabRef/jabref/issues/15084)
 
 ### Removed
 
