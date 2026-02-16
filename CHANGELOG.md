@@ -30,17 +30,20 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to enable/disable the HTTP-Server for the browser extension to the Quick Settings on the Welcome screen [#14902](https://github.com/JabRef/jabref/issues/14902)
 - We added the ability to update bibliographic information based on the existing entry data. [#14185](https://github.com/JabRef/jabref/issues/14185)
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
+- We added an option to open the citation fetcher API URL in the browser in the Citations tab. [#15033](https://github.com/JabRef/jabref/issues/15033)
 - We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
 
 ### Changed
 
+- Refined the Automatic Field Editor to contextually filter field lists based on populated data in selected entries. [#15066](https://github.com/JabRef/jabref/issues/15066)
 - We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog. [#11791](https://github.com/JabRef/jabref/issues/11791)
 - Checking for existence of the "Imported entries" group is now case-insensitive. [#14999](https://github.com/JabRef/jabref/pull/14999)
 - Batch update for bibliographic information now uses heuristics to update the field.
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 - Moved "Rename subgroup" below "Edit group" and renamed it to "Rename group". [#15041](https://github.com/JabRef/jabref/issues/15041)
+- We hanged the bibliographic information update process to show a notification instead of a blocking dialog in case of errors. [#15097](https://github.com/JabRef/jabref/issues/15097)
 
 ### Fixed
 
