@@ -299,22 +299,9 @@ public class UnlinkedFilesDialogViewModel {
     public ObservableList<BibEntry> getRelatedEntriesForFiles(Path file) {
         ObservableList<BibEntry> relatedEntries = FXCollections.observableArrayList();
         String fileName = file.getFileName().toString();
-        int dotIndex = fileName.indexOf('.');
-        int spaceIndex = fileName.indexOf(' ');
-        int separatorIndex = 0;
-        if (dotIndex != -1 || spaceIndex != -1) {
-            if (dotIndex == -1) {
-                separatorIndex = spaceIndex;
-            } else if (spaceIndex == -1) {
-                separatorIndex = dotIndex;
-            } else {
-                separatorIndex = Math.min(dotIndex, spaceIndex);
-            }
-        }
-        String citationKeyCandidate = fileName.substring(0, separatorIndex);
 
         List<BibEntry> relatedEntriesList =
-                bibDatabase.getDatabase().getEntriesByCitationKey(citationKeyCandidate);
+                bibDatabase.getDatabase().getEntriesByPdfName(fileName);
 
         relatedEntries.setAll(relatedEntriesList);
         return relatedEntries;
