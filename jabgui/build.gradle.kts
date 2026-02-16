@@ -1,5 +1,4 @@
 import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.toolchain.JavaToolchainService
 
 plugins {
@@ -266,8 +265,4 @@ tasks.test {
     )
 
     maxParallelForks = 1
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
 }
