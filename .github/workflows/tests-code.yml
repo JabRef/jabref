@@ -284,6 +284,31 @@ jobs:
         env:
           CI: "true"
 
+  tests-windows-file-based:
+    name: "Unit tests (Windows) - file-based"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Detect changed windows-related classes
+        id: changed-windows-related-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
+            jablib/src/test/java/org/jabref/logic/citationstyle/CSLStyleUtilsTest.java
+
+      - uses: ./.github/actions/setup-gradle
+        if: steps.changed-windows-related-files.outputs.any_changed != 'true'
+      - name: Run jablib tests
+        if: steps.changed-windows-related-files.outputs.any_changed != 'true'
+        run: gradle :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        env:
+          CI: "true"
+
   tests-jabkit-smoke:
     name: "JabKit Smoke Test"
     runs-on: ubuntu-slim
