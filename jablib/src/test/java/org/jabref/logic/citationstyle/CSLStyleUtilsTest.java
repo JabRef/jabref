@@ -86,7 +86,7 @@ class CSLStyleUtilsTest {
     @Test
     void createStyleFromFileReturnsEmptyOptionalForInvalidPath() {
         Optional<CitationStyle> styleInfo = CSLStyleUtils.createCitationStyleFromFile("\\\\\\\\ieee.csl");
-        assertTrue(styleInfo.isEmpty());
+        assertEquals(Optional.empty(), styleInfo);
     }
 
     @ParameterizedTest
