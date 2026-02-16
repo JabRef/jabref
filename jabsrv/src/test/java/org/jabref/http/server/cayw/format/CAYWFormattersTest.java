@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
+import org.jabref.http.server.cayw.CitationProperties;
+import org.jabref.http.server.cayw.LocatorType;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
-import org.jabref.http.server.cayw.gui.CitationProperties;
-import org.jabref.http.server.cayw.gui.LocatorType;
 import org.jabref.model.entry.BibEntry;
 
 import jakarta.ws.rs.core.MediaType;

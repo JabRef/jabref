@@ -1,4 +1,4 @@
-package org.jabref.http.server.cayw.gui;
+package org.jabref.http.server.cayw;
 
 import java.util.Optional;
 import java.util.StringJoiner;

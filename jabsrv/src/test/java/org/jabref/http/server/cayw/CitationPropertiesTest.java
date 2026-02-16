@@ -2,9 +2,6 @@ package org.jabref.http.server.cayw;
 
 import java.util.Optional;
 
-import org.jabref.http.server.cayw.gui.CitationProperties;
-import org.jabref.http.server.cayw.gui.LocatorType;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

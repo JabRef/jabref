@@ -2,6 +2,7 @@ package org.jabref.http.server.cayw.gui;
 
 import java.util.Objects;
 
+import org.jabref.http.server.cayw.CitationProperties;
 import org.jabref.model.entry.BibEntry;
 
 public record CAYWEntry(

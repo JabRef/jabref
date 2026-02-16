@@ -1,6 +1,6 @@
 package org.jabref.http.dto.cayw;
 
-import org.jabref.http.server.cayw.gui.CitationProperties;
+import org.jabref.http.server.cayw.CitationProperties;
 import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.Nullable;

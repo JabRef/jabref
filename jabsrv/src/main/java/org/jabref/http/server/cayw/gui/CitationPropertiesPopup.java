@@ -13,6 +13,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 
+import org.jabref.http.server.cayw.CitationProperties;
+import org.jabref.http.server.cayw.LocatorType;
+
 public class CitationPropertiesPopup extends Popup {
 
     public CitationPropertiesPopup(CAYWEntry entry) {

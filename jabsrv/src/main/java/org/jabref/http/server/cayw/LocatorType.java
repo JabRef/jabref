@@ -1,4 +1,4 @@
-package org.jabref.http.server.cayw.gui;
+package org.jabref.http.server.cayw;
 
 public enum LocatorType {
     PAGE("Page", "p."),

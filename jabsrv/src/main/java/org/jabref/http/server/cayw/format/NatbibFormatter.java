@@ -5,8 +5,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
+import org.jabref.http.server.cayw.CitationProperties;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
-import org.jabref.http.server.cayw.gui.CitationProperties;
 
 import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
