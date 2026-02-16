@@ -7,6 +7,8 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -37,12 +39,12 @@ import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -74,7 +76,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<ExternalFileSorter> fileSortList;
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
@@ -296,14 +298,29 @@ public class UnlinkedFilesDialogViewModel {
         return checkedFileListProperty;
     }
 
-    public ObservableList<BibEntry> getRelatedEntriesForFiles(Path file) {
-        ObservableList<BibEntry> relatedEntries = FXCollections.observableArrayList();
-        String fileName = file.getFileName().toString();
+    public ObservableList<BibEntry> getRelatedEntriesForFiles(Path filePath) {
+        List<BibEntry> relatedEntriesList = new ArrayList<>();
+        List<BibEntry> allEntries = bibDatabase.getDatabase().getEntries();
 
-        List<BibEntry> relatedEntriesList =
-                bibDatabase.getDatabase().getEntriesByPdfName(fileName);
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                bibDatabase,
+                preferences.getExternalApplicationsPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getAutoLinkPreferences());
 
-        relatedEntries.setAll(relatedEntriesList);
-        return relatedEntries;
+        for (BibEntry entry : allEntries) {
+            try {
+                Collection<LinkedFile> associatedFiles = util.findAssociatedNotLinkedFiles(entry);
+
+                if (associatedFiles.stream().anyMatch(linkedFile -> linkedFile.findIn(List.of(filePath.getParent())).isPresent())) {
+                    relatedEntriesList.add(entry);
+                }
+            } catch (IOException e) {
+                LOGGER.warn("Error finding associated files for entry {}", entry.getCitationKey(), e);
+            }
+        }
+
+        LOGGER.debug("Found {} related entries for file {}", relatedEntriesList.size(), filePath);
+        return FXCollections.observableArrayList(relatedEntriesList);
     }
 }

@@ -150,26 +150,6 @@ public class BibDatabase {
         return result;
     }
 
-    /// Collects entries matching the specified PDF name with their citation keys and returns these entries as list.
-    /// The order of the entries is the order they appear in the database.
-    ///
-    /// @return list of entries that contains the citation key matching the given PDF name
-    public synchronized List<BibEntry> getEntriesByPdfName(String pdf) {
-        List<BibEntry> result = new ArrayList<>();
-        String pdfWithoutExtension = pdf.substring(0, pdf.lastIndexOf('.'));
-
-        for (BibEntry entry : entries) {
-            entry.getCitationKey().ifPresent(entryKey -> {
-                int finalIndex = Math.min(entryKey.length(), pdfWithoutExtension.length());
-                String pdfName = pdfWithoutExtension.substring(0, finalIndex);
-                if (pdfName.equals(entryKey)) {
-                    result.add(entry);
-                }
-            });
-        }
-        return result;
-    }
-
     public synchronized void insertEntry(BibEntry entry) {
         insertEntry(entry, EntriesEventSource.LOCAL);
     }
