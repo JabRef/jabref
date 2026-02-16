@@ -22,6 +22,22 @@ public class NameDisplayPreferences {
         this.abbreviationStyle.set(abbreviationStyle);
     }
 
+    private NameDisplayPreferences() {
+        this(
+                DisplayStyle.NATBIB,
+                AbbreviationStyle.LASTNAME_ONLY
+        );
+    }
+
+    public static NameDisplayPreferences getDefault() {
+        return new NameDisplayPreferences();
+    }
+
+    public void setAll(NameDisplayPreferences preferences) {
+        this.displayStyle.set(preferences.displayStyle.get());
+        this.abbreviationStyle.set(preferences.abbreviationStyle.get());
+    }
+
     public DisplayStyle getDisplayStyle() {
         return displayStyle.get();
     }
