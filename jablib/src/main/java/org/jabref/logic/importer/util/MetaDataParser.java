@@ -23,7 +23,6 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
@@ -263,10 +262,10 @@ public class MetaDataParser {
 
     public static HashSet<CleanupPreferences.CleanupStep> multiFieldCleanupsParse(List<String> multiFieldMetaList) {
         if ((multiFieldMetaList != null) && (multiFieldMetaList.size() == 1)) {
-            String multiFieldMetaString = multiFieldMetaList.getFirst();
+            String multiFieldMetaString = StringUtil.unifyLineBreaks(multiFieldMetaList.getFirst(), "");
 
             HashSet<CleanupPreferences.CleanupStep> steps = new HashSet<>();
-            for (String stringStep : multiFieldMetaString.split(OS.NEWLINE)) {
+            for (String stringStep : multiFieldMetaString.split(";")) {
                 try {
                     steps.add(CleanupPreferences.CleanupStep.valueOf(stringStep));
                 } catch (IllegalArgumentException e) {

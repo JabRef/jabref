@@ -190,6 +190,7 @@ public class MetaDataSerializer {
         StringBuilder stringBuilder = new StringBuilder();
         for (CleanupPreferences.CleanupStep step : multiFieldCleanupActions) {
             stringBuilder.append(step);
+            stringBuilder.append(";");
             stringBuilder.append(delimiter);
         }
         stringRepresentation.add(stringBuilder.toString());

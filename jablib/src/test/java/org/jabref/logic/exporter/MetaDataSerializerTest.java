@@ -84,7 +84,7 @@ public class MetaDataSerializerTest {
 
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("multiFieldCleanupActions",
-                "DO_NOT_CONVERT_TIMESTAMP" + OS.NEWLINE + ";");
+                "DO_NOT_CONVERT_TIMESTAMP" + "\\;" + OS.NEWLINE + ";");
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
