@@ -46,6 +46,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- Ensure INSPIRE texkeys are used consistently when importing entries via ArXiv identifiers, aligning arXiv-id based search behavior with normal INSPIRE searches. [#12292](https://github.com/JabRef/jabref/issues/12292)
+- Fixed a NullPointerException when resetting preview Preferences. [#14410](https://github.com/JabRef/jabref/issues/14410)
 - We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
