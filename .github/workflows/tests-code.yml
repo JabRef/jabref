@@ -303,9 +303,9 @@ jobs:
             jablib/src/test/java/org/jabref/logic/citationstyle/CSLStyleUtilsTest.java
 
       - uses: ./.github/actions/setup-gradle
-        if: steps.changed-windows-related-files.outputs.any_changed != 'true'
+        if: steps.changed-windows-related-files.outputs.any_changed == 'true'
       - name: Run jablib tests
-        if: steps.changed-windows-related-files.outputs.any_changed != 'true'
+        if: steps.changed-windows-related-files.outputs.any_changed == 'true'
         run: gradle :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
