@@ -345,9 +345,6 @@ extraJavaModuleInfo {
         overrideModuleName()
         exportAllPackages()
     }
-    module("javax.websocket:javax.websocket-api", "javax.websocket.api") {
-        exportAllPackages()
-    }
     module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {
         exportAllPackages()
     }
