@@ -62,7 +62,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:3.8.3")
+    api("com.dlsc.gemsfx:gemsfx:3.9.1")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")
@@ -94,7 +94,7 @@ dependencies.constraints {
     api("commons-logging:commons-logging:1.3.5")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
-    api("de.undercouch:citeproc-java:3.4.1")
+    api("de.undercouch:citeproc-java:3.5.0")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
