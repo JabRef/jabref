@@ -26,7 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
-
+- when memoryStickMode is on relativePath will be stored [#15026](https://github.com/JabRef/jabref/pull/15026)
 ### Fixed
 
 - Fixed redundant action icons showing in empty identifier fields (DOI, Eprint, ISBN) [#14821](https://github.com/JabRef/jabref/pull/14821)
