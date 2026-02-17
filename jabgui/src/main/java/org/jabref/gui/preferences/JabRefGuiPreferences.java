@@ -931,17 +931,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
-            System.out.println(NAMES_NATBIB + ": " + newValue);
             putBoolean(NAMES_AS_IS, newValue == NameDisplayPreferences.DisplayStyle.AS_IS);
-            System.out.println(NAMES_AS_IS + ": " + newValue);
             putBoolean(NAMES_FIRST_LAST, newValue == NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME);
-            System.out.println(NAMES_FIRST_LAST + ": " + newValue);
         });
         EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(ABBR_AUTHOR_NAMES, newValue == NameDisplayPreferences.AbbreviationStyle.FULL);
-            System.out.println(ABBR_AUTHOR_NAMES + ": " + newValue);
             putBoolean(NAMES_LAST_ONLY, newValue == NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY);
-            System.out.println(NAMES_LAST_ONLY + ": " + newValue);
         });
 
         return nameDisplayPreferences;
@@ -988,7 +983,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (hasKey(ABBR_AUTHOR_NAMES) || hasKey(NAMES_LAST_ONLY)) {
             return NameDisplayPreferences.AbbreviationStyle.NONE;
         }
-        
         return defaults.getAbbreviationStyle();
     }
     // endregion
