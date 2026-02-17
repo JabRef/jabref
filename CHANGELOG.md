@@ -34,7 +34,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
 - We added "DOI" replace if entry preview has default value [#14193](https://github.com/JabRef/jabref/issues/14193)
 
-
 ### Changed
 
 - Refined the Automatic Field Editor to contextually filter field lists based on populated data in selected entries. [#15066](https://github.com/JabRef/jabref/issues/15066)
