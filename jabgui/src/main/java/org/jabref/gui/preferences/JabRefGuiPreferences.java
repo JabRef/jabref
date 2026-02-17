@@ -964,7 +964,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
         }
 
-        if (hasKey(NAMES_NATBIB) || hasKey(NAMES_AS_IS) || hasKey(NAMES_FIRST_LAST)) {
+        if (hasKey(NAMES_NATBIB) && hasKey(NAMES_AS_IS) && hasKey(NAMES_FIRST_LAST)) {
             return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
         }
         return defaults.getDisplayStyle();
@@ -980,7 +980,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (namesLastOnly) {
             return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
         }
-        if (hasKey(ABBR_AUTHOR_NAMES) || hasKey(NAMES_LAST_ONLY)) {
+        if (hasKey(ABBR_AUTHOR_NAMES) && hasKey(NAMES_LAST_ONLY)) {
             return NameDisplayPreferences.AbbreviationStyle.NONE;
         }
         return defaults.getAbbreviationStyle();
