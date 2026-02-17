@@ -10,12 +10,10 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -28,11 +26,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.cell.CheckBoxTreeCell;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -40,8 +34,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.fieldeditors.LinkedEntriesEditorViewModel;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
@@ -56,7 +48,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -98,8 +89,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
-    private LinkedEntriesEditorViewModel linkedEntriesEditorViewModel;
-
     private BibDatabaseContext bibDatabaseContext;
 
     public UnlinkedFilesDialogView() {
@@ -188,84 +177,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     private void initUnlinkedFilesList() {
-        unlinkedFilesList.setCellFactory(_ -> new CheckBoxTreeCell<>() {
-            private final ComboBox<BibEntry> relatedEntries = new ComboBox<>();
-            private final Label entryLink = new Label();
-            private final Button jumpToEntryButton = new Button();
-            private final HBox cellContent = new HBox();
-            private final HBox leftSide = new HBox();
-            private final HBox jumpIcon = new HBox();
-
-            {
-                cellContent.setSpacing(10);
-                leftSide.setSpacing(5);
-                jumpIcon.setSpacing(5);
-
-                new ViewModelListCellFactory<BibEntry>()
-                        .withText(entry -> entry.getCitationKey().orElse("(new)"))
-                        .install(relatedEntries);
-                HBox.setHgrow(leftSide, Priority.ALWAYS);
-                relatedEntries.setPrefWidth(200);
-
-                entryLink.getStyleClass().add("hyperlink");
-                jumpToEntryButton.setGraphic(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-                jumpToEntryButton.getStyleClass().add("icon-button");
-                jumpToEntryButton.setTooltip(new Tooltip(Localization.lang("Jump to entry")));
-                jumpToEntryButton.setOnAction(_ -> {
-                    BibEntry selectedEntry = relatedEntries.getValue();
-                    if (selectedEntry != null) {
-                        stateManager.activeTabProperty().get().ifPresent(tab -> {
-                            tab.clearAndSelect(selectedEntry);
-                            tab.showAndEdit(selectedEntry);
-                        });
-                    }
-                });
-            }
-
-            @Override
-            public void updateItem(FileNodeViewModel item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    leftSide.getChildren().clear();
-                    CheckBox checkBox = (CheckBox) getGraphic();
-                    if (checkBox != null) {
-                        Label fileNameLabel = new Label(item.getDisplayText());
-                        leftSide.getChildren().addAll(checkBox, fileNameLabel);
-                    }
-                    cellContent.getChildren().clear();
-                    cellContent.getChildren().add(leftSide);
-
-                    if (item.getPath().toFile().isFile()) {
-                        ObservableList<BibEntry> fileRelatedEntries =
-                                viewModel.getRelatedEntriesForFiles(item.getPath());
-
-                        if (fileRelatedEntries.size() == 1) {
-                            BibEntry singleEntry = fileRelatedEntries.getFirst();
-                            entryLink.setText(singleEntry.getCitationKey().orElse("(new)"));
-                            entryLink.setOnMouseClicked(_ -> {
-                                stateManager.activeTabProperty().get().ifPresent(tab -> {
-                                    tab.clearAndSelect(singleEntry);
-                                    tab.showAndEdit(singleEntry);
-                                });
-                            });
-                            cellContent.getChildren().add(entryLink);
-                        } else if (fileRelatedEntries.size() > 1) {
-                            relatedEntries.setPromptText(Localization.lang("Select entry to link"));
-                            relatedEntries.setItems(fileRelatedEntries);
-                            jumpIcon.getChildren().clear();
-                            jumpIcon.getChildren().addAll(relatedEntries, jumpToEntryButton);
-                            cellContent.getChildren().add(jumpIcon);
-                        }
-                    }
-                    setGraphic(cellContent);
-                    setText(null);
-                }
-            }
-        });
+        unlinkedFilesList.setCellFactory(_ -> new UnlinkedFilesCellFactory(stateManager, viewModel));
 
         unlinkedFilesList.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

@@ -298,6 +298,9 @@ public class UnlinkedFilesDialogViewModel {
         return checkedFileListProperty;
     }
 
+    /// This method retrieves a list of BibEntry objects that are related to the given file path.
+    /// It checks for associated files that are not yet linked to any entry in the database
+    /// and returns the entries that have such associated files.
     public ObservableList<BibEntry> getRelatedEntriesForFiles(Path filePath) {
         List<BibEntry> relatedEntriesList = new ArrayList<>();
         List<BibEntry> allEntries = bibDatabase.getDatabase().getEntries();
