@@ -931,39 +931,66 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
+            System.out.println(NAMES_NATBIB + ": " + newValue);
             putBoolean(NAMES_AS_IS, newValue == NameDisplayPreferences.DisplayStyle.AS_IS);
+            System.out.println(NAMES_AS_IS + ": " + newValue);
             putBoolean(NAMES_FIRST_LAST, newValue == NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME);
+            System.out.println(NAMES_FIRST_LAST + ": " + newValue);
         });
         EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(ABBR_AUTHOR_NAMES, newValue == NameDisplayPreferences.AbbreviationStyle.FULL);
+            System.out.println(ABBR_AUTHOR_NAMES + ": " + newValue);
             putBoolean(NAMES_LAST_ONLY, newValue == NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY);
+            System.out.println(NAMES_LAST_ONLY + ": " + newValue);
         });
 
         return nameDisplayPreferences;
     }
 
-    private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyle() {
-        NameDisplayPreferences.AbbreviationStyle abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.NONE; // default
-        if (getBoolean(ABBR_AUTHOR_NAMES)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.FULL;
-        } else if (getBoolean(NAMES_LAST_ONLY)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
-        }
-        return abbreviationStyle;
+    private NameDisplayPreferences getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences defaults) {
+        return new NameDisplayPreferences(
+                getNameDisplayStyleFromBackingStore(defaults),
+                getNameAbbreviationStyleFromBackingStore(defaults)
+        );
     }
 
-    private NameDisplayPreferences.DisplayStyle getNameDisplayStyle() {
-        NameDisplayPreferences.DisplayStyle displayStyle = NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME; // default
-        if (getBoolean(NAMES_NATBIB)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.NATBIB;
-        } else if (getBoolean(NAMES_AS_IS)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.AS_IS;
-        } else if (getBoolean(NAMES_FIRST_LAST)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+    private NameDisplayPreferences.DisplayStyle getNameDisplayStyleFromBackingStore(NameDisplayPreferences defaults) {
+        boolean natbib = getBoolean(NAMES_NATBIB, false);
+        boolean asIs = getBoolean(NAMES_AS_IS, false);
+        boolean firstLast = getBoolean(NAMES_FIRST_LAST, false);
+
+        if (natbib) {
+            return NameDisplayPreferences.DisplayStyle.NATBIB;
         }
-        return displayStyle;
+        if (asIs) {
+            return NameDisplayPreferences.DisplayStyle.AS_IS;
+        }
+        if (firstLast) {
+            return NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+        }
+
+        if (hasKey(NAMES_NATBIB) || hasKey(NAMES_AS_IS) || hasKey(NAMES_FIRST_LAST)) {
+            return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
+        }
+        return defaults.getDisplayStyle();
     }
 
+    private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyleFromBackingStore(NameDisplayPreferences defaults) {
+        boolean abbrAuthorNames = getBoolean(ABBR_AUTHOR_NAMES, false);
+        boolean namesLastOnly = getBoolean(NAMES_LAST_ONLY, false);
+
+        if (abbrAuthorNames) {
+            return NameDisplayPreferences.AbbreviationStyle.FULL;
+        }
+        if (namesLastOnly) {
+            return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
+        }
+        if (hasKey(ABBR_AUTHOR_NAMES) || hasKey(NAMES_LAST_ONLY)) {
+            return NameDisplayPreferences.AbbreviationStyle.NONE;
+        }
+        
+        return defaults.getAbbreviationStyle();
+    }
     // endregion
 
     // region: Main table, main table column, and search dialog column preferences
@@ -1221,14 +1248,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return new DonationPreferences(
                 getBoolean(DONATION_NEVER_SHOW, defaults.isNeverShowAgain()),
                 getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaults.getLastShownEpochDay()));
-    }
-    // endregion
-
-    // region NameDisplay preferences
-    private NameDisplayPreferences getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences defaults) {
-        return new NameDisplayPreferences(
-                defaults.getDisplayStyle(),
-                defaults.getAbbreviationStyle());
     }
     // endregion
 

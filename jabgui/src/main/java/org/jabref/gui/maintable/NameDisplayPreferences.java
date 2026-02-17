@@ -25,7 +25,7 @@ public class NameDisplayPreferences {
     private NameDisplayPreferences() {
         this(
                 DisplayStyle.NATBIB,
-                AbbreviationStyle.LASTNAME_ONLY
+                AbbreviationStyle.FULL
         );
     }
 
