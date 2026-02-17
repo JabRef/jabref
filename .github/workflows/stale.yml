@@ -3,15 +3,19 @@ name: Mark and close stale change-request PRs
 on:
   schedule:
     - cron: "0 3 * * *"
+  pull_request:
+    paths:
+      - '.github/workflows/stale.yml'
   workflow_dispatch:
 
 permissions:
+  actions: write
   pull-requests: write
 
 jobs:
   stale:
     if: github.repository == 'JabRef/jabref'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/stale@v10
         id: stale
@@ -43,6 +47,9 @@ jobs:
           CLOSED_JSON: ${{ steps.stale.outputs.closed-issues-prs }}
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+          set -x
+          PS4='+ ${LINENO}: '
           echo "Raw payload:"
           cat <<EOF
           ${{ steps.stale.outputs.closed-issues-prs }}

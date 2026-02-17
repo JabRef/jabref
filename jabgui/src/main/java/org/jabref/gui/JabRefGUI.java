@@ -85,6 +85,7 @@ public class JabRefGUI extends Application {
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
     private static GitHandlerRegistry gitHandlerRegistry;
+    private static JournalAbbreviationRepository journalAbbreviationRepository;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -117,11 +118,13 @@ public class JabRefGUI extends Application {
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     clipBoardManager,
                     taskExecutor,
-                    gitHandlerRegistry);
+                    gitHandlerRegistry,
+                    journalAbbreviationRepository);
 
             openWindow();
 
             startBackgroundTasks();
+            setupHttpServerEnabledListener();
 
             if (!fileUpdateMonitor.isActive()) {
                 dialogService.showErrorDialogAndWait(
@@ -168,7 +171,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -443,6 +446,17 @@ public class JabRefGUI extends Application {
         }
     }
 
+    private void setupHttpServerEnabledListener() {
+        RemotePreferences remotePreferences = preferences.getRemotePreferences();
+        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> {
+            // stop in all cases, because the port might have changed
+            httpServerManager.stop();
+            if (newValue) {
+                httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+            }
+        });
+    }
+
     @Override
     public void stop() {
         LOGGER.trace("Stopping JabRef GUI");
@@ -450,6 +464,7 @@ public class JabRefGUI extends Application {
             LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
 
             // Shutdown everything in parallel to prevent causing non-shutdown of something in case of issues
+
             executor.submit(() -> {
                 LOGGER.trace("Closing citations and relations search service");
                 citationsAndRelationsSearchService.close();

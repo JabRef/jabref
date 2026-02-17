@@ -70,7 +70,7 @@ public class MSBibDatabase {
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            LOGGER.warn("Could not parse document", e);
+            LOGGER.debug("Could not parse document", e);
             return List.of();
         }
         NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");

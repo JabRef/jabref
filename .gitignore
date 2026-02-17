@@ -69,9 +69,6 @@ flatpak/JabRef-portable_linux.tar.gz
 # Gradle
 # generated when `gradlew --gui` is called
 ui/
-# for workspace specific gradle properties
-gradle.properties
-
 
 # IntelliJ IDEA
 !.idea/codeStyles
@@ -584,6 +581,8 @@ lib/ojdbc.jar
 !src/main/java/org/jabref/gui/icon
 
 !**/autosaveandbackup/*.bak
+
+!.idea/dictionaries
 
 # generated during release process
 CHANGELOG.html

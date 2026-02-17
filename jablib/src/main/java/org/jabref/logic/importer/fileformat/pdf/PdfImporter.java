@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.Importer;
@@ -30,9 +31,18 @@ import org.jspecify.annotations.NullMarked;
 /// The result might be the metadata of the given PDF *or* the list of references in the references section (also called "citations"). Each implementation should denote which of these two it supports.
 @NullMarked
 public abstract class PdfImporter extends Importer {
+
+    @Override
+    public boolean isRecognizedFormat(Reader input) throws IOException {
+        return isRecognizedFormat(new BufferedReader(input));
+    }
+
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return input.readLine().startsWith("%PDF");
+        input.mark(1_000);
+        String firstLine = input.readLine();
+        input.reset();
+        return firstLine.startsWith("%PDF");
     }
 
     @Override

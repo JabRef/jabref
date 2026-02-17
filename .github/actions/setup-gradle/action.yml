@@ -1,16 +1,33 @@
 name: Setup JDK, JBang, and gradle
 description: Setup JDK, JBang and gradle
+
+inputs:
+  distribution:
+    description: JDK distribution
+    required: false
+    default: corretto
+  javaVersion:
+    description: Java version
+    required: false
+    default: '25'
+
 runs:
   using: composite
   steps:
     - name: Setup JDK
       uses: actions/setup-java@v5
       with:
-        java-version: '25'
-        distribution: 'corretto'
+        java-version: ${{ inputs.javaVersion }}
+        distribution: ${{ inputs.distribution }}
         check-latest: true
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
+      with:
+        gradle-version: current
+      env:
+        GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+    - name: Setup TestLens
+      uses: testlens-app/setup-testlens@v1.6.1
     - name: Generate JBang cache key
       id: cache-key
       shell: bash

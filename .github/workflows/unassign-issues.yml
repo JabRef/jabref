@@ -7,8 +7,8 @@ on:
 
 jobs:
   unassign_issues:
-    if: github.repository_owner == 'JabRef'
-    runs-on: ubuntu-latest
+    if: ${{ github.repository == 'JabRef/jabref' || github.repository == 'JabRef/jabref-koppor' }}
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     outputs:
@@ -19,7 +19,7 @@ jobs:
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          reminder_comment: |
+          reminder_text: |
             ### ⏰ Assignment Reminder
 
             Hi @{{ handle }}, this is a friendly reminder about your assignment to this issue.
@@ -42,7 +42,7 @@ jobs:
 
             We appreciate your contribution and are here to help if needed!
           days_until_unassign: 14
-          unassigned_comment: |
+          unassigned_text: |
             ### 📋 Assignment Update
 
             Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
@@ -62,7 +62,7 @@ jobs:
   move_unassigned_issues:
     needs: unassign_issues
     if: ${{ needs.unassign_issues.outputs.unassigned_issues != '[]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     strategy:
       fail-fast: false
       max-parallel: 1

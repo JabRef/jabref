@@ -1,5 +1,9 @@
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.jvm.toolchain.JavaToolchainService
+
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
@@ -7,7 +11,10 @@ plugins {
 }
 
 group = "org.jabref"
-version = project.findProperty("projVersion") ?: "100.0.0"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
 // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 val mockitoAgent = configurations.create("mockitoAgent")
@@ -139,17 +146,22 @@ application {
     mainModule.set("org.jabref")
 
     applicationDefaultJvmArgs = listOf(
+        "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
+
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-modules", "jdk.incubator.vector",
 
-        "-XX:+UnlockExperimentalVMOptions",
-        "-XX:+UseCompactObjectHeaders",
-        "-XX:+UseZGC",
-        "-XX:+ZUncommit",
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
         "-XX:+UseStringDeduplication"
+
+        // Default garbage collector (G1) is sufficient
+        // More informaiton: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
+        // "-XX:+UseZGC", "-XX:+ZUncommit"
+        // "-XX:+UseG1GC"
     )
 }
 
@@ -164,6 +176,7 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
+
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
@@ -183,6 +196,7 @@ javaModulePackaging {
             include("JabRefHost.ps1")
         })
     }
+
     targetsWithOs("linux") {
         options.addAll(
             "--linux-menu-group", "Office;",

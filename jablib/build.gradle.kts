@@ -14,15 +14,19 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.35.0"
+    id("com.vanniktech.maven.publish") version "0.36.0"
 
     id("dev.jbang") version "0.4.0"
 
-    id("net.ltgt.errorprone") version "4.4.0"
-    id("net.ltgt.nullaway") version "2.3.0"
+    id("net.ltgt.errorprone") version "5.0.0"
+    id("net.ltgt.nullaway") version "3.0.0"
 }
 
-var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
+var version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("0.1.0")
+    .get()
+
 if (project.findProperty("tagbuild")?.toString() != "true") {
     version += "-SNAPSHOT"
 }
@@ -323,7 +327,9 @@ val maintainersProvider: Provider<String> = extractMaintainers.flatMap {
     it.outputFile.map { file -> file.asFile.readText() }
 }
 
-val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.0")
+val versionProvider = providers.gradleProperty("projVersionInfo")
+    .orElse(providers.environmentVariable("VERSION_INFO"))
+    .orElse("100.0.0")
 
 val year = Calendar.getInstance().get(Calendar.YEAR).toString()
 
@@ -332,6 +338,7 @@ val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDa
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
+val openAlexApiKey = providers.environmentVariable("OpenAlexApiKey").orElse("")
 val scopusApiKey = providers.environmentVariable("ScopusApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
@@ -353,6 +360,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
     inputs.property("ieeeAPIKey", ieeeAPIKey)
     inputs.property("medlineApiKey", medlineApiKey)
+    inputs.property("openAlexApiKey", openAlexApiKey)
     inputs.property("springerNatureAPIKey", springerNatureAPIKey)
     inputs.property("scopusApiKey", scopusApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
@@ -370,6 +378,7 @@ tasks.named<ProcessResources>("processResources") {
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "medlineApiKey" to inputs.properties["medlineApiKey"],
+                "openAlexApiKey" to inputs.properties["openAlexApiKey"],
                 "scopusApiKey" to inputs.properties["scopusApiKey"],
                 "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
                 "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],

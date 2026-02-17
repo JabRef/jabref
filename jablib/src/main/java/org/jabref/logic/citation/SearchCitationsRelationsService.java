@@ -1,5 +1,6 @@
 package org.jabref.logic.citation;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +58,7 @@ public class SearchCitationsRelationsService {
                     aiService);
         });
 
-        this.relationsRepository = BibEntryCitationsAndReferencesRepositoryShell.of(
+        this.relationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
                 Directories.getCitationsRelationsDirectory(),
                 importerPreferences.getCitationsRelationsStoreTTL(),
                 importFormatPreferences,
@@ -75,29 +76,31 @@ public class SearchCitationsRelationsService {
         this.relationsRepository = repository;
     }
 
-    public List<BibEntry> searchCites(BibEntry referencing) throws FetcherException {
+    public List<BibEntry> searchCites(BibEntry referencing, boolean bypassCache) throws FetcherException {
         boolean isFetchingAllowed =
-                !relationsRepository.containsReferences(referencing) ||
-                        relationsRepository.isReferencesUpdatable(referencing);
+                bypassCache
+                        || !relationsRepository.containsReferences(referencing)
+                        || relationsRepository.isReferencesUpdatable(referencing);
         if (isFetchingAllowed) {
             List<BibEntry> referencedBy = citationFetcher.getReferences(referencing);
-            relationsRepository.insertReferences(referencing, referencedBy);
+            relationsRepository.addReferences(referencing, referencedBy);
         }
-        return relationsRepository.readReferences(referencing);
+        return relationsRepository.getReferences(referencing);
     }
 
     /// If the store was empty and nothing was fetch in any case (empty fetch, or error) then yes => empty list
     /// If the store was not empty and nothing was fetched after a successful fetch => the store will be erased and the returned collection will be empty
     /// If the store was not empty and an error occurs while fetching => will return the content of the store
-    public List<BibEntry> searchCitedBy(BibEntry cited) throws FetcherException {
+    public List<BibEntry> searchCitedBy(BibEntry cited, boolean bypassCache) throws FetcherException {
         boolean isFetchingAllowed =
-                !relationsRepository.containsCitations(cited) ||
-                        relationsRepository.isCitationsUpdatable(cited);
+                bypassCache
+                        || !relationsRepository.containsCitations(cited)
+                        || relationsRepository.isCitationsUpdatable(cited);
         if (isFetchingAllowed) {
             List<BibEntry> citedBy = citationFetcher.getCitations(cited);
-            relationsRepository.insertCitations(cited, citedBy);
+            relationsRepository.addCitations(cited, citedBy);
         }
-        return relationsRepository.readCitations(cited);
+        return relationsRepository.getCitations(cited);
     }
 
     public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue) throws FetcherException {
@@ -113,5 +116,13 @@ public class SearchCitationsRelationsService {
 
     public void close() {
         relationsRepository.close();
+    }
+
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return citationFetcher.getReferencesApiUri(entry);
+    }
+
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return citationFetcher.getCitationsApiUri(entry);
     }
 }
