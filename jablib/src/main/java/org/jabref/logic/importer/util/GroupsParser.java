@@ -5,6 +5,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
@@ -72,8 +73,15 @@ public class GroupsParser {
                     throw new ParseException("Expected \"" + string + "\" to contain whitespace");
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
-                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData, userAndHost);
-                GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
+                Optional<AbstractGroup> group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData, userAndHost);
+
+                // If the group type is unknown, fromString returns empty.
+                // We skip it to prevent a ParseException.
+                if (group.isEmpty()) {
+                    continue;
+                }
+
+                GroupTreeNode newNode = GroupTreeNode.fromGroup(group.get());
                 if (cursor == null) {
                     // create new root
                     cursor = newNode;
@@ -100,44 +108,46 @@ public class GroupsParser {
     /// @param input The result from the group's toString() method.
     /// @return New instance of the encoded group.
     /// @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
-    public static AbstractGroup fromString(String input, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost)
+    public static Optional<AbstractGroup> fromString(String input, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost)
             throws ParseException {
         if (input.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
-            return keywordGroupFromString(input, keywordSeparator);
+            return Optional.of(keywordGroupFromString(input, keywordSeparator));
         }
         if (input.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
-            return allEntriesGroupFromString(input);
+            return Optional.of(allEntriesGroupFromString(input));
         }
         if (input.startsWith(SMART_GROUP_ID_FOR_MIGRATION)) {
-            // Migration: SmartGroup is replaced by ExplicitGroup
-            return smartGroupFromString(input, keywordSeparator);
+            return Optional.of(smartGroupFromString(input, keywordSeparator));
         }
         if (input.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
-            return searchGroupFromString(input);
+            return Optional.of(searchGroupFromString(input));
         }
         if (input.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
-            return explicitGroupFromString(input, keywordSeparator);
+            return Optional.of(explicitGroupFromString(input, keywordSeparator));
         }
         if (input.startsWith(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID)) {
-            return legacyExplicitGroupFromString(input, keywordSeparator);
+            return Optional.of(legacyExplicitGroupFromString(input, keywordSeparator));
         }
         if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID)) {
-            return automaticPersonsGroupFromString(input);
+            return Optional.of(automaticPersonsGroupFromString(input));
         }
         if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
-            return automaticKeywordGroupFromString(input);
+            return Optional.of(automaticKeywordGroupFromString(input));
         }
         if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_ENTRY_TYPE_GROUP_ID)) {
-            return automaticEntryTypeGroupFromString(input);
+            return Optional.of(automaticEntryTypeGroupFromString(input));
         }
         if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
-            return automaticDateGroupFromString(input);
+            return Optional.of(automaticDateGroupFromString(input));
         }
         if (input.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
-            return texGroupFromString(input, fileMonitor, metaData, userAndHost);
+            return Optional.of(texGroupFromString(input, fileMonitor, metaData, userAndHost));
         }
 
-        throw new ParseException("Unknown group: " + input);
+        // Fix: Instead of throwing an exception and stopping the whole import,
+        // we log the warning and return an empty Optional.
+        LOGGER.warn("Unknown group skipped: {}", input);
+        return Optional.empty();
     }
 
     private static AbstractGroup texGroupFromString(String input, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost) throws ParseException {
