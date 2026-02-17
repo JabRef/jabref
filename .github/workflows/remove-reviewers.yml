@@ -5,7 +5,7 @@ on:
     types: [review_requested]
 
 jobs:
-  guard-review:
+  guard-reviewers:
     runs-on: ubuntu-slim
     if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     permissions:
@@ -15,6 +15,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      - name: Output link
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL:    ${{ github.event.pull_request.html_url }}
+        run: |
+          echo "PR Number: $PR_NUMBER"
+          echo "PR URL: $PR_URL"
+          echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
       - name: Evaluate state
         id: eval
         env:
@@ -60,7 +68,7 @@ jobs:
       - name: Remove reviewer
         if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN_COMMENT_ON_PR }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN_ADAPT_REVIEW }}
         run: |
           reviewer="${{ github.event.requested_reviewer.login }}"
           gh api \
