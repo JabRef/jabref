@@ -286,26 +286,20 @@ public class AutoSetFileLinksUtil {
     }
 
     private LinkedFile buildLinkedFileFromPath(Path associatedFile) {
-
         String fileType = checkAndGetFileType(associatedFile);
 
         Path relativePath = associatedFile;
 
         try {
-
             Optional<Path> matchingDirectory =
                     directories.stream()
                                .filter(dir -> associatedFile.startsWith(dir))
                                .findFirst();
 
             if (matchingDirectory.isPresent()) {
-
-                relativePath =
-                        matchingDirectory.get().relativize(associatedFile);
+                relativePath = matchingDirectory.get().relativize(associatedFile);
             }
-
         } catch (IllegalArgumentException e) {
-
             LOGGER.debug("Could not relativize path {}", associatedFile, e);
         }
 
@@ -338,19 +332,12 @@ public class AutoSetFileLinksUtil {
 
     private static boolean isFileAlreadyLinked(Path foundFile,
                                                List<Path> linkedFiles) {
-
         return linkedFiles.stream()
                           .anyMatch(linked -> {
-
                               try {
-
-                                  return Files.isSameFile(linked,
-                                          foundFile);
-
+                                  return Files.isSameFile(linked, foundFile);
                               } catch (IOException e) {
-
                                   LOGGER.debug("Unable to check file identity", e);
-
                                   return false;
                               }
                           });
