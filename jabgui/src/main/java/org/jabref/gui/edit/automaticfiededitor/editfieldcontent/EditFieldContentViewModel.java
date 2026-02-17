@@ -15,6 +15,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -46,6 +47,9 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
     public EditFieldContentViewModel(BibDatabase database, List<BibEntry> selectedEntries, StateManager stateManager) {
         super(database, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
+
+        FieldHelper.getSetFieldsOnly(selectedEntries, getAllFields())
+                   .stream().findFirst().ifPresent(selectedField::set);
 
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> {
             if (StringUtil.isBlank(field.getName())) {
