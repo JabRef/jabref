@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -193,33 +194,12 @@ public class AutoSetFileLinksUtil {
     public Collection<LinkedFile> findAssociatedNotLinkedFilesWithFinder(
             BibEntry entry,
             FileFinder finder,
-            List<String> extensions)
-            throws IOException {
-        List<LinkedFile> result = new ArrayList<>();
-        Optional<String> citationKeyOpt = entry.getCitationKey();
-        if (citationKeyOpt.isEmpty()) {
-            return result;
-        }
-        String citationKey = citationKeyOpt.get();
-        for (Path dir : directories) {
-            try (Stream<Path> walk = Files.walk(dir)) {
-                walk.filter(Files::isRegularFile)
-                    .forEach(path -> {
-                        Optional<String> ext = FileUtil.getFileExtension(path);
-                        if (ext.isEmpty()) {
-                            return;
-                        }
-                        if (!extensions.contains(ext.get())) {
-                            return;
-                        }
-                        String fileName = FileUtil.getBaseName(path);
-                        if (citationKey.equals(fileName)) {
-                            result.add(buildLinkedFileFromPath(path));
-                        }
-                    });
-            }
-        }
-        return result;
+            List<String> extensions) throws IOException {
+
+        return finder.findAssociatedFiles(entry, directories, extensions)
+                     .stream()
+                     .map(this::buildLinkedFileFromPath)
+                     .collect(Collectors.toList());
     }
 
     private boolean isBrokenLinkedFile(LinkedFile file) {
