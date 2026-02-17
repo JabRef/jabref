@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fetcher.citation.opencitations;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,6 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -43,35 +44,45 @@ public class OpenCitationsFetcher implements CitationFetcher {
         return FETCHER_NAME;
     }
 
-    private String getApiUrl(String endpoint, BibEntry entry) throws FetcherException {
-        String doi = entry.getDOI()
-                          .orElseThrow(() -> new FetcherException("Entry does not have a DOI"))
-                          .asString();
-        return API_BASE_URL + "/" + endpoint + "/doi:" + doi;
+    private Optional<URI> getApiUrl(String endpoint, BibEntry entry) {
+        Optional<DOI> doi = entry.getDOI();
+        if (doi.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = API_BASE_URL + "/" + endpoint + "/doi:" + doi.get().asString();
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create API URI for endpoint: {}", endpoint, e);
+            return Optional.empty();
+        }
     }
 
     @Override
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
-        return fetchCitationData(entry, "references", CitationItem::citedIdentifiers);
+        Optional<URI> apiUri = getReferencesApiUri(entry);
+        if (apiUri.isEmpty()) {
+            return List.of();
+        }
+        return fetchCitationData(apiUri.get(), CitationItem::citedIdentifiers);
     }
 
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
-        return fetchCitationData(entry, "citations", CitationItem::citingIdentifiers);
+        Optional<URI> apiUri = getCitationsApiUri(entry);
+        if (apiUri.isEmpty()) {
+            return List.of();
+        }
+        return fetchCitationData(apiUri.get(), CitationItem::citingIdentifiers);
     }
 
     /// API explained at <https://api.opencitations.net/index/v2#/references/{id}> and <https://api.opencitations.net/index/v2#/citations/{id}>
-    private List<BibEntry> fetchCitationData(BibEntry entry, String endpoint, Function<CitationItem, List<CitationItem.IdentifierWithField>> identifierExtractor) throws FetcherException {
-        Optional<DOI> doi = entry.getDOI();
-        if (doi.isEmpty()) {
-            return List.of();
-        }
-
-        String apiUrl = getApiUrl(endpoint, entry);
-        LOGGER.debug("{} URL: {}", endpoint, apiUrl);
+    private List<BibEntry> fetchCitationData(URI apiUri, Function<CitationItem, List<CitationItem.IdentifierWithField>> identifierExtractor) throws FetcherException {
+        LOGGER.debug("Fetching citation data from: {}", apiUri);
 
         try {
-            URL url = URLUtil.create(apiUrl);
+            URL url = apiUri.toURL();
             URLDownload urlDownload = new URLDownload(importerPreferences, url);
             importerPreferences.getApiKey(getName())
                                .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
@@ -131,15 +142,15 @@ public class OpenCitationsFetcher implements CitationFetcher {
     /// API explained at <https://api.opencitations.net/index/v2#/reference-count/{id}>
     @Override
     public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getApiUrl("citation-count", entry);
+        if (apiUri.isEmpty()) {
             return Optional.empty();
         }
 
-        String apiUrl = getApiUrl("citation-count", entry);
-        LOGGER.debug("Citation count URL: {}", apiUrl);
+        LOGGER.debug("Citation count URL: {}", apiUri.get());
 
         try {
-            URL url = URLUtil.create(apiUrl);
+            URL url = apiUri.get().toURL();
             URLDownload urlDownload = new URLDownload(importerPreferences, url);
             importerPreferences.getApiKey(getName())
                                .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
@@ -158,5 +169,15 @@ public class OpenCitationsFetcher implements CitationFetcher {
         } catch (JsonSyntaxException e) {
             throw new FetcherException("Could not parse JSON response from OpenCitations", e);
         }
+    }
+
+    @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return getApiUrl("references", entry);
+    }
+
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return getApiUrl("citations", entry);
     }
 }

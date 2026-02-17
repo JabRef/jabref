@@ -31,18 +31,24 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability to update bibliographic information based on the existing entry data. [#14185](https://github.com/JabRef/jabref/issues/14185)
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
 - We added --entry-type-pattern option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
+- We added an option to open the citation fetcher API URL in the browser in the Citations tab. [#15033](https://github.com/JabRef/jabref/issues/15033)
+- We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
 
 ### Changed
 
+- Refined the Automatic Field Editor to contextually filter field lists based on populated data in selected entries. [#15066](https://github.com/JabRef/jabref/issues/15066)
 - We moved journal abbreviations from the "Quality" menu to the "Clean up entries" dialog. [#11791](https://github.com/JabRef/jabref/issues/11791)
 - Checking for existence of the "Imported entries" group is now case-insensitive. [#14999](https://github.com/JabRef/jabref/pull/14999)
 - Batch update for bibliographic information now uses heuristics to update the field.
 - REST-API: Command resource: `command` instead of `commandId`. [#14855](https://github.com/JabRef/jabref/pull/14855)
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 - Moved "Rename subgroup" below "Edit group" and renamed it to "Rename group". [#15041](https://github.com/JabRef/jabref/issues/15041)
+- We hanged the bibliographic information update process to show a notification instead of a blocking dialog in case of errors. [#15097](https://github.com/JabRef/jabref/issues/15097)
 
 ### Fixed
 
+- We fixed an issue where empty entry type or entry type with spaces can be created. [#15103](https://github.com/JabRef/jabref/issues/15103)
+- We fixed an issue where duplicate entry type can be created and overwrite existing entry type. [#15074](https://github.com/JabRef/jabref/issues/15074)
 - We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
@@ -66,6 +72,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Imported entries" group was automatically selected when switching between library tabs. [#14948](https://github.com/JabRef/jabref/issues/14948)
 - Endashes and emdashes are now supported in citation keys for the LibreOffice CSL integration. [#14961](https://github.com/JabRef/jabref/issues/14961)
 - We fixed an issue where JabRef would throw an `IllegalCharacterException` trying to download pdfs using links containing a colon (`:`). [#14975](https://github.com/JabRef/jabref/issues/14975)
+- `--help` works now at JabSrv. [#15085](https://github.com/JabRef/jabref/pull/15085)
+- Fixed UI overlap in Citation Relations tab when entry titles are very long. [#15047](https://github.com/JabRef/jabref/issues/15047)
+- Fixed capitalization errors in the Automatic Field Editor. [#15068](https://github.com/JabRef/jabref/issues/15068)
 
 ### Removed
 
