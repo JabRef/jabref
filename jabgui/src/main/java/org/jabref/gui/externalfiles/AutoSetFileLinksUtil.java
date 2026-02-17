@@ -105,17 +105,19 @@ public class AutoSetFileLinksUtil {
         return result;
     }
 
-    private void doLinkAssociatedFiles(BibEntry entry,
-                                       BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile,
-                                       LinkFilesResult result) {
-        Map<String, LinkedFile> foundFiles =
-                getAssociatedFiles(entry, result, preConfiguredFileFinder);
+    private void doLinkAssociatedFiles(
+            BibEntry entry,
+            BiConsumer<List<LinkedFile>, BibEntry> onAddLinkedFile,
+            LinkFilesResult result) {
+        Map<String, LinkedFile> foundFiles = new HashMap<>();
+        foundFiles.putAll(getAssociatedFiles(entry, result, preConfiguredFileFinder));
+        foundFiles.putAll(getAssociatedFiles(entry, result, brokenLinkedFileNameBasedFileFinder));
         if (foundFiles.isEmpty()) {
             return;
         }
         List<LinkedFile> currentFiles = new ArrayList<>(entry.getFiles());
-        List<LinkedFile> updatedFiles = new ArrayList<>();
         boolean updated = false;
+        List<LinkedFile> updatedFiles = new ArrayList<>();
         for (LinkedFile existing : currentFiles) {
             Optional<LinkedFile> replacement =
                     foundFiles.values().stream()
