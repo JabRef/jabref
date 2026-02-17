@@ -10,7 +10,6 @@ import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -19,7 +18,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;

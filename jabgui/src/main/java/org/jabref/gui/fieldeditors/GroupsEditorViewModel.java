@@ -1,7 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -79,12 +79,12 @@ public class GroupsEditorViewModel extends AbstractEditorViewModel {
     }
 
     public List<Keyword> getSuggestions(String request) {
-        List<Keyword> suggestions = suggestionProvider.getPossibleSuggestions().stream()
+        List<Keyword> suggestions = new ArrayList<>(suggestionProvider.getPossibleSuggestions().stream()
                                                       .map(String.class::cast)
                                                       .filter(group -> group.toLowerCase().contains(request.toLowerCase()))
                                                       .map(Keyword::new)
                                                       .distinct()
-                                                      .collect(Collectors.toList());
+                                                      .toList());
 
         Keyword requestedGroup = new Keyword(request);
         if (!suggestions.contains(requestedGroup)) {

@@ -18,8 +18,8 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -37,7 +37,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -137,13 +136,18 @@ public class GroupsEditor extends TagsEditor {
         this.setOnDragDropped(event -> {
             boolean success = false;
             if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
-                List<String> draggedGroups = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
-                if (bibEntry.isPresent() && draggedGroups.getFirst() != null) {
-                    Keyword newGroup = new Keyword(draggedGroups.getFirst());
-                    if (!groupTagsField.getTags().contains(newGroup)) {
-                        groupTagsField.addTags(newGroup);
+                Object content = event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
+                if (bibEntry.isPresent() && content instanceof List<?> rawList && !rawList.isEmpty()) {
+                    for (Object item : rawList) {
+                        if (item instanceof String path && !path.isBlank()) {
+                            String groupName = path.contains(" > ") ? path.substring(path.lastIndexOf(" > ") + 3) : path;
+                            Keyword newGroup = new Keyword(groupName);
+                            if (!groupTagsField.getTags().contains(newGroup)) {
+                                groupTagsField.addTags(newGroup);
+                            }
+                            success = true;
+                        }
                     }
-                    success = true;
                 }
             }
             event.setDropCompleted(success);
