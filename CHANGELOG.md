@@ -30,7 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to enable/disable the HTTP-Server for the browser extension to the Quick Settings on the Welcome screen [#14902](https://github.com/JabRef/jabref/issues/14902)
 - We added the ability to update bibliographic information based on the existing entry data. [#14185](https://github.com/JabRef/jabref/issues/14185)
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
-- We added --entry-type-pattern option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
+- We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
 - We added an option to open the citation fetcher API URL in the browser in the Citations tab. [#15033](https://github.com/JabRef/jabref/issues/15033)
 - We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
 
