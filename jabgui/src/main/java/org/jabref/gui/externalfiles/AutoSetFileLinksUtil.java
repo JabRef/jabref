@@ -254,6 +254,7 @@ public class AutoSetFileLinksUtil {
                 .map(ExternalFileType::getExtension)
                 .toList();
     }
+
     private String checkAndGetFileType(Path associatedFile) {
         return FileUtil.getFileExtension(associatedFile)
                        .flatMap(extension ->
