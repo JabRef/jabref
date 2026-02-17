@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -80,6 +82,17 @@ class CSLStyleUtilsTest {
         assertEquals(expectedNumericNature, styleInfo.get().isNumericStyle());
         assertEquals(expectedBibliographicNature, styleInfo.get().hasBibliography());
         assertEquals(expectedUsesHangingIndent, styleInfo.get().usesHangingIndent());
+    }
+
+    @EnabledOnOs(OS.WINDOWS)
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "\\\\ieee.csl",
+            "//ieee.csl",
+    })
+    void createStyleFromFileReturnsEmptyOptionalForInvalidPath(String filename) {
+        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(filename);
+        assertEquals(Optional.empty(), citationStyle);
     }
 
     @ParameterizedTest
