@@ -315,7 +315,7 @@ public class UnlinkedFilesDialogViewModel {
             try {
                 Collection<LinkedFile> associatedFiles = util.findAssociatedNotLinkedFiles(entry);
 
-                if (associatedFiles.stream().anyMatch(linkedFile -> linkedFile.findIn(List.of(filePath.getParent())).isPresent())) {
+                if (associatedFiles.stream().anyMatch(linkedFile -> linkedFile.findIn(List.of(filePath)).isPresent())) {
                     relatedEntriesList.add(entry);
                 }
             } catch (IOException e) {
