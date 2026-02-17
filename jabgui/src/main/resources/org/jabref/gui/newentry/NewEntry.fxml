@@ -18,7 +18,11 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="600"
+<DialogPane xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="850"
+            prefHeight="700"
+            minWidth="850"
+            minHeight="700"
         xmlns="http://javafx.com/javafx/8.0.171"
         fx:controller="org.jabref.gui.newentry.NewEntryView">
     <content>
