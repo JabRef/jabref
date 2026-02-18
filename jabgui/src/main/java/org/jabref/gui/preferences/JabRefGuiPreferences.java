@@ -980,7 +980,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (namesLastOnly) {
             return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
         }
-        if (hasKey(ABBR_AUTHOR_NAMES) && hasKey(NAMES_LAST_ONLY)) {
+        if (hasKey(ABBR_AUTHOR_NAMES) || hasKey(NAMES_LAST_ONLY)) {
             return NameDisplayPreferences.AbbreviationStyle.NONE;
         }
         return defaults.getAbbreviationStyle();
