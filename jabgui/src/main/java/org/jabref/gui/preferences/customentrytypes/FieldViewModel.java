@@ -60,7 +60,7 @@ public class FieldViewModel {
     public Field toField(EntryType type) {
         // If the field name is known by JabRef, JabRef's casing will win.
         // If the field is not known by JabRef (UnknownField), the new casing will be taken.
-        Field field = FieldFactory.parseField(type, displayName.getValue());
+        Field field = FieldFactory.parseField(type, displayName.getValue().toLowerCase());
         if (multiline.getValue()) {
             field.getProperties().add(FieldProperty.MULTILINE_TEXT);
         }
