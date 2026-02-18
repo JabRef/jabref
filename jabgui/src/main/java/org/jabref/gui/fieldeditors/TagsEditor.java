@@ -10,10 +10,8 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-/**
- * Abstract base class for tag-based field editors.
- * Provides common functionality for editors that display field values as tags.
- */
+/// Abstract base class for tag-based field editors.
+/// Provides common functionality for editors that display field values as tags.
 public abstract class TagsEditor extends HBox implements FieldEditorFX {
 
     protected final Field field;
