@@ -90,7 +90,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewField.disableProperty().bind(viewModel.selectedEntryTypeProperty().isNull());
 
         addNewEntryType.setOnAction(event -> addEntryType());
-        addNewField.setOnAction(event -> viewModel.addNewField());
+        addNewField.setOnAction(event -> addNewField());
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
         addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
@@ -286,6 +286,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addNewField() {
+        if (!viewModel.fieldValidationStatus().isValid()) {
+            return;
+        }
+
         viewModel.addNewField();
     }
 
