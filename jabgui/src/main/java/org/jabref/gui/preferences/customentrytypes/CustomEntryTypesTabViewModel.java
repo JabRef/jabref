@@ -78,7 +78,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         fieldValidator = new FunctionBasedValidator<>(
                 newFieldToAdd,
                 input -> StringUtil.isNotBlank(input) && !input.contains(" "),
-                ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name."))
+                ValidationMessage.error(Localization.lang("Field cannot be empty and must not contain spaces."))
         );
     }
 
@@ -174,7 +174,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public boolean displayNameExists(String displayName) {
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
         return entryFields.stream().anyMatch(fieldViewModel ->
-                fieldViewModel.displayNameProperty().getValue().equals(displayName));
+                fieldViewModel.displayNameProperty().getValue().equalsIgnoreCase(displayName));
     }
 
     public void removeField(FieldViewModel focusedItem) {
