@@ -166,7 +166,40 @@ class CAYWFormattersTest {
 
         BibLatexFormatter formatter = new BibLatexFormatter("autocite");
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        assertEquals("\\autocites*{key1}", actual);
+        assertEquals("\\autocite*{key1}", actual);
+    }
+    
+    @Test
+    void biblatex_omitAuthor_singleEntry() {
+        CitationProperties props = new CitationProperties();
+        props.setOmitAuthor(true);
+
+        BibLatexFormatter formatter = new BibLatexFormatter("autocite");
+        String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
+        assertEquals("\\autocite*{key1}", actual);
+    }
+
+    @Test
+    void biblatex_omitAuthor_unsupportedCommand() {
+        CitationProperties props = new CitationProperties();
+        props.setOmitAuthor(true);
+
+        BibLatexFormatter formatter = new BibLatexFormatter("textcite");
+        String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
+        assertEquals("\\textcite{key1}", actual);
+    }
+
+    @Test
+    void biblatex_omitAuthor_multipleEntries_ignored() {
+        CitationProperties props1 = new CitationProperties();
+        props1.setOmitAuthor(true);
+
+        BibLatexFormatter formatter = new BibLatexFormatter("autocite");
+        String actual = formatter.format(queryParams(null), List.of(
+                caywEntryWithProperties("key1", props1),
+                caywEntryWithProperties("key2", new CitationProperties())
+        ));
+        assertEquals("\\autocites{key1}{key2}", actual);
     }
 
     @Test
