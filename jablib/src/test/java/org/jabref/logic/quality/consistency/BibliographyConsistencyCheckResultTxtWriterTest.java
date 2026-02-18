@@ -184,7 +184,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type | citation key        | custom | Pages | Title |
+                | entry type | citation key        | Custom | Pages | Title |
                 | ---------- | ------------------- | ------ | ----- | ----- |
                 | Article    | first-very-long-key | ?      | o     | x     |
                 | Article    | second              | -      | -     | -     |
