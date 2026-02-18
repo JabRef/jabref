@@ -100,8 +100,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                                     StandardField.FILE,
                                     FileFieldWriter.getStringRepresentation(newLinkedFiles)
                             );
-
-                                    FileFieldWriter.getStringRepresentation(newLinkedFiles);
                         });
                     };
 
