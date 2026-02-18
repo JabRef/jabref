@@ -37,7 +37,7 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
         jumpIcon.setSpacing(5);
 
         new ViewModelListCellFactory<BibEntry>()
-                .withText(entry -> entry.getCitationKey().orElse("(new)"))
+                .withText(entry -> entry.getCitationKey().orElse(Localization.lang("new")))
                 .install(relatedEntries);
         HBox.setHgrow(leftSide, Priority.ALWAYS);
         relatedEntries.setPrefWidth(200);
@@ -84,7 +84,7 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
 
         if (fileRelatedEntries.size() == 1) {
             BibEntry singleEntry = fileRelatedEntries.getFirst();
-            entryLink.setText(singleEntry.getCitationKey().orElse("(new)"));
+            entryLink.setText(singleEntry.getCitationKey().orElse(Localization.lang("new")));
             entryLink.setOnMouseClicked(_ -> {
                 stateManager.activeTabProperty().get().ifPresent(tab -> {
                     tab.clearAndSelect(singleEntry);
