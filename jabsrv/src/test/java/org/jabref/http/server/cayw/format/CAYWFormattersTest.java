@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CAYWFormattersTest {
+    private static final String MMD_BRACKET_SEPARATOR = new String(new char[] {'\\', ']', '\\', '['});
 
     private List<CAYWEntry> caywEntries(String... keys) {
         if (keys == null) {
@@ -74,7 +75,7 @@ class CAYWFormattersTest {
     void mmd() {
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), caywEntries("key1", "key2"));
-        assertEquals("[#key1][][#key2][]", actual);
+        assertEquals("[#key1][#key2]", actual);
         assertEquals(MediaType.TEXT_PLAIN_TYPE, formatter.getMediaType());
     }
 
@@ -156,7 +157,7 @@ class CAYWFormattersTest {
 
         BibLatexFormatter formatter = new BibLatexFormatter("autocite");
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        assertEquals("\\autocites[see][ch. 3]{key1}", actual);
+        assertEquals("\\autocite[see][ch. 3]{key1}", actual);
     }
 
     @Test
@@ -211,7 +212,7 @@ class CAYWFormattersTest {
 
         BibLatexFormatter formatter = new BibLatexFormatter("autocite");
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        assertEquals("\\autocites[][p. 42, emphasis added]{key1}", actual);
+        assertEquals("\\autocite[][p. 42, emphasis added]{key1}", actual);
     }
 
     @Test
@@ -276,7 +277,8 @@ class CAYWFormattersTest {
         props.setLocatorValue("42");
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        assertEquals("[\\$$\\$$p. 42][#key1]", actual);
+        String expected = "[" + MMD_BRACKET_SEPARATOR + "p. 42][#key1]";
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -287,6 +289,7 @@ class CAYWFormattersTest {
         props.setLocatorValue("42");
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        assertEquals("[see\\$$\\[p. 42][#key1]", actual);
+        String expected = "[see" + MMD_BRACKET_SEPARATOR + "p. 42][#key1]";
+        assertEquals(expected, actual);
     }
 }
