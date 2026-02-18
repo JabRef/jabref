@@ -168,7 +168,7 @@ class CAYWFormattersTest {
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
         assertEquals("\\autocite*{key1}", actual);
     }
-    
+
     @Test
     void biblatex_omitAuthor_singleEntry() {
         CitationProperties props = new CitationProperties();
@@ -261,23 +261,32 @@ class CAYWFormattersTest {
     }
 
     @Test
+    void mmd_withPrefix() {
+        CitationProperties props = new CitationProperties();
+        props.setPrefix("see");
+        MMDFormatter formatter = new MMDFormatter();
+        String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
+        assertEquals("[see][#key1]", actual);
+    }
+
+    @Test
     void mmd_withLocator() {
         CitationProperties props = new CitationProperties();
         props.setLocatorType(LocatorType.PAGE);
         props.setLocatorValue("42");
-
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        assertEquals("[#key1, p. 42][]", actual);
+        assertEquals("[\\$$\\$$p. 42][#key1]", actual);
     }
 
     @Test
-    void mmd_withPrefix() {
+    void mmd_withPrefixAndLocator() {
         CitationProperties props = new CitationProperties();
         props.setPrefix("see");
-
+        props.setLocatorType(LocatorType.PAGE);
+        props.setLocatorValue("42");
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        assertEquals("[see][#key1]", actual);
+        assertEquals("[see\\$$\\[p. 42][#key1]", actual);
     }
 }

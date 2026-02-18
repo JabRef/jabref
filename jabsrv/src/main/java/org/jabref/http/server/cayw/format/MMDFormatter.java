@@ -11,6 +11,7 @@ import org.jabref.http.server.cayw.gui.CAYWEntry;
 import jakarta.ws.rs.core.MediaType;
 
 public class MMDFormatter implements CAYWFormatter {
+    private static final String MMD_BRACKET_SEPARATOR = new String(new char[] {'\\', ']', '\\', '['});
 
     @Override
     public MediaType getMediaType() {
@@ -28,15 +29,18 @@ public class MMDFormatter implements CAYWFormatter {
     private Optional<String> formatEntry(CAYWEntry entry) {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
+            String prefix = props.getPrefix().orElse(null);
+            String postnote = props.getPostnote().orElse(null);
 
-            StringBuilder keyPart = new StringBuilder("#").append(key);
-            props.getFormattedLocator().ifPresent(l -> keyPart.append(", ").append(l));
-            props.getSuffix().ifPresent(s -> keyPart.append(", ").append(s));
-
-            if (props.getPrefix().isPresent()) {
-                return "[%s][%s]".formatted(props.getPrefix().get(), keyPart);
+            if (prefix != null && postnote != null) {
+                return "[" + prefix + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
+            } else if (prefix != null) {
+                return "[" + prefix + "][#" + key + "]";
+            } else if (postnote != null) {
+                return "[" + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
+            } else {
+                return "[#" + key + "]";
             }
-            return "[%s][]".formatted(keyPart);
         });
     }
 }
