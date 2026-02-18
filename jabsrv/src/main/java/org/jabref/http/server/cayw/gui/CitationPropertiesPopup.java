@@ -15,6 +15,7 @@ import javafx.stage.Popup;
 
 import org.jabref.http.server.cayw.CitationProperties;
 import org.jabref.http.server.cayw.LocatorType;
+import org.jabref.logic.l10n.Localization;
 
 public class CitationPropertiesPopup extends Popup {
 
@@ -41,7 +42,7 @@ public class CitationPropertiesPopup extends Popup {
         TextField suffixField = new TextField();
         properties.getSuffix().ifPresent(suffixField::setText);
 
-        CheckBox omitAuthorCheck = new CheckBox("Omit Author");
+        CheckBox omitAuthorCheck = new CheckBox(Localization.lang("Omit author"));
         omitAuthorCheck.setSelected(properties.isOmitAuthor());
 
         locatorTypeCombo.valueProperty().addListener((_, _, val) -> properties.setLocatorType(val));
@@ -56,9 +57,9 @@ public class CitationPropertiesPopup extends Popup {
 
         grid.add(locatorTypeCombo, 0, 0);
         grid.add(locatorValueField, 1, 0);
-        grid.add(new Label("Prefix:"), 0, 1);
+        grid.add(new Label(Localization.lang("Prefix")), 0, 1);
         grid.add(prefixField, 1, 1);
-        grid.add(new Label("Suffix:"), 0, 2);
+        grid.add(new Label(Localization.lang("Suffix")), 0, 2);
         grid.add(suffixField, 1, 2);
         grid.add(omitAuthorCheck, 0, 3, 2, 1);
 
