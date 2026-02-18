@@ -225,7 +225,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         for (int i = 0; i < count; i++) {
             if (task.isCancelled()) {
-                return;
+                break;
             }
 
             if (doCleanup(cleanupPreferences, entries.get(i), compoundEdit, failures)) {
