@@ -337,19 +337,12 @@ extraJavaModuleInfo {
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug") {
         exportAllPackages()
     }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "org.eclipse.lsp4j.websocket") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
     module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket") {
         overrideModuleName()
-        exportAllPackages()
-    }
-    module("javax.websocket:javax.websocket-api", "javax.websocket.api") {
         exportAllPackages()
     }
     module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {
