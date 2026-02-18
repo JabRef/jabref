@@ -45,7 +45,7 @@ public class MMDFormatter implements CAYWFormatter {
             if (postnote != null) {
                 return "[" + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
             }
-            
+
             return "[#" + key + "]";
         });
     }
