@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -151,7 +152,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         entryTypesToDelete.add(focusedItem.entryType().getValue());
     }
 
-    public void addNewField() {
+    public Optional<FieldViewModel> addNewField() {
         String fieldName = newFieldToAdd.get().trim();
         Field newField = new UnknownField(fieldName);
 
@@ -161,14 +162,18 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             dialogService.showWarningDialogAndWait(
                     Localization.lang("Duplicate fields"),
                     Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", FieldTextMapper.getDisplayName(newField)));
-        } else {
-            this.selectedEntryType.getValue().addField(new FieldViewModel(
-                    newField,
-                    FieldViewModel.Mandatory.REQUIRED,
-                    FieldPriority.IMPORTANT,
-                    false));
+
+            return Optional.empty();
         }
+
+        FieldViewModel viewModel = new FieldViewModel(newField,
+                FieldViewModel.Mandatory.REQUIRED,
+                FieldPriority.IMPORTANT,
+                false);
+        this.selectedEntryType.getValue().addField(viewModel);
         newFieldToAdd.set("");
+
+        return Optional.of(viewModel);
     }
 
     public boolean displayNameExists(String displayName) {

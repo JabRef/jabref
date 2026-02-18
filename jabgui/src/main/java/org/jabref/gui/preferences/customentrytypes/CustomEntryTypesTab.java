@@ -290,7 +290,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
             return;
         }
 
-        viewModel.addNewField();
+        viewModel.addNewField().ifPresent(newlyAdded -> {
+            this.fields.getSelectionModel().select(newlyAdded);
+            this.fields.scrollTo(newlyAdded);
+        });
     }
 
     @FXML
