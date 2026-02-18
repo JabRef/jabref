@@ -80,11 +80,11 @@ public class GroupsEditorViewModel extends AbstractEditorViewModel {
 
     public List<Keyword> getSuggestions(String request) {
         List<Keyword> suggestions = new ArrayList<>(suggestionProvider.getPossibleSuggestions().stream()
-                                                      .map(String.class::cast)
-                                                      .filter(group -> group.toLowerCase().contains(request.toLowerCase()))
-                                                      .map(Keyword::new)
-                                                      .distinct()
-                                                      .toList());
+                                                                      .map(String.class::cast)
+                                                                      .filter(group -> group.toLowerCase().contains(request.toLowerCase()))
+                                                                      .map(Keyword::new)
+                                                                      .distinct()
+                                                                      .toList());
 
         Keyword requestedGroup = new Keyword(request);
         if (!suggestions.contains(requestedGroup)) {
