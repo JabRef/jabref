@@ -148,6 +148,7 @@ public class AutoSetFileLinksUtil {
                     && extension.isPresent()
                     && extension.get().equalsIgnoreCase(files.get(fileName).getFileType())) {
                 linkedFile.setLink(files.get(fileName).getLink());
+                linkedFile.setFileType(files.get(fileName).getFileType());
                 updated.add(linkedFile);
                 files.remove(fileName);
             } else {
@@ -211,11 +212,12 @@ public class AutoSetFileLinksUtil {
             BibEntry entry,
             FileFinder finder,
             List<String> extensions) throws IOException {
-
-        return finder.findAssociatedFiles(entry, directories, extensions)
-                     .stream()
-                     .map(this::buildLinkedFileFromPath)
-                     .collect(Collectors.toList());
+        List<Path> paths = finder.findAssociatedFiles(entry, directories, extensions);
+        List<LinkedFile> result = new ArrayList<>();
+        for (Path path : paths) {
+            result.add(buildLinkedFileFromPath(path));
+        }
+        return result;
     }
 
     private boolean isBrokenLinkedFile(LinkedFile file) {
