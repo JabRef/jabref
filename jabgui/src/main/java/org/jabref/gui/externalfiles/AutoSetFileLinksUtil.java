@@ -132,7 +132,6 @@ public class AutoSetFileLinksUtil {
         }
     }
 
-
     private List<LinkedFile> autoLinkBrokenLinkedFiles(
             List<LinkedFile> linkedFiles,
             Map<String, LinkedFile> foundFiles) {
