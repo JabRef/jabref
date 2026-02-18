@@ -120,25 +120,18 @@ public class AutoSetFileLinksUtil {
                 new ArrayList<>(entry.getFiles());
         List<LinkedFile> updatedFiles =
                 autoLinkBrokenLinkedFiles(currentFiles, citationKeyFiles);
+        updatedFiles.addAll(citationKeyFiles.values());
         updatedFiles =
                 autoLinkBrokenLinkedFiles(updatedFiles, brokenLinkedFiles);
         boolean updated =
                 filesChanged(updatedFiles, currentFiles);
-        for (LinkedFile file : citationKeyFiles.values()) {
-            boolean exists =
-                    updatedFiles.stream()
-                                .anyMatch(existing ->
-                                        existing.getLink().equals(file.getLink()));
-            if (!exists) {
-                updatedFiles.add(file);
-                updated = true;
-            }
-        }
+
         if (updated) {
             onAddLinkedFile.accept(updatedFiles, entry);
             result.addBibEntry(entry);
         }
     }
+
 
     private List<LinkedFile> autoLinkBrokenLinkedFiles(
             List<LinkedFile> linkedFiles,
@@ -147,13 +140,8 @@ public class AutoSetFileLinksUtil {
         for (LinkedFile linkedFile : linkedFiles) {
             String baseName =
                     FileUtil.getBaseName(linkedFile.getLink());
-            Optional<String> extension =
-                    FileUtil.getFileExtension(linkedFile.getLink());
             if (isBrokenLinkedFile(linkedFile)
-                    && foundFiles.containsKey(baseName)
-                    && extension.isPresent()
-                    && extension.get().equalsIgnoreCase(
-                    foundFiles.get(baseName).getFileType())) {
+                    && foundFiles.containsKey(baseName)) {
                 LinkedFile replacement =
                         foundFiles.get(baseName);
                 linkedFile.setLink(replacement.getLink());
