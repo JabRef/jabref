@@ -69,6 +69,7 @@ dependencies.constraints {
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.21.0")
     api("commons-logging:commons-logging:1.3.5")
+    api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.0")

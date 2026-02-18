@@ -79,6 +79,10 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
+
+    module("dev.langchain4j:langchain4j-core") {
+        addRuntimeOnlyDependency("com.knuddels:jtokkit:1.1.0")
+    }
 }
 
 extraJavaModuleInfo {
@@ -207,7 +211,7 @@ extraJavaModuleInfo {
         mergeJar("dev.langchain4j:langchain4j-mistral-ai")
         mergeJar("dev.langchain4j:langchain4j-open-ai")
         mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
-        requires("jtokkit")
+        // requires("jtokkit")
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
         exportAllPackages()

@@ -126,6 +126,8 @@ open module org.jabref.jablib {
     requires java.base;
 
     requires javafx.base;
+    requires javafx.controls;
+    requires javafx.fxml;
     requires javafx.graphics; // because of javafx.scene.paint.Color
     requires afterburner.fx;
     requires com.tobiasdiez.easybind;
