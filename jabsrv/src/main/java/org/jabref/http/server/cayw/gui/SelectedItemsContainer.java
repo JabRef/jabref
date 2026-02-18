@@ -53,6 +53,7 @@ public class SelectedItemsContainer extends FlowPane {
 
     private static class Chip extends HBox {
         private final CAYWEntry entry;
+        private CitationPropertiesPopup activePopup;
 
         public Chip(CAYWEntry entry, ObservableList<CAYWEntry> parentList) {
             this.entry = entry;
@@ -76,8 +77,12 @@ public class SelectedItemsContainer extends FlowPane {
             getChildren().addAll(label, removeButton);
 
             this.setOnMouseClicked(e -> {
-                CitationPropertiesPopup popup = new CitationPropertiesPopup(entry);
-                popup.showBelow(this);
+                if (activePopup != null && activePopup.isShowing()) {
+                    activePopup.hide();
+                    return;
+                }
+                activePopup = new CitationPropertiesPopup(entry);
+                activePopup.showBelow(this);
             });
         }
 
