@@ -148,15 +148,25 @@ public class AutoSetFileLinksUtil {
 
     private List<LinkedFile> autoLinkBrokenLinkedFiles(
             List<LinkedFile> linkedFiles,
-            Map<String, LinkedFile> files) {
+            Map<String, LinkedFile> candidateFiles) {
         List<LinkedFile> updated = new ArrayList<>();
         for (LinkedFile linkedFile : linkedFiles) {
-            String fileName = FileUtil.getBaseName(linkedFile.getLink());
-            if (isBrokenLinkedFile(linkedFile) && files.containsKey(fileName)) {
-                LinkedFile newFile = files.get(fileName);
+            if (!isBrokenLinkedFile(linkedFile)) {
+                updated.add(linkedFile);
+                continue;
+            }
+            String brokenBaseName = FileUtil.getBaseName(linkedFile.getLink());
+            Optional<Map.Entry<String, LinkedFile>> match =
+                    candidateFiles.entrySet()
+                                  .stream()
+                                  .filter(entry ->
+                                          entry.getKey().equals(brokenBaseName))
+                                  .findFirst();
+            if (match.isPresent()) {
+                LinkedFile newFile = match.get().getValue();
                 linkedFile.setLink(newFile.getLink());
                 linkedFile.setFileType(newFile.getFileType());
-                files.remove(fileName);
+                candidateFiles.remove(match.get().getKey());
             }
             updated.add(linkedFile);
         }
@@ -234,7 +244,18 @@ public class AutoSetFileLinksUtil {
     }
 
     private boolean isBrokenLinkedFile(LinkedFile file) {
-        return file.findIn(directories).isEmpty();
+        try {
+            for (Path directory : directories) {
+                Path resolved = directory.resolve(file.getLink());
+                if (Files.exists(resolved)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            LOGGER.debug("Error checking linked file", e);
+            return true;
+        }
     }
 
     private LinkedFile buildLinkedFileFromPath(Path associatedFile) {
