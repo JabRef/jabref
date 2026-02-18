@@ -9,6 +9,7 @@ dependencies {
     api(project(":jablib"))
 
     implementation("org.slf4j:slf4j-api")
+    implementation("tools.jackson.core:jackson-databind")
 
     // LSP4J for LSP Server
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j")

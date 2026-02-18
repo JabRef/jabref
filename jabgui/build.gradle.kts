@@ -115,6 +115,8 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring")
 
+    implementation("tools.jackson.core:jackson-databind")
+
     implementation("info.picocli:picocli")
     annotationProcessor("info.picocli:picocli-codegen")
 

@@ -9,6 +9,7 @@ dependencies {
     api(project(":jablib"))
 
     implementation("org.slf4j:slf4j-api")
+    implementation("tools.jackson.core:jackson-databind")
 
     // API
     implementation("jakarta.ws.rs:jakarta.ws.rs-api")
