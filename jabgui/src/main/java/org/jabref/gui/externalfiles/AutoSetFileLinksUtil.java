@@ -125,10 +125,13 @@ public class AutoSetFileLinksUtil {
             String baseName =
                     FileUtil.getBaseName(existing.getLink());
             LinkedFile replacement =
-                    citationKeyFiles.remove(baseName);
-            if (isBrokenLinkedFile(existing) && replacement != null) {
+                    citationKeyFiles.get(baseName);
+            if (isBrokenLinkedFile(existing)
+                    && replacement != null
+                    && FileUtil.getBaseName(replacement.getLink()).equals(baseName)) {
                 existing.setLink(replacement.getLink());
                 existing.setFileType(replacement.getFileType());
+                citationKeyFiles.remove(baseName);
                 updated = true;
             }
             updatedFiles.add(existing);
@@ -142,7 +145,8 @@ public class AutoSetFileLinksUtil {
                     FileUtil.getBaseName(existing.getLink());
             LinkedFile replacement =
                     brokenLinkedFiles.get(baseName);
-            if (isBrokenLinkedFile(existing) && replacement != null) {
+            if (isBrokenLinkedFile(existing)
+                    && replacement != null) {
                 existing.setLink(replacement.getLink());
                 existing.setFileType(replacement.getFileType());
                 updated = true;

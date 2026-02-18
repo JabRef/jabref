@@ -101,8 +101,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                                     FileFieldWriter.getStringRepresentation(newLinkedFiles)
                             );
 
-                            System.out.println("DEBUG: FILE FIELD UPDATED → " +
-                                    FileFieldWriter.getStringRepresentation(newLinkedFiles));
+                                    FileFieldWriter.getStringRepresentation(newLinkedFiles);
                         });
                     };
 
