@@ -113,46 +113,23 @@ public class AutoSetFileLinksUtil {
                 getAssociatedFiles(entry, result, preConfiguredFileFinder);
         Map<String, LinkedFile> brokenLinkedFiles =
                 getAssociatedFiles(entry, result, brokenLinkedFileNameBasedFileFinder);
-        if (citationKeyFiles.isEmpty() && brokenLinkedFiles.isEmpty()) {
-            return;
-        }
-        List<LinkedFile> currentFiles =
-                new ArrayList<>(entry.getFiles());
-        List<LinkedFile> updatedFiles =
-                new ArrayList<>();
+        List<LinkedFile> currentFiles = new ArrayList<>(entry.getFiles());
         boolean updated = false;
-        for (LinkedFile existing : currentFiles) {
-            String baseName =
-                    FileUtil.getBaseName(existing.getLink());
-            LinkedFile replacement =
-                    citationKeyFiles.get(baseName);
-            if (isBrokenLinkedFile(existing)
-                    && replacement != null
-                    && FileUtil.getBaseName(replacement.getLink()).equals(baseName)) {
-                existing.setLink(replacement.getLink());
-                existing.setFileType(replacement.getFileType());
-                citationKeyFiles.remove(baseName);
-                updated = true;
-            }
-            updatedFiles.add(existing);
-        }
-        if (!citationKeyFiles.isEmpty()) {
-            updatedFiles.addAll(citationKeyFiles.values());
-            updated = true;
-        }
-        for (LinkedFile existing : updatedFiles) {
-            String baseName =
-                    FileUtil.getBaseName(existing.getLink());
-            LinkedFile replacement =
-                    brokenLinkedFiles.get(baseName);
-            if (isBrokenLinkedFile(existing)
-                    && replacement != null) {
-                existing.setLink(replacement.getLink());
-                existing.setFileType(replacement.getFileType());
+        List<LinkedFile> updatedFiles =
+                autoLinkBrokenLinkedFiles(currentFiles, citationKeyFiles);
+        updatedFiles =
+                autoLinkBrokenLinkedFiles(updatedFiles, brokenLinkedFiles);
+        for (LinkedFile newFile : citationKeyFiles.values()) {
+            boolean exists =
+                    updatedFiles.stream()
+                                .anyMatch(existing ->
+                                        existing.getLink().equals(newFile.getLink()));
+            if (!exists) {
+                updatedFiles.add(newFile);
                 updated = true;
             }
         }
-        if (updated) {
+        if (filesChanged(updatedFiles, currentFiles)) {
             onAddLinkedFile.accept(updatedFiles, entry);
             result.addBibEntry(entry);
         }
@@ -160,20 +137,22 @@ public class AutoSetFileLinksUtil {
 
     private List<LinkedFile> autoLinkBrokenLinkedFiles(
             List<LinkedFile> linkedFiles,
-            Map<String, LinkedFile> foundFiles) {
+            Map<String, LinkedFile> files) {
         List<LinkedFile> updated = new ArrayList<>();
         for (LinkedFile linkedFile : linkedFiles) {
-            String baseName =
-                    FileUtil.getBaseName(linkedFile.getLink());
+            String fileName = FileUtil.getBaseName(linkedFile.getLink());
+            Optional<String> extension =
+                    FileUtil.getFileExtension(linkedFile.getLink());
             if (isBrokenLinkedFile(linkedFile)
-                    && foundFiles.containsKey(baseName)) {
-                LinkedFile replacement =
-                        foundFiles.get(baseName);
-                linkedFile.setLink(replacement.getLink());
-                linkedFile.setFileType(replacement.getFileType());
-                foundFiles.remove(baseName);
+                    && files.containsKey(fileName)
+                    && extension.isPresent()
+                    && extension.get().equalsIgnoreCase(files.get(fileName).getFileType())) {
+                linkedFile.setLink(files.get(fileName).getLink());
+                updated.add(linkedFile);
+                files.remove(fileName);
+            } else {
+                updated.add(linkedFile);
             }
-            updated.add(linkedFile);
         }
         return updated;
     }
@@ -191,9 +170,9 @@ public class AutoSetFileLinksUtil {
     }
 
     private boolean filesChanged(
-            List<LinkedFile> newFiles,
+            List<LinkedFile> newLinkedFiles,
             List<LinkedFile> oldFiles) {
-        return !newFiles.equals(oldFiles);
+        return !newLinkedFiles.equals(oldFiles);
     }
 
     private Map<String, LinkedFile> findAssociatedNotLinkedFilesWithUniqueName(BibEntry entry,
