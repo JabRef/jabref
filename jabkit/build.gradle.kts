@@ -26,6 +26,8 @@ if (target >= 26) {
 }
 
 dependencies {
+    javaModuleDependencies.analyseOnly = true
+
     implementation(project(":jablib"))
 
     // FIXME: Injector needs to be removed, no JavaFX dependencies, etc.

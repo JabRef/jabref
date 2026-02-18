@@ -39,6 +39,8 @@ if (target >= 26) {
 }
 
 dependencies {
+    javaModuleDependencies.analyseOnly = true
+
     implementation(project(":jablib"))
     implementation(project(":jabsrv"))
 

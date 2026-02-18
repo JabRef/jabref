@@ -22,25 +22,23 @@ plugins {
     id("net.ltgt.nullaway") version "3.0.0"
 }
 
-javaModuleDependencies.analyseOnly = false
-
 mainModuleInfo {
     runtimeOnly("embedded.postgres.binaries.darwin.arm64v8")
     runtimeOnly("embedded.postgres.binaries.linux.arm64v8")
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
-    runtimeOnly("org.slf4j.jul.to.slf4j")
+    runtimeOnly("jul.to.slf4j")
     // route all requests to log4j to SLF4J
     runtimeOnly("org.apache.logging.log4j.to.slf4j")
     // required by org.jabref.generators (only)
     runtimeOnly("org.tinylog.api.slf4j")
     runtimeOnly("org.tinylog.impl")
 }
+
 testModuleInfo {
     requires("io.github.classgraph")
 
     requires("jtokkit")
-    requires("jilt")
     requires("java.compiler")
 
     requires("org.libreoffice.unoloader")
@@ -53,7 +51,6 @@ testModuleInfo {
 
     // Required for LocalizationConsistencyTest
     requires("org.testfx.junit5")
-    // requires("org.assertj.core")
 
     requires("org.xmlunit")
     requires("org.xmlunit.matchers")
@@ -61,7 +58,9 @@ testModuleInfo {
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
     runtimeOnly("com.tngtech.archunit.junit5.engine")
+
     // Highly recommended builder generator - https://github.com/skinny85/jilt (used for tests only)
+    requiresStatic("jilt")
     annotationProcessor("jilt")
 }
 

@@ -6,6 +6,8 @@ plugins {
 }
 
 dependencies {
+    javaModuleDependencies.analyseOnly = true
+
     api(project(":jablib"))
 
     implementation("org.slf4j:slf4j-api")

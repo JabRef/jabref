@@ -10,6 +10,16 @@ testing {
     suites.named<JvmTestSuite>("test") {
         useJUnitJupiter()
     }
+
+    @Suppress("UnstableApiUsage")
+    suites.withType<JvmTestSuite> {
+        configurations.getByName(sources.implementationConfigurationName) {
+            withDependencies {
+                removeIf { it.group == "org.junit.jupiter" && it.name == "junit-jupiter" }
+            }
+        }
+        dependencies { runtimeOnly("org.junit.jupiter:junit-jupiter-engine") }
+    }
 }
 
 tasks.withType<Test>().configureEach {

@@ -10,6 +10,8 @@ plugins {
     // id("com.redock.classpathtofile") version "0.1.0"
 }
 
+javaModuleDependencies.analyseOnly = true
+
 group = "org.jabref"
 version = providers.gradleProperty("projVersion")
     .orElse(providers.environmentVariable("VERSION"))

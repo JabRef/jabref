@@ -1,15 +1,14 @@
+import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
+
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
     id("org.gradlex.java-module-dependencies") // only for mappings at the moment
+    id("com.autonomousapps.dependency-analysis")
 }
 
-javaModuleDependencies {
-    // TODO remove to translate 'requires' from 'module-info.java' to Gradle dependencies
-    //      and remove 'dependencies {}' block from build.gradle files
-    analyseOnly = true
-    moduleNameToGA.put("jul.to.slf4j", "org.slf4j:jul-to-slf4j")
-}
+// ordering check is done by SortModuleInfoRequiresStep
+tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
 
 jvmDependencyConflicts {
     consistentResolution {
