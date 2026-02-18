@@ -8,7 +8,6 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
-import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
@@ -18,6 +17,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;
@@ -41,11 +42,9 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.HashBiMap;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,13 +76,12 @@ public class KeywordsEditor extends TagsEditor {
         }
     }
 
-    @FXML private KeywordsEditorViewModel viewModel;
-    @FXML private TagsField<Keyword> keywordTagsField;
+    private KeywordsEditorViewModel viewModel;
+    private final TagsField<Keyword> keywordTagsField = new TagsField<>();
 
-    @Inject private CliPreferences preferences;
-    @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
-    @Inject private ClipBoardManager clipBoardManager;
+    private final CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);
+    private final DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+    private final ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
 
     private boolean isSortedTagsField = false;
     private Optional<Keyword> draggedKeyword = Optional.empty();
@@ -94,9 +92,8 @@ public class KeywordsEditor extends TagsEditor {
 
         super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
 
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        HBox.setHgrow(keywordTagsField, Priority.ALWAYS);
+        getChildren().add(keywordTagsField);
 
         this.viewModel = new KeywordsEditorViewModel(
                 field,
