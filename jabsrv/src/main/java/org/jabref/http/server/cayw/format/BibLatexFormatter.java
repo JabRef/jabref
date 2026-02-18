@@ -36,11 +36,11 @@ public class BibLatexFormatter implements CAYWFormatter {
                                               .anyMatch(e -> e.citationProperties().hasProperties());
 
         if (!anyHasProperties) {
-            return "\\%s{%s}".formatted(command,
-                    caywEntries.stream()
-                               .map(e -> e.bibEntry().getCitationKey())
-                               .flatMap(Optional::stream)
-                               .collect(Collectors.joining(",")));
+            String keys = caywEntries.stream()
+                                     .map(e -> e.bibEntry().getCitationKey())
+                                     .flatMap(Optional::stream)
+                                     .collect(Collectors.joining(","));
+            return "\\%s{%s}".formatted(command, keys);
         }
 
         /// Single entry if suppress author + supported command
@@ -49,24 +49,28 @@ public class BibLatexFormatter implements CAYWFormatter {
         }
 
         /// Multiple entries with s-affixed, never starred
-        return "\\%ss%s".formatted(command,
-                caywEntries.stream()
-                           .map(this::formatMulticiteEntry)
-                           .flatMap(Optional::stream)
-                           .collect(Collectors.joining("")));
+        String entries = caywEntries.stream()
+                                    .map(this::formatMulticiteEntry)
+                                    .flatMap(Optional::stream)
+                                    .collect(Collectors.joining(""));
+        return "\\%ss%s".formatted(command, entries);
     }
 
     private String formatSingleEntry(CAYWEntry entry, String command) {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
+
             String prenote = props.getPrefix().orElse("");
             String postnote = props.getPostnote().orElse("");
+            boolean useStar = props.isOmitAuthor() && STAR_COMMANDS.contains(command);
+            String star = useStar ? "*" : "";
 
-            String star = (props.isOmitAuthor() && STAR_COMMANDS.contains(command)) ? "*" : "";
-
+            /// No prenote/postnote
             if (prenote.isEmpty() && postnote.isEmpty()) {
                 return "\\%s%s{%s}".formatted(command, star, key);
             }
+
+            /// With prenote/postnote
             return "\\%s%s[%s][%s]{%s}".formatted(command, star, prenote, postnote, key);
         }).orElse("");
     }
@@ -74,12 +78,16 @@ public class BibLatexFormatter implements CAYWFormatter {
     private Optional<String> formatMulticiteEntry(CAYWEntry entry) {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
+
             String prenote = props.getPrefix().orElse("");
             String postnote = props.getPostnote().orElse("");
 
+            /// No prenote/postnote
             if (prenote.isEmpty() && postnote.isEmpty()) {
                 return "{%s}".formatted(key);
             }
+
+            /// With prenote/postnote
             return "[%s][%s]{%s}".formatted(prenote, postnote, key);
         });
     }

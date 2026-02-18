@@ -28,14 +28,29 @@ public class PandocFormatter implements CAYWFormatter {
     private Optional<String> formatEntry(CAYWEntry entry) {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
-            StringBuilder sb = new StringBuilder();
 
-            props.getPrefix().ifPresent(p -> sb.append(p).append(" "));
-            sb.append(props.isOmitAuthor() ? "-@" : "@").append(key);
-            props.getFormattedLocator().ifPresent(l -> sb.append(", ").append(l));
-            props.getSuffix().ifPresent(s -> sb.append(", ").append(s));
+            String prefix = props.getPrefix().orElse("");
+            String citationKey = (props.isOmitAuthor() ? "-@" : "@") + key;
+            String locator = props.getFormattedLocator().orElse("");
+            String suffix = props.getSuffix().orElse("");
 
-            return sb.toString();
+            StringBuilder result = new StringBuilder();
+
+            if (!prefix.isEmpty()) {
+                result.append(prefix).append(" ");
+            }
+
+            result.append(citationKey);
+
+            if (!locator.isEmpty()) {
+                result.append(", ").append(locator);
+            }
+
+            if (!suffix.isEmpty()) {
+                result.append(", ").append(suffix);
+            }
+
+            return result.toString();
         });
     }
 }

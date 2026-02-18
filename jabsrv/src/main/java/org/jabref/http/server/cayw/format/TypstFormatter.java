@@ -30,14 +30,23 @@ public class TypstFormatter implements CAYWFormatter {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
 
+            /// <key> or label("key") for keys with /
             String keyRef = key.contains("/")
                             ? "label(\"%s\")".formatted(key)
                             : "<%s>".formatted(key);
 
+            String locator = props.getFormattedLocator().orElse("");
+            boolean omitAuthor = props.isOmitAuthor();
+
+            /// #cite(<key>, supplement: [...], form: "year")
             List<String> args = new ArrayList<>();
             args.add(keyRef);
-            props.getFormattedLocator().ifPresent(l -> args.add("supplement: [%s]".formatted(l)));
-            if (props.isOmitAuthor()) {
+
+            if (!locator.isEmpty()) {
+                args.add("supplement: [%s]".formatted(locator));
+            }
+
+            if (omitAuthor) {
                 args.add("form: \"year\"");
             }
 

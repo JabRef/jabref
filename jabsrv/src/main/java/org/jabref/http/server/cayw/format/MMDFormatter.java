@@ -29,18 +29,24 @@ public class MMDFormatter implements CAYWFormatter {
     private Optional<String> formatEntry(CAYWEntry entry) {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
+
             String prefix = props.getPrefix().orElse(null);
             String postnote = props.getPostnote().orElse(null);
 
+            /// Both prefix and postnote
             if (prefix != null && postnote != null) {
                 return "[" + prefix + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
-            } else if (prefix != null) {
-                return "[" + prefix + "][#" + key + "]";
-            } else if (postnote != null) {
-                return "[" + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
-            } else {
-                return "[#" + key + "]";
             }
+
+            if (prefix != null) {
+                return "[" + prefix + "][#" + key + "]";
+            }
+
+            if (postnote != null) {
+                return "[" + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
+            }
+            
+            return "[#" + key + "]";
         });
     }
 }

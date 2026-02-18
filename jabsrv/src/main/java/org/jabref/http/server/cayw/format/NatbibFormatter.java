@@ -33,11 +33,11 @@ public class NatbibFormatter implements CAYWFormatter {
                                               .anyMatch(e -> e.citationProperties().hasProperties());
 
         if (!anyHasProperties) {
-            return "\\%s{%s}".formatted(command,
-                    caywEntries.stream()
-                               .map(e -> e.bibEntry().getCitationKey())
-                               .flatMap(Optional::stream)
-                               .collect(Collectors.joining(",")));
+            String keys = caywEntries.stream()
+                                     .map(e -> e.bibEntry().getCitationKey())
+                                     .flatMap(Optional::stream)
+                                     .collect(Collectors.joining(","));
+            return "\\%s{%s}".formatted(command, keys);
         }
 
         return caywEntries.stream()
@@ -49,12 +49,16 @@ public class NatbibFormatter implements CAYWFormatter {
     private Optional<String> formatEntry(CAYWEntry entry, String command) {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
+
             String prenote = props.getPrefix().orElse("");
             String postnote = props.getPostnote().orElse("");
 
+            /// No prenote/postnote: \command{key}
             if (prenote.isEmpty() && postnote.isEmpty()) {
                 return "\\%s{%s}".formatted(command, key);
             }
+
+            /// With prenote/postnote: \command[prenote][postnote]{key}
             return "\\%s[%s][%s]{%s}".formatted(command, prenote, postnote, key);
         });
     }
