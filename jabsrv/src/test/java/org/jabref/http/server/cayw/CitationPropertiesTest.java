@@ -99,10 +99,10 @@ class CitationPropertiesTest {
     }
 
     @Test
-    void suffix_stripsLeadingComma() {
+    void suffix_stripped() {
         CitationProperties props = new CitationProperties();
-        props.setSuffix(", for details");
-        assertEquals(Optional.of("for details"), props.getSuffix());
+        props.setSuffix("  emphasis added  ");
+        assertEquals(Optional.of("emphasis added"), props.getSuffix());
     }
 
     @Test

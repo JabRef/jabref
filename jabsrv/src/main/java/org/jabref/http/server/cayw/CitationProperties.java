@@ -44,7 +44,7 @@ public class CitationProperties {
 
     public Optional<String> getSuffix() {
         return Optional.ofNullable(suffix)
-                       .map(s -> s.stripLeading().replaceFirst("^,\\s*", ""))
+                       .map(String::strip)
                        .filter(s -> !s.isEmpty());
     }
 
