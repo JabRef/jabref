@@ -155,12 +155,18 @@ public class AutoSetFileLinksUtil {
                 updated.add(linkedFile);
                 continue;
             }
-            String brokenBaseName = FileUtil.getBaseName(linkedFile.getLink());
+            String brokenFileName =
+                    Path.of(linkedFile.getLink())
+                        .getFileName()
+                        .toString();
             Optional<Map.Entry<String, LinkedFile>> match =
                     candidateFiles.entrySet()
                                   .stream()
                                   .filter(entry ->
-                                          entry.getKey().equals(brokenBaseName))
+                                          Path.of(entry.getValue().getLink())
+                                              .getFileName()
+                                              .toString()
+                                              .equals(brokenFileName))
                                   .findFirst();
             if (match.isPresent()) {
                 LinkedFile newFile = match.get().getValue();
