@@ -8,9 +8,11 @@ import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 
@@ -51,7 +53,10 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     // FieldFormatterCleanupsPanel
     private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<FieldFormatterCleanup> fieldFormatterCleanupsProperty = new SimpleListProperty<>(FXCollections.emptyObservableList());
+
     private final SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
+
+    private final ObjectProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupProperty = new SimpleObjectProperty<>();
 
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
@@ -106,11 +111,12 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             fieldFormatterCleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
         });
 
-        //  maybe somehow filter active cleanups, for now empty by default
         Optional<Set<CleanupPreferences.CleanupStep>> multiFieldCleanups = initialMetaData.getMultiFieldCleanups();
-        multiFieldCleanups.ifPresent(set ->
-                multiFieldCleanupsProperty.set(FXCollections.observableSet(set))
+        multiFieldCleanups.ifPresent(set -> multiFieldCleanupsProperty.set(FXCollections.observableSet(set))
         );
+
+        Optional<CleanupPreferences.CleanupStep> journalAbbreviationCleanup = initialMetaData.getJournalAbbreviationCleanup();
+        journalAbbreviationCleanup.ifPresent(journalAbbreviationCleanupProperty::set);
     }
 
     @Override
@@ -125,7 +131,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(
                 !cleanupsDisableProperty().getValue(),
-                cleanupsProperty());
+                fieldFormatterCleanupsProperty());
 
         if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
             newMetaData.clearFieldFormatterActions();
@@ -142,6 +148,12 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             newMetaData.clearMultiFieldCleanups();
         } else {
             newMetaData.setMultiFieldCleanups(new HashSet<>(multiFieldCleanupsProperty.get()));
+        }
+
+        if (journalAbbreviationCleanupProperty.get() == null) {
+            newMetaData.clearJournalAbbreviationCleanup();
+        } else {
+            newMetaData.setJournalAbbreviationCleanup(journalAbbreviationCleanupProperty.get());
         }
 
         SaveOrder newSaveOrder = new SaveOrder(
@@ -165,6 +177,14 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     public BooleanProperty libraryProtectedProperty() {
         return libraryProtectedProperty;
+    }
+
+    public SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsPropertyProperty() {
+        return multiFieldCleanupsProperty;
+    }
+
+    public ObjectProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupPropertyProperty() {
+        return journalAbbreviationCleanupProperty;
     }
 
     // SaveOrderConfigPanel
@@ -195,11 +215,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         return cleanupsDisableProperty;
     }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
+    public ListProperty<FieldFormatterCleanup> fieldFormatterCleanupsProperty() {
         return fieldFormatterCleanupsProperty;
-    }
-
-    public SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsPropertyProperty() {
-        return multiFieldCleanupsProperty;
     }
 }

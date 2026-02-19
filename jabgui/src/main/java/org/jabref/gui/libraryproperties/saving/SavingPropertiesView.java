@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
+import org.jabref.gui.commonfxcontrols.JournalAbbreviationPanel;
 import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
@@ -21,6 +22,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
     @FXML private MultiFieldsCleanupPanel multiFieldsCleanupPanel;
+    @FXML private JournalAbbreviationPanel journalAbbreviationPanel;
 
     @Inject private CliPreferences preferences;
 
@@ -49,7 +51,8 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
         saveOrderConfigPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         saveOrderConfigPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
 
-        fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());
+        fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.fieldFormatterCleanupsProperty());
         multiFieldsCleanupPanel.selectedJobsProperty().bindBidirectional(viewModel.multiFieldCleanupsPropertyProperty());
+        journalAbbreviationPanel.selectedJournalCleanupOption().bindBidirectional(viewModel.journalAbbreviationCleanupPropertyProperty());
     }
 }
