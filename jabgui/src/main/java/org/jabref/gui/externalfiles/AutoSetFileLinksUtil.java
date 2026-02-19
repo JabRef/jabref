@@ -146,16 +146,16 @@ public class AutoSetFileLinksUtil {
         }
     }
 
-    private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles,Map<String,LinkedFile> candidateFiles){
+    private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles,Map<String,LinkedFile> candidateFiles) {
         List<LinkedFile> updated=new ArrayList<>();
-        for(LinkedFile linkedFile:linkedFiles){
-            if(!isBrokenLinkedFile(linkedFile)){
+        for(LinkedFile linkedFile:linkedFiles) {
+            if(!isBrokenLinkedFile(linkedFile)) {
                 updated.add(linkedFile);
                 continue;
             }
             String brokenBaseName=FileUtil.getBaseName(linkedFile.getLink());
             LinkedFile replacement=candidateFiles.get(brokenBaseName);
-            if(replacement!=null){
+            if(replacement!=null) {
                 linkedFile.setLink(replacement.getLink());
                 linkedFile.setFileType(replacement.getFileType());
                 candidateFiles.remove(brokenBaseName);
@@ -235,13 +235,13 @@ public class AutoSetFileLinksUtil {
         return result;
     }
 
-    private boolean isBrokenLinkedFile(LinkedFile file){
+    private boolean isBrokenLinkedFile(LinkedFile file) {
         Path filePath=Path.of(file.getLink());
-        if(filePath.isAbsolute()){
+        if(filePath.isAbsolute()) {
             return!Files.exists(filePath);
         }
-        for(Path directory:directories){
-            if(Files.exists(directory.resolve(filePath))){
+        for(Path directory:directories) {
+            if(Files.exists(directory.resolve(filePath))) {
                 return false;
             }
         }
