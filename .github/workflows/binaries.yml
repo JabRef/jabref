@@ -347,6 +347,7 @@ jobs:
     steps:
       - id: set
         shell: bash
+        name: Compute Matrix
         run: |
           # if you change the os version rename all other occurrences
           # ./gradlew on Windows is because of https://github.com/gradle/gradle/pull/34227
