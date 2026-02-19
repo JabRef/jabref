@@ -146,33 +146,19 @@ public class AutoSetFileLinksUtil {
         }
     }
 
-    private List<LinkedFile> autoLinkBrokenLinkedFiles(
-            List<LinkedFile> linkedFiles,
-            Map<String, LinkedFile> candidateFiles) {
-        List<LinkedFile> updated = new ArrayList<>();
-        for (LinkedFile linkedFile : linkedFiles) {
-            if (!isBrokenLinkedFile(linkedFile)) {
+    private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles,Map<String,LinkedFile> candidateFiles){
+        List<LinkedFile> updated=new ArrayList<>();
+        for(LinkedFile linkedFile:linkedFiles){
+            if(!isBrokenLinkedFile(linkedFile)){
                 updated.add(linkedFile);
                 continue;
             }
-            String brokenFileName =
-                    Path.of(linkedFile.getLink())
-                        .getFileName()
-                        .toString();
-            Optional<Map.Entry<String, LinkedFile>> match =
-                    candidateFiles.entrySet()
-                                  .stream()
-                                  .filter(entry ->
-                                          Path.of(entry.getValue().getLink())
-                                              .getFileName()
-                                              .toString()
-                                              .equals(brokenFileName))
-                                  .findFirst();
-            if (match.isPresent()) {
-                LinkedFile newFile = match.get().getValue();
-                linkedFile.setLink(newFile.getLink());
-                linkedFile.setFileType(newFile.getFileType());
-                candidateFiles.remove(match.get().getKey());
+            String brokenBaseName=FileUtil.getBaseName(linkedFile.getLink());
+            LinkedFile replacement=candidateFiles.get(brokenBaseName);
+            if(replacement!=null){
+                linkedFile.setLink(replacement.getLink());
+                linkedFile.setFileType(replacement.getFileType());
+                candidateFiles.remove(brokenBaseName);
             }
             updated.add(linkedFile);
         }
@@ -249,19 +235,17 @@ public class AutoSetFileLinksUtil {
         return result;
     }
 
-    private boolean isBrokenLinkedFile(LinkedFile file) {
-        try {
-            for (Path directory : directories) {
-                Path resolved = directory.resolve(file.getLink());
-                if (Files.exists(resolved)) {
-                    return false;
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            LOGGER.debug("Error checking linked file", e);
-            return true;
+    private boolean isBrokenLinkedFile(LinkedFile file){
+        Path filePath=Path.of(file.getLink());
+        if(filePath.isAbsolute()){
+            return!Files.exists(filePath);
         }
+        for(Path directory:directories){
+            if(Files.exists(directory.resolve(filePath))){
+                return false;
+            }
+        }
+        return true;
     }
 
     private LinkedFile buildLinkedFileFromPath(Path associatedFile) {
