@@ -325,7 +325,7 @@ public class PreferencesMigrations {
     /// -  Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
     ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
-        String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE).replace("\n", "__NEWLINE__");
+        String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
