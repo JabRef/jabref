@@ -149,16 +149,22 @@ public class AutoSetFileLinksUtil {
     private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles,Map<String,LinkedFile> candidateFiles) {
         List<LinkedFile> updated=new ArrayList<>();
         for(LinkedFile linkedFile:linkedFiles) {
-            if(!isBrokenLinkedFile(linkedFile)) {
-                updated.add(linkedFile);
-                continue;
+            Path linkedPath=Path.of(linkedFile.getLink());
+            String brokenFileName=linkedPath.getFileName().toString();
+            boolean exists=false;
+            for(Path directory:directories) {
+                if(Files.exists(directory.resolve(linkedPath))) {
+                    exists=true;
+                    break;
+                }
             }
-            String brokenBaseName=FileUtil.getBaseName(linkedFile.getLink());
-            LinkedFile replacement=candidateFiles.get(brokenBaseName);
-            if(replacement!=null) {
-                linkedFile.setLink(replacement.getLink());
-                linkedFile.setFileType(replacement.getFileType());
-                candidateFiles.remove(brokenBaseName);
+            if(!exists) {
+                LinkedFile replacement=candidateFiles.get(FileUtil.getBaseName(brokenFileName));
+                if(replacement!=null) {
+                    linkedFile.setLink(replacement.getLink());
+                    linkedFile.setFileType(replacement.getFileType());
+                    candidateFiles.remove(FileUtil.getBaseName(brokenFileName));
+                }
             }
             updated.add(linkedFile);
         }
