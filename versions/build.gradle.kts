@@ -26,7 +26,7 @@ dependencies {
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.1.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.2.0"))
 
     api(platform("org.junit:junit-bom:6.0.3"))
     api("org.junit.jupiter:junit-jupiter-api")
