@@ -341,13 +341,16 @@ jobs:
           fi
 
   compute-matrix:
+    needs: conditions
     runs-on: ubuntu-slim
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
     steps:
       - id: set
-        shell: bash
         name: Compute Matrix
+        shell: bash
+        env:
+          SHOULD_NOTARIZE: ${{ needs.conditions.outputs.should-notarize }}
         run: |
           # if you change the os version rename all other occurrences
           # ./gradlew on Windows is because of https://github.com/gradle/gradle/pull/34227
@@ -406,11 +409,9 @@ jobs:
             ]
           }'
 
-          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
-            # drop macos-15-intel on non-main
+          if [[ "$GITHUB_REF" != "refs/heads/main" && "$SHOULD_NOTARIZE" != "true" ]]; then
+            # drop macos-15-intel
             MATRIX_JSON="$(jq -c ' .include |= map(select(.os != "macos-15-intel")) ' <<<"$MATRIX_JSON")"
-          else
-            MATRIX_JSON="$(jq -c . <<<"$MATRIX_JSON")"
           fi
 
           echo "matrix=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
