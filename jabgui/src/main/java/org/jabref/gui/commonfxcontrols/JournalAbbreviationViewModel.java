@@ -13,12 +13,13 @@ public class JournalAbbreviationViewModel {
             CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
             CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
             CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-            CleanupPreferences.CleanupStep.UNABBREVIATE
+            CleanupPreferences.CleanupStep.UNABBREVIATE,
+            CleanupPreferences.CleanupStep.NO_CHANGES
     );
 
     public final ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleObjectProperty<>();
 
     public JournalAbbreviationViewModel() {
-        selectedJournalCleanupOption.set(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
+        selectedJournalCleanupOption.set(CleanupPreferences.CleanupStep.NO_CHANGES);
     }
 }

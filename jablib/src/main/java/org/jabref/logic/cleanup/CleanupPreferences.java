@@ -97,6 +97,7 @@ public class CleanupPreferences {
         ABBREVIATE_DOTLESS,
         ABBREVIATE_SHORTEST_UNIQUE,
         ABBREVIATE_LTWA,
-        UNABBREVIATE
+        UNABBREVIATE,
+        NO_CHANGES
     }
 }

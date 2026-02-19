@@ -23,6 +23,7 @@ public class JournalAbbreviationPanel extends VBox {
     @FXML private RadioButton abbreviateShortestUnique;
     @FXML private RadioButton abbreviateLTWA;
     @FXML private RadioButton unabbreviate;
+    @FXML private RadioButton noChanges;
 
     private final JournalAbbreviationViewModel viewModel;
 
@@ -54,6 +55,9 @@ public class JournalAbbreviationPanel extends VBox {
 
         unabbreviate.setText(Localization.lang("Unabbreviate"));
         unabbreviate.setUserData(CleanupPreferences.CleanupStep.UNABBREVIATE);
+
+        noChanges.setText(Localization.lang("No changes"));
+        noChanges.setUserData(CleanupPreferences.CleanupStep.NO_CHANGES);
     }
 
     private void bindProperties() {

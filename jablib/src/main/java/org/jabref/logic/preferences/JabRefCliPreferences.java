@@ -343,7 +343,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
-    public static final String JOURNAL_FIELD_SHOULD_BE_ABBREVIATED_ON_DOWNLOAD = "journalFieldShouldBeAbbreviated";
+    private static final String JOURNAL_FIELD_SHOULD_BE_ABBREVIATED_ON_DOWNLOAD = "journalFieldShouldBeAbbreviated";
 
     // Protected terms
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
@@ -1923,7 +1923,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
                 CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
                 CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-                CleanupPreferences.CleanupStep.UNABBREVIATE));
+                CleanupPreferences.CleanupStep.UNABBREVIATE,
+                CleanupPreferences.CleanupStep.NO_CHANGES));
         return activeJobs;
     }
 

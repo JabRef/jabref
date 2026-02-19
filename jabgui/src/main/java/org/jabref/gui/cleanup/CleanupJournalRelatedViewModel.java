@@ -24,6 +24,6 @@ public class CleanupJournalRelatedViewModel {
         return allSupportedJobs.stream()
                                .filter(preferences::isActive)
                                .findFirst()
-                               .orElse(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
+                               .orElse(CleanupPreferences.CleanupStep.NO_CHANGES);
     }
 }
