@@ -149,24 +149,19 @@ public class AutoSetFileLinksUtil {
     private List<LinkedFile> autoLinkBrokenLinkedFiles(List<LinkedFile> linkedFiles, Map<String, LinkedFile> candidateFiles) {
         List<LinkedFile> updated = new ArrayList<>();
         for (LinkedFile linkedFile : linkedFiles) {
-            Path linkedPath = Path.of(linkedFile.getLink());
-            String fileName = linkedPath.getFileName().toString();
-            boolean exists = false;
-            for (Path directory : directories) {
-                if (Files.exists(directory.resolve(linkedPath))) {
-                    exists = true;
-                    break;
-                }
+            if (!isBrokenLinkedFile(linkedFile)) {
+                updated.add(linkedFile);
+                continue;
             }
-            if (!exists) {
-                LinkedFile replacement = candidateFiles.get(fileName);
-                if (replacement != null) {
-                    linkedFile.setLink(replacement.getLink());
-                    linkedFile.setFileType(replacement.getFileType());
-                    candidateFiles.remove(fileName);
-                }
+            String brokenFileName = Path.of(linkedFile.getLink()).getFileName().toString();
+            Optional<Map.Entry<String, LinkedFile>> match = candidateFiles.entrySet().stream().filter(entry -> Path.of(entry.getValue().getLink()).getFileName().toString().equals(brokenFileName)).findFirst();
+            if (match.isPresent()) {
+                LinkedFile newFile = match.get().getValue();
+                updated.add(new LinkedFile(linkedFile.getDescription(), Path.of(newFile.getLink()), newFile.getFileType()));
+                candidateFiles.remove(match.get().getKey());
+            } else {
+                updated.add(linkedFile);
             }
-            updated.add(linkedFile);
         }
         return updated;
     }
