@@ -15,12 +15,14 @@ public class ValidCitationKeyChecker implements ValueChecker {
             return Optional.of(Localization.lang("empty citation key"));
         }
 
-        String cleaned = CitationKeyGenerator.cleanKey(value, "");
+        boolean hasIllegalChar = value.chars().anyMatch(c ->
+                Character.isWhitespace(c) || CitationKeyGenerator.DISALLOWED_CHARACTERS.contains((char) c)
+        );
 
-        if (cleaned.equals(value)) {
-            return Optional.empty();
-        } else {
+        if (hasIllegalChar) {
             return Optional.of(Localization.lang("Invalid citation key"));
         }
+
+        return Optional.empty();
     }
 }
