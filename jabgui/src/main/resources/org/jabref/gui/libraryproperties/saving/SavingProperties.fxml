@@ -7,6 +7,7 @@
 <?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
 <?import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel?>
 <?import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel?>
+<?import org.jabref.gui.commonfxcontrols.JournalAbbreviationPanel?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.saving.SavingPropertiesView">
@@ -26,7 +27,7 @@
     <MultiFieldsCleanupPanel fx:id="multiFieldsCleanupPanel" />
 
     <Label text="%Journal-related"/>
-    <!--    <CleanupJournalRelatedPanel fx:id="cleanupJournalRelatedPanel" />-->
+    <JournalAbbreviationPanel fx:id="journalAbbreviationPanel" />
     <padding>
         <Insets bottom="12.0" />
     </padding>
