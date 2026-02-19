@@ -94,6 +94,18 @@ public class MetaDataParserTest {
     }
 
     @Test
+    void parseJournalAbbreviationCleanup() throws ParseException {
+        Map<String, String> data = Map.of("journalAbbreviationCleanup", "ABBREVIATE_DEFAULT");
+        MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
+
+        MetaData expected = new MetaData();
+        CleanupPreferences.CleanupStep cleanupStep = CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT;
+        expected.setJournalAbbreviationCleanup(cleanupStep);
+        assertEquals(expected, parsed);
+    }
+
+    @Test
     void parsesUserSpecificBlgPathSuccessfully() throws ParseException {
         String user = "testUser";
         String rawKey = "blgFilePath-" + user;

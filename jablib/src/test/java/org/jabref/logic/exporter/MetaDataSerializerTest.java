@@ -89,6 +89,17 @@ public class MetaDataSerializerTest {
     }
 
     @Test
+    void serializeJournalAbbreviationCleanup() {
+        CleanupPreferences.CleanupStep journalAbbreviationCleanup = CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT;
+        metaData.setJournalAbbreviationCleanup(journalAbbreviationCleanup);
+
+        Map<String, String> expectedSerialization = new TreeMap<>();
+        expectedSerialization.put("journalAbbreviationCleanup",
+                "ABBREVIATE_DEFAULT" + ";");
+        assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
     void serializeSingleContentSelectors() {
         List<String> values = List.of(
                 "approved",

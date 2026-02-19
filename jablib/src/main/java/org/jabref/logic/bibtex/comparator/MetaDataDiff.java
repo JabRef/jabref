@@ -27,6 +27,7 @@ public class MetaDataDiff {
         PROTECTED,
         FIELDFORMATTERCLEANUPACTIONS,
         MULTIFIELDCLEANUPACTIONS,
+        JOURNALABBREVIATIONCLEANUP,
         SAVE_SORT_ORDER,
         USER_FILE_DIRECTORY
     }
@@ -111,6 +112,7 @@ public class MetaDataDiff {
         addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());
         addToListIfDiff(changes, DifferenceType.FIELDFORMATTERCLEANUPACTIONS, originalMetaData.getFieldFormatterCleanupActions(), newMetaData.getFieldFormatterCleanupActions());
         addToListIfDiff(changes, DifferenceType.MULTIFIELDCLEANUPACTIONS, originalMetaData.getMultiFieldCleanups(), newMetaData.getMultiFieldCleanups());
+        addToListIfDiff(changes, DifferenceType.JOURNALABBREVIATIONCLEANUP, originalMetaData.getJournalAbbreviationCleanup(), newMetaData.getJournalAbbreviationCleanup());
         addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
         addToListIfDiff(changes, DifferenceType.LIBRARY_SPECIFIC_FILE_DIRECTORY, originalMetaData.getLibrarySpecificFileDirectory(), newMetaData.getLibrarySpecificFileDirectory());
         addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());

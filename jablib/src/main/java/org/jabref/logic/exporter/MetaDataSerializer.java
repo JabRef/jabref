@@ -45,6 +45,7 @@ public class MetaDataSerializer {
         metaData.getFieldFormatterCleanupActions().ifPresent(
                 fieldFormatterCleanupActions -> stringyMetaData.put(MetaData.FIELDFORMATTERCLEANUPACTIONS, getAsStringList(fieldFormatterCleanupActions, OS.NEWLINE)));
         metaData.getMultiFieldCleanups().ifPresent(multiFieldCleanupActions -> stringyMetaData.put(MetaData.MULTIFIELDCLEANUPACTIONS, getAsStringList(multiFieldCleanupActions, OS.NEWLINE)));
+        metaData.getJournalAbbreviationCleanup().ifPresent(journalAbbreviationCleanup -> stringyMetaData.put(MetaData.JOURNALABBREVIATIONCLEANUP, List.of(journalAbbreviationCleanup.toString())));
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of("true"));
         }

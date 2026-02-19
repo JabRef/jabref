@@ -132,6 +132,8 @@ public class MetaDataParser {
                 metaData.setFieldFormatterCleanupActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.MULTIFIELDCLEANUPACTIONS.equals(entry.getKey())) {
                 metaData.setMultiFieldCleanups(multiFieldCleanupsParse(values));
+            } else if (MetaData.JOURNALABBREVIATIONCLEANUP.equals(entry.getKey())) {
+                metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.valueOf(entry.getValue()));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
