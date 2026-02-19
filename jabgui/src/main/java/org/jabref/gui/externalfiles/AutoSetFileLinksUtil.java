@@ -237,16 +237,21 @@ public class AutoSetFileLinksUtil {
     }
 
     private boolean isBrokenLinkedFile(LinkedFile file) {
-        Path filePath = Path.of(file.getLink());
-        if (filePath.isAbsolute()) {
-            return !Files.exists(filePath);
-        }
-        for (Path directory : directories) {
-            if (Files.exists(directory.resolve(filePath))) {
-                return false;
+        try {
+            Path filePath = Path.of(file.getLink());
+            if (filePath.isAbsolute()) {
+                return !Files.exists(filePath);
             }
+            for (Path directory : directories) {
+                if (Files.exists(directory.resolve(filePath))) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            LOGGER.debug("Error checking linked file", e);
+            return true;
         }
-        return true;
     }
 
     private LinkedFile buildLinkedFileFromPath(Path associatedFile) {
