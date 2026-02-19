@@ -150,7 +150,7 @@ public class AutoSetFileLinksUtil {
         List<LinkedFile> updated = new ArrayList<>();
         for (LinkedFile linkedFile : linkedFiles) {
             Path linkedPath = Path.of(linkedFile.getLink());
-            String brokenFileName = linkedPath.getFileName().toString();
+            String fileName = linkedPath.getFileName().toString();
             boolean exists = false;
             for (Path directory : directories) {
                 if (Files.exists(directory.resolve(linkedPath))) {
@@ -159,11 +159,11 @@ public class AutoSetFileLinksUtil {
                 }
             }
             if (!exists) {
-                LinkedFile replacement = candidateFiles.get(FileUtil.getBaseName(brokenFileName));
+                LinkedFile replacement = candidateFiles.get(fileName);
                 if (replacement != null) {
                     linkedFile.setLink(replacement.getLink());
                     linkedFile.setFileType(replacement.getFileType());
-                    candidateFiles.remove(FileUtil.getBaseName(brokenFileName));
+                    candidateFiles.remove(fileName);
                 }
             }
             updated.add(linkedFile);
@@ -197,16 +197,11 @@ public class AutoSetFileLinksUtil {
         return false;
     }
 
-    private Map<String, LinkedFile> findAssociatedNotLinkedFilesWithUniqueName(BibEntry entry,
-                                                                               FileFinder finder)
-            throws IOException {
-        Collection<LinkedFile> files =
-                findAssociatedNotLinkedFilesWithFinder(entry,
-                        finder,
-                        getConfiguredExtensions());
+    private Map<String, LinkedFile> findAssociatedNotLinkedFilesWithUniqueName(BibEntry entry, FileFinder finder) throws IOException {
+        Collection<LinkedFile> files = findAssociatedNotLinkedFilesWithFinder(entry, finder, getConfiguredExtensions());
         Map<String, LinkedFile> result = new HashMap<>();
         for (LinkedFile file : files) {
-            String fileName = FileUtil.getBaseName(file.getLink());
+            String fileName = Path.of(file.getLink()).getFileName().toString();
             result.putIfAbsent(fileName, file);
         }
         return result;
@@ -242,12 +237,12 @@ public class AutoSetFileLinksUtil {
     }
 
     private boolean isBrokenLinkedFile(LinkedFile file) {
-        Path filePath=Path.of(file.getLink());
-        if(filePath.isAbsolute()) {
-            return!Files.exists(filePath);
+        Path filePath = Path.of(file.getLink());
+        if (filePath.isAbsolute()) {
+            return !Files.exists(filePath);
         }
-        for(Path directory:directories) {
-            if(Files.exists(directory.resolve(filePath))) {
+        for (Path directory:directories) {
+            if (Files.exists(directory.resolve(filePath))) {
                 return false;
             }
         }
