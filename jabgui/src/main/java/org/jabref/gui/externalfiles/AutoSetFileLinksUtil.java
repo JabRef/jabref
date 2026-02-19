@@ -241,7 +241,7 @@ public class AutoSetFileLinksUtil {
         if (filePath.isAbsolute()) {
             return !Files.exists(filePath);
         }
-        for (Path directory:directories) {
+        for (Path directory : directories) {
             if (Files.exists(directory.resolve(filePath))) {
                 return false;
             }
