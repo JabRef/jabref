@@ -60,6 +60,8 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -401,7 +403,16 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);
             }
+        } else if (comment.startsWith(MetaData.META_FLAG_V1)) {
+            parseCommentToJson(comment).ifPresent(_ -> {
+            });
         }
+    }
+
+    Optional<JsonObject> parseCommentToJson(String comment) {
+        Gson gson = new Gson();
+        String content = comment.substring(MetaData.META_FLAG_V1.length());
+        return Optional.ofNullable(gson.fromJson(content, JsonObject.class));
     }
 
     /// Adds BibDesk group entries to the JabRef database
