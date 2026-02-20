@@ -274,7 +274,13 @@ public class BibtexParser implements Parser {
             MetaData metaData = metaDataParser.parse(
                     meta,
                     importFormatPreferences.bibEntryPreferences().getKeywordSeparator(),
-                    importFormatPreferences.filePreferences().getUserAndHost());
+                    importFormatPreferences.filePreferences().getUserAndHost()
+            );
+
+            if (!metaData.getGroupParsingErrors().isEmpty()) {
+                metaData.getGroupParsingErrors().forEach(parserResult::addWarning);
+            }
+
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
                             String existingGroups = meta.get(MetaData.GROUPSTREE);

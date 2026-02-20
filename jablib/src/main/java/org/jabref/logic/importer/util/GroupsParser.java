@@ -3,13 +3,13 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.strings.QuotedStringTokenizer;
 import org.jabref.logic.util.strings.StringUtil;
@@ -25,6 +25,7 @@ import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.GroupsParsingResult;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
@@ -51,21 +52,22 @@ public class GroupsParser {
     private GroupsParser() {
     }
 
-    public static GroupTreeNode importGroups(List<String> orderedData,
-                                             Character keywordSeparator,
-                                             FileUpdateMonitor fileMonitor,
-                                             MetaData metaData,
-                                             String userAndHost)
-            throws ParseException {
-        try {
-            GroupTreeNode cursor = null;
-            GroupTreeNode root = null;
-            for (String string : orderedData) {
-                // This allows reading databases that have been modified by, e.g., BibDesk
-                string = string.trim();
-                if (string.isEmpty()) {
-                    continue;
-                }
+    public static GroupsParsingResult importGroups(List<String> orderedData,
+                                                   Character keywordSeparator,
+                                                   FileUpdateMonitor fileMonitor,
+                                                   MetaData metaData,
+                                                   String userAndHost) {
+        GroupTreeNode cursor = null;
+        GroupTreeNode root = null;
+        List<String> parsingErrors = new ArrayList<>();
+
+        for (String string : orderedData) {
+            // This allows reading databases that have been modified by, e.g., BibDesk
+            string = string.trim();
+            if (string.isEmpty()) {
+                continue;
+            }
+            try {
 
                 int spaceIndex = string.indexOf(' ');
                 if (spaceIndex <= 0) {
@@ -86,13 +88,13 @@ public class GroupsParser {
                     cursor.addChild(newNode);
                     cursor = newNode;
                 }
+            } catch (ParseException | NumberFormatException e) {
+                LOGGER.warn("Skipping unknown or corrupt group: {}", string, e);
+                parsingErrors.add("Error parsing group line: " + string + " (" + e.getMessage() + ")");
             }
-            return root;
-        } catch (ParseException e) {
-            throw new ParseException(Localization
-                    .lang("Group tree could not be parsed. If you save the BibTeX library, all groups will be lost."),
-                    e);
         }
+
+        return new GroupsParsingResult(root, parsingErrors);
     }
 
     /// Re-create a group instance from a textual representation.

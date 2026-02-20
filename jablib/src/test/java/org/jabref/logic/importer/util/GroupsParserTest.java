@@ -23,6 +23,7 @@ import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.GroupsParsingResult;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.metadata.MetaData;
@@ -76,8 +77,7 @@ class GroupsParserTest {
     }
 
     @Test
-    void importSubGroups() throws ParseException {
-
+    void importSubGroups() {
         List<String> orderedData = Arrays.asList("0 AllEntriesGroup:", "1 ExplicitGroup:1;0;",
                 "2 ExplicitGroup:2;0;", "0 ExplicitGroup:3;0;");
         // Create group hierarchy:
@@ -98,7 +98,7 @@ class GroupsParserTest {
         AbstractGroup thirdSubGrpLvl1 = new ExplicitGroup("3", GroupHierarchyType.INDEPENDENT, ',');
         rootNode.addSubgroup(thirdSubGrpLvl1);
 
-        GroupTreeNode parsedNode = GroupsParser.importGroups(orderedData, ',', fileMonitor, metaData, "userAndHost");
+        GroupTreeNode parsedNode = GroupsParser.importGroups(orderedData, ',', fileMonitor, metaData, "userAndHost").root();
         assertEquals(rootNode.getChildren(), parsedNode.getChildren());
     }
 
@@ -216,5 +216,25 @@ class GroupsParserTest {
         // Verify it's still ExplicitGroup and properties are preserved
         assertEquals(ExplicitGroup.class, roundtripParsed.getClass());
         assertEquals(parsed, roundtripParsed);
+    }
+
+    @Test
+    void importGroupsSkipsUnknownGroupAndReportsError() {
+        List<String> data = List.of(
+                "0 AllEntriesGroup:",
+                "1 ExplicitGroup:ValidGroup;0;",
+                "1 DirectoryGroup:BrokenGroup;0;C:/temp;1;;;;",
+                "1 ExplicitGroup:AnotherValidGroup;0;"
+        );
+
+        GroupsParsingResult result = GroupsParser.importGroups(data, ';', fileMonitor, metaData, "userAndHost");
+
+        GroupTreeNode expectedRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ';'));
+        expectedRoot.addSubgroup(new ExplicitGroup("ValidGroup", GroupHierarchyType.INDEPENDENT, ';'));
+        expectedRoot.addSubgroup(new ExplicitGroup("AnotherValidGroup", GroupHierarchyType.INDEPENDENT, ';'));
+
+        assertEquals(expectedRoot.getChildren(), result.root().getChildren());
+        assertEquals(1, result.errors().size());
+        assertTrue(result.errors().getFirst().contains("DirectoryGroup"));
     }
 }
