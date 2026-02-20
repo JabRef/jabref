@@ -16,7 +16,7 @@ module org.jabref.jabsrv {
     opens org.jabref.http.server.resources to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     exports org.jabref.http.server.resources;
 
-    requires javafx.base;
+    requires transitive javafx.base;
 
     // For CAYW feature
     requires transitive javafx.graphics;
@@ -25,39 +25,35 @@ module org.jabref.jabsrv {
     requires java.desktop;
 
     // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
-    requires org.glassfish.hk2.locator;
-    uses org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl;
+    requires /*runtime*/ org.glassfish.hk2.locator;
 
-    requires org.jabref.jablib;
+    requires transitive org.jabref.jablib;
 
-    requires org.slf4j;
+    requires transitive org.slf4j;
 
     requires com.google.common;
-    requires com.google.gson;
+    requires transitive com.google.gson;
 
-    requires org.glassfish.hk2.api;
+    requires transitive org.glassfish.hk2.api;
 
-    requires jakarta.annotation;
-    requires jakarta.inject;
+    requires static jakarta.annotation;
+    requires transitive jakarta.inject;
+
+    // Injection framework
+    requires /*runtime*/ org.glassfish.jersey.inject.hk2;
 
     requires org.glassfish.grizzly;
-    requires org.glassfish.grizzly.http;
-    requires org.glassfish.grizzly.http.server;
-    requires jakarta.validation;
-    requires jakarta.ws.rs;
+    requires transitive org.glassfish.grizzly.http.server;
+    requires transitive jakarta.ws.rs;
 
-    requires org.glassfish.jersey.core.common;
     requires org.glassfish.jersey.core.server;
     requires org.glassfish.jersey.container.grizzly2.http;
 
     requires net.harawata.appdirs;
-    requires com.sun.jna;
-    requires com.sun.jna.platform;
-
-    requires jbibtex;
-    requires citeproc.java;
 
     requires transitive org.jspecify;
     requires java.logging;
+    requires tools.jackson.core;
     requires tools.jackson.databind;
+    requires transitive com.fasterxml.jackson.annotation;
 }
