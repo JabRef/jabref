@@ -262,8 +262,6 @@ open module org.jabref.jablib {
     requires com.dd.plist;
     requires io.github.darvil.terminal.textformatter;
     requires static io.github.eadr;
-    // required by okhttp and some AI library
-    requires kotlin.stdlib;
     requires mslinks;
     requires transitive org.antlr.antlr4.runtime;
     requires org.jooq.jool;
