@@ -4,7 +4,6 @@ plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
     id("org.gradlex.java-module-dependencies")
-    id("com.autonomousapps.dependency-analysis")
 }
 
 // module-info entry order not checked
