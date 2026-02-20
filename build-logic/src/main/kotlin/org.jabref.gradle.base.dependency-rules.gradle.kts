@@ -7,7 +7,7 @@ plugins {
     id("com.autonomousapps.dependency-analysis")
 }
 
-// ordering check is done by SortModuleInfoRequiresStep
+// module-info entry order not checked
 tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
 
 jvmDependencyConflicts {
@@ -472,6 +472,7 @@ extraJavaModuleInfo {
     module("org.openjfx:javafx-base", "javafx.base") {
         preserveExisting()
         exports("javafx.collections")
+        opens("com.sun.javafx.beans", "net.bytebuddy")
     }
 
     // open packages for testing of jablib
