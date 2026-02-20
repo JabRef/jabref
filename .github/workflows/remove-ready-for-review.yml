@@ -34,6 +34,11 @@ jobs:
           running=$(gh pr checks "$PR" --json state -q '.[] | select(.state=="IN_PROGRESS" or .state=="QUEUED") | length' | wc -l)
           if [ "$running" -gt 0 ] || [ "$label" -gt 0 ]; then
             echo "ci_running=true" >> $GITHUB_OUTPUT
+            {
+              echo "### Running / Queued checks for PR #$PR"
+              gh pr checks "$PR" --json name,state \
+                -q '.[] | select(.state=="IN_PROGRESS" or .state=="QUEUED") | "- \(.name)"'
+            } >> "$GITHUB_STEP_SUMMARY"
           else
             echo "ci_running=false" >> $GITHUB_OUTPUT
           fi
