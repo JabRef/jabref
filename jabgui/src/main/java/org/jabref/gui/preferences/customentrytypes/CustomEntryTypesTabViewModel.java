@@ -166,14 +166,14 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             return Optional.empty();
         }
 
-        FieldViewModel viewModel = new FieldViewModel(newField,
+        FieldViewModel fieldViewModel = new FieldViewModel(newField,
                 FieldViewModel.Mandatory.REQUIRED,
                 FieldPriority.IMPORTANT,
                 false);
-        this.selectedEntryType.getValue().addField(viewModel);
+        this.selectedEntryType.getValue().addField(fieldViewModel);
         newFieldToAdd.set("");
 
-        return Optional.of(viewModel);
+        return Optional.of(fieldViewModel);
     }
 
     public boolean displayNameExists(String displayName) {
