@@ -17,8 +17,7 @@ mainModuleInfo {
 }
 
 application{
-    mainClass.set("org.jabref.http.server.cli.ServerCli")
-    mainModule.set("org.jabref.jabsrv.cli")
+    mainClass = "org.jabref.http.server.cli.ServerCli"
 
     applicationDefaultJvmArgs = listOf(
         "--enable-native-access=com.sun.jna,org.apache.lucene.core",
