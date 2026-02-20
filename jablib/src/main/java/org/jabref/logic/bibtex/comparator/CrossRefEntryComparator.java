@@ -22,8 +22,7 @@ public class CrossRefEntryComparator implements Comparator<BibEntry> {
 
         if (!crEntry1) {
             return 1;
-        } else {
-            return -1;
         }
+        return -1;
     }
 }

@@ -232,11 +232,10 @@ public class LinkedFile implements Serializable {
             return FileUtil.getFileNameFromUrl(linkedName);
         } else if (linkedName.isEmpty()) {
             return Optional.empty();
-        } else {
-            int slash = linkedName.lastIndexOf(File.separatorChar);
-            if (slash >= 0) {
-                return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
-            }
+        }
+        int slash = linkedName.lastIndexOf(File.separatorChar);
+        if (slash >= 0) {
+            return Optional.of(FileUtil.getValidFileName(linkedName.substring(slash + 1)));
         }
         return Optional.of(FileUtil.getValidFileName(linkedName));
     }
@@ -262,12 +261,10 @@ public class LinkedFile implements Serializable {
             if (file.isAbsolute() || directories.isEmpty()) {
                 if (Files.exists(file)) {
                     return Optional.of(file);
-                } else {
-                    return Optional.empty();
                 }
-            } else {
-                return FileUtil.find(link.get(), directories);
+                return Optional.empty();
             }
+            return FileUtil.find(link.get(), directories);
         } catch (InvalidPathException ex) {
             return Optional.empty();
         }

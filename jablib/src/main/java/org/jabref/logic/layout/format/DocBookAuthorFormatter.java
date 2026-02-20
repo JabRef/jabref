@@ -1,7 +1,11 @@
 package org.jabref.logic.layout.format;
 
+import java.util.function.Predicate;
+
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
+
+import static java.util.function.Predicate.not;
 
 /// DocBook author formatter for both version 4 and 5
 public class DocBookAuthorFormatter {
@@ -16,13 +20,13 @@ public class DocBookAuthorFormatter {
                 sb.append("<personname>");
             }
             Author a = al.getAuthor(i);
-            a.getGivenName().filter(first -> !first.isEmpty()).ifPresent(first -> sb.append("<firstname>")
+            a.getGivenName().filter(not(String::isEmpty)).ifPresent(first -> sb.append("<firstname>")
                                                                                     .append(XML_CHARS.format(first)).append("</firstname>"));
-            a.getNamePrefix().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append("<othername>")
+            a.getNamePrefix().filter(not(String::isEmpty)).ifPresent(von -> sb.append("<othername>")
                                                                                .append(XML_CHARS.format(von)).append("</othername>"));
-            a.getFamilyName().filter(last -> !last.isEmpty()).ifPresent(last -> {
+            a.getFamilyName().filter(not(String::isEmpty)).ifPresent(last -> {
                 sb.append("<surname>").append(XML_CHARS.format(last));
-                a.getNameSuffix().filter(jr -> !jr.isEmpty())
+                a.getNameSuffix().filter(not(String::isEmpty))
                  .ifPresent(jr -> sb.append(' ').append(XML_CHARS.format(jr)));
                 sb.append("</surname>");
                 if (version == DocBookVersion.DOCBOOK_5) {

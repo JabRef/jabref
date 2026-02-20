@@ -175,9 +175,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         if (entryEprint.isEmpty()) {
             LOGGER.error("Cannot infer ArXiv-issued DOI from BibEntry: no 'EPRINT' field found");
             return Optional.empty();
-        } else {
-            return Optional.of(ArXivFetcher.getAutomaticDoi(entryEprint.get()));
         }
+        return Optional.of(ArXivFetcher.getAutomaticDoi(entryEprint.get()));
     }
 
     /// Get ArXiv-issued DOI from ArXiv Identifier object
@@ -403,9 +402,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             List<ArXivEntry> entries = queryApi(searchQuery, List.of(), 0, 1);
             if (entries.size() == 1) {
                 return Optional.of(entries.getFirst());
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         private Optional<ArXivEntry> searchForEntryById(String id) throws FetcherException {
@@ -417,9 +415,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             List<ArXivEntry> entries = queryApi("", List.of(identifier.get()), 0, 1);
             if (!entries.isEmpty()) {
                 return Optional.of(entries.getFirst());
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         private List<ArXivEntry> searchForEntries(BibEntry originalEntry) throws FetcherException {
@@ -528,9 +525,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 if (connection.getResponseCode() == 400) {
                     // Bad request error from server, try to get more information
                     throw getException(builder.parse(connection.getErrorStream()));
-                } else {
-                    return builder.parse(connection.getInputStream());
                 }
+                return builder.parse(connection.getInputStream());
             } catch (SAXException | ParserConfigurationException | IOException exception) {
                 throw new FetcherException(url, "arXiv API request failed", exception);
             }
@@ -722,9 +718,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 return publishedDate.map(date -> {
                     if (date.length() < 10) {
                         return null;
-                    } else {
-                        return date.substring(0, 10);
                     }
+                    return date.substring(0, 10);
                 });
             }
 

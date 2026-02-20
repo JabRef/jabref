@@ -29,9 +29,8 @@ public class CountingUndoManager extends UndoManager {
             updateUndoableStatus();
             updateRedoableStatus();
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

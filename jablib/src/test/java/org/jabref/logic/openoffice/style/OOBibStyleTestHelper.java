@@ -98,16 +98,15 @@ class OOBibStyleTestHelper {
                     new CitationMarkerNumericBibEntryImpl("key",
                             n == 0 ? Optional.empty() : Optional.of(n));
             return style.getNumCitationMarkerForBibliography(x).toString();
-        } else {
-            List<CitationMarkerNumericEntry> input =
-                    num.stream()
-                       .map(n ->
-                               new CitationMarkerNumericEntryImpl("key" + n,
-                                       n,
-                                       Optional.empty()))
-                       .collect(Collectors.toList());
-            return style.getNumCitationMarker2(input, minGroupingCount).toString();
         }
+        List<CitationMarkerNumericEntry> input =
+                num.stream()
+                        .map(n ->
+                                new CitationMarkerNumericEntryImpl("key" + n,
+                                        n,
+                                        Optional.empty()))
+                        .collect(Collectors.toList());
+        return style.getNumCitationMarker2(input, minGroupingCount).toString();
     }
 
     /*

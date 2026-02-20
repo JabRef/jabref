@@ -176,10 +176,9 @@ public class MetaDataParser {
         } else if (value.contains("\\\\") && !SINGLE_BACKSLASH.matcher(value).find()) {
             // All backslashes escaped
             return value.replace("\\\\", "\\");
-        } else {
-            // No backslash escaping
-            return value;
         }
+        // No backslash escaping
+        return value;
     }
 
     private static Comparator<? super Map.Entry<String, String>> groupsLast() {
@@ -192,9 +191,8 @@ public class MetaDataParser {
     private static String getSingleItem(List<String> value) throws ParseException {
         if (value.size() == 1) {
             return value.getFirst();
-        } else {
-            throw new ParseException("Expected a single item but received " + value);
         }
+        throw new ParseException("Expected a single item but received " + value);
     }
 
     private static List<String> getAsList(String value) throws ParseException {
@@ -250,10 +248,9 @@ public class MetaDataParser {
             String formatterString = formatterMetaList.get(1);
 
             return new FieldFormatterCleanupActions(enablementStatus, FieldFormatterCleanupMapper.parseActions(formatterString));
-        } else {
-            // return default actions
-            return new FieldFormatterCleanupActions(false, DEFAULT_SAVE_ACTIONS);
         }
+        // return default actions
+        return new FieldFormatterCleanupActions(false, DEFAULT_SAVE_ACTIONS);
     }
 
     /// Handles a blgFilePath-* metadata entry. Expects exactly one valid path.

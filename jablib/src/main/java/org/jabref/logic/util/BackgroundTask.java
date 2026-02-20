@@ -87,12 +87,10 @@ public abstract class BackgroundTask<V> {
                     first.run();
                     second.accept(result);
                 };
-            } else {
-                return result -> first.run();
             }
-        } else {
-            return second;
+            return result -> first.run();
         }
+        return second;
     }
 
     public boolean isCancelled() {
@@ -284,9 +282,8 @@ public abstract class BackgroundTask<V> {
         public double getWorkDonePercentage() {
             if (max == 0) {
                 return 0;
-            } else {
-                return workDone / max;
             }
+            return workDone / max;
         }
     }
 }

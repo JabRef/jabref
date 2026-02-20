@@ -20,9 +20,8 @@ public record UserHostInfo(
             String host = userHostString.substring(index + 1);
             String user = userHostString.substring(0, index);
             return new UserHostInfo(user, host);
-        } else {
-            return new UserHostInfo(userHostString, "");
         }
+        return new UserHostInfo(userHostString, "");
     }
 
     /// Returns the user-host string representation.
@@ -33,9 +32,8 @@ public record UserHostInfo(
     public String getUserHostString() {
         if (host.isEmpty()) {
             return user;
-        } else {
-            return user + "-" + host;
         }
+        return user + "-" + host;
     }
 
     /// Checks if this UserHostInfo has the same host as the given UserHostInfo.

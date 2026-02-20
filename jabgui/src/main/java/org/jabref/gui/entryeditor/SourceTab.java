@@ -296,13 +296,12 @@ public class SourceTab extends EntryEditorTab {
                     dialogService.showErrorDialogAndWait(errors);
                     validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
                     return;
-                } else {
-                    LOGGER.warn("No entries found.");
-                    String errors = Localization.lang("No entries available");
-                    dialogService.showErrorDialogAndWait(errors);
-                    validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
-                    return;
                 }
+                LOGGER.warn("No entries found.");
+                String errors = Localization.lang("No entries available");
+                dialogService.showErrorDialogAndWait(errors);
+                validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
+                return;
             }
 
             if (parserResult.hasWarnings()) {

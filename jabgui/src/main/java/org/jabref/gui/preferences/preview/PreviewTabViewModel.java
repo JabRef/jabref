@@ -329,33 +329,31 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             spansBuilder.add(List.of(), matcher.start() - lastKeywordEnd);
             if (matcher.group("COMMENT") != null) {
                 spansBuilder.add(Set.of("comment"), matcher.end() - matcher.start());
-            } else {
-                if (matcher.group("ELEMENT") != null) {
-                    String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);
+            } else if (matcher.group("ELEMENT") != null) {
+                String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);
 
-                    spansBuilder.add(Set.of("tagmark"), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
-                    spansBuilder.add(Set.of("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
+                spansBuilder.add(Set.of("tagmark"), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
+                spansBuilder.add(Set.of("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
 
-                    if (!attributesText.isEmpty()) {
-                        lastKeywordEnd = 0;
+                if (!attributesText.isEmpty()) {
+                    lastKeywordEnd = 0;
 
-                        Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);
-                        while (attributesMatcher.find()) {
-                            spansBuilder.add(List.of(), attributesMatcher.start() - lastKeywordEnd);
-                            spansBuilder.add(Set.of("attribute"), attributesMatcher.end(GROUP_ATTRIBUTE_NAME) - attributesMatcher.start(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Set.of("tagmark"), attributesMatcher.end(GROUP_EQUAL_SYMBOL) - attributesMatcher.end(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Set.of("avalue"), attributesMatcher.end(GROUP_ATTRIBUTE_VALUE) - attributesMatcher.end(GROUP_EQUAL_SYMBOL));
-                            lastKeywordEnd = attributesMatcher.end();
-                        }
-                        if (attributesText.length() > lastKeywordEnd) {
-                            spansBuilder.add(List.of(), attributesText.length() - lastKeywordEnd);
-                        }
+                    Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);
+                    while (attributesMatcher.find()) {
+                        spansBuilder.add(List.of(), attributesMatcher.start() - lastKeywordEnd);
+                        spansBuilder.add(Set.of("attribute"), attributesMatcher.end(GROUP_ATTRIBUTE_NAME) - attributesMatcher.start(GROUP_ATTRIBUTE_NAME));
+                        spansBuilder.add(Set.of("tagmark"), attributesMatcher.end(GROUP_EQUAL_SYMBOL) - attributesMatcher.end(GROUP_ATTRIBUTE_NAME));
+                        spansBuilder.add(Set.of("avalue"), attributesMatcher.end(GROUP_ATTRIBUTE_VALUE) - attributesMatcher.end(GROUP_EQUAL_SYMBOL));
+                        lastKeywordEnd = attributesMatcher.end();
                     }
-
-                    lastKeywordEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);
-
-                    spansBuilder.add(Set.of("tagmark"), matcher.end(GROUP_CLOSE_BRACKET) - lastKeywordEnd);
+                    if (attributesText.length() > lastKeywordEnd) {
+                        spansBuilder.add(List.of(), attributesText.length() - lastKeywordEnd);
+                    }
                 }
+
+                lastKeywordEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);
+
+                spansBuilder.add(Set.of("tagmark"), matcher.end(GROUP_CLOSE_BRACKET) - lastKeywordEnd);
             }
             lastKeywordEnd = matcher.end();
         }

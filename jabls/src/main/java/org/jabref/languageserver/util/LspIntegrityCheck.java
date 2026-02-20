@@ -39,9 +39,8 @@ public class LspIntegrityCheck {
                 return integrityCheck.checkEntry(entry).stream().map(message -> {
                     if (entry.getFieldOrAlias(message.field()).isPresent()) {
                         return LspDiagnosticBuilder.create(parserResult, message.message()).setField(message.field()).setEntry(entry).build();
-                    } else {
-                        return LspDiagnosticBuilder.create(parserResult, message.message()).setEntry(entry).build();
                     }
+                    return LspDiagnosticBuilder.create(parserResult, message.message()).setEntry(entry).build();
                 });
             } catch (NullPointerException nullPointerException) {
                 LOGGER.debug("Error while performing integrity check.", nullPointerException);

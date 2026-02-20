@@ -101,9 +101,8 @@ public class FieldEditors {
         } else if (field == StandardField.TYPE) {
             if (entryType.equals(IEEETranEntryType.Patent)) {
                 return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
-            } else {
-                return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
             }
+            return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
@@ -116,17 +115,15 @@ public class FieldEditors {
             return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction, databaseContext);
         } else if (field == StandardField.ICORERANKING) {
             return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);
-        } else {
-            // There was no specific editor found
-
-            // Check whether there are selectors defined for the field at hand
-            List<String> selectorValues = databaseContext.getMetaData().getContentSelectorValuesForField(field);
-            if (!isMultiLine && !selectorValues.isEmpty()) {
-                return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, selectorValues));
-            } else {
-                return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);
-            }
         }
+        // There was no specific editor found
+
+        // Check whether there are selectors defined for the field at hand
+        List<String> selectorValues = databaseContext.getMetaData().getContentSelectorValuesForField(field);
+        if (!isMultiLine && !selectorValues.isEmpty()) {
+            return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, selectorValues));
+        }
+        return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);
     }
 
     private static SuggestionProvider<?> getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {

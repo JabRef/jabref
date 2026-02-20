@@ -59,12 +59,10 @@ public class Author {
             // We do not remove braces here to keep institutions protected
             // https://github.com/JabRef/jabref/issues/10031
             this.familyName = familyName;
+        } else if (!StringUtil.isBlank(familyName)) {
+            this.familyName = FORMATTER.format(familyName);
         } else {
-            if (!StringUtil.isBlank(familyName)) {
-                this.familyName = FORMATTER.format(familyName);
-            } else {
-                this.familyName = null;
-            }
+            this.familyName = null;
         }
         if (!StringUtil.isBlank(nameSuffix)) {
             this.nameSuffix = FORMATTER.format(nameSuffix);
@@ -223,9 +221,8 @@ public class Author {
     public String getNamePrefixAndFamilyName() {
         if (namePrefix == null || namePrefix.isEmpty()) {
             return getFamilyName().orElse("");
-        } else {
-            return familyName == null ? namePrefix : namePrefix + ' ' + familyName;
         }
+        return familyName == null ? namePrefix : namePrefix + ' ' + familyName;
     }
 
     /// Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.

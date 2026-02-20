@@ -180,23 +180,20 @@ public class Launcher {
                     // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
                     LOGGER.warn("A JabRef instance is already running. Switching to that instance.");
                     return MultipleInstanceAction.FOCUS;
-                } else {
-                    // We are not alone, there is already a server out there, send command line arguments to other instance
-                    LOGGER.debug("Passing arguments passed on to running JabRef...");
-                    if (remoteClient.sendCommandLineArguments(args)) {
-                        // So we assume it's all taken care of, and quit.
-                        // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
-                        LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
-                        return MultipleInstanceAction.SHUTDOWN;
-                    } else {
-                        LOGGER.warn("Could not communicate with other running JabRef instance.");
-                    }
                 }
+                // We are not alone, there is already a server out there, send command line arguments to other instance
+                LOGGER.debug("Passing arguments passed on to running JabRef...");
+                if (remoteClient.sendCommandLineArguments(args)) {
+                    // So we assume it's all taken care of, and quit.
+                    // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
+                    LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
+                    return MultipleInstanceAction.SHUTDOWN;
+                }
+                LOGGER.warn("Could not communicate with other running JabRef instance.");
                 // We do not launch a new instance in presence if there is another instance running
                 return MultipleInstanceAction.SHUTDOWN;
-            } else {
-                LOGGER.debug("Could not ping JabRef instance.");
             }
+            LOGGER.debug("Could not ping JabRef instance.");
         }
         return MultipleInstanceAction.CONTINUE;
     }

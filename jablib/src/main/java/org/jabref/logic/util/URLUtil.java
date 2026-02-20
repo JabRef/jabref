@@ -77,7 +77,7 @@ public class URLUtil {
     /// @param url the String to check for a URL
     /// @return true if `url` contains a valid URL
     public static boolean isURL(String url) {
-        if (url == null || url.trim().isEmpty()) {
+        if (url == null || url.isBlank()) {
             return false;
         }
 

@@ -137,9 +137,8 @@ public class GlobalSearchBar extends HBox {
                         return "";
                     } else if (matched.intValue() == 0) {
                         return Localization.lang("No results found.");
-                    } else {
-                        return Localization.lang("Found %0 results.", String.valueOf(matched));
                     }
+                    return Localization.lang("Found %0 results.", String.valueOf(matched));
                 }
         ));
 

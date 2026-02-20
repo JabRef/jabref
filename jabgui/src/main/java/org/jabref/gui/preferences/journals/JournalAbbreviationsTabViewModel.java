@@ -236,11 +236,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     }
 
     private void setCurrentAbbreviationNameAndAbbreviationIfValid(Abbreviation abbreviationObject) {
-        if (abbreviationObject.getName().trim().isEmpty()) {
+        if (abbreviationObject.getName().isBlank()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Name cannot be empty"));
             return;
         }
-        if (abbreviationObject.getAbbreviation().trim().isEmpty()) {
+        if (abbreviationObject.getAbbreviation().isBlank()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Abbreviation cannot be empty"));
             return;
         }

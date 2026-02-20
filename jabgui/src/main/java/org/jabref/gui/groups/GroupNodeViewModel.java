@@ -446,9 +446,9 @@ public class GroupNodeViewModel {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
             return groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
-                            .orElse(false);
+                    .map(GroupTreeNode::getGroup)
+                    .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
+                    .orElse(false);
         } else if (group instanceof KeywordGroup) {
             // also covers WordKeywordGroup
             return true;
@@ -468,9 +468,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof EntryTypeGroup) {
             return false;
-        } else {
-            throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
+        throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
     }
 
     public boolean canBeDragged() {

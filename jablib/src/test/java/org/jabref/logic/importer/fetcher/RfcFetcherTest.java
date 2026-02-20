@@ -13,7 +13,7 @@ import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,7 +67,7 @@ class RfcFetcherTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"rfc1945", "RFC1945", "1945"})
+    @ValueSource(strings = {"rfc1945", "RFC1945", "1945"})
     void performSearchByIdFindsEntry(String identifier) throws FetcherException {
         assertEquals(Optional.of(bibEntry), fetcher.performSearchById(identifier));
     }
@@ -78,7 +78,7 @@ class RfcFetcherTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             // syntactically valid identifier
             "draft-test-draft-spec",
             "RFC9999",

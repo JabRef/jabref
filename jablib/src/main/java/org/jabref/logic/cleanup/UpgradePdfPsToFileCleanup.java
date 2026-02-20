@@ -35,7 +35,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         int oldItemCount = fileList.size();
         for (Map.Entry<Field, String> field : fields.entrySet()) {
             entry.getField(field.getKey()).ifPresent(fieldContent -> {
-                if (fieldContent.trim().isEmpty()) {
+                if (fieldContent.isBlank()) {
                     return;
                 }
                 Path path = Path.of(fieldContent);

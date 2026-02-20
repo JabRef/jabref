@@ -69,9 +69,8 @@ public class ZipFileChooser extends BaseDialog<Path> {
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 return table.getSelectionModel().getSelectedItem();
-            } else {
-                return null;
             }
+            return null;
         });
     }
 

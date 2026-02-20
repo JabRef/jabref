@@ -136,10 +136,8 @@ public class NameFormatter implements LayoutFormatter {
 
             if ("*".equals(formatString[0])) {
                 return format(toFormat, al, formatString);
-            } else {
-                if (al.getNumberOfAuthors() <= Integer.parseInt(formatString[0])) {
-                    return format(toFormat, al, formatString);
-                }
+            } else if (al.getNumberOfAuthors() <= Integer.parseInt(formatString[0])) {
+                return format(toFormat, al, formatString);
             }
         }
         return toFormat;

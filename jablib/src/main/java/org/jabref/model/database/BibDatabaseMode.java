@@ -12,9 +12,8 @@ public enum BibDatabaseMode {
     public String getFormattedName() {
         if (this == BIBTEX) {
             return "BibTeX";
-        } else {
-            return "biblatex";
         }
+        return "biblatex";
     }
 
     /// Returns the opposite mode of the current mode as {@link BibDatabaseMode}.
@@ -23,9 +22,8 @@ public enum BibDatabaseMode {
     public BibDatabaseMode getOppositeMode() {
         if (this == BIBTEX) {
             return BIBLATEX;
-        } else {
-            return BIBTEX;
         }
+        return BIBTEX;
     }
 
     /// Returns the {@link BibDatabaseMode} that equals the given string. The use of capital and small letters

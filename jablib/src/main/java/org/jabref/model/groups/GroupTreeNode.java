@@ -148,10 +148,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             if (this.getGroup().containsAll(entries)) {
                 groups.add(this);
             }
-        } else {
-            if (this.getGroup().containsAny(entries)) {
-                groups.add(this);
-            }
+        } else if (this.getGroup().containsAny(entries)) {
+            groups.add(this);
         }
 
         // Traverse children
@@ -282,19 +280,17 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public List<FieldChange> addEntriesToGroup(Collection<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger) {
             return ((GroupEntryChanger) getGroup()).add(entries);
-        } else {
-            return List.of();
         }
+        return List.of();
     }
 
     /// Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
     public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger entryChanger) {
             return entryChanger.remove(entries);
-        } else {
-            LOGGER.warn("Tried to remove entries from a group that does not support entry changing: {}", getGroup().getName());
-            return List.of();
         }
+        LOGGER.warn("Tried to remove entries from a group that does not support entry changing: {}", getGroup().getName());
+        return List.of();
     }
 
     /// Returns true if the underlying groups of both {@link GroupTreeNode}s is the same.
@@ -305,8 +301,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public boolean containsGroup(AbstractGroup other) {
         if (this.getGroup() == other) {
             return true;
-        } else {
-            return this.getChildren().stream().anyMatch(child -> child.getGroup() == other);
         }
+        return this.getChildren().stream().anyMatch(child -> child.getGroup() == other);
     }
 }

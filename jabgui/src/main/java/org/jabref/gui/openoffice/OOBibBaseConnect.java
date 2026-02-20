@@ -239,8 +239,7 @@ public class OOBibBaseConnect {
     public Optional<String> getCurrentDocumentTitle() {
         if (isDocumentConnectionMissing()) {
             return Optional.empty();
-        } else {
-            return UnoTextDocument.getFrameTitle(this.xTextDocument);
         }
+        return UnoTextDocument.getFrameTitle(this.xTextDocument);
     }
 }

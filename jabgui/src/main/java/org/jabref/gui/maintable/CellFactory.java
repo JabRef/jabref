@@ -101,9 +101,8 @@ public class CellFactory {
         if (icon == null) {
             // LOGGER.info("Error: no table icon defined for type '" + field + "'.");
             return null;
-        } else {
-            // node should be generated for each call, as nodes can be added to the scene graph only once
-            return icon.getGraphicNode();
         }
+        // node should be generated for each call, as nodes can be added to the scene graph only once
+        return icon.getGraphicNode();
     }
 }

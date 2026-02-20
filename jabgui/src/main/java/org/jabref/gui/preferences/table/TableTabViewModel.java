@@ -42,9 +42,8 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         public String toString(MainTableColumnModel object) {
             if (object != null) {
                 return object.getName();
-            } else {
-                return "";
             }
+            return "";
         }
 
         @Override

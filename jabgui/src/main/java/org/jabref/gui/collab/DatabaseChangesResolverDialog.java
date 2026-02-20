@@ -78,10 +78,9 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
             if (viewModel.areAllChangesResolved()) {
                 LOGGER.info("External changes are resolved successfully");
                 return true;
-            } else {
-                LOGGER.info("External changes aren't resolved");
-                return false;
             }
+            LOGGER.info("External changes aren't resolved");
+            return false;
         });
     }
 

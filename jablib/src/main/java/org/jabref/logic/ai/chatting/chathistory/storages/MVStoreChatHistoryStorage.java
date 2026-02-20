@@ -58,10 +58,9 @@ public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistor
                 return new UserMessage(content);
             } else if (className.equals(ErrorMessage.class.getName())) {
                 return new ErrorMessage(content);
-            } else {
-                LOGGER.warn("ChatHistoryRecord supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message.", className);
-                return new AiMessage(content);
             }
+            LOGGER.warn("ChatHistoryRecord supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message.", className);
+            return new AiMessage(content);
         }
     }
 

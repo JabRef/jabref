@@ -76,9 +76,8 @@ public class PreviewPreferences {
                 || layoutCyclePosition.getValue() < 0
                 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
             return getCustomPreviewLayout();
-        } else {
-            return layoutCycle.get(layoutCyclePosition.getValue());
         }
+        return layoutCycle.get(layoutCyclePosition.getValue());
     }
 
     public TextBasedPreviewLayout getCustomPreviewLayout() {

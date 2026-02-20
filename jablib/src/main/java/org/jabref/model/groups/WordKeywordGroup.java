@@ -152,9 +152,8 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
             Set<String> content = entry.getFieldAsWords(searchField);
             if (caseSensitive) {
                 return content.containsAll(searchWords);
-            } else {
-                return containsCaseInsensitive(content, searchWords);
             }
+            return containsCaseInsensitive(content, searchWords);
         }
     }
 

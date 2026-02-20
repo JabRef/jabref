@@ -22,9 +22,8 @@ public class AddBracesFormatter extends Formatter {
         if ((value.length() >= 2) && (value.charAt(0) != '{') && (value.charAt(value.length() - 1) != '}')) {
             // Title does not start with { and does not end with }, then this formatter can be applied
             return "{" + value + "}";
-        } else {
-            return value;
         }
+        return value;
     }
 
     @Override

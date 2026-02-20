@@ -119,13 +119,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
             newMetaData.clearSaveActions();
+        } else // if all actions have been removed, remove the save actions from the MetaData
+        if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
+            newMetaData.clearSaveActions();
         } else {
-            // if all actions have been removed, remove the save actions from the MetaData
-            if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
-                newMetaData.clearSaveActions();
-            } else {
-                newMetaData.setSaveActions(fieldFormatterCleanupActions);
-            }
+            newMetaData.setSaveActions(fieldFormatterCleanupActions);
         }
 
         SaveOrder newSaveOrder = new SaveOrder(

@@ -70,9 +70,8 @@ public class ArXivIdentifier extends EprintIdentifier {
     public Optional<String> getClassification() {
         if (classification.isEmpty()) {
             return Optional.empty();
-        } else {
-            return Optional.of(classification);
         }
+        return Optional.of(classification);
     }
 
     /// ArXiv articles are automatically assigned DOIs starting with the prefix
@@ -119,9 +118,8 @@ public class ArXivIdentifier extends EprintIdentifier {
     public String asString() {
         if (StringUtil.isNotBlank(version)) {
             return identifier + "v" + version;
-        } else {
-            return identifier;
         }
+        return identifier;
     }
 
     public String asStringWithoutVersion() {

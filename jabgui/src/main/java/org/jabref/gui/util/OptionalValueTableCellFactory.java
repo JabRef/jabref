@@ -30,9 +30,8 @@ public class OptionalValueTableCellFactory<S, T> extends ValueTableCellFactory<S
         withGraphic((rowItem, item) -> {
             if (item.isPresent() && toGraphicIfPresent != null) {
                 return toGraphicIfPresent.apply(rowItem, item.get());
-            } else {
-                return defaultGraphic;
             }
+            return defaultGraphic;
         });
     }
 }

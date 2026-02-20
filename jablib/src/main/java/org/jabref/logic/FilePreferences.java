@@ -93,9 +93,8 @@ public class FilePreferences {
     public Optional<Path> getMainFileDirectory() {
         if (StringUtil.isBlank(mainFileDirectory.getValue())) {
             return Optional.empty();
-        } else {
-            return Optional.of(Path.of(mainFileDirectory.getValue()));
         }
+        return Optional.of(Path.of(mainFileDirectory.getValue()));
     }
 
     public StringProperty mainFileDirectoryProperty() {

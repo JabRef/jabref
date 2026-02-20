@@ -175,9 +175,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private @Nullable AbstractGroup parentGroup() {
         if (parentNode == null) {
             return null;
-        } else {
-            return parentNode.getGroup();
         }
+        return parentNode.getGroup();
     }
 
     @FXML

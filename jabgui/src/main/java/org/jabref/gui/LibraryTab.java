@@ -514,13 +514,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
         if (file.isPresent()) {
             resetChangeMonitor();
-        } else {
-            if (bibDatabaseContext.getDatabase().hasEntries()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                this.changedProperty.setValue(true);
-            }
+        } else if (bibDatabaseContext.getDatabase().hasEntries()) {
+            // if the database is not empty and no file is assigned,
+            // the database came from an import and has to be treated somehow
+            // -> mark as changed
+            this.changedProperty.setValue(true);
         }
     }
 
@@ -605,9 +603,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                     cancelButton,
                     Localization.lang("Do not ask again"),
                     optOut -> preferences.getWorkspacePreferences().setConfirmDelete(!optOut));
-        } else {
-            return true;
         }
+        return true;
     }
 
     public boolean requestClose() {

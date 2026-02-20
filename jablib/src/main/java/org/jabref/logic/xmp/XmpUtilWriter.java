@@ -334,8 +334,7 @@ public class XmpUtilWriter {
     private BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
         if (database == null) {
             return defaultEntry;
-        } else {
-            return database.resolveForStrings(defaultEntry, false);
         }
+        return database.resolveForStrings(defaultEntry, false);
     }
 }

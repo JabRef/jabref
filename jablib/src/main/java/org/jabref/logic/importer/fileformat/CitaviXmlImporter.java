@@ -773,10 +773,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
             if (count == 2) {
                 pages = tmpStr.substring(i + 2, tmpStr.length() - END_TAG_CHARACTER_COUNT); // extract tag content, skipping first 2 chars ("s>") and trimming closing tag
                 break;
-            } else {
-                if (tmpStr.charAt(i) == '>') {
-                    count++;
-                }
+            } else if (tmpStr.charAt(i) == '>') {
+                count++;
             }
         }
         return pages;

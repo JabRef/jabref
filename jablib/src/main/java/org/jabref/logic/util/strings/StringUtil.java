@@ -191,7 +191,7 @@ public class StringUtil {
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
-            if (lines[i].trim().isEmpty()) {
+            if (lines[i].isBlank()) {
                 result.append(newline);
                 result.append('\t');
             } else {
@@ -397,39 +397,36 @@ public class StringUtil {
         int brackets = 0;
         if ((toCheck == null) || toCheck.isEmpty()) {
             return false;
-        } else {
-            if ((toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}')) {
-                for (char c : toCheck.toCharArray()) {
-                    if (c == '{') {
-                        if (brackets == 0) {
-                            count++;
-                        }
-                        brackets++;
-                    } else if (c == '}') {
-                        brackets--;
-                    }
-                }
-
-                return count == 1;
-            }
-            return false;
         }
+        if ((toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}')) {
+            for (char c : toCheck.toCharArray()) {
+                if (c == '{') {
+                    if (brackets == 0) {
+                        count++;
+                    }
+                    brackets++;
+                } else if (c == '}') {
+                    brackets--;
+                }
+            }
+
+            return count == 1;
+        }
+        return false;
     }
 
     public static boolean isInSquareBrackets(String toCheck) {
         if ((toCheck == null) || toCheck.isEmpty()) {
             return false; // In case of null or empty string
-        } else {
-            return (toCheck.charAt(0) == '[') && (toCheck.charAt(toCheck.length() - 1) == ']');
         }
+        return (toCheck.charAt(0) == '[') && (toCheck.charAt(toCheck.length() - 1) == ']');
     }
 
     public static boolean isInCitationMarks(String toCheck) {
         if ((toCheck == null) || (toCheck.length() <= 1)) {
             return false; // In case of null, empty string, or a single citation mark
-        } else {
-            return (toCheck.charAt(0) == '"') && (toCheck.charAt(toCheck.length() - 1) == '"');
         }
+        return (toCheck.charAt(0) == '"') && (toCheck.charAt(toCheck.length() - 1) == '"');
     }
 
     /// Optimized method for converting a String into an Integer
@@ -660,9 +657,8 @@ public class StringUtil {
         if (toCapitalize.length() > 1) {
             return toCapitalize.substring(0, 1).toUpperCase(Locale.ROOT)
                     + toCapitalize.substring(1).toLowerCase(Locale.ROOT);
-        } else {
-            return toCapitalize.toUpperCase(Locale.ROOT);
         }
+        return toCapitalize.toUpperCase(Locale.ROOT);
     }
 
     /// Returns a list of words contained in the given text.
@@ -711,9 +707,8 @@ public class StringUtil {
     public static String quoteStringIfSpaceIsContained(String string) {
         if (string.contains(" ")) {
             return "\"" + string + "\"";
-        } else {
-            return string;
         }
+        return string;
     }
 
     /// Checks if the given string contains any whitespace characters. The supported whitespace characters

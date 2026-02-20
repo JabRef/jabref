@@ -66,9 +66,8 @@ public class CitationKeyGenerator extends BracketedPattern {
         if (number >= APPENDIX_CHARACTERS.length()) {
             int lastChar = number % APPENDIX_CHARACTERS.length();
             return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.charAt(lastChar);
-        } else {
-            return APPENDIX_CHARACTERS.substring(number, number + 1);
         }
+        return APPENDIX_CHARACTERS.substring(number, number + 1);
     }
 
     public static String removeDefaultUnwantedCharacters(String key) {
@@ -163,7 +162,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private String replaceWithRegex(String key) {
         // Remove Regular Expressions while generating Keys
         String regex = citationKeyPatternPreferences.getKeyPatternRegex();
-        if ((regex != null) && !regex.trim().isEmpty()) {
+        if ((regex != null) && !regex.isBlank()) {
             String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
             try {
                 key = key.replaceAll(regex, replacement);

@@ -75,12 +75,10 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
                 } else {
                     disabledInternalList.add(list.getLocation());
                 }
+            } else if (list.isEnabled()) {
+                enabledExternalList.add(list.getLocation());
             } else {
-                if (list.isEnabled()) {
-                    enabledExternalList.add(list.getLocation());
-                } else {
-                    disabledExternalList.add(list.getLocation());
-                }
+                disabledExternalList.add(list.getLocation());
             }
         }
 

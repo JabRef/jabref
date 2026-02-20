@@ -94,8 +94,7 @@ public class DocumentInformationExtractor {
 
         if (bibEntry.getFields().isEmpty()) {
             return Optional.empty();
-        } else {
-            return Optional.of(bibEntry);
         }
+        return Optional.of(bibEntry);
     }
 }

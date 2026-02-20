@@ -55,9 +55,8 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {
                     if (toggle != null) {
                         return (ManageKeywordsDisplayType) toggle.getUserData();
-                    } else {
-                        return ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES;
                     }
+                    return ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES;
                 })
         );
 

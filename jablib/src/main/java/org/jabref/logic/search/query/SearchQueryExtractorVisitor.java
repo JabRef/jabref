@@ -34,13 +34,12 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
         List<List<SearchQueryNode>> children = ctx.expression().stream().map(this::visit).toList();
         if (children.size() == 1) {
             return children.getFirst();
-        } else {
-            List<SearchQueryNode> terms = new ArrayList<>();
-            for (List<SearchQueryNode> child : children) {
-                terms.addAll(child);
-            }
-            return terms;
         }
+        List<SearchQueryNode> terms = new ArrayList<>();
+        for (List<SearchQueryNode> child : children) {
+            terms.addAll(child);
+        }
+        return terms;
     }
 
     @Override

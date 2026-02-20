@@ -74,9 +74,8 @@ public class SemanticConflictDetector {
         if (base == null && local != null && remote != null) {
             if (hasConflictingFields(new BibEntry(), local, remote)) {
                 return Optional.of(new ThreeWayEntryConflict(null, local, remote));
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         // Case 2: base exists, one side deleted, other modified -> conflict

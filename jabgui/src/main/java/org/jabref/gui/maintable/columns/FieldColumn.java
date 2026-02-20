@@ -58,9 +58,8 @@ public class FieldColumn extends MainTableColumn<String> {
     private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
         if (fields.isEmpty()) {
             return null;
-        } else {
-            return entry.getFields(fields);
         }
+        return entry.getFields(fields);
     }
 
     private Tooltip createTooltip(BibEntryTableViewModel entry, String fieldValue) {

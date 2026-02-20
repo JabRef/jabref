@@ -18,8 +18,7 @@ public class AppendPersonNamesStrategy extends AppendWordsStrategy {
     public String getDelimiter() {
         if (this.separationBySpace) {
             return " ";
-        } else {
-            return " and ";
         }
+        return " and ";
     }
 }

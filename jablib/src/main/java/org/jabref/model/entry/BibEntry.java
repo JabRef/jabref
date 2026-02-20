@@ -62,6 +62,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 /// Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
 ///
 /// Example:
@@ -450,17 +452,15 @@ public class BibEntry {
             return Optional.of(type.get().getDisplayName());
         } else if (latexFreeFields.containsKey(field)) {
             return Optional.ofNullable(latexFreeFields.get(field));
-        } else {
-            Optional<String> fieldValue = getField(field);
-            if (fieldValue.isPresent()) {
-                // TODO: Do we need FieldFactory.isLaTeXField(field) here to filter?
-                String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
-                latexFreeFields.put(field, latexFreeValue);
-                return Optional.of(latexFreeValue);
-            } else {
-                return Optional.empty();
-            }
         }
+        Optional<String> fieldValue = getField(field);
+        if (fieldValue.isPresent()) {
+            // TODO: Do we need FieldFactory.isLaTeXField(field) here to filter?
+            String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
+            latexFreeFields.put(field, latexFreeValue);
+            return Optional.of(latexFreeValue);
+        }
+        return Optional.empty();
     }
 
     /// Returns true if the entry has the given field, or false if it is not set.
@@ -509,19 +509,18 @@ public class BibEntry {
             if (parsedDate.isPresent()) {
                 return switch (field) {
                     case StandardField.YEAR ->
-                            parsedDate.get().getYear().map(Object::toString);
+                        parsedDate.get().getYear().map(Object::toString);
                     case StandardField.MONTH ->
-                            parsedDate.get().getMonth().map(Month::getJabRefFormat);
+                        parsedDate.get().getMonth().map(Month::getJabRefFormat);
                     case StandardField.DAY ->
-                            parsedDate.get().getDay().map(Object::toString);
+                        parsedDate.get().getDay().map(Object::toString);
                     default ->
-                            throw new IllegalStateException("Unexpected value");
+                        throw new IllegalStateException("Unexpected value");
                 };
-            } else {
-                // Date field not in valid format
-                LOGGER.debug("Could not parse date {}", date.get());
-                return Optional.empty();
             }
+            // Date field not in valid format
+            LOGGER.debug("Could not parse date {}", date.get());
+            return Optional.empty();
         }
         return Optional.empty();
     }
@@ -793,9 +792,8 @@ public class BibEntry {
             // Clear keyword field
             if (oldValue.isPresent()) {
                 return this.clearField(StandardField.KEYWORDS);
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         // Set new keyword field
@@ -849,9 +847,8 @@ public class BibEntry {
         // With claim 1, we can assume no change if there is no change on the size
         if (oldSize == keywordList.size()) {
             return Optional.empty();
-        } else {
-            return putKeywords(keywordList, keywordDelimiter);
         }
+        return putKeywords(keywordList, keywordDelimiter);
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace,
@@ -967,16 +964,14 @@ public class BibEntry {
         Set<String> storedList = fieldsAsWords.get(field);
         if (storedList != null) {
             return storedList;
-        } else {
-            String fieldValue = fields.get(field);
-            if (fieldValue == null) {
-                return Set.of();
-            } else {
-                HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
-                fieldsAsWords.put(field, words);
-                return words;
-            }
         }
+        String fieldValue = fields.get(field);
+        if (fieldValue == null) {
+            return Set.of();
+        }
+        HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
+        fieldsAsWords.put(field, words);
+        return words;
     }
 
     public KeywordList getFieldAsKeywords(Field field, Character keywordSeparator) {
@@ -1077,7 +1072,7 @@ public class BibEntry {
                    .stream()
                    .flatMap(content -> Arrays.stream(content.split(",")))
                    .map(String::trim)
-                   .filter(key -> !key.isEmpty())
+                   .filter(not(String::isEmpty))
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

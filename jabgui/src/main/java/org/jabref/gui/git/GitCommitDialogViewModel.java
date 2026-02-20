@@ -52,7 +52,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
         this.commitMessageValidator = new FunctionBasedValidator<>(
                 commitMessage,
-                message -> message != null && !message.trim().isEmpty(),
+                message -> message != null && !message.isBlank(),
                 ValidationMessage.error(Localization.lang("Commit message cannot be empty"))
         );
     }

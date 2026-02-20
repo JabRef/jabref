@@ -170,9 +170,8 @@ public class AiChatLogic {
 
                     if (link == null) {
                         return new PaperExcerpt("", textSegment.text());
-                    } else {
-                        return new PaperExcerpt(findEntryByLink(link).flatMap(BibEntry::getCitationKey).orElse(""), textSegment.text());
                     }
+                    return new PaperExcerpt(findEntryByLink(link).flatMap(BibEntry::getCitationKey).orElse(""), textSegment.text());
                 })
                 .toList();
 

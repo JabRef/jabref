@@ -162,9 +162,8 @@ public class JournalInformationFetcher implements WebFetcher {
         JSONArray jsonArray = jsonObject.optJSONArray(key);
         if (jsonArray != null) {
             return QUOTES_BRACKET_PATTERN.matcher(jsonArray.join(", ")).replaceAll("");
-        } else {
-            return "";
         }
+        return "";
     }
 
     private JSONObject buildPostData(String issn, String journalName) {

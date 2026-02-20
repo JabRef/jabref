@@ -177,9 +177,8 @@ public class EntryResource {
 
         if (renameSuccessful) {
             return Response.noContent().build();
-        } else {
-            return Response.ok("File uploaded but could not be renamed to suggested pattern.").build();
         }
+        return Response.ok("File uploaded but could not be renamed to suggested pattern.").build();
     }
 
     /// @param id - also "demo" for the Chocolate.bib file

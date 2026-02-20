@@ -317,9 +317,8 @@ public class AiPreferences {
     public EmbeddingModel getEmbeddingModel() {
         if (getCustomizeExpertSettings()) {
             return embeddingModel.get();
-        } else {
-            return AiDefaultPreferences.EMBEDDING_MODEL;
         }
+        return AiDefaultPreferences.EMBEDDING_MODEL;
     }
 
     public void setEmbeddingModel(EmbeddingModel embeddingModel) {
@@ -393,9 +392,8 @@ public class AiPreferences {
     public double getTemperature() {
         if (getCustomizeExpertSettings()) {
             return temperature.get();
-        } else {
-            return AiDefaultPreferences.TEMPERATURE;
         }
+        return AiDefaultPreferences.TEMPERATURE;
     }
 
     public void setTemperature(double temperature) {
@@ -409,20 +407,19 @@ public class AiPreferences {
     public int getContextWindowSize() {
         if (getCustomizeExpertSettings()) {
             return contextWindowSize.get();
-        } else {
-            return switch (aiProvider.get()) {
-                case OPEN_AI ->
-                        AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
-                case MISTRAL_AI ->
-                        AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
-                case HUGGING_FACE ->
-                        AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
-                case GEMINI ->
-                        AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
-                case GPT4ALL ->
-                        AiDefaultPreferences.getContextWindowSize(AiProvider.GPT4ALL, gpt4AllChatModel.get());
-            };
         }
+        return switch (aiProvider.get()) {
+            case OPEN_AI ->
+                AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
+            case MISTRAL_AI ->
+                AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
+            case HUGGING_FACE ->
+                AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
+            case GEMINI ->
+                AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
+            case GPT4ALL ->
+                AiDefaultPreferences.getContextWindowSize(AiProvider.GPT4ALL, gpt4AllChatModel.get());
+        };
     }
 
     public void setContextWindowSize(int contextWindowSize) {
@@ -436,9 +433,8 @@ public class AiPreferences {
     public int getDocumentSplitterChunkSize() {
         if (getCustomizeExpertSettings()) {
             return documentSplitterChunkSize.get();
-        } else {
-            return AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE;
         }
+        return AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE;
     }
 
     public void setDocumentSplitterChunkSize(int documentSplitterChunkSize) {
@@ -452,9 +448,8 @@ public class AiPreferences {
     public int getDocumentSplitterOverlapSize() {
         if (getCustomizeExpertSettings()) {
             return documentSplitterOverlapSize.get();
-        } else {
-            return AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP;
         }
+        return AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP;
     }
 
     public void setDocumentSplitterOverlapSize(int documentSplitterOverlapSize) {
@@ -468,9 +463,8 @@ public class AiPreferences {
     public int getRagMaxResultsCount() {
         if (getCustomizeExpertSettings()) {
             return ragMaxResultsCount.get();
-        } else {
-            return AiDefaultPreferences.RAG_MAX_RESULTS_COUNT;
         }
+        return AiDefaultPreferences.RAG_MAX_RESULTS_COUNT;
     }
 
     public void setRagMaxResultsCount(int ragMaxResultsCount) {
@@ -484,9 +478,8 @@ public class AiPreferences {
     public double getRagMinScore() {
         if (getCustomizeExpertSettings()) {
             return ragMinScore.get();
-        } else {
-            return AiDefaultPreferences.RAG_MIN_SCORE;
         }
+        return AiDefaultPreferences.RAG_MIN_SCORE;
     }
 
     public void setRagMinScore(double ragMinScore) {
@@ -555,19 +548,18 @@ public class AiPreferences {
         if (customizeExpertSettings.get()) {
             return switch (aiProvider.get()) {
                 case OPEN_AI ->
-                        openAiApiBaseUrl.get();
+                    openAiApiBaseUrl.get();
                 case MISTRAL_AI ->
-                        mistralAiApiBaseUrl.get();
+                    mistralAiApiBaseUrl.get();
                 case HUGGING_FACE ->
-                        huggingFaceApiBaseUrl.get();
+                    huggingFaceApiBaseUrl.get();
                 case GEMINI ->
-                        geminiApiBaseUrl.get();
+                    geminiApiBaseUrl.get();
                 case GPT4ALL ->
-                        gpt4AllApiBaseUrl.get();
+                    gpt4AllApiBaseUrl.get();
             };
-        } else {
-            return aiProvider.get().getApiUrl();
         }
+        return aiProvider.get().getApiUrl();
     }
 
     public void setApiKeyChangeListener(Runnable apiKeyChangeListener) {

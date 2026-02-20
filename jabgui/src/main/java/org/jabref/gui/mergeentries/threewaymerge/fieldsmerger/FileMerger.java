@@ -17,12 +17,11 @@ public class FileMerger implements FieldMerger {
             return filesB;
         } else if (StringUtil.isBlank(filesB)) {
             return filesA;
-        } else {
-            List<LinkedFile> linkedFilesA = FileFieldParser.parse(filesA);
-            List<LinkedFile> linkedFilesB = FileFieldParser.parse(filesB);
-
-            linkedFilesA.addAll(linkedFilesB);
-            return FileFieldWriter.getStringRepresentation(linkedFilesA);
         }
+        List<LinkedFile> linkedFilesA = FileFieldParser.parse(filesA);
+        List<LinkedFile> linkedFilesB = FileFieldParser.parse(filesB);
+
+        linkedFilesA.addAll(linkedFilesB);
+        return FileFieldWriter.getStringRepresentation(linkedFilesA);
     }
 }

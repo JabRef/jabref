@@ -164,9 +164,8 @@ public class BindingsHelper {
         return EasyBind.map(condition, conditionValue -> {
             if (conditionValue) {
                 return value;
-            } else {
-                return other;
             }
+            return other;
         });
     }
 

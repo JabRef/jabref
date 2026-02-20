@@ -64,9 +64,8 @@ public class FieldChangedEvent extends EntryChangedEvent {
             return oldValue.length();
         } else if (oldValue.length() == newValue.length()) {
             return newValue.length();
-        } else {
-            return Math.abs(newValue.length() - oldValue.length());
         }
+        return Math.abs(newValue.length() - oldValue.length());
     }
 
     public Field getField() {

@@ -29,22 +29,18 @@ public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
             public String toString(Month object) {
                 if (object == null) {
                     return null;
-                } else {
-                    if (databaseMode == BibDatabaseMode.BIBLATEX) {
-                        return String.valueOf(object.getNumber());
-                    } else {
-                        return object.getJabRefFormat();
-                    }
+                } else if (databaseMode == BibDatabaseMode.BIBLATEX) {
+                    return String.valueOf(object.getNumber());
                 }
+                return object.getJabRefFormat();
             }
 
             @Override
             public Month fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
                     return Month.parse(string).orElse(null);
-                } else {
-                    return null;
                 }
+                return null;
             }
         };
     }

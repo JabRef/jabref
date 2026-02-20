@@ -40,9 +40,8 @@ public class RemoveEnclosingBracesFormatter extends Formatter {
             // In this case, trimmed has a closing } without an opening { before that
             if (hasNegativeBraceCount(trimmed)) {
                 return formatted;
-            } else {
-                formatted = trimmed;
             }
+            formatted = trimmed;
         }
         return formatted;
     }

@@ -502,9 +502,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         if (enableAi.get()) {
             if (customizeExpertSettings.get()) {
                 return validateBasicSettings() && validateExpertSettings();
-            } else {
-                return validateBasicSettings();
             }
+            return validateBasicSettings();
         }
 
         return true;

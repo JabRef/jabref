@@ -85,9 +85,8 @@ public class FetcherException extends JabRefException {
             return getPrefix() + "URL: %s\nHTTP %d %s\n%s".formatted(getRedactedUrl(), httpResponse.statusCode(), httpResponse.responseMessage(), httpResponse.responseBody());
         } else if (url != null) {
             return getPrefix() + "URL: %s".formatted(getRedactedUrl());
-        } else {
-            return super.getLocalizedMessage();
         }
+        return super.getLocalizedMessage();
     }
 
     String getRedactedUrl() {
@@ -102,9 +101,8 @@ public class FetcherException extends JabRefException {
         String superLocalizedMessage = super.getLocalizedMessage();
         if (!StringUtil.isBlank(superLocalizedMessage)) {
             return superLocalizedMessage + "\n";
-        } else {
-            return "";
         }
+        return "";
     }
 
     public Optional<SimpleHttpResponse> getHttpResponse() {
@@ -118,8 +116,7 @@ public class FetcherException extends JabRefException {
     public static FetcherException of(URL url, SimpleHttpResponse simpleHttpResponse) {
         if (simpleHttpResponse.statusCode() >= 500) {
             return new FetcherServerException(url, simpleHttpResponse);
-        } else {
-            return new FetcherClientException(url, simpleHttpResponse);
         }
+        return new FetcherClientException(url, simpleHttpResponse);
     }
 }

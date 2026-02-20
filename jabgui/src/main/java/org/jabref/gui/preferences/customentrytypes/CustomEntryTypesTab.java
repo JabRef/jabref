@@ -117,24 +117,21 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 .withGraphic((type, _) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
                         return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-                    } else {
-                        return null;
                     }
+                    return null;
                 })
                 .withTooltip((type, name) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
                         return Localization.lang("Remove entry type") + " " + name;
-                    } else {
-                        return null;
                     }
+                    return null;
                 })
                 .withOnMouseClickedEvent((type, _) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
                         return _ -> viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());
-                    } else {
-                        return _ -> {
-                        };
                     }
+                    return _ -> {
+                    };
                 })
                 .install(entryTypeActionsColumn);
 

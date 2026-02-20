@@ -86,13 +86,13 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!"default".equals(item.getEntryType().getName())) {
-                if (!patternString.trim().isEmpty()) {
+                if (!patternString.isBlank()) {
                     newKeyPattern.addCitationKeyPattern(item.getEntryType(), patternString);
                 }
             }
         });
 
-        if (!defaultKeyPatternProperty.getValue().getPattern().trim().isEmpty()) {
+        if (!defaultKeyPatternProperty.getValue().getPattern().isBlank()) {
             // we do not trim the value at the assignment to enable users to have spaces at the beginning and
             // at the end of the pattern
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());

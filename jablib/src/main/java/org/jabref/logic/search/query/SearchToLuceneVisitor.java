@@ -98,11 +98,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         if (isRegexOp) {
             String expression = field + "/" + term + "/";
             return isNegationOp ? "NOT " + expression : expression;
-        } else {
-            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
-            String expression = field + term;
-            return isNegationOp ? "NOT " + expression : expression;
         }
+        term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+        String expression = field + term;
+        return isNegationOp ? "NOT " + expression : expression;
     }
 
     private static String escapeQuotes(String term) {

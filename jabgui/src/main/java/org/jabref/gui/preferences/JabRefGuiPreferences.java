@@ -884,21 +884,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         if (CSLStyleUtils.isCitationStyleFile(layout)) {
                             BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
                             return CSLStyleUtils.createCitationStyleFromFile(layout)
-                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
-                                                .orElse(null);
+                                    .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
+                                    .orElse(null);
                         }
                         if (BstPreviewLayout.isBstStyleFile(layout)) {
                             return getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
-                                                                          .filter(path -> path.endsWith(layout)).map(Path::of)
-                                                                          .map(BstPreviewLayout::new)
-                                                                          .findFirst()
-                                                                          .orElse(null);
-                        } else {
-                            return new TextBasedPreviewLayout(
-                                    style,
-                                    getLayoutFormatterPreferences(),
-                                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+                                    .filter(path -> path.endsWith(layout)).map(Path::of)
+                                    .map(BstPreviewLayout::new)
+                                    .findFirst()
+                                    .orElse(null);
                         }
+                        return new TextBasedPreviewLayout(
+                                style,
+                                getLayoutFormatterPreferences(),
+                                Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                     }).filter(Objects::nonNull)
                     .collect(Collectors.toList());
     }
@@ -906,12 +905,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private void storePreviewLayouts(ObservableList<PreviewLayout> previewCycle) {
         putStringList(CYCLE_PREVIEW, previewCycle.stream()
                                                  .map(layout -> {
-                                                     if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
-                                                         return citationStyleLayout.getFilePath();
-                                                     } else {
-                                                         return layout.getDisplayName();
-                                                     }
-                                                 }).toList()
+            if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
+                return citationStyleLayout.getFilePath();
+            }
+            return layout.getDisplayName();
+        }).toList()
         );
     }
 
@@ -919,9 +917,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
         if (storedCyclePos < layouts.size()) {
             return storedCyclePos;
-        } else {
-            return 0; // fallback if stored position is no longer valid
         }
+        return 0; // fallback if stored position is no longer valid
     }
     // endregion
 

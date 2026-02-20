@@ -74,8 +74,7 @@ public class SaveException extends Exception {
     public String getLocalizedMessage() {
         if (localizedMessage == null) {
             return getMessage();
-        } else {
-            return localizedMessage;
         }
+        return localizedMessage;
     }
 }

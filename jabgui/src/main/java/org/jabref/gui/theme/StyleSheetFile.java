@@ -112,9 +112,8 @@ final class StyleSheetFile extends StyleSheet {
                     String embeddedDataUrl = DATA_URL_PREFIX + Base64.getEncoder().encodeToString(data);
                     LOGGER.trace("Embedded css in data URL of length {}", embeddedDataUrl.length());
                     return Optional.of(embeddedDataUrl);
-                } else {
-                    LOGGER.trace("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
                 }
+                LOGGER.trace("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
             }
         } catch (IOException e) {
             LOGGER.warn("Could not load css url {}", url, e);

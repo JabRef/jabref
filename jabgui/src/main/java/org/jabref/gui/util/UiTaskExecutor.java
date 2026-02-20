@@ -200,8 +200,7 @@ public class UiTaskExecutor implements TaskExecutor {
         LOGGER.warn("Converting throwable to Exception", throwable);
         if (throwable instanceof Exception exception) {
             return exception;
-        } else {
-            return new Exception(throwable);
         }
+        return new Exception(throwable);
     }
 }

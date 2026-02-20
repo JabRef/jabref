@@ -35,9 +35,8 @@ public class ControlHelper {
         return node.isFocused() || node.getChildrenUnmodifiable().stream().anyMatch(child -> {
             if (child instanceof Parent parent) {
                 return childIsFocused(parent);
-            } else {
-                return child.isFocused();
             }
+            return child.isFocused();
         });
     }
 
@@ -67,9 +66,8 @@ public class ControlHelper {
             return DroppingMouseLocation.TOP;
         } else if ((cell.getHeight() * 0.75) < event.getY()) {
             return DroppingMouseLocation.BOTTOM;
-        } else {
-            return DroppingMouseLocation.CENTER;
         }
+        return DroppingMouseLocation.CENTER;
     }
 
     public static void setDroppingPseudoClasses(Cell<?> cell, DragEvent event) {

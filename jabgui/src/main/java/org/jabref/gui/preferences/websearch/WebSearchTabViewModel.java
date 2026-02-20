@@ -208,7 +208,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldKeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
-        if (addImportedEntriesGroupName.getValue().trim().isEmpty()) {
+        if (addImportedEntriesGroupName.getValue().isBlank()) {
             libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
         } else {
             libraryPreferences.setAddImportedEntriesGroupName(addImportedEntriesGroupName.getValue().trim());

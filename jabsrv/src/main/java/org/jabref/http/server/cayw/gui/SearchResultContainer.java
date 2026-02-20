@@ -110,9 +110,8 @@ public class SearchResultContainer extends ListView<CAYWEntry> {
 
             if (lines.length <= MAX_LINES) {
                 return StringUtil.limitStringLength(text, ESTIMATED_CHARS_PER_LINE * MAX_LINES);
-            } else {
-                return String.join(OS.NEWLINE, Arrays.copyOf(lines, MAX_LINES)) + "...";
             }
+            return String.join(OS.NEWLINE, Arrays.copyOf(lines, MAX_LINES)) + "...";
         }
     }
 }

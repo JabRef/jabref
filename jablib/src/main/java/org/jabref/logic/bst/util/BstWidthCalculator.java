@@ -159,9 +159,8 @@ public class BstWidthCalculator {
     public static int getCharWidth(char c) {
         if ((c >= 0) && (c < 128)) {
             return BstWidthCalculator.widths[c];
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     public static int width(String toMeasure) {
@@ -200,10 +199,8 @@ public class BstWidthCalculator {
                         }
                         if ((i < n) && (i == afterBackslash)) {
                             i++; // Skip non-alpha control seq
-                        } else {
-                            if (BstCaseChanger.findSpecialChar(c, afterBackslash).isPresent()) {
-                                result += BstWidthCalculator.getSpecialCharWidth(c, afterBackslash);
-                            }
+                        } else if (BstCaseChanger.findSpecialChar(c, afterBackslash).isPresent()) {
+                            result += BstWidthCalculator.getSpecialCharWidth(c, afterBackslash);
                         }
                         while ((i < n) && Character.isWhitespace(c[i])) {
                             i++;

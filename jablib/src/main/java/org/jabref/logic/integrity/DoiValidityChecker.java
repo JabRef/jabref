@@ -15,8 +15,7 @@ public class DoiValidityChecker implements ValueChecker {
 
         if (DOI.isValid(value)) {
             return Optional.empty();
-        } else {
-            return Optional.of(Localization.lang("DOI %0 is invalid", value));
         }
+        return Optional.of(Localization.lang("DOI %0 is invalid", value));
     }
 }

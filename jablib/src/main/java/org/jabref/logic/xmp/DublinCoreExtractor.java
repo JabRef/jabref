@@ -405,16 +405,14 @@ public class DublinCoreExtractor {
                     default ->
                             this.fillCustomField(field);
                 }
+            } else if (DC_COVERAGE.equals(field.getName())) {
+                this.fillCoverage(value);
+            } else if (DC_RIGHTS.equals(field.getName())) {
+                this.fillRights(value);
+            } else if (DC_SOURCE.equals(field.getName())) {
+                this.fillSource(value);
             } else {
-                if (DC_COVERAGE.equals(field.getName())) {
-                    this.fillCoverage(value);
-                } else if (DC_RIGHTS.equals(field.getName())) {
-                    this.fillRights(value);
-                } else if (DC_SOURCE.equals(field.getName())) {
-                    this.fillSource(value);
-                } else {
-                    this.fillCustomField(field);
-                }
+                this.fillCustomField(field);
             }
         }
 

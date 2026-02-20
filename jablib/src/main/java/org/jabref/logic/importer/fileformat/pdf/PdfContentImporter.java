@@ -156,22 +156,20 @@ public class PdfContentImporter extends PdfImporter {
                             workedOnFirstOrMiddle = false;
                         }
                     }
-                } else {
-                    if (!"and".equalsIgnoreCase(splitNames[i])) {
-                        if (isFirst) {
-                            isFirst = false;
-                        } else {
-                            res = res.concat(" and ");
-                        }
-                        if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1))
-                                && "al.".equalsIgnoreCase(splitNames[i + 1])) {
-                            res = res.concat("others");
-                            break;
-                        } else {
-                            res = res.concat(splitNames[i]).concat(" ");
-                            workedOnFirstOrMiddle = true;
-                        }
-                    }  // do nothing, just increment i at the end of this iteration
+                } else if (!"and".equalsIgnoreCase(splitNames[i])) {
+                    if (isFirst) {
+                        isFirst = false;
+                    } else {
+                        res = res.concat(" and ");
+                    }
+                    if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1))
+                            && "al.".equalsIgnoreCase(splitNames[i + 1])) {
+                        res = res.concat("others");
+                        break;
+                    } else {
+                        res = res.concat(splitNames[i]).concat(" ");
+                        workedOnFirstOrMiddle = true;
+                    }
                 }
                 i++;
             } while (i < splitNames.length);
@@ -333,7 +331,7 @@ public class PdfContentImporter extends PdfImporter {
         // we start at the current line
         curString = lines[lineIndex];
         // i might get incremented later and curString modified, too
-        lineIndex = lineIndex + 1;
+        lineIndex++;
 
         String author;
         String editor = null;
@@ -390,10 +388,8 @@ public class PdfContentImporter extends PdfImporter {
             curString = streamlineNames(lines[lineIndex]);
             if (author == null) {
                 author = curString;
-            } else {
-                if (!"".equals(curString)) {
-                    author = author.concat(" and ").concat(curString);
-                }  // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
+            } else if (!"".equals(curString)) {
+                author = author.concat(" and ").concat(curString);
             }
             lineIndex++;
         }
@@ -613,7 +609,7 @@ public class PdfContentImporter extends PdfImporter {
     /// (besides at strange PDFs). These strange PDFs are handled here:
     /// proceed to next non-empty line
     private void proceedToNextNonEmptyLine() {
-        while ((lineIndex < lines.length) && lines[lineIndex].trim().isEmpty()) {
+        while ((lineIndex < lines.length) && lines[lineIndex].isBlank()) {
             lineIndex++;
         }
     }
@@ -650,7 +646,7 @@ public class PdfContentImporter extends PdfImporter {
     ///
     /// invariant before/after: i points to line before the last handled block
     private void readLastBlock() {
-        while ((lineIndex >= 0) && lines[lineIndex].trim().isEmpty()) {
+        while ((lineIndex >= 0) && lines[lineIndex].isBlank()) {
             lineIndex--;
         }
         // i is now at the end of a block

@@ -66,7 +66,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         super.clearSelection();
         getChildren().clear();
 
-        if (markdownText.trim().isEmpty()) {
+        if (markdownText.isBlank()) {
             return;
         }
 
@@ -198,9 +198,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             String title = link.getTitle().toString();
             if (title.isEmpty()) {
                 return "[" + linkText + "](" + url + ")";
-            } else {
-                return "[" + linkText + "](" + url + " \"" + title + "\")";
             }
+            return "[" + linkText + "](" + url + " \"" + title + "\")";
         } else if (astNode instanceof LinkRef linkRef) {
             String linkText = linkRef.getText().toString();
             String reference = linkRef.getReference().toString();
@@ -220,9 +219,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return renderedText.replace(UNICODE_BULLET, "-");
         } else if (renderedText.matches(NUMBERED_LIST_PATTERN)) {
             return renderedText;
-        } else {
-            return renderedText;
         }
+        return renderedText;
     }
 
     private class MarkdownRenderer {

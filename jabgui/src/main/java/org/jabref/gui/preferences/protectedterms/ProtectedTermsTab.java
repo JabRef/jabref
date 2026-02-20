@@ -60,9 +60,8 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
             ProtectedTermsList list = data.getValue().getTermsList();
             if (list.isInternalList()) {
                 return BindingsHelper.constantOf(Localization.lang("Internal list"));
-            } else {
-                return BindingsHelper.constantOf(list.getLocation());
             }
+            return BindingsHelper.constantOf(list.getLocation());
         });
 
         filesTableEditColumn.setCellValueFactory(data -> data.getValue().internalProperty().not());

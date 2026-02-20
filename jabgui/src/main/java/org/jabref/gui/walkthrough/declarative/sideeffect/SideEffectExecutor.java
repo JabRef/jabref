@@ -61,9 +61,8 @@ public class SideEffectExecutor {
                     return false;
                 }
                 return sideEffect.forward(walkthrough);
-            } else {
-                return sideEffect.backward(walkthrough);
             }
+            return sideEffect.backward(walkthrough);
         } catch (Exception e) {
             LOGGER.error("Error executing {} effect: {}", forward ? "forward" : "backward", sideEffect.description(), e);
             notifyUser(Localization.lang("Walkthrough side effect error"),

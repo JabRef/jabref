@@ -79,9 +79,8 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
         if (baseUrl.endsWith("/v1")) {
             return baseUrl + "/models";
-        } else {
-            return baseUrl + "/v1/models";
         }
+        return baseUrl + "/v1/models";
     }
 
     private List<String> parseModelsFromResponse(JsonNode jsonNode) {

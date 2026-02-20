@@ -24,9 +24,8 @@ public class CitationStyleCache {
         citationStyleCache = Caffeine.newBuilder().maximumSize(CACHE_SIZE).build(entry -> {
             if (citationStyle != null) {
                 return citationStyle.generatePreview(entry, databaseContext);
-            } else {
-                return "";
             }
+            return "";
         });
         databaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
     }

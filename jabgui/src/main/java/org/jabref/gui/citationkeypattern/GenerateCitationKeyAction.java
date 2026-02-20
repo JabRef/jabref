@@ -82,10 +82,9 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     Localization.lang("Cancel"),
                     Localization.lang("Do not ask again"),
                     optOut -> preferences.getCitationKeyPatternPreferences().setWarnBeforeOverwriteCiteKey(!optOut));
-        } else {
-            // Always overwrite keys by default
-            return true;
         }
+        // Always overwrite keys by default
+        return true;
     }
 
     private void checkOverwriteKeysChosen() {

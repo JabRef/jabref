@@ -44,9 +44,8 @@ public class OOVoidResult<E> {
     public <F> OOVoidResult<F> mapError(Function<E, F> fun) {
         if (isError()) {
             return error(fun.apply(getError()));
-        } else {
-            return ok();
         }
+        return ok();
     }
 }
 

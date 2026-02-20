@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
@@ -16,6 +17,8 @@ import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 /// Abstract class for pushing entries into different editors.
 public abstract class AbstractPushToApplication implements PushToApplication {
@@ -40,7 +43,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                       .map(BibEntry::getCitationKey)
                       .filter(Optional::isPresent)
                       .map(Optional::get)
-                      .filter(key -> !key.isEmpty())
+                      .filter(not(String::isEmpty))
                       .collect(Collectors.joining(delimiter));
     }
 

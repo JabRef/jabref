@@ -442,9 +442,8 @@ public abstract class DBMSProcessor {
         List<BibEntry> sharedEntries = getSharedEntries(List.of(sharedID));
         if (sharedEntries.isEmpty()) {
             return Optional.empty();
-        } else {
-            return Optional.of(sharedEntries.getFirst());
         }
+        return Optional.of(sharedEntries.getFirst());
     }
 
     /// Queries the database for shared entries in 500 element batches.

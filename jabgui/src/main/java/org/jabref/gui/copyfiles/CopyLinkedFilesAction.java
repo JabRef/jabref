@@ -88,12 +88,10 @@ public class CopyLinkedFilesAction extends SimpleCommand {
             } else {
                 dialogService.notify(Localization.lang("Could not copy file to %0, maybe the file is already existing?", target));
             }
+        } else if (failedCount == 0) {
+            dialogService.notify(Localization.lang("Successfully copied %0 file(s) to %1.", copiedFiles, target));
         } else {
-            if (failedCount == 0) {
-                dialogService.notify(Localization.lang("Successfully copied %0 file(s) to %1.", copiedFiles, target));
-            } else {
-                dialogService.notify(Localization.lang("Copied %0 file(s). Failed: %1", copiedFiles, failedCount));
-            }
+            dialogService.notify(Localization.lang("Copied %0 file(s). Failed: %1", copiedFiles, failedCount));
         }
     }
 

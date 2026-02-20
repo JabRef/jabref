@@ -144,10 +144,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (tabContainer.getLibraryTabs().isEmpty() || tabContainer.getCurrentLibraryTab() == null) {
             // currentTab might not be a LibraryTab but the WelcomeTab
             return preferences.getFilePreferences().getWorkingDirectory();
-        } else {
-            Optional<Path> databasePath = tabContainer.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(preferences.getFilePreferences().getWorkingDirectory());
         }
+        Optional<Path> databasePath = tabContainer.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
+        return databasePath.map(Path::getParent).orElse(preferences.getFilePreferences().getWorkingDirectory());
     }
 
     /// Opens the given file. If null or 404, nothing happens.
