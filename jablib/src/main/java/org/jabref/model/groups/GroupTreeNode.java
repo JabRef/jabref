@@ -27,7 +27,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNode.class);
 
-    private static final String PATH_DELIMITER = " > ";
+    public static final String PATH_DELIMITER = " > ";
     private ObjectProperty<AbstractGroup> groupProperty = new SimpleObjectProperty<>();
 
     /// Creates this node and associates the specified group with it.

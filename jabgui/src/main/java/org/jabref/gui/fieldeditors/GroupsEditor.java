@@ -38,6 +38,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.groups.GroupTreeNode;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.TagsField;
@@ -48,12 +49,14 @@ import org.slf4j.LoggerFactory;
 public class GroupsEditor extends TagsEditor {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
+    private static final PseudoClass DRAG_OVER = PseudoClass.getPseudoClass("drag-over");
 
     private GroupsEditorViewModel viewModel;
     private final TagsField<Keyword> groupTagsField = new TagsField<>();
 
     private final DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
     private final ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
+    private final KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
     private boolean isSortedTagsField = false;
     private Optional<Keyword> draggedGroup = Optional.empty();
@@ -109,8 +112,6 @@ public class GroupsEditor extends TagsEditor {
         });
 
         groupTagsField.getEditor().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, event)) {
                 String clipboardText = ClipBoardManager.getContents();
                 if (!clipboardText.isEmpty()) {
@@ -131,27 +132,50 @@ public class GroupsEditor extends TagsEditor {
         });
 
         this.setOnDragDropped(event -> {
-            boolean success = false;
-            if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
-                Object content = event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
-                if (bibEntry.isPresent() && content instanceof List<?> rawList && !rawList.isEmpty()) {
-                    for (Object item : rawList) {
-                        if (item instanceof String path && !path.isBlank()) {
-                            String groupName = path.contains(" > ") ? path.substring(path.lastIndexOf(" > ") + 3) : path;
-                            Keyword newGroup = new Keyword(groupName);
-                            if (!groupTagsField.getTags().contains(newGroup)) {
-                                groupTagsField.addTags(newGroup);
-                            }
-                            success = true;
-                        }
-                    }
-                }
-            }
+            boolean success = handleGroupDrop(event.getDragboard());
             event.setDropCompleted(success);
             event.consume();
         });
 
         Bindings.bindContentBidirectional(groupTagsField.getTags(), viewModel.groupListProperty());
+    }
+
+    private boolean handleGroupDrop(Dragboard dragboard) {
+        if (bibEntry.isEmpty()) {
+            return false;
+        }
+        if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
+            return false;
+        }
+        if (!(dragboard.getContent(DragAndDropDataFormats.GROUP) instanceof List<?> rawList) || rawList.isEmpty()) {
+            return false;
+        }
+
+        boolean added = false;
+        for (Object item : rawList) {
+            if (item instanceof String path && !path.isBlank()) {
+                added |= addGroupByPath(path);
+            }
+        }
+        return added;
+    }
+
+    private boolean addGroupByPath(String path) {
+        String groupName = extractGroupName(path);
+        Keyword newGroup = new Keyword(groupName);
+        if (groupTagsField.getTags().contains(newGroup)) {
+            return false;
+        }
+        groupTagsField.addTags(newGroup);
+        return true;
+    }
+
+    static String extractGroupName(String path) {
+        int separatorIndex = path.lastIndexOf(GroupTreeNode.PATH_DELIMITER);
+        if (separatorIndex >= 0) {
+            return path.substring(separatorIndex + GroupTreeNode.PATH_DELIMITER.length());
+        }
+        return path;
     }
 
     private Node createTag(Keyword group) {
@@ -190,8 +214,8 @@ public class GroupsEditor extends TagsEditor {
             draggedGroup = Optional.of(group);
             event.consume();
         });
-        tagLabel.setOnDragEntered(_ -> tagLabel.setStyle("-fx-background-color: lightgrey;"));
-        tagLabel.setOnDragExited(_ -> tagLabel.setStyle(""));
+        tagLabel.setOnDragEntered(_ -> tagLabel.pseudoClassStateChanged(DRAG_OVER, true));
+        tagLabel.setOnDragExited(_ -> tagLabel.pseudoClassStateChanged(DRAG_OVER, false));
         tagLabel.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             if (db.hasString() && draggedGroup.isPresent()) {

@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 public class KeywordsEditor extends TagsEditor {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
+    private static final PseudoClass DRAG_OVER = PseudoClass.getPseudoClass("drag-over");
     private static HashBiMap<String, String> mscmap;
 
     static {
@@ -82,6 +83,7 @@ public class KeywordsEditor extends TagsEditor {
     private final CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);
     private final DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
     private final ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
+    private final KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
     private boolean isSortedTagsField = false;
     private Optional<Keyword> draggedKeyword = Optional.empty();
@@ -136,8 +138,6 @@ public class KeywordsEditor extends TagsEditor {
         });
 
         keywordTagsField.getEditor().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, event)) {
                 String clipboardText = ClipBoardManager.getContents();
                 if (!clipboardText.isEmpty()) {
@@ -195,8 +195,8 @@ public class KeywordsEditor extends TagsEditor {
             draggedKeyword = Optional.of(keyword);
             event.consume();
         });
-        tagLabel.setOnDragEntered(_ -> tagLabel.setStyle("-fx-background-color: lightgrey;"));
-        tagLabel.setOnDragExited(_ -> tagLabel.setStyle(""));
+        tagLabel.setOnDragEntered(_ -> tagLabel.pseudoClassStateChanged(DRAG_OVER, true));
+        tagLabel.setOnDragExited(_ -> tagLabel.pseudoClassStateChanged(DRAG_OVER, false));
         tagLabel.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             if (db.hasString() && draggedKeyword.isPresent()) {
