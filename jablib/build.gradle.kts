@@ -159,8 +159,8 @@ abstract class JoinNonCommentedLines : DefaultTask() {
 }
 
 val extractMaintainers by tasks.registering(JoinNonCommentedLines::class) {
-    inputFile.set(layout.projectDirectory.file("../MAINTAINERS"))
-    outputFile.set(layout.buildDirectory.file("maintainers.txt"))
+    inputFile = layout.projectDirectory.file("../MAINTAINERS")
+    outputFile = layout.buildDirectory.file("maintainers.txt")
 }
 
 val maintainersProvider: Provider<String> = extractMaintainers.flatMap {
@@ -246,7 +246,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
 
     options.errorprone {
-        disableAllChecks.set(true)
+        disableAllChecks = true
         enable("NullAway")
     }
 
@@ -359,27 +359,27 @@ mavenPublishing {
   coordinates("org.jabref", "jablib", version)
 
   pom {
-    name.set("jablib")
-    description.set("JabRef's Java library to work with BibTeX")
-    inceptionYear.set("2025")
-    url.set("https://github.com/JabRef/jabref/")
+    name = "jablib"
+    description = "JabRef's Java library to work with BibTeX"
+    inceptionYear = "2025"
+    url = "https://github.com/JabRef/jabref/"
     licenses {
       license {
-        name.set("MIT")
-        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+        name = "MIT"
+        url = "https://github.com/JabRef/jabref/blob/main/LICENSE"
       }
     }
     developers {
       developer {
-        id.set("jabref")
-        name.set("JabRef Developers")
-        url.set("https://github.com/JabRef/")
+        id = "jabref"
+        name = "JabRef Developers"
+        url = "https://github.com/JabRef/"
       }
     }
     scm {
-        url.set("https://github.com/JabRef/jabref")
-        connection.set("scm:git:https://github.com/JabRef/jabref")
-        developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+        url = "https://github.com/JabRef/jabref"
+        connection = "scm:git:https://github.com/JabRef/jabref"
+        developerConnection = "scm:git:git@github.com:JabRef/jabref.git"
     }
   }
 }
