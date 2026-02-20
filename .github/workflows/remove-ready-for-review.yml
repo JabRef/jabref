@@ -53,7 +53,8 @@ jobs:
 
           # check running CI
           running=$(gh pr checks "$PR" --json state -q '.[] | select(.state=="IN_PROGRESS" or .state=="QUEUED") | length' | wc -l)
-          if [ "$running" -gt 0 ] || [ "$label" -gt 0 ]; then
+          # This workflow is allowed to run, therefore -gt 1
+          if [ "$running" -gt 1 ] ]; then
             echo "ci_running=true" >> $GITHUB_OUTPUT
             {
               echo "### Running / Queued checks for PR #$PR"
