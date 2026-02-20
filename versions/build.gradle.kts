@@ -55,6 +55,7 @@ dependencies.constraints {
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.29")
     api("com.h2database:h2-mvstore:2.4.240")
+    api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.7.4")
     api("com.konghq:unirest-modules-gson:4.7.4")
     api("com.pixelduke:fxthemes:1.6.0")

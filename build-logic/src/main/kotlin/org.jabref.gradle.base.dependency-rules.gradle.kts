@@ -79,12 +79,16 @@ jvmDependencyConflicts.patch {
         removeDependency("junit:junit")
     }
     module("dev.langchain4j:langchain4j-core") {
-        addRuntimeOnlyDependency("com.knuddels:jtokkit:1.1.0")
+        addRuntimeOnlyDependency("com.knuddels:jtokkit")
     }
     module("org.jabref:afterburner.fx") {
         // metadata decared these as runtime only, but they are 'requires transitive' in module-info
         addApiDependency("org.openjfx:javafx-fxml")
         addApiDependency("org.openjfx:javafx-controls")
+    }
+    module("org.libreoffice:libreoffice") {
+        // no dependency in metadata, but 'requires org.libreoffice.unoloader' in module-info
+        addRuntimeOnlyDependency("org.libreoffice:unoloader")
     }
 }
 
