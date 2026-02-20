@@ -101,7 +101,7 @@ public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistor
     private void storeMessagesForMap(Map<Integer, ChatHistoryRecord> map, List<ChatMessage> messages) {
         map.clear();
 
-        for (int i = 0; i < messages.size() - 1; i++) {
+        for (int i = 0; i < messages.size(); i++) {
             map.put(i, ChatHistoryRecord.fromLangchainMessage(messages.get(i)));
         }
     }
