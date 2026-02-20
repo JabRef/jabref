@@ -257,7 +257,9 @@ extraJavaModuleInfo {
     module("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64", "embedded.postgres.binaries.windows.amd64")
     module("net.harawata:appdirs", "net.harawata.appdirs")
     module("net.java.dev.jna:jna", "com.sun.jna") {
-        patchRealModule() // TODO required as sometimes the non-jpms version if picked (should be fixed in dependencies setup)
+        // Required as sometimes the non-jpms version if picked which should ideally be fixed differently
+        // More details: https://github.com/gradlex-org/jvm-dependency-conflict-resolution/issues/346
+        patchRealModule()
         exportAllPackages()
         requires("java.logging")
     }
@@ -343,25 +345,11 @@ extraJavaModuleInfo {
     }
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug")
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta")
-    module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket") {
-        overrideModuleName()
-        exportAllPackages()
-    }
-    module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {
-        exportAllPackages()
-    }
-    module("org.eclipse.xtend:org.eclipse.xtend.lib", "xtend.lib") {
-        overrideModuleName()
-        exportAllPackages()
-    }
-    module("org.eclipse.xtend:org.eclipse.xtend.lib.macro", "xtend.lib.macro") {
-        overrideModuleName()
-        exportAllPackages()
-    }
-    module("org.eclipse.xtext:org.eclipse.xtext.xbase.lib", "xtext.xbase.lib") {
-        overrideModuleName()
-        exportAllPackages()
-    }
+    module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket")
+    module("org.eclipse.xtend:org.eclipse.xtend", "xtend")
+    module("org.eclipse.xtend:org.eclipse.xtend.lib", "xtend.lib")
+    module("org.eclipse.xtend:org.eclipse.xtend.lib.macro", "xtend.lib.macro")
+    module("org.eclipse.xtext:org.eclipse.xtext.xbase.lib", "xtext.xbase.lib")
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
     module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
@@ -497,9 +485,7 @@ extraJavaModuleInfo {
         exports("com.sun.javafx.scene.control")
     }
 
-    module("org.hamcrest:hamcrest", "org.hamcrest") {
-        exportAllPackages()
-    }
+    module("org.hamcrest:hamcrest", "org.hamcrest")
 
     module("org.mockito:mockito-core", "org.mockito") {
         preserveExisting()
