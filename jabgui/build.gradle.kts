@@ -18,9 +18,6 @@ version = providers.gradleProperty("projVersion")
     .orElse("100.0.0")
     .get()
 
-// See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
-val mockitoAgent = configurations.create("mockitoAgent")
-
 dependencies {
     implementation(project(":jablib"))
     // Following already provided by jablib
@@ -119,7 +116,6 @@ dependencies {
     testImplementation("org.testfx:testfx-junit5")
 
     testImplementation("org.mockito:mockito-core")
-    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.hamcrest:hamcrest")
@@ -134,8 +130,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("org.jabref.Launcher")
-    mainModule.set("org.jabref")
+    mainClass= "org.jabref.Launcher"
 
     applicationDefaultJvmArgs = listOf(
         "--add-modules", "jdk.incubator.vector",
@@ -188,7 +183,6 @@ javaModulePackaging {
             include("JabRefHost.ps1")
         })
     }
-
     targetsWithOs("linux") {
         options.addAll(
             "--linux-menu-group", "Office;",
@@ -243,7 +237,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
 tasks.test {
     jvmArgs = listOf(
-        "-javaagent:${mockitoAgent.asPath}",
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
 
         // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",

@@ -23,8 +23,7 @@ tasks.withType<Test>().configureEach {
 }
 
 application {
-    mainClass.set("org.jabref.toolkit.JabKitLauncher")
-    mainModule.set("org.jabref.jabkit")
+    mainClass = "org.jabref.toolkit.JabKitLauncher"
 
     // Also passed to launcher by java-module-packaging plugin
     applicationDefaultJvmArgs = listOf(
@@ -65,14 +64,13 @@ javaModulePackaging {
     }
 }
 
-val app = the<JavaApplication>()
 tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     group = "test"
     description = "Runs JabKit from test resources dir"
     mainClass = "org.jabref.toolkit.JabKitLauncher"
-    mainModule.set("org.jabref.jabkit")
+    mainModule = "org.jabref.jabkit"
     classpath = sourceSets.main.get().runtimeClasspath
-    jvmArgs(app.applicationDefaultJvmArgs)
+    jvmArgs(application.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
     args("--debug", "check-consistency", "--input=empty.bib")
 }

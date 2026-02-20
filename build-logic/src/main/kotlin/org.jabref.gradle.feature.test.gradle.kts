@@ -51,3 +51,9 @@ testlogger {
 configurations.testCompileOnly {
     extendsFrom(configurations.compileOnly.get())
 }
+
+// See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+val mockitoAgent = configurations.create("mockitoAgent")
+dependencies {
+    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
+}

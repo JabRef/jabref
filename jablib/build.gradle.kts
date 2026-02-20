@@ -55,14 +55,8 @@ testModuleInfo {
     annotationProcessor("jilt")
 }
 
-// See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
-val mockitoAgent = configurations.create("mockitoAgent") {
-    extendsFrom(configurations["internal"])
-}
 dependencies {
     antlr("org.antlr:antlr4")
-
-    mockitoAgent("org.mockito:mockito-core") { isTransitive = false }
 
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
@@ -275,7 +269,7 @@ tasks.test {
         excludeTags("DatabaseTest", "FetcherTest")
     }
     jvmArgs = listOf(
-        "-javaagent:${mockitoAgent.asPath}",
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
@@ -289,7 +283,7 @@ jmh {
     zip64  = true
 }
 
-val testSourceSet = sourceSets["test"]
+val testSourceSet = sourceSets.test.get()
 
 tasks.register<Test>("fetcherTest") {
     enabled = false
