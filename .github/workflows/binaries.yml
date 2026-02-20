@@ -412,6 +412,9 @@ jobs:
           if [[ "$GITHUB_REF" != "refs/heads/main" && "$SHOULD_NOTARIZE" != "true" ]]; then
             # drop macos-15-intel
             MATRIX_JSON="$(jq -c ' .include |= map(select(.os != "macos-15-intel")) ' <<<"$MATRIX_JSON")"
+          else
+            # Format into one line for output, otherwise it cannot be used as matrix output
+            MATRIX_JSON="$(jq -c . <<<"$MATRIX_JSON")"
           fi
 
           echo "matrix=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
