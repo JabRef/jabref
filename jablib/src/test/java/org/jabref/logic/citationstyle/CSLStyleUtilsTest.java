@@ -153,7 +153,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of("IEEE Reference Guide version 11.29.2023", IEEE),
                 Arguments.of("APA Style 7th edition", APA),
-                Arguments.of("NLM Style Guide (Vancouver): Citing Medicine 2nd edition (citation-sequence)", NLM_CITATION_SEQUENCE_VANCOUVER),
+                Arguments.of("NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)", NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of("Chicago Manual of Style 18th edition (author-date)", CHICAGO_AUTHOR_DATE),
                 Arguments.of("Nature", NATURE),
                 Arguments.of("MLA Handbook 9th edition (in-text citations)", MLA),
