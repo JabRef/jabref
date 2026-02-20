@@ -3,7 +3,7 @@ import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
-    id("org.gradlex.java-module-dependencies") // only for mappings at the moment
+    id("org.gradlex.java-module-dependencies")
     id("com.autonomousapps.dependency-analysis")
 }
 
@@ -28,17 +28,33 @@ jvmDependencyConflicts {
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
-jvmDependencyConflicts.patch {
-    listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
-        module("org.openjfx:$jfxModule") {
-            addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
-            addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
-            addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
-            addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
-            addTargetPlatformVariant("mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
-            addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
+listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
+    addJfxTarget(jfxModule, "", "none", "none") // matches the empty Jars: to get better errors
+    addJfxTarget(jfxModule, "linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
+    addJfxTarget(jfxModule, "linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
+    addJfxTarget(jfxModule, "mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
+    addJfxTarget(jfxModule, "mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
+    addJfxTarget(jfxModule, "win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
+}
+
+fun addJfxTarget(jfxModule: String, name: String, os: String, arch: String) {
+    if (jfxModule == "javafx-web" && name.isNotEmpty()) {
+        // Special treatment of 'javafx-web' for the time being due to https://bugs.openjdk.org/browse/JDK-8342623
+        // Can be remove once Java 26 is the minimum JabRef is built for
+        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
+            params(name, os, arch, 11)
+        }
+        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
+            params(name, os, arch, 26)
+        }
+    } else {
+        jvmDependencyConflicts.patch.module("org.openjfx:$jfxModule") {
+            addTargetPlatformVariant(name, os, arch)
         }
     }
+}
+
+jvmDependencyConflicts.patch {
     // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L9
     module("com.google.guava:guava") {
         removeDependency("com.google.code.findbugs:jsr305")

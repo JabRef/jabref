@@ -26,18 +26,6 @@ application{
     )
 }
 
-// See https://bugs.openjdk.org/browse/JDK-8342623
-val target = java.toolchain.languageVersion.get().asInt()
-if (target >= 26) {
-    dependencies {
-        implementation("org.openjfx:jdk-jsobject")
-    }
-} else {
-    configurations.all {
-        exclude(group = "org.openjfx", module = "jdk-jsobject")
-    }
-}
-
 dependencies {
     javaModuleDependencies.analyseOnly = true
 
