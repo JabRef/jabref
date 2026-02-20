@@ -140,11 +140,11 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public EntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), List.of());
-        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
-        this.entryTypesWithFields.add(viewModel);
+        EntryTypeViewModel entryTypeViewModel = new CustomEntryTypeViewModel(type, isMultiline);
+        this.entryTypesWithFields.add(entryTypeViewModel);
         this.entryTypeToAdd.setValue("");
 
-        return viewModel;
+        return entryTypeViewModel;
     }
 
     public void removeEntryType(EntryTypeViewModel focusedItem) {
