@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to open the citation fetcher API URL in the browser in the Citations tab. [#15033](https://github.com/JabRef/jabref/issues/15033)
 - We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
 - We added "DOI" and URL replace if entry preview has default value [#14193](https://github.com/JabRef/jabref/issues/14193)
+- We added a progress indicator for the cleanup operation. [#15122](https://github.com/JabRef/jabref/issues/15122)
 
 ### Changed
 
@@ -47,6 +48,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where empty entry type or entry type with spaces can be created. [#15103](https://github.com/JabRef/jabref/issues/15103)
+- We fixed an issue where duplicate entry type can be created and overwrite existing entry type. [#15074](https://github.com/JabRef/jabref/issues/15074)
 - We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
