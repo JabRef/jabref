@@ -225,6 +225,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
     private static final String JOURNAL_POPUP = "journalPopup";
     private static final String SHOW_SCITE_TAB = "showSciteTab";
+    private static final String SHOW_CITATION_CONTEXT_TAB = "showCitationContextTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
     // endregion
@@ -398,6 +399,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (_, _, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
         EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (_, _, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
         EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (_, _, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowCitationContextTabProperty(), (_, _, newValue) -> putBoolean(SHOW_CITATION_CONTEXT_TAB, newValue));
         EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
         return entryEditorPreferences;
@@ -419,6 +421,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
                 CitationFetcherType.SEMANTIC_SCHOLAR, // always use default
                 getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
+                getBoolean(SHOW_CITATION_CONTEXT_TAB, defaults.shouldShowCitationContextTab()),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
         );
