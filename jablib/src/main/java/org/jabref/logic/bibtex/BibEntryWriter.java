@@ -167,7 +167,7 @@ public class BibEntryWriter {
         Optional<String> value = entry.getField(field);
         // only write field if it is not empty
         // field.ifPresent does not work as an IOException may be thrown
-        if (value.isPresent() && !value.get().trim().isEmpty()) {
+        if (value.isPresent() && !value.get().isBlank()) {
             out.write("  ");
             out.write(getFormattedFieldName(field, indent));
             try {

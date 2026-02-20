@@ -40,12 +40,10 @@ public abstract class EmbeddingModelGuardedComponent extends AiPrivacyNoticeGuar
         if (!aiService.getEmbeddingModel().isPresent()) {
             if (aiService.getEmbeddingModel().hadErrorWhileBuildingModel()) {
                 return showErrorWhileBuildingEmbeddingModel();
-            } else {
-                return showBuildingEmbeddingModel();
             }
-        } else {
-            return showEmbeddingModelGuardedContent();
+            return showBuildingEmbeddingModel();
         }
+        return showEmbeddingModelGuardedContent();
     }
 
     private Node showErrorWhileBuildingEmbeddingModel() {

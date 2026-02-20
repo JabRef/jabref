@@ -106,9 +106,8 @@ public class GitStatusChecker {
             return SyncStatus.AHEAD;
         } else if (localInRemote) {
             return SyncStatus.BEHIND;
-        } else {
-            return SyncStatus.DIVERGED;
         }
+        return SyncStatus.DIVERGED;
     }
 
     public static boolean isRemoteEmpty(GitHandler gitHandler) {

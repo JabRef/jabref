@@ -280,11 +280,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 horizontalDividerSubscription.unsubscribe();
             }
             horizontalSplit.getItems().remove(sidePane);
-        } else {
-            if (!horizontalSplit.getItems().contains(sidePane)) {
-                horizontalSplit.getItems().addFirst(sidePane);
-                updateHorizontalDividerPosition();
-            }
+        } else if (!horizontalSplit.getItems().contains(sidePane)) {
+            horizontalSplit.getItems().addFirst(sidePane);
+            updateHorizontalDividerPosition();
         }
     }
 
@@ -294,11 +292,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 verticalDividerSubscription.unsubscribe();
             }
             verticalSplit.getItems().remove(entryEditor);
-        } else {
-            if (!verticalSplit.getItems().contains(entryEditor)) {
-                verticalSplit.getItems().addLast(entryEditor);
-                updateVerticalDividerPosition();
-            }
+        } else if (!verticalSplit.getItems().contains(entryEditor)) {
+            verticalSplit.getItems().addLast(entryEditor);
+            updateVerticalDividerPosition();
         }
     }
 

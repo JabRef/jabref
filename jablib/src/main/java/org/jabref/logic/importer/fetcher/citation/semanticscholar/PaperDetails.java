@@ -92,34 +92,33 @@ public class PaperDetails {
             return "InProceedings";
         } else if (publicationTypes.contains("JournalArticle")) {
             return "Article";
-        } else {
-            return switch (publicationTypes.getFirst()) {
-                case "Review" ->
-                        "Misc";
-                case "CaseReport" ->
-                        "Report";
-                case "ClinicalTrial" ->
-                        "Report";
-                case "Dataset" ->
-                        "Dataset";
-                case "Editorial" ->
-                        "Misc";
-                case "LettersAndComments" ->
-                        "Misc";
-                case "MetaAnalysis" ->
-                        "Article";
-                case "News" ->
-                        "Misc";
-                case "Study" ->
-                        "Article";
-                case "Book" ->
-                        "Book";
-                case "BookSection" ->
-                        "InBook";
-                default ->
-                        "Misc";
-            };
         }
+        return switch (publicationTypes.getFirst()) {
+            case "Review" ->
+                "Misc";
+            case "CaseReport" ->
+                "Report";
+            case "ClinicalTrial" ->
+                "Report";
+            case "Dataset" ->
+                "Dataset";
+            case "Editorial" ->
+                "Misc";
+            case "LettersAndComments" ->
+                "Misc";
+            case "MetaAnalysis" ->
+                "Article";
+            case "News" ->
+                "Misc";
+            case "Study" ->
+                "Article";
+            case "Book" ->
+                "Book";
+            case "BookSection" ->
+                "InBook";
+            default ->
+                "Misc";
+        };
     }
 
     public String getDOI() {

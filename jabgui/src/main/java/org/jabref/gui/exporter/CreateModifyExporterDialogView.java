@@ -35,9 +35,8 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
         this.setResultConverter(button -> {
             if (button == saveExporter) {
                 return viewModel.saveExporter();
-            } else {
-                return null;
             }
+            return null;
         });
     }
 

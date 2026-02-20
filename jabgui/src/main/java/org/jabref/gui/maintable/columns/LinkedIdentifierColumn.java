@@ -72,9 +72,8 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
             return IconTheme.JabRefIcons.LINK_VARIANT.getGraphicNode();
         } else if (values.size() == 1) {
             return IconTheme.JabRefIcons.LINK.getGraphicNode();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private String createIdentifierTooltip(Map<Field, String> values) {

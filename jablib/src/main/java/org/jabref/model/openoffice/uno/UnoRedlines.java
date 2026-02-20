@@ -43,17 +43,16 @@ public class UnoRedlines {
         XEnumeration enumeration = enumerationAccess.createEnumeration();
         if (enumeration == null) {
             return 0;
-        } else {
-            int count = 0;
-            while (enumeration.hasMoreElements()) {
-                try {
-                    enumeration.nextElement();
-                    count++;
-                } catch (NoSuchElementException | WrappedTargetException ex) {
-                    break;
-                }
-            }
-            return count;
         }
+        int count = 0;
+        while (enumeration.hasMoreElements()) {
+            try {
+                enumeration.nextElement();
+                count++;
+            } catch (NoSuchElementException | WrappedTargetException ex) {
+                break;
+            }
+        }
+        return count;
     }
 }

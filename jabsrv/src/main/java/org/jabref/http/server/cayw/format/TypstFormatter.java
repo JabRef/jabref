@@ -27,9 +27,8 @@ public class TypstFormatter implements CAYWFormatter {
                          .map(entry -> entry.getCitationKey().map(key -> {
                              if (key.contains("/")) {
                                  return "#cite(label(\"%s\"))".formatted(key);
-                             } else {
-                                 return "#cite(<%s>)".formatted(key);
                              }
+                             return "#cite(<%s>)".formatted(key);
                          }))
                          .flatMap(Optional::stream)
                          .collect(Collectors.joining(" "));

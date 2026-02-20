@@ -97,13 +97,11 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
             if (ingestedModificationTimeInSeconds.isEmpty()) {
                 modTime = Optional.of(currentModificationTimeInSeconds);
+            } else if (currentModificationTimeInSeconds > ingestedModificationTimeInSeconds.get()) {
+                modTime = Optional.of(currentModificationTimeInSeconds);
             } else {
-                if (currentModificationTimeInSeconds > ingestedModificationTimeInSeconds.get()) {
-                    modTime = Optional.of(currentModificationTimeInSeconds);
-                } else {
-                    LOGGER.debug("No need to generate embeddings for file \"{}\", because it was already generated", linkedFile.getLink());
-                    shouldIngest = false;
-                }
+                LOGGER.debug("No need to generate embeddings for file \"{}\", because it was already generated", linkedFile.getLink());
+                shouldIngest = false;
             }
         } catch (IOException e) {
             LOGGER.error("Could not retrieve attributes of a linked file \"{}\"", linkedFile.getLink(), e);

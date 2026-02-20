@@ -106,7 +106,7 @@ public class ProgressCounter implements Progress {
     private void update() {
         Duration workTime = Duration.between(workStartTime, Instant.now());
         Duration oneWorkTime = workTime.dividedBy(workDone.get() == 0 ? 1 : workDone.get());
-        Duration eta = oneWorkTime.multipliedBy(workMax.get() - workDone.get() <= 0 ? 1 : workMax.get() - workDone.get());
+        Duration eta = oneWorkTime.multipliedBy(workMax.get() <= workDone.get() ? 1 : workMax.get() - workDone.get());
 
         updateMessage(eta);
     }

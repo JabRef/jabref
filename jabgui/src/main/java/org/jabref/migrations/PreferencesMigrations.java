@@ -77,12 +77,10 @@ public class PreferencesMigrations {
             if (mainPrefsNode.childrenNames().length != 0) {
                 // skip further processing as prefs already have been migrated
                 LOGGER.debug("New prefs node already exists with content - skipping migration");
-            } else {
-                if (mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
-                    LOGGER.info("Migrating old preferences.");
-                    Preferences oldNode = mainPrefsNode.parent().parent().node("net/sf/jabref");
-                    copyPrefsRecursively(oldNode, mainPrefsNode);
-                }
+            } else if (mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
+                LOGGER.info("Migrating old preferences.");
+                Preferences oldNode = mainPrefsNode.parent().parent().node("net/sf/jabref");
+                copyPrefsRecursively(oldNode, mainPrefsNode);
             }
         } catch (BackingStoreException ex) {
             LOGGER.error("Migrating old preferences failed.", ex);
@@ -439,12 +437,11 @@ public class PreferencesMigrations {
         List<String> fieldColumnNames = oldColumnNames.stream()
                                                       .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
                                                       .map(columnName -> {
-                                                          if (columnName.startsWith("field:")) {
-                                                              return columnName.substring(6);
-                                                          } else { // special
-                                                              return columnName.substring(8);
-                                                          }
-                                                      }).collect(Collectors.toList());
+            if (columnName.startsWith("field:")) {
+                return columnName.substring(6);
+            } // special
+            return columnName.substring(8);
+        }).collect(Collectors.toList());
 
         if (!fieldColumnNames.isEmpty()) {
             preferences.putStringList(V5_0_COLUMN_NAMES, fieldColumnNames);

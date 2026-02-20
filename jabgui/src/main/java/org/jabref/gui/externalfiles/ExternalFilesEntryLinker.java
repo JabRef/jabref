@@ -44,8 +44,8 @@ public class ExternalFilesEntryLinker {
         List<LinkedFile> existingFiles = entry.getFiles();
         List<LinkedFile> linkedFiles = files.stream().flatMap(file -> {
             String typeName = FileUtil.getFileExtension(file)
-                                      .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
-                                      .orElse("");
+                    .map(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences).orElse(new UnknownExternalFileType(ext)).getName())
+                    .orElse("");
             Path relativePath = FileUtil.relativize(file, bibDatabaseContextSupplier.get(), filePreferences);
             LinkedFile linkedFile = new LinkedFile("", relativePath, typeName);
 
@@ -54,9 +54,8 @@ public class ExternalFilesEntryLinker {
             if (alreadyLinked) {
                 notificationService.notify(Localization.lang("File '%0' already linked", link));
                 return Stream.empty();
-            } else {
-                return Stream.of(linkedFile);
             }
+            return Stream.of(linkedFile);
         }).toList();
         entry.addFiles(linkedFiles);
     }

@@ -210,11 +210,9 @@ public class OOTextIntoOO {
                                 // <p oo:ParaStyleName="Standard">
                                 if (StringUtil.isNullOrEmpty(value)) {
                                     LOGGER.debug("oo:ParaStyleName inherited");
-                                } else {
-                                    if (setParagraphStyle(cursor, value)) {
-                                        // Presumably tested already:
-                                        LOGGER.debug("oo:ParaStyleName=\"{}\" failed", value);
-                                    }
+                                } else if (setParagraphStyle(cursor, value)) {
+                                    // Presumably tested already:
+                                    LOGGER.debug("oo:ParaStyleName=\"{}\" failed", value);
                                 }
                                 break;
                             default:

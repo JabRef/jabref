@@ -207,7 +207,7 @@ public class EditMerge {
             couldExpand = thisCharCursor.goRight((short) 1, true);
             String thisChar = thisCharCursor.getString();
             thisCharCursor.collapseToEnd();
-            if (thisChar.isEmpty() || "\n".equals(thisChar) || !thisChar.trim().isEmpty()) {
+            if (thisChar.isEmpty() || "\n".equals(thisChar) || !thisChar.isBlank()) {
                 couldExpand = false;
                 if (!thisChar.isEmpty()) {
                     thisCharCursor.goLeft((short) 1, false);

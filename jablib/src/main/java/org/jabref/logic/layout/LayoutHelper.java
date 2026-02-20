@@ -295,12 +295,11 @@ public class LayoutHelper {
                         doBracketedOptionField();
 
                         return;
-                    } else {
-                        // get field name
-                        doBracketedField(LayoutHelper.IS_OPTION_FIELD);
-
-                        return;
                     }
+                    // get field name
+                    doBracketedField(LayoutHelper.IS_OPTION_FIELD);
+
+                    return;
                 } else if ("filename".equalsIgnoreCase(name)) {
                     // Print the name of the database BIB file.
                     // This is only supported in begin/end layouts, not in
@@ -333,13 +332,12 @@ public class LayoutHelper {
                 parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_COMMAND));
 
                 return;
-            } else {
-                if (buffer == null) {
-                    buffer = new StringBuilder(100);
-                }
-
-                buffer.append((char) c);
             }
+            if (buffer == null) {
+                buffer = new StringBuilder(100);
+            }
+
+            buffer.append((char) c);
         }
     }
 

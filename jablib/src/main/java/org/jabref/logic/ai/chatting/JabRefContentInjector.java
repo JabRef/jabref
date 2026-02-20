@@ -52,9 +52,8 @@ public class JabRefContentInjector implements ContentInjector {
 
         if (keys.isEmpty()) {
             return text;
-        } else {
-            return keys + ":\n" + text;
         }
+        return keys + ":\n" + text;
     }
 
     private Stream<BibEntry> findEntriesByLink(String link) {

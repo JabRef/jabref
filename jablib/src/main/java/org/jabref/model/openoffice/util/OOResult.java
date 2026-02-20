@@ -76,17 +76,15 @@ public class OOResult<R, E> {
     public <S> OOResult<S, E> map(Function<R, S> fun) {
         if (isError()) {
             return error(getError());
-        } else {
-            return ok(fun.apply(get()));
         }
+        return ok(fun.apply(get()));
     }
 
     public <F> OOResult<R, F> mapError(Function<E, F> fun) {
         if (isError()) {
             return error(fun.apply(getError()));
-        } else {
-            return ok(get());
         }
+        return ok(get());
     }
 
     /// Throw away the error part.
@@ -98,9 +96,8 @@ public class OOResult<R, E> {
     public OOVoidResult<E> asVoidResult() {
         if (isError()) {
             return OOVoidResult.error(getError());
-        } else {
-            return OOVoidResult.ok();
         }
+        return OOVoidResult.ok();
     }
 }
 

@@ -60,9 +60,8 @@ public class BackupFileUtil {
             Path result = FileUtil.addExtension(targetFile, extension);
             if (Files.exists(result)) {
                 return Optional.of(result);
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         // Search the directory for the latest file

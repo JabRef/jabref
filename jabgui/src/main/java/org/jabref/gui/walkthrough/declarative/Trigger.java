@@ -174,7 +174,7 @@ public interface Trigger {
                     throw new IllegalArgumentException("onTextInput can only be used with TextInputControl");
                 }
                 ChangeListener<String> listener = (_, _, newText) -> {
-                    if (!newText.trim().isEmpty()) {
+                    if (!newText.isBlank()) {
                         // A text input change doesn't have an "original action" to wrap, so we pass NOTHING.
                         onNavigate.apply(NOTHING);
                     }

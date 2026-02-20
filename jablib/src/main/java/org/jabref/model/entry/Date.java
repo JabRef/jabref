@@ -350,9 +350,8 @@ public class Date {
     public Optional<Integer> get(ChronoField field) {
         if (date.isSupported(field)) {
             return Optional.of(date.get(field));
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     public Optional<Month> getMonth() {

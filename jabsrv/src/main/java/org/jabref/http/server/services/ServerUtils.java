@@ -47,9 +47,8 @@ public class ServerUtils {
     public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, SrvStateManager srvStateManager) {
         if (filesToServe.isEmpty()) {
             return getLibraryPath(id, srvStateManager);
-        } else {
-            return getLibraryPath(id, filesToServe);
         }
+        return getLibraryPath(id, filesToServe);
     }
 
     /// @param id - also "demo" for the demo library

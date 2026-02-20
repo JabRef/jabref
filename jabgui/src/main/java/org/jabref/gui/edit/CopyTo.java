@@ -124,8 +124,7 @@ public class CopyTo extends SimpleCommand {
                     Localization.lang("Do not ask again"),
                     optOut -> copyToPreferences.setShouldAskForIncludingCrossReferences(!optOut)
             );
-        } else {
-            return copyToPreferences.getShouldIncludeCrossReferences();
         }
+        return copyToPreferences.getShouldIncludeCrossReferences();
     }
 }

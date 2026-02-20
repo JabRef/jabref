@@ -96,10 +96,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 link -> {
                     if (linkedFile.isOnlineLink()) {
                         return true;
-                    } else {
-                        Optional<Path> path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
-                        return path.isPresent() && Files.exists(path.get());
                     }
+                    Optional<Path> path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
+                    return path.isPresent() && Files.exists(path.get());
                 },
                 ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
 
@@ -158,21 +157,19 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public String getDescriptionAndLink() {
         if (StringUtil.isBlank(linkedFile.getDescription())) {
             return linkedFile.getLink();
-        } else {
-            return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
         }
+        return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
     }
 
     public String getTruncatedDescriptionAndLink() {
         if (StringUtil.isBlank(linkedFile.getDescription())) {
             return ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
                     ControlHelper.EllipsisPosition.CENTER);
-        } else {
-            return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
-                    ControlHelper.EllipsisPosition.CENTER) + " (" +
-                    ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
-                            ControlHelper.EllipsisPosition.CENTER) + ")";
         }
+        return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
+                ControlHelper.EllipsisPosition.CENTER) + " (" +
+                ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
+                        ControlHelper.EllipsisPosition.CENTER) + ")";
     }
 
     public Optional<Path> findIn(List<Path> directories) {

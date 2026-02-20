@@ -75,7 +75,7 @@ public class DefaultLatexParser implements LatexParser {
              LineNumberReader lineNumberReader = new LineNumberReader(reader)) {
             for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
                 // Skip comments and blank lines.
-                if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
+                if (line.isBlank() || line.trim().charAt(0) == '%') {
                     continue;
                 }
                 matchCitation(latexFile, lineNumberReader.getLineNumber(), line, latexParserResult);

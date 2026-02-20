@@ -31,9 +31,8 @@ public class FieldFormatterCleanup implements CleanupJob {
             return cleanupAllFields(entry);
         } else if (InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD == field) {
             return cleanupAllTextFields(entry);
-        } else {
-            return cleanupSingleField(field, entry);
         }
+        return cleanupSingleField(field, entry);
     }
 
     /// Runs the formatter on the specified field in the given entry.
@@ -54,16 +53,15 @@ public class FieldFormatterCleanup implements CleanupJob {
 
         if (newValue.equals(oldValue)) {
             return List.of();
-        } else {
-            if (newValue.isEmpty()) {
-                entry.clearField(fieldKey);
-                newValue = null;
-            } else {
-                entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION);
-            }
-            FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
-            return List.of(change);
         }
+        if (newValue.isEmpty()) {
+            entry.clearField(fieldKey);
+            newValue = null;
+        } else {
+            entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION);
+        }
+        FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
+        return List.of(change);
     }
 
     private List<FieldChange> cleanupAllFields(BibEntry entry) {

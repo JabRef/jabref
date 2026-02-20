@@ -148,16 +148,14 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         ParserResult result = parser.parse(Reader.of(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {
             throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
-        } else {
-            Collection<BibEntry> entries = result.getDatabase().getEntries();
-            if (entries.size() != 1) {
-                LOGGER.debug("{} entries found! ({})", entries.size(), link);
-                throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
-            } else {
-                BibEntry entry = entries.iterator().next();
-                return entry;
-            }
         }
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        if (entries.size() != 1) {
+            LOGGER.debug("{} entries found! ({})", entries.size(), link);
+            throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
+        }
+        BibEntry entry = entries.iterator().next();
+        return entry;
     }
 
     private void obtainAndModifyCookie() throws FetcherException {
@@ -210,15 +208,14 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
                 throw new FetcherException("Fetching from Google Scholar failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
-            } else {
-                URL url;
-                try {
-                    url = uriBuilder.build().toURL();
-                } catch (URISyntaxException | MalformedURLException ex) {
-                    throw new FetcherException("Wrong URL syntax", e);
-                }
-                throw new FetcherException(url, "Error while fetching from " + getName(), e);
             }
+            URL url;
+            try {
+                url = uriBuilder.build().toURL();
+            } catch (URISyntaxException | MalformedURLException ex) {
+                throw new FetcherException("Wrong URL syntax", e);
+            }
+            throw new FetcherException(url, "Error while fetching from " + getName(), e);
         }
         return new Page<>(transformedQuery, pageNumber, foundEntries);
     }

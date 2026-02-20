@@ -107,10 +107,9 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                 LOGGER.debug("Successfully closed example library tab");
                 createdTab = null;
                 return true;
-            } else {
-                LOGGER.warn("Failed to close example library tab");
-                return false;
             }
+            LOGGER.warn("Failed to close example library tab");
+            return false;
         }
 
         Optional<LibraryTab> exampleTab = findLibraryTab();

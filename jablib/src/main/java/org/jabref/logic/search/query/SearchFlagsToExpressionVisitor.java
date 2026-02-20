@@ -86,12 +86,10 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
 
         if (isRegularExpression) {
             searchFlags.add(REGULAR_EXPRESSION);
-        } else {
-            if (operator == SearchParser.EQUAL || operator == SearchParser.CONTAINS || operator == SearchParser.NEQUAL) {
-                searchFlags.add(INEXACT_MATCH);
-            } else if (operator == SearchParser.EEQUAL || operator == SearchParser.MATCHES) {
-                searchFlags.add(EXACT_MATCH);
-            }
+        } else if (operator == SearchParser.EQUAL || operator == SearchParser.CONTAINS || operator == SearchParser.NEQUAL) {
+            searchFlags.add(INEXACT_MATCH);
+        } else if (operator == SearchParser.EEQUAL || operator == SearchParser.MATCHES) {
+            searchFlags.add(EXACT_MATCH);
         }
         return getFieldQueryNode(field, term, searchFlags);
     }

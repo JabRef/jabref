@@ -222,15 +222,13 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
                                 urlDownload.getSource().toString()))) {
                     return true;
-                } else {
-                    dialogService.notify(Localization.lang("Download operation canceled."));
-                    return false;
                 }
-            } else {
-                LOGGER.error("Error while checking if the file can be downloaded", ex);
-                dialogService.notify(Localization.lang("Error downloading"));
+                dialogService.notify(Localization.lang("Download operation canceled."));
                 return false;
             }
+            LOGGER.error("Error while checking if the file can be downloaded", ex);
+            dialogService.notify(Localization.lang("Error downloading"));
+            return false;
         }
         return true;
     }

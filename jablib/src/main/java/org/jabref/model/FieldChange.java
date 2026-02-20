@@ -71,9 +71,8 @@ public class FieldChange {
 
             if (oldValue == null) {
                 return other.oldValue == null;
-            } else {
-                return oldValue.equals(other.oldValue);
             }
+            return oldValue.equals(other.oldValue);
         }
         return false;
     }

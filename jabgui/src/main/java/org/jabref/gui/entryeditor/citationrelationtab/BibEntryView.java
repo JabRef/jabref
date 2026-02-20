@@ -100,9 +100,8 @@ public class BibEntryView {
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
             scrollPane.setFitToHeight(true);
             return scrollPane;
-        } else {
-            return new TextFlowLimited(new Text(text));
         }
+        return new TextFlowLimited(new Text(text));
     }
 
     /// Creates a label with horizontal scrolling for RTL text,
@@ -119,10 +118,9 @@ public class BibEntryView {
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
             scrollPane.setFitToHeight(true);
             return scrollPane;
-        } else {
-            Label label = new Label(text);
-            label.setWrapText(true);
-            return label;
         }
+        Label label = new Label(text);
+        label.setWrapText(true);
+        return label;
     }
 }

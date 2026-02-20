@@ -211,9 +211,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         Optional<String> doi = entry.getField(StandardField.DOI);
         if (doi.isPresent()) {
             return OptionalUtil.toList(performSearchById(doi.get()));
-        } else {
-            return List.of();
         }
+        return List.of();
     }
 
     /// Returns registration agency. Optional.empty() if no agency is found.

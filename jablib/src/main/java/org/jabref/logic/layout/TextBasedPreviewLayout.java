@@ -47,9 +47,8 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
         if (layout != null) {
             return layout.doLayout(entry, databaseContext.getDatabase());
-        } else {
-            return "";
         }
+        return "";
     }
 
     @Override

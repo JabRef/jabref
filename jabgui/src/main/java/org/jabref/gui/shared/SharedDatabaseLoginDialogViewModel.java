@@ -124,7 +124,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
 
-        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+        Predicate<String> notEmpty = input -> (input != null) && !input.isBlank();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
 

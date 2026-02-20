@@ -87,10 +87,9 @@ public class BibEntryTypesManager {
         if (currentlyStoredType.isEmpty()) {
             // new customization
             return true;
-        } else {
-            // different customization
-            return !EntryTypeFactory.nameAndFieldsAreEqual(type, currentlyStoredType.get());
         }
+        // different customization
+        return !EntryTypeFactory.nameAndFieldsAreEqual(type, currentlyStoredType.get());
     }
 
     /// Sets the given custom entry types for BibTeX and biblatex mode
@@ -198,16 +197,15 @@ public class BibEntryTypesManager {
         /// or an empty optional if it does not exist.
         private Optional<BibEntryType> enrich(EntryType type) {
             Optional<BibEntryType> enrichedType = customOrModifiedType.stream()
-                                                                      .filter(typeEquals(type))
-                                                                      .findFirst();
+                    .filter(typeEquals(type))
+                    .findFirst();
             if (enrichedType.isPresent()) {
                 LOGGER.debug("Using customized entry type for {}", type.getName());
                 return enrichedType;
-            } else {
-                return standardTypes.stream()
-                                    .filter(typeEquals(type))
-                                    .findFirst();
             }
+            return standardTypes.stream()
+                    .filter(typeEquals(type))
+                    .findFirst();
         }
 
         static Predicate<BibEntryType> typeEquals(EntryType toCompare) {

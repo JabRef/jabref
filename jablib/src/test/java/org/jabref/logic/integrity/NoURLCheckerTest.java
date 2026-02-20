@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -16,7 +16,7 @@ public class NoURLCheckerTest {
     private final NoURLChecker checker = new NoURLChecker();
 
     @ParameterizedTest(name = "{index}. Title: \"{0}\"")
-    @CsvSource({
+    @ValueSource(strings = {
             "Proceedings of the https://example.com/conference",
             "Find more at http://mywebsite.org/article",
             "Visit ftp://files.example.com/download",

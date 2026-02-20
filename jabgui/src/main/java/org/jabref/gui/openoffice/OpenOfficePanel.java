@@ -196,23 +196,21 @@ public class OpenOfficePanel {
         if (currentStyle == null) {
             currentStyle = openOfficePreferences.getCurrentStyle();
             currentStyleProperty.set(currentStyle);
-        } else {
-            if (currentStyle instanceof JStyle jStyle) {
-                try {
-                    jStyle = jStyleLoader.getUsedJstyle();
-                    jStyle.ensureUpToDate();
-                } catch (IOException ex) {
-                    LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-                    String msg = Localization.lang("Unable to reload style file")
-                            + "'" + jStyle.getPath() + "'"
-                            + "\n" + ex.getMessage();
-                    new OOError(title, msg, ex).showErrorDialog(dialogService);
-                    return FAIL;
-                }
-            } else {
-                // CSL Styles don't need to be updated
-                return PASS;
+        } else if (currentStyle instanceof JStyle jStyle) {
+            try {
+                jStyle = jStyleLoader.getUsedJstyle();
+                jStyle.ensureUpToDate();
+            } catch (IOException ex) {
+                LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
+                String msg = Localization.lang("Unable to reload style file")
+                        + "'" + jStyle.getPath() + "'"
+                        + "\n" + ex.getMessage();
+                new OOError(title, msg, ex).showErrorDialog(dialogService);
+                return FAIL;
             }
+        } else {
+            // CSL Styles don't need to be updated
+            return PASS;
         }
         return PASS;
     }
@@ -627,10 +625,9 @@ public class OpenOfficePanel {
             undoManager.addEdit(undoCompound);
             // Now every entry has a key
             return true;
-        } else {
-            // No, we canceled (or there is no panel to get the database from, highly unlikely)
-            return false;
         }
+        // No, we canceled (or there is no panel to get the database from, highly unlikely)
+        return false;
     }
 
     private ContextMenu createSettingsPopup() {

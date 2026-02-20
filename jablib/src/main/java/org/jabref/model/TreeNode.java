@@ -114,9 +114,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
         int index = children.indexOf(childNode);
         if (index == -1) {
             return Optional.empty();
-        } else {
-            return Optional.of(index);
         }
+        return Optional.of(index);
     }
 
     /// Gets the number of levels above this node, i.e. the distance from the root to this node.
@@ -198,15 +197,13 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     private Optional<T> getRelativeSibling(int shiftIndex) {
         if (parent == null) {
             return Optional.empty();
-        } else {
-            int indexInParent = getPositionInParent();
-            int indexTarget = indexInParent + shiftIndex;
-            if (parent.childIndexExists(indexTarget)) {
-                return parent.getChildAt(indexTarget);
-            } else {
-                return Optional.empty();
-            }
         }
+        int indexInParent = getPositionInParent();
+        int indexTarget = indexInParent + shiftIndex;
+        if (parent.childIndexExists(indexTarget)) {
+            return parent.getChildAt(indexTarget);
+        }
+        return Optional.empty();
     }
 
     /// Returns this node's parent or an empty Optional if this node has no parent.
@@ -262,14 +259,13 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     public boolean isAncestorOf(@NonNull T anotherNode) {
         if (anotherNode == this) {
             return true;
-        } else {
-            for (T child : children) {
-                if (child.isAncestorOf(anotherNode)) {
-                    return true;
-                }
-            }
-            return false;
         }
+        for (T child : children) {
+            if (child.isAncestorOf(anotherNode)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// Returns the root of the tree that contains this node. The root is the ancestor with an empty parent.
@@ -279,9 +275,8 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     public T getRoot() {
         if (parent == null) {
             return (T) this;
-        } else {
-            return parent.getRoot();
         }
+        return parent.getRoot();
     }
 
     /// Returns true if this node has no children.

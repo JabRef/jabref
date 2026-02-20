@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -29,6 +30,8 @@ import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 /// Fetches data from the LOBID API
 ///
@@ -97,7 +100,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
         if (typeArray != null) {
             List<String> typeList = IntStream.range(0, typeArray.length())
                                              .mapToObj(typeArray::optString)
-                                             .filter(type -> !type.isEmpty())
+                                             .filter(not(String::isEmpty))
                                              .toList();
             types = String.join(", ", typeList);
             entry.setField(StandardField.TYPE, types);
@@ -172,7 +175,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
         if (keywordArray != null) {
             List<String> keywordList = IntStream.range(0, keywordArray.length())
                                                 .mapToObj(keywordArray::optString)
-                                                .filter(keyword -> !keyword.isEmpty())
+                                                .filter(not(String::isEmpty))
                                                 .toList();
             entry.setField(StandardField.KEYWORDS, String.join(", ", keywordList));
         }

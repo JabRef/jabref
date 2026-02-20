@@ -41,19 +41,18 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
             LOGGER.error("Resource not found: msc_codes.json");
             conversionPossible = false;
             return tempMap;
-        } else {
-            try {
-                tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl).get();
-                if (!tempMap.isEmpty()) {
-                    conversionPossible = true;
-                    return tempMap;
-                }
-            } catch (MscCodeLoadingException e) {
-                LOGGER.error("Error loading MSC codes:", e);
-                conversionPossible = false;
-            }
-            return tempMap;
         }
+        try {
+            tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl).get();
+            if (!tempMap.isEmpty()) {
+                conversionPossible = true;
+                return tempMap;
+            }
+        } catch (MscCodeLoadingException e) {
+            LOGGER.error("Error loading MSC codes:", e);
+            conversionPossible = false;
+        }
+        return tempMap;
     }
 
     @NonNull

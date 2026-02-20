@@ -46,14 +46,13 @@ public class MetaDataDiff {
     public static Optional<MetaDataDiff> compare(MetaData originalMetaData, MetaData newMetaData) {
         if (originalMetaData.equals(newMetaData)) {
             return Optional.empty();
-        } else {
-            MetaDataDiff diff = new MetaDataDiff(originalMetaData, newMetaData);
-            List<Difference> differences = diff.getDifferences(new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN));
-            if (differences.isEmpty()) {
-                return Optional.empty();
-            }
-            return Optional.of(diff);
         }
+        MetaDataDiff diff = new MetaDataDiff(originalMetaData, newMetaData);
+        List<Difference> differences = diff.getDifferences(new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN));
+        if (differences.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(diff);
     }
 
     /// Checks if given content selectors are empty or default

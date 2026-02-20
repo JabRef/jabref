@@ -148,13 +148,11 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                     sb.append('\\');
                     sb.append(c);
                 }
+            } else // Check if we are at the start of an escape sequence:
+            if (c == '\\') {
+                escaped = true;
             } else {
-                // Check if we are at the start of an escape sequence:
-                if (c == '\\') {
-                    escaped = true;
-                } else {
-                    sb.append(c);
-                }
+                sb.append(c);
             }
         }
         // Finished scanning the string. If we collected text at the end, add an entry for it:
@@ -169,7 +167,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     public void setArgument(String arg) {
         List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
         format = parseFormatString(parts.getFirst());
-        if ((parts.size() > 1) && !parts.get(1).trim().isEmpty()) {
+        if ((parts.size() > 1) && !parts.get(1).isBlank()) {
             fileType = parts.get(1);
         }
         if (parts.size() > 2) {

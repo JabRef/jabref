@@ -27,9 +27,8 @@ public class ISBN implements Identifier {
         ISBN isbn = new ISBN(input);
         if (isbn.isValid()) {
             return Optional.of(isbn);
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     public boolean isValidFormat() {

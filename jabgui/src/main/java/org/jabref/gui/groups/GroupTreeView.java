@@ -227,13 +227,12 @@ public class GroupTreeView extends BorderPane {
                         group -> {
                             if (group == null) {
                                 return null;
-                            } else {
-                                return new RecursiveTreeItem<>(
-                                        group,
-                                        GroupNodeViewModel::getChildren,
-                                        GroupNodeViewModel::expandedProperty,
-                                        viewModel.filterPredicateProperty());
                             }
+                            return new RecursiveTreeItem<>(
+                                    group,
+                                    GroupNodeViewModel::getChildren,
+                                    GroupNodeViewModel::expandedProperty,
+                                    viewModel.filterPredicateProperty());
                         }));
 
         // Icon and group name

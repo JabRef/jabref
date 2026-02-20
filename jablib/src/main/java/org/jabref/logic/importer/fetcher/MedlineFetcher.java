@@ -202,23 +202,22 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
 
         if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {
             return List.of();
-        } else {
-            // searching for pubmed ids matching the query
-            List<String> idList = getPubMedIdsFromQuery(transformedQuery.get());
-
-            if (idList.isEmpty()) {
-                LOGGER.info("No results found.");
-                return List.of();
-            }
-            if (numberOfResultsFound > NUMBER_TO_FETCH) {
-                LOGGER.info("{} results found. Only 50 relevant results will be fetched by default.", numberOfResultsFound);
-            }
-
-            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
-            entryList = fetchMedline(idList);
-
-            return entryList;
         }
+        // searching for pubmed ids matching the query
+        List<String> idList = getPubMedIdsFromQuery(transformedQuery.get());
+
+        if (idList.isEmpty()) {
+            LOGGER.info("No results found.");
+            return List.of();
+        }
+        if (numberOfResultsFound > NUMBER_TO_FETCH) {
+            LOGGER.info("{} results found. Only 50 relevant results will be fetched by default.", numberOfResultsFound);
+        }
+
+        // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
+        entryList = fetchMedline(idList);
+
+        return entryList;
     }
 
     @Override

@@ -103,9 +103,8 @@ public class ActionHelper {
                         files.getFirst().getLink(),
                         preferences.getFilePreferences());
                 return filename.isPresent();
-            } else {
-                return false;
             }
+            return false;
         }).orElseOpt(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);

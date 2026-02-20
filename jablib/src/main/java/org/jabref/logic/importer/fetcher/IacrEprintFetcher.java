@@ -134,9 +134,8 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         String value = StringUtil.substringBetween(haystack, from, to);
         if (value == null) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
-        } else {
-            return value;
         }
+        return value;
     }
 
     private boolean isFromOrAfterYear2000(BibEntry entry) throws FetcherException {

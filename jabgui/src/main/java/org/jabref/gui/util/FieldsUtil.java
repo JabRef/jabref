@@ -23,9 +23,8 @@ public class FieldsUtil {
         public String toString(Field field) {
             if (field != null) {
                 return FieldTextMapper.getDisplayName(field);
-            } else {
-                return "";
             }
+            return "";
         }
 
         @Override

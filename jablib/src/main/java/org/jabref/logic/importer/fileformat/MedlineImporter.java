@@ -934,13 +934,11 @@ public class MedlineImporter extends Importer implements Parser {
         // Check whether MeshHeadingList exists or not
         if (fields.get(StandardField.KEYWORDS) == null) {
             fields.put(StandardField.KEYWORDS, String.join(KEYWORD_SEPARATOR, keywordList));
-        } else {
-            if (!keywordList.isEmpty()) {
-                // if it exists, combine the MeshHeading with the keywords
-                String result = String.join("; ", keywordList);
-                result = fields.get(StandardField.KEYWORDS) + KEYWORD_SEPARATOR + result;
-                fields.put(StandardField.KEYWORDS, result);
-            }
+        } else if (!keywordList.isEmpty()) {
+            // if it exists, combine the MeshHeading with the keywords
+            String result = String.join("; ", keywordList);
+            result = fields.get(StandardField.KEYWORDS) + KEYWORD_SEPARATOR + result;
+            fields.put(StandardField.KEYWORDS, result);
         }
     }
 

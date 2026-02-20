@@ -73,9 +73,8 @@ public class KeyBindingRepository {
             return result.get();
         } else if (keyBinding.isPresent()) {
             return keyBinding.get().getDefaultKeyBinding();
-        } else {
-            return "Not associated";
         }
+        return "Not associated";
     }
 
     /// Returns the HashMap containing all key bindings.

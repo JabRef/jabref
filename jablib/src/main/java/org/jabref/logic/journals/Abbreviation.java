@@ -82,9 +82,8 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
             return getAbbreviation();
-        } else {
-            return getDotlessAbbreviation();
         }
+        return getDotlessAbbreviation();
     }
 
     @Override

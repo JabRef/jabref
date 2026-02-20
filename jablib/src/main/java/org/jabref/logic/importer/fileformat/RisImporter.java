@@ -143,12 +143,10 @@ public class RisImporter extends Importer {
                         String oldVal = fields.get(StandardField.TITLE);
                         if (oldVal == null) {
                             fields.put(StandardField.TITLE, value);
+                        } else if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
+                            fields.put(StandardField.TITLE, oldVal + " " + value);
                         } else {
-                            if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                                fields.put(StandardField.TITLE, oldVal + " " + value);
-                            } else {
-                                fields.put(StandardField.TITLE, oldVal + ": " + value);
-                            }
+                            fields.put(StandardField.TITLE, oldVal + ": " + value);
                         }
                         fields.put(StandardField.TITLE, fields.get(StandardField.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
                     } else if ("BT".equals(tag)) {
@@ -306,7 +304,7 @@ public class RisImporter extends Importer {
             }
 
             // Remove empty fields
-            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
+            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().isBlank());
 
             // Create final entry
             BibEntry entry = new BibEntry(type);

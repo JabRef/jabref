@@ -66,6 +66,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1810,7 +1811,7 @@ class BibtexParserTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             // single backslash kept
             "C:\\temp\\test",
             "\\\\servername\\path\\to\\file",

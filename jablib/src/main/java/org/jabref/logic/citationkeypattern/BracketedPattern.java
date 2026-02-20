@@ -351,11 +351,10 @@ public class BracketedPattern {
                     return authN(authorList, num);
                 } else if (pattern.matches("authors\\d+")) {
                     return nAuthors(authorList, Integer.parseInt(pattern.substring(7)));
-                } else {
-                    // This "auth" business was a dead end, so just
-                    // use it literally:
-                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
                 }
+                // This "auth" business was a dead end, so just
+                // use it literally:
+                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
             } else if (pattern.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
@@ -396,11 +395,10 @@ public class BracketedPattern {
                         num = fa.length();
                     }
                     return fa.substring(0, num);
-                } else {
-                    // This "ed" business was a dead end, so just
-                    // use it literally:
-                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
                 }
+                // This "ed" business was a dead end, so just
+                // use it literally:
+                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
             } else if ("firstpage".equals(pattern)) {
                 return firstPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("pageprefix".equals(pattern)) {
@@ -435,9 +433,8 @@ public class BracketedPattern {
                     return "IP";
                 } else if (yearString.length() > 2) {
                     return yearString.substring(yearString.length() - 2);
-                } else {
-                    return yearString;
                 }
+                return yearString;
             } else if ("entrytype".equals(pattern)) {
                 return entry.getResolvedFieldOrAlias(InternalField.TYPE_HEADER, database).orElse("");
             } else if (pattern.matches("keyword\\d+")) {
@@ -447,10 +444,9 @@ public class BracketedPattern {
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
-                } else {
-                    // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return separatedKeywords.get(num - 1).toString();
                 }
+                // num counts from 1 to n, but index in arrayList count from 0 to n-1
+                return separatedKeywords.get(num - 1).toString();
             } else if (pattern.matches("keywords\\d*")) {
                 // return all keywords, not separated
                 int num;
@@ -472,10 +468,9 @@ public class BracketedPattern {
                     }
                 }
                 return sb.toString();
-            } else {
-                // we haven't seen any special demands
-                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
             }
+            // we haven't seen any special demands
+            return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
         } catch (NullPointerException ex) {
             LOGGER.debug("Problem making expanding bracketed expression", ex);
             return "";
@@ -890,12 +885,10 @@ public class BracketedPattern {
                              if (author.equals(Author.OTHERS)) {
                                  if (suffix.startsWith(delimiter)) {
                                      return Optional.of(suffix.substring(delimiter.length()));
-                                 } else {
-                                     return Optional.of(suffix);
                                  }
-                             } else {
-                                 return author.getFamilyName();
+                                 return Optional.of(suffix);
                              }
+                             return author.getFamilyName();
                          })
                          .flatMap(Optional::stream)
                          .limit(maxAuthors)
@@ -944,9 +937,8 @@ public class BracketedPattern {
             // in case 1 or two authors, just name them
             // exception: If the second author is "and others", then do the appendix handling (in the other branch)
             return joinAuthorsOnLastName(authorList, 2, delim, "");
-        } else {
-            return authorList.getAuthor(0).getFamilyName().orElse("") + append;
         }
+        return authorList.getAuthor(0).getFamilyName().orElse("") + append;
     }
 
     /// The first N characters of the Mth author's or editor's last name. M starts counting from 1.
@@ -1009,9 +1001,9 @@ public class BracketedPattern {
             // This gets the single char "+" only
             AuthorList allButOthers = AuthorList.of(
                     authorList.getAuthors()
-                              .stream()
-                              .limit(limit)
-                              .toList());
+                            .stream()
+                            .limit(limit)
+                            .toList());
             return authIniN(allButOthers, n - 1) + "+";
         }
 
@@ -1028,9 +1020,8 @@ public class BracketedPattern {
 
         if (author.length() <= n) {
             return author.toString();
-        } else {
-            return author.substring(0, n);
         }
+        return author.substring(0, n);
     }
 
     /// Split the pages field into separate numbers and return the lowest
@@ -1058,9 +1049,8 @@ public class BracketedPattern {
     public static String pagePrefix(String pages) {
         if (pages.matches("^\\D+.*$")) {
             return (pages.split("\\d+"))[0];
-        } else {
-            return "";
         }
+        return "";
     }
 
     /// Split the pages field into separate numbers and return the highest

@@ -45,9 +45,8 @@ public class WebViewStore {
         }
         if (hasMore()) {
             return WEB_VIEWS.poll();
-        } else {
-            return new WebView();
         }
+        return new WebView();
     }
 
     private static void addWebViewLater() {

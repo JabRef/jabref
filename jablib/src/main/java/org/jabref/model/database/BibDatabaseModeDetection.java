@@ -26,8 +26,7 @@ public class BibDatabaseModeDetection {
 
         if (entryTypes.anyMatch(EntryTypeFactory::isExclusiveBiblatex)) {
             return BibDatabaseMode.BIBLATEX;
-        } else {
-            return BibDatabaseMode.BIBTEX;
         }
+        return BibDatabaseMode.BIBTEX;
     }
 }

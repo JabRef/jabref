@@ -53,9 +53,8 @@ public class TextFlowLimited extends TextFlow {
     protected double computePrefHeight(double width) {
         if (isCollapsed) {
             return 38;
-        } else {
-            return super.computePrefHeight(width);
         }
+        return super.computePrefHeight(width);
     }
 
     @Override

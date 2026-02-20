@@ -65,9 +65,8 @@ public class FieldComparator implements Comparator<BibEntry> {
             return FieldType.YEAR;
         } else if (StandardField.MONTH == this.fields.getPrimary()) {
             return FieldType.MONTH;
-        } else {
-            return FieldType.OTHER;
         }
+        return FieldType.OTHER;
     }
 
     private String getFieldValue(BibEntry entry) {

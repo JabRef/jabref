@@ -87,9 +87,8 @@ public class FieldFormatterCleanupActions {
     public List<FieldChange> applySaveActions(BibEntry entry) {
         if (enabled) {
             return applyAllActions(entry);
-        } else {
-            return List.of();
         }
+        return List.of();
     }
 
     private List<FieldChange> applyAllActions(BibEntry entry) {

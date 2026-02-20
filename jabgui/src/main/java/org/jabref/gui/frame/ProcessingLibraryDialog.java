@@ -26,9 +26,8 @@ public class ProcessingLibraryDialog {
                     while (libraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
                         if (isCancelled()) {
                             return null;
-                        } else {
-                            Thread.sleep(100);
                         }
+                        Thread.sleep(100);
                     }
                     return null;
                 }

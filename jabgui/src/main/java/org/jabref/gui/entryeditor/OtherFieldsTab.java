@@ -67,15 +67,15 @@ public class OtherFieldsTab extends FieldsEditorTab {
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                           .orElse(BibDatabaseMode.BIBLATEX);
+                .orElse(BibDatabaseMode.BIBLATEX);
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             // Get all required and optional fields configured for the entry
             Set<Field> allKnownFields = entryType.get().getAllFields();
             // Remove all fields being required or optional
             SequencedSet<Field> otherFields = entry.getFields().stream()
-                                                   .filter(field -> !allKnownFields.contains(field))
-                                                   .collect(Collectors.toCollection(LinkedHashSet::new));
+                    .filter(field -> !allKnownFields.contains(field))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
             // The key field is in the required tab, but has a special treatment
             otherFields.remove(InternalField.KEY_FIELD);
             // Remove all fields contained in JabRef's tab "Deprecated"
@@ -86,9 +86,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
             otherFields.removeIf(field -> field.equals(StandardField.COMMENT));
             otherFields.removeIf(field -> field instanceof UserSpecificCommentField);
             return otherFields;
-        } else {
-            // Entry type unknown -> treat all fields as required (thus no other fields)
-            return new LinkedHashSet<>();
         }
+        // Entry type unknown -> treat all fields as required (thus no other fields)
+        return new LinkedHashSet<>();
     }
 }

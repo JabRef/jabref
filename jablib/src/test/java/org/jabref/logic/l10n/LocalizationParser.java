@@ -70,12 +70,11 @@ public class LocalizationParser {
     private static Set<LocalizationEntry> findLocalizationEntriesInFiles(LocalizationBundleForTest type) throws IOException {
         if (type == LocalizationBundleForTest.MENU) {
             return findLocalizationEntriesInJavaFiles(type);
-        } else {
-            Set<LocalizationEntry> entriesInFiles = new HashSet<>();
-            entriesInFiles.addAll(findLocalizationEntriesInJavaFiles(type));
-            entriesInFiles.addAll(findLocalizationEntriesInFxmlFiles(type));
-            return entriesInFiles;
         }
+        Set<LocalizationEntry> entriesInFiles = new HashSet<>();
+        entriesInFiles.addAll(findLocalizationEntriesInJavaFiles(type));
+        entriesInFiles.addAll(findLocalizationEntriesInFxmlFiles(type));
+        return entriesInFiles;
     }
 
     public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)

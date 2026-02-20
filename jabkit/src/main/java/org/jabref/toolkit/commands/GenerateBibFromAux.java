@@ -79,16 +79,15 @@ class GenerateBibFromAux implements Runnable {
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()
-                                          .map(BibEntry::toString)
-                                          .collect(Collectors.joining("\n\n")));
+                    .map(BibEntry::toString)
+                    .collect(Collectors.joining("\n\n")));
             return;
-        } else {
-            JabKit.saveDatabase(
-                    argumentProcessor.cliPreferences,
-                    argumentProcessor.entryTypesManager,
-                    subDatabase,
-                    outputFile);
         }
+        JabKit.saveDatabase(
+                argumentProcessor.cliPreferences,
+                argumentProcessor.entryTypesManager,
+                subDatabase,
+                outputFile);
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));

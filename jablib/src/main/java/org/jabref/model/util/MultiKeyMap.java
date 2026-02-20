@@ -16,9 +16,8 @@ public class MultiKeyMap<K1 extends Enum<K1>, K2, V> {
         Map<K2, V> metaValue = map.get(key1);
         if (metaValue == null) {
             return Optional.empty();
-        } else {
-            return Optional.ofNullable(metaValue.get(key2));
         }
+        return Optional.ofNullable(metaValue.get(key2));
     }
 
     public void put(K1 key1, K2 key2, V value) {

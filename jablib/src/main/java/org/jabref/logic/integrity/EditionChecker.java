@@ -47,10 +47,8 @@ public class EditionChecker implements ValueChecker {
             if (!ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
                 return Optional.of(Localization.lang("should contain an integer or a literal"));
             }
-        } else {
-            if (ONLY_NUMERALS.test(value) && (!allowIntegerEdition)) {
-                return Optional.of(Localization.lang("no integer as values for edition allowed"));
-            }
+        } else if (ONLY_NUMERALS.test(value) && (!allowIntegerEdition)) {
+            return Optional.of(Localization.lang("no integer as values for edition allowed"));
         }
         if (!isFirstCharDigit(value) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
             return Optional.of(Localization.lang("should have the first letter capitalized"));

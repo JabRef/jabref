@@ -296,49 +296,46 @@ class LayoutEntry {
         if ((field.isPresent() == negated) || ((type == LayoutHelper.IS_GROUP_START)
                 && field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
             return null;
-        } else {
-            if (type == LayoutHelper.IS_GROUP_START) {
-                LayoutHelper.setCurrentGroup(field.get());
-            }
-            StringBuilder sb = new StringBuilder(100);
-            String fieldText;
-            boolean previousSkipped = false;
+        }
+        if (type == LayoutHelper.IS_GROUP_START) {
+            LayoutHelper.setCurrentGroup(field.get());
+        }
+        StringBuilder sb = new StringBuilder(100);
+        String fieldText;
+        boolean previousSkipped = false;
 
-            for (int i = 0; i < layoutEntries.size(); i++) {
-                fieldText = layoutEntries.get(i).doLayout(bibtex, database);
+        for (int i = 0; i < layoutEntries.size(); i++) {
+            fieldText = layoutEntries.get(i).doLayout(bibtex, database);
 
-                if (fieldText == null) {
-                    if ((i + 1) < layoutEntries.size()) {
-                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
-                            i++;
-                            previousSkipped = true;
-                            continue;
-                        }
-                    }
-                } else {
-                    // if previous was skipped --> remove leading line
-                    // breaks
-                    if (previousSkipped) {
-                        int eol = 0;
-
-                        while ((eol < fieldText.length())
-                                && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
-                            eol++;
-                        }
-
-                        if (eol < fieldText.length()) {
-                            sb.append(fieldText.substring(eol));
-                        }
-                    } else {
-                        sb.append(fieldText);
+            if (fieldText == null) {
+                if ((i + 1) < layoutEntries.size()) {
+                    if (layoutEntries.get(i + 1).doLayout(bibtex, database).isBlank()) {
+                        i++;
+                        previousSkipped = true;
+                        continue;
                     }
                 }
+            } else // if previous was skipped --> remove leading line
+                // breaks
+                if (previousSkipped) {
+                    int eol = 0;
 
-                previousSkipped = false;
-            }
+                    while ((eol < fieldText.length())
+                            && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
+                        eol++;
+                    }
 
-            return sb.toString();
+                    if (eol < fieldText.length()) {
+                        sb.append(fieldText.substring(eol));
+                    }
+                } else {
+                    sb.append(fieldText);
+                }
+
+            previousSkipped = false;
         }
+
+        return sb.toString();
     }
 
     /// Do layout for general formatters (no bibtex-entry fields).

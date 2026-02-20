@@ -184,10 +184,8 @@ public class Backend52 {
                 case JabRef52:
                     if (i == last) {
                         cit.setPageInfo(pageInfo);
-                    } else {
-                        if (pageInfo.isPresent()) {
-                            LOGGER.warn("dataModel JabRef52" + " only supports pageInfo for the last citation of a group");
-                        }
+                    } else if (pageInfo.isPresent()) {
+                        LOGGER.warn("dataModel JabRef52" + " only supports pageInfo for the last citation of a group");
                     }
                     break;
                 case JabRef60:

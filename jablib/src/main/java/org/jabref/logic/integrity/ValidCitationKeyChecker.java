@@ -19,8 +19,7 @@ public class ValidCitationKeyChecker implements ValueChecker {
 
         if (cleaned.equals(value)) {
             return Optional.empty();
-        } else {
-            return Optional.of(Localization.lang("Invalid citation key"));
         }
+        return Optional.of(Localization.lang("Invalid citation key"));
     }
 }

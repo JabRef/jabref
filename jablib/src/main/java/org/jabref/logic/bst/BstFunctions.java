@@ -420,7 +420,7 @@ public class BstFunctions {
             throw new BstVMException("Operand does not match function empty$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        boolean result = s.trim().isEmpty();
+        boolean result = s.isBlank();
         LOGGER.trace("empty$({}) result: {}", s, result);
         stack.push(result ? BstVM.TRUE : BstVM.FALSE);
     }

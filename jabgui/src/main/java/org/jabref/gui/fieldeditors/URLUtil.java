@@ -51,20 +51,15 @@ public class URLUtil {
                 // not a proper suffix, so we should give up:
                 if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
                     return Optional.empty();
-                } else {
-                    return Optional.of(suffix); // return the first one we found, anyway.
                 }
-            } else {
-                // Check if there are path separators in the suffix - if so, it is definitely
+                return Optional.of(suffix); // return the first one we found, anyway.
+            } else // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
                 if (link.substring(index + 1).indexOf('/') >= 1) {
                     return Optional.empty();
-                } else {
-                    return Optional.of(link.substring(index + 1));
                 }
-            }
-        } else {
-            return Optional.ofNullable(suffix);
+            return Optional.of(link.substring(index + 1));
         }
+        return Optional.ofNullable(suffix);
     }
 }

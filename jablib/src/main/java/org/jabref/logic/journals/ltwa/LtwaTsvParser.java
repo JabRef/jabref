@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.function.Predicate.not;
 
 /// Parser for the LTWA (List of Title Word Abbreviations) CSV file.
 /// Converts CSV data into a list of LtwaEntry objects.
@@ -57,7 +60,7 @@ public class LtwaTsvParser {
                 word = normalizeResult.get();
                 String abbreviation = NO_ABBREVIATION.equals(abbreviationStr) ? null : abbreviationStr;
                 List<String> languages = Arrays.stream(languageStr.split("\\s*,\\s*")).map(String::trim)
-                                               .filter(s -> !s.isEmpty()).toList();
+                                               .filter(not(String::isEmpty)).toList();
 
                 entries.add(new LtwaEntry(word, abbreviation, languages));
             }

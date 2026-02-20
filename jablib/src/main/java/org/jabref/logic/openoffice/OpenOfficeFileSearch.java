@@ -33,9 +33,8 @@ public class OpenOfficeFileSearch {
         } else if (OS.LINUX) {
             List<Path> programDirs = findLinuxOpenOfficeDirs();
             return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, dir).isPresent()).toList();
-        } else {
-            return List.of();
         }
+        return List.of();
     }
 
     private static List<Path> findOpenOfficeDirectories(List<Path> programDirectories) {

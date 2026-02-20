@@ -55,9 +55,8 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
         // Check the actual operator token
         if (ctx.bin_op.getType() == SearchParser.AND) {
             return new OperatorNode(OperatorNode.Operator.AND, List.of(left, right));
-        } else { // Assuming the only other binary op is OR
-            return new OperatorNode(OperatorNode.Operator.OR, List.of(left, right));
-        }
+        } // Assuming the only other binary op is OR
+        return new OperatorNode(OperatorNode.Operator.OR, List.of(left, right));
     }
 
     @Override

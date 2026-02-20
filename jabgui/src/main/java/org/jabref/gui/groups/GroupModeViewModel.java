@@ -19,16 +19,14 @@ public class GroupModeViewModel {
     public Node getUnionIntersectionGraphic() {
         if (mode.contains(GroupViewMode.INTERSECTION)) {
             return JabRefIcons.GROUP_INTERSECTION.getGraphicNode();
-        } else {
-            return JabRefIcons.GROUP_UNION.getGraphicNode();
         }
+        return JabRefIcons.GROUP_UNION.getGraphicNode();
     }
 
     public Tooltip getUnionIntersectionTooltip() {
         if (!mode.contains(GroupViewMode.INTERSECTION)) {
             return new Tooltip(Localization.lang("Toggle intersection"));
-        } else {
-            return new Tooltip(Localization.lang("Toggle union"));
         }
+        return new Tooltip(Localization.lang("Toggle union"));
     }
 }

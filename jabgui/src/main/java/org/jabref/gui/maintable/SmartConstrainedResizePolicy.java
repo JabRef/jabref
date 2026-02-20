@@ -25,9 +25,8 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     public Boolean call(TableView.ResizeFeatures prop) {
         if (prop.getColumn() == null) {
             return initColumnSize(prop.getTable());
-        } else {
-            return constrainedResize(prop);
         }
+        return constrainedResize(prop);
     }
 
     private Boolean initColumnSize(TableView<?> table) {

@@ -89,12 +89,11 @@ public final class MergeBookkeeper {
                 return commitWithParents(repo, branchRef, treeId,
                         "Semantic merge (GUI-applied) on top of remote",
                         remote.getId());
-            } else {
-                // DIVERGED or other -> merge commit with parents [localHead, remote]
-                return commitWithParents(repo, branchRef, treeId,
-                        "Semantic merge (GUI-applied)",
-                        localHead.getId(), remote.getId());
             }
+            // DIVERGED or other -> merge commit with parents [localHead, remote]
+            return commitWithParents(repo, branchRef, treeId,
+                    "Semantic merge (GUI-applied)",
+                    localHead.getId(), remote.getId());
         }
     }
 

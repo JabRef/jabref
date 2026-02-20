@@ -97,8 +97,7 @@ public class AbbreviationsFileViewModel {
     public boolean equals(Object obj) {
         if (obj instanceof AbbreviationsFileViewModel model) {
             return Objects.equals(this.name, model.name);
-        } else {
-            return false;
         }
+        return false;
     }
 }
