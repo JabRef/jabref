@@ -39,8 +39,8 @@ listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "java
 
 fun addJfxTarget(jfxModule: String, name: String, os: String, arch: String) {
     if (jfxModule == "javafx-web" && name.isNotEmpty()) {
-        // Special treatment of 'javafx-web' for the time being due to https://bugs.openjdk.org/browse/JDK-8342623
-        // Can be remove once Java 26 is the minimum JabRef is built for
+        // Special treatment of 'javafx-web' for the time being due to https://bugs.openjdk.org/browse/JDK-8342623.
+        // Can be remove once Java 26 is the minimum version JabRef is built with.
         dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
             params(name, os, arch, 11)
         }
