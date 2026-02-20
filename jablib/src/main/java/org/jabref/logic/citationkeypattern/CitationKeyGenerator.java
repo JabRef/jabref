@@ -79,8 +79,11 @@ public class CitationKeyGenerator extends BracketedPattern {
         String newKey = key.chars()
                            .filter(c -> unwantedCharacters.indexOf(c) == -1)
                            .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
-                           .collect(StringBuilder::new,
-                                   StringBuilder::appendCodePoint, StringBuilder::append)
+                           .collect(
+                                   StringBuilder::new,
+                                   StringBuilder::appendCodePoint,
+                                   StringBuilder::append
+                           )
                            .toString();
 
         // Replace non-English characters like umlauts etc. with a sensible
@@ -101,8 +104,11 @@ public class CitationKeyGenerator extends BracketedPattern {
         return key.chars()
                   .filter(c -> !Character.isWhitespace(c))
                   .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
-                  .collect(StringBuilder::new,
-                          StringBuilder::appendCodePoint, StringBuilder::append)
+                  .collect(
+                          StringBuilder::new,
+                          StringBuilder::appendCodePoint,
+                          StringBuilder::append
+                  )
                   .toString();
     }
 
