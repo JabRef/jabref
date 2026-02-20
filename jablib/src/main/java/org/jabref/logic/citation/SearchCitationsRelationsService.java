@@ -14,6 +14,8 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.importer.util.GrobidPreferences;
@@ -30,12 +32,14 @@ public class SearchCitationsRelationsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchCitationsRelationsService.class);
 
     private CitationFetcher citationFetcher;
+    private CitationCountFetcher citationCountFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences,
                                            ImportFormatPreferences importFormatPreferences,
                                            FieldPreferences fieldPreferences,
                                            ObjectProperty<CitationFetcherType> citationFetcherTypeProperty,
+                                           ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty,
                                            CitationKeyPatternPreferences citationKeyPatternPreferences,
                                            GrobidPreferences grobidPreferences,
                                            AiService aiService,
@@ -48,6 +52,10 @@ public class SearchCitationsRelationsService {
                 grobidPreferences,
                 aiService);
 
+        this.citationCountFetcher = CitationCountFetcherType.getCitationCountFetcher(
+                citationCountFetcherTypeProperty.get(),
+                importerPreferences);
+
         citationFetcherTypeProperty.addListener((_, _, newValue) -> {
             this.citationFetcher = CitationFetcherType.getCitationFetcher(
                     newValue,
@@ -56,6 +64,12 @@ public class SearchCitationsRelationsService {
                     citationKeyPatternPreferences,
                     grobidPreferences,
                     aiService);
+        });
+
+        citationCountFetcherTypeProperty.addListener((_, _, newValue) -> {
+            this.citationCountFetcher = CitationCountFetcherType.getCitationCountFetcher(
+                    newValue,
+                    importerPreferences);
         });
 
         this.relationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
@@ -73,6 +87,7 @@ public class SearchCitationsRelationsService {
                                     BibEntryCitationsAndReferencesRepository repository
     ) {
         this.citationFetcher = citationFetcher;
+        this.citationCountFetcher = citationFetcher;
         this.relationsRepository = repository;
     }
 
@@ -107,7 +122,7 @@ public class SearchCitationsRelationsService {
         boolean isFetchingAllowed = actualFieldValue.isEmpty() ||
                 relationsRepository.isCitationsUpdatable(citationCounted);
         if (isFetchingAllowed) {
-            Optional<Integer> citationCountResult = citationFetcher.getCitationCount(citationCounted);
+            Optional<Integer> citationCountResult = citationCountFetcher.getCitationCount(citationCounted);
             return citationCountResult.orElse(0);
         }
         assert actualFieldValue.isPresent();
