@@ -494,14 +494,18 @@ extraJavaModuleInfo {
     // open packages for testing of jablib
     module("org.openjfx:javafx-fxml", "javafx.fxml") {
         preserveExisting()
+
         opens("javafx.fxml", "org.jabref.jablib");
     }
 
     // Required for fxml loading (for localization test)
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         preserveExisting()
+
         exports("com.sun.javafx.scene")
         opens("com.sun.javafx.application", "org.testfx")
+        opens("javafx.stage", "com.pixelduke.fxthemes")
+        opens("com.sun.javafx.tk.quantum", "com.pixelduke.fxthemes")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
@@ -514,7 +518,6 @@ extraJavaModuleInfo {
     module("org.openjfx:javafx-controls", "javafx.controls") {
         preserveExisting()
 
-        // PATCH REASON:
         exports("com.sun.javafx.scene.control")
     }
 
