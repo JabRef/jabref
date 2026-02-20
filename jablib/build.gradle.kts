@@ -22,20 +22,12 @@ plugins {
     id("net.ltgt.nullaway") version "3.0.0"
 }
 
-mainModuleInfo {
-    runtimeOnly("embedded.postgres.binaries.darwin.arm64v8")
-    runtimeOnly("embedded.postgres.binaries.linux.arm64v8")
-
-    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
-    runtimeOnly("jul.to.slf4j")
-    // route all requests to log4j to SLF4J
-    runtimeOnly("org.apache.logging.log4j.to.slf4j")
-    // required by org.jabref.generators (only)
-    runtimeOnly("org.tinylog.api.slf4j")
-    runtimeOnly("org.tinylog.impl")
-}
-
 testModuleInfo {
+    // loading of .fxml files in localization tests requires JabRef's GUI classes
+    runtimeOnly("org.jabref")
+
+    requires("org.jabref.testsupport")
+
     requires("io.github.classgraph")
 
     requires("jtokkit")
@@ -45,7 +37,6 @@ testModuleInfo {
 
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
-    requires("org.jabref.testsupport")
     requires("org.hamcrest")
     requires("org.mockito")
 
