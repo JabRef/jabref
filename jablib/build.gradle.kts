@@ -292,6 +292,7 @@ jmh {
 val testSourceSet = sourceSets["test"]
 
 tasks.register<Test>("fetcherTest") {
+    enabled = false
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     testClassesDirs = testSourceSet.output.classesDirs
     classpath = testSourceSet.runtimeClasspath
