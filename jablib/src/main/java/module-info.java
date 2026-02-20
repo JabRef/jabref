@@ -151,6 +151,7 @@ open module org.jabref.jablib {
 
     // Preferences and XML
     requires java.prefs;
+    requires /*runtime*/ com.fasterxml.aalto;
 
     // YAML
     requires org.yaml.snakeyaml;
