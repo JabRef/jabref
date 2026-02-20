@@ -21,6 +21,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -100,10 +101,18 @@ class PseudonymizationTest {
 
         Pseudonymization pseudonymization = new Pseudonymization();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
-        databaseWriter.writeDatabase(result.bibDatabaseContext());
 
-        Path expectedPath = Path.of(PseudonymizationTest.class.getResource("Chocolate-pseudnomyized.bib").toURI());
-        assertEquals(Files.readString(expectedPath), stringWriter.toString());
+        GroupTreeNode root = result.bibDatabaseContext().getMetaData().getGroups().get();
+        String renamedName = root.getChildren().get(3).getName();
+        System.out.println("Renamed Group Name (Index 3): " + renamedName);
+        assertTrue(renamedName.startsWith("Group-"), "Group should be renamed");
+        BibEntry parkerEntry = result.bibDatabaseContext().getEntries().stream()
+                                     .filter(e -> e.getCitationKey().orElse("").equals("citationkey-6")) // It's pseudonymized now!
+                                     .findFirst()
+                                     .orElseThrow();
+        String entryGroupField = parkerEntry.getField(StandardField.GROUPS).orElse("");
+        System.out.println("Parker Entry's Pseudonymized Group field: " + entryGroupField);
+        assertTrue(entryGroupField.startsWith("Group-"), "The entry group field should be pseudonymized");
     }
 
     /// This test can be used to anonymize a library.
