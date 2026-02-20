@@ -126,8 +126,6 @@ open module org.jabref.jablib {
     requires java.base;
 
     requires transitive javafx.base;
-    requires javafx.fxml;
-    requires javafx.graphics; // because of javafx.scene.paint.Color
     requires afterburner.fx;
     requires transitive com.tobiasdiez.easybind;
 
@@ -176,7 +174,7 @@ open module org.jabref.jablib {
     requires transitive org.apache.httpcomponents.core5.httpcore5;
     requires transitive org.jsoup;
     requires transitive unirest.java.core;
-    requires unirest.modules.gson;
+    requires /*runtime*/ unirest.modules.gson;
     // endregion
 
     // region: SQL databases
@@ -192,12 +190,10 @@ open module org.jabref.jablib {
     // region: Apache Commons and other (similar) helper libraries
     requires transitive com.google.common;
     requires java.string.similarity;
-    requires org.apache.commons.compress;
     requires transitive org.apache.commons.csv;
     requires org.apache.commons.io;
     requires org.apache.commons.lang3;
     requires org.apache.commons.text;
-    requires org.apache.commons.logging;
     // endregion
 
     // region: caching
@@ -207,11 +203,10 @@ open module org.jabref.jablib {
     // region: latex2unicode
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
-    requires scala.library;
     // endregion
 
     requires jbibtex;
-    requires citeproc.java;
+    requires transitive citeproc.java;
 
     requires transitive snuggletex.core;
 
@@ -229,7 +224,7 @@ open module org.jabref.jablib {
 
     // region AI
     requires transitive ai.djl.api;
-    requires ai.djl.pytorch_model_zoo;
+    requires /*runtime*/ ai.djl.pytorch_model_zoo;
     requires ai.djl.tokenizers;
     requires jvm.openai;
     requires langchain4j;

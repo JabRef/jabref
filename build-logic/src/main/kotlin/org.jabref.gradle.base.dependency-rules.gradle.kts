@@ -470,10 +470,17 @@ extraJavaModuleInfo {
         exports("javafx.collections")
     }
 
+    // open packages for testing of jablib
+    module("org.openjfx:javafx-fxml", "javafx.fxml") {
+        preserveExisting()
+        opens("javafx.fxml", "org.jabref.jablib");
+    }
+
     // Required for fxml loading (for localization test)
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         preserveExisting()
         exports("com.sun.javafx.scene")
+        opens("com.sun.javafx.application", "org.testfx")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {

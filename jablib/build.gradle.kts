@@ -28,12 +28,12 @@ testModuleInfo {
 
     requires("org.jabref.testsupport")
 
+    requires("javafx.fxml")
+    requires("javafx.graphics")
+
     requires("io.github.classgraph")
 
-    requires("jtokkit")
     requires("java.compiler")
-
-    requires("org.libreoffice.unoloader")
 
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")

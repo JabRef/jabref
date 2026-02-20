@@ -22,6 +22,7 @@ module org.jabref.jabsrv {
     requires transitive javafx.graphics;
     requires transitive javafx.controls;
     requires afterburner.fx;
+    requires java.desktop;
 
     // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
     requires org.glassfish.hk2.locator;
