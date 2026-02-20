@@ -36,7 +36,7 @@ public class FieldTextMapper {
             return "Citationkey";
         }
 
-        return StringUtil.capitalizeFirst(field.getName());
+        return field.getName();
     }
 
     public static String getDisplayName(OrFields fields) {
