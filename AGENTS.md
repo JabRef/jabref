@@ -321,6 +321,7 @@ When creating commits:
 - Clear, technical commit messages
 - Do not reference issues in commits
 - Avoid force-pushes
+- Branch names should follow the pattern: `feature/short-description` or `fix/short-description`
 - No generated artifacts unless required
 
 PR descriptions:
