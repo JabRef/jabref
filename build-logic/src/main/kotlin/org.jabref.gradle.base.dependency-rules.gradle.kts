@@ -289,9 +289,7 @@ extraJavaModuleInfo {
         requires("javafx.graphics")
     }
     module("org.javassist:javassist", "org.javassist")
-    module("org.jbibtex:jbibtex", "jbibtex") {
-        exportAllPackages()
-    }
+    module("org.jbibtex:jbibtex", "jbibtex")
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
@@ -336,24 +334,15 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("com.google.gson")
     }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.debug", "org.eclipse.lsp4j.debug") {
-        exportAllPackages()
-    }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.generator", "org.eclipse.lsp4j.generator") {
-        exportAllPackages()
-    }
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.debug", "org.eclipse.lsp4j.debug")
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.generator", "org.eclipse.lsp4j.generator")
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "org.eclipse.lsp4j.jsonrpc") {
         exportAllPackages()
         requires("com.google.gson")
         requires("java.logging")
     }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug") {
-        exportAllPackages()
-    }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug")
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta")
     module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket") {
         overrideModuleName()
         exportAllPackages()
@@ -374,18 +363,9 @@ extraJavaModuleInfo {
         exportAllPackages()
     }
 
-    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
+    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
+    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
+    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi")
     module("com.tngtech.archunit:archunit", "com.tngtech.archunit") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -494,14 +474,12 @@ extraJavaModuleInfo {
     // open packages for testing of jablib
     module("org.openjfx:javafx-fxml", "javafx.fxml") {
         preserveExisting()
-
         opens("javafx.fxml", "org.jabref.jablib");
     }
 
     // Required for fxml loading (for localization test)
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         preserveExisting()
-
         exports("com.sun.javafx.scene")
         opens("com.sun.javafx.application", "org.testfx")
         opens("javafx.stage", "com.pixelduke.fxthemes")
@@ -510,14 +488,12 @@ extraJavaModuleInfo {
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         preserveExisting()
-
         exports("impl.org.controlsfx.skin")
         requires("javafx.graphics")
     }
 
     module("org.openjfx:javafx-controls", "javafx.controls") {
         preserveExisting()
-
         exports("com.sun.javafx.scene.control")
     }
 
@@ -530,10 +506,7 @@ extraJavaModuleInfo {
         requires("java.prefs")
     }
 
-    module("org.objenesis:objenesis", "org.objenesis") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
+    module("org.objenesis:objenesis", "org.objenesis")
     module("com.jayway.jsonpath:json-path", "json.path") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -541,9 +514,6 @@ extraJavaModuleInfo {
     }
     module("net.minidev:json-smart", "json.smart")
     module("net.minidev:accessors-smart", "accessors.smart")
-    module("org.ow2.asm:asm", "org.objectweb.asm") {
-        preserveExisting()
-    }
 
     module("org.openjdk.jmh:jmh-core", "jmh.core")
     module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")
