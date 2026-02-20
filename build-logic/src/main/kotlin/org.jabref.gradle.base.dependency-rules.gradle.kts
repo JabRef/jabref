@@ -78,9 +78,13 @@ jvmDependencyConflicts.patch {
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
-
     module("dev.langchain4j:langchain4j-core") {
         addRuntimeOnlyDependency("com.knuddels:jtokkit:1.1.0")
+    }
+    module("org.jabref:afterburner.fx") {
+        // metadata decared these as runtime only, but they are 'requires transitive' in module-info
+        addApiDependency("org.openjfx:javafx-fxml")
+        addApiDependency("org.openjfx:javafx-controls")
     }
 }
 
@@ -204,18 +208,17 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j", "langchain4j")
     module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
         // workaround for https://github.com/langchain4j/langchain4j/issues/3668
+        patchRealModule()
         mergeJar("dev.langchain4j:langchain4j-http-client")
         mergeJar("dev.langchain4j:langchain4j-http-client-jdk")
         mergeJar("dev.langchain4j:langchain4j-hugging-face")
         mergeJar("dev.langchain4j:langchain4j-mistral-ai")
         mergeJar("dev.langchain4j:langchain4j-open-ai")
         mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
-        // requires("jtokkit")
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
-        patchRealModule()
     }
     module("dev.langchain4j:langchain4j-google-ai-gemini", "langchain4j.google.ai.gemini")
     module("dev.langchain4j:langchain4j-http-client", "langchain4j.http.client")
@@ -225,15 +228,6 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
-    module("io.github.darvil82:terminal-text-formatter", "io.github.darvil.terminal.textformatter") {
-        patchRealModule()
-        exportAllPackages()
-        requires("io.github.darvil.utils")
-    }
-    module("io.github.darvil82:utils", "io.github.darvil.utils") {
-        patchRealModule()
-        exportAllPackages()
-    }
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8", "embedded.postgres.binaries.darwin.arm64v8")
@@ -243,7 +237,7 @@ extraJavaModuleInfo {
     module("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64", "embedded.postgres.binaries.windows.amd64")
     module("net.harawata:appdirs", "net.harawata.appdirs")
     module("net.java.dev.jna:jna", "com.sun.jna") {
-        patchRealModule()
+        patchRealModule() // TODO required as sometimes the non-jpms version if picked (should be fixed in dependencies setup)
         exportAllPackages()
         requires("java.logging")
     }
@@ -282,7 +276,6 @@ extraJavaModuleInfo {
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
     module("org.testfx:testfx-core", "org.testfx") {
-        patchRealModule()
         exportAllPackages()
         // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
         requires("java.desktop")
@@ -290,12 +283,10 @@ extraJavaModuleInfo {
         requiresTransitive("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
-        patchRealModule()
         exportAllPackages()
         requires("org.junit.jupiter.api")
         requiresTransitive("org.testfx")
     }
-
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
@@ -475,57 +466,25 @@ extraJavaModuleInfo {
     }
 
     module("org.openjfx:javafx-base", "javafx.base") {
-        patchRealModule()
-        // jabgui requires at least "javafx.collections"
-        exportAllPackages()
-    }
-
-    // required for testing of jablib
-    module("org.openjfx:javafx-fxml", "javafx.fxml") {
-        patchRealModule()
-        exportAllPackages()
-
-        requiresTransitive("javafx.graphics")
-        requiresTransitive("java.desktop")
+        preserveExisting()
+        exports("javafx.collections")
     }
 
     // Required for fxml loading (for localization test)
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
-        patchRealModule()
-        exportAllPackages() // required for testfx
-
-        requiresTransitive("javafx.base")
-        requiresTransitive("java.desktop")
-        requiresTransitive("jdk.unsupported")
+        preserveExisting()
+        exports("com.sun.javafx.scene")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
-        patchRealModule()
+        preserveExisting()
 
         exports("impl.org.controlsfx.skin")
-        exports("org.controlsfx.control")
-        exports("org.controlsfx.control.action")
-        exports("org.controlsfx.control.decoration")
-        exports("org.controlsfx.control.table")
-        exports("org.controlsfx.control.textfield")
-        exports("org.controlsfx.dialog")
-        exports("org.controlsfx.validation")
-        exports("org.controlsfx.validation.decoration")
-
-        requires("javafx.controls")
-        requiresTransitive("javafx.graphics")
+        requires("javafx.graphics")
     }
 
     module("org.openjfx:javafx-controls", "javafx.controls") {
-        patchRealModule()
-
-        requiresTransitive("javafx.base");
-        requiresTransitive("javafx.graphics");
-
-        exports("javafx.scene.chart")
-        exports("javafx.scene.control")
-        exports("javafx.scene.control.cell")
-        exports("javafx.scene.control.skin")
+        preserveExisting()
 
         // PATCH REASON:
         exports("com.sun.javafx.scene.control")
