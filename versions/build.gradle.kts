@@ -26,7 +26,7 @@ dependencies {
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.1.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.2.0"))
 
     api(platform("org.junit:junit-bom:6.0.3"))
     api("org.junit.jupiter:junit-jupiter-api")
@@ -76,7 +76,7 @@ dependencies.constraints {
     api("com.github.vatbub:mslinks:1.0.6.2")
     api("com.google.errorprone:error_prone_core:2.47.0")
     api("com.google.guava:guava:33.5.0-jre")
-    api("com.googlecode.plist:dd-plist:1.28")
+    api("com.googlecode.plist:dd-plist:1.29")
     api("com.h2database:h2-mvstore:2.4.240")
     api("com.konghq:unirest-java-core:4.7.4")
     api("com.konghq:unirest-modules-gson:4.7.4")
