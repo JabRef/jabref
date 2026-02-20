@@ -1,6 +1,3 @@
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.jvm.toolchain.JavaToolchainService
-
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
@@ -10,123 +7,28 @@ plugins {
     // id("com.redock.classpathtofile") version "0.1.0"
 }
 
-javaModuleDependencies.analyseOnly = true
-
 group = "org.jabref"
 version = providers.gradleProperty("projVersion")
     .orElse(providers.environmentVariable("VERSION"))
     .orElse("100.0.0")
     .get()
 
-dependencies {
-    implementation(project(":jablib"))
-    // Following already provided by jablib
-    // implementation("org.openjfx:javafx-base")
-    // implementation("org.openjfx:javafx-controls")
-    // implementation("org.openjfx:javafx-fxml")
-    // implementation("org.openjfx:javafx-graphics")
+testModuleInfo {
+    requires("org.jabref.testsupport")
 
-    implementation(project(":jabls"))
-    implementation(project(":jabsrv"))
+    requires("com.github.javaparser.core")
+    requires("org.junit.jupiter.api")
+    requires("org.junit.jupiter.params")
+    requires("org.mockito")
+    requires("org.hamcrest")
 
-    implementation("org.openjfx:javafx-swing")
-    implementation("org.openjfx:javafx-web")
+    requires("org.testfx")
+    requires("org.testfx.junit5")
 
-    implementation("com.pixelduke:fxthemes")
+    requires("com.tngtech.archunit")
+    requires("com.tngtech.archunit.junit5.api")
 
-    implementation("org.slf4j:slf4j-api")
-    implementation("org.tinylog:tinylog-api")
-    implementation("org.tinylog:slf4j-tinylog")
-    implementation("org.tinylog:tinylog-impl")
-    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation("org.slf4j:jul-to-slf4j")
-    // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j")
-
-    implementation("org.jabref:afterburner.fx")
-    implementation("org.kordamp.ikonli:ikonli-javafx")
-    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack")
-    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation") //jitpack
-    implementation("de.saxsys:mvvmfx")
-    implementation("org.fxmisc.flowless:flowless")
-    implementation("org.fxmisc.richtext:richtextfx")
-    implementation("com.dlsc.gemsfx:gemsfx")
-    implementation("com.dlsc.pdfviewfx:pdfviewfx")
-
-    // Required by gemsfx
-    implementation("tech.units:indriya")
-    // Required by gemsfx and langchain4j
-    implementation ("com.squareup.retrofit2:retrofit")
-
-    implementation("org.controlsfx:controlsfx")
-    implementation("org.jabref:easybind")
-
-    implementation("org.apache.lucene:lucene-core")
-    implementation("org.apache.lucene:lucene-queryparser")
-    implementation("org.apache.lucene:lucene-queries")
-    implementation("org.apache.lucene:lucene-analysis-common")
-    implementation("org.apache.lucene:lucene-highlighter")
-
-    implementation("org.jsoup:jsoup")
-
-    // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
-    implementation("org.jspecify:jspecify")
-
-    implementation("com.google.guava:guava")
-
-    implementation("dev.langchain4j:langchain4j")
-
-    implementation("io.github.java-diff-utils:java-diff-utils")
-
-    implementation("org.jooq:jool")
-
-    implementation("commons-io:commons-io")
-
-    implementation ("org.apache.pdfbox:pdfbox")
-
-    implementation("net.java.dev.jna:jna-jpms")
-    implementation("net.java.dev.jna:jna-platform")
-
-    implementation("org.eclipse.jgit:org.eclipse.jgit")
-
-    implementation("com.konghq:unirest-java-core")
-
-    implementation("org.apache.httpcomponents.client5:httpclient5")
-
-    implementation("com.vladsch.flexmark:flexmark-html2md-converter")
-
-    implementation("io.github.adr:e-adr")
-
-    implementation("org.libreoffice:unoloader")
-    implementation("org.libreoffice:libreoffice")
-
-    implementation("com.github.javakeyring:java-keyring")
-
-    implementation("tools.jackson.core:jackson-databind")
-
-    implementation("info.picocli:picocli")
-    annotationProcessor("info.picocli:picocli-codegen")
-
-    implementation("de.undercouch:citeproc-java")
-
-    testImplementation(project(":test-support"))
-
-    testImplementation("io.github.classgraph:classgraph")
-    testImplementation("org.testfx:testfx-core")
-    testImplementation("org.testfx:testfx-junit5")
-
-    testImplementation("org.mockito:mockito-core")
-    testImplementation("net.bytebuddy:byte-buddy")
-
-    testImplementation("org.hamcrest:hamcrest")
-
-    testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
-    testImplementation("org.ow2.asm:asm")
-
-    testImplementation("com.tngtech.archunit:archunit")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
-
+    runtimeOnly("com.tngtech.archunit.junit5.engine")
 }
 
 application {
@@ -215,24 +117,6 @@ javaModulePackaging {
             include("Resources/**")
         })
     }
-}
-
-javaModuleTesting.whitebox(testing.suites["test"]) {
-    requires.add("org.jabref.testsupport")
-
-    // Not sure why there is no dependency for jabgui normal running for this dependency
-    // requires.add("javafx.graphics")
-
-    requires.add("com.github.javaparser.core")
-    requires.add("org.junit.jupiter.api")
-    requires.add("org.junit.jupiter.params")
-    requires.add("org.mockito")
-
-    requires.add("org.testfx")
-    requires.add("org.testfx.junit5")
-
-    requires.add("com.tngtech.archunit")
-    requires.add("com.tngtech.archunit.junit5.api")
 }
 
 tasks.test {
