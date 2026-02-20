@@ -43,6 +43,10 @@ public class LinkedFileHandler {
         return copyOrMoveToDefaultDirectory(true, false);
     }
 
+    public void moveToDirectory(Path baseDirectory) throws IOException {
+        copyOrMoveToDirectory(baseDirectory, true, false);
+    }
+
     /// @return true if the file was copied/moved or the same file exists in the target directory
     public boolean copyOrMoveToDefaultDirectory(boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         Optional<Path> databaseFileDirectoryOpt = databaseContext.getFirstExistingFileDir(filePreferences);
@@ -51,7 +55,10 @@ public class LinkedFileHandler {
             return false;
         }
         Path databaseFileDirectory = databaseFileDirectoryOpt.get();
+        return copyOrMoveToDirectory(databaseFileDirectory, shouldMove, shouldRenameToFilenamePattern);
+    }
 
+    private boolean copyOrMoveToDirectory(Path databaseFileDirectory, boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         Optional<Path> sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);
         if (sourcePathOpt.isEmpty()) {
             LOGGER.warn("Could not find file {}", linkedFile.getLink());
