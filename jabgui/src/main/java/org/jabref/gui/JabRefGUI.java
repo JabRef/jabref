@@ -1,4 +1,4 @@
-﻿package org.jabref.gui;
+package org.jabref.gui;
 
 import java.util.List;
 import java.util.Optional;
@@ -111,18 +111,18 @@ public class JabRefGUI extends Application {
             initialize();
 
             JabRefGUI.mainFrame = new JabRefFrame(
-                    mainStage,
-                    dialogService,
-                    fileUpdateMonitor,
-                    preferences,
-                    aiService,
-                    stateManager,
-                    countingUndoManager,
-                    Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                    clipBoardManager,
-                    taskExecutor,
-                    gitHandlerRegistry,
-                    journalAbbreviationRepository);
+                                                  mainStage,
+                                                  dialogService,
+                                                  fileUpdateMonitor,
+                                                  preferences,
+                                                  aiService,
+                                                  stateManager,
+                                                  countingUndoManager,
+                                                  Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                                                  clipBoardManager,
+                                                  taskExecutor,
+                                                  gitHandlerRegistry,
+                                                  journalAbbreviationRepository);
 
             openWindow();
 
