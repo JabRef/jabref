@@ -54,7 +54,7 @@ class LatexToUnicodeFormatterTest {
 
     @Test
     void equationsMoreComplicatedFormatting() {
-        assertEquals("A 32 mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+        assertEquals("A 32\u00a0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
     @Test
@@ -162,6 +162,21 @@ class LatexToUnicodeFormatterTest {
     @Test
     void apostrophC() {
         assertEquals("O'Connor", formatter.format("O'Connor"));
+    }
+
+    @Test
+    void tildeConvertedToNonBreakingSpace() {
+        assertEquals("foo\u00a0bar", formatter.format("foo~bar"));
+    }
+
+    @Test
+    void multipleTildesConvertedToNonBreakingSpaces() {
+        assertEquals("a\u00a0b\u00a0c", formatter.format("a~b~c"));
+    }
+
+    @Test
+    void tildeAccentNotAffected() {
+        assertEquals("ñ", formatter.format("\\~{n}"));
     }
 
     @Test
