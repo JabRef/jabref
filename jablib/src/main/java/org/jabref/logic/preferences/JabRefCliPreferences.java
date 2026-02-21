@@ -862,7 +862,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region: Backingstore access logic
 
-    // Check whether a key is set...
+// Check whether a key is set...
 // @param key The key to check.
 // @return true if the key is set
     public boolean hasKey(String key) {
