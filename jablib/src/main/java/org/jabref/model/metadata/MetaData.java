@@ -53,6 +53,10 @@ public class MetaData {
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String BIBDESK_STATIC_FLAG = "BibDesk Static Groups";
+    public static final String GIT_AUTO_PULL = "gitAutoPull";
+    public static final String GIT_AUTO_COMMIT = "gitAutoCommit";
+    public static final String GIT_AUTO_PUSH = "gitAutoPush";
+    public static final String LEGACY_GIT_ENABLED = "gitEnabled";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
@@ -355,6 +359,59 @@ public class MetaData {
 
     public void putUnknownMetaDataItem(@NonNull String key, @NonNull List<String> value) {
         unknownMetaData.put(key, value);
+        postChange();
+    }
+
+    public void removeUnknownMetaDataItem(String key) {
+        unknownMetaData.remove(key);
+        postChange();
+    }
+
+    public boolean isGitAutoPullEnabled() {
+        return isBooleanMetaDataEnabled(GIT_AUTO_PULL) || isLegacyGitEnabled();
+    }
+
+    public boolean isGitAutoCommitEnabled() {
+        return isBooleanMetaDataEnabled(GIT_AUTO_COMMIT) || isLegacyGitEnabled();
+    }
+
+    public boolean isGitAutoPushEnabled() {
+        return isBooleanMetaDataEnabled(GIT_AUTO_PUSH) || isLegacyGitEnabled();
+    }
+
+    public void setGitAutoPullEnabled(boolean enabled) {
+        setBooleanMetaData(GIT_AUTO_PULL, enabled);
+        removeLegacyGitEnabled();
+    }
+
+    public void setGitAutoCommitEnabled(boolean enabled) {
+        setBooleanMetaData(GIT_AUTO_COMMIT, enabled);
+        removeLegacyGitEnabled();
+    }
+
+    public void setGitAutoPushEnabled(boolean enabled) {
+        setBooleanMetaData(GIT_AUTO_PUSH, enabled);
+        removeLegacyGitEnabled();
+    }
+
+    private boolean isBooleanMetaDataEnabled(String key) {
+        return unknownMetaData.getOrDefault(key, List.of()).contains("true");
+    }
+
+    private void setBooleanMetaData(String key, boolean enabled) {
+        if (enabled) {
+            putUnknownMetaDataItem(key, List.of("true"));
+        } else {
+            removeUnknownMetaDataItem(key);
+        }
+    }
+
+    private boolean isLegacyGitEnabled() {
+        return unknownMetaData.getOrDefault(LEGACY_GIT_ENABLED, List.of()).contains("true");
+    }
+
+    private void removeLegacyGitEnabled() {
+        removeUnknownMetaDataItem(LEGACY_GIT_ENABLED);
     }
 
     @Override

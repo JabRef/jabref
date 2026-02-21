@@ -25,6 +25,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -256,6 +257,27 @@ public class OpenDatabaseAction extends SimpleCommand {
                 parserResult = OpenDatabase.loadDatabase(fileToLoad,
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
+            }
+
+            try {
+                if (parserResult.getMetaData().isGitAutoPullEnabled()) {
+                    Optional<GitHandler> gitHandler = GitHandler.fromAnyPath(fileToLoad, preferences.getGitPreferences());
+
+                    if (gitHandler.isPresent()) {
+                        UiTaskExecutor.runInJavaFXThread(() ->
+                                dialogService.notify(Localization.lang("Git: Pulling latest changes.")));
+
+                        gitHandler.get().pullOnCurrentBranch();
+
+                        parserResult = OpenDatabase.loadDatabase(
+                                fileToLoad,
+                                preferences.getImportFormatPreferences(),
+                                fileUpdateMonitor
+                        );
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Git auto-pull failed on open. Continuing with local file.", e);
             }
 
             if (parserResult.hasWarnings()) {

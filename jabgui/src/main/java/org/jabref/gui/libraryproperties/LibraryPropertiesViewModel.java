@@ -5,6 +5,7 @@ import java.util.List;
 import org.jabref.gui.libraryproperties.constants.ConstantsPropertiesView;
 import org.jabref.gui.libraryproperties.contentselectors.ContentSelectorView;
 import org.jabref.gui.libraryproperties.general.GeneralPropertiesView;
+import org.jabref.gui.libraryproperties.git.GitPropertiesView;
 import org.jabref.gui.libraryproperties.keypattern.KeyPatternPropertiesView;
 import org.jabref.gui.libraryproperties.preamble.PreamblePropertiesView;
 import org.jabref.gui.libraryproperties.saving.SavingPropertiesView;
@@ -21,7 +22,8 @@ public class LibraryPropertiesViewModel {
                 new KeyPatternPropertiesView(databaseContext),
                 new ConstantsPropertiesView(databaseContext),
                 new ContentSelectorView(databaseContext),
-                new PreamblePropertiesView(databaseContext)
+                new PreamblePropertiesView(databaseContext),
+                new GitPropertiesView(databaseContext)
         );
     }
 
