@@ -13,6 +13,10 @@ public class LatexToUnicodeAdapter {
 
     private static final Pattern UNDERSCORE_MATCHER = Pattern.compile("_(?!\\{)");
 
+    private static final Pattern TILDE_MATCHER = Pattern.compile("(?<!\\\\)~");
+
+    private static final String NON_BREAKING_SPACE = "\u00a0";
+
     private static final String REPLACEMENT_CHAR = "\uFFFD";
 
     private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
@@ -30,7 +34,7 @@ public class LatexToUnicodeAdapter {
     /// @param inField a String containing LaTeX
     /// @return an `Optional<String>` with LaTeX resolved into Unicode or `empty` on failure.
     public static Optional<String> parse(@NonNull String inField) {
-        String toFormat = inField.replaceAll("(?<!\\\\)~", "\u00a0");
+        String toFormat = TILDE_MATCHER.matcher(inField).replaceAll(NON_BREAKING_SPACE);
         toFormat = UNDERSCORE_MATCHER.matcher(toFormat).replaceAll(REPLACEMENT_CHAR);
         Parsed<String> parsingResult = LaTeX2Unicode.parse(toFormat);
         if (parsingResult instanceof Parsed.Success) {
