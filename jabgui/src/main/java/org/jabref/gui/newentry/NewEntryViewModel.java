@@ -126,12 +126,14 @@ public class NewEntryViewModel {
                 input -> checkDOI(input).orElse(null));
 
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
-        idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
+
+
         idFetcher = new SimpleObjectProperty<>();
         idFetcherValidator = new FunctionBasedValidator<>(
                 idFetcher,
                 Objects::nonNull,
                 ValidationMessage.error(Localization.lang("You must select an identifier type.")));
+
         idLookupWorker = null;
 
         interpretText = new SimpleStringProperty();
@@ -150,8 +152,15 @@ public class NewEntryViewModel {
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("You must specify a Bib(La)TeX source.")));
         bibtexWorker = null;
+        initializeFetchers();
     }
-
+    public void initializeFetchers() {
+        var fetchers = WebFetchers.getIdBasedFetchers(
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences()
+        );
+        idFetchers.setAll(fetchers);
+    }
     public void populateDOICache() {
         doiCache.clear();
         stateManager.getActiveDatabase()

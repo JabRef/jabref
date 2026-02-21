@@ -215,7 +215,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML
     public void initialize() {
         viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
-
+        viewModel.initializeFetchers();
         visualizer.setDecoration(new IconValidationDecorator());
 
         EasyBind.subscribe(
@@ -331,6 +331,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         });
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
+        Platform.runLater(() -> idFetcher.getSelectionModel().selectFirst());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
         idFetcher.disableProperty().bind(idLookupSpecify.selectedProperty().not());
         idFetcher.valueProperty().bindBidirectional(viewModel.idFetcherProperty());
