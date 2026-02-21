@@ -7,7 +7,7 @@ In case there is no issue present, the pull request implementing the feature is 
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [6.0-alpha.5] – 2026-02-20
 
 ### Added
 
@@ -32,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
 - We added an option to open the citation fetcher API URL in the browser in the Citations tab. [#15033](https://github.com/JabRef/jabref/issues/15033)
 - We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
+- We added "DOI" and "URL" fields to the default customized preview style [#14193](https://github.com/JabRef/jabref/issues/14193)
 - We added a progress indicator for the cleanup operation. [#15122](https://github.com/JabRef/jabref/issues/15122)
 
 ### Changed
@@ -1906,6 +1907,7 @@ The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...HEAD
+[6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...HEAD
 [6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...HEAD
 [6.0-alpha.3]: https://github.com/JabRef/jabref/compare/v6.0-alpha2...v6.0-alpha.3
 [6.0-alpha2]: https://github.com/JabRef/jabref/compare/v6.0-alpha...v6.0-alpha2
