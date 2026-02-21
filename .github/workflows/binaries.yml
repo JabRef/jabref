@@ -640,7 +640,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabls-cli
           componentShort: jabls
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
@@ -665,7 +664,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabsrv-cli
           componentShort: jabsrv
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
@@ -691,7 +689,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabgui
           componentShort: jabgui
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
@@ -716,7 +713,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabkit
           componentShort: jabkit
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
