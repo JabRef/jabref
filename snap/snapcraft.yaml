@@ -77,7 +77,7 @@ parts:
     stage-packages:
       - x11-utils
     override-build: |
-      craftctl build
+      snapctl build
       craftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/.jpackage.xml | grep "app-version" | cut -d">" -f2 | cut -d"<" -f1)"
       sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/native-messaging-host/*/org.jabref.jabref.json
       sed -i 's/usr\/bin\/env python3/usr\/bin\/python3/g' $SNAPCRAFT_PART_INSTALL/lib/jabrefHost.py
