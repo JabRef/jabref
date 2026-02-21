@@ -531,6 +531,12 @@ jobs:
         run: |
           branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
           branch="${branch%-merge}"   # removes suffix only if present
+
+          if [[ "$branch" == tag* ]]; then
+            # tag builds go into a sub folder
+            branch="${{ steps.gitversion.outputs.BranchName }}"
+          fi
+
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
       - name: Output URL
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
