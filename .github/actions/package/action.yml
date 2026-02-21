@@ -34,6 +34,8 @@ inputs:
     required: true
   gradleCommand:
     required: true
+  secretsPresent:
+    required: true
 
   # API keys
   astrophysicsDataSystemApiKey:
@@ -58,6 +60,11 @@ runs:
         BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
         IEEEAPIKey: ${{ inputs.ieeeApiKey }}
         SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    - name: Validate Signature
+      if: ${{ inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' }}
+      shell: bash
+      run: |
+        codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |

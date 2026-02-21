@@ -653,6 +653,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
@@ -677,6 +678,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
@@ -702,6 +704,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
@@ -726,6 +729,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
