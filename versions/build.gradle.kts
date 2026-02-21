@@ -21,34 +21,11 @@ val pdfbox = "3.0.6"
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.11.0"))
-    api("dev.langchain4j:langchain4j")
-    api("dev.langchain4j:langchain4j-google-ai-gemini")
-    api("dev.langchain4j:langchain4j-hugging-face")
-    api("dev.langchain4j:langchain4j-mistral-ai")
-    api("dev.langchain4j:langchain4j-open-ai")
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.2.0"))
-
     api(platform("org.junit:junit-bom:6.0.3"))
-    api("org.junit.jupiter:junit-jupiter-api")
-    api("org.junit.jupiter:junit-jupiter-params")
-    api("org.junit.jupiter:junit-jupiter")
-    api("org.junit.platform:junit-platform-launcher")
-
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
-    api("org.glassfish.grizzly:grizzly-framework")
-    api("org.glassfish.grizzly:grizzly-http-server")
-
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
-    api("org.glassfish.jersey.core:jersey-server")
-    api("org.glassfish.jersey.inject:jersey-hk2")
-    api("org.glassfish.jersey.test-framework:jersey-test-framework-core")
-    api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
-
     api(platform("tools.jackson:jackson-bom:3.0.4"))
-    api("tools.jackson.core:jackson-core")
-    api("tools.jackson.core:jackson-databind")
-    api("tools.jackson.dataformat:jackson-dataformat-yaml")
 }
 
 dependencies.constraints {
@@ -70,6 +47,7 @@ dependencies.constraints {
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:1.0.0")
     api("com.github.ben-manes.caffeine:caffeine:3.2.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
+    api("com.github.javaparser:javaparser-core:3.28.0")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.0")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
@@ -78,6 +56,7 @@ dependencies.constraints {
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.29")
     api("com.h2database:h2-mvstore:2.4.240")
+    api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.7.4")
     api("com.konghq:unirest-modules-gson:4.7.4")
     api("com.pixelduke:fxthemes:1.6.0")
@@ -92,6 +71,7 @@ dependencies.constraints {
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.21.0")
     api("commons-logging:commons-logging:1.3.5")
+    api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.0")
@@ -122,6 +102,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
+    api("org.apache.httpcomponents.core5:httpcore5:5.4.1")
     api("org.apache.httpcomponents.client5:httpclient5:5.6")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.3")
     api("org.apache.lucene:lucene-analysis-common:$lucene")

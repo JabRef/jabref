@@ -1,15 +1,13 @@
+import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
+
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
-    id("org.gradlex.java-module-dependencies") // only for mappings at the moment
+    id("org.gradlex.java-module-dependencies")
 }
 
-javaModuleDependencies {
-    // TODO remove to translate 'requires' from 'module-info.java' to Gradle dependencies
-    //      and remove 'dependencies {}' block from build.gradle files
-    analyseOnly = true
-    moduleNameToGA.put("jul.to.slf4j", "org.slf4j:jul-to-slf4j")
-}
+// module-info entry order not checked
+tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
 
 jvmDependencyConflicts {
     consistentResolution {
@@ -29,17 +27,33 @@ jvmDependencyConflicts {
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
-jvmDependencyConflicts.patch {
-    listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
-        module("org.openjfx:$jfxModule") {
-            addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
-            addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
-            addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
-            addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
-            addTargetPlatformVariant("mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
-            addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
+listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
+    addJfxTarget(jfxModule, "", "none", "none") // matches the empty Jars: to get better errors
+    addJfxTarget(jfxModule, "linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
+    addJfxTarget(jfxModule, "linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
+    addJfxTarget(jfxModule, "mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
+    addJfxTarget(jfxModule, "mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
+    addJfxTarget(jfxModule, "win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
+}
+
+fun addJfxTarget(jfxModule: String, name: String, os: String, arch: String) {
+    if (jfxModule == "javafx-web" && name.isNotEmpty()) {
+        // Special treatment of 'javafx-web' for the time being due to https://bugs.openjdk.org/browse/JDK-8342623.
+        // Can be remove once Java 26 is the minimum version JabRef is built with.
+        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
+            params(name, os, arch, 11)
+        }
+        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
+            params(name, os, arch, 26)
+        }
+    } else {
+        jvmDependencyConflicts.patch.module("org.openjfx:$jfxModule") {
+            addTargetPlatformVariant(name, os, arch)
         }
     }
+}
+
+jvmDependencyConflicts.patch {
     // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L9
     module("com.google.guava:guava") {
         removeDependency("com.google.code.findbugs:jsr305")
@@ -78,6 +92,18 @@ jvmDependencyConflicts.patch {
     }
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
+    }
+    module("dev.langchain4j:langchain4j-core") {
+        addRuntimeOnlyDependency("com.knuddels:jtokkit")
+    }
+    module("org.jabref:afterburner.fx") {
+        // metadata decared these as runtime only, but they are 'requires transitive' in module-info
+        addApiDependency("org.openjfx:javafx-fxml")
+        addApiDependency("org.openjfx:javafx-controls")
+    }
+    module("org.libreoffice:libreoffice") {
+        // no dependency in metadata, but 'requires org.libreoffice.unoloader' in module-info
+        addRuntimeOnlyDependency("org.libreoffice:unoloader")
     }
 }
 
@@ -201,18 +227,17 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j", "langchain4j")
     module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
         // workaround for https://github.com/langchain4j/langchain4j/issues/3668
+        patchRealModule()
         mergeJar("dev.langchain4j:langchain4j-http-client")
         mergeJar("dev.langchain4j:langchain4j-http-client-jdk")
         mergeJar("dev.langchain4j:langchain4j-hugging-face")
         mergeJar("dev.langchain4j:langchain4j-mistral-ai")
         mergeJar("dev.langchain4j:langchain4j-open-ai")
         mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
-        requires("jtokkit")
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
-        patchRealModule()
     }
     module("dev.langchain4j:langchain4j-google-ai-gemini", "langchain4j.google.ai.gemini")
     module("dev.langchain4j:langchain4j-http-client", "langchain4j.http.client")
@@ -222,15 +247,6 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
-    module("io.github.darvil82:terminal-text-formatter", "io.github.darvil.terminal.textformatter") {
-        patchRealModule()
-        exportAllPackages()
-        requires("io.github.darvil.utils")
-    }
-    module("io.github.darvil82:utils", "io.github.darvil.utils") {
-        patchRealModule()
-        exportAllPackages()
-    }
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8", "embedded.postgres.binaries.darwin.arm64v8")
@@ -240,6 +256,8 @@ extraJavaModuleInfo {
     module("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64", "embedded.postgres.binaries.windows.amd64")
     module("net.harawata:appdirs", "net.harawata.appdirs")
     module("net.java.dev.jna:jna", "com.sun.jna") {
+        // Required as sometimes the non-jpms version if picked which should ideally be fixed differently
+        // More details: https://github.com/gradlex-org/jvm-dependency-conflict-resolution/issues/346
         patchRealModule()
         exportAllPackages()
         requires("java.logging")
@@ -272,14 +290,11 @@ extraJavaModuleInfo {
         requires("javafx.graphics")
     }
     module("org.javassist:javassist", "org.javassist")
-    module("org.jbibtex:jbibtex", "jbibtex") {
-        exportAllPackages()
-    }
+    module("org.jbibtex:jbibtex", "jbibtex")
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
     module("org.testfx:testfx-core", "org.testfx") {
-        patchRealModule()
         exportAllPackages()
         // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
         requires("java.desktop")
@@ -287,12 +302,10 @@ extraJavaModuleInfo {
         requiresTransitive("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
-        patchRealModule()
         exportAllPackages()
         requires("org.junit.jupiter.api")
         requiresTransitive("org.testfx")
     }
-
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
@@ -322,56 +335,24 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("com.google.gson")
     }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.debug", "org.eclipse.lsp4j.debug") {
-        exportAllPackages()
-    }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.generator", "org.eclipse.lsp4j.generator") {
-        exportAllPackages()
-    }
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.debug", "org.eclipse.lsp4j.debug")
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.generator", "org.eclipse.lsp4j.generator")
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "org.eclipse.lsp4j.jsonrpc") {
         exportAllPackages()
         requires("com.google.gson")
         requires("java.logging")
     }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug") {
-        exportAllPackages()
-    }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket") {
-        overrideModuleName()
-        exportAllPackages()
-    }
-    module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {
-        exportAllPackages()
-    }
-    module("org.eclipse.xtend:org.eclipse.xtend.lib", "xtend.lib") {
-        overrideModuleName()
-        exportAllPackages()
-    }
-    module("org.eclipse.xtend:org.eclipse.xtend.lib.macro", "xtend.lib.macro") {
-        overrideModuleName()
-        exportAllPackages()
-    }
-    module("org.eclipse.xtext:org.eclipse.xtext.xbase.lib", "xtext.xbase.lib") {
-        overrideModuleName()
-        exportAllPackages()
-    }
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug")
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta")
+    module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket")
+    module("org.eclipse.xtend:org.eclipse.xtend", "xtend")
+    module("org.eclipse.xtend:org.eclipse.xtend.lib", "xtend.lib")
+    module("org.eclipse.xtend:org.eclipse.xtend.lib.macro", "xtend.lib.macro")
+    module("org.eclipse.xtext:org.eclipse.xtext.xbase.lib", "xtext.xbase.lib")
 
-    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
+    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
+    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
+    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi")
     module("com.tngtech.archunit:archunit", "com.tngtech.archunit") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -472,75 +453,45 @@ extraJavaModuleInfo {
     }
 
     module("org.openjfx:javafx-base", "javafx.base") {
-        patchRealModule()
-        // jabgui requires at least "javafx.collections"
-        exportAllPackages()
+        preserveExisting()
+        exports("javafx.collections")
+        opens("com.sun.javafx.beans", "net.bytebuddy")
     }
 
-    // required for testing of jablib
+    // open packages for testing of jablib
     module("org.openjfx:javafx-fxml", "javafx.fxml") {
-        patchRealModule()
-        exportAllPackages()
-
-        requiresTransitive("javafx.graphics")
-        requiresTransitive("java.desktop")
+        preserveExisting()
+        opens("javafx.fxml", "org.jabref.jablib");
     }
 
     // Required for fxml loading (for localization test)
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
-        patchRealModule()
-        exportAllPackages() // required for testfx
-
-        requiresTransitive("javafx.base")
-        requiresTransitive("java.desktop")
-        requiresTransitive("jdk.unsupported")
+        preserveExisting()
+        exports("com.sun.javafx.scene")
+        opens("com.sun.javafx.application", "org.testfx")
+        opens("javafx.stage", "com.pixelduke.fxthemes")
+        opens("com.sun.javafx.tk.quantum", "com.pixelduke.fxthemes")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
-        patchRealModule()
-
+        preserveExisting()
         exports("impl.org.controlsfx.skin")
-        exports("org.controlsfx.control")
-        exports("org.controlsfx.control.action")
-        exports("org.controlsfx.control.decoration")
-        exports("org.controlsfx.control.table")
-        exports("org.controlsfx.control.textfield")
-        exports("org.controlsfx.dialog")
-        exports("org.controlsfx.validation")
-        exports("org.controlsfx.validation.decoration")
-
-        requires("javafx.controls")
-        requiresTransitive("javafx.graphics")
+        requires("javafx.graphics")
     }
 
     module("org.openjfx:javafx-controls", "javafx.controls") {
-        patchRealModule()
-
-        requiresTransitive("javafx.base");
-        requiresTransitive("javafx.graphics");
-
-        exports("javafx.scene.chart")
-        exports("javafx.scene.control")
-        exports("javafx.scene.control.cell")
-        exports("javafx.scene.control.skin")
-
-        // PATCH REASON:
+        preserveExisting()
         exports("com.sun.javafx.scene.control")
     }
 
-    module("org.hamcrest:hamcrest", "org.hamcrest") {
-        exportAllPackages()
-    }
+    module("org.hamcrest:hamcrest", "org.hamcrest")
 
     module("org.mockito:mockito-core", "org.mockito") {
         preserveExisting()
         requires("java.prefs")
     }
 
-    module("org.objenesis:objenesis", "org.objenesis") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
+    module("org.objenesis:objenesis", "org.objenesis")
     module("com.jayway.jsonpath:json-path", "json.path") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -548,9 +499,6 @@ extraJavaModuleInfo {
     }
     module("net.minidev:json-smart", "json.smart")
     module("net.minidev:accessors-smart", "accessors.smart")
-    module("org.ow2.asm:asm", "org.objectweb.asm") {
-        preserveExisting()
-    }
 
     module("org.openjdk.jmh:jmh-core", "jmh.core")
     module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")

@@ -22,6 +22,46 @@ plugins {
     id("net.ltgt.nullaway") version "3.0.0"
 }
 
+testModuleInfo {
+    // loading of .fxml files in localization tests requires JabRef's GUI classes
+    runtimeOnly("org.jabref")
+
+    requires("org.jabref.testsupport")
+
+    requires("javafx.fxml")
+    requires("javafx.graphics")
+
+    requires("io.github.classgraph")
+
+    requires("java.compiler")
+
+    requires("org.junit.jupiter.api")
+    requires("org.junit.jupiter.params")
+    requires("org.hamcrest")
+    requires("org.mockito")
+
+    // Required for LocalizationConsistencyTest
+    requires("org.testfx.junit5")
+
+    requires("org.xmlunit")
+    requires("org.xmlunit.matchers")
+
+    requires("com.tngtech.archunit")
+    requires("com.tngtech.archunit.junit5.api")
+    runtimeOnly("com.tngtech.archunit.junit5.engine")
+
+    // Highly recommended builder generator - https://github.com/skinny85/jilt (used for tests only)
+    requiresStatic("jilt")
+    annotationProcessor("jilt")
+}
+
+dependencies {
+    antlr("org.antlr:antlr4")
+
+    errorprone("com.google.errorprone:error_prone_core")
+    errorprone("com.uber.nullaway:nullaway")
+}
+
 var version = providers.gradleProperty("projVersion")
     .orElse(providers.environmentVariable("VERSION"))
     .orElse("0.1.0")
@@ -29,10 +69,6 @@ var version = providers.gradleProperty("projVersion")
 
 if (project.findProperty("tagbuild")?.toString() != "true") {
     version += "-SNAPSHOT"
-}
-
-configurations.antlr {
-    extendsFrom(configurations.internal.get())
 }
 
 configurations {
@@ -46,202 +82,6 @@ configurations {
 tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach {
     dependsOn(tasks.withType<AntlrTask>())
 }
-
-// See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
-val mockitoAgent = configurations.create("mockitoAgent")
-
-dependencies {
-    // api(platform(project(":versions")))
-
-    implementation("org.openjfx:javafx-base")
-
-    implementation("com.ibm.icu:icu4j")
-
-    // Fix "error: module not found: javafx.controls" during compilation
-    // implementation("org.openjfx:javafx-controls:$javafxVersion")
-
-    // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
-    // exclusions are not supported
-
-    implementation("org.jabref:afterburner.fx")
-    // Required by afterburner.fx
-    implementation("org.openjfx:javafx-fxml")
-
-    implementation("org.jabref:easybind")
-
-    implementation ("org.apache.pdfbox:pdfbox")
-    implementation ("org.apache.pdfbox:fontbox")
-    implementation ("org.apache.pdfbox:xmpbox")
-
-    implementation("org.apache.lucene:lucene-core")
-    implementation("org.apache.lucene:lucene-queryparser")
-    implementation("org.apache.lucene:lucene-queries")
-    implementation("org.apache.lucene:lucene-analysis-common")
-    implementation("org.apache.lucene:lucene-highlighter")
-
-    implementation("org.apache.commons:commons-csv")
-    implementation("org.apache.commons:commons-lang3")
-    implementation("org.apache.commons:commons-text")
-    implementation("commons-logging:commons-logging")
-
-    implementation("com.h2database:h2-mvstore")
-
-    // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation("org.bouncycastle:bcprov-jdk18on")
-
-    // region: LibreOffice
-    implementation("org.libreoffice:unoloader")
-    implementation("org.libreoffice:libreoffice")
-    // Required for ID generation
-    implementation("io.github.thibaultmeyer:cuid")
-    // endregion
-
-    implementation("io.github.java-diff-utils:java-diff-utils")
-    implementation("info.debatty:java-string-similarity")
-
-    implementation("com.github.javakeyring:java-keyring")
-
-    implementation("org.eclipse.jgit:org.eclipse.jgit")
-
-    implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
-    implementation("tools.jackson.core:jackson-databind")
-    // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
-    // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
-
-    implementation("com.fasterxml:aalto-xml")
-
-    implementation("org.postgresql:postgresql")
-
-    antlr("org.antlr:antlr4")
-    implementation("org.antlr:antlr4-runtime")
-
-    implementation("com.google.guava:guava")
-
-    implementation("jakarta.annotation:jakarta.annotation-api")
-    implementation("jakarta.inject:jakarta.inject-api")
-
-    // region HTTP clients
-    implementation("org.jsoup:jsoup")
-    implementation("com.konghq:unirest-java-core")
-    implementation("com.konghq:unirest-modules-gson")
-    implementation("org.apache.httpcomponents.client5:httpclient5")
-    implementation("jakarta.ws.rs:jakarta.ws.rs-api")
-    // endregion
-
-    implementation("org.slf4j:slf4j-api")
-    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
-    implementation("org.slf4j:jul-to-slf4j")
-    // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j")
-
-    // required by org.jabref.generators (only)
-    implementation("org.tinylog:slf4j-tinylog")
-    implementation("org.tinylog:tinylog-api")
-    implementation("org.tinylog:tinylog-impl")
-
-    implementation("de.undercouch:citeproc-java")
-
-    implementation("com.vladsch.flexmark:flexmark")
-    implementation("com.vladsch.flexmark:flexmark-html2md-converter")
-
-    implementation("net.harawata:appdirs")
-
-    implementation("org.jooq:jool")
-
-    // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
-    implementation("org.jspecify:jspecify")
-
-    // parse plist files
-    implementation("com.googlecode.plist:dd-plist")
-
-    // Parse lnk files
-    implementation("com.github.vatbub:mslinks")
-
-    // YAML reading and writing
-    implementation("org.yaml:snakeyaml")
-
-    // region AI
-    implementation("dev.langchain4j:langchain4j")
-    // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai")
-    implementation("dev.langchain4j:langchain4j-mistral-ai")
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini")
-    implementation("dev.langchain4j:langchain4j-http-client")
-    implementation("dev.langchain4j:langchain4j-http-client-jdk")
-
-    implementation("org.apache.velocity:velocity-engine-core")
-    implementation("ai.djl:api")
-    implementation("ai.djl.huggingface:tokenizers")
-    implementation("ai.djl.pytorch:pytorch-model-zoo")
-    implementation("io.github.stefanbratanov:jvm-openai")
-    // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
-    implementation("com.squareup.okhttp3:okhttp")
-    // GemxFX also (transitively) depends on kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    // endregion
-
-    implementation("com.github.ben-manes.caffeine:caffeine")
-
-    implementation("commons-io:commons-io")
-
-    implementation("com.github.tomtung:latex2unicode_2.13")
-
-    implementation("de.rototor.snuggletex:snuggletex-jeuclid")
-
-    // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
-    implementation("io.github.adr:e-adr")
-
-    implementation("io.github.darvil82:terminal-text-formatter")
-
-    implementation("io.zonky.test:embedded-postgres")
-    implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
-    implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
-
-    testImplementation(project(":test-support"))
-
-    // loading of .fxml files in localization tests requires JabRef's GUI classes
-    testImplementation(project(":jabgui"))
-
-    testImplementation("io.github.classgraph:classgraph")
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("org.junit.platform:junit-platform-launcher")
-
-    testImplementation("org.mockito:mockito-core")
-    // TODO: Use versions of versions/build.gradle.kts
-    mockitoAgent("org.mockito:mockito-core:5.21.0") { isTransitive = false }
-    testImplementation("net.bytebuddy:byte-buddy")
-
-    testImplementation("org.xmlunit:xmlunit-core")
-    testImplementation("org.xmlunit:xmlunit-matchers")
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-
-    testImplementation("com.tngtech.archunit:archunit")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
-
-    testImplementation("org.hamcrest:hamcrest")
-
-    testImplementation("org.ow2.asm:asm")
-
-    // Required for LocalizationConsistencyTest
-    testImplementation("org.testfx:testfx-core")
-    testImplementation("org.testfx:testfx-junit5")
-
-    // Highly recommended builder generator - https://github.com/skinny85/jilt
-    // Keep it for tests only
-    testCompileOnly("cc.jilt:jilt")
-    testAnnotationProcessor("cc.jilt:jilt")
-
-    errorprone("com.google.errorprone:error_prone_core")
-    errorprone("com.uber.nullaway:nullaway")
-}
-/*
-jacoco {
-    toolVersion = "0.8.13"
-}
- */
 
 tasks.generateGrammarSource {
     maxHeapSize = "64m"
@@ -319,8 +159,8 @@ abstract class JoinNonCommentedLines : DefaultTask() {
 }
 
 val extractMaintainers by tasks.registering(JoinNonCommentedLines::class) {
-    inputFile.set(layout.projectDirectory.file("../MAINTAINERS"))
-    outputFile.set(layout.buildDirectory.file("maintainers.txt"))
+    inputFile = layout.projectDirectory.file("../MAINTAINERS")
+    outputFile = layout.buildDirectory.file("maintainers.txt")
 }
 
 val maintainersProvider: Provider<String> = extractMaintainers.flatMap {
@@ -406,7 +246,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
 
     options.errorprone {
-        disableAllChecks.set(true)
+        disableAllChecks = true
         enable("NullAway")
     }
 
@@ -429,7 +269,7 @@ tasks.test {
         excludeTags("DatabaseTest", "FetcherTest")
     }
     jvmArgs = listOf(
-        "-javaagent:${mockitoAgent.asPath}",
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
@@ -443,7 +283,7 @@ jmh {
     zip64  = true
 }
 
-val testSourceSet = sourceSets["test"]
+val testSourceSet = sourceSets.test.get()
 
 tasks.register<Test>("fetcherTest") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -519,27 +359,27 @@ mavenPublishing {
   coordinates("org.jabref", "jablib", version)
 
   pom {
-    name.set("jablib")
-    description.set("JabRef's Java library to work with BibTeX")
-    inceptionYear.set("2025")
-    url.set("https://github.com/JabRef/jabref/")
+    name = "jablib"
+    description = "JabRef's Java library to work with BibTeX"
+    inceptionYear = "2025"
+    url = "https://github.com/JabRef/jabref/"
     licenses {
       license {
-        name.set("MIT")
-        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+        name = "MIT"
+        url = "https://github.com/JabRef/jabref/blob/main/LICENSE"
       }
     }
     developers {
       developer {
-        id.set("jabref")
-        name.set("JabRef Developers")
-        url.set("https://github.com/JabRef/")
+        id = "jabref"
+        name = "JabRef Developers"
+        url = "https://github.com/JabRef/"
       }
     }
     scm {
-        url.set("https://github.com/JabRef/jabref")
-        connection.set("scm:git:https://github.com/JabRef/jabref")
-        developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+        url = "https://github.com/JabRef/jabref"
+        connection = "scm:git:https://github.com/JabRef/jabref"
+        developerConnection = "scm:git:git@github.com:JabRef/jabref.git"
     }
   }
 }
@@ -562,27 +402,4 @@ publishing.publications.withType<MavenPublication>().configureEach {
     versionMapping {
         allVariants { fromResolutionResult() }
     }
-}
-
-javaModuleTesting.whitebox(testing.suites["test"]) {
-    requires.add("io.github.classgraph")
-
-    requires.add("jilt")
-    requires.add("java.compiler")
-
-    requires.add("org.junit.jupiter.api")
-    requires.add("org.junit.jupiter.params")
-    requires.add("org.jabref.testsupport")
-    requires.add("org.hamcrest")
-    requires.add("org.mockito")
-
-    // Required for LocalizationConsistencyTest
-    requires.add("org.testfx.junit5")
-    // requires.add("org.assertj.core")
-
-    requires.add("org.xmlunit")
-    requires.add("org.xmlunit.matchers")
-
-    requires.add("com.tngtech.archunit")
-    requires.add("com.tngtech.archunit.junit5.api")
 }
