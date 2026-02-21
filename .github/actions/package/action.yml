@@ -60,9 +60,12 @@ runs:
         BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
         IEEEAPIKey: ${{ inputs.ieeeApiKey }}
         SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
-    - name: Validate Signature
+    - name: Validate signature
       if: ${{ inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' }}
       shell: bash
+      run: |
+        codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
+    - shell: bash
       run: |
         codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
     - name: Smoke test ${{ inputs.component }}
