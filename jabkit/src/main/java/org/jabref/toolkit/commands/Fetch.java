@@ -82,7 +82,7 @@ class Fetch implements Runnable {
                 System.out.println(matches.stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
             }
         } catch (FetcherException e) {
-            LOGGER.error("Error while fetching", e);
+            LOGGER.error("Error while fetching:", e);
         }
     }
 }
