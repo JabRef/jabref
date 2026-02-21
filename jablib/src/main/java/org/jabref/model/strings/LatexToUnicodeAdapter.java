@@ -30,7 +30,8 @@ public class LatexToUnicodeAdapter {
     /// @param inField a String containing LaTeX
     /// @return an `Optional<String>` with LaTeX resolved into Unicode or `empty` on failure.
     public static Optional<String> parse(@NonNull String inField) {
-        String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
+        String toFormat = inField.replaceAll("(?<!\\\\)~", "\u00a0");
+        toFormat = UNDERSCORE_MATCHER.matcher(toFormat).replaceAll(REPLACEMENT_CHAR);
         Parsed<String> parsingResult = LaTeX2Unicode.parse(toFormat);
         if (parsingResult instanceof Parsed.Success) {
             String text = parsingResult.get().value();

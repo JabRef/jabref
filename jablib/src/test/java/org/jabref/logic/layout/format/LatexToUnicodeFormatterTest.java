@@ -54,7 +54,7 @@ class LatexToUnicodeFormatterTest {
 
     @Test
     void equationsMoreComplicatedFormatting() {
-        assertEquals("A 32 mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+        assertEquals("A 32\u00a0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
     @Test
@@ -203,5 +203,10 @@ class LatexToUnicodeFormatterTest {
     @Test
     void conversionOfOrdinal9th() {
         assertEquals("9ᵗʰ", formatter.format("9\\textsuperscript{th}"));
+    }
+
+    @Test
+    void formatPreserveNoBreakSpaces() {
+        assertEquals("Y.\u00a0Matsumoto", formatter.format("Y.~Matsumoto"));
     }
 }
