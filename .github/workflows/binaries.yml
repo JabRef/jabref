@@ -389,7 +389,7 @@ jobs:
               {
                 "os": "macos-15-intel",
                 "displayName": "macOS-intel",
-                "gradleCommand": "gradle",
+                "gradleCommand": "./gradlew",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app",
@@ -399,7 +399,7 @@ jobs:
               {
                 "os": "macos-15",
                 "displayName": "macOS-silicon",
-                "gradleCommand": "gradle",
+                "gradleCommand": "./gradlew",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app",
