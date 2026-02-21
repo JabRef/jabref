@@ -137,7 +137,7 @@ runs:
       if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
       uses: actions/upload-artifact@v6
       with:
-        name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
+        name: ${{ inputs.componentShort }} (${{ inputs.displayName }}) (shadowJar)
         path: |
           ${{ inputs.component }}/build/libs/*-all.jar
     - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
