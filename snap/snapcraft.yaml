@@ -9,6 +9,12 @@ description: |
   To access files in external media (i.e., USB drives) you must run:
   `snap connect jabref:removable-media`
 grade: stable
+title: JabRef
+donation: https://donations.jabref.org
+issues: https://github.com/JabRef/jabref/issues
+website: https://www.jabref.org/
+source-code: https://github.com/JabRef/jabref
+contact: web@jabref.org
 confinement: strict
 base: core24
 compression: lzo
@@ -71,8 +77,8 @@ parts:
     stage-packages:
       - x11-utils
     override-build: |
-      snapcraftctl build
-      snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/.jpackage.xml | grep "app-version" | cut -d">" -f2 | cut -d"<" -f1)"
+      craftctl build
+      craftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/.jpackage.xml | grep "app-version" | cut -d">" -f2 | cut -d"<" -f1)"
       sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/native-messaging-host/*/org.jabref.jabref.json
       sed -i 's/usr\/bin\/env python3/usr\/bin\/python3/g' $SNAPCRAFT_PART_INSTALL/lib/jabrefHost.py
       rm $SNAPCRAFT_PART_INSTALL/bin/JabRef
