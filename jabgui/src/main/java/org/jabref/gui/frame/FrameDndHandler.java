@@ -91,10 +91,12 @@ public class FrameDndHandler {
             }
 
             LibraryTab destinationLibraryTab = null;
-            for (Tab libraryTab : tabPane.getTabs()) {
-                if (libraryTab.getId().equals(destinationTabNode.getId()) &&
-                        !tabPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
-                    destinationLibraryTab = (LibraryTab) libraryTab;
+            for (Tab tab : tabPane.getTabs()) {
+                if (tab.getId() != null
+                        && tab.getId().equals(destinationTabNode.getId())
+                        && !tabPane.getSelectionModel().getSelectedItem().equals(tab)
+                        && tab instanceof LibraryTab libraryTab) {
+                    destinationLibraryTab = libraryTab;
                     break;
                 }
             }

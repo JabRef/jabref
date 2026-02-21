@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
 - We added "DOI" and "URL" fields to the default customized preview style [#14193](https://github.com/JabRef/jabref/issues/14193)
 - We added a progress indicator for the cleanup operation. [#15122](https://github.com/JabRef/jabref/issues/15122)
+- Added support for dragging entries from the "Citation relations" tab to other libraries. [#15135](https://github.com/JabRef/jabref/issues/15135)
 
 ### Changed
 
@@ -76,6 +77,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - `--help` works now at JabSrv. [#15085](https://github.com/JabRef/jabref/pull/15085)
 - Fixed UI overlap in Citation Relations tab when entry titles are very long. [#15047](https://github.com/JabRef/jabref/issues/15047)
 - Fixed capitalization errors in the Automatic Field Editor. [#15068](https://github.com/JabRef/jabref/issues/15068)
+- Fixed an application crash when dragging entries onto the tab bar while the Welcome tab is open. [#15135](https://github.com/JabRef/jabref/issues/15135)
 
 ### Removed
 
