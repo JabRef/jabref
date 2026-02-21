@@ -106,15 +106,19 @@ public class FrameDndHandler {
                 return;
             }
 
+            boolean success = false;
             if (hasEntries(dragboard)) {
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
                 destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies);
+                success = true;
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
+                success = true;
             }
 
+            tabDragEvent.setDropCompleted(success);
             tabDragEvent.consume();
         }
     }
