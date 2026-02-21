@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -46,6 +52,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -117,6 +124,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final GridPane sciteResultsPane;
     private final EntryEditorPreferences entryEditorPreferences;
     private ComboBox<CitationFetcherType> fetcherCombo;
+
+    private boolean shouldClearSelectionOnDrop = false;
 
     public CitationRelationsTab(DialogService dialogService,
                                 UndoManager undoManager,
@@ -569,10 +578,42 @@ public class CitationRelationsTab extends EntryEditorTab {
                         listView.getCheckModel().toggleCheckState(citationRelationItem);
                     }
                 })
+                .setOnDragDetected((item, event) -> handleDragDetected(listView, item, event))
+                .setOnDragDone((_, event) -> handleDragDone(listView, event))
                 .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
+    }
+
+    private void handleDragDetected(CheckListView<CitationRelationItem> listView, CitationRelationItem item, MouseEvent event) {
+        shouldClearSelectionOnDrop = false;
+        List<BibEntry> entriesToDrag = new ArrayList<>();
+        var checkedItems = listView.getCheckModel().getCheckedItems();
+
+        if (checkedItems.contains(item)) {
+            shouldClearSelectionOnDrop = true;
+            entriesToDrag.addAll(checkedItems.stream().map(CitationRelationItem::entry).toList());
+        } else {
+            entriesToDrag.add(item.entry());
+        }
+
+        if (!entriesToDrag.isEmpty()) {
+            Dragboard dragboard = listView.startDragAndDrop(TransferMode.COPY);
+            ClipboardContent content = new ClipboardContent();
+            content.put(DragAndDropDataFormats.ENTRIES, "");
+            dragboard.setContent(content);
+            stateManager.getLocalDragboard().putBibEntries(entriesToDrag);
+        }
+
+        event.consume();
+    }
+
+    private void handleDragDone(CheckListView<CitationRelationItem> listView, DragEvent event) {
+        if (event.getTransferMode() != null && shouldClearSelectionOnDrop) {
+            listView.getCheckModel().clearChecks();
+        }
+        event.consume();
     }
 
     private void jumpToEntry(CitationRelationItem entry) {
