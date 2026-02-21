@@ -146,7 +146,6 @@ extraJavaModuleInfo {
         requires("scala.library")
     }
 
-    module("com.googlecode.plist:dd-plist", "dd.plist")
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
     module("com.knuddels:jtokkit", "jtokkit")
