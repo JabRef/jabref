@@ -15,6 +15,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticDateGroup;
+import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -124,6 +125,14 @@ class GroupsParserTest {
     void fromStringParsesAutomaticPersonGroup() throws ParseException {
         AutomaticPersonsGroup expected = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR);
         AbstractGroup parsed = GroupsParser.fromString("AutomaticPersonsGroup:myAutomaticGroup;0;author;1;;;;", ',', fileMonitor, metaData, "userAndHost");
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void fromStringParsesAutomaticEntryTypeGroupWithDescription() throws ParseException {
+        AutomaticEntryTypeGroup expected = new AutomaticEntryTypeGroup("Entry types", GroupHierarchyType.INDEPENDENT);
+        expected.setDescription("Group by entry type");
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticEntryTypeGroup:Entry types;0;1;;;Group by entry type;", ',', fileMonitor, metaData, "userAndHost");
         assertEquals(expected, parsed);
     }
 
