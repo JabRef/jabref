@@ -843,9 +843,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return JabRefCliPreferences.singleton;
     }
 
-    /// **********************************************************************************************************
-    /// Common serializer logic
-    /// ************************************************************************************************************
+    // region: Common serializer logic
 
     @VisibleForTesting
     static String convertListToString(List<String> value) {
@@ -860,15 +858,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
     }
+    // endregion
 
-    /// ************************************************************************************************************
-    /// Backingstore access logic
-    /// ************************************************************************************************************
+    // region: Backingstore access logic
 
-    /// Check whether a key is set (differently from null).
-    ///
-    /// @param key The key to check.
-    /// @return true if the key is set, false otherwise.
+    // Check whether a key is set...
+// @param key The key to check.
+// @return true if the key is set
     public boolean hasKey(String key) {
         return PREFS_NODE.get(key, null) != null;
     }
@@ -885,7 +881,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
         return result;
     }
-
+// endregion
     public Optional<String> getAsOptional(String key) {
         return Optional.ofNullable(PREFS_NODE.get(key, (String) defaults.get(key)));
     }
