@@ -11,6 +11,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -71,9 +72,11 @@ public class JabRefGUI extends Application {
     private static List<UiCommand> uiCommands;
     private static GuiPreferences preferences;
 
-    // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
+    // AI Service handles chat messages etc. Therefore, it is tightly coupled to the
+    // GUI.
     private static AiService aiService;
-    // CitationsAndRelationsSearchService is here configured for a local machine and so to the GUI.
+    // CitationsAndRelationsSearchService is here configured for a local machine and
+    // so to the GUI.
     private static SearchCitationsRelationsService citationsAndRelationsSearchService;
 
     private static FileUpdateMonitor fileUpdateMonitor;
@@ -94,7 +97,7 @@ public class JabRefGUI extends Application {
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
-                             GuiPreferences preferences) {
+            GuiPreferences preferences) {
         JabRefGUI.uiCommands = uiCommands;
         JabRefGUI.preferences = preferences;
     }
@@ -147,6 +150,14 @@ public class JabRefGUI extends Application {
             setupProxy();
         } catch (Throwable throwable) {
             LOGGER.error("Error during initialization", throwable);
+            // Show an error dialog so the user knows what went wrong before JabRef crashes.
+            // dialogService might not yet be initialized, so we use a raw JavaFX Alert
+            // here.
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(Localization.lang("Error during startup"));
+            alert.setHeaderText(Localization.lang("An error occurred during JabRef startup"));
+            alert.setContentText(throwable.getLocalizedMessage());
+            alert.showAndWait();
             throw throwable;
         }
 
@@ -171,10 +182,12 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+        journalAbbreviationRepository = JournalAbbreviationLoader
+                .loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
-        Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
+        Injector.setModelOrService(ProtectedTermsLoader.class,
+                new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
         IndexManager.clearOldSearchIndices();
 
@@ -184,7 +197,8 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
-        JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
+        JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository,
+                entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
         JabRefGUI.stateManager = new JabRefGuiStateManager();
@@ -194,8 +208,7 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.themeManager = new ThemeManager(
                 preferences.getWorkspacePreferences(),
-                fileUpdateMonitor
-        );
+                fileUpdateMonitor);
         Injector.setModelOrService(ThemeManager.class, themeManager);
 
         JabRefGUI.countingUndoManager = new CountingUndoManager();
@@ -228,8 +241,7 @@ public class JabRefGUI extends Application {
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
                 JabRefGUI.aiService,
-                entryTypesManager
-        );
+                entryTypesManager);
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
     }
 
@@ -273,7 +285,8 @@ public class JabRefGUI extends Application {
         mainStage.setMinWidth(580);
         mainStage.setMinHeight(330);
 
-        // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
+        // maximized target state is stored, because "saveWindowState" saves x and y
+        // only if not maximized
         boolean windowMaximised = coreGuiPreferences.isWindowMaximised();
 
         LOGGER.debug("Screens: {}", Screen.getScreens());
@@ -287,7 +300,8 @@ public class JabRefGUI extends Application {
             mainStage.setHeight(coreGuiPreferences.getSizeY());
             LOGGER.debug("NOT saving window positions");
         } else {
-            LOGGER.info("The JabRef window is outside of screen bounds. Position and size will be corrected to 1024x768. Primary screen will be used.");
+            LOGGER.info(
+                    "The JabRef window is outside of screen bounds. Position and size will be corrected to 1024x768. Primary screen will be used.");
             Rectangle2D bounds = Screen.getPrimary().getBounds();
             mainStage.setX(bounds.getMinX());
             mainStage.setY(bounds.getMinY());
@@ -342,7 +356,9 @@ public class JabRefGUI extends Application {
         }
 
         Platform.runLater(() -> {
-            // We need to check at this point, because here, all libraries are loaded (e.g., load previously opened libraries) and all UI commands (e.g., load libraries, blank workspace, ...) are handled.
+            // We need to check at this point, because here, all libraries are loaded (e.g.,
+            // load previously opened libraries) and all UI commands (e.g., load libraries,
+            // blank workspace, ...) are handled.
             if (stateManager.getOpenDatabases().isEmpty()) {
                 mainFrame.showWelcomeTab();
             }
@@ -370,7 +386,8 @@ public class JabRefGUI extends Application {
             preferences.setSizeX(mainStage.getWidth());
             preferences.setSizeY(mainStage.getHeight());
         }
-        // maximize does not correctly work on OSX, reports true, although the window was resized!
+        // maximize does not correctly work on OSX, reports true, although the window
+        // was resized!
         if (OS.OS_X) {
             preferences.setWindowMaximised(false);
         } else {
@@ -384,14 +401,15 @@ public class JabRefGUI extends Application {
     /// @param mainStage JabRef's stage
     private void debugLogWindowState(Stage mainStage) {
         LOGGER.debug("""
-                        screen data:
-                          mainStage.WINDOW_MAXIMISED: {}
-                          mainStage.POS_X: {}
-                          mainStage.POS_Y: {}
-                          mainStage.SIZE_X: {}
-                          mainStage.SIZE_Y: {}
-                        """,
-                mainStage.isMaximized(), mainStage.getX(), mainStage.getY(), mainStage.getWidth(), mainStage.getHeight());
+                screen data:
+                  mainStage.WINDOW_MAXIMISED: {}
+                  mainStage.POS_X: {}
+                  mainStage.POS_Y: {}
+                  mainStage.SIZE_X: {}
+                  mainStage.SIZE_Y: {}
+                """,
+                mainStage.isMaximized(), mainStage.getX(), mainStage.getY(), mainStage.getWidth(),
+                mainStage.getHeight());
     }
 
     /// Tests if the window coordinates are inside any screen
@@ -417,8 +435,10 @@ public class JabRefGUI extends Application {
     }
 
     private boolean upperRightIsInBounds(CoreGuiPreferences coreGuiPreferences) {
-        // The upper right corner is checked as there are most probably the window controls.
-        // Windows/PowerToys somehow adds 10 pixels to the right and top of the screen, they are removed
+        // The upper right corner is checked as there are most probably the window
+        // controls.
+        // Windows/PowerToys somehow adds 10 pixels to the right and top of the screen,
+        // they are removed
         double rightX = coreGuiPreferences.getPositionX() + coreGuiPreferences.getSizeX() - 10.0;
         double topY = coreGuiPreferences.getPositionY();
         LOGGER.debug("right x: {}, top y: {}", rightX, topY);
@@ -463,7 +483,8 @@ public class JabRefGUI extends Application {
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
 
-            // Shutdown everything in parallel to prevent causing non-shutdown of something in case of issues
+            // Shutdown everything in parallel to prevent causing non-shutdown of something
+            // in case of issues
 
             executor.submit(() -> {
                 LOGGER.trace("Closing citations and relations search service");
