@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 
@@ -48,9 +49,9 @@ public class ExternalApplicationsPreferences {
 
     private ExternalApplicationsPreferences() {
         this(
-                Localization.lang("References"),                                             // eMailSubject
+                Localization.lang("References"),                                        // eMailSubject
                 OS.WINDOWS,                                                                  // shouldAutoOpenEmailAttachmentsFolder
-                Set.of(),                                                                    // externalFileTypes
+                Set.copyOf(ExternalFileTypes.getDefaultExternalFileTypes()),                 // externalFileTypes
                 false,                                                                       // useCustomTerminal
                 OS.WINDOWS ? "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\""
                            : "",                                                             // customTerminalCommand
