@@ -808,24 +808,15 @@ public class JabRefCliPreferences implements CliPreferences {
         commandPair.forEach((key, value) -> {
             // is only for the preferences and therefore is okay to throw NoSuchElementException
             switch (PushApplications.getApplicationByDisplayName(key).get()) {
-                case PushApplications.EMACS ->
-                        put(PUSH_EMACS_PATH, value);
-                case PushApplications.LYX ->
-                        put(PUSH_LYXPIPE, value);
-                case PushApplications.TEXMAKER ->
-                        put(PUSH_TEXMAKER_PATH, value);
-                case PushApplications.TEXSTUDIO ->
-                        put(PUSH_TEXSTUDIO_PATH, value);
-                case PushApplications.TEXWORKS ->
-                        put(PUSH_TEXWORKS_PATH, value);
-                case PushApplications.VIM ->
-                        put(PUSH_VIM, value);
-                case PushApplications.WIN_EDT ->
-                        put(PUSH_WINEDT_PATH, value);
-                case PushApplications.SUBLIME_TEXT ->
-                        put(PUSH_SUBLIME_TEXT_PATH, value);
-                case PushApplications.VSCODE ->
-                        put(PUSH_VSCODE_PATH, value);
+                case PushApplications.EMACS -> put(PUSH_EMACS_PATH, value);
+                case PushApplications.LYX -> put(PUSH_LYXPIPE, value);
+                case PushApplications.TEXMAKER -> put(PUSH_TEXMAKER_PATH, value);
+                case PushApplications.TEXSTUDIO -> put(PUSH_TEXSTUDIO_PATH, value);
+                case PushApplications.TEXWORKS -> put(PUSH_TEXWORKS_PATH, value);
+                case PushApplications.VIM -> put(PUSH_VIM, value);
+                case PushApplications.WIN_EDT -> put(PUSH_WINEDT_PATH, value);
+                case PushApplications.SUBLIME_TEXT -> put(PUSH_SUBLIME_TEXT_PATH, value);
+                case PushApplications.VSCODE -> put(PUSH_VSCODE_PATH, value);
             }
         });
     }
@@ -862,9 +853,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region: Backingstore access logic
 
-// Check whether a key is set...
-// @param key The key to check.
-// @return true if the key is set
+    /// Check whether a key is set.
+    ///
+    /// @param key The key to check.
+    /// @return true if the key is set
     public boolean hasKey(String key) {
         return PREFS_NODE.get(key, null) != null;
     }
@@ -881,7 +873,8 @@ public class JabRefCliPreferences implements CliPreferences {
         }
         return result;
     }
-// endregion
+
+    // endregion
     public Optional<String> getAsOptional(String key) {
         return Optional.ofNullable(PREFS_NODE.get(key, (String) defaults.get(key)));
     }
@@ -1184,9 +1177,9 @@ public class JabRefCliPreferences implements CliPreferences {
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
         try {
             Arrays.stream(prefsNode.keys())
-                  .map(key -> prefsNode.get(key, null))
-                  .filter(Objects::nonNull)
-                  .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
+                    .map(key -> prefsNode.get(key, null))
+                    .filter(Objects::nonNull)
+                    .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
         } catch (BackingStoreException e) {
             LOGGER.info("Parsing customized entry types failed.", e);
         }
@@ -1234,8 +1227,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
-               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
-               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
+                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
+                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
     //*************************************************************************************************************
@@ -1628,11 +1621,11 @@ public class JabRefCliPreferences implements CliPreferences {
         fieldPreferences = new FieldPreferences(
                 !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
-                                                         .map(FieldFactory::parseField)
-                                                         .collect(Collectors.toList()),
+                        .map(FieldFactory::parseField)
+                        .collect(Collectors.toList()),
                 getStringList(NON_WRAPPABLE_FIELDS).stream()
-                                                   .map(FieldFactory::parseField)
-                                                   .collect(Collectors.toList()));
+                        .map(FieldFactory::parseField)
+                        .collect(Collectors.toList()));
 
         EasyBind.listen(fieldPreferences.resolveStringsProperty(), (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
         fieldPreferences.getResolvableFields().addListener((InvalidationListener) _ ->
@@ -1821,10 +1814,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
-            case SPECIFIED ->
-                    SelfContainedSaveOrder.of(exportSaveOrder);
-            case ORIGINAL ->
-                    SaveOrder.getDefaultSaveOrder();
+            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
+            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
 
         return new SelfContainedSaveConfiguration(
@@ -1877,8 +1868,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         cleanupPreferences = new CleanupPreferences(
                 EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
-                                                          .map(CleanupPreferences.CleanupStep::valueOf)
-                                                          .collect(Collectors.toSet())),
+                        .map(CleanupPreferences.CleanupStep::valueOf)
+                        .collect(Collectors.toSet())),
                 new FieldFormatterCleanupActions(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
                         FieldFormatterCleanupMapper.parseActions(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
                 ));
@@ -1933,8 +1924,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
                 getStringList(LAST_EDITED).stream()
-                                          .map(Path::of)
-                                          .toList(),
+                        .map(Path::of)
+                        .toList(),
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory());
 
@@ -1943,9 +1934,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 remove(LAST_EDITED);
             } else {
                 putStringList(LAST_EDITED, lastFilesOpenedPreferences.getLastFilesOpened().stream()
-                                                                     .map(Path::toAbsolutePath)
-                                                                     .map(Path::toString)
-                                                                     .toList());
+                        .map(Path::toAbsolutePath)
+                        .map(Path::toString)
+                        .toList());
             }
         });
         EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (_, _, newValue) -> {
@@ -1962,15 +1953,15 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private FileHistory getFileHistory() {
         return FileHistory.of(getStringList(RECENT_DATABASES).stream()
-                                                             .map(Path::of)
-                                                             .toList());
+                .map(Path::of)
+                .toList());
     }
 
     private void storeFileHistory(FileHistory history) {
         putStringList(RECENT_DATABASES, history.stream()
-                                               .map(Path::toAbsolutePath)
-                                               .map(Path::toString)
-                                               .toList());
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
+                .toList());
     }
 
     // endregion
@@ -2109,8 +2100,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 (_, _, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
         xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) _ ->
                 putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
-                                                                 .map(Field::getName)
-                                                                 .collect(Collectors.toList())));
+                        .map(Field::getName)
+                        .collect(Collectors.toList())));
 
         return xmpPreferences;
     }
@@ -2415,7 +2406,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // Reassign currentStyle based on actual last used CSL style or JStyle
         if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
             currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
-                                        .orElse(CSLStyleLoader.getDefaultStyle());
+                    .orElse(CSLStyleLoader.getDefaultStyle());
         } else {
             // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
