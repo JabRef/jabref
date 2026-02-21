@@ -15,6 +15,8 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.PreviewPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -46,6 +48,9 @@ public class EntryResource {
 
     @Inject
     FilesToServe filesToServe;
+
+    @Inject
+    PreviewPreferences previewPreferences;
 
     /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
     ///
@@ -100,10 +105,10 @@ public class EntryResource {
     /// @return a basic entry preview as HTML text
     /// @throws IOException
     @GET
-    @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")
     public String getHTMLRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
-        List<BibEntry> entriesByCitationKey = getDatabaseContext(id).getDatabase().getEntriesByCitationKey(entryId);
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
+        List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
             throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
         }
@@ -111,29 +116,9 @@ public class EntryResource {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
         }
 
-        // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
-        // build the preview
         BibEntry entry = entriesByCitationKey.getFirst();
-
-        String author = entry.getField(StandardField.AUTHOR).orElse("(N/A)");
-        String title = entry.getField(StandardField.TITLE).orElse("(N/A)");
-        String journal = entry.getField(StandardField.JOURNAL).orElse("(N/A)");
-        String volume = entry.getField(StandardField.VOLUME).orElse("(N/A)");
-        String number = entry.getField(StandardField.NUMBER).orElse("(N/A)");
-        String pages = entry.getField(StandardField.PAGES).orElse("(N/A)");
-        String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
-
-        // the only difference to the plain text version of this method is the format of the output:
-        String preview =
-                "<strong>Author:</strong> " + author + "<br>" +
-                        "<strong>Title:</strong> " + title + "<br>" +
-                        "<strong>Journal:</strong> " + journal + "<br>" +
-                        "<strong>Volume:</strong> " + volume + "<br>" +
-                        "<strong>Number:</strong> " + number + "<br>" +
-                        "<strong>Pages:</strong> " + pages + "<br>" +
-                        "<strong>Released on:</strong> " + releaseDate;
-
-        return preview;
+        PreviewLayout previewLayout = previewPreferences.getSelectedPreviewLayout();
+        return previewLayout.generatePreview(entry, databaseContext);
     }
 
     @POST

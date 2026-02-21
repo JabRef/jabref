@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
@@ -39,11 +40,13 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
@@ -74,6 +77,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
@@ -83,6 +87,8 @@ import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.PreviewPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.CitationCommandString;
@@ -117,6 +123,7 @@ import org.jabref.model.metadata.UserHostInfo;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
@@ -305,6 +312,16 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
+    // region Preview - public for pref migrations
+    public static final String PREVIEW_STYLE = "previewStyle";
+    public static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
+    public static final String CYCLE_PREVIEW = "cyclePreview";
+    public static final String PREVIEW_AS_TAB = "previewAsTab";
+    public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
+    public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
+    public static final String COVER_IMAGE_DOWNLOAD = "coverDownload";
+    // endregion
+
     // TODO: USed by both importer preferences and workspace preferences
     protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
 
@@ -473,6 +490,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private GitPreferences gitPreferences;
+    private PreviewPreferences previewPreferences;
 
     /// @implNote The constructor was made public because dependency injection via constructor
     /// required widespread refactoring, currently we are using reflection in some formatters
@@ -763,6 +781,34 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GITHUB_USERNAME_KEY, "");
         defaults.put(GITHUB_REMOTE_URL_KEY, "");
         defaults.put(GITHUB_REMEMBER_PAT_KEY, false);
+        // endregion
+
+        // region PreviewStyle
+        defaults.put(CYCLE_PREVIEW, "Preview;" + CSLStyleLoader.DEFAULT_STYLE);
+        defaults.put(CYCLE_PREVIEW_POS, 0);
+        defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
+        defaults.put(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, Boolean.FALSE);
+        defaults.put(PREVIEW_STYLE,
+                "<font face=\"sans-serif\">" +
+                        "<b>\\bibtextype</b><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>\\end{citationkey}__NEWLINE__" +
+                        "\\begin{author}<BR><BR>\\format[Authors(LastFirst, FullName,Sep= / ,LastSep= / ),HTMLChars]{\\author}\\end{author}__NEWLINE__" +
+                        "\\begin{editor & !author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & !author}__NEWLINE__" +
+                        "\\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b> \\end{title}__NEWLINE__" +
+                        "<BR>\\begin{date}\\date\\end{date}\\begin{edition}, \\edition. edition\\end{edition}__NEWLINE__" +
+                        "\\begin{editor & author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & author}__NEWLINE__" +
+                        "\\begin{booktitle}<BR><i>\\format[HTMLChars]{\\booktitle}</i>\\end{booktitle}__NEWLINE__" +
+                        "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}" +
+                        "\\begin{editor & !author}<BR>\\end{editor & !author}\\begin{!editor}<BR>\\end{!editor}\\begin{journal}<BR><i>\\format[HTMLChars]{\\journal}</i> \\end{journal} \\begin{volume}, Vol. \\volume\\end{volume}\\begin{series}<BR>\\format[HTMLChars]{\\series}\\end{series}\\begin{number}, No. \\format[HTMLChars]{\\number}\\end{number}__NEWLINE__" +
+                        "\\begin{school} \\format[HTMLChars]{\\school}, \\end{school}__NEWLINE__" +
+                        "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" +
+                        "\\begin{publisher}<BR>\\format[HTMLChars]{\\publisher}\\end{publisher}\\begin{location}: \\format[HTMLChars]{\\location} \\end{location}__NEWLINE__" +
+                        "\\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__" +
+                        "\\begin{doi}<BR>doi <a href=\"https://doi.org/\\format[DOIStrip]{\\doi}\">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__" +
+                        "\\begin{url}<BR>URL <a href=\"\\url\">\\url</a>\\end{url}__NEWLINE__" +
+                        "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
+                        "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
+                        "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}\\end{comment}__NEWLINE__" +
+                        "</font>__NEWLINE__");
         // endregion
     }
 
@@ -2529,4 +2575,98 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
     }
+
+    // region Preview preferences
+    public PreviewPreferences getPreviewPreferences() {
+        if (previewPreferences != null) {
+            return previewPreferences;
+        }
+
+        String style = get(PREVIEW_STYLE);
+        List<PreviewLayout> layouts = getPreviewLayouts(style);
+
+        this.previewPreferences = new PreviewPreferences(
+                layouts,
+                getPreviewCyclePosition(layouts),
+                new TextBasedPreviewLayout(
+                        style,
+                        getLayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
+                (String) defaults.get(PREVIEW_STYLE),
+                getBoolean(PREVIEW_AS_TAB),
+                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
+                getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
+                                                       .map(Path::of)
+                                                       .collect(Collectors.toList()),
+                getBoolean(COVER_IMAGE_DOWNLOAD)
+        );
+
+        previewPreferences.getLayoutCycle().addListener((InvalidationListener) c -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
+        EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (obs, oldValue, newValue) -> putInt(CYCLE_PREVIEW_POS, newValue));
+        // must be stored with __NEWLINE__ instead of \n so that our migration correclty triggers, in getText it will be replaced by \n
+        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (obs, oldValue, newValue) -> put(PREVIEW_STYLE, newValue.getText().replace("\n", "__NEWLINE__")));
+        EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
+        EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
+        previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) c -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
+        EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(COVER_IMAGE_DOWNLOAD, newValue));
+        return this.previewPreferences;
+    }
+
+    private void storeBstPaths(List<Path> bstPaths) {
+        putStringList(PREVIEW_BST_LAYOUT_PATHS, bstPaths.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
+    }
+
+    private List<PreviewLayout> getPreviewLayouts(String style) {
+        List<String> cycle = getStringList(CYCLE_PREVIEW);
+
+        // For backwards compatibility always add at least the default preview to the cycle
+        if (cycle.isEmpty()) {
+            cycle.add("Preview");
+        }
+
+        return cycle.stream()
+                    .map(layout -> {
+                        if (CSLStyleUtils.isCitationStyleFile(layout)) {
+                            BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
+                            return CSLStyleUtils.createCitationStyleFromFile(layout)
+                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
+                                                .orElse(null);
+                        }
+                        if (BstPreviewLayout.isBstStyleFile(layout)) {
+                            return getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
+                                                                          .filter(path -> path.endsWith(layout)).map(Path::of)
+                                                                          .map(BstPreviewLayout::new)
+                                                                          .findFirst()
+                                                                          .orElse(null);
+                        } else {
+                            return new TextBasedPreviewLayout(
+                                    style,
+                                    getLayoutFormatterPreferences(),
+                                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+                        }
+                    }).filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+    }
+
+    private void storePreviewLayouts(ObservableList<PreviewLayout> previewCycle) {
+        putStringList(CYCLE_PREVIEW, previewCycle.stream()
+                                                 .map(layout -> {
+                                                     if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
+                                                         return citationStyleLayout.getFilePath();
+                                                     } else {
+                                                         return layout.getDisplayName();
+                                                     }
+                                                 }).toList()
+        );
+    }
+
+    private int getPreviewCyclePosition(List<PreviewLayout> layouts) {
+        int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
+        if (storedCyclePos < layouts.size()) {
+            return storedCyclePos;
+        } else {
+            return 0; // fallback if stored position is no longer valid
+        }
+    }
+    // endregion
 }
