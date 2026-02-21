@@ -312,6 +312,13 @@ jobs:
         shell: bash
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
+          if [[ -z "$PR_NUMBER" ]]; then
+            echo "☁️ Not a pull request event – skipping disk space check – will upload"
+            echo "☁️ Not a pull request event – skipping disk space check – will upload" >> $GITHUB_STEP_SUMMARY
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           TARGET="/var/www/builds.jabref.org/www/pull-$PR_NUMBER"
           SSH_OPTS="-p 9922 -i sshkey -o StrictHostKeyChecking=no"
           HOST="jrrsync@build-upload.jabref.org"
