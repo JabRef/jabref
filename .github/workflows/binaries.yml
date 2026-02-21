@@ -231,7 +231,7 @@ jobs:
             echo "🧾 macOS notarization"
             echo "🧾 macOS notarization" >> $GITHUB_STEP_SUMMARY
             echo "should-notarize=true" >> "$GITHUB_OUTPUT"
-            if [[ "${GITHUB_REF}" == refs/tags/* || ( "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "main" ) ]]; then
+            if [[ "${GITHUB_REF}" == refs/tags/* || ( "${{ github.event_name }}" == "push" && ("${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "main-release") ) ]]; then
               echo "☁️ will upload"
               echo "☁️ will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
