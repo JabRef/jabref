@@ -18,6 +18,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticDateGroup;
+import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGranularity;
@@ -126,6 +127,9 @@ public class GroupsParser {
         if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
             return automaticKeywordGroupFromString(input);
         }
+        if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_ENTRY_TYPE_GROUP_ID)) {
+            return automaticEntryTypeGroupFromString(input);
+        }
         if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
             return automaticDateGroupFromString(input);
         }
@@ -189,6 +193,19 @@ public class GroupsParser {
         String granularityString = StringUtil.unquote(token.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         DateGranularity granularity = DateGranularity.valueOf(granularityString);
         AutomaticDateGroup newGroup = new AutomaticDateGroup(name, context, field, granularity);
+        addGroupDetails(token, newGroup);
+        return newGroup;
+    }
+
+    private static AbstractGroup automaticEntryTypeGroupFromString(String input) {
+        assert input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_ENTRY_TYPE_GROUP_ID);
+
+        QuotedStringTokenizer token = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.AUTOMATIC_ENTRY_TYPE_GROUP_ID
+                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = StringUtil.unquote(token.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(token.nextToken()));
+        AutomaticEntryTypeGroup newGroup = new AutomaticEntryTypeGroup(name, context);
         addGroupDetails(token, newGroup);
         return newGroup;
     }

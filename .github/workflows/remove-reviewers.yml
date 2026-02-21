@@ -5,8 +5,9 @@ on:
     types: [review_requested]
 
 jobs:
-  guard-review:
+  guard-reviewers:
     runs-on: ubuntu-slim
+    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     permissions:
       pull-requests: write
       checks: read
@@ -14,6 +15,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      - name: Output link
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL:    ${{ github.event.pull_request.html_url }}
+        run: |
+          echo "PR Number: $PR_NUMBER"
+          echo "PR URL: $PR_URL"
+          echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
       - name: Evaluate state
         id: eval
         env:
@@ -22,9 +31,8 @@ jobs:
           PR=${{ github.event.pull_request.number }}
 
           # check running CI
-          running=$(gh pr checks "$PR" --json state -q '.[] | select(.state=="IN_PROGRESS" or .state=="QUEUED") | length' | wc -l)
-          if [ "$running" -gt 0 ] || [ "$label" -gt 0 ]; then
-            echo "ci_running=true" >> $GITHUB_OUTPUT
+          running=$( gh pr checks "$PR" --json name,state -q '[.[] | select((.name=="Binaries" or .name=="Source Code Tests") and (.state=="IN_PROGRESS" or .state=="QUEUED"))] | length' )
+          if [ "$running" -gt 0 ] || [ "$label" -gt 0 ]; then echo "ci_running=true" >> $GITHUB_OUTPUT
           else
             echo "ci_running=false" >> $GITHUB_OUTPUT
           fi
@@ -60,7 +68,7 @@ jobs:
       - name: Remove reviewer
         if: ${{ steps.eval.outputs.ci_running == 'true' || steps.eval.outputs.changes_required == 'true' }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN_ADAPT_REVIEW }}
         run: |
           reviewer="${{ github.event.requested_reviewer.login }}"
           gh api \
