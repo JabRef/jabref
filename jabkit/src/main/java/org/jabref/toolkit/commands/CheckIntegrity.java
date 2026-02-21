@@ -48,7 +48,7 @@ class CheckIntegrity implements Callable<Integer> {
     @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
     private String outputFormat;
 
-    // in BibTeX it could be preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex()
+    // in BibTeX it could be preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex().
     @Option(names = {"--allow-integer-edition"}, description = "Allows Integer edition", negatable = true, defaultValue = "true", fallbackValue = "true")
     private boolean allowIntegerEdition;
 
