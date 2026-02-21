@@ -79,8 +79,11 @@ public class CitationKeyGenerator extends BracketedPattern {
         String newKey = key.chars()
                            .filter(c -> unwantedCharacters.indexOf(c) == -1)
                            .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
-                           .collect(StringBuilder::new,
-                                   StringBuilder::appendCodePoint, StringBuilder::append)
+                           .collect(
+                                   StringBuilder::new,
+                                   StringBuilder::appendCodePoint,
+                                   StringBuilder::append
+                           )
                            .toString();
 
         // Replace non-English characters like umlauts etc. with a sensible
@@ -90,6 +93,23 @@ public class CitationKeyGenerator extends BracketedPattern {
 
     public static String cleanKey(String key, String unwantedCharacters) {
         return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
+    }
+
+    /// Removes only characters that are illegal in citation keys
+    /// preserving Unicode and diacritical characters.
+    ///
+    /// @param key the citation key to sanitize
+    /// @return the key with only illegal characters removed
+    public static String removeIllegalCharacters(String key) {
+        return key.chars()
+                  .filter(c -> !Character.isWhitespace(c))
+                  .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
+                  .collect(
+                          StringBuilder::new,
+                          StringBuilder::appendCodePoint,
+                          StringBuilder::append
+                  )
+                  .toString();
     }
 
     /// Generate a citation key for the given {@link BibEntry}.

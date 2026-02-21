@@ -244,6 +244,21 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
+    void removeIllegalCharactersPreservesDiacritics() {
+        assertEquals("kṛṣṇā", CitationKeyGenerator.removeIllegalCharacters("kṛṣṇā"));
+        assertEquals("Müller2020", CitationKeyGenerator.removeIllegalCharacters("Müller2020"));
+        assertEquals("taṇḍulīyaka", CitationKeyGenerator.removeIllegalCharacters("taṇḍulīyaka"));
+        assertEquals("García_2021", CitationKeyGenerator.removeIllegalCharacters("García_2021"));
+    }
+
+    @Test
+    void removeIllegalCharactersRemovesDisallowedChars() {
+        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("ke{y}"));
+        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("ke y"));
+        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("k#e%y"));
+    }
+
+    @Test
     void crossrefUniversity() {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");

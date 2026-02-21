@@ -15,7 +15,7 @@ public class ValidCitationKeyChecker implements ValueChecker {
             return Optional.of(Localization.lang("empty citation key"));
         }
 
-        String cleaned = CitationKeyGenerator.cleanKey(value, "");
+        String cleaned = CitationKeyGenerator.removeIllegalCharacters(value);
 
         if (cleaned.equals(value)) {
             return Optional.empty();
