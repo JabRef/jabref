@@ -8,6 +8,8 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SaveException;
@@ -15,6 +17,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -50,6 +53,9 @@ class Convert implements Runnable {
     @Option(names = {"--output-format"}, description = "Output format")
     private String outputFormat = "bibtex";
 
+    @Option(names = {"--field-formatters"}, description = "Field Formatter")
+    private String fieldFormatters;
+
     @Override
     public void run() {
         Optional<ParserResult> parserResult = JabKit.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
@@ -61,6 +67,16 @@ class Convert implements Runnable {
         if (parserResult.get().isInvalid()) {
             System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
             return;
+        }
+
+        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
+            String parseableString = fieldFormatters.replace(",", "\n");
+            List<FieldFormatterCleanup> cleanups = FieldFormatterCleanupMapper.parseActions(parseableString);
+            for (BibEntry entry : parserResult.get().getDatabase().getEntries()) {
+                for (FieldFormatterCleanup cleanup : cleanups) {
+                    cleanup.cleanup(entry);
+                }
+            }
         }
 
         if (!sharedOptions.porcelain) {

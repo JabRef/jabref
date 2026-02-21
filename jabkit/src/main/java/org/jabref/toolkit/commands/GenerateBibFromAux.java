@@ -2,6 +2,7 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -9,6 +10,8 @@ import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
 import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -43,6 +46,9 @@ class GenerateBibFromAux implements Runnable {
     @Option(names = "--output")
     private Path outputFile;
 
+    @Option(names = {"--field-formatters"}, description = "Field Formatter")
+    private String fieldFormatters;
+
     @Override
     public void run() {
         Optional<ParserResult> pr = JabKit.importFile(
@@ -75,6 +81,16 @@ class GenerateBibFromAux implements Runnable {
         if (subDatabase == null || !subDatabase.hasEntries()) {
             System.out.println(Localization.lang("No library generated."));
             return;
+        }
+
+        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
+            String parseableString = fieldFormatters.replace(",", "\n");
+            List<FieldFormatterCleanup> cleanups = FieldFormatterCleanupMapper.parseActions(parseableString);
+            for (BibEntry entry : subDatabase.getEntries()) {
+                for (FieldFormatterCleanup cleanup : cleanups) {
+                    cleanup.cleanup(entry);
+                }
+            }
         }
 
         if (outputFile == null) {

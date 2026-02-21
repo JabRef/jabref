@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -116,5 +117,36 @@ public class ConvertTest extends AbstractJabKitTest {
         commandLine.execute(args.toArray(String[]::new));
 
         assertFileExists(outputHtml);
+    }
+
+    @Test
+    void fieldFormattersAreAppliedDuringConversion(@TempDir Path tempDir) throws IOException {
+        Path newPath = tempDir.resolve("origin.bib");
+        String originBibtex = "@Article{test_entry,\n" +
+                "  title   = {my ﬁrst research},\n" +
+                "  pages   = {1-10},\n" +
+                "  month   = {January},\n" +
+                "  comment = {private note}\n" +
+                "}";
+        Files.writeString(newPath, originBibtex);
+
+        Path outputPath = tempDir.resolve("output");
+
+        commandLine.execute("convert",
+                "--input=" + newPath, "--input-format=bibtex",
+                "--output-format=bibtex",
+                "--output=" + outputPath,
+                "--field-formatters=pages[normalize_page_numbers],month[normalize_month],All-text-fields[replace_unicode_ligatures],comment[clear]");
+
+        assertFileExists(outputPath);
+        String outputContent = Files.readString(outputPath);
+
+        assertTrue(outputContent.contains("1--10"));
+
+        assertTrue(outputContent.toLowerCase().contains("jan"));
+
+        assertTrue(outputContent.contains("first"));
+
+        assertFalse(outputContent.contains("private note"));
     }
 }
