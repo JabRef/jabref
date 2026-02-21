@@ -42,7 +42,6 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
@@ -90,7 +89,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
-
     private BibDatabaseContext bibDatabaseContext;
 
     public UnlinkedFilesDialogView() {
@@ -179,9 +177,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     private void initUnlinkedFilesList() {
-        new ViewModelTreeCellFactory<FileNodeViewModel>()
-                .withText(FileNodeViewModel::getDisplayTextWithEditDate)
-                .install(unlinkedFilesList);
+        unlinkedFilesList.setCellFactory(_ -> new UnlinkedFilesCellFactory(stateManager, viewModel));
 
         unlinkedFilesList.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
