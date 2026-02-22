@@ -3,13 +3,15 @@ package org.jabref.http.server.cayw.format;
 import java.util.Locale;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.jvnet.hk2.annotations.Service;
 
 @Service
 public class FormatterService {
 
-    public CAYWFormatter getFormatter(CAYWQueryParams queryParams) {
+    public CAYWFormatter getFormatter(CAYWQueryParams queryParams, CliPreferences preferences, BibDatabaseContext databaseContext) {
         String format = queryParams.getFormat().toLowerCase(Locale.ROOT);
 
         return switch (format) {
@@ -29,6 +31,8 @@ public class FormatterService {
                     new SimpleJsonFormatter();
             case "typst" ->
                     new TypstFormatter();
+            case "formatted-bibliography" ->
+                    new FormattedBibliographyFormatter(preferences, databaseContext);
             default ->
                     new BibLatexFormatter("autocite");
         };

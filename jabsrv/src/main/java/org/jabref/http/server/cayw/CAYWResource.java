@@ -114,7 +114,7 @@ public class CAYWResource {
         }
 
         // Format parameter handling
-        CAYWFormatter formatter = formatterService.getFormatter(queryParams);
+        CAYWFormatter formatter = formatterService.getFormatter(queryParams, preferences, databaseContext);
         String formattedResponse = formatter.format(queryParams, searchResults);
 
         // Clipboard parameter handling
