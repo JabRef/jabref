@@ -13,12 +13,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added CLI option `--field-formatters` to the `convert` and `generate-bib-from-aux` commands to apply field formatters during export. [#11520](https://github.com/JabRef/jabref/issues/11520)
 
-### Changed
-
-### Fixed
-
-### Removed
-
 ## [6.0-alpha.5] – 2026-02-20
 
 ### Added
