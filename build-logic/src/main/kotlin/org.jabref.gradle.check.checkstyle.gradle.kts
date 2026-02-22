@@ -9,8 +9,8 @@ checkstyle {
 
 tasks.withType<Checkstyle>().configureEach {
     reports {
-        xml.required.set(false)
-        html.required.set(true)
+        xml.required = false
+        html.required = true
     }
     source = fileTree("src") { include("**/*.java") }
 }
