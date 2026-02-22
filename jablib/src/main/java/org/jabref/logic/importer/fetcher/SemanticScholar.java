@@ -207,9 +207,6 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         }
     }
 
-    /// Returns the localized name of this fetcher. The title can be used to display the fetcher in the menu and in the side pane.
-    ///
-    /// @return the localized name
     @Override
     public String getName() {
         return "SemanticScholar";

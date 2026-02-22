@@ -16,7 +16,7 @@ jobs:
   changelog_modification_consistency:
     name: CHANGELOG.md needs to be modified if indicated
     if: (github.event.pull_request.user.login != 'dependabot[bot]') && (github.event.pull_request.user.login != 'renovate-bot')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
         with:
@@ -69,7 +69,7 @@ jobs:
           fi
 
   upload-pr-number:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt

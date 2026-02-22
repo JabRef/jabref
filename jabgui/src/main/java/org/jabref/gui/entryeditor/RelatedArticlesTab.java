@@ -191,7 +191,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Text title = new Text(Localization.lang("Mr. DLib Privacy settings"));
         title.getStyleClass().add("heading");
 
-        Button button = new Button(Localization.lang("I Agree"));
+        Button button = new Button(Localization.lang("I agree"));
         button.setDefaultButton(true);
 
         Button hideTab = new Button(Localization.lang("Hide 'Related articles' tab"));

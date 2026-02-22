@@ -1,4 +1,7 @@
-FROM gradle:jdk24-noble AS build
+FROM maven:3.9.12-amazoncorretto-25-debian AS build
+
+# Is not debian-based
+# FROM amazoncorretto:25-jdk AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
@@ -6,20 +9,47 @@ ARG TAG_BUILD="false"
 
 WORKDIR /build
 
+COPY --from=jbangdev/jbang:0.136.0-java-21 /jbang-0.136.0/ /jbang/
+
+ENV PATH="${PATH}:/jbang/bin"
+ENV JBANG_DIR="/jbang/.jbang"
+
+COPY gradlew .
+COPY gradle gradle
+
+RUN ./gradlew || true
+
+COPY settings.gradle.kts .
+COPY build.gradle.kts .
+COPY gradle.properties .
+COPY build-logic/ build-logic/
+COPY build-support/ build-support/
+COPY jabgui/build.gradle.kts jabgui/
+COPY jabkit/build.gradle.kts jabkit/
+COPY jablib/build.gradle.kts jablib/
+COPY jabls/build.gradle.kts jabls/
+COPY jabls-cli/build.gradle.kts jabls-cli/
+COPY jabsrv/build.gradle.kts jabsrv/
+COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
+COPY test-support test-support
+COPY versions versions
+
+# Cache gradle and build-logic
+RUN ./gradlew --no-daemon :build-logic:jar
+
 COPY . .
 
-RUN gradle --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage
+RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage && \
+    mkdir /dist && \
+    mv jabsrv-cli/build/packages/*/* /dist
 
-RUN mkdir /dist
-
-RUN mv jabsrv-cli/build/packages/*/* /dist
 
 # jpackage needs glibc; alpine does not work
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 
-LABEL org.opencontainers.image.title="jabsrv" \
-      org.opencontainers.image.description="JabRef's HTTP server" \
-      org.opencontainers.image.source=https://github.com/JabRef/jabref
+LABEL org.opencontainers.image.title="jabsrv"
+LABEL org.opencontainers.image.description="JabRef's HTTP server"
+LABEL org.opencontainers.image.source="https://github.com/JabRef/jabref"
 
 WORKDIR /work
 

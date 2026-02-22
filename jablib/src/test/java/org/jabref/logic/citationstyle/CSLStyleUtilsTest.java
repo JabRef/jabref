@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +26,7 @@ class CSLStyleUtilsTest {
     // internal styles
     private static final String APA = "apa.csl";
     private static final String IEEE = "ieee.csl";
-    private static final String VANCOUVER = "vancouver.csl";
+    private static final String NLM_CITATION_SEQUENCE_VANCOUVER = "nlm-citation-sequence.csl";
     private static final String CHICAGO_AUTHOR_DATE = "chicago-author-date.csl";
     private static final String NATURE = "nature.csl";
     private static final String MLA = "modern-language-association.csl";
@@ -40,7 +42,7 @@ class CSLStyleUtilsTest {
             "ieee.csl",
             "apa.csl",
             "harvard.csl",
-            "vancouver.csl",
+            "nlm-citation-sequence.csl",
             "ieee.modified.csl",
             "apa.v7.csl",
             "/path/to/style/nature.csl",
@@ -82,6 +84,17 @@ class CSLStyleUtilsTest {
         assertEquals(expectedUsesHangingIndent, styleInfo.get().usesHangingIndent());
     }
 
+    @EnabledOnOs(OS.WINDOWS)
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "\\\\ieee.csl",
+            "//ieee.csl",
+    })
+    void createStyleFromFileReturnsEmptyOptionalForInvalidPath(String filename) {
+        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(filename);
+        assertEquals(Optional.empty(), citationStyle);
+    }
+
     @ParameterizedTest
     @MethodSource("styleTestData")
     void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) {
@@ -121,7 +134,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(IEEE),
                 Arguments.of(APA),
-                Arguments.of(VANCOUVER),
+                Arguments.of(NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(CHICAGO_AUTHOR_DATE),
                 Arguments.of(NATURE),
                 Arguments.of(MLA),
@@ -139,8 +152,8 @@ class CSLStyleUtilsTest {
     static Stream<Arguments> titleMatches() {
         return Stream.of(
                 Arguments.of("IEEE Reference Guide version 11.29.2023", IEEE),
-                Arguments.of("American Psychological Association 7th edition", APA),
-                Arguments.of("Vancouver", VANCOUVER),
+                Arguments.of("APA Style 7th edition", APA),
+                Arguments.of("NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)", NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of("Chicago Manual of Style 18th edition (author-date)", CHICAGO_AUTHOR_DATE),
                 Arguments.of("Nature", NATURE),
                 Arguments.of("MLA Handbook 9th edition (in-text citations)", MLA),
@@ -159,7 +172,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(true, IEEE),
                 Arguments.of(false, APA),
-                Arguments.of(true, VANCOUVER),
+                Arguments.of(true, NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(false, CHICAGO_AUTHOR_DATE),
                 Arguments.of(true, NATURE),
                 Arguments.of(false, MLA),
@@ -178,7 +191,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(true, IEEE),
                 Arguments.of(true, APA),
-                Arguments.of(true, VANCOUVER),
+                Arguments.of(true, NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(true, CHICAGO_AUTHOR_DATE),
                 Arguments.of(true, NATURE),
                 Arguments.of(true, MLA),
@@ -197,7 +210,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(false, IEEE),
                 Arguments.of(true, APA),
-                Arguments.of(false, VANCOUVER),
+                Arguments.of(false, NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(true, CHICAGO_AUTHOR_DATE),
                 Arguments.of(false, NATURE),
                 Arguments.of(true, MLA),

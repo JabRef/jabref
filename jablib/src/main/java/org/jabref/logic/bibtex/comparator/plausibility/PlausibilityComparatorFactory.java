@@ -11,6 +11,7 @@ public enum PlausibilityComparatorFactory {
     // Single instance ensured by Java compiler
     INSTANCE;
 
+    /// This implements <https://github.com/JabRef/jabref/issues/12549>
     public Optional<FieldValuePlausibilityComparator> getPlausibilityComparator(Field field) {
         // Similar code as [org.jabref.gui.fieldeditors.FieldEditors.getForField]
         if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
