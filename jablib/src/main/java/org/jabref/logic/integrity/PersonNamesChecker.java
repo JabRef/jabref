@@ -24,25 +24,28 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        String valueTrimmed = value.trim();
-        String valueLower = valueTrimmed.toLowerCase(Locale.ROOT);
+        String valueLower = value.toLowerCase(Locale.ROOT);
 
         if (valueLower.startsWith("and ") || valueLower.startsWith(",")) {
             return Optional.of(Localization.lang("should start with a name"));
-        } else if (valueLower.endsWith(" and") || valueLower.endsWith(",")) {
+        }
+
+        if (valueLower.endsWith(" and") || valueLower.endsWith(",")) {
             return Optional.of(Localization.lang("should end with a name"));
         }
 
-        if (valueTrimmed.startsWith("{") && valueTrimmed.endsWith("}")) {
+        if (value.startsWith("{") && value.endsWith("}")) {
             return Optional.empty();
         }
 
-        String valueWithoutBrackets = new RemoveBrackets().format(valueTrimmed);
-        AuthorList authorList = AuthorList.parse(valueTrimmed);
+        String valueWithoutBrackets = new RemoveBrackets().format(value);
+        AuthorList authorList = AuthorList.parse(valueWithoutBrackets);
 
         if (!authorList.getAsLastFirstNamesWithAnd(false).equals(valueWithoutBrackets)
                 && !authorList.getAsFirstLastNamesWithAnd().equals(valueWithoutBrackets)) {
-            return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));
+            return Optional.of(Localization.lang(
+                    "Names are not in the standard %0 format.",
+                    bibMode.getFormattedName()));
         }
 
         return Optional.empty();
