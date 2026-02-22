@@ -4,18 +4,18 @@ module org.jabref.jabls {
     exports org.jabref.languageserver.controller;
     exports org.jabref.languageserver.util;
 
-    requires transitive org.jabref.jablib;
+    requires org.jabref.jablib;
 
-    requires tools.jackson.core;
     requires tools.jackson.databind;
 
     requires com.google.common;
-    requires transitive com.google.gson;
+    requires com.google.gson;
 
     requires org.slf4j;
 
-    requires transitive org.eclipse.lsp4j;
+    requires org.eclipse.lsp4j;
     requires org.eclipse.lsp4j.jsonrpc;
-    requires transitive org.jspecify;
+    requires org.eclipse.lsp4j.websocket.jakarta;
+    requires org.jspecify;
 
 }
