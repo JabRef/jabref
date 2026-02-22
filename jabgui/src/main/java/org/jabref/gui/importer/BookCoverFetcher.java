@@ -44,24 +44,56 @@ public class BookCoverFetcher {
         return entry.getISBN().flatMap(isbn -> findExistingImage("isbn-" + isbn.asString(), Directories.getCoverDirectory()));
     }
 
-    public void downloadCoversForEntry(BibEntry entry) {
-        entry.getISBN().ifPresent(isbn -> downloadCoverForISBN(isbn, Directories.getCoverDirectory()));
+    public boolean downloadCoversForEntry(BibEntry entry) {
+        return entry.getISBN().map(isbn -> downloadCoverForISBN(isbn, Directories.getCoverDirectory())).orElse(false);
     }
 
-    private void downloadCoverForISBN(ISBN isbn, Path directory) {
+    private boolean downloadCoverForISBN(ISBN isbn, Path directory) {
         final String name = "isbn-" + isbn.asString();
         if (findExistingImage(name, directory).isEmpty()) {
+            Path notAvailableFile = directory.resolve(name + ".not-available");
+            if (Files.exists(notAvailableFile)) {
+                try {
+                    long lastModifiedTime = Files.getLastModifiedTime(notAvailableFile).toMillis();
+                    if (System.currentTimeMillis() - lastModifiedTime < 24 * 60 * 60 * 1000) {
+                        LOGGER.info("Cover for {} was not found recently. Skipping download.", isbn.asString());
+                        return false;
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Could not read last modified time of .not-available file", e);
+                }
+            }
+
             final String url = getImageUrl(isbn);
-            downloadCoverImage(url, name, directory);
+            boolean success = downloadCoverImage(url, name, directory);
+            if (!success) {
+                try {
+                    if (!Files.exists(notAvailableFile)) {
+                        Files.createFile(notAvailableFile);
+                    } else {
+                        Files.setLastModifiedTime(notAvailableFile, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Could not create/update .not-available file", e);
+                }
+            } else {
+                try {
+                    Files.deleteIfExists(notAvailableFile);
+                } catch (IOException e) {
+                    LOGGER.error("Could not delete .not-available file", e);
+                }
+            }
+            return success;
         }
+        return false;
     }
 
-    private void downloadCoverImage(String url, final String name, final Path directory) {
+    private boolean downloadCoverImage(String url, final String name, final Path directory) {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
             LOGGER.error("Could not access cover image directories", e);
-            return;
+            return false;
         }
 
         LOGGER.info("Downloading cover image file from {}", url);
@@ -71,7 +103,7 @@ public class BookCoverFetcher {
             download = new URLDownload(url);
         } catch (MalformedURLException e) {
             LOGGER.error("Error while downloading cover image file", e);
-            return;
+            return false;
         }
 
         ExternalFileType inferredFileType = download
@@ -84,13 +116,15 @@ public class BookCoverFetcher {
 
         Optional<Path> destination = resolveNameWithType(directory, name, inferredFileType);
         if (destination.isEmpty()) {
-            return;
+            return false;
         }
         try {
             download.toFile(destination.get());
         } catch (FetcherException e) {
             LOGGER.error("Error while downloading cover image file", e);
+            return false;
         }
+        return true;
     }
 
     private Optional<Path> findExistingImage(final String name, final Path directory) {
