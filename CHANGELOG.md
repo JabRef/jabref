@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - Fixed issues with escaping keywords in "Keywords Editor" [#14780](https://github.com/JabRef/jabref/issues/14780)
+- We fixed an issue where institutional authors in braces {Institutional Author} triggered a "Names are not in the standard format" warning. [#15157](https://github.com/JabRef/jabref/issues/15157)
 
 ### Removed
 
