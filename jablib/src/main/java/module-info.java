@@ -262,7 +262,7 @@ open module org.jabref.jablib {
 
     // region: other libraries (alphabetically)
     requires cuid;
-    requires dd.plist;
+    requires com.dd.plist;
     requires io.github.darvil.terminal.textformatter;
     requires io.github.eadr;
     // required by okhttp and some AI library
