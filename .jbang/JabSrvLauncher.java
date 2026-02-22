@@ -57,6 +57,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/BibLatexFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/CAYWFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormattedBibliographyFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormatterService.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/MMDFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/NatbibFormatter.java
