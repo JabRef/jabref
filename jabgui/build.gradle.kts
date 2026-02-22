@@ -116,7 +116,7 @@ javaModulePackaging {
             "--resource-dir", layout.projectDirectory.dir("buildres").dir("linux").asFile.absolutePath,
 
             // Target-speccific options
-            "--linux-menu-group", "Office;",
+            "--linux-menu-group", "Office",
             // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
             "--linux-shortcut"
         )
