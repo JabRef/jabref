@@ -65,19 +65,20 @@ javaModulePackaging {
     verbose = true
     addModules.add("jdk.incubator.vector")
 
-    options.adAll(
-        "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
-        "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md"
-    )
-
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
         options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
             "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties",
 
+            // Target-speccific options
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
             "--win-dir-chooser",
             "--win-shortcut",
@@ -94,9 +95,15 @@ javaModulePackaging {
     targetsWithOs("linux") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
         options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
             "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties",
 
+            // Target-speccific options
             "--linux-menu-group", "Office;",
             // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
             "--linux-shortcut"
@@ -109,9 +116,15 @@ javaModulePackaging {
     targetsWithOs("macos") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
         options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
             "--icon", "$projectDir/buildres/macos/JabRef.icns",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
 
+            // Target-speccific options
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef"
         )
