@@ -13,9 +13,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - Added support for dragging entries from the "Citation relations" tab to other libraries. [#15135](https://github.com/JabRef/jabref/issues/15135)
 
+### Changed
+
 ### Fixed
 
 - Fixed an application crash when dragging entries onto the tab bar while the Welcome tab is open. [#15135](https://github.com/JabRef/jabref/issues/15135)
+
+### Removed
 
 ## [6.0-alpha.5] – 2026-02-20
 
