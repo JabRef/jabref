@@ -84,7 +84,7 @@ javaModulePackaging {
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
             "--file-associations", "$projectDir\\buildres\\windows\\bibtexAssociations.properties",
-            // "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
 
             // Target-speccific options
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
