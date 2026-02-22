@@ -12,9 +12,12 @@ version = providers.gradleProperty("projVersion")
     .orElse("100.0.0")
     .get()
 
+mainModuleInfo {
+    annotationProcessor("info.picocli.codegen")
+}
+
 application{
-    mainClass.set("org.jabref.languageserver.cli.ServerCli")
-    mainModule.set("org.jabref.jabls.cli")
+    mainClass = "org.jabref.languageserver.cli.ServerCli"
 
     applicationDefaultJvmArgs = listOf(
         "--enable-native-access=com.sun.jna,org.apache.lucene.core",
@@ -24,37 +27,6 @@ application{
 
         "-XX:+UseStringDeduplication"
     )
-}
-
-// See https://bugs.openjdk.org/browse/JDK-8342623
-val target = java.toolchain.languageVersion.get().asInt()
-if (target >= 26) {
-    dependencies {
-        implementation("org.openjfx:jdk-jsobject")
-    }
-} else {
-    configurations.all {
-        exclude(group = "org.openjfx", module = "jdk-jsobject")
-    }
-}
-
-dependencies {
-    implementation(project(":jablib"))
-    implementation(project(":jabls"))
-
-    implementation("org.openjfx:javafx-controls")
-    implementation("org.openjfx:javafx-fxml")
-    implementation("org.jabref:afterburner.fx")
-
-    implementation("org.slf4j:slf4j-api")
-    implementation("org.tinylog:slf4j-tinylog")
-    implementation("org.tinylog:tinylog-impl")
-    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation("org.slf4j:jul-to-slf4j")
-    // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j")
-    implementation("info.picocli:picocli")
-    annotationProcessor("info.picocli:picocli-codegen")
 }
 
 tasks.test {
