@@ -15,6 +15,7 @@ import org.jabref.logic.util.NotificationService;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
+import kotlin.ranges.IntRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,9 +102,9 @@ public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistor
     private void storeMessagesForMap(Map<Integer, ChatHistoryRecord> map, List<ChatMessage> messages) {
         map.clear();
 
-        for (int i = 0; i < messages.size(); i++) {
-            map.put(i, ChatHistoryRecord.fromLangchainMessage(messages.get(i)));
-        }
+        new IntRange(0, messages.size() - 1).forEach(i ->
+                map.put(i, ChatHistoryRecord.fromLangchainMessage(messages.get(i)))
+        );
     }
 
     private Map<Integer, ChatHistoryRecord> getMapForEntry(Path bibDatabasePath, String citationKey) {
