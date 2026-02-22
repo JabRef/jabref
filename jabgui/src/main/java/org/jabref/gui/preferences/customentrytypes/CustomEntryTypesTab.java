@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.customentrytypes;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -184,7 +185,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
-        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multilineProperty());
+        //        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multilineProperty());
+        fieldTypeMultilineColumn.setCellValueFactory(this::createMultilinePropertyListener);
         makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         fieldTypeActionColumn.setSortable(false);
@@ -303,4 +305,18 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
             entryTypesTable.refresh();
         }
     }
+
+    private BooleanProperty createMultilinePropertyListener(TableColumn.CellDataFeatures<FieldViewModel, Boolean> item) {
+        BooleanProperty property = item.getValue().multilineProperty();
+        property.addListener((obs, wasSelected, isSelected) -> {
+            viewModel.entryTypes().forEach(typeViewModel -> {
+                typeViewModel.fields().stream()
+                             .filter(field -> field.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
+                             .forEach(field -> field.multilineProperty().set(isSelected));
+            });
+        });
+        return property;
+    }
+
+    // TODO: implement reset to default on fields
 }
