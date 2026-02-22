@@ -18,6 +18,7 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
         return keywordListProperty;
     }
 
-    StringConverter<Keyword> getStringConverter() {
+    static StringConverter<Keyword> getStringConverter() {
         return new StringConverter<>() {
             @Override
             public String toString(Keyword keyword) {
@@ -73,14 +74,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
             @Override
             public Keyword fromString(String keywordString) {
-                if (keywordString == null || keywordString.isEmpty()) {
-                    return null;
-                }
-
-                return KeywordList.parse(keywordString, keywordSeparator)
-                                  .stream()
-                                  .findFirst()
-                                  .orElse(null);
+                return Keyword.ofHierarchical(keywordString);
             }
         };
     }
@@ -93,12 +87,17 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                                                       .distinct()
                                                       .collect(Collectors.toList());
 
-        Keyword requestedKeyword = getStringConverter().fromString(request);
+        Keyword requestedKeyword = parseKeyword(request);
         if (!suggestions.contains(requestedKeyword)) {
             suggestions.addFirst(requestedKeyword);
         }
 
         return suggestions;
+    }
+
+    @Nullable
+    public Keyword parseKeyword(String keyword) {
+        return KeywordList.parse(keyword, keywordSeparator).stream().findFirst().orElse(null);
     }
 
     public Character getKeywordSeparator() {
