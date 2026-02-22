@@ -75,16 +75,16 @@ javaModulePackaging {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
         appImageOptions.addAll(
             // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/windows/JabRef.ico",
+            "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
         )
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
 
             // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/windows/JabRef.ico",
-            "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties",
-            // "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
+            "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
+            "--file-associations", "$projectDir\\buildres\\windows\\bibtexAssociations.properties",
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
 
             // Target-speccific options
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
