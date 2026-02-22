@@ -62,21 +62,27 @@ tasks.named<JavaExec>("run") {
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     applicationName = "JabRef"
-    jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
+
+    options.adAll(
+        "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
+        "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md"
+    )
 
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
         options.addAll(
+            "--icon", "$projectDir/buildres/linux/JabRef.png",
+            "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties",
+
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
             "--win-dir-chooser",
             "--win-shortcut",
             "--win-menu",
-            "--win-menu-group", "JabRef",
-            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
-            "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
+            "--win-menu-group", "JabRef"
         )
         targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
             include("jabref-firefox.json")
@@ -86,13 +92,14 @@ javaModulePackaging {
         })
     }
     targetsWithOs("linux") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
         options.addAll(
+            "--icon", "$projectDir/buildres/linux/JabRef.png",
+            "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties",
+
             "--linux-menu-group", "Office;",
             // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
-            "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
-            "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
-            "--linux-shortcut",
-            "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
+            "--linux-shortcut"
         )
         targetResources.from(layout.projectDirectory.dir("buildres/linux").asFileTree.matching {
             include("native-messaging-host/**")
@@ -100,11 +107,13 @@ javaModulePackaging {
         })
     }
     targetsWithOs("macos") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
         options.addAll(
             "--icon", "$projectDir/buildres/macos/JabRef.icns",
-            "--mac-package-identifier", "JabRef",
-            "--mac-package-name", "JabRef",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
+
+            "--mac-package-identifier", "JabRef",
+            "--mac-package-name", "JabRef"
         )
         if (providers.environmentVariable("OSXCERT").orNull?.isNotBlank() ?: false) {
             options.addAll(
