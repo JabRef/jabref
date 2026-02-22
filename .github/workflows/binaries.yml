@@ -106,13 +106,15 @@ permissions:
   pull-requests: write
 
 env:
-  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
-  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
-  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
-  OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
   GRADLE_OPTS: -Xmx4g -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
+
+  # API keys
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}-${{ github.event.inputs.useEaJdk }}-${{ github.event.inputs.jdkVersion }}-${{ github.event.inputs.jdkVersionFlavour }}-${{ github.event.inputs.javafxVersion }}"
@@ -120,13 +122,16 @@ concurrency:
 
 jobs:
   conditions:
-    runs-on: ubuntu-latest
+    # Dependency updates should only run in the main repo
+    if: ${{ github.repository == 'JabRef/jabref' || github.actor != 'dependabot[bot]' || github.ref_name != 'main' }}
+    runs-on: ubuntu-slim
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
       tagbuild: ${{ steps.binary.outputs.tagbuild }}
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
+      should-jbundle: ${{ steps.binary.outputs.should-jbundle }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
       jvmDistribution:  ${{ steps.binary.outputs.jvmDistribution }}
       useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
@@ -134,6 +139,10 @@ jobs:
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Determine conditions
         id: binary
         shell: bash
@@ -144,6 +153,10 @@ jobs:
           LABEL_NAME: ${{ github.event.label.name }}
           REPO_OWNER: ${{ github.repository_owner }}
         run: |
+          set -euo pipefail
+          set -x
+          PS4='+ ${LINENO}: '
+
           if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binaries" ]]; then
             echo "📦 build enabled"
             echo "📦 build enabled" >> $GITHUB_STEP_SUMMARY
@@ -204,8 +217,10 @@ jobs:
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "⊘ tag bulid" >> $GITHUB_STEP_SUMMARY
+            echo "🏷️ tag build" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=true" >> "$GITHUB_OUTPUT"
+            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ no tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=false" >> "$GITHUB_OUTPUT"
@@ -232,17 +247,28 @@ jobs:
           echo "⊘ no macOS notarization" >> $GITHUB_STEP_SUMMARY
           echo "should-notarize=false" >> "$GITHUB_OUTPUT"
 
-          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" = "main" ]; then
-            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}"
-            echo "☁️ Non-PR event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
-            echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            if [[ "${{ github.ref_name }}" == "main" ]]; then
+              echo "☁️ Push to \`main\` – will upload"
+              echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
+              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+              echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi;
+            echo "⊘ Push to some branch not main – skipping upload"
+            echo "⊘ Push to some branch not main – skipping upload" >> $GITHUB_STEP_SUMMARY
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi;
 
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "☁️ Push to `main` – will upload"
-            echo "☁️ Push to `main` – will upload" >> $GITHUB_STEP_SUMMARY
-            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "☁️? Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}"
+            echo "☁️= Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
+            echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
+            echo "should-jbundle=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -252,15 +278,19 @@ jobs:
             echo "☁️ Label 'dev: binaries' found – will upload"
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ Label 'dev: binaries' not found – skipping upload"
             echo "⊘ Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
           fi
 
   disk-space-check:
     needs: conditions
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       available: ${{ steps.diskspace.outputs.available }}
     steps:
@@ -282,7 +312,7 @@ jobs:
         shell: bash
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          TARGET="/var/www/builds.jabref.org/www/pull/$PR_NUMBER"
+          TARGET="/var/www/builds.jabref.org/www/pull-$PR_NUMBER"
           SSH_OPTS="-p 9922 -i sshkey -o StrictHostKeyChecking=no"
           HOST="jrrsync@build-upload.jabref.org"
           if ssh $SSH_OPTS "$HOST" "test -d '$TARGET'"; then
@@ -309,61 +339,99 @@ jobs:
             echo "⛔ not enough disk space – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Output URL
-        if: steps.diskspace.outputs.available == 'true'
+
+  compute-matrix:
+    needs: conditions
+    runs-on: ubuntu-slim
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - id: set
+        name: Compute Matrix
         shell: bash
+        env:
+          SHOULD_NOTARIZE: ${{ needs.conditions.outputs.should-notarize }}
         run: |
-          echo "Link: https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge"
-          echo "Link: <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>" >> $GITHUB_STEP_SUMMARY
+          # if you change the os version rename all other occurrences
+          # ./gradlew on Windows is because of https://github.com/gradle/gradle/pull/34227
+          MATRIX_JSON='{
+            "include": [
+              {
+                "os": "ubuntu-22.04",
+                "displayName": "linux-amd64",
+                "gradleCommand": "gradle",
+                "archivePortable": "tar -c -C jabgui/build/packages/ubuntu-22.04 JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04/JabRef-portable_linux.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04/JabRef",
+                "archivePortableJabKit": "tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit",
+                "archivePortableJabLS": "tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls",
+                "suffix": "",
+                "archForDebianRepack": "_amd64"
+              },
+              {
+                "os": "ubuntu-22.04-arm",
+                "displayName": "linux-arm",
+                "gradleCommand": "gradle",
+                "archivePortable": "tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef",
+                "archivePortableJabKit": "tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit",
+                "archivePortableJabLS": "tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls",
+                "suffix": "_arm64",
+                "archForDebianRepack": "_arm64"
+              },
+              {
+                "os": "windows-latest",
+                "displayName": "windows-amd64",
+                "gradleCommand": "./gradlew",
+                "archivePortable": "7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef",
+                "archivePortableJabKit": "7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit",
+                "archivePortableJabLS": "7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls",
+                "suffix": "",
+                "archForDebianRepack": ""
+              },
+              {
+                "os": "macos-15-intel",
+                "displayName": "macOS-intel",
+                "gradleCommand": "gradle",
+                "archivePortable": "7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app",
+                "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app",
+                "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app",
+                "suffix": "_intel",
+                "archForDebianRepack": ""
+              },
+              {
+                "os": "macos-15",
+                "displayName": "macOS-silicon",
+                "gradleCommand": "gradle",
+                "archivePortable": "7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app",
+                "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app",
+                "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app",
+                "suffix": "_silicon",
+                "archForDebianRepack": ""
+              }
+            ]
+          }'
+
+          if [[ "$GITHUB_REF" != "refs/heads/main" && "$SHOULD_NOTARIZE" != "true" ]]; then
+            # drop macos-15-intel
+            MATRIX_JSON="$(jq -c ' .include |= map(select(.os != "macos-15-intel")) ' <<<"$MATRIX_JSON")"
+          else
+            # Format into one line for output, otherwise it cannot be used as matrix output
+            MATRIX_JSON="$(jq -c . <<<"$MATRIX_JSON")"
+          fi
+
+          echo "matrix=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
 
   build:
-    needs: [ conditions, disk-space-check ]
+    needs: [ compute-matrix, conditions, disk-space-check ]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # if you change the os version rename all other occurrences
-          - os: ubuntu-22.04 # if this is adapted, also the next lines need to be adapted
-            displayName: linux-amd64
-            archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04 JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04/JabRef-portable_linux.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04/JabRef
-            archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit
-            archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls
-            suffix: ''
-            archForDebianRepack: '_amd64'
-          - os: ubuntu-22.04-arm # if this is adapted, also the next lines need to be adapted
-            displayName: linux-arm
-            archivePortable: tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef
-            archivePortableJabKit: tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit
-            archivePortableJabLS: tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls
-            suffix: '_arm64'
-            archForDebianRepack: '_arm64'
-          - os: windows-latest
-            displayName: windows-amd64
-            archivePortable: 7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef
-            archivePortableJabKit: 7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls
-            suffix: ''
-            archForDebianRepack: ''
-          - os: macos-15-intel
-            displayName: macOS-intel
-            archivePortable: 7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app
-            suffix: '_intel'
-            archForDebianRepack: ''
-          - os: macos-15
-            displayName: macOS-silicon
-            archivePortable: 7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app
-            archivePortableJabLS: 7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app
-            suffix: '_silicon'
-            archForDebianRepack: ''
+        ${{ fromJSON(needs.compute-matrix.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
-      branchname: ${{ steps.gitversion.outputs.branchName }}
+      branchname: ${{ steps.normalize.outputs.branch }}
+      url: ${{ steps.url.outputs.url }}
     name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Fetch all history for all tags and branches
@@ -372,13 +440,35 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+
       - name: Install GitVersion
+        id: pre-gitversion
+        # background: true
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
+        # wait: pre-gitversion
+        # background: true
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
+
+      - name: Setup SSH key
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Setup rsync (macOS)
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        run: brew install rsync
+      - name: Setup rsync (Windows)
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
+        # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
+        # We cannot use "setup-rsync", because that does not work on Windows
+        # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
+        # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
+        run: choco install rsync --version=6.4.4
 
       - name: Patch used JDK
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.jvmVendor != 'AMAZON' }}
@@ -391,7 +481,7 @@ jobs:
           sed "${SED_I[@]}" "s/AMAZON/${{ inputs.jvmVendor }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
 
-      # region setup JDK EA and JavaFX EA
+      # Setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
         if: ${{ needs.conditions.outputs.useEaJdk == 'true' }}
         uses: oracle-actions/setup-java@v1
@@ -411,7 +501,6 @@ jobs:
           sed "${SED_I[@]}" "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed "${SED_I[@]}" "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed "${SED_I[@]}" "s|val javafx = .*|val javafx = \"${{ needs.conditions.outputs.javafxVersion }}\"|" versions/build.gradle.kts
-      # endregion
 
       - uses: ./.github/actions/setup-gradle
         with:
@@ -428,11 +517,68 @@ jobs:
           which jlink
           jlink --version
 
-      - name: Workaround for jpackage issue
+      - name: Normalize branch name
+        id: normalize
+        # wait: gitversion
+        shell: bash
         run: |
-          cd jabgui
-          cp buildres/linux/JabRef.png . # Linux
-          cp buildres/windows/JabRef.ico . # Windows
+          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
+          branch="${branch%-merge}"   # removes suffix only if present
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - name: Output URL
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        id: url
+        run: |
+          echo "Link: https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/"
+          echo "Link: <https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/>" >> $GITHUB_STEP_SUMMARY
+          echo "url=https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/" >> "$GITHUB_OUTPUT"
+      - name: Create backlink to PR at builds.jabref.org
+        # background: true
+        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
+        run: |
+          echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
+
+      # jablib is used by all components - thus, compile it first
+      - name: jablib jar
+        id: jablib-jar
+        # wait: gitversion
+        # background: true
+        run: ${{ matrix.gradleCommand }} :jablib:jar
+        env:
+          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
+
+      # Save disk space
+      # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+      - run: sudo rm -rf /usr/local/lib/android/sdk
+        # background: true
+        if: startsWith(matrix.os, 'ubuntu')
+      - run: sudo rm -rf /usr/local/.ghcup
+        # background: true
+        if: startsWith(matrix.os, 'ubuntu')
+      - run: sudo rm -rf /usr/share/swift
+        # background: true
+        if: startsWith(matrix.os, 'ubuntu')
+
+      # Both JabRef Language Server and JabRef HTTP Server are required by the GUI
+      # They are independent from each other and could be build in parallel.
+      # - wait: jablib-jar # plus "normalize"
+      - name: jabls jar
+        # background: true
+        id: jabls-jar
+        run: ${{ matrix.gradleCommand }} :jabls:jar
+        env:
+          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
+      - name: jabsrv jar
+        # background: true
+        id: jabsrv-jar
+        run: ${{ matrix.gradleCommand }} :jabsrv:jar
+        env:
+          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
 
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
@@ -450,150 +596,135 @@ jobs:
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
 
-      - run: ./gradlew :jabgui:dependencies
-        shell: bash
-
-      - name: jpackage JabGui
-        shell: bash
-        run: ./gradlew -i -PeaJdkBuild="${{ needs.conditions.outputs.useEaJdk }}" -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
-      - name: Smoke test JabGui
-        shell: bash
-        run: |
-          ./gradlew :jabgui:run --args="--help"
-
+      - name: Install jbundle
+        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: jbundle
+          git: https://github.com/avelino/jbundle/
+          branch: main
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pigz
           version: 1.0
-      - name: Package JabGui application image
-        shell: bash
-        run: |
-          set -e
-          ${{ matrix.archivePortable }}
-      - name: Rename files
-        shell: pwsh
-        run: |
-          get-childitem -Path 'jabgui/build/packages/*/*' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
-      - name: Repack deb file for Debian
-        if: (startsWith(matrix.os, 'ubuntu'))
-        shell: bash
-        run: |
-          cd jabgui/build/packages/${{ matrix.os }}
-          ls -l
-          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
-          rm jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
-          zstd -d < control.tar.zst | xz > control.tar.xz
-          zstd -d < data.tar.zst | xz > data.tar.xz
-          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb debian-binary control.tar.xz data.tar.xz
-          rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
 
-      - name: Setup SSH key
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+      - name: Workaround for jpackage issue
         run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-      - name: Setup rsync (macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
-        run: brew install rsync
-      - name: Setup rsync (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
-        # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
-        # We cannot use "setup-rsync", because that does not work on Windows
-        # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
-        # We need to use v6.4.4 as v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
-        run: choco install rsync --version=6.4.4
+          cd jabgui
+          cp buildres/linux/JabRef.png .   # Linux
+          cp buildres/windows/JabRef.ico . # Windows
 
-      - name: Upload jabgui to builds.jabref.org (Linux, macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && ((startsWith(matrix.os, 'macos') && (needs.conditions.outputs.should-notarize != 'true')) || startsWith(matrix.os, 'ubuntu')) }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabgui to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        shell: cmd
-        # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+      # jars already exists - thus, these calls will build on the jar result (hopefully).
+      # - wait: [ jabls-jar, jabsrv-jar ]
+
+      - uses: ./.github/actions/package
+        name: Package JabRef Language Server
+        id: jabls-cli
+        # background: true
         with:
-          name: JabGui (${{ matrix.displayName }})
-          path: |
-            jabgui/build/packages/${{ matrix.os }}
-
-      - name: jpackage JabKit
-        shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Smoke test JabKit
-        shell: bash
-        run: |
-          ./gradlew :jabkit:run --args="--help"
-      - name: Package JabKit application image
-        shell: bash
-        run: |
-          set -e
-          ${{ matrix.archivePortableJabKit }}
-      - name: Upload jabkit to builds.jabref.org (Linux, macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabkkit to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        shell: cmd
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+          gradleCommand: ${{ matrix.gradleCommand }}
+          component: jabls-cli
+          componentShort: jabls
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.normalize.outputs.branch }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortableJabLS }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
+      - uses: ./.github/actions/package
+        name: Package JabRef HTTP Server
+        # background: true
         with:
-          name: JabKit (${{ matrix.displayName }})
-          path: |
-            jabkit/build/packages/${{ matrix.os }}
-
-      - name: jpackage jabls-cli
-        shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabls-cli:jpackage
-      - name: Smoke test jabls-cli
-        shell: bash
-        run: |
-          ./gradlew :jabls-cli:run --args="--help"
-      - name: Package jabls-cli application image
-        shell: bash
-        run: |
-          set -e
-          ${{ matrix.archivePortableJabLS }}
-      - name: Upload jabls-cli to builds.jabref.org (Linux, macOS)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
-        shell: bash
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload jabls-cli to builds.jabref.org (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
-        shell: cmd
-        run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabls-cli/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload artifacts
-        if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+          gradleCommand: ${{ matrix.gradleCommand }}
+          component: jabsrv-cli
+          componentShort: jabsrv
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.normalize.outputs.branch }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: 'NONE'
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
+      - uses: ./.github/actions/package
+        name: Package JabGUI
+        id: jabgui
+        # background: true
         with:
-          name: JabLs (${{ matrix.displayName }})
-          path: |
-            jabls-cli/build/packages/${{ matrix.os }}
-
-      # Currently not packaged, but we build and smoke test it to detect errors early
-      - name: Smoke test jabsrv-cli
-        shell: bash
-        run: |
-          ./gradlew :jabsrv-cli:run --args="--help"
+          gradleCommand: ${{ matrix.gradleCommand }}
+          component: jabgui
+          componentShort: jabgui
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.normalize.outputs.branch }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortable }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
+      - uses: ./.github/actions/package
+        name: Package JabKit
+        # background: true
+        with:
+          gradleCommand: ${{ matrix.gradleCommand }}
+          component: jabkit
+          componentShort: jabkit
+          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
+          branchName: ${{ steps.normalize.outputs.branch }}
+          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+          Major: ${{ steps.gitversion.outputs.Major }}
+          Minor: ${{ steps.gitversion.outputs.Minor }}
+          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortableJabKit }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        # wait: [ jabgui, jabls-cli ]
         uses: actions/upload-artifact@v6
         with:
           # tbn = to-be-notarized
@@ -610,18 +741,19 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Comment PR
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-            The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
+            The build of this PR is available at <${{ needs.build.outputs.url }}>.
           comment-tag: download-link
           mode: recreate
       - name: Create GitHub Summary
-        run: echo "The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>." >> "$GITHUB_STEP_SUMMARY"
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        run: echo "The build of this PR is available at <${{ needs.build.outputs.url }}>." >> "$GITHUB_STEP_SUMMARY"
       - name: echo PR data
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -647,14 +779,14 @@ jobs:
           bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!13109\b)\d+)'
           bodyRegexFlags: 'i'
           outputOnly: true
-      - name: Comment on issue
-        if: ${{ steps.get_issue_number.outputs.ticketNumber != '-1' }}
+      - name: Comment on issue (build available)
+        if: ${{ (steps.get_issue_number.outputs.ticketNumber != '-1') && (needs.disk-space-check.outputs.available == 'true') }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           message: >
             A pull request addressing the issue has been created.
-            The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
+            The build of this PR is available at <${{ needs.build.outputs.url }}>.
 
 
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
@@ -725,3 +857,16 @@ jobs:
           name: ${{ matrix.displayName }}
           path: |
             ${{ matrix.path }}/build/packages/${{ matrix.os }}
+
+  upload-pr-nnumber:
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v6
+        with:
+          name: pr_number
+          path: pr_number.txt
