@@ -16,6 +16,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 ### Removed
+### [Unreleased]
+
+### Fixed
+- Fixed markdown documentation comments by replacing them with proper region markers for consistency. [#14897](https://github.com/JabRef/jabref/issues/14897)
 
 ## [6.0-alpha.5] – 2026-02-20
 
