@@ -629,6 +629,10 @@ jobs:
           cp buildres/linux/JabRef.png .   # Linux
           cp buildres/windows/JabRef.ico . # Windows
 
+      - name: Check WiX Version
+        run: candle -?
+        if: startsWith(matrix.os, 'windows')
+
       # jars already exists - thus, these calls will build on the jar result (hopefully).
       # - wait: [ jabls-jar, jabsrv-jar ]
 
