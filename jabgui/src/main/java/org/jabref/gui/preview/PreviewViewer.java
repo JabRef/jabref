@@ -211,7 +211,19 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         BibEntry currentEntry = entry;
 
         BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
-                      .onSuccess(this::setPreviewText)
+                      .onSuccess(text -> {
+                          setPreviewText(text);
+
+                          // Trigger downloading of the cover in the background
+                          BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(currentEntry))
+                                        .onSuccess(downloaded -> {
+                                            if (downloaded) {
+                                                // Review the same preview text since cover has just been downloaded
+                                                setPreviewText(text);
+                                            }
+                                        })
+                                        .executeWith(taskExecutor);
+                      })
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
                       .executeWith(taskExecutor);
     }
