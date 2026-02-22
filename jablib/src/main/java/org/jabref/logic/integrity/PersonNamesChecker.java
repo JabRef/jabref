@@ -24,21 +24,24 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        String valueTrimmedAndLowerCase = value.trim().toLowerCase(Locale.ROOT);
-        if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
+        String valueTrimmed = value.trim();
+        String valueLower = valueTrimmed.toLowerCase(Locale.ROOT);
+
+        if (valueLower.startsWith("and ") || valueLower.startsWith(",")) {
             return Optional.of(Localization.lang("should start with a name"));
-        } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
+        } else if (valueLower.endsWith(" and") || valueLower.endsWith(",")) {
             return Optional.of(Localization.lang("should end with a name"));
         }
 
-        // Remove all brackets to handle corporate names correctly, e.g., {JabRef}
-        value = new RemoveBrackets().format(value);
-        // Check that the value is in one of the two standard BibTeX formats:
-        //  Last, First and ...
-        //  First Last and ...
-        AuthorList authorList = AuthorList.parse(value);
-        if (!authorList.getAsLastFirstNamesWithAnd(false).equals(value)
-                && !authorList.getAsFirstLastNamesWithAnd().equals(value)) {
+        if (valueTrimmed.startsWith("{") && valueTrimmed.endsWith("}")) {
+            return Optional.empty();
+        }
+
+        String valueWithoutBrackets = new RemoveBrackets().format(valueTrimmed);
+        AuthorList authorList = AuthorList.parse(valueTrimmed);
+
+        if (!authorList.getAsLastFirstNamesWithAnd(false).equals(valueWithoutBrackets)
+                && !authorList.getAsFirstLastNamesWithAnd().equals(valueWithoutBrackets)) {
             return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));
         }
 
