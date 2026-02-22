@@ -48,19 +48,19 @@ class KeywordsEditorViewModelTest {
     }
 
     @Test
-    void stringConverterFromStringWithHierarchicalKeywords() {
+    void parseKeywordWithHierarchicalKeywords() {
         String hierarchichalString = "parent > node > child";
         Keyword parsedKeyword = KeywordList.parse(hierarchichalString, viewModel.getKeywordSeparator()).get(0);
 
-        assertEquals(parsedKeyword, viewModel.getStringConverter().fromString(hierarchichalString));
+        assertEquals(parsedKeyword, viewModel.parseKeyword(hierarchichalString));
     }
 
     @Test
-    void stringConverterFromStringWithMultipleKeywords() {
+    void parseKeywordWithMultipleKeywords() {
         String multipleKeysStr = "key1, key2";
         Keyword firstParsedKeyword = KeywordList.parse(multipleKeysStr, viewModel.getKeywordSeparator()).get(0);
 
-        assertEquals(firstParsedKeyword, viewModel.getStringConverter().fromString(multipleKeysStr));
+        assertEquals(firstParsedKeyword, viewModel.parseKeyword(multipleKeysStr));
     }
 
     @Test
@@ -68,6 +68,6 @@ class KeywordsEditorViewModelTest {
         String hierarchichalString = "parent > node > child";
         Keyword keyword = Keyword.ofHierarchical(hierarchichalString);
 
-        assertEquals(hierarchichalString, viewModel.getStringConverter().toString(keyword));
+        assertEquals(hierarchichalString, KeywordsEditorViewModel.getStringConverter().toString(keyword));
     }
 }
