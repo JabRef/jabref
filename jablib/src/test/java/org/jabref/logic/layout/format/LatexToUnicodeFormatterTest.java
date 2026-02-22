@@ -206,7 +206,7 @@ class LatexToUnicodeFormatterTest {
     }
 
     @Test
-    void formatPreservesNoBreakingSpaces() {
+    void formatPreservesNoBreakSpaces() {
         assertEquals("Y.\u00a0Matsumoto", formatter.format("Y.~Matsumoto"));
     }
 }
