@@ -16,44 +16,47 @@ module org.jabref.jabsrv {
     opens org.jabref.http.server.resources to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     exports org.jabref.http.server.resources;
 
-    requires transitive javafx.base;
+    requires javafx.base;
 
     // For CAYW feature
     requires transitive javafx.graphics;
     requires transitive javafx.controls;
     requires afterburner.fx;
-    requires java.desktop;
 
     // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
-    requires /*runtime*/ org.glassfish.hk2.locator;
+    requires org.glassfish.hk2.locator;
+    uses org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl;
 
-    requires transitive org.jabref.jablib;
+    requires org.jabref.jablib;
 
-    requires transitive org.slf4j;
+    requires org.slf4j;
 
     requires com.google.common;
-    requires transitive com.google.gson;
+    requires com.google.gson;
 
-    requires transitive org.glassfish.hk2.api;
+    requires org.glassfish.hk2.api;
 
-    requires static jakarta.annotation;
-    requires transitive jakarta.inject;
-
-    // Injection framework
-    requires /*runtime*/ org.glassfish.jersey.inject.hk2;
+    requires jakarta.annotation;
+    requires jakarta.inject;
 
     requires org.glassfish.grizzly;
-    requires transitive org.glassfish.grizzly.http.server;
-    requires transitive jakarta.ws.rs;
+    requires org.glassfish.grizzly.http;
+    requires org.glassfish.grizzly.http.server;
+    requires jakarta.validation;
+    requires jakarta.ws.rs;
 
+    requires org.glassfish.jersey.core.common;
     requires org.glassfish.jersey.core.server;
     requires org.glassfish.jersey.container.grizzly2.http;
 
     requires net.harawata.appdirs;
+    requires com.sun.jna;
+    requires com.sun.jna.platform;
+
+    requires jbibtex;
+    requires citeproc.java;
 
     requires transitive org.jspecify;
     requires java.logging;
-    requires tools.jackson.core;
     requires tools.jackson.databind;
-    requires transitive com.fasterxml.jackson.annotation;
 }

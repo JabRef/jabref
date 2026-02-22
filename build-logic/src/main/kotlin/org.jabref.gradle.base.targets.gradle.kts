@@ -1,13 +1,11 @@
 plugins {
-    id("org.jabref.gradle.base.dependency-rules")
     id("org.gradlex.java-module-packaging")
 }
 
-val jdkVersion = java.toolchain.languageVersion.map { it.asInt() }
-val isIbm = javaToolchains.launcherFor(java.toolchain)
+val javaExt = extensions.getByType<JavaPluginExtension>()
+val toolchains = extensions.getByType<JavaToolchainService>()
+val isIbm = toolchains.launcherFor(javaExt.toolchain)
     .map { it.metadata.vendor.contains("IBM", ignoreCase = true) }
-
-val mainRuntimeClasspath = configurations["mainRuntimeClasspath"]
 
 // Source: https://github.com/jjohannes/java-module-system/blob/main/gradle/plugins/src/main/kotlin/targets.gradle.kts
 // Configure variants for OS. Target name can be any string, but should match the name used in GitHub actions.
@@ -32,47 +30,27 @@ javaModulePackaging {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "deb", "rpm")
-        configurations.named("${name}RuntimeClasspath") {
-            shouldResolveConsistentlyWith(mainRuntimeClasspath)
-            attributes.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jdkVersion)
-        }
     }
     target("ubuntu-22.04-arm") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "deb", "rpm")
-        configurations.named("${name}RuntimeClasspath") {
-            shouldResolveConsistentlyWith(mainRuntimeClasspath)
-            attributes.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jdkVersion)
-        }
     }
     target("macos-15-intel") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
-        configurations.named("${name}RuntimeClasspath") {
-            shouldResolveConsistentlyWith(mainRuntimeClasspath)
-            attributes.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jdkVersion)
-        }
     }
     target("macos-15") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.ARM64
         packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
-        configurations.named("${name}RuntimeClasspath") {
-            shouldResolveConsistentlyWith(mainRuntimeClasspath)
-            attributes.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jdkVersion)
-        }
     }
     target("windows-latest") {
         operatingSystem = OperatingSystemFamily.WINDOWS
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "msi")
-        configurations.named("${name}RuntimeClasspath") {
-            shouldResolveConsistentlyWith(mainRuntimeClasspath)
-            attributes.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jdkVersion)
-        }
     }
 }
