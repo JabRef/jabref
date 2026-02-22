@@ -101,6 +101,8 @@
     <Icon Id="JpARPPRODUCTICON" SourceFile="$(var.JpIcon)"/>
     <?endif?>
 
+    <WixVariable Id="WixUIBannerBmp" Value="${var.JpConfigDir}\JabRefTopBanner.bmp">
+
     <UIRef Id="JpUI"/>
 
     <InstallExecuteSequence>
@@ -162,6 +164,5 @@
     <Feature Id="BrowserExtension" Level="1">
       <ComponentRef Id="RegistryJabRefBrowserEntries" />
     </Feature>
-  <!--  <WixVariable Id="WixUIBannerBmp" Value="JabRefTopBanner.bmp" /> -->
   </Product>
 </Wix>
