@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
+
 ### Changed
 
 ### Fixed
@@ -42,7 +44,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to clear [groups with explicitly selected entries](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups#explicit-selection). [#15001](https://github.com/JabRef/jabref/issues/15001)
 - We added an option to open the citation fetcher API URL in the browser in the Citations tab. [#15033](https://github.com/JabRef/jabref/issues/15033)
 - We added the option to group entries by entry type [#15040](https://github.com/JabRef/jabref/issues/15040)
-- We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
 - We added "DOI" and "URL" fields to the default customized preview style [#14193](https://github.com/JabRef/jabref/issues/14193)
 - We added a progress indicator for the cleanup operation. [#15122](https://github.com/JabRef/jabref/issues/15122)
 
