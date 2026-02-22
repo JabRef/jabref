@@ -9,6 +9,12 @@ description: |
   To access files in external media (i.e., USB drives) you must run:
   `snap connect jabref:removable-media`
 grade: stable
+title: JabRef
+donation: https://donations.jabref.org
+issues: https://github.com/JabRef/jabref/issues
+website: https://www.jabref.org/
+source-code: https://github.com/JabRef/jabref
+contact: web@jabref.org
 confinement: strict
 base: core24
 compression: lzo
