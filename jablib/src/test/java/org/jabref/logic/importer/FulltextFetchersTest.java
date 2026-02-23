@@ -12,6 +12,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.jspecify.annotations.NonNull;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,6 +71,44 @@ class FulltextFetchersTest {
         when(finderLow.getTrustLevel()).thenReturn(TrustLevel.UNKNOWN);
         final URL lowUrl = URLUtil.create("http://docs.oasis-open.org/opencsa/sca-bpel/sca-bpel-1.1-spec-cd-01.pdf");
         when(finderLow.findFullText(entry)).thenReturn(Optional.of(lowUrl));
+
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(finderLow, finderHigh));
+
+        assertEquals(Optional.of(highUrl), fetchers.findFullTextPDF(entry));
+    }
+
+    /**
+     * Stub implementing FulltextFetcher, used instead of Mockito.
+     */
+    private static class FulltextFetcherStub implements FulltextFetcher {
+        private final URL url;
+        private final TrustLevel trustLevel;
+
+        FulltextFetcherStub(URL url, TrustLevel trustLevel) {
+            this.url = url;
+            this.trustLevel = trustLevel;
+        }
+
+        @Override
+        public Optional<URL> findFullText(@NonNull BibEntry entry) {
+            return Optional.of(url);
+        }
+
+        @Override
+        public TrustLevel getTrustLevel() {
+            return trustLevel;
+        }
+    }
+
+    @Test
+    void higherTrustLevelWinsWithStub() throws IOException, FetcherException {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.5220/0007903201120130");
+
+        final URL highUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
+        final URL lowUrl = URLUtil.create("http://docs.oasis-open.org/opencsa/sca-bpel/sca-bpel-1.1-spec-cd-01.pdf");
+
+        FulltextFetcher finderHigh = new FulltextFetcherStub(highUrl, TrustLevel.SOURCE);
+        FulltextFetcher finderLow = new FulltextFetcherStub(lowUrl, TrustLevel.UNKNOWN);
 
         FulltextFetchers fetchers = new FulltextFetchers(Set.of(finderLow, finderHigh));
 
