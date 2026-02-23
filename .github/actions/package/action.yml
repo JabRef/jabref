@@ -56,7 +56,7 @@ runs:
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
-        OSXCERT: true
+        OSXCERT: ${{ inputs.secretsPresent }}
         AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
         BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
         IEEEAPIKey: ${{ inputs.ieeeApiKey }}
