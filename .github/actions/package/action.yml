@@ -64,6 +64,7 @@ runs:
       if: ${{ inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' }}
       shell: bash
       run: |
+        ls -la ${{ inputs.component }}/build/packages/${{ inputs.os }}/
         codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
     - name: Smoke test ${{ inputs.component }}
       shell: bash
