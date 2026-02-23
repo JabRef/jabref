@@ -80,15 +80,20 @@ public class BookCoverFetcher {
             }
             return success;
         } catch (org.jabref.logic.importer.FetcherClientException e) {
-            // HTTP 4xx — the server confirmed no cover exists for this ISBN
-            LOGGER.info("No cover found for ISBN {} ({}). Will skip for 24h.", isbn.asString(), e.getMessage());
+            // Only cache a 404 (cover doesn't exist) — 429, 403, etc. are transient and should be retried
+            int statusCode = e.getHttpResponse().map(r -> r.statusCode()).orElse(-1);
+            if (statusCode != java.net.HttpURLConnection.HTTP_NOT_FOUND) {
+                LOGGER.warn("Non-404 client error ({}) fetching cover for ISBN {}, will retry next time", statusCode, isbn.asString(), e);
+                return false;
+            }
+            LOGGER.info("No cover found for ISBN {} (HTTP 404). Will skip for 24h.", isbn.asString(), e);
             try {
                 if (!Files.exists(notAvailableFile)) {
                     Files.createDirectories(directory);
                     Files.createFile(notAvailableFile);
                 } else {
                     Files.setLastModifiedTime(notAvailableFile,
-                            java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+                                              java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
                 }
             } catch (IOException ioException) {
                 LOGGER.warn("Could not write .not-available file for {}", isbn.asString(), ioException);
@@ -120,12 +125,12 @@ public class BookCoverFetcher {
         }
 
         ExternalFileType inferredFileType = download
-                .getMimeType().flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
-                .filter(fileType -> fileType.getMimeType().startsWith("image/"))
-                .or(() -> FileUtil.getFileNameFromUrl(url).flatMap(FileUtil::getFileExtension)
-                                  .flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
-                                  .filter(fileType -> fileType.getMimeType().startsWith("image/")))
-                .orElse(StandardExternalFileType.JPG);
+                                                    .getMimeType().flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
+                                                    .filter(fileType -> fileType.getMimeType().startsWith("image/"))
+                                                    .or(() -> FileUtil.getFileNameFromUrl(url).flatMap(FileUtil::getFileExtension)
+                                                                      .flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
+                                                                      .filter(fileType -> fileType.getMimeType().startsWith("image/")))
+                                                    .orElse(StandardExternalFileType.JPG);
 
         Optional<Path> destination = resolveNameWithType(directory, name, inferredFileType);
         if (destination.isEmpty()) {
@@ -133,7 +138,7 @@ public class BookCoverFetcher {
         }
 
         download.toFile(destination.get());
-        
+
         return true;
     }
 

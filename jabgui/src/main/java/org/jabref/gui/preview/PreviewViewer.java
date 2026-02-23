@@ -55,26 +55,26 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT = """
-            function getSelectionHtml() {
-                var html = "";
-                if (typeof window.getSelection != "undefined") {
-                    var sel = window.getSelection();
-                    if (sel.rangeCount) {
-                        var container = document.createElement("div");
-                        for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-                            container.appendChild(sel.getRangeAt(i).cloneContents());
-                        }
-                        html = container.innerHTML;
+        function getSelectionHtml() {
+            var html = "";
+            if (typeof window.getSelection != "undefined") {
+                var sel = window.getSelection();
+                if (sel.rangeCount) {
+                    var container = document.createElement("div");
+                    for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                        container.appendChild(sel.getRangeAt(i).cloneContents());
                     }
-                } else if (typeof document.selection != "undefined") {
-                    if (document.selection.type == "Text") {
-                        html = document.selection.createRange().htmlText;
-                    }
+                    html = container.innerHTML;
                 }
-                return html;
+            } else if (typeof document.selection != "undefined") {
+                if (document.selection.type == "Text") {
+                    html = document.selection.createRange().htmlText;
+                }
             }
-            getSelectionHtml();
-            """;
+            return html;
+        }
+        getSelectionHtml();
+        """;
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
     private static final int HEIGHT_BUFFER = 15; // Ensures that text is not cut off
@@ -185,6 +185,21 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 observable.addListener(this);
             }
         }
+
+        // Kick off cover download when an entry is opened, not on every field-level update.
+        // We capture the reference here so the async callback can check it hasn't been replaced.
+        if (newEntry != null && preferences.getPreviewPreferences().shouldDownloadCovers()) {
+            BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(newEntry))
+                          .onSuccess(downloaded -> {
+                              // Only refresh if this is still the active entry when the download finishes
+                              if (downloaded && entry == newEntry) {
+                                  update();
+                              }
+                          })
+                          .onFailure(e -> LOGGER.error("Cover download failed for entry {}", newEntry.getCitationKey(), e))
+                          .executeWith(taskExecutor);
+        }
+
         update();
     }
 
@@ -200,9 +215,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void update() {
         if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
-                    databaseContext == null ? "null" : databaseContext,
-                    entry == null ? "null" : entry,
-                    layout == null ? "null" : layout);
+                         databaseContext == null ? "null" : databaseContext,
+                         entry == null ? "null" : entry,
+                         layout == null ? "null" : layout);
             setPreviewText("");
             return;
         }
@@ -211,23 +226,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         BibEntry currentEntry = entry;
 
         BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
-                      .onSuccess(text -> {
-                          setPreviewText(text);
-
-                          if (!preferences.getPreviewPreferences().shouldDownloadCovers()) {
-                              return;
-                          }
-
-                          BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(currentEntry))
-                                        .onSuccess(downloaded -> {
-                                            // Only refresh preview if the user hasn't switched to a different entry in the meantime
-                                            if (downloaded && Objects.equals(entry, currentEntry)) {
-                                                setPreviewText(text);
-                                            }
-                                        })
-                                        .onFailure(e -> LOGGER.error("Failed to download cover for entry {}", currentEntry.getCitationKey(), e))
-                                        .executeWith(taskExecutor);
-                      })
+                      .onSuccess(this::setPreviewText)
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
                       .executeWith(taskExecutor);
     }
@@ -236,14 +235,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         LOGGER.error("Error generating preview for entry: {}", entry.getCitationKey(), exception);
 
         return """
-                <div class="error">
-                    <h3>%s</h3>
-                    <p>%s</p>
-                    <p><small>Check the event logs for details.</small></p>
-                </div>
-                """.formatted(
-                Localization.lang("Error while generating citation style"),
-                exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
+            <div class="error">
+                <h3>%s</h3>
+                <p>%s</p>
+                <p><small>Check the event logs for details.</small></p>
+            </div>
+            """.formatted(
+                          Localization.lang("Error while generating citation style"),
+                          exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
     }
 
     private void setPreviewText(String text) {
@@ -276,15 +275,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
         return """
-                <html>
-                    <head>
-                        <base href="%s">
-                    </head>
-                    <body id="previewBody">
-                        %s <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(baseUrl, coverIfAny, text);
+            <html>
+                <head>
+                    <base href="%s">
+                </head>
+                <body id="previewBody">
+                    %s <div id="content"> %s </div>
+                </body>
+            </html>
+            """.formatted(baseUrl, coverIfAny, text);
     }
 
     private void highlightLayoutText() {
@@ -314,10 +313,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
 
         BackgroundTask.wrap(() -> {
-                          job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
-                          previewView.getEngine().print(job);
-                          job.endJob();
-                      })
+            job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
+            previewView.getEngine().print(job);
+            job.endJob();
+        })
                       .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e))
                       .executeWith(taskExecutor);
     }
@@ -359,11 +358,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void exportToClipBoard(StateManager stateManager) {
         ExportToClipboardAction exportToClipboardAction = new ExportToClipboardAction(
-                dialogService,
-                stateManager,
-                clipBoardManager,
-                taskExecutor,
-                preferences);
+                                                                                      dialogService,
+                                                                                      stateManager,
+                                                                                      clipBoardManager,
+                                                                                      taskExecutor,
+                                                                                      preferences);
         exportToClipboardAction.execute();
     }
 
@@ -380,9 +379,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             if (newState == Worker.State.SUCCEEDED) {
                 Platform.runLater(() -> {
                     Object result = previewView.getEngine().executeScript(
-                            "var content = document.getElementById('content');" +
-                                    "content ? content.getBoundingClientRect().height : document.body.scrollHeight;"
-                    );
+                                                                          "var content = document.getElementById('content');" +
+                                                                              "content ? content.getBoundingClientRect().height : document.body.scrollHeight;");
 
                     if (result instanceof java.lang.Number height) {
                         double actualH = height.doubleValue() + HEIGHT_BUFFER;
