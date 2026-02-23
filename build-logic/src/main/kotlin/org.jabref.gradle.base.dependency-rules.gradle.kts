@@ -454,7 +454,9 @@ extraJavaModuleInfo {
 
     module("org.openjfx:javafx-base", "javafx.base") {
         preserveExisting()
-        exports("javafx.collections")
+        exports("com.sun.javafx.event")
+        opens("javafx.collections")
+        opens("javafx.collections.transformation")
         opens("com.sun.javafx.beans", "net.bytebuddy")
     }
 
@@ -469,13 +471,15 @@ extraJavaModuleInfo {
         preserveExisting()
         exports("com.sun.javafx.scene")
         opens("com.sun.javafx.application", "org.testfx")
-        opens("javafx.stage", "com.pixelduke.fxthemes")
         opens("com.sun.javafx.tk.quantum", "com.pixelduke.fxthemes")
+        opens("javafx.scene", "org.controlsfx.controls")
+        opens("javafx.stage", "com.pixelduke.fxthemes")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         preserveExisting()
         exports("impl.org.controlsfx.skin")
+        opens("org.controlsfx.control.textfield")
         requires("javafx.graphics")
     }
 
