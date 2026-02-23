@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where institutional authors in braces {Institutional Author} triggered a "Names are not in the standard format" warning. [#15157](https://github.com/JabRef/jabref/issues/15157)
+- We fixed an issue where book covers were only downloaded when adding an entry, ensuring they are now also fetched when viewing an entry in the editor, with a 24-hour cache for missing covers. [#14848](https://github.com/JabRef/jabref/issues/14848)
 
 ### Removed
 
