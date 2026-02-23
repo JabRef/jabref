@@ -1312,6 +1312,28 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestSaveActionsJson() throws IOException {
+        ParserResult parserResult = parser.parse(
+                Reader.of("""
+                        @Comment{jabref-meta-0.1.0
+                        {
+                          "saveActions": {
+                            "state": true,
+                            "title": ["lower_case"]
+                          }
+                        }
+                        }
+                        """));
+
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
+
+        assertTrue(saveActions.isEnabled());
+        List<FieldFormatterCleanup> expected = List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()));
+        List<FieldFormatterCleanup> actual = saveActions.getConfiguredActions();
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void integrationTestBibEntryType() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));
