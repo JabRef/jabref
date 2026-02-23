@@ -39,6 +39,7 @@ import com.sun.star.comp.helper.ComponentContext;
 import com.sun.star.comp.helper.ComponentContextEntry;
 import com.sun.star.comp.loader.JavaLoader;
 import com.sun.star.comp.servicemanager.ServiceManager;
+import com.sun.star.connection.ConnectionSetupException;
 import com.sun.star.connection.NoConnectException;
 import com.sun.star.container.ElementExistException;
 import com.sun.star.container.XSet;
@@ -245,16 +246,41 @@ public class Bootstrap {
         return bootstrap(defaultArgArray, ooPath);
     }
 
-    /// Bootstraps the component context from a UNO installation.
-    ///
-    /// @param argArray an array of strings - commandline options to start instance of soffice with
-    /// @return a bootstrapped component context.
-    /// @throws BootstrapException if things go awry.
-    /// @see #getDefaultOptions()
-    /// @since LibreOffice 5.1
-    public static XComponentContext bootstrap(String[] argArray, Path path) throws BootstrapException, IOException, InterruptedException {
+    /**
+     * Bootstraps the component context from a UNO installation.
+     * @param argArray Array of String arguments
+     * @param path Path to openoffice
+     * @return XComponentContext
+     */
+    public static XComponentContext bootstrap(String[] argArray, Path path)
+            throws BootstrapException, IOException, InterruptedException {
+        ProcessStarter processStarter = cmd -> Runtime.getRuntime().exec(cmd);
+        UnoResolverFactory resolverFactory = UnoUrlResolver::create;
+        return bootstrap(argArray, path, Sleeper.THREAD_SLEEPER, processStarter, resolverFactory, 600, 500);
+    }
 
-        XComponentContext xContext = null;
+    /**
+     * Bootstraps a LibreOffice/OpenOffice instance and establishes a UNO connection to it.
+     * @param argArray additional command-line arguments passed to the office process
+     * @param path filesystem path to the LibreOffice/OpenOffice executable
+     * @param sleeper Sleeper for delaying between retry attempts
+     * @param processStarter strategy used to start the external office process
+     * @param resolverFactory factory used to create the {@link XUnoUrlResolver} for establishing the UNO connection
+     * @param maxAttempts maximum number of connection retry attempts before failing
+     * @param sleepMillis delay in milliseconds between retry attempts
+     * @return the connected {@link XComponentContext} once the office process is ready
+     *
+     *  @see #getDefaultOptions()
+     *  @since LibreOffice 5.1
+     */
+    static XComponentContext bootstrap(String[] argArray,
+                                       Path path,
+                                       Sleeper sleeper,
+                                       ProcessStarter processStarter,
+                                       UnoResolverFactory resolverFactory,
+                                       int maxAttempts,
+                                       long sleepMillis)
+            throws BootstrapException, IOException, InterruptedException {
 
         try {
             // create default local component context
@@ -268,11 +294,10 @@ public class Bootstrap {
             String[] cmdArray = new String[argArray.length + 2];
             cmdArray[0] = path.toAbsolutePath().toString();
             cmdArray[1] = "--accept=socket,host=localhost,port=2083" + ";urp;";
-
             System.arraycopy(argArray, 0, cmdArray, 2, argArray.length);
 
             // start office process
-            Process p = Runtime.getRuntime().exec(cmdArray);
+            Process p = processStarter.exec(cmdArray);
             pipe(p.getInputStream(), System.out, "CO> ");
             pipe(p.getErrorStream(), System.err, "CE> ");
 
@@ -283,35 +308,60 @@ public class Bootstrap {
             }
 
             // create a URL resolver
-            XUnoUrlResolver xUrlResolver = UnoUrlResolver.create(xLocalContext);
+            XUnoUrlResolver xUrlResolver = resolverFactory.create(xLocalContext);
 
             // connection string
             String sConnect = "uno:socket,host=localhost,port=2083" + ";urp;StarOffice.ComponentContext";
 
             // wait until office is started
-            for (int i = 0; ; ++i) {
-                try {
-                    // try to connect to office
-                    Object context = xUrlResolver.resolve(sConnect);
-                    xContext = UnoRuntime.queryInterface(XComponentContext.class, context);
-                    if (xContext == null) {
-                        throw new BootstrapException("no component context!");
-                    }
-                    break;
-                } catch (NoConnectException ex) {
-                    // Wait 500 ms, then try to connect again, but do not wait
-                    // longer than 5 min (= 600 * 500 ms) total:
-                    if (i == 600) {
-                        throw new BootstrapException(ex);
-                    }
-                    Thread.sleep(500);
-                }
-            }
+            return resolveWithRetry(xUrlResolver, sConnect, sleeper, maxAttempts, sleepMillis);
+
+        } catch (BootstrapException e) {
+            // keep BootstrapException as-is (more precise)
+            throw e;
+        } catch (InterruptedException e) {
+            // preserve interrupt status + rethrow
+            Thread.currentThread().interrupt();
+            throw e;
         } catch (Exception e) {
+            // wrap everything else
             throw new BootstrapException(e);
         }
+    }
 
-        return xContext;
+    /**
+     * Attempts to resolve a UNO connection repeatedly until it succeeds or the maximum
+     * number of attempts is reached.
+     * @param resolver the UNO URL resolver used to establish the connection
+     * @param connectString the UNO connection string to resolve
+     * @param sleeper abstraction used to pause between retry attempts
+     * @param maxAttempts maximum number of retries before failing
+     * @param sleepMillis delay in milliseconds between attempts
+     * @return the resolved {@link XComponentContext} once the connection succeeds
+     */
+    static XComponentContext resolveWithRetry(
+            XUnoUrlResolver resolver,
+            String connectString,
+            Sleeper sleeper,
+            int maxAttempts,
+            long sleepMillis
+    ) throws BootstrapException, InterruptedException {
+
+        for (int i = 0; ; i++) {
+            try {
+                Object context = resolver.resolve(connectString);
+                XComponentContext xContext = UnoRuntime.queryInterface(XComponentContext.class, context);
+                if (xContext == null) {
+                    throw new BootstrapException("no component context!");
+                }
+                return xContext;
+            } catch (NoConnectException | ConnectionSetupException ex) {
+                if (i == maxAttempts) {
+                    throw new BootstrapException(ex);
+                }
+                sleeper.sleep(sleepMillis);
+            }
+        }
     }
 
     private static void pipe(final InputStream in, final PrintStream out, final String prefix) {
