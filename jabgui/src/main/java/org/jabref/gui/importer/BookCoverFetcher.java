@@ -93,7 +93,7 @@ public class BookCoverFetcher {
                     Files.createFile(notAvailableFile);
                 } else {
                     Files.setLastModifiedTime(notAvailableFile,
-                                              java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+                            java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
                 }
             } catch (IOException ioException) {
                 LOGGER.warn("Could not write .not-available file for {}", isbn.asString(), ioException);
@@ -125,12 +125,12 @@ public class BookCoverFetcher {
         }
 
         ExternalFileType inferredFileType = download
-                                                    .getMimeType().flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
-                                                    .filter(fileType -> fileType.getMimeType().startsWith("image/"))
-                                                    .or(() -> FileUtil.getFileNameFromUrl(url).flatMap(FileUtil::getFileExtension)
-                                                                      .flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
-                                                                      .filter(fileType -> fileType.getMimeType().startsWith("image/")))
-                                                    .orElse(StandardExternalFileType.JPG);
+                .getMimeType().flatMap(mime -> ExternalFileTypes.getExternalFileTypeByMimeType(mime, externalApplicationsPreferences))
+                .filter(fileType -> fileType.getMimeType().startsWith("image/"))
+                .or(() -> FileUtil.getFileNameFromUrl(url).flatMap(FileUtil::getFileExtension)
+                                  .flatMap(ext -> ExternalFileTypes.getExternalFileTypeByExt(ext, externalApplicationsPreferences))
+                                  .filter(fileType -> fileType.getMimeType().startsWith("image/")))
+                .orElse(StandardExternalFileType.JPG);
 
         Optional<Path> destination = resolveNameWithType(directory, name, inferredFileType);
         if (destination.isEmpty()) {

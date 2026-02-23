@@ -2,32 +2,147 @@
 parent: Decision Records
 nav_order: 14
 ---
+
 # Separate URL creation to enable proper logging
 
 ## Context and Problem Statement
 
-Fetchers are failing.
-The reason why they are failing needs to be investigated.
+Fetchers
+are
+failing.
+The
+reason
+why
+they
+are
+failing
+needs
+to
+be
+investigated.
 
-* Claim 1: Knowing the URL which was used to query the fetcher eases debugging
-* Claim 2: Somehow logging the URL eases debugging (instead of showing it in the debugger only)
+*
 
-How to properly log the URL used for fetching?
+Claim
+1:
+Knowing
+the
+URL
+which
+was
+used
+to
+query
+the
+fetcher
+eases
+debugging
+
+*
+
+Claim
+2:
+Somehow
+logging
+the
+URL
+eases
+debugging (
+instead
+of
+showing
+it
+in
+the
+debugger
+only)
+
+How
+to
+properly
+log
+the
+URL
+used
+for
+fetching?
 
 ## Decision Drivers
 
-* Code should be easy to read
-* Include URL in the exception instead of logging in case an exception is thrown already (see <https://howtodoinjava.com/best-practices/java-exception-handling-best-practices/#6>)
+*
+
+Code
+should
+be
+easy
+to
+read
+
+*
+
+Include
+URL
+in
+the
+exception
+instead
+of
+logging
+in
+case
+an
+exception
+is
+thrown
+already (
+see <https://howtodoinjava.com/best-practices/java-exception-handling-best-practices/#6>)
 
 ## Considered Options
 
-* Separate URL creation
-* Create URL when logging the URL
-* Include URL creation as statement before the stream creation in the try-with-resources block
+*
+
+Separate
+URL
+creation
+
+*
+
+Create
+URL
+when
+logging
+the
+URL
+
+*
+
+Include
+URL
+creation
+as
+statement
+before
+the
+stream
+creation
+in
+the
+try-with-resources
+block
 
 ## Decision Outcome
 
-Chosen option: "Separate URL creation", because comes out best \(see below\).
+Chosen
+option: "
+Separate
+URL
+creation",
+because
+comes
+out
+best
+\(see
+below\).
 
 ## Pros and Cons of the Options
 
@@ -49,18 +164,95 @@ Chosen option: "Separate URL creation", because comes out best \(see below\).
     }
 ```
 
-* Good, because exceptions thrown at method are directly caught
-* Good, because exceptions in different statements belong to different catch blocks
-* Good, because code to determine URL is written once
-* OK, because "Java by Comparison" does not state anything about it
-* Bad, because multiple try/catch statements are required
-* Bad, because this style seems to be uncommon to Java coders
+*
+
+Good,
+because
+exceptions
+thrown
+at
+method
+are
+directly
+caught
+
+*
+
+Good,
+because
+exceptions
+in
+different
+statements
+belong
+to
+different
+catch
+blocks
+
+*
+
+Good,
+because
+code
+to
+determine
+URL
+is
+written
+once
+
+*
+
+OK,
+because "
+Java
+by
+Comparison"
+does
+not
+state
+anything
+about
+it
+
+*
+
+Bad,
+because
+multiple
+try/catch
+statements
+are
+required
+
+*
+
+Bad,
+because
+this
+style
+seems
+to
+be
+uncommon
+to
+Java
+coders
 
 ### Create URL when logging the URL
 
-The "logging" is done when throwing the exception.
+The "
+logging"
+is
+done
+when
+throwing
+the
+exception.
 
-Example code:
+Example
+code:
 
 ```java
     try (InputStream stream = getUrlDownload(getURLForQuery(query)).asInputStream()) {
@@ -84,10 +276,77 @@ Example code:
     }
 ```
 
-* Good, because code inside the `try` statement stays the same
-* OK, because "Java by Comparison" does not state anything about it
-* Bad, because an additional try/catch-block is added to each catch statement
-* Bad, because needs a `throw` statement in the `URISyntaxException` catch block (even though at this point the exception cannot be thrown), because Java otherwise misses a `return` statement.
+*
+
+Good,
+because
+code
+inside
+the
+`try`
+statement
+stays
+the
+same
+
+*
+
+OK,
+because "
+Java
+by
+Comparison"
+does
+not
+state
+anything
+about
+it
+
+*
+
+Bad,
+because
+an
+additional
+try/catch-block
+is
+added
+to
+each
+catch
+statement
+
+*
+
+Bad,
+because
+needs
+a
+`throw`
+statement
+in
+the
+`URISyntaxException`
+catch
+block (
+even
+though
+at
+this
+point
+the
+exception
+cannot
+be
+thrown),
+because
+Java
+otherwise
+misses
+a
+`return`
+statement.
 
 ### Include URL creation as statement before the stream creation in the try-with-resources block
 
@@ -103,6 +362,36 @@ Example code:
     }
 ```
 
-* Good, because the single try/catch-block can be kept
-* Good, because logical flow is kept
-* Bad, because does not compile (because URL is not an `AutoClosable`)
+*
+
+Good,
+because
+the
+single
+try/catch-block
+can
+be
+kept
+
+*
+
+Good,
+because
+logical
+flow
+is
+kept
+
+*
+
+Bad,
+because
+does
+not
+compile (
+because
+URL
+is
+not
+an
+`AutoClosable`)

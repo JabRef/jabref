@@ -53,10 +53,119 @@ Closes _____
       [/] not applicable
    -->
 
-- [x] I own the copyright of the code submitted and I license it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
-- [.] I manually tested my changes in running JabRef (always required)
-- [.] I added JUnit tests for changes (if applicable)
-- [.] I added screenshots in the PR description (if change is visible to the user)
-- [.] I added a screenshot in the PR description showing a library with a single entry with me as author and as title the issue number
-- [.] I described the change in `CHANGELOG.md` in a way that can be understood by the average user (if change is visible to the user)
-- [.] I checked the [user documentation](https://docs.jabref.org/) for up to dateness and submitted a pull request to our [user documentation repository](https://github.com/JabRef/user-documentation/tree/main/en)
+- [x] 
+  I
+  own
+  the
+  copyright
+  of
+  the
+  code
+  submitted
+  and
+  I
+  license
+  it
+  under
+  the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
+- [.]
+  I
+  manually
+  tested
+  my
+  changes
+  in
+  running
+  JabRef (
+  always
+  required)
+- [.]
+  I
+  added
+  JUnit
+  tests
+  for
+  changes (
+  if
+  applicable)
+- [.]
+  I
+  added
+  screenshots
+  in
+  the
+  PR
+  description (
+  if
+  change
+  is
+  visible
+  to
+  the
+  user)
+- [.]
+  I
+  added
+  a
+  screenshot
+  in
+  the
+  PR
+  description
+  showing
+  a
+  library
+  with
+  a
+  single
+  entry
+  with
+  me
+  as
+  author
+  and
+  as
+  title
+  the
+  issue
+  number
+- [.]
+  I
+  described
+  the
+  change
+  in
+  `CHANGELOG.md`
+  in
+  a
+  way
+  that
+  can
+  be
+  understood
+  by
+  the
+  average
+  user (
+  if
+  change
+  is
+  visible
+  to
+  the
+  user)
+- [.]
+  I
+  checked
+  the [user documentation](https://docs.jabref.org/)
+  for
+  up
+  to
+  dateness
+  and
+  submitted
+  a
+  pull
+  request
+  to
+  our [user documentation repository](https://github.com/JabRef/user-documentation/tree/main/en)

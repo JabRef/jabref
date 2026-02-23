@@ -133,8 +133,8 @@ jobs:
       should-build: ${{ steps.binary.outputs.should-build }}
       should-jbundle: ${{ steps.binary.outputs.should-jbundle }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
-      jvmDistribution:  ${{ steps.binary.outputs.jvmDistribution }}
-      useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
+      jvmDistribution: ${{ steps.binary.outputs.jvmDistribution }}
+      useEaJdk: ${{ steps.binary.outputs.useEaJdk }}
       jdkVersion: ${{ steps.binary.outputs.jdkVersion }}
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}

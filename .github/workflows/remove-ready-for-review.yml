@@ -2,7 +2,7 @@ name: Auto-remove ready-for-review
 
 on:
   pull_request_target:
-    types: [ready_for_review]
+    types: [ ready_for_review ]
 
 jobs:
   guard-review:
@@ -18,7 +18,7 @@ jobs:
       - name: Output link
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_URL:    ${{ github.event.pull_request.html_url }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           echo "PR Number: $PR_NUMBER"
           echo "PR URL: $PR_URL"
@@ -27,14 +27,14 @@ jobs:
         id: perm
         run: |
           user="${{ github.actor }}"
-      
+
           perm=$(gh api \
             repos/${{ github.repository }}/collaborators/$user/permission \
             --jq '.permission')
-      
+
           echo "User: $user"
           echo "Permission: $perm"
-      
+
           if [[ "$perm" == "admin" || "$perm" == "maintain" || "$perm" == "write" ]]; then
             echo "skip-check=true" >> "$GITHUB_OUTPUT"
             echo "Maintainer detected → skipping"

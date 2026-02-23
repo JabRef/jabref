@@ -2,7 +2,7 @@ name: Auto-remove review request
 
 on:
   pull_request_target:
-    types: [review_requested]
+    types: [ review_requested ]
 
 jobs:
   guard-reviewers:
@@ -18,7 +18,7 @@ jobs:
       - name: Output link
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_URL:    ${{ github.event.pull_request.html_url }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           echo "PR Number: $PR_NUMBER"
           echo "PR URL: $PR_URL"

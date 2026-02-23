@@ -2,13 +2,42 @@
 parent: Decision Records
 nav_order: 20
 ---
+
 # Use Jackson to parse study.yml
 
 ## Context and Problem Statement
 
-The study definition file is formulated as a YAML document.
-To access the definition within JabRef this document has to be parsed.
-What parser should be used to parse YAML files?
+The
+study
+definition
+file
+is
+formulated
+as
+a
+YAML
+document.
+To
+access
+the
+definition
+within
+JabRef
+this
+document
+has
+to
+be
+parsed.
+What
+parser
+should
+be
+used
+to
+parse
+YAML
+files?
 
 ## Considered Options
 
@@ -16,43 +45,199 @@ What parser should be used to parse YAML files?
 * [SnakeYAML Engine](https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/)
 * [yamlbeans](https://github.com/EsotericSoftware/yamlbeans)
 * [eo-yaml](https://github.com/decorators-squad/eo-yaml)
-* Self-written parser
+*
+
+Self-written
+parser
 
 ## Decision Outcome
 
-Chosen option: "Jackson", because as it is a dedicated library for parsing YAML. `yamlbeans` also seem to be viable. They all offer similar functionality.
+Chosen
+option: "
+Jackson",
+because
+as
+it
+is
+a
+dedicated
+library
+for
+parsing
+YAML.
+`yamlbeans`
+also
+seem
+to
+be
+viable.
+They
+all
+offer
+similar
+functionality.
 
 ## Pros and Cons of the Options
 
 ### Jackson
 
-* Good, because established YAML parser library
-* Good, because supports YAML 1.2
-* Good, because it can parse LocalDate
+*
+
+Good,
+because
+established
+YAML
+parser
+library
+
+*
+
+Good,
+because
+supports
+YAML
+1.2
+
+*
+
+Good,
+because
+it
+can
+parse
+LocalDate
 
 ### SnakeYAML Engine
 
-* Good, because established YAML parser library
-* Good, because supports YAML 1.2
-* Bad, because cannot parse YAML into Java DTOs, only into [basic Java structures](https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/), this then has to be assembled into DTOs
+*
+
+Good,
+because
+established
+YAML
+parser
+library
+
+*
+
+Good,
+because
+supports
+YAML
+1.2
+
+*
+
+Bad,
+because
+cannot
+parse
+YAML
+into
+Java
+DTOs,
+only
+into [basic Java structures](https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/),
+this
+then
+has
+to
+be
+assembled
+into
+DTOs
 
 ### yamlbeans
 
-* Good, because established YAML parser library
-* Good, because [nice getting started page](https://github.com/EsotericSoftware/yamlbeans)
-* Bad, because objects need to be annotated in the yaml file to be parsed into Java objects
+*
+
+Good,
+because
+established
+YAML
+parser
+library
+
+*
+
+Good,
+because [nice getting started page](https://github.com/EsotericSoftware/yamlbeans)
+
+*
+
+Bad,
+because
+objects
+need
+to
+be
+annotated
+in
+the
+yaml
+file
+to
+be
+parsed
+into
+Java
+objects
 
 ### eo-yaml
 
-* Good, because established YAML parser library
-* Good, because supports YAML 1.2
-* Bad, because cannot parse YAML into Java DTOs
+*
+
+Good,
+because
+established
+YAML
+parser
+library
+
+*
+
+Good,
+because
+supports
+YAML
+1.2
+
+*
+
+Bad,
+because
+cannot
+parse
+YAML
+into
+Java
+DTOs
 
 ### Own parser
 
-* Good, because easily customizable
-* Bad, because high effort
-* Bad, because has to be tested extensively
+*
+
+Good,
+because
+easily
+customizable
+
+*
+
+Bad,
+because
+high
+effort
+
+*
+
+Bad,
+because
+has
+to
+be
+tested
+extensively
 
 ## Links
 

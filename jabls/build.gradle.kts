@@ -6,32 +6,58 @@ plugins {
 }
 
 dependencies {
-    api(project(":jablib"))
+    api(
+        project(
+            ":jablib"
+        )
+    )
 
-    implementation("org.slf4j:slf4j-api")
+    implementation(
+        "org.slf4j:slf4j-api"
+    )
 
     // LSP4J for LSP Server
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j")
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta")
+    implementation(
+        "org.eclipse.lsp4j:org.eclipse.lsp4j"
+    )
+    implementation(
+        "org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta"
+    )
 
-    implementation("com.google.guava:guava")
+    implementation(
+        "com.google.guava:guava"
+    )
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    testImplementation("org.slf4j:jul-to-slf4j")
+    testImplementation(
+        "org.slf4j:jul-to-slf4j"
+    )
 
-    testImplementation("org.mockito:mockito-core")
+    testImplementation(
+        "org.mockito:mockito-core"
+    )
 }
 
-javaModuleTesting.whitebox(testing.suites["test"]) {
-    requires.add("org.junit.jupiter.api")
-    requires.add("org.mockito")
+javaModuleTesting.whitebox(
+    testing.suites["test"]
+) {
+    requires.add(
+        "org.junit.jupiter.api"
+    )
+    requires.add(
+        "org.mockito"
+    )
 }
 
 tasks.test {
     testLogging {
         // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
+        events(
+            "FAILED"
+        )
+        exceptionFormat =
+            TestExceptionFormat.FULL
     }
-    maxParallelForks = 1
+    maxParallelForks =
+        1
 }

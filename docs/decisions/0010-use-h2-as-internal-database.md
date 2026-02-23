@@ -2,17 +2,43 @@
 parent: Decision Records
 nav_order: 10
 ---
+
 # Use H2 as Internal SQL Database
 
 ## Context and Problem Statement
 
-We need to store data internally in a structured way to gain performance.
+We
+need
+to
+store
+data
+internally
+in
+a
+structured
+way
+to
+gain
+performance.
 
 ## Decision Drivers
 
-* Easy to integrate
-* Easy to use
-* Common technology
+*
+
+Easy
+to
+integrate
+
+*
+
+Easy
+to
+use
+
+*
+
+Common
+technology
 
 ## Considered Options
 
@@ -21,7 +47,17 @@ We need to store data internally in a structured way to gain performance.
 
 ## Decision Outcome
 
-Chosen option: "H2 Database Engine", because it was straight-forward to use.
+Chosen
+option: "
+H2
+Database
+Engine",
+because
+it
+was
+straight-forward
+to
+use.
 
 ## Links
 

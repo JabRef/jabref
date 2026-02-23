@@ -13,50 +13,73 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.jabref.gui.util.component.HelpButton?>
 <?import org.jabref.gui.welcome.components.ThemeWireFrame?>
-<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.jabref.gui.welcome.quicksettings.ThemeDialog">
+<DialogPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.welcome.quicksettings.ThemeDialog">
     <content>
         <VBox styleClass="quick-settings-dialog-container">
-            <HBox alignment="CENTER_LEFT" spacing="4">
+            <HBox alignment="CENTER_LEFT"
+                  spacing="4">
                 <Label text="%Choose between light, dark, or custom themes to personalize your JabRef experience."
-                       wrapText="true" HBox.hgrow="ALWAYS"/>
-                <HelpButton fx:id="helpButton"/>
+                       wrapText="true"
+                       HBox.hgrow="ALWAYS"/>
+                <HelpButton
+                        fx:id="helpButton"/>
             </HBox>
 
             <HBox>
-                <VBox styleClass="theme-option" onMouseClicked="#selectLight">
-                    <RadioButton fx:id="lightRadio" text="Light Theme">
+                <VBox styleClass="theme-option"
+                      onMouseClicked="#selectLight">
+                    <RadioButton
+                            fx:id="lightRadio"
+                            text="Light Theme">
                         <toggleGroup>
-                            <ToggleGroup fx:id="themeGroup"/>
+                            <ToggleGroup
+                                    fx:id="themeGroup"/>
                         </toggleGroup>
                     </RadioButton>
-                    <ThemeWireFrame fx:id="lightWireframe"/>
+                    <ThemeWireFrame
+                            fx:id="lightWireframe"/>
                 </VBox>
 
-                <VBox styleClass="theme-option" onMouseClicked="#selectDark">
-                    <RadioButton fx:id="darkRadio" text="Dark Theme"
-                                 toggleGroup="$themeGroup"/>
-                    <ThemeWireFrame fx:id="darkWireframe"/>
+                <VBox styleClass="theme-option"
+                      onMouseClicked="#selectDark">
+                    <RadioButton
+                            fx:id="darkRadio"
+                            text="Dark Theme"
+                            toggleGroup="$themeGroup"/>
+                    <ThemeWireFrame
+                            fx:id="darkWireframe"/>
                 </VBox>
 
-                <VBox styleClass="theme-option" onMouseClicked="#selectCustom">
-                    <RadioButton fx:id="customRadio" text="Custom Theme"
-                                 toggleGroup="$themeGroup"/>
-                    <ThemeWireFrame fx:id="customWireframe"/>
+                <VBox styleClass="theme-option"
+                      onMouseClicked="#selectCustom">
+                    <RadioButton
+                            fx:id="customRadio"
+                            text="Custom Theme"
+                            toggleGroup="$themeGroup"/>
+                    <ThemeWireFrame
+                            fx:id="customWireframe"/>
                 </VBox>
             </HBox>
 
-            <VBox fx:id="customThemeContainer" spacing="4.0">
+            <VBox fx:id="customThemeContainer"
+                  spacing="4.0">
                 <HBox spacing="4.0">
-                    <TextField fx:id="customPathField"
-                               promptText="%Custom theme file path"
-                               HBox.hgrow="ALWAYS"/>
-                    <Button styleClass="icon-button" onAction="#browseThemeFile">
+                    <TextField
+                            fx:id="customPathField"
+                            promptText="%Custom theme file path"
+                            HBox.hgrow="ALWAYS"/>
+                    <Button styleClass="icon-button"
+                            onAction="#browseThemeFile">
                         <graphic>
-                            <JabRefIconView glyph="OPEN"/>
+                            <JabRefIconView
+                                    glyph="OPEN"/>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="%Browse"/>
+                            <Tooltip
+                                    text="%Browse"/>
                         </tooltip>
                     </Button>
                 </HBox>
@@ -64,6 +87,8 @@
         </VBox>
     </content>
 
-    <ButtonType fx:constant="CLOSE"/>
-    <ButtonType fx:constant="OK"/>
+    <ButtonType
+            fx:constant="CLOSE"/>
+    <ButtonType
+            fx:constant="OK"/>
 </DialogPane>
