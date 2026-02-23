@@ -132,7 +132,7 @@ public class CAYWResource {
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }
 
-        return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
+        return Response.ok(formattedResponse).type(formatter.getMediaType() + ";charset=UTF-8").build();
     }
 
     private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries) throws InterruptedException, ExecutionException {

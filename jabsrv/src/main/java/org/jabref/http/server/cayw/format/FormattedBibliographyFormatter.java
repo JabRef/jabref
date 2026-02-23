@@ -10,6 +10,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import jakarta.ws.rs.core.MediaType;
+import org.jsoup.Jsoup;
 import org.jvnet.hk2.annotations.Service;
 
 @Service
@@ -34,8 +35,10 @@ public class FormattedBibliographyFormatter implements CAYWFormatter {
                                                .map(CAYWEntry::bibEntry)
                                                .toList();
 
-        return bibEntries.stream()
-                         .map(entry -> preferences.getPreviewPreferences().getSelectedPreviewLayout().generatePreview(entry, databaseContext))
-                         .collect(Collectors.joining("\n\n"));
+        String text = Jsoup.parse(bibEntries.stream()
+                                            .map(entry -> preferences.getPreviewPreferences().getSelectedPreviewLayout().generatePreview(entry, databaseContext))
+                                            .collect(Collectors.joining("<br>"))).text();
+        System.out.println(text);
+        return text;
     }
 }
