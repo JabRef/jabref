@@ -13,6 +13,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
+
 ### Fixed
 
 - We fixed an issue where resetting preference does not reset External File Type to default. [#15117](https://github.com/JabRef/jabref/issues/15117)
