@@ -1,6 +1,7 @@
 package org.jabref.logic.citationstyle;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
@@ -17,7 +18,7 @@ public record CitationStylePreviewLayout(
             // style has no bibliography formatting instructions - fall back to citation
             return CitationStyleGenerator.generateCitation(entries, citationStyle.getSource(), CitationStyleOutputFormat.HTML, databaseContext, bibEntryTypesManager);
         }
-        return CitationStyleGenerator.generateBibliography(entries, citationStyle.getSource(), CitationStyleOutputFormat.HTML, databaseContext, bibEntryTypesManager).getFirst();
+        return CitationStyleGenerator.generateBibliography(entries, citationStyle.getSource(), CitationStyleOutputFormat.HTML, databaseContext, bibEntryTypesManager).stream().collect(Collectors.joining());
     }
 
     @Override

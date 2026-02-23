@@ -27,6 +27,16 @@ Accept: application/json
 GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex
 
+### Get plain text preview of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: text/plain
+
+### Get html preview of Chocolate.bib
+
+GET http://localhost:23119/libraries/demo
+Accept: text/html
+
 ### Get list of files in Chocolate.bib
 
 GET http://localhost:23119/libraries/demo/entries/pdffiles

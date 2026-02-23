@@ -13,8 +13,11 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.PreviewPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -22,12 +25,14 @@ import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import org.jsoup.Jsoup;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +52,9 @@ public class LibraryResource {
 
     @Inject
     Gson gson;
+
+    @Inject
+    PreviewPreferences previewPreferences;
 
     /// At http://localhost:23119/libraries/{id}
     ///
@@ -102,6 +110,48 @@ public class LibraryResource {
                        .header("Content-Disposition", "attachment; filename=\"" + library.getFileName() + "\"")
                        .entity(libraryAsString)
                        .build();
+    }
+
+    /// At http://localhost:23119/libraries/{id} <br><br>
+    ///
+    /// Combines the entries of the given library into a basic entry preview as plain text.
+    ///
+    /// @param id The name of the library
+    /// @return a basic preview of all entries as plain text
+    @GET
+    @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
+    public String getPlainRepresentation(@PathParam("id") String id) throws IOException {
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
+        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+        if (entries.isEmpty()) {
+            throw new NotFoundException("No BibEntries found in library " + id);
+        }
+
+        PreviewLayout previewLayout = previewPreferences.getSelectedPreviewLayout();
+
+        String html = previewLayout.generatePreview(entries, databaseContext);
+        return Jsoup.parse(html).text();
+    }
+
+    /// At http://localhost:23119/libraries/{id} <br><br>
+    ///
+    /// Combines the entries of the given library into a basic entry preview as HTML text.
+    ///
+    /// @param id The name of the library
+    /// @return a basic preview of all entries as HTML text
+    /// @throws IOException
+    @GET
+    @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")
+    public String getHTMLRepresentation(@PathParam("id") String id) throws IOException {
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
+        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+        if (entries.isEmpty()) {
+            throw new NotFoundException("No BibEntries found in library " + id);
+        }
+
+        PreviewLayout previewLayout = previewPreferences.getSelectedPreviewLayout();
+
+        return previewLayout.generatePreview(entries, databaseContext);
     }
 
     /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
