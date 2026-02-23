@@ -453,7 +453,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         shell: cmd
         run: |
-          deltree "C:\Program Files (x86)\WiX Toolset v3.11\"
+          rmdir /s /q "C:\Program Files (x86)\WiX Toolset v3.11\"
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
