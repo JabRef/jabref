@@ -1,6 +1,3 @@
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.jvm.toolchain.JavaToolchainService
-import sun.jvm.hotspot.HelloWorld.e
 
 plugins {
     id("org.jabref.gradle.module")
