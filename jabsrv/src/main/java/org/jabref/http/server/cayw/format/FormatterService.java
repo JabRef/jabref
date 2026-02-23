@@ -32,7 +32,7 @@ public class FormatterService {
             case "typst" ->
                     new TypstFormatter();
             case "formatted-bibliography" ->
-                    new FormattedBibliographyFormatter(preferences, databaseContext);
+                    new FormattedBibliographyFormatter(preferences.getPreviewPreferences(), databaseContext);
             default ->
                     new BibLatexFormatter("autocite");
         };

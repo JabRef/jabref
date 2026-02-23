@@ -1,11 +1,10 @@
 package org.jabref.http.server.cayw.format;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preview.PreviewPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -16,11 +15,11 @@ import org.jvnet.hk2.annotations.Service;
 @Service
 public class FormattedBibliographyFormatter implements CAYWFormatter {
 
-    private final CliPreferences preferences;
+    private final PreviewPreferences previewPreferences;
     private final BibDatabaseContext databaseContext;
 
-    public FormattedBibliographyFormatter(CliPreferences preferences, BibDatabaseContext databaseContext) {
-        this.preferences = preferences;
+    public FormattedBibliographyFormatter(PreviewPreferences previewPreferences, BibDatabaseContext databaseContext) {
+        this.previewPreferences = previewPreferences;
         this.databaseContext = databaseContext;
     }
 
@@ -35,8 +34,6 @@ public class FormattedBibliographyFormatter implements CAYWFormatter {
                                                .map(CAYWEntry::bibEntry)
                                                .toList();
 
-        return bibEntries.stream()
-                         .map(entry -> Jsoup.parse(preferences.getPreviewPreferences().getSelectedPreviewLayout().generatePreview(entry, databaseContext)).text())
-                         .collect(Collectors.joining("\n"));
+        return Jsoup.parse(previewPreferences.getSelectedPreviewLayout().generatePreview(bibEntries, databaseContext)).text();
     }
 }
