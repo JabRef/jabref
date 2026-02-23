@@ -35,10 +35,8 @@ public class FormattedBibliographyFormatter implements CAYWFormatter {
                                                .map(CAYWEntry::bibEntry)
                                                .toList();
 
-        String text = Jsoup.parse(bibEntries.stream()
-                                            .map(entry -> preferences.getPreviewPreferences().getSelectedPreviewLayout().generatePreview(entry, databaseContext))
-                                            .collect(Collectors.joining("<br>"))).text();
-        System.out.println(text);
-        return text;
+        return bibEntries.stream()
+                         .map(entry -> Jsoup.parse(preferences.getPreviewPreferences().getSelectedPreviewLayout().generatePreview(entry, databaseContext)).text())
+                         .collect(Collectors.joining("\n"));
     }
 }
