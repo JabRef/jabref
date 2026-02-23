@@ -60,6 +60,12 @@ class PersonNamesCheckerTest {
                 checker.checkValue("Test1, Test2, Test3, Test4, Test5, Test6"));
     }
 
+    @Test
+    void institutionalAuthorWithSpaceInListDoesNotTriggerWarnings() {
+        assertEquals(Optional.empty(),
+                checker.checkValue("Last, F. I. and {Institutional Author}"));
+    }
+
     @ParameterizedTest
     @MethodSource("provideCorrectFormats")
     void authorNameInCorrectFormatsShouldNotComplain(String input) {
