@@ -45,7 +45,7 @@ class CAYWResourceTest extends ServerTest {
                 .get();
         assertEquals(200, response.getStatus());
         assertEquals("ready", response.readEntity(String.class));
-        assertEquals("text/plain;charset=UTF-8", response.getHeaderString("Content-Type"));
+        assertEquals("text/plain", response.getHeaderString("Content-Type"));
     }
 
     @Test
