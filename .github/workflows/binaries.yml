@@ -449,6 +449,11 @@ jobs:
           dotnet tool update --global wix --version 6.0.2
           wix extension add -g WixToolset.Util.wixext/6.0.2
           wix extension add -g WixToolset.Ui.wixext/6.0.2
+      - name: Remove wix3
+        if: ${{ matrix.os == 'windows-latest' }}
+        shell: cmd
+        run: |
+          deltree "C:\Program Files (x86)\WiX Toolset v3.11\"
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
@@ -638,7 +643,7 @@ jobs:
           cp buildres/windows/JabRef.ico . # Windows
 
       - name: Check WiX Version
-        run: candle -?
+        run: wix -?
         if: startsWith(matrix.os, 'windows')
 
       # jars already exists - thus, these calls will build on the jar result (hopefully).
