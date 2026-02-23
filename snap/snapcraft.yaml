@@ -9,6 +9,12 @@ description: |
   To access files in external media (i.e., USB drives) you must run:
   `snap connect jabref:removable-media`
 grade: stable
+title: JabRef
+donation: https://donations.jabref.org
+issues: https://github.com/JabRef/jabref/issues
+website: https://www.jabref.org/
+source-code: https://github.com/JabRef/jabref
+contact: web@jabref.org
 confinement: strict
 base: core24
 compression: lzo
@@ -59,11 +65,15 @@ environment:
   GTK_USE_PORTAL: "1"
 
 parts:
+  mesa-fix:
+    plugin: nil
+    build-snaps:
+      - mesa-2404/candidate  # Force it to look in candidate
   jabref:
     plugin: dump
     source:
-      - on amd64 to amd64: https://builds.jabref.org/main/JabRef-portable_linux.tar.gz
-      - on arm64 to arm64: https://builds.jabref.org/main/JabRef-portable_linux_arm64.tar.gz
+      - on amd64 to amd64: https://builds.jabref.org/main/linux-amd64/JabRef-portable_linux.tar.gz
+      - on arm64 to arm64: https://builds.jabref.org/main/linux-arm/JabRef-portable_linux_arm64.tar.gz
     stage-packages:
       - x11-utils
     override-build: |
@@ -87,6 +97,7 @@ parts:
     plugin: nil
     build-snaps:
       - gnome-46-2404
+      - mesa-2404/candidate
     override-prime: |
       set -eux
       for snap in "gnome-46-2404"; do  # List all content-snaps you're using here
