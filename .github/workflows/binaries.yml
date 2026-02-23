@@ -447,6 +447,8 @@ jobs:
         # Update to v7 requries extra EULA check - see https://github.com/wixtoolset/issues/issues/9196
         run: |
           dotnet tool update --global wix --version 6.0.2
+          wix extension add -g WixToolset.Util.wixext/6.0.2
+          wix extension add -g WixToolset.Ui.wixext/6.0.2
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
