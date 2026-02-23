@@ -49,7 +49,7 @@ public class ExternalApplicationsPreferences {
 
     private ExternalApplicationsPreferences() {
         this(
-                Localization.lang("References"),                                        // eMailSubject
+                Localization.lang("References"),                                             // eMailSubject
                 OS.WINDOWS,                                                                  // shouldAutoOpenEmailAttachmentsFolder
                 Set.copyOf(ExternalFileTypes.getDefaultExternalFileTypes()),                 // externalFileTypes
                 false,                                                                       // useCustomTerminal
