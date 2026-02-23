@@ -1,5 +1,6 @@
 package org.jabref.logic.preview;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.jabref.logic.bst.BstPreviewLayout;
@@ -11,7 +12,11 @@ import org.jabref.model.entry.BibEntry;
 /// Used for displaying a rendered entry in the UI. Due to historical reasons, "rendering" is called "layout".
 public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePreviewLayout, TextBasedPreviewLayout {
 
-    String generatePreview(BibEntry entry, BibDatabaseContext databaseContext);
+    default String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
+        return generatePreview(List.of(entry), databaseContext);
+    }
+
+    String generatePreview(List<BibEntry> entries, BibDatabaseContext databaseContext);
 
     String getDisplayName();
 
