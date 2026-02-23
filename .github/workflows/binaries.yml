@@ -441,6 +441,11 @@ jobs:
       url: ${{ steps.url.outputs.url }}
     name: ${{ matrix.displayName }} installer and portable version
     steps:
+      - name: Install wix6
+        if: ${{ matrix.os == 'windows-latest' }}
+        # background: true
+        run: |
+          dotnet tool update --global wix
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
