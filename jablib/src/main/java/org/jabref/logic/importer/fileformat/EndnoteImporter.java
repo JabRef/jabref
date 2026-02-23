@@ -236,7 +236,7 @@ public class EndnoteImporter extends Importer {
                         }
                     }
                     case "F" ->
-                            hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.removeIllegalCharacters(val));
+                            hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.removeIllegalCharacters(val, CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
                 }
             }
 
