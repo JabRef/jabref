@@ -3,6 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 
 import org.junit.jupiter.api.parallel.ResourceLock;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ResourceLock("Localization.lang")
 class ValidCitationKeyCheckerTest {
 
-    private final ValidCitationKeyChecker checker = new ValidCitationKeyChecker();
+    private final ValidCitationKeyChecker checker = new ValidCitationKeyChecker(CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
 
     @ParameterizedTest
     @MethodSource("provideCitationKeys")

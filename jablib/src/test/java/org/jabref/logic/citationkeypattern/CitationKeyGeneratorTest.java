@@ -245,17 +245,17 @@ class CitationKeyGeneratorTest {
 
     @Test
     void removeIllegalCharactersPreservesDiacritics() {
-        assertEquals("kṛṣṇā", CitationKeyGenerator.removeIllegalCharacters("kṛṣṇā"));
-        assertEquals("Müller2020", CitationKeyGenerator.removeIllegalCharacters("Müller2020"));
-        assertEquals("taṇḍulīyaka", CitationKeyGenerator.removeIllegalCharacters("taṇḍulīyaka"));
-        assertEquals("García_2021", CitationKeyGenerator.removeIllegalCharacters("García_2021"));
+        assertEquals("kṛṣṇā", CitationKeyGenerator.removeIllegalCharacters("kṛṣṇā", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("Müller2020", CitationKeyGenerator.removeIllegalCharacters("Müller2020", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("taṇḍulīyaka", CitationKeyGenerator.removeIllegalCharacters("taṇḍulīyaka", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("García_2021", CitationKeyGenerator.removeIllegalCharacters("García_2021", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void removeIllegalCharactersRemovesDisallowedChars() {
-        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("ke{y}"));
-        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("ke y"));
-        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("k#e%y"));
+        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("ke{y}", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("ke y", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("key", CitationKeyGenerator.removeIllegalCharacters("k#e%y", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
