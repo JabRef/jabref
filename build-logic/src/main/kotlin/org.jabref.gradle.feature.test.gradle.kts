@@ -10,6 +10,20 @@ testing {
     suites.named<JvmTestSuite>("test") {
         useJUnitJupiter()
     }
+
+    @Suppress("UnstableApiUsage")
+    suites.withType<JvmTestSuite> {
+        // Replace the 'catch-all' junit-jupiter dependency added by Gradle with a dependency to the engine only.
+        // This is, because all compile-time dependencies are defined explicitly in the modules, including
+        // 'org.junit.jupiter.api'. Unfortunately, there is no simple off switch.
+        // https://github.com/gradle/gradle/issues/21299#issuecomment-1316438289
+        configurations.getByName(sources.implementationConfigurationName) {
+            withDependencies {
+                removeIf { it.group == "org.junit.jupiter" && it.name == "junit-jupiter" }
+            }
+        }
+        dependencies { runtimeOnly("org.junit.jupiter:junit-jupiter-engine") }
+    }
 }
 
 tasks.withType<Test>().configureEach {
@@ -40,4 +54,10 @@ testlogger {
 
 configurations.testCompileOnly {
     extendsFrom(configurations.compileOnly.get())
+}
+
+// See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+val mockitoAgent = configurations.create("mockitoAgent")
+dependencies {
+    mockitoAgent("org.mockito:mockito-core:5.21.0") { isTransitive = false }
 }
