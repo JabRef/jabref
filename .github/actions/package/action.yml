@@ -56,10 +56,17 @@ runs:
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
+        OSXCERT: ${{ inputs.secretsPresent }}
         AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
         BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
         IEEEAPIKey: ${{ inputs.ieeeApiKey }}
         SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    - name: Validate Signature
+      if: ${{ inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' && inputs.component == 'jabgui' }}
+      shell: bash
+      run: |
+        ls -la ${{ inputs.component }}/build/packages/${{ inputs.os }}/
+        codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
