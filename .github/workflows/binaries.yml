@@ -226,12 +226,12 @@ jobs:
             echo "tagbuild=false" >> "$GITHUB_OUTPUT"
           fi
 
-          if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
+          if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${GITHUB_REF}" == "refs/heads/main-release" ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
             # This workflow runs on ubuntu-latest even for notarization for macOS; need to check later if really on macOS
             echo "🧾 macOS notarization"
             echo "🧾 macOS notarization" >> $GITHUB_STEP_SUMMARY
             echo "should-notarize=true" >> "$GITHUB_OUTPUT"
-            if [[ "${GITHUB_REF}" == refs/tags/* || ( "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "main" ) ]]; then
+            if [[ "${GITHUB_REF}" == refs/tags/* || ( "${{ github.event_name }}" == "push" && ("${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "main-release") ) ]]; then
               echo "☁️ will upload"
               echo "☁️ will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -312,6 +312,13 @@ jobs:
         shell: bash
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
+          if [[ -z "$PR_NUMBER" ]]; then
+            echo "☁️ Not a pull request event – skipping disk space check – will upload"
+            echo "☁️ Not a pull request event – skipping disk space check – will upload" >> $GITHUB_STEP_SUMMARY
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           TARGET="/var/www/builds.jabref.org/www/pull-$PR_NUMBER"
           SSH_OPTS="-p 9922 -i sshkey -o StrictHostKeyChecking=no"
           HOST="jrrsync@build-upload.jabref.org"
@@ -389,7 +396,7 @@ jobs:
               {
                 "os": "macos-15-intel",
                 "displayName": "macOS-intel",
-                "gradleCommand": "gradle",
+                "gradleCommand": "./gradlew",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app",
@@ -399,7 +406,7 @@ jobs:
               {
                 "os": "macos-15",
                 "displayName": "macOS-silicon",
-                "gradleCommand": "gradle",
+                "gradleCommand": "./gradlew",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app",
@@ -524,6 +531,12 @@ jobs:
         run: |
           branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
           branch="${branch%-merge}"   # removes suffix only if present
+
+          if [[ "$branch" == tag* ]]; then
+            # tag builds go into a sub folder
+            branch="${{ steps.gitversion.outputs.BranchName }}"
+          fi
+
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
       - name: Output URL
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
@@ -616,6 +629,10 @@ jobs:
           cp buildres/linux/JabRef.png .   # Linux
           cp buildres/windows/JabRef.ico . # Windows
 
+      - name: Check WiX Version
+        run: candle -?
+        if: startsWith(matrix.os, 'windows')
+
       # jars already exists - thus, these calls will build on the jar result (hopefully).
       # - wait: [ jabls-jar, jabsrv-jar ]
 
@@ -627,7 +644,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabls-cli
           componentShort: jabls
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
@@ -641,6 +657,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
@@ -652,7 +669,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabsrv-cli
           componentShort: jabsrv
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
@@ -666,6 +682,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
@@ -678,7 +695,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabgui
           componentShort: jabgui
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
@@ -692,6 +708,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
@@ -703,7 +720,6 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabkit
           componentShort: jabkit
-          useEaJdk: ${{ needs.conditions.outputs.useEaJdk }}
           branchName: ${{ steps.normalize.outputs.branch }}
           AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
           Major: ${{ steps.gitversion.outputs.Major }}
@@ -717,6 +733,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
           ieeeApiKey: ${{ secrets.IEEEAPIKey }}
