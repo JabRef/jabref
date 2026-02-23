@@ -17,7 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where LaTeX to Unicode conversion replaced tildes with standard spaces instead of non-breaking spaces. ([#15158](https://github.com/JabRef/jabref/issues/15158))
+- We fixed an issue where LaTeX to Unicode conversion replaced tildes with standard spaces instead of non-break spaces. ([#15158](https://github.com/JabRef/jabref/issues/15158))
 - We fixed an issue where institutional authors in braces {Institutional Author} triggered a "Names are not in the standard format" warning. [#15157](https://github.com/JabRef/jabref/issues/15157)
 
 ### Removed
@@ -65,7 +65,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue where empty entry type or entry type with spaces can be created. [#15103](https://github.com/JabRef/jabref/issues/15103)
 - We fixed an issue where duplicate entry type can be created and overwrite existing entry type. [#15074](https://github.com/JabRef/jabref/issues/15074)
-- We fixed an issue where LaTeX to Unicode conversion replaced tildes with standard spaces instead of no-break spaces. ([#15158](https://github.com/JabRef/jabref/issues/15158))
 - We fixed an issue regarding enabledment of buttons in identifier fields (DOI, Eprint, ISBN). [#14821](https://github.com/JabRef/jabref/issues/14821)
 - Fixed localized walkthrough highlight for 'Preferences' menu item. [#14822](https://github.com/JabRef/jabref/issues/14822)
 - We Improved detection of arXiv identifiers when pasting arXiv URLs that include URL fragments. [#14659](https://github.com/JabRef/jabref/issues/14659)
