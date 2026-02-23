@@ -159,17 +159,6 @@ open module org.jabref {
     // requires velocity.engine.core;
     // endregion
 
-    // region: Lucene
-    /*
-     * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
-     */
-    // uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
-    // requires org.apache.lucene.analysis.common;
-    // requires org.apache.lucene.core;
-    // requires org.apache.lucene.highlighter;
-    // requires org.apache.lucene.queryparser;
-    // endregion
-
     // requires net.harawata.appdirs;
     // requires com.sun.jna;
     requires com.sun.jna.platform;
