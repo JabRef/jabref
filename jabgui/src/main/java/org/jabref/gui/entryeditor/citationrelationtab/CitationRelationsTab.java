@@ -26,9 +26,11 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
@@ -365,8 +367,14 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         Label citingLabel = new Label(Localization.lang("References cited in %0", citationKey));
         styleLabel(citingLabel, Localization.lang("Also called \"backward citations\""));
+        citingLabel.setMinWidth(100);
+        citingLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
+        HBox.setHgrow(citingLabel, javafx.scene.layout.Priority.ALWAYS);
         Label citedByLabel = new Label(Localization.lang("References that cite %0", citationKey));
         styleLabel(citedByLabel, Localization.lang("Also called \"forward citations\""));
+        citedByLabel.setMinWidth(100);
+        citedByLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
+        HBox.setHgrow(citedByLabel, javafx.scene.layout.Priority.ALWAYS);
 
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
@@ -395,6 +403,10 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .install(fetcherCombo);
         styleTopBarNode(fetcherCombo, 75.0);
         fetcherCombo.valueProperty().bindBidirectional(entryEditorPreferences.citationFetcherTypeProperty());
+
+        // Add context menus to labels for opening API URLs
+        citingLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITES));
+        citedByLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITED_BY));
 
         // Create abort buttons for both sides
         Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
@@ -614,10 +626,53 @@ public class CitationRelationsTab extends EntryEditorTab {
         label.setStyle("-fx-padding: 5px");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
-        AnchorPane.setTopAnchor(label, 0.0);
-        AnchorPane.setLeftAnchor(label, 0.0);
-        AnchorPane.setBottomAnchor(label, 0.0);
-        AnchorPane.setRightAnchor(label, 0.0);
+        label.setMaxWidth(Double.MAX_VALUE);
+    }
+
+    /// Creates a context menu for citation relation labels with an option to open the API URL in browser
+    ///
+    /// @param entry      the BibEntry to get the API URL for
+    /// @param searchType the type of search (CITES for references, CITED_BY for citations)
+    /// @return a ContextMenu with the "Open API URL in browser" option
+    private ContextMenu createCitationContextMenu(BibEntry entry, CitationFetcher.SearchType searchType) {
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem openApiUrl = new MenuItem(Localization.lang("Open API URL in browser"));
+
+        /// Create a binding that checks if URI is available
+        BooleanBinding uriAvailable = Bindings.createBooleanBinding(
+                () -> {
+                    Optional<URI> uri = searchType == CitationFetcher.SearchType.CITES
+                                        ? searchCitationsRelationsService.getReferencesApiUri(entry)
+                                        : searchCitationsRelationsService.getCitationsApiUri(entry);
+                    return uri.isPresent();
+                },
+                fetcherCombo.valueProperty() /// revaluate when fetcher changes
+        );
+
+        /// Disable the menu item when URI is not available
+        openApiUrl.disableProperty().bind(uriAvailable.not());
+
+        /// Set action to open browser (only executes when enabled)
+        openApiUrl.setOnAction(_ -> {
+            Optional<URI> uri = searchType == CitationFetcher.SearchType.CITES
+                                ? searchCitationsRelationsService.getReferencesApiUri(entry)
+                                : searchCitationsRelationsService.getCitationsApiUri(entry);
+
+            /// URI should always be present because menu item is disabled otherwise
+            /// check for safety
+            uri.ifPresent(apiUri -> {
+                try {
+                    NativeDesktop.openBrowser(apiUri, preferences.getExternalApplicationsPreferences());
+                } catch (IOException e) {
+                    LOGGER.warn("Could not open API URL in browser: {}", apiUri, e);
+                    dialogService.notify(Localization.lang("Unable to open link."));
+                }
+            });
+        });
+
+        contextMenu.getItems().add(openApiUrl);
+        return contextMenu;
     }
 
     /// Method to style refresh buttons
