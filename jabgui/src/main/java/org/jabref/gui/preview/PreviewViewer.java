@@ -214,14 +214,18 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                       .onSuccess(text -> {
                           setPreviewText(text);
 
-                          // Trigger downloading of the cover in the background
+                          if (!preferences.getPreviewPreferences().shouldDownloadCovers()) {
+                              return;
+                          }
+
                           BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(currentEntry))
                                         .onSuccess(downloaded -> {
-                                            if (downloaded) {
-                                                // Review the same preview text since cover has just been downloaded
+                                            // Only refresh preview if the user hasn't switched to a different entry in the meantime
+                                            if (downloaded && Objects.equals(entry, currentEntry)) {
                                                 setPreviewText(text);
                                             }
                                         })
+                                        .onFailure(e -> LOGGER.error("Failed to download cover for entry {}", currentEntry.getCitationKey(), e))
                                         .executeWith(taskExecutor);
                       })
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))

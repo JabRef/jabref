@@ -50,45 +50,58 @@ public class BookCoverFetcher {
 
     private boolean downloadCoverForISBN(ISBN isbn, Path directory) {
         final String name = "isbn-" + isbn.asString();
-        if (findExistingImage(name, directory).isEmpty()) {
-            Path notAvailableFile = directory.resolve(name + ".not-available");
-            if (Files.exists(notAvailableFile)) {
-                try {
-                    long lastModifiedTime = Files.getLastModifiedTime(notAvailableFile).toMillis();
-                    if (System.currentTimeMillis() - lastModifiedTime < 24 * 60 * 60 * 1000) {
-                        LOGGER.info("Cover for {} was not found recently. Skipping download.", isbn.asString());
-                        return false;
-                    }
-                } catch (IOException e) {
-                    LOGGER.error("Could not read last modified time of .not-available file", e);
-                }
-            }
+        if (findExistingImage(name, directory).isPresent()) {
+            return false;
+        }
 
-            final String url = getImageUrl(isbn);
-            boolean success = downloadCoverImage(url, name, directory);
-            if (!success) {
-                try {
-                    if (!Files.exists(notAvailableFile)) {
-                        Files.createFile(notAvailableFile);
-                    } else {
-                        Files.setLastModifiedTime(notAvailableFile, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
-                    }
-                } catch (IOException e) {
-                    LOGGER.error("Could not create/update .not-available file", e);
+        Path notAvailableFile = directory.resolve(name + ".not-available");
+        if (Files.exists(notAvailableFile)) {
+            try {
+                long lastModified = Files.getLastModifiedTime(notAvailableFile).toMillis();
+                if (System.currentTimeMillis() - lastModified < 24 * 60 * 60 * 1000L) {
+                    LOGGER.debug("Skipping cover download for {} — marked not-available within last 24h", isbn.asString());
+                    return false;
                 }
-            } else {
+            } catch (IOException e) {
+                LOGGER.warn("Could not read .not-available file timestamp for {}", isbn.asString(), e);
+            }
+        }
+
+        final String url = getImageUrl(isbn);
+        try {
+            boolean success = downloadCoverImage(url, name, directory);
+            if (success) {
+                // Clean up any stale not-available flag when we finally get a cover
                 try {
                     Files.deleteIfExists(notAvailableFile);
                 } catch (IOException e) {
-                    LOGGER.error("Could not delete .not-available file", e);
+                    LOGGER.warn("Could not delete .not-available file for {}", isbn.asString(), e);
                 }
             }
             return success;
+        } catch (org.jabref.logic.importer.FetcherClientException e) {
+            // HTTP 4xx — the server confirmed no cover exists for this ISBN
+            LOGGER.info("No cover found for ISBN {} ({}). Will skip for 24h.", isbn.asString(), e.getMessage());
+            try {
+                if (!Files.exists(notAvailableFile)) {
+                    Files.createDirectories(directory);
+                    Files.createFile(notAvailableFile);
+                } else {
+                    Files.setLastModifiedTime(notAvailableFile,
+                            java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+                }
+            } catch (IOException ioException) {
+                LOGGER.warn("Could not write .not-available file for {}", isbn.asString(), ioException);
+            }
+            return false;
+        } catch (FetcherException e) {
+            // Transient network or server error — do NOT cache, allow retry on next open
+            LOGGER.warn("Transient error fetching cover for ISBN {}, will retry next time", isbn.asString(), e);
+            return false;
         }
-        return false;
     }
 
-    private boolean downloadCoverImage(String url, final String name, final Path directory) {
+    private boolean downloadCoverImage(String url, final String name, final Path directory) throws FetcherException {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -118,12 +131,9 @@ public class BookCoverFetcher {
         if (destination.isEmpty()) {
             return false;
         }
-        try {
-            download.toFile(destination.get());
-        } catch (FetcherException e) {
-            LOGGER.error("Error while downloading cover image file", e);
-            return false;
-        }
+
+        download.toFile(destination.get());
+        
         return true;
     }
 
