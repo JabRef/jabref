@@ -13,8 +13,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
+
 ### Fixed
 
+- We fixed an issue where duplicate fields can be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
+- We fixed an issue where blank fields could be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
+- Fixed issues with escaping keywords in "Keywords Editor" [#14780](https://github.com/JabRef/jabref/issues/14780)
+- We fixed an issue where resetting preference does not reset External File Type to default. [#15117](https://github.com/JabRef/jabref/issues/15117)
 - We fixed an issue where institutional authors in braces {Institutional Author} triggered a "Names are not in the standard format" warning. [#15157](https://github.com/JabRef/jabref/issues/15157)
 
 ### Removed
