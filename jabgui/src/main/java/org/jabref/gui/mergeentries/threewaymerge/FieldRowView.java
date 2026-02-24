@@ -46,11 +46,9 @@ public class FieldRowView {
     public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, StateManager stateManager, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
-        fieldNameCell = new FieldNameCell(FieldTextMapper.getDisplayName(field), rowIndex);
-        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences, stateManager);
+        fieldNameCell = new FieldNameCell(field, FieldTextMapper.getDisplayName(field), rowIndex);        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences, stateManager);
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences, stateManager);
-        mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
-
+        mergedValueCell = new MergedFieldCell(field, viewModel.getMergedFieldValue(), rowIndex);
         // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
         // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
         leftValueCell.parentProperty().addListener(e -> {
