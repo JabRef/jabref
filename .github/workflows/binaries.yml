@@ -449,11 +449,6 @@ jobs:
           dotnet tool update --global wix --version 6.0.2
           wix extension add -g WixToolset.Util.wixext/6.0.2
           wix extension add -g WixToolset.Ui.wixext/6.0.2
-      - name: Remove wix3
-        if: ${{ matrix.os == 'windows-latest' }}
-        shell: cmd
-        run: |
-          rmdir /s /q "C:\Program Files (x86)\WiX Toolset v3.11\"
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
