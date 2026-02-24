@@ -127,7 +127,6 @@ public class NewEntryViewModel {
 
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-
         idFetcher = new SimpleObjectProperty<>();
         idFetcherValidator = new FunctionBasedValidator<>(
                 idFetcher,
@@ -154,6 +153,7 @@ public class NewEntryViewModel {
         bibtexWorker = null;
         initializeFetchers();
     }
+
     public void initializeFetchers() {
         var fetchers = WebFetchers.getIdBasedFetchers(
                 preferences.getImportFormatPreferences(),
@@ -161,6 +161,7 @@ public class NewEntryViewModel {
         );
         idFetchers.setAll(fetchers);
     }
+
     public void populateDOICache() {
         doiCache.clear();
         stateManager.getActiveDatabase()
