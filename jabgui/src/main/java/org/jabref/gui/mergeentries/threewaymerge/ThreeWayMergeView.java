@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.StandardField;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
@@ -107,7 +108,8 @@ public class ThreeWayMergeView extends VBox {
     private void updateDiff() {
         if (toolbar.shouldShowDiffs()) {
             for (FieldRowView row : fieldRows) {
-                if ("Groups".equals(row.getFieldNameCell().getText()) && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
+                Field field = row.getFieldNameCell().getField();
+                if (field == StandardField.GROUPS) {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
                 } else {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod()));
@@ -156,10 +158,27 @@ public class ThreeWayMergeView extends VBox {
         Field field = getFieldAtIndex(fieldIndex);
 
         FieldRowView fieldRow;
+
         if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
-            fieldRow = new PersonsNameFieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, preferences, stateManager, fieldIndex);
+            fieldRow = new PersonsNameFieldRowView(
+                    field,
+                    getLeftEntry(),
+                    getRightEntry(),
+                    getMergedEntry(),
+                    fieldMergerFactory,
+                    preferences,
+                    stateManager,
+                    fieldIndex);
         } else {
-            fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, preferences, stateManager, fieldIndex);
+            fieldRow = new FieldRowView(
+                    field,
+                    getLeftEntry(),
+                    getRightEntry(),
+                    getMergedEntry(),
+                    fieldMergerFactory,
+                    preferences,
+                    stateManager,
+                    fieldIndex);
         }
 
         fieldRows.add(fieldIndex, fieldRow);

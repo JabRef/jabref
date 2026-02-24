@@ -5,6 +5,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import org.jabref.model.entry.field.Field;
+
 /// A readonly cell used to display the name of some field.
 public class FieldNameCell extends ThreeWayMergeCell {
     public static final String DEFAULT_STYLE_CLASS = "field-name";
@@ -13,9 +15,16 @@ public class FieldNameCell extends ThreeWayMergeCell {
 
     private final HBox labelBox = new HBox(label);
 
-    public FieldNameCell(String text, int rowIndex) {
+    private final Field field;
+
+    public FieldNameCell(Field field, String text, int rowIndex) {
         super(text, rowIndex);
+        this.field = field;
         initialize();
+    }
+
+    public Field getField() {
+        return field;
     }
 
     private void initialize() {
