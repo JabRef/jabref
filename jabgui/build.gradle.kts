@@ -1,5 +1,3 @@
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.jvm.toolchain.JavaToolchainService
 
 plugins {
     id("org.jabref.gradle.module")
@@ -256,7 +254,7 @@ javaModulePackaging {
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef"
         )
-        if (providers.environmentVariable("OSXCERT").orNull?.isNotBlank() ?: false) {
+        if (providers.environmentVariable("OSXCERT").map { it == "true" }.orNull ?: false) {
             options.addAll(
                 "--mac-sign",
                 "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
