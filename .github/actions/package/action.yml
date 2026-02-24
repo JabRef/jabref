@@ -34,6 +34,8 @@ inputs:
     required: true
   gradleCommand:
     required: true
+  secretsPresent:
+    required: true
 
   # API keys
   astrophysicsDataSystemApiKey:
@@ -54,10 +56,17 @@ runs:
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
+        OSXCERT: ${{ inputs.secretsPresent }}
         AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
         BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
         IEEEAPIKey: ${{ inputs.ieeeApiKey }}
         SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    - name: Validate Signature
+      if: ${{ inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' && inputs.component == 'jabgui' }}
+      shell: bash
+      run: |
+        ls -la ${{ inputs.component }}/build/packages/${{ inputs.os }}/
+        codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
@@ -137,7 +146,7 @@ runs:
       if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
       uses: actions/upload-artifact@v6
       with:
-        name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
+        name: ${{ inputs.componentShort }} (${{ inputs.displayName }}) (shadowJar)
         path: |
           ${{ inputs.component }}/build/libs/*-all.jar
     - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
