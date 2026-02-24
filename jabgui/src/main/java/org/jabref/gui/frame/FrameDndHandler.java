@@ -91,10 +91,12 @@ public class FrameDndHandler {
             }
 
             LibraryTab destinationLibraryTab = null;
-            for (Tab libraryTab : tabPane.getTabs()) {
-                if (libraryTab.getId().equals(destinationTabNode.getId()) &&
-                        !tabPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
-                    destinationLibraryTab = (LibraryTab) libraryTab;
+            for (Tab tab : tabPane.getTabs()) {
+                if (tab.getId() != null
+                        && tab.getId().equals(destinationTabNode.getId())
+                        && !tabPane.getSelectionModel().getSelectedItem().equals(tab)
+                        && tab instanceof LibraryTab libraryTab) {
+                    destinationLibraryTab = libraryTab;
                     break;
                 }
             }
@@ -104,15 +106,19 @@ public class FrameDndHandler {
                 return;
             }
 
+            boolean success = false;
             if (hasEntries(dragboard)) {
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
                 destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies);
+                success = true;
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
+                success = true;
             }
 
+            tabDragEvent.setDropCompleted(success);
             tabDragEvent.consume();
         }
     }
