@@ -313,6 +313,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                             idText.setText(ClipBoardManager.getContents().trim());
                             idText.selectAll();
                             Platform.runLater(() -> {
+                                // [impl->req~newentry.clipboard.autofocus~1]
                                 idLookupSpecify.setSelected(true);
                                 WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences)
                                            .ifPresent(foundFetcher -> {
