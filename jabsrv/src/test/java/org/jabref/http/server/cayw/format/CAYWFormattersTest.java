@@ -18,7 +18,6 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CAYWFormattersTest {
-    private static final String MMD_BRACKET_SEPARATOR = new String(new char[] {'\\', ']', '\\', '['});
 
     private List<CAYWEntry> caywEntries(String... keys) {
         if (keys == null) {
@@ -277,7 +276,7 @@ class CAYWFormattersTest {
         props.setLocatorValue("42");
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        String expected = "[" + MMD_BRACKET_SEPARATOR + "p. 42][#key1]";
+        String expected = "[" + '\\' + "]" + '\\' + "[" + "p. 42][#key1]";
         assertEquals(expected, actual);
     }
 
@@ -289,7 +288,7 @@ class CAYWFormattersTest {
         props.setLocatorValue("42");
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-        String expected = "[see" + MMD_BRACKET_SEPARATOR + "p. 42][#key1]";
+        String expected = "[see" + '\\' + "]" + '\\' + "[" + "p. 42][#key1]";
         assertEquals(expected, actual);
     }
 }

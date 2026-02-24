@@ -11,7 +11,6 @@ import org.jabref.http.server.cayw.gui.CAYWEntry;
 import jakarta.ws.rs.core.MediaType;
 
 public class MMDFormatter implements CAYWFormatter {
-    private static final String MMD_BRACKET_SEPARATOR = new String(new char[] {'\\', ']', '\\', '['});
 
     @Override
     public MediaType getMediaType() {
@@ -32,10 +31,11 @@ public class MMDFormatter implements CAYWFormatter {
 
             String prefix = props.getPrefix().orElse(null);
             String postnote = props.getPostnote().orElse(null);
+            String sep = '\\' + "]" + '\\' + "[";
 
             /// Both prefix and postnote
             if (prefix != null && postnote != null) {
-                return "[" + prefix + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
+                return "[" + prefix + sep + postnote + "][#" + key + "]";
             }
 
             if (prefix != null) {
@@ -43,7 +43,7 @@ public class MMDFormatter implements CAYWFormatter {
             }
 
             if (postnote != null) {
-                return "[" + MMD_BRACKET_SEPARATOR + postnote + "][#" + key + "]";
+                return "[" + sep + postnote + "][#" + key + "]";
             }
 
             return "[#" + key + "]";
