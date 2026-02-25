@@ -211,6 +211,7 @@ javaModulePackaging {
             include("jabref-chrome.json")
             include("JabRefHost.bat")
             include("JabRefHost.ps1")
+            include("JabRefTopBanner.bmp")
         })
     }
 
