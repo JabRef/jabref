@@ -25,7 +25,7 @@ dependencies {
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.0.4"))
+    api(platform("tools.jackson:jackson-bom:3.1.0"))
 }
 
 dependencies.constraints {
@@ -39,7 +39,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:3.9.1")
+    api("com.dlsc.gemsfx:gemsfx:3.10.1")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")

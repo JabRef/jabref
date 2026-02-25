@@ -2,7 +2,9 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.undo.UndoManager;
 
@@ -113,7 +115,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         keywordTagsField.setMatcher((keyword, searchText) -> keyword.get().toLowerCase().startsWith(searchText.toLowerCase()));
         keywordTagsField.setComparator(Comparator.comparing(Keyword::get));
 
-        keywordTagsField.setNewItemProducer(searchText -> KeywordsEditorViewModel.getStringConverter().fromString(searchText));
+        keywordTagsField.setNewItemProducer(searchText -> viewModel.parseKeyword(searchText));
 
         keywordTagsField.setShowSearchIcon(false);
         keywordTagsField.setOnMouseClicked(_ -> keywordTagsField.getEditor().requestFocus());
@@ -124,7 +126,11 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         String keywordSeparator = String.valueOf(viewModel.getKeywordSeparator());
         keywordTagsField.getEditor().setOnKeyReleased(event -> {
             if (event.getText().equals(keywordSeparator)) {
-                keywordTagsField.commit();
+                String editorText = keywordTagsField.getEditor().getText();
+
+                if (isSeparatedKeyword(editorText, keywordSeparator)) {
+                    keywordTagsField.commit();
+                }
                 event.consume();
             }
         });
@@ -155,6 +161,22 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
     }
 
+    private boolean isSeparatedKeyword(String keywordString, String keywordSeparator) {
+        int separatorLastOccurrence = keywordString.lastIndexOf(keywordSeparator);
+        if (separatorLastOccurrence == -1) {
+            return false;
+        }
+
+        int separatorFirstOccurrence = keywordString.lastIndexOf(keywordSeparator);
+        String substringWithSeparator = new StringBuilder(keywordString.substring(0, separatorFirstOccurrence)).reverse().toString();
+
+        AtomicBoolean isSeparatedKeyword = new AtomicBoolean(true);
+        substringWithSeparator.chars().takeWhile(symbol -> symbol == Keyword.DEFAULT_ESCAPE_SYMBOL)
+                              .forEachOrdered(_ -> isSeparatedKeyword.set(!isSeparatedKeyword.get()));
+
+        return isSeparatedKeyword.get();
+    }
+
     private Node createTag(Keyword keyword) {
         Label tagLabel = new Label();
         tagLabel.setText(keywordTagsField.getConverter().toString(keyword));
@@ -172,7 +194,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         tagLabel.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 keywordTagsField.removeTags(keyword);
-                keywordTagsField.getEditor().setText(keyword.get());
+                keywordTagsField.getEditor().setText(KeywordList.serialize(List.of(keyword), viewModel.getKeywordSeparator()));
                 keywordTagsField.getEditor().positionCaret(keyword.get().length());
             }
         });
