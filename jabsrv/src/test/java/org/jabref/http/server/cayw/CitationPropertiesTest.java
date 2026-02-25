@@ -2,6 +2,8 @@ package org.jabref.http.server.cayw;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,140 +12,169 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CitationPropertiesTest {
 
-    @Test
-    void formattedLocator_withTypeAndValue() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.PAGE);
-        props.setLocatorValue("42");
-        assertEquals(Optional.of("p. 42"), props.getFormattedLocator());
+    @Nested
+    class FormattedLocatorTest {
+
+        private CitationProperties props;
+
+        @BeforeEach
+        void setUp() {
+            props = new CitationProperties();
+        }
+
+        @Test
+        void withTypeAndValue() {
+            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42");
+            assertEquals(Optional.of("p. 42"), props.getFormattedLocator());
+        }
+
+        @Test
+        void withChapter() {
+            props.withLocatorType(LocatorType.CHAPTER).withLocatorValue("3");
+            assertEquals(Optional.of("ch. 3"), props.getFormattedLocator());
+        }
+
+        @Test
+        void emptyWhenNoType() {
+            props.withLocatorValue("42");
+            assertEquals(Optional.empty(), props.getFormattedLocator());
+        }
+
+        @Test
+        void emptyWhenNoValue() {
+            props.withLocatorType(LocatorType.PAGE);
+            assertEquals(Optional.empty(), props.getFormattedLocator());
+        }
+
+        @Test
+        void emptyWhenBlankValue() {
+            props.withLocatorType(LocatorType.PAGE).withLocatorValue("   ");
+            assertEquals(Optional.empty(), props.getFormattedLocator());
+        }
     }
 
-    @Test
-    void formattedLocator_withChapter() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.CHAPTER);
-        props.setLocatorValue("3");
-        assertEquals(Optional.of("ch. 3"), props.getFormattedLocator());
+    @Nested
+    class PostnoteTest {
+
+        private CitationProperties props;
+
+        @BeforeEach
+        void setUp() {
+            props = new CitationProperties();
+        }
+
+        @Test
+        void locatorAndSuffix() {
+            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42").withSuffix("emphasis added");
+            assertEquals(Optional.of("p. 42, emphasis added"), props.getPostnote());
+        }
+
+        @Test
+        void locatorOnly() {
+            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42");
+            assertEquals(Optional.of("p. 42"), props.getPostnote());
+        }
+
+        @Test
+        void suffixOnly() {
+            props.withSuffix("emphasis added");
+            assertEquals(Optional.of("emphasis added"), props.getPostnote());
+        }
+
+        @Test
+        void emptyWhenNothing() {
+            assertEquals(Optional.empty(), props.getPostnote());
+        }
     }
 
-    @Test
-    void formattedLocator_emptyWhenNoType() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorValue("42");
-        assertEquals(Optional.empty(), props.getFormattedLocator());
+    @Nested
+    class PrefixTest {
+
+        private CitationProperties props;
+
+        @BeforeEach
+        void setUp() {
+            props = new CitationProperties();
+        }
+
+        @Test
+        void stripped() {
+            props.withPrefix("  see  ");
+            assertEquals(Optional.of("see"), props.getPrefix());
+        }
+
+        @Test
+        void emptyWhenBlank() {
+            props.withPrefix("   ");
+            assertEquals(Optional.empty(), props.getPrefix());
+        }
+
+        @Test
+        void emptyWhenNull() {
+            assertEquals(Optional.empty(), props.getPrefix());
+        }
     }
 
-    @Test
-    void formattedLocator_emptyWhenNoValue() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.PAGE);
-        assertEquals(Optional.empty(), props.getFormattedLocator());
+    @Nested
+    class SuffixTest {
+
+        private CitationProperties props;
+
+        @BeforeEach
+        void setUp() {
+            props = new CitationProperties();
+        }
+
+        @Test
+        void stripped() {
+            props.withSuffix("  emphasis added  ");
+            assertEquals(Optional.of("emphasis added"), props.getSuffix());
+        }
+
+        @Test
+        void emptyWhenBlank() {
+            props.withSuffix("   ");
+            assertEquals(Optional.empty(), props.getSuffix());
+        }
     }
 
-    @Test
-    void formattedLocator_emptyWhenBlankValue() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.PAGE);
-        props.setLocatorValue("   ");
-        assertEquals(Optional.empty(), props.getFormattedLocator());
-    }
+    @Nested
+    class HasPropertiesTest {
 
-    @Test
-    void postnote_locatorAndSuffix() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.PAGE);
-        props.setLocatorValue("42");
-        props.setSuffix("emphasis added");
-        assertEquals(Optional.of("p. 42, emphasis added"), props.getPostnote());
-    }
+        private CitationProperties props;
 
-    @Test
-    void postnote_locatorOnly() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.PAGE);
-        props.setLocatorValue("42");
-        assertEquals(Optional.of("p. 42"), props.getPostnote());
-    }
+        @BeforeEach
+        void setUp() {
+            props = new CitationProperties();
+        }
 
-    @Test
-    void postnote_suffixOnly() {
-        CitationProperties props = new CitationProperties();
-        props.setSuffix("emphasis added");
-        assertEquals(Optional.of("emphasis added"), props.getPostnote());
-    }
+        @Test
+        void falseWhenEmpty() {
+            assertFalse(props.hasProperties());
+        }
 
-    @Test
-    void postnote_emptyWhenNothing() {
-        CitationProperties props = new CitationProperties();
-        assertEquals(Optional.empty(), props.getPostnote());
-    }
+        @Test
+        void trueWithPrefix() {
+            props.withPrefix("see");
+            assertTrue(props.hasProperties());
+        }
 
-    @Test
-    void prefix_stripped() {
-        CitationProperties props = new CitationProperties();
-        props.setPrefix("  see  ");
-        assertEquals(Optional.of("see"), props.getPrefix());
-    }
+        @Test
+        void trueWithOmitAuthor() {
+            props.withOmitAuthor(true);
+            assertTrue(props.hasProperties());
+        }
 
-    @Test
-    void prefix_emptyWhenBlank() {
-        CitationProperties props = new CitationProperties();
-        props.setPrefix("   ");
-        assertEquals(Optional.empty(), props.getPrefix());
-    }
+        @Test
+        void trueWithLocator() {
+            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42");
+            assertTrue(props.hasProperties());
+        }
 
-    @Test
-    void prefix_emptyWhenNull() {
-        CitationProperties props = new CitationProperties();
-        assertEquals(Optional.empty(), props.getPrefix());
-    }
-
-    @Test
-    void suffix_stripped() {
-        CitationProperties props = new CitationProperties();
-        props.setSuffix("  emphasis added  ");
-        assertEquals(Optional.of("emphasis added"), props.getSuffix());
-    }
-
-    @Test
-    void suffix_emptyWhenBlank() {
-        CitationProperties props = new CitationProperties();
-        props.setSuffix("   ");
-        assertEquals(Optional.empty(), props.getSuffix());
-    }
-
-    @Test
-    void hasProperties_falseWhenEmpty() {
-        CitationProperties props = new CitationProperties();
-        assertFalse(props.hasProperties());
-    }
-
-    @Test
-    void hasProperties_trueWithPrefix() {
-        CitationProperties props = new CitationProperties();
-        props.setPrefix("see");
-        assertTrue(props.hasProperties());
-    }
-
-    @Test
-    void hasProperties_trueWithSuppressAuthor() {
-        CitationProperties props = new CitationProperties();
-        props.setOmitAuthor(true);
-        assertTrue(props.hasProperties());
-    }
-
-    @Test
-    void hasProperties_trueWithLocator() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.PAGE);
-        props.setLocatorValue("42");
-        assertTrue(props.hasProperties());
-    }
-
-    @Test
-    void hasProperties_falseWithLocatorTypeButNoValue() {
-        CitationProperties props = new CitationProperties();
-        props.setLocatorType(LocatorType.PAGE);
-        assertFalse(props.hasProperties());
+        @Test
+        void falseWithLocatorTypeButNoValue() {
+            props.withLocatorType(LocatorType.PAGE);
+            assertFalse(props.hasProperties());
+        }
     }
 }
