@@ -9,6 +9,8 @@ import javax.swing.undo.UndoManager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -211,6 +213,16 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
+
+        stateManager.getRunningBackgroundTasks().addListener((ListChangeListener<? super Task<?>>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Task<?> task : change.getAddedSubList()) {
+                        dialogService.notify(new JabRefDialogService.TaskNotification(task));
+                    }
+                }
+            }
+        });
 
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);

@@ -80,6 +80,7 @@ public class JabRefDialogService implements DialogService {
     private final NotificationGroup<Object, FileNotification> fileNotifications = new NotificationGroup<>("Files");
     private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>("Preview");
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>("Notifications");
+    private final NotificationGroup<Task<?>, Notification<Task<?>>> taskNotifications = new NotificationGroup<>("Tasks");
 
     private final Window mainWindow;
 
@@ -449,13 +450,18 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void notify(Notification<Object> notification) {
-        if (notification instanceof FileNotification) {
-            fileNotifications.getNotifications().add((FileNotification) notification);
-        } else if (notification instanceof PreviewNotification) {
-            previewNotifications.getNotifications().add((PreviewNotification) notification);
-        } else {
-            undefinedNotifications.getNotifications().add(notification);
+    public void notify(Notification<?> notification) {
+        switch (notification) {
+            case FileNotification fileNotification ->
+                    fileNotifications.getNotifications().add(fileNotification);
+            case PreviewNotification previewNotification ->
+                    previewNotifications.getNotifications().add(previewNotification);
+            case TaskNotification taskNotification ->
+                    taskNotifications.getNotifications().add(taskNotification);
+            case UndefinedNotification undefinedNotification ->
+                    undefinedNotifications.getNotifications().add(undefinedNotification);
+            default ->
+                    undefinedNotifications.getNotifications().add(new UndefinedNotification(notification.getTitle(), notification.getSummary()));
         }
     }
 
@@ -570,7 +576,13 @@ public class JabRefDialogService implements DialogService {
         }
     }
 
-    public List<NotificationGroup<?, ? extends Notification<Object>>> getNotificationGroups() {
-        return List.of(fileNotifications, undefinedNotifications, previewNotifications);
+    public static class TaskNotification extends Notification<Task<?>> {
+        public TaskNotification(Task<?> task) {
+            super(task.getTitle(), "");
+        }
+    }
+
+    public List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups() {
+        return List.of(fileNotifications, undefinedNotifications, previewNotifications, taskNotifications);
     }
 }

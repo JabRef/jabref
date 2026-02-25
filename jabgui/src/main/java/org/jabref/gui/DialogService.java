@@ -260,7 +260,7 @@ public interface DialogService extends NotificationService {
     /// @return the selected file or an empty {@link Optional} if no file has been selected
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
 
-    List<NotificationGroup<?, ? extends Notification<Object>>> getNotificationGroups();
+    List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups();
 
-    void notify(Notification<Object> notification);
+    void notify(Notification<?> notification);
 }
