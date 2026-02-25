@@ -24,31 +24,34 @@ class CitationPropertiesTest {
 
         @Test
         void withTypeAndValue() {
-            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42");
+            props.setLocatorType(LocatorType.PAGE);
+            props.setLocatorValue("42");
             assertEquals(Optional.of("p. 42"), props.getFormattedLocator());
         }
 
         @Test
         void withChapter() {
-            props.withLocatorType(LocatorType.CHAPTER).withLocatorValue("3");
+            props.setLocatorType(LocatorType.CHAPTER);
+            props.setLocatorValue("3");
             assertEquals(Optional.of("ch. 3"), props.getFormattedLocator());
         }
 
         @Test
         void emptyWhenNoType() {
-            props.withLocatorValue("42");
+            props.setLocatorValue("42");
             assertEquals(Optional.empty(), props.getFormattedLocator());
         }
 
         @Test
         void emptyWhenNoValue() {
-            props.withLocatorType(LocatorType.PAGE);
+            props.setLocatorType(LocatorType.PAGE);
             assertEquals(Optional.empty(), props.getFormattedLocator());
         }
 
         @Test
         void emptyWhenBlankValue() {
-            props.withLocatorType(LocatorType.PAGE).withLocatorValue("   ");
+            props.setLocatorType(LocatorType.PAGE);
+            props.setLocatorValue("   ");
             assertEquals(Optional.empty(), props.getFormattedLocator());
         }
     }
@@ -65,19 +68,22 @@ class CitationPropertiesTest {
 
         @Test
         void locatorAndSuffix() {
-            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42").withSuffix("emphasis added");
+            props.setLocatorType(LocatorType.PAGE);
+            props.setLocatorValue("42");
+            props.setSuffix("emphasis added");
             assertEquals(Optional.of("p. 42, emphasis added"), props.getPostnote());
         }
 
         @Test
         void locatorOnly() {
-            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42");
+            props.setLocatorType(LocatorType.PAGE);
+            props.setLocatorValue("42");
             assertEquals(Optional.of("p. 42"), props.getPostnote());
         }
 
         @Test
         void suffixOnly() {
-            props.withSuffix("emphasis added");
+            props.setSuffix("emphasis added");
             assertEquals(Optional.of("emphasis added"), props.getPostnote());
         }
 
@@ -99,13 +105,13 @@ class CitationPropertiesTest {
 
         @Test
         void stripped() {
-            props.withPrefix("  see  ");
+            props.setPrefix("  see  ");
             assertEquals(Optional.of("see"), props.getPrefix());
         }
 
         @Test
         void emptyWhenBlank() {
-            props.withPrefix("   ");
+            props.setPrefix("   ");
             assertEquals(Optional.empty(), props.getPrefix());
         }
 
@@ -127,13 +133,13 @@ class CitationPropertiesTest {
 
         @Test
         void stripped() {
-            props.withSuffix("  emphasis added  ");
+            props.setSuffix("  emphasis added  ");
             assertEquals(Optional.of("emphasis added"), props.getSuffix());
         }
 
         @Test
         void emptyWhenBlank() {
-            props.withSuffix("   ");
+            props.setSuffix("   ");
             assertEquals(Optional.empty(), props.getSuffix());
         }
     }
@@ -155,25 +161,26 @@ class CitationPropertiesTest {
 
         @Test
         void trueWithPrefix() {
-            props.withPrefix("see");
+            props.setPrefix("see");
             assertTrue(props.hasProperties());
         }
 
         @Test
         void trueWithOmitAuthor() {
-            props.withOmitAuthor(true);
+            props.setOmitAuthor(true);
             assertTrue(props.hasProperties());
         }
 
         @Test
         void trueWithLocator() {
-            props.withLocatorType(LocatorType.PAGE).withLocatorValue("42");
+            props.setLocatorType(LocatorType.PAGE);
+            props.setLocatorValue("42");
             assertTrue(props.hasProperties());
         }
 
         @Test
         void falseWithLocatorTypeButNoValue() {
-            props.withLocatorType(LocatorType.PAGE);
+            props.setLocatorType(LocatorType.PAGE);
             assertFalse(props.hasProperties());
         }
     }
