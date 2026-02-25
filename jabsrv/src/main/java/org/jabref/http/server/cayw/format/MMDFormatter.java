@@ -29,21 +29,21 @@ public class MMDFormatter implements CAYWFormatter {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
 
-            String prefix = props.getPrefix().orElse(null);
-            String postnote = props.getPostnote().orElse(null);
-            String sep = '\\' + "]" + '\\' + "[";
+            Optional<String> prefix = props.getPrefix();
+            Optional<String> postnote = props.getPostnote();
+            String sep = "\\]\\[";
 
             /// Both prefix and postnote
-            if (prefix != null && postnote != null) {
-                return "[" + prefix + sep + postnote + "][#" + key + "]";
+            if (prefix.isPresent() && postnote.isPresent()) {
+                return "[" + prefix.get() + sep + postnote.get() + "][#" + key + "]";
             }
 
-            if (prefix != null) {
-                return "[" + prefix + "][#" + key + "]";
+            if (prefix.isPresent()) {
+                return "[" + prefix.get() + "][#" + key + "]";
             }
 
-            if (postnote != null) {
-                return "[" + sep + postnote + "][#" + key + "]";
+            if (postnote.isPresent()) {
+                return "[" + sep + postnote.get() + "][#" + key + "]";
             }
 
             return "[#" + key + "]";

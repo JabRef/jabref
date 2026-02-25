@@ -32,10 +32,10 @@ public class BibLatexFormatter implements CAYWFormatter {
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
         String command = queryParams.getCommand().orElse(defaultCommand);
 
-        boolean anyHasProperties = caywEntries.stream()
+        boolean hasAnyProperties = caywEntries.stream()
                                               .anyMatch(e -> e.citationProperties().hasProperties());
 
-        if (!anyHasProperties) {
+        if (!hasAnyProperties) {
             String keys = caywEntries.stream()
                                      .map(e -> e.bibEntry().getCitationKey())
                                      .flatMap(Optional::stream)
