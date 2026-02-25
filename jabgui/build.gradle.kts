@@ -202,7 +202,8 @@ javaModulePackaging {
             "--win-dir-chooser",
             "--win-shortcut",
             "--win-menu",
-            "--win-menu-group", "JabRef"
+            "--win-menu-group", "JabRef",
+            "--verbose"
         )
         targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
             include("jabref-firefox.json")
