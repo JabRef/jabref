@@ -13,6 +13,16 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added CLI option `--field-formatters` to the `convert` and `generate-bib-from-aux` commands to apply field formatters during export. [#11520](https://github.com/JabRef/jabref/issues/11520)
 
+### Changed
+
+- We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
+
+### Fixed
+
+- We fixed an issue where institutional authors in braces {Institutional Author} triggered a "Names are not in the standard format" warning. [#15157](https://github.com/JabRef/jabref/issues/15157)
+
+### Removed
+
 ## [6.0-alpha.5] – 2026-02-20
 
 ### Added
