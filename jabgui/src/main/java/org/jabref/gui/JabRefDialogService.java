@@ -51,6 +51,7 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
 
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -578,7 +579,15 @@ public class JabRefDialogService implements DialogService {
 
     public static class TaskNotification extends Notification<Task<?>> {
         public TaskNotification(Task<?> task) {
-            super(task.getTitle(), "");
+            super(task.getTitle(), task.getMessage());
+            setOnClick(_ -> OnClickBehaviour.NONE);
+            task.setOnSucceeded(_ -> {
+                if (StringUtil.isBlank(task.getTitle())) {
+                    // ToDo
+                } else {
+                    setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+                }
+            });
         }
     }
 
