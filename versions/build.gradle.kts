@@ -45,7 +45,7 @@ dependencies {
     api("org.glassfish.jersey.test-framework:jersey-test-framework-core")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
 
-    api(platform("tools.jackson:jackson-bom:3.0.4"))
+    api(platform("tools.jackson:jackson-bom:3.1.0"))
     api("tools.jackson.core:jackson-core")
     api("tools.jackson.core:jackson-databind")
     api("tools.jackson.dataformat:jackson-dataformat-yaml")
@@ -62,7 +62,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:3.9.1")
+    api("com.dlsc.gemsfx:gemsfx:3.10.1")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")
@@ -106,7 +106,7 @@ dependencies.constraints {
     api("io.github.thibaultmeyer:cuid:2.0.5")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
-    api("io.zonky.test:embedded-postgres:2.2.0")
+    api("io.zonky.test:embedded-postgres:2.2.1")
     api("jakarta.annotation:jakarta.annotation-api:3.0.0")
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
