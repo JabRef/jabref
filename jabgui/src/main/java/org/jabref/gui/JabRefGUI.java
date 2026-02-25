@@ -60,6 +60,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.PowerPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
+import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
@@ -306,6 +307,7 @@ public class JabRefGUI extends Application {
         powerpane.getInfoCenterPane().getInfoCenterView().getGroups().addAll(dialogService.getNotificationGroups());
         Injector.setModelOrService(InfoCenterPane.class, powerpane.getInfoCenterPane());
         powerpane.setContent(JabRefGUI.mainFrame);
+        powerpane.getInfoCenterPane().setInfoCenterViewPos(InfoCenterViewPos.BOTTOM_RIGHT);
 
         Scene scene = new Scene(powerpane);
 
