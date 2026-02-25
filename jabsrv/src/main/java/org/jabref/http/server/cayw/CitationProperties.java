@@ -20,16 +20,18 @@ public class CitationProperties {
         return Optional.ofNullable(locatorType);
     }
 
-    public void setLocatorType(@Nullable LocatorType locatorType) {
+    public CitationProperties withLocatorType(@Nullable LocatorType locatorType) {
         this.locatorType = locatorType;
+        return this;
     }
 
     public Optional<String> getLocatorValue() {
         return Optional.ofNullable(locatorValue).filter(s -> !s.isBlank());
     }
 
-    public void setLocatorValue(@Nullable String locatorValue) {
+    public CitationProperties withLocatorValue(@Nullable String locatorValue) {
         this.locatorValue = locatorValue;
+        return this;
     }
 
     public Optional<String> getPrefix() {
@@ -38,8 +40,9 @@ public class CitationProperties {
                        .filter(s -> !s.isEmpty());
     }
 
-    public void setPrefix(@Nullable String prefix) {
+    public CitationProperties withPrefix(@Nullable String prefix) {
         this.prefix = prefix;
+        return this;
     }
 
     public Optional<String> getSuffix() {
@@ -48,16 +51,18 @@ public class CitationProperties {
                        .filter(s -> !s.isEmpty());
     }
 
-    public void setSuffix(@Nullable String suffix) {
+    public CitationProperties withSuffix(@Nullable String suffix) {
         this.suffix = suffix;
+        return this;
     }
 
     public boolean isOmitAuthor() {
         return omitAuthor;
     }
 
-    public void setOmitAuthor(boolean omitAuthor) {
+    public CitationProperties withOmitAuthor(boolean omitAuthor) {
         this.omitAuthor = omitAuthor;
+        return this;
     }
 
     public Optional<String> getFormattedLocator() {
