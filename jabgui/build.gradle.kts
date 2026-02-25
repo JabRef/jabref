@@ -202,12 +202,6 @@ javaModulePackaging {
             "--win-menu",
             "--win-menu-group", "JabRef"
         )
-        targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
-            include("jabref-firefox.json")
-            include("jabref-chrome.json")
-            include("JabRefHost.bat")
-            include("JabRefHost.ps1")
-        })
     }
 
     targetsWithOs("linux") {
@@ -230,10 +224,6 @@ javaModulePackaging {
             // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
             "--linux-shortcut"
         )
-        targetResources.from(layout.projectDirectory.dir("buildres/linux").asFileTree.matching {
-            include("native-messaging-host/**")
-            include("jabrefHost.py")
-        })
     }
     targetsWithOs("macos") {
         jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
@@ -261,9 +251,6 @@ javaModulePackaging {
                 "--mac-package-signing-prefix", "org.jabref.",
             )
         }
-        targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
-            include("Resources/**")
-        })
     }
 }
 
