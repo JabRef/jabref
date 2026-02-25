@@ -212,6 +212,7 @@ javaModulePackaging {
             include("JabRefHost.bat")
             include("JabRefHost.ps1")
             include("JabRefTopBanner.bmp")
+            include("JabRef.VisualElementsManifest.xml")
         })
     }
 
