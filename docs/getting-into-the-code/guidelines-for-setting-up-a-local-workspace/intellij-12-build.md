@@ -155,19 +155,19 @@ Now you can use IntelliJ IDEA's internal build system by using **Build > Build P
 
 To run an example test from IntelliJ, we let IntelliJ create a launch configuration:
 
-Locate the class `BibEntryTest`:
+Locate the class `LocalizationConsistencyTest`:
 Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
-Enter `bibentrytest`.
-Now, `BibEntryTest` should appear first:
+Enter `localizationconsistencytest`.
+Now, `LocalizationConsistencyTest` should appear first:
 
-{% figure caption:"IntelliJ search for class “BibEntryTest”" %}
-![IntelliJ search for class "BibEntryTest"](12-08-locate-BibEntryTest.png)
+{% figure caption:"IntelliJ search for class “LocalizationConsistencyTest”" %}
+![IntelliJ search for class "LocalizationConsistencyTest"](12-08-locate-LocalizationConsistencyTest.png)
 {% endfigure %}
 
 Press <kbd>Enter</kbd> to jump to that class.
 
-Hover on the green play button on `defaultConstructor`:
+Hover on the green play button on `findMissingLocalizationKeys`:
 
 {% figure caption:"However on green play button" %}
 ![However on green play button](12-09-run-single-test.png)
@@ -175,16 +175,16 @@ Hover on the green play button on `defaultConstructor`:
 
 Then, click on it.
 A popup menu opens.
-Choose the first entry "Run BibEntryTest.testDefaultConstructor" and click on it.
+Choose the first entry "Run LocalizationConsistencyTest.findMissingLocalizationKeys" and click on it.
 
-{% figure caption:"Run BibEntryTest.testDefaultConstructor" %}
-![Popup menu - Run testDefaultConstructor](12-10-run-single-test-launch-config.png)
+{% figure caption:"Run LocalizationConsistencyTest.findMissingLocalizationKeys" %}
+![Popup menu - Run testfindMissingLocalizationKeys](12-10-run-single-test-launch-config.png)
 {% endfigure %}
 
 Then, another popup menu opens. Choose "test" as the run task for the test.
 
-{% figure caption:"Run Tasks for default Constructor" %}
-![Run Tasks for default Constructor](12-11-run-task-for-test.png)
+{% figure caption:"Run Tasks for findMissingLocalizationKeys" %}
+![Run Tasks for findMissingLocalizationKeys](12-11-run-task-for-test.png)
 {% endfigure %}
 
 Then, the single test starts.
@@ -192,16 +192,16 @@ Then, the single test starts.
 You also have an entry in the Launch configurations to directly launch the test.
 You can also click on the debug symbol next to it to enable stopping at breakpoints.
 
-{% figure caption:"Launch menu contains BibEntry test case" %}
-![Launch menu contains BibEntry test case](12-12-run-BibEntryTest.png)
+{% figure caption:"Launch menu contains LocalizationConsistencyTest test case" %}
+![Launch menu contains LocalizationConsistencyTest test case](12-12-run-LocalizationConsistencyTest.png)
 {% endfigure %}
 
 The tests are green after the run.
 You can also use the play button there to re-execute the tests.
-A right-click on "BibEntryTests" enables the debugger to start.
+A right-click on "findMissingLocalizationKeys" enables the debugger to start.
 
-{% figure caption:"Run window for the BibEntry test case" %}
-![Run window for the BibEntry test case](12-13-tests-are-green.png)
+{% figure caption:"Run window for the LocalizationConsistencyTest test case" %}
+![Run window for the LocalizationConsistencyTest test case](12-13-tests-are-green.png)
 {% endfigure %}
 
 <!-- markdownlint-disable-file MD033 -->

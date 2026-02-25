@@ -1,0 +1,36 @@
+name: Auto-remove review request
+
+on:
+  pull_request_target:
+    types: [review_requested]
+
+jobs:
+  guard-reviewers:
+    runs-on: ubuntu-slim
+    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    permissions:
+      pull-requests: write
+      checks: read
+      contents: read
+
+    steps:
+      - uses: ./.github/actions/pr-gate
+        id: gate
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          ci-running-message: >
+            Do not request reviews while the CI is running.
+            CI checks need to be completed and passed.
+          changes-required-message: |
+            Do not request reviews if changes are required.
+            Address the changes first.
+      - name: Remove reviewer
+        if: ${{ steps.gate.outputs.skip-check != 'true' && (steps.gate.outputs.ci_running == 'true' || steps.gate.outputs.changes_required == 'true') }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_ADAPT_REVIEW }}
+        run: |
+          reviewer="${{ github.event.requested_reviewer.login }}"
+          gh api \
+            -X DELETE \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
+            -f reviewers[]="$reviewer"

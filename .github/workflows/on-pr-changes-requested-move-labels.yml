@@ -8,7 +8,7 @@ on:
 jobs:
   apply-labels:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       actions: write
       contents: write
@@ -27,16 +27,15 @@ jobs:
           if [ -f pr_number.txt ]; then
             echo "continue=true" >> "$GITHUB_OUTPUT"
             echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$(cat pr_number.txt)" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "continue=false" >> "$GITHUB_OUTPUT"
+            echo "No PR number existing" >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Apply label operations
         if: steps.check.outputs.continue == 'true'
+        shell: bash -euxo pipefail {0}
         run: >
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }}
-            --remove-label "status: ready-for-review"
-            --remove-label "status: awaiting-second-review"
-            --remove-label "status: to-be-merged"
-            --add-label "status: changes-required"
+          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: ready-for-review,status: awaiting-second-review,status: to-be-merged,status: no-bot-comments" --add-label "status: changes-required"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

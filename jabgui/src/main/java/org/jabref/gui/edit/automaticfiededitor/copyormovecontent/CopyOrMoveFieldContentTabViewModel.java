@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompoundEdit;
@@ -44,6 +45,11 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, BibDatabase bibDatabase, StateManager stateManager) {
         super(bibDatabase, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
+
+        FieldHelper.getSetFieldsOnly(this.selectedEntries, getAllFields())
+                   .stream()
+                   .findFirst()
+                   .ifPresent(fromField::set);
 
         toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
             if (StringUtil.isBlank(field.getName())) {

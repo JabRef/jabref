@@ -330,7 +330,13 @@ public class PreferencesMigrations {
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
                                                   .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
-                                                  .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
+                                                  .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__")
+                                                  .replace("\\end{pages}__NEWLINE__\\begin{abstract}", """
+                                                          \\end{pages}__NEWLINE__\
+                                                          \\begin{doi}<BR>doi <a href="https://doi.org/\\format[DOIStrip]{\\doi}">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__\
+                                                          \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
+                                                          \\begin{abstract}\
+                                                          """);
         prefs.put(JabRefGuiPreferences.PREVIEW_STYLE, migratedStyle);
     }
 

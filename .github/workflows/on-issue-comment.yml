@@ -2,12 +2,12 @@ name: On isuse comment
 
 on:
   issue_comment:
-    types: [ created, edited ]
+    types: [ created ]
 
 jobs:
   assign:
     if: ${{ github.repository == 'JabRef/jabref' || github.repository == 'JabRef/jabref-koppor' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       issues: write
@@ -20,21 +20,21 @@ jobs:
           maintainers: '@JabRef/developers,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan'
           allow_self_assign_author: false
           ignored_users: ${{ secrets.IGNORED_USERS }}
-          ignored_message: >
+          ignored_text: >
             Hi @{{ handle }}, it seems that your past activity showed too much undirected AI usage.
             Please re-iterate on [AI_USAGE_POLIY.md](https://github.com/JabRef/jabref/blob/main/AI_USAGE_POLICY.md) and [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md).
 
 
             We might reconsider your request to work on an issue after March 31, 2026.
-          assignment_suggestion_comment: >
+          assignment_suggestion_text: >
             👋 Hey @{{ handle }}, looks like you’re eager to work on this issue — great! 🎉
             It also looks like you don't know how to assign issues to yourself.
             Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
             It will also guide you in other aspects of contributing to JabRef.
           # 2: One person could have one PR opened and while waiting for feedback working on another one.
-          max_assignments: 2
+          max_assignments: 3
           max_overall_assignment_labels: "good first issue"
-          max_overall_assignment_message: >
+          max_overall_assignment_text: >
             ### ⚠️ Assignment Limit Reached for Good First Issues
 
 
@@ -44,7 +44,7 @@ jobs:
 
             While waiting for feedback on your current assignments, you are invited to move on to more advanced issues.
             Start at checking the [good second issues](https://github.com/JabRef/jabref/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen%20label%3A%22good%20second%20issue%22%20no%3Aassignee).
-          assigned_comment_newcomer: >
+          assigned_newcomer_text: >
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
 
@@ -65,13 +65,18 @@ jobs:
 
 
             Happy coding! 🚀
-          assigned_comment: >
+          assigned_text: >
             Thank you for your continued work in JabRef.
             At this point, you probably already know the basics and the important links.
             If not, our [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) is the place you should go to.
+
+
+            At this point in time, you raised {{ prs_total }} pull request(s) of which {{ prs_merged_percentage }}% ({{ prs_merged }}/{{ prs_total }}) have been merged.
           # If this is updated, also update the number at unassign-issues.yml
           days_until_unassign: 14
-          unassigned_comment: |
+          self_unassigned_text: |
+            @{{ handle }} has been unassigned from this issue.
+          unassigned_text: |
             ### 📋 Assignment Update
 
             Hi @{{ handle }} you have been unassigned from this issue.

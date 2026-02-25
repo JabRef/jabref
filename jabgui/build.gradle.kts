@@ -1,8 +1,7 @@
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.jvm.toolchain.JavaToolchainService
 
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
@@ -10,7 +9,10 @@ plugins {
 }
 
 group = "org.jabref"
-version = project.findProperty("projVersion") ?: "100.0.0"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
 // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 val mockitoAgent = configurations.create("mockitoAgent")
@@ -142,17 +144,22 @@ application {
     mainModule.set("org.jabref")
 
     applicationDefaultJvmArgs = listOf(
+        "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
+
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-modules", "jdk.incubator.vector",
 
-        "-XX:+UnlockExperimentalVMOptions",
-        "-XX:+UseCompactObjectHeaders",
-        "-XX:+UseZGC",
-        "-XX:+ZUncommit",
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
         "-XX:+UseStringDeduplication"
+
+        // Default garbage collector (G1) is sufficient
+        // More informaiton: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
+        // "-XX:+UseZGC", "-XX:+ZUncommit"
+        // "-XX:+UseG1GC"
     )
 }
 
@@ -163,22 +170,37 @@ tasks.named<JavaExec>("run") {
 
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
-    applicationName = "JabRef"
-    jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
+
+    applicationName = "JabRef"
+    applicationDescription = "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX."
+    vendor = "JabRef e.V."
+
     addModules.add("jdk.incubator.vector")
 
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
+        appImageOptions.addAll(
+            // Generic options, but different for each target
+            "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
+        )
         options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
+            "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
+            "--file-associations", "$projectDir\\buildres\\windows\\bibtexAssociations.properties",
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
+
+            // Target-speccific options
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
             "--win-dir-chooser",
             "--win-shortcut",
             "--win-menu",
-            "--win-menu-group", "JabRef",
-            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
-            "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
+            "--win-menu-group", "JabRef"
         )
         targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
             include("jabref-firefox.json")
@@ -189,13 +211,24 @@ javaModulePackaging {
     }
 
     targetsWithOs("linux") {
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
+        appImageOptions.addAll(
+            // Generic options, but different for each target
+            "--icon", "$projectDir/buildres/linux/JabRef.png",
+        )
         options.addAll(
-            "--linux-menu-group", "Office;",
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
+            "--icon", "$projectDir/buildres/linux/JabRef.png",
+            "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties",
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("linux").asFile.absolutePath,
+
+            // Target-speccific options
+            "--linux-menu-group", "Office",
             // "--linux-rpm-license-type", "MIT", // We currently package for Ubuntu only, which uses deb, not rpm
-            "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
-            "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
-            "--linux-shortcut",
-            "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
+            "--linux-shortcut"
         )
         targetResources.from(layout.projectDirectory.dir("buildres/linux").asFileTree.matching {
             include("native-messaging-host/**")
@@ -203,13 +236,25 @@ javaModulePackaging {
         })
     }
     targetsWithOs("macos") {
-        options.addAll(
+        jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
+        appImageOptions.addAll(
+            // Generic options, but different for each target
             "--icon", "$projectDir/buildres/macos/JabRef.icns",
-            "--mac-package-identifier", "JabRef",
-            "--mac-package-name", "JabRef",
-            "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
         )
-        if (providers.environmentVariable("OSXCERT").orNull?.isNotBlank() ?: false) {
+        options.addAll(
+            // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // Generic options, but different for each target
+            "--icon", "$projectDir/buildres/macos/JabRef.icns",
+            "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("macos").asFile.absolutePath,
+
+            // Target-speccific options
+            "--mac-package-identifier", "JabRef",
+            "--mac-package-name", "JabRef"
+        )
+        if (providers.environmentVariable("OSXCERT").map { it == "true" }.orNull ?: false) {
             options.addAll(
                 "--mac-sign",
                 "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",

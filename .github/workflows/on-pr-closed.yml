@@ -4,6 +4,8 @@ on:
   pull_request_target:
     types: [ closed ]
 
+  # Manual trigger to unassign a contributor and take necessary follow-up actions
+  # Do not call if PR was successfully merged
   workflow_dispatch:
     inputs:
       pr_number:
@@ -14,7 +16,7 @@ on:
 jobs:
   collect_parameters:
     name: Collect parameters
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: >
       github.repository == 'JabRef/jabref' &&
       (
@@ -30,11 +32,13 @@ jobs:
     permissions:
       pull-requests: read
     outputs:
-      pr_number: ${{ steps.pick.outputs.pr_number }}
-      pr_url:    ${{ steps.pick.outputs.pr_url }}
-      pr_body:   ${{ steps.pick.outputs.pr_body }}
+      pr_number:  ${{ steps.pick.outputs.pr_number }}
+      pr_url:     ${{ steps.pick.outputs.pr_url }}
+      pr_body:    ${{ steps.pick.outputs.pr_body }}
+      pr_user:    ${{ steps.pick.outputs.pr_user }}
     steps:
       - id: from_dispatch
+        name: Collect from dispatch
         if: github.event_name == 'workflow_dispatch'
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
@@ -47,12 +51,14 @@ jobs:
             core.setOutput("pr_number", String(pr.number));
             core.setOutput("pr_url", pr.html_url ?? "");
             core.setOutput("pr_body", pr.body ?? "");
+            core.setOutput("pr_user", pr.user?.login ?? "");
       - name: Pick outputs
         id: pick
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "pr_number=${{ steps.from_dispatch.outputs.pr_number }}" >> "$GITHUB_OUTPUT"
             echo "pr_url=${{ steps.from_dispatch.outputs.pr_url }}"       >> "$GITHUB_OUTPUT"
+            echo "pr_user=${{ steps.from_dispatch.outputs.pr_user }}"       >> "$GITHUB_OUTPUT"
             cat >> "$GITHUB_OUTPUT" <<'EOF'
           pr_body<<BODY
           ${{ steps.from_dispatch.outputs.pr_body }}
@@ -61,6 +67,7 @@ jobs:
           else
             echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
             echo "pr_url=${{ github.event.pull_request.html_url }}"  >> "$GITHUB_OUTPUT"
+            echo "pr_user=${{ github.event.pull_request.user.login }}"  >> "$GITHUB_OUTPUT"
             cat >> "$GITHUB_OUTPUT" <<'EOF'
           pr_body<<BODY
           ${{ github.event.pull_request.body }}
@@ -71,7 +78,7 @@ jobs:
   determine_issue_number:
     name: Determine issue number
     needs: collect_parameters
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
     outputs:
@@ -102,7 +109,7 @@ jobs:
 
   unassign_issue:
     name: Mark issue as available
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [ collect_parameters, determine_issue_number ]
     if: >
       (needs.determine_issue_number.outputs.issue_number != '') &&
@@ -115,10 +122,17 @@ jobs:
       - uses: actions/checkout@v6
       - name: Remove assignee
         run: |
+          set -euo pipefail
+          set -x
+
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-assignee ${{ github.event.pull_request.user.login }} || true
+          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-assignee ${{ needs.collect_parameters.outputs.pr_user }} || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Check assignees
         id: check_assignee
         run: |
@@ -134,12 +148,7 @@ jobs:
       - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
         if: steps.check_assignee.outputs.assigned == 'no'
         run: |
-          set -e
-
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "📍 Assigned"
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "🔔 reminder-sent"
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "📌 Pinned"
-          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "FirstTimeCodeContribution"
+          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "📍 Assigned,🔔 reminder-sent,📌 Pinned,FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move issue to "Free to take" in "Good First Issues"
@@ -176,7 +185,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
   comment_on_resolved_issue:
     name: Comment on resolved issue
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: determine_issue_number
     if: >
       (needs.determine_issue_number.outputs.issue_number != '') &&
@@ -195,11 +204,10 @@ jobs:
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
   remove_download_hint:
     name: Remove download hint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: determine_issue_number
-    if: >
-      (needs.determine_issue_number.outputs.issue_number != '') &&
-      (github.event_name != 'workflow_dispatch')
+    # Link is removed in both cases (merged and closed)
+    if: needs.determine_issue_number.outputs.issue_number != ''
     permissions:
       contents: read
       issues: write

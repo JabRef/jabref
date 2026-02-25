@@ -10,7 +10,7 @@ jobs:
     # Triggered when manually assigned the label "📍 Assigned" to trigger the automatic unassignment after 30 days
     name: "📍 Assigned"
     if: ${{ github.event.label.name == '📍 Assigned' && github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
@@ -36,7 +36,7 @@ jobs:
           skip-if-not-in-project: true
   FirstTimeCodeContribution:
     if: ${{ github.event.label.name == 'FirstTimeCodeContribution' && github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
@@ -78,6 +78,7 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
+      - uses: actions/checkout@v6
       - name: Remove label
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
@@ -86,8 +87,12 @@ jobs:
   good-first-issue:
     name: "good first issue"
     if: "${{ github.event.label.name == 'good first issue' && github.repository_owner == 'JabRef' }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: "good first issue"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -96,8 +101,12 @@ jobs:
           gh project item-add 5 --owner JabRef --url $ISSUE_URL
   needs-refinement:
     if: github.event.label.name == 'needs-refinement' && github.repository_owner == 'JabRef'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: needs-refinement
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -107,8 +116,12 @@ jobs:
   status-freeze:
     name: "status: freeze"
     if: "${{ github.event.label.name == 'status: freeze' && github.repository_owner == 'JabRef' }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: "status: freeze"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -118,7 +131,7 @@ jobs:
   wisdom:
     name: "dev: wisdom"
     if: "${{ github.event.label.name == 'dev: wisdom' && github.repository_owner == 'JabRef' }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
       contents: read
