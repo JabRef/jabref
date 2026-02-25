@@ -69,15 +69,7 @@ class Convert implements Runnable {
             return;
         }
 
-        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
-            String parseableString = fieldFormatters.replace(",", "\n");
-            List<FieldFormatterCleanup> cleanups = FieldFormatterCleanupMapper.parseActions(parseableString);
-            for (BibEntry entry : parserResult.get().getDatabase().getEntries()) {
-                for (FieldFormatterCleanup cleanup : cleanups) {
-                    cleanup.cleanup(entry);
-                }
-            }
-        }
+        applyFormatters(fieldFormatters, parserResult.get().getDatabase().getEntries());
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
@@ -130,6 +122,18 @@ class Convert implements Runnable {
                  | ParserConfigurationException
                  | TransformerException ex) {
             LOGGER.error("Could not export file '{}'.", outputFile, ex);
+        }
+    }
+
+    public static void applyFormatters(String fieldFormatters, List<BibEntry> entries) {
+        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
+            String parseableString = fieldFormatters.replaceAll(",(?![^\\[]*\\])", "\n");
+            List<FieldFormatterCleanup> cleanups = FieldFormatterCleanupMapper.parseActions(parseableString);
+            for (BibEntry entry : entries) {
+                for (FieldFormatterCleanup cleanup : cleanups) {
+                    cleanup.cleanup(entry);
+                }
+            }
         }
     }
 }

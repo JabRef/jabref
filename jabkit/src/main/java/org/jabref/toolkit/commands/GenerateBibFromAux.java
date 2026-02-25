@@ -83,15 +83,7 @@ class GenerateBibFromAux implements Runnable {
             return;
         }
 
-        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
-            String parseableString = fieldFormatters.replace(",", "\n");
-            List<FieldFormatterCleanup> cleanups = FieldFormatterCleanupMapper.parseActions(parseableString);
-            for (BibEntry entry : subDatabase.getEntries()) {
-                for (FieldFormatterCleanup cleanup : cleanups) {
-                    cleanup.cleanup(entry);
-                }
-            }
-        }
+        Convert.applyFormatters(fieldFormatters, subDatabase.getEntries());
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()

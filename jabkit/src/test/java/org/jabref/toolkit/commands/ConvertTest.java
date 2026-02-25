@@ -122,12 +122,13 @@ public class ConvertTest extends AbstractJabKitTest {
     @Test
     void fieldFormattersAreAppliedDuringConversion(@TempDir Path tempDir) throws IOException {
         Path newPath = tempDir.resolve("origin.bib");
-        String originBibtex = "@Article{test_entry,\n" +
-                "  title   = {my ﬁrst research},\n" +
-                "  pages   = {1-10},\n" +
-                "  month   = {January},\n" +
-                "  comment = {private note}\n" +
-                "}";
+        String originBibtex = """
+                @Article{test_energy,
+                  title   = {my ﬁrst research},
+                  pages   = {1-10},
+                  month   = {January},
+                  comment = {private note}
+                }""";
         Files.writeString(newPath, originBibtex);
 
         Path outputPath = tempDir.resolve("output");
@@ -143,7 +144,7 @@ public class ConvertTest extends AbstractJabKitTest {
 
         assertTrue(outputContent.contains("1--10"));
 
-        assertTrue(outputContent.toLowerCase().contains("jan"));
+        assertTrue(outputContent.contains("#jan#"));
 
         assertTrue(outputContent.contains("first"));
 
