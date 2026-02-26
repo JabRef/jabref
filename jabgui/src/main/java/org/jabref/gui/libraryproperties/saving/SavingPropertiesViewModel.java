@@ -1,6 +1,7 @@
 package org.jabref.gui.libraryproperties.saving;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -147,7 +148,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         if (multiFieldCleanupsProperty.get().isEmpty()) {
             newMetaData.clearMultiFieldCleanups();
         } else {
-            newMetaData.setMultiFieldCleanups(new HashSet<>(multiFieldCleanupsProperty.get()));
+            newMetaData.setMultiFieldCleanups(EnumSet.copyOf(multiFieldCleanupsProperty.get()));
         }
 
         if (journalAbbreviationCleanupProperty.get() == null) {
