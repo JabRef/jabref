@@ -528,7 +528,7 @@ public class FileUtil {
     /// @param file The file to check
     /// @return True if file extension is ".lnk", false otherwise
     public static boolean isShortcutFile(Path file) {
-        return getFileExtension(file).filter(ext -> "lnk".equalsIgnoreCase(ext)).isPresent();
+        return getFileExtension(file).filter("lnk"::equalsIgnoreCase).isPresent();
     }
 
     /// Resolves a Windows shortcut (.lnk) file to its target path.
@@ -536,7 +536,7 @@ public class FileUtil {
     /// Only works on Windows systems. On other systems or if resolution fails, returns the original path.
     ///
     /// @param path The path to check (may be .lnk or any other file)
-    /// @return The resolved path if file is a .lnk on Windows, otherwise returns the original path
+    /// @return The resolved path if file is a .lnk on Windows and the target is a valid file, otherwise returns the original path
     public static Path resolveIfShortcut(Path path) {
         if (!OS.WINDOWS || !isShortcutFile(path)) {
             return path;
@@ -554,7 +554,7 @@ public class FileUtil {
                 }
             }
         } catch (IOException | ShellLinkException e) {
-            LOGGER.warn("Could not resolve shortcut {}", path, e);
+            LOGGER.warn("Could not resolve shortcut file", e);
         }
 
         return path;

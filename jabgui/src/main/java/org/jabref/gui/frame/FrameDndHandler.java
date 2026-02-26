@@ -240,7 +240,7 @@ public class FrameDndHandler {
     }
 
     private boolean isAcceptedFile(Path path) {
-        return FileUtil.isBibFile(path) || FileUtil.isShortcutFile(path);
+        return FileUtil.isBibFile(FileUtil.resolveIfShortcut(path));
     }
 
     private boolean hasGroups(Dragboard dragboard) {

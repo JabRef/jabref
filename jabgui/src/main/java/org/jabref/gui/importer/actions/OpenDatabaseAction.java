@@ -165,9 +165,11 @@ public class OpenDatabaseAction extends SimpleCommand {
     ///
     /// @param filesToOpen the filesToOpen, may be null or not existing
     public void openFiles(List<Path> filesToOpen) {
-        // Resolve any shortcuts to their targets
+        // Resolve any shortcuts to their targets and filter to only .bib files.
+        // The resulting list must remain modifiable for downstream processing (iterator.remove() calls below).
         List<Path> resolvedFiles = filesToOpen.stream()
                                               .map(FileUtil::resolveIfShortcut)
+                                              .filter(FileUtil::isBibFile)
                                               .collect(Collectors.toList());
 
         LibraryTab toRaise = null;
