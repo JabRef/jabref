@@ -26,6 +26,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
@@ -56,6 +57,7 @@ import org.jabref.model.http.SimpleHttpResponse;
 
 import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
+import com.dlsc.gemsfx.infocenter.NotificationView;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.control.textfield.CustomPasswordField;
@@ -81,7 +83,7 @@ public class JabRefDialogService implements DialogService {
     private final NotificationGroup<Object, FileNotification> fileNotifications = new NotificationGroup<>("Files");
     private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>("Preview");
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>("Notifications");
-    private final NotificationGroup<Task<?>, Notification<Task<?>>> taskNotifications = new NotificationGroup<>("Tasks");
+    private final NotificationGroup<Task<?>, Notification<Task<?>>> taskNotifications = new TaskNotificationGroup("Tasks");
 
     private final Window mainWindow;
 
@@ -582,6 +584,7 @@ public class JabRefDialogService implements DialogService {
 
         public TaskNotification(Task<?> task) {
             super(task.getTitle(), task.getMessage());
+            setUserObject(task);
             if (StringUtil.isBlank(task.getTitle())) {
                 setTitle(Localization.lang("Background task"));
                 undefinedTask = true;
@@ -593,6 +596,25 @@ public class JabRefDialogService implements DialogService {
                 }
                 setOnClick(_ -> OnClickBehaviour.REMOVE);
             });
+        }
+    }
+
+    public static class TaskNotificationGroup extends NotificationGroup<Task<?>, Notification<Task<?>>> {
+
+        public TaskNotificationGroup(String title) {
+            super(title);
+            setViewFactory(TaskNotificationView::new);
+        }
+    }
+
+    public static class TaskNotificationView extends NotificationView<Task<?>, Notification<Task<?>>> {
+        ProgressBar progressBar = new ProgressBar();
+
+        public TaskNotificationView(Notification<Task<?>> notification) {
+            super(notification);
+            progressBar.progressProperty().bind(notification.getUserObject().progressProperty());
+            setContent(progressBar);
+            setShowContent(true);
         }
     }
 
