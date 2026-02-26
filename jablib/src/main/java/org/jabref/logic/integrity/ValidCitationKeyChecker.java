@@ -20,7 +20,7 @@ public class ValidCitationKeyChecker implements ValueChecker {
             return Optional.of(Localization.lang("empty citation key"));
         }
 
-        String cleaned = CitationKeyGenerator.removeIllegalCharacters(value, unwantedCharacters);
+        String cleaned = CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics(value, unwantedCharacters);
 
         if (cleaned.equals(value)) {
             return Optional.empty();
