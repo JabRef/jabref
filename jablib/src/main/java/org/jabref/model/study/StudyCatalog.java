@@ -1,17 +1,32 @@
 package org.jabref.model.study;
 
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /// data model for the view `org.jabref.gui.slr.StudyCatalogItem`
-public class StudyDatabase {
+public class StudyCatalog {
+    @JsonProperty("name")
     private String name;
+
+    @JsonProperty("enabled")
     private boolean enabled;
 
-    public StudyDatabase(String name, boolean enabled) {
+    @JsonProperty("reason")
+    private String reason;
+
+    public StudyCatalog(String name, boolean enabled, String reason) {
         this.name = name;
         this.enabled = enabled;
+        this.reason = reason;
+    }
+
+    public StudyCatalog(String name, boolean enabled) {
+        this(name, enabled, null);
     }
 
     /// Used for Jackson deserialization
-    public StudyDatabase() {
+    public StudyCatalog() {
         // Per default fetcher is activated
         this.enabled = true;
     }
@@ -32,6 +47,14 @@ public class StudyDatabase {
         this.enabled = enabled;
     }
 
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -41,26 +64,28 @@ public class StudyDatabase {
             return false;
         }
 
-        StudyDatabase that = (StudyDatabase) o;
+        StudyCatalog that = (StudyCatalog) o;
 
         if (isEnabled() != that.isEnabled()) {
             return false;
         }
-        return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
+        if (!Objects.equals(getName(), that.getName())) {
+            return false;
+        }
+        return Objects.equals(getReason(), that.getReason());
     }
 
     @Override
     public int hashCode() {
-        int result = getName() != null ? getName().hashCode() : 0;
-        result = 31 * result + (isEnabled() ? 1 : 0);
-        return result;
+        return Objects.hash(name, enabled, reason);
     }
 
     @Override
     public String toString() {
-        return "LibraryEntry{" +
+        return "StudyCatalog{" +
                 "name='" + name + '\'' +
                 ", enabled=" + enabled +
+                ", reason='" + reason + '\'' +
                 '}';
     }
 }
