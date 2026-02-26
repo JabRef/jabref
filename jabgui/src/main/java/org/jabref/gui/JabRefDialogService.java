@@ -578,15 +578,20 @@ public class JabRefDialogService implements DialogService {
     }
 
     public static class TaskNotification extends Notification<Task<?>> {
+        boolean undefinedTask = false;
+
         public TaskNotification(Task<?> task) {
             super(task.getTitle(), task.getMessage());
+            if (StringUtil.isBlank(task.getTitle())) {
+                setTitle(Localization.lang("Background task"));
+                undefinedTask = true;
+            }
             setOnClick(_ -> OnClickBehaviour.NONE);
             task.setOnSucceeded(_ -> {
-                if (StringUtil.isBlank(task.getTitle())) {
-                    // ToDo
-                } else {
-                    setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+                if (undefinedTask) {
+                    UiTaskExecutor.runInJavaFXThread(this::remove);
                 }
+                setOnClick(_ -> OnClickBehaviour.REMOVE);
             });
         }
     }
