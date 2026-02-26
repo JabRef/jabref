@@ -14,7 +14,7 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 val javafx = "25.0.2"
 
-val lucene = "10.3.2"
+val lucene = "10.4.0"
 
 val pdfbox = "3.0.6"
 
