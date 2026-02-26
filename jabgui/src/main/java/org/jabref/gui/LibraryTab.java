@@ -790,7 +790,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 taskExecutor,
                 dialogService,
                 preferences,
-                databaseNotificationPane,
                 undoManager,
                 stateManager));
     }
