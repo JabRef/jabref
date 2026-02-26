@@ -29,25 +29,21 @@ public class PandocFormatter implements CAYWFormatter {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
 
-            String prefix = props.getPrefix().orElse("");
-            String citationKey = (props.isOmitAuthor() ? "-@" : "@") + key;
-            String locator = props.getFormattedLocator().orElse("");
-            String suffix = props.getSuffix().orElse("");
-
             StringBuilder result = new StringBuilder();
 
-            if (!prefix.isEmpty()) {
-                result.append(prefix).append(" ");
-            }
+            props.getPrefix().ifPresent(prefix -> result.append(prefix).append(" "));
 
+            String citationKey = (props.isOmitAuthor() ? "-@" : "@") + key;
             result.append(citationKey);
 
-            if (!locator.isEmpty()) {
-                result.append(", ").append(locator);
-            }
-
-            if (!suffix.isEmpty()) {
-                result.append(", ").append(suffix);
+            if (props.getFormattedLocator().isPresent() || props.getSuffix().isPresent()) {
+                result.append(", ");
+                props.getFormattedLocator().ifPresent(result::append);
+                if (props.getFormattedLocator().isPresent()) {
+                    props.getSuffix().ifPresent(suffix -> result.append(" ").append(suffix));
+                } else {
+                    props.getSuffix().ifPresent(result::append);
+                }
             }
 
             return result.toString();
