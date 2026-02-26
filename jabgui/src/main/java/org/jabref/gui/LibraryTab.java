@@ -1167,10 +1167,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public DatabaseNotification getNotificationPane() {
-        return databaseNotificationPane;
-    }
-
     @Override
     public String toString() {
         return "LibraryTab{" +

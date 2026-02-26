@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -28,7 +26,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.slf4j.Logger;
@@ -42,28 +39,22 @@ public class ExportCommand extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
 
     private final ExportMethod exportMethod;
-    private final Supplier<LibraryTab> tabSupplier;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
-    private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
 
     public ExportCommand(ExportMethod exportMethod,
-                         Supplier<LibraryTab> tabSupplier,
                          StateManager stateManager,
                          DialogService dialogService,
                          GuiPreferences preferences,
-                         BibEntryTypesManager entryTypesManager,
                          JournalAbbreviationRepository abbreviationRepository,
                          TaskExecutor taskExecutor) {
         this.exportMethod = exportMethod;
-        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.entryTypesManager = entryTypesManager;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
 
@@ -126,7 +117,7 @@ public class ExportCommand extends SimpleCommand {
                             finEntries,
                             fileDirForDatabase,
                             abbreviationRepository);
-                    return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
+                    return null; // cannot use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(_ -> dialogService.notify(new ExportSuccessNotification(file)))
                 .onFailure(this::handleError)
