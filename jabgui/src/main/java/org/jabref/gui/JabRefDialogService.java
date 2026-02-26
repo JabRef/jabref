@@ -79,10 +79,10 @@ public class JabRefDialogService implements DialogService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
-    private final NotificationGroup<Path, FileNotification> fileNotifications = new NotificationGroup<>("Files");
-    private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>("Preview");
-    private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>("Notifications");
-    private final NotificationGroup<Task<?>, TaskNotification> taskNotifications = new NotificationGroup<>("Tasks") {
+    private final NotificationGroup<Path, FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
+    private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>(Localization.lang("Preview"));
+    private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>(Localization.lang("Notifications"));
+    private final NotificationGroup<Task<?>, TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks")) {
         {
             setViewFactory(TaskNotificationView::new);
         }
@@ -600,7 +600,7 @@ public class JabRefDialogService implements DialogService {
                 setOnClick(_ -> OnClickBehaviour.REMOVE);
             });
 
-            getActions().add(new NotificationAction<>("Cancel", _ -> {
+            getActions().add(new NotificationAction<>(Localization.lang("Cancel"), _ -> {
                 task.cancel();
                 return OnClickBehaviour.REMOVE;
             }));

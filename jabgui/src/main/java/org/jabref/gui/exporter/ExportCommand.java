@@ -135,7 +135,7 @@ public class ExportCommand extends SimpleCommand {
         public ExportSuccessNotification(Path path) {
             super(Localization.lang("Export operation finished successfully."), path.toString());
 
-            NotificationAction<Path> action = new NotificationAction<>("Reveal", _ -> {
+            NotificationAction<Path> action = new NotificationAction<>(Localization.lang("Reveal"), _ -> {
                 try {
                     NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
