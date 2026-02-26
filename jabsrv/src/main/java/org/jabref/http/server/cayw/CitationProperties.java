@@ -94,7 +94,7 @@ public class CitationProperties {
 
     /// Returns the combined postnote string (locator + suffix)
     public Optional<String> getPostnote() {
-        StringJoiner joiner = new StringJoiner(" ");
+        StringJoiner joiner = new StringJoiner(", ");
         getFormattedLocator().ifPresent(joiner::add);
         getSuffix().ifPresent(joiner::add);
         String result = joiner.toString();
