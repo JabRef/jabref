@@ -54,5 +54,6 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
         fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.fieldFormatterCleanupsProperty());
         multiFieldsCleanupPanel.selectedJobsProperty().bindBidirectional(viewModel.multiFieldCleanupsPropertyProperty());
         journalAbbreviationPanel.selectedJournalCleanupOption().bindBidirectional(viewModel.journalAbbreviationCleanupPropertyProperty());
+        fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.fieldFormatterCleanupsDisableProperty());
     }
 }

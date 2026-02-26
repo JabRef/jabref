@@ -52,7 +52,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
     // FieldFormatterCleanupsPanel
-    private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
+    private final BooleanProperty fieldFormatterCleanupsDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<FieldFormatterCleanup> fieldFormatterCleanupsProperty = new SimpleListProperty<>(FXCollections.emptyObservableList());
 
     private final SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
@@ -104,11 +104,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         Optional<FieldFormatterCleanupActions> fieldFormatterCleanupActions = initialMetaData.getFieldFormatterCleanupActions();
         fieldFormatterCleanupActions.ifPresentOrElse(value -> {
-            cleanupsDisableProperty.setValue(!value.isEnabled());
+            fieldFormatterCleanupsDisableProperty.setValue(!value.isEnabled());
             fieldFormatterCleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
             CleanupPreferences defaultPreset = preferences.getDefaultCleanupPreset();
-            cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
+            fieldFormatterCleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
             fieldFormatterCleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
         });
 
@@ -131,7 +131,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(
-                !cleanupsDisableProperty().getValue(),
+                !fieldFormatterCleanupsDisableProperty().getValue(),
                 fieldFormatterCleanupsProperty());
 
         if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
@@ -212,8 +212,8 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     // FieldFormatterCleanupsPanel
 
-    public BooleanProperty cleanupsDisableProperty() {
-        return cleanupsDisableProperty;
+    public BooleanProperty fieldFormatterCleanupsDisableProperty() {
+        return fieldFormatterCleanupsDisableProperty;
     }
 
     public ListProperty<FieldFormatterCleanup> fieldFormatterCleanupsProperty() {

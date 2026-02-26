@@ -146,7 +146,6 @@ extraJavaModuleInfo {
         requires("scala.library")
     }
 
-    module("com.googlecode.plist:dd-plist", "dd.plist")
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
     module("com.knuddels:jtokkit", "jtokkit")
@@ -337,19 +336,12 @@ extraJavaModuleInfo {
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug") {
         exportAllPackages()
     }
-    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "org.eclipse.lsp4j.websocket") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
     module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket") {
         overrideModuleName()
-        exportAllPackages()
-    }
-    module("javax.websocket:javax.websocket-api", "javax.websocket.api") {
         exportAllPackages()
     }
     module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {
@@ -583,9 +575,6 @@ extraJavaModuleInfo {
     module("com.github.kevinstern:software-and-algorithms", "software.and.algorithms")
 
     module("com.uber.nullaway:nullaway", "nullaway")
-    module("org.checkerframework:dataflow-nullaway", "org.checkerframework.dataflow") {
-        exportAllPackages()
-    }
 }
 
 // Configure consistent resolution across the whole project

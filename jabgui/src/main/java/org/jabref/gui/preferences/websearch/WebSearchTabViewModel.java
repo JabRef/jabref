@@ -211,10 +211,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldKeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
-        if (addImportedEntriesGroupName.getValue().isEmpty() || addImportedEntriesGroupName.getValue().startsWith(" ")) {
+        if (addImportedEntriesGroupName.getValue().trim().isEmpty()) {
             libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
         } else {
-            libraryPreferences.setAddImportedEntriesGroupName(addImportedEntriesGroupName.getValue());
+            libraryPreferences.setAddImportedEntriesGroupName(addImportedEntriesGroupName.getValue().trim());
         }
         importerPreferences.setDefaultPlainCitationParser(defaultPlainCitationParser.getValue());
         importerPreferences.setCitationsRelationsStoreTTL(citationsRelationStoreTTL.getValue());

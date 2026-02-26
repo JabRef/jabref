@@ -80,23 +80,49 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void previewStyleReviewToComment() {
-        String oldPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
-                + "Customized preview style using reviews and comments:__NEWLINE__"
-                + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}__NEWLINE__"
-                + "\\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}__NEWLINE__"
-                + "</font>__NEWLINE__";
+        String oldPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Customized preview style using reviews and comments:__NEWLINE__\
+                \\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}__NEWLINE__\
+                \\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}__NEWLINE__\
+                </font>__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
 
-        String newPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
-                + "Customized preview style using reviews and comments:__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__"
-                + "\\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__"
-                + "</font>__NEWLINE__";
+        String newPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Customized preview style using reviews and comments:__NEWLINE__\
+                \\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__\
+                \\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__\
+                </font>__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{doi}<BR>doi <a href="https://doi.org/\\format[DOIStrip]{\\doi}">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__\
+                \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
 
         when(preferences.get(JabRefGuiPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
 
         PreferencesMigrations.upgradePreviewStyle(preferences);
 
         verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, newPreviewStyle);
+    }
+
+    @Test
+    void previewStyleUnchangedWhenMigrationPatternIsMissing() {
+        String unchangedPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Custom preview style with no migration patterns.__NEWLINE__\
+                \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{note}<BR>\\format[HTMLChars]{\\note}\\end{note}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
+                </font>__NEWLINE__""";
+
+        when(preferences.get(JabRefGuiPreferences.PREVIEW_STYLE)).thenReturn(unchangedPreviewStyle);
+
+        PreferencesMigrations.upgradePreviewStyle(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, unchangedPreviewStyle);
     }
 
     @Test

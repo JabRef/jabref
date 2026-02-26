@@ -114,7 +114,7 @@ class CitationStyleGeneratorTest {
     @Test
     void aPABibliography() {
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
-        CitationStyle style = STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get();
+        CitationStyle style = STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER).getFirst();
 
         // if the apa.csl citation style changes this has to be modified
@@ -253,6 +253,7 @@ class CitationStyleGeneratorTest {
     static Stream<Arguments> cslMapping() {
         // if the default citation style changes this has to be modified
         return Stream.of(
+                // 1.
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 28.\n",
                         BibDatabaseMode.BIBTEX,
@@ -260,6 +261,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                                 .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
+                // 2.
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 7.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -267,6 +269,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
                                 .withField(StandardField.ISSUE, "7"),
                         "ieee.csl"),
+                // 3.
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 28.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -274,6 +277,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.AUTHOR, "Last, First and Doe, Jane")
                                 .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
+                // 4.
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 28.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -282,6 +286,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "7")
                                 .withField(StandardField.NUMBER, "28"),
                         "ieee.csl"),
+                // 5.
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 7, Art. no. e0270533.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -290,6 +295,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "7")
                                 .withField(StandardField.EID, "e0270533"),
                         "ieee.csl"),
+                // 6.
                 Arguments.of(
                         "[1]F. Last and J. Doe, no. 33, pp. 7–8.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -298,7 +304,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "7--8")
                                 .withField(StandardField.ISSUE, "33"),
                         "ieee.csl"),
-
+                // 7.
                 Arguments.of(
                         "Foo, B. (n.d.). volume + issue + number + pages. Bib(La)TeX Journal, 1(3number), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
@@ -313,6 +319,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
 
+                // 8.
                 Arguments.of(
                         "Foo, B. (n.d.). volume + issue + pages. Bib(La)TeX Journal, 1(9), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
@@ -326,6 +333,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9"),
                         "apa.csl"),
 
+                // 9.
                 Arguments.of(
                         "Foo, B. (n.d.). volume + pages. Bib(La)TeX Journal, 1, 45–67.\n",
                         BibDatabaseMode.BIBTEX,
@@ -337,8 +345,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.VOLUME, "1"),
                         "apa.csl"),
 
+                // 10.
                 Arguments.of(
-                        "Foo, B. (n.d.). number. Bib(La)TeX Journal, 3number.\n",
+                        "Foo, B. (n.d.). number. Bib(La)TeX Journal, (3number).\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -347,9 +356,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "number"),
                         "apa.csl"),
 
+                // 11.
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + pages. Bib(La)TeX Journal, 9, 45–67.\n",
+                        "Foo, B. (n.d.). issue + pages. Bib(La)TeX Journal, (9), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -359,9 +369,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9"),
                         "apa.csl"),
 
+                // 12.
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though)
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, 3number.\n",
+                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, (3number).\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -371,9 +382,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
 
+                // 13.
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though)
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + number + pages. Bib(La)TeX Journal, 3number, 45–67.\n",
+                        "Foo, B. (n.d.). issue + number + pages. Bib(La)TeX Journal, (3number), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -384,9 +396,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
 
+                // 14.
                 // "Article number" is not a field that exists in Bibtex standard. Printing the article number in the pages field is a workaround. Some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range. Question: Should it be rendered WITH Article or WITHOUT the Word Article in Front? I guess without?
                 Arguments.of(
-                        "Foo, B. (n.d.). number + pages. Bib(La)TeX Journal, 3number, Article 777.\n",
+                        "Foo, B. (n.d.). number + pages. Bib(La)TeX Journal, (3number), Article 777.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -397,9 +410,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.COMMENT, "number + article-number WITH the word article instead of pagerange"),
                         "apa.csl"),
 
+                // 15.
                 // "The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing."
                 Arguments.of(
-                        "Foo, B. (n.d.). issue. Bib(La)TeX Journal, 9issue.\n",
+                        "Foo, B. (n.d.). issue. Bib(La)TeX Journal, (9issue).\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -408,8 +422,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
 
+                // 16.
                 Arguments.of(
-                        "Foo, B. (n.d.). number + pages. Bib(La)TeX Journal, 3number, 45–67.\n",
+                        "Foo, B. (n.d.). number + pages. Bib(La)TeX Journal, (3number), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -419,9 +434,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "number + pages"),
                         "apa.csl"),
 
+                // 17.
                 // "Article number" is not a field that exists in Bibtex standard. Printing the article number in the pages field is a workaround. Some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range. Question: Should it be rendered WITH Article or WITHOUT the Word Article in Front? I guess without?
                 Arguments.of(
-                        "Foo, B. (n.d.). number + pages. BibTeX Journal, 3number, 777e23.\n",
+                        "Foo, B. (n.d.). number + pages. BibTeX Journal, (3number), 777e23.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -432,9 +448,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.COMMENT, "number + article-number WITHOUT the word article instead of pagerange"),
                         "apa.csl"),
 
+                // 18.
                 // Not rendering the "eid" field here, is correct. The "eid" field(short for: electronic identifier) does not exist in Bibtex standard. It exists in Biblatex standard though and is the field, in which the "article number" should be entered into. "Article number" is a field that does not exist in Bibtex and also not in Biblatex standard. As a workaround, some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue (= the "number" field" in Biblatex)  whenever it is in the data and the number (= the "eid" field in Biblatex) when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280). I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition. Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + number + pages. BibTeX Journal, 3number, 45–67.\n",
+                        "Foo, B. (n.d.). eid + issue + number + pages. BibTeX Journal, (3number), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -446,6 +463,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
 
+                // 19.
                 /*
                 Not rendering the "eid" field here, is correct. The "eid" field(= electronic identifier) does not exist in Bibtex standard.
                                  Since, for this entry, there is no pages field present and therefore no data will be overwritten, enabling the user to be able to move the data within the eid scala.annotation.meta.field to the pages scala.annotation.meta.field via cleanup action is something worth pursuing.
@@ -454,7 +472,7 @@ class CitationStyleGeneratorTest {
                         Since, for this entry, there is no number field present and therefore no data will be overwritten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
                  */
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue. BibTeX Journal, 9issue, Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue. BibTeX Journal, (9issue), Article 6eid.\n",
                         BibDatabaseMode.BIBTEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -465,6 +483,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
 
+                // 20.
         /*
         Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
 
@@ -484,6 +503,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.VOLUME, "1"),
                         "apa.csl"),
 
+                // 21.
                 // eid field will always be prefixed with article
                 Arguments.of(
                         "Foo, B. (n.d.). volume + issue + pages + eid. Bib(La)TeX Journal, 1(9issue), Article Article 6eid.\n",
@@ -498,6 +518,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.VOLUME, "1"),
                         "apa.csl"),
 
+                // 22.
                 Arguments.of(
                         "Foo, B. (n.d.). volume + number + pages + eid. Bib(La)TeX Journal, 1(3number), Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -511,8 +532,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.VOLUME, "1"),
                         "apa.csl"),
 
+                // 23.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, 9issue, Article Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue), Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -521,9 +543,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.EID, "Article 6eid")
                                 .withField(StandardField.ISSUE, "9issue"),
                         "apa.csl"),
-
+                // 24.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + pages. Bib(La)TeX Journal, 9issue, Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue + pages. Bib(La)TeX Journal, (9issue), Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -533,9 +555,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.PAGES, "45--67"),
                         "apa.csl"),
-
+                // 25.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, 3number, Article Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, (3number), Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -545,9 +567,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.NUMBER, "3number"),
                         "apa.csl"),
-
+                // 26.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + issue + number + pages. Bib(La)TeX Journal, 3number, Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + issue + number + pages. Bib(La)TeX Journal, (3number), Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -558,7 +580,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67"),
                         "apa.csl"),
-
+                // 27.
                 Arguments.of(
                         "Foo, B. (n.d.). eid + pages. Bib(La)TeX Journal, Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -569,7 +591,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.EID, "6eid")
                                 .withField(StandardField.PAGES, "45--67"),
                         "apa.csl"),
-
+                // 28.
                 Arguments.of(
                         "Foo, B. (n.d.). eid. Bib(La)TeX Journal, Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -579,7 +601,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "eid")
                                 .withField(StandardField.EID, "Article 6eid"),
                         "apa.csl"),
-
+                // 29.
                 Arguments.of(
                         "Foo, B. (n.d.). volume + number + eid. Bib(La)TeX Journal, 1(3number), Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -591,7 +613,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.VOLUME, "1"),
                         "apa.csl"),
-
+                // 30.
                 Arguments.of(
                         "Foo, B. (n.d.). volume + pages + eid. Bib(La)TeX Journal, 1, Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
@@ -604,8 +626,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.VOLUME, "1"),
                         "apa.csl"),
 
+                // 31.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, 3number, Article Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, (3number), Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -615,8 +638,9 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number"),
                         "apa.csl"),
 
+                // 32.
                 Arguments.of(
-                        "Foo, B. (n.d.). eid + number + pages. Bib(La)TeX Journal, 3number, Article 6eid.\n",
+                        "Foo, B. (n.d.). eid + number + pages. Bib(La)TeX Journal, (3number), Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -627,9 +651,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "45--67"),
                         "apa.csl"),
 
+                // 32.
                 // Not rendering the "issue" field here is sufficient for APA Style (7th edition). Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, 3number.\n",
+                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, (3number).\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -639,9 +664,10 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number"),
                         "apa.csl"),
 
+                // 33.
                 // Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
-                        "Foo, B. (n.d.). issue + number + pages. Bib(La)TeX Journal, 3number, 45–67.\n",
+                        "Foo, B. (n.d.). issue + number + pages. Bib(La)TeX Journal, (3number), 45–67.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Foo, Bar")
@@ -665,7 +691,7 @@ class CitationStyleGeneratorTest {
                 TEXT_OUTPUT_FORMAT,
                 testEntryContext,
                 ENTRY_TYPES_MANAGER).getFirst();
-        assertEquals(expected, citation);
+        assertEquals(expected, citation, "Failed for " + cslFileName);
     }
 
     static Stream<Arguments> doiFieldMapping() {

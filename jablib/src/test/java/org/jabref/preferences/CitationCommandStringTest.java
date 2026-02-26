@@ -32,6 +32,14 @@ class CitationCommandStringTest {
                 Arguments.of(
                         new CitationCommandString("\\cite[key1,key]{", ",", "}"),
                         "\\cite[key1,key]"
+                ),
+                Arguments.of(
+                        new CitationCommandString("", "", ""),
+                        "key1key2"
+                ),
+                Arguments.of(
+                        new CitationCommandString("key2,key1{", ",", "}"),
+                        "key2,key1"
                 )
         );
     }
