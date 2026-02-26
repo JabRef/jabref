@@ -83,7 +83,11 @@ public class JabRefDialogService implements DialogService {
     private final NotificationGroup<Object, FileNotification> fileNotifications = new NotificationGroup<>("Files");
     private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>("Preview");
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>("Notifications");
-    private final NotificationGroup<Task<?>, Notification<Task<?>>> taskNotifications = new TaskNotificationGroup("Tasks");
+    private final NotificationGroup<Task<?>, Notification<Task<?>>> taskNotifications = new NotificationGroup<>("Tasks") {
+        {
+            setViewFactory(TaskNotificationView::new);
+        }
+    };
 
     private final Window mainWindow;
 
@@ -596,14 +600,6 @@ public class JabRefDialogService implements DialogService {
                 }
                 setOnClick(_ -> OnClickBehaviour.REMOVE);
             });
-        }
-    }
-
-    public static class TaskNotificationGroup extends NotificationGroup<Task<?>, Notification<Task<?>>> {
-
-        public TaskNotificationGroup(String title) {
-            super(title);
-            setViewFactory(TaskNotificationView::new);
         }
     }
 
