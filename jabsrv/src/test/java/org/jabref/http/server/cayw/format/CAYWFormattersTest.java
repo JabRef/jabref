@@ -120,8 +120,7 @@ class CAYWFormattersTest {
 
         @Test
         void explicitCommand() {
-            BibLatexFormatter citeFormatter = new BibLatexFormatter("autocite");
-            String actual = citeFormatter.format(queryParams("cite"), caywEntries("key1"));
+            String actual = formatter.format(queryParams("cite"), caywEntries("key1"));
             assertEquals("\\cite{key1}", actual);
         }
 
