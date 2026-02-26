@@ -37,7 +37,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
@@ -56,6 +55,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
 
 import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import com.dlsc.gemsfx.infocenter.NotificationView;
 import com.tobiasdiez.easybind.EasyBind;
@@ -77,13 +77,12 @@ public class JabRefDialogService implements DialogService {
     // Snackbar dialog maximum size
     public static final int DIALOG_SIZE_LIMIT = 300;
 
-    private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
     private final NotificationGroup<Path, FileNotification> fileNotifications = new NotificationGroup<>("Files");
     private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>("Preview");
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>("Notifications");
-    private final NotificationGroup<Task<?>, Notification<Task<?>>> taskNotifications = new NotificationGroup<>("Tasks") {
+    private final NotificationGroup<Task<?>, TaskNotification> taskNotifications = new NotificationGroup<>("Tasks") {
         {
             setViewFactory(TaskNotificationView::new);
         }
@@ -600,13 +599,18 @@ public class JabRefDialogService implements DialogService {
                 }
                 setOnClick(_ -> OnClickBehaviour.REMOVE);
             });
+
+            getActions().add(new NotificationAction<>("Cancel", _ -> {
+                task.cancel();
+                return OnClickBehaviour.REMOVE;
+            }));
         }
     }
 
-    public static class TaskNotificationView extends NotificationView<Task<?>, Notification<Task<?>>> {
+    public static class TaskNotificationView extends NotificationView<Task<?>, TaskNotification> {
         ProgressBar progressBar = new ProgressBar();
 
-        public TaskNotificationView(Notification<Task<?>> notification) {
+        public TaskNotificationView(TaskNotification notification) {
             super(notification);
             progressBar.progressProperty().bind(notification.getUserObject().progressProperty());
             setContent(progressBar);
