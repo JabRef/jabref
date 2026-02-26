@@ -31,7 +31,7 @@ public class CitationPropertiesPopup extends Popup {
         ComboBox<LocatorType> locatorTypeCombo = new ComboBox<>();
         locatorTypeCombo.getItems().addAll(LocatorType.values());
         locatorTypeCombo.setValue(properties.getLocatorType().orElse(LocatorType.PAGE));
-        properties.withLocatorType(locatorTypeCombo.getValue());
+        properties.setLocatorType(locatorTypeCombo.getValue());
 
         TextField locatorValueField = new TextField();
         properties.getLocatorValue().ifPresent(locatorValueField::setText);
@@ -45,11 +45,11 @@ public class CitationPropertiesPopup extends Popup {
         CheckBox omitAuthorCheck = new CheckBox(Localization.lang("Omit author"));
         omitAuthorCheck.setSelected(properties.isOmitAuthor());
 
-        locatorTypeCombo.valueProperty().addListener((_, _, val) -> properties.withLocatorType(val));
-        locatorValueField.textProperty().addListener((_, _, val) -> properties.withLocatorValue(val));
-        prefixField.textProperty().addListener((_, _, val) -> properties.withPrefix(val));
-        suffixField.textProperty().addListener((_, _, val) -> properties.withSuffix(val));
-        omitAuthorCheck.selectedProperty().addListener((_, _, val) -> properties.withOmitAuthor(val));
+        locatorTypeCombo.valueProperty().addListener((_, _, val) -> properties.setLocatorType(val));
+        locatorValueField.textProperty().addListener((_, _, val) -> properties.setLocatorValue(val));
+        prefixField.textProperty().addListener((_, _, val) -> properties.setPrefix(val));
+        suffixField.textProperty().addListener((_, _, val) -> properties.setSuffix(val));
+        omitAuthorCheck.selectedProperty().addListener((_, _, val) -> properties.setOmitAuthor(val));
 
         GridPane grid = new GridPane();
         grid.setHgap(8);
