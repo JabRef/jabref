@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,20 +18,10 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
-import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
-import org.jabref.logic.bibtex.comparator.FieldComparator;
-import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
-import org.jabref.logic.bibtex.comparator.IdComparator;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
-import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -45,7 +32,6 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
@@ -69,7 +55,6 @@ public class BibDatabaseWriter {
     protected final BibWriter bibWriter;
     protected final SelfContainedSaveConfiguration saveConfiguration;
     protected final CitationKeyPatternPreferences keyPatternPreferences;
-    protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
     protected final FieldPreferences fieldPreferences;
 
@@ -99,74 +84,6 @@ public class BibDatabaseWriter {
                 preferences.getFieldPreferences(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getCustomEntryTypesRepository());
-    }
-
-    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
-        List<FieldChange> changes = new ArrayList<>();
-
-        Optional<FieldFormatterCleanupActions> saveActions = metaData.getSaveActions();
-        saveActions.ifPresent(actions -> {
-            // save actions defined -> apply for every entry
-            for (BibEntry entry : toChange) {
-                changes.addAll(actions.applySaveActions(entry));
-            }
-        });
-
-        // Trim and normalize all white spaces
-        FieldFormatterCleanup trimWhiteSpaces = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new TrimWhitespaceFormatter());
-        NormalizeWhitespacesCleanup normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
-        for (BibEntry entry : toChange) {
-            // Only apply the trimming if the entry itself has other changes (e.g., by the user or by save actions)
-            if (entry.hasChanged()) {
-                changes.addAll(trimWhiteSpaces.cleanup(entry));
-                changes.addAll(normalizeWhitespacesCleanup.cleanup(entry));
-            }
-        }
-
-        return changes;
-    }
-
-    public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData, FieldPreferences fieldPreferences) {
-        return applySaveActions(List.of(entry), metaData, fieldPreferences);
-    }
-
-    private static List<Comparator<BibEntry>> getSaveComparators(SaveOrder saveOrder) {
-        List<Comparator<BibEntry>> comparators = new ArrayList<>();
-
-        // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
-        // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
-        comparators.add(new CrossRefEntryComparator());
-
-        if (saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL) {
-            // entries will be sorted based on their internal IDs
-            comparators.add(new IdComparator());
-        } else {
-            // use configured sorting strategy
-            List<FieldComparator> fieldComparators = saveOrder.getSortCriteria().stream()
-                                                              .map(FieldComparator::new)
-                                                              .toList();
-            comparators.addAll(fieldComparators);
-            comparators.add(new FieldComparator(InternalField.KEY_FIELD));
-        }
-
-        return comparators;
-    }
-
-    /// We have begun to use getSortedEntries() for both database save operations and non-database save operations. In a
-    /// non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
-    /// saving in standard order.
-    public static List<BibEntry> getSortedEntries(@NonNull List<BibEntry> entriesToSort,
-                                                  @NonNull SelfContainedSaveOrder saveOrder) {
-        List<Comparator<BibEntry>> comparators = getSaveComparators(saveOrder);
-        FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
-
-        List<BibEntry> sorted = new ArrayList<>(entriesToSort);
-        sorted.sort(comparatorStack);
-        return sorted;
-    }
-
-    public List<FieldChange> getSaveActionsFieldChanges() {
-        return Collections.unmodifiableList(saveActionsFieldChanges);
     }
 
     /// Saves the complete database.
@@ -200,16 +117,7 @@ public class BibDatabaseWriter {
         writeStrings(bibDatabaseContext.getDatabase());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
-
-        // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
-        //        The cleanup should be done before the write operation
-        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences);
-        saveActionsFieldChanges.addAll(saveActionChanges);
-        if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
-            List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
-            saveActionsFieldChanges.addAll(keyChanges);
-        }
+        List<BibEntry> sortedEntries = BibDatabaseSaver.getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
 
         // Map to collect entry type definitions that we must save along with entries using them.
         SortedSet<BibEntryType> typesToWrite = new TreeSet<>();
@@ -400,19 +308,5 @@ public class BibDatabaseWriter {
         bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
         bibWriter.writeLine("}");
         bibWriter.finishBlock();
-    }
-
-    /// Generate keys for all entries that are lacking keys.
-    protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
-        List<FieldChange> changes = new ArrayList<>();
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, keyPatternPreferences);
-        for (BibEntry bes : entries) {
-            Optional<String> oldKey = bes.getCitationKey();
-            if (StringUtil.isBlank(oldKey)) {
-                Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
-                change.ifPresent(changes::add);
-            }
-        }
-        return changes;
     }
 }
