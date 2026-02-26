@@ -40,7 +40,7 @@ public class BibLatexFormatter implements CAYWFormatter {
                                      .collect(Collectors.joining(","));
             return "\\%s{%s}".formatted(command, keys);
         }
-        
+
         /// Single entry if suppress author + supported command
         if (caywEntries.size() == 1) {
             CAYWEntry entry = caywEntries.getFirst();
