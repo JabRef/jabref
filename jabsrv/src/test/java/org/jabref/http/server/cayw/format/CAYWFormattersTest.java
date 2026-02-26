@@ -65,7 +65,7 @@ class CAYWFormattersTest {
                     .withSuffix("for details");
 
             String actual = formatter.format(queryParams(null), List.of(caywEntryWithProperties("key1", props)));
-            assertEquals("[see @key1, p. 42, for details]", actual);
+            assertEquals("[see @key1, p. 42 for details]", actual);
         }
 
         @Test
