@@ -1,17 +1,12 @@
 package org.jabref.gui.frame;
 
-import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
-import javafx.scene.Group;
 import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.shape.Rectangle;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -31,23 +26,19 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
-import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.PopOver;
-import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
     private final LibraryTabContainer frame;
@@ -154,8 +145,7 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        createTaskIndicator(),
-                        factory.createIconButton(StandardActions.HELP, new SimpleCommand() {
+                        factory.createIconButton(StandardActions.INFOCENTER, new SimpleCommand() {
                             @Override
                             public void execute() {
                                 Injector.instantiateModelOrService(InfoCenterPane.class).setShowInfoCenter(true);
@@ -175,61 +165,6 @@ public class MainToolBar extends ToolBar {
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
 
         getStyleClass().add("mainToolbar");
-    }
-
-    Group createTaskIndicator() {
-        ProgressIndicator indicator = new ProgressIndicator();
-        indicator.getStyleClass().add("progress-indicatorToolbar");
-        indicator.progressProperty().bind(stateManager.getTasksProgress());
-
-        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background tasks are running"));
-        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background tasks are finished"));
-        indicator.setTooltip(noTasksRunning);
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                indicator.setTooltip(someTasksRunning);
-            } else {
-                indicator.setTooltip(noTasksRunning);
-            }
-        });
-
-        // The label of the indicator cannot be removed with styling. Therefore,
-        // hide it and clip it to a square of (width x width) each time width is updated.
-        indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
-            // The indeterminate spinner is wider than the determinate spinner.
-            // We must make sure they are the same width for the clipping to result in a square of the same size always.
-            if (!indicator.isIndeterminate()) {
-                indicator.setPrefWidth(newValue.doubleValue());
-            }
-            if (newValue.doubleValue() > 0) {
-                Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
-                indicator.setClip(clip);
-            }
-        });
-
-        indicator.setOnMouseClicked(event -> {
-            if ((progressViewPopOver != null) && (progressViewPopOver.isShowing())) {
-                progressViewPopOver.hide();
-                taskProgressSubscription.unsubscribe();
-                return;
-            }
-
-            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            taskProgressSubscription = EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
-            taskProgressView.setRetainTasks(false);
-            taskProgressView.setGraphicFactory(task -> ThemeManager.getDownloadIconTitleMap.getOrDefault(task.getTitle(), null));
-
-            if (progressViewPopOver == null) {
-                progressViewPopOver = new PopOver(taskProgressView);
-                progressViewPopOver.setTitle(Localization.lang("Background tasks"));
-                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-            }
-
-            progressViewPopOver.setContentNode(taskProgressView);
-            progressViewPopOver.show(indicator);
-        });
-
-        return new Group(indicator);
     }
 
     private void initNavigationCommands() {
