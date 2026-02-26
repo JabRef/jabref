@@ -343,7 +343,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
-    private static final String JOURNAL_FIELD_SHOULD_BE_ABBREVIATED_ON_DOWNLOAD = "journalFieldShouldBeAbbreviated";
 
     // Protected terms
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
@@ -647,7 +646,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
-        defaults.put(JOURNAL_FIELD_SHOULD_BE_ABBREVIATED_ON_DOWNLOAD, false);
         defaults.put(LAST_USED_EXPORT, "");
 
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
@@ -2207,7 +2205,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getBoolean(JOURNAL_FIELD_SHOULD_BE_ABBREVIATED_ON_DOWNLOAD),
                 getCustomImportFormats(),
                 getFetcherKeys(),
                 getDefaultFetcherKeys(),
@@ -2222,7 +2219,6 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (_, _, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
         EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (_, _, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (_, _, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.listen(importerPreferences.abbreviateJournalOnDownloadProperty(), (_, _, newValue) -> putBoolean(JOURNAL_FIELD_SHOULD_BE_ABBREVIATED_ON_DOWNLOAD, newValue));
         EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (_, _, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) _ -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) _ -> storeCustomImportFormats(importerPreferences.getCustomImporters()));

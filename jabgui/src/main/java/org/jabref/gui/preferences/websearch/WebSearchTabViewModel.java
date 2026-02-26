@@ -48,7 +48,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
-    private final BooleanProperty abbreviateJournalOnDownload = new SimpleBooleanProperty();
 
     private final ListProperty<PlainCitationParserChoice> plainCitationParsers =
             new SimpleListProperty<>(FXCollections.observableArrayList(PlainCitationParserChoice.values()));
@@ -150,7 +149,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldKeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
         addImportedEntries.setValue(libraryPreferences.isAddImportedEntriesEnabled());
-        abbreviateJournalOnDownload.setValue(importerPreferences.shouldJournalBeAbbreviatedOnDownload());
         addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
         citationsRelationStoreTTL.setValue(importerPreferences.getCitationsRelationsStoreTTL());
@@ -207,7 +205,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
-        importerPreferences.setAbbreviateJournalOnDownloadProperty(abbreviateJournalOnDownload.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldKeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
@@ -265,14 +262,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty getAddImportedEntries() {
         return addImportedEntries;
-    }
-
-    public boolean shouldAbbreviateJournalOnDownload() {
-        return abbreviateJournalOnDownload.get();
-    }
-
-    public BooleanProperty abbreviateJournalOnDownloadProperty() {
-        return abbreviateJournalOnDownload;
     }
 
     public StringProperty getAddImportedEntriesGroupName() {

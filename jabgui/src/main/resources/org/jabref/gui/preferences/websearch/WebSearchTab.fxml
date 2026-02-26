@@ -20,7 +20,6 @@
         <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
         <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download referenced files (PDFs, ...)"/>
         <CheckBox fx:id="keepDownloadUrl" text="%Store url for downloaded file"/>
-        <CheckBox fx:id="abbreviateJournalOnDownload" text="%Abbreviate Journal field on download"/>
     </FlowPane>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="addImportedEntries" text="%Add imported entries to group"/>
