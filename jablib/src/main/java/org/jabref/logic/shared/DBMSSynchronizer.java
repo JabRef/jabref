@@ -9,12 +9,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
+import org.jabref.logic.exporter.SaveActionsWorker;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
@@ -53,26 +56,35 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final Character keywordSeparator;
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
     private final FieldPreferences fieldPreferences;
+    private final FilePreferences filePreferences;
+    private final TimestampPreferences timestampPreferences;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
     private final String userAndHost;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public DBMSSynchronizer(@NonNull BibDatabaseContext bibDatabaseContext,
                             Character keywordSeparator,
                             FieldPreferences fieldPreferences,
+                            FilePreferences filePreferences,
+                            TimestampPreferences timestampPreferences,
                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                             FileUpdateMonitor fileMonitor,
-                            String userAndHost) {
+                            String userAndHost,
+                            JournalAbbreviationRepository journalAbbreviationRepository) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
         this.fieldPreferences = fieldPreferences;
+        this.filePreferences = filePreferences;
+        this.timestampPreferences = timestampPreferences;
         this.fileMonitor = fileMonitor;
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = globalCiteKeyPattern;
         this.lastEntryChanged = Optional.empty();
         this.userAndHost = userAndHost;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     /// Listening method. Inserts a new {@link BibEntry} into shared database.
@@ -233,7 +245,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         try {
-            BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences); // perform possibly existing save actions
+            SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext, filePreferences, timestampPreferences, fieldPreferences, true, journalAbbreviationRepository);
+            saveActionsWorker.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
@@ -277,8 +290,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         for (BibEntry bibEntry : bibDatabase.getEntries()) {
             try {
+                SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext, filePreferences, timestampPreferences, fieldPreferences, true, journalAbbreviationRepository);
                 // synchronize only if changes were present
-                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
+                if (!saveActionsWorker.applySaveActions(bibEntry, metaData).isEmpty()) {
                     dbmsProcessor.updateEntry(bibEntry);
                 }
             } catch (OfflineLockException exception) {
@@ -343,8 +357,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Checks whether the {@link EntriesEventSource} of an {@link EntriesEvent} is crucial for this class.
     ///
     /// @param event An {@link EntriesEvent}
-    /// @return `true` if the event is able to trigger operations in {@link DBMSSynchronizer}, else
-    /// `false`
+    /// @return `true` if the event is able to trigger operations in {@linkDBMSSynchronizer}, else
+    ///`false`
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();
         return (eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO);

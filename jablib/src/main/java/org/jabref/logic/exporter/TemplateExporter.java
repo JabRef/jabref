@@ -222,7 +222,7 @@ public class TemplateExporter extends Exporter {
              * Write database entries; entries will be sorted as they appear on the
              * screen, or sorted by author, depending on Preferences.
              */
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(entries, saveOrder);
+            List<BibEntry> sorted = BibDatabaseSaver.getSortedEntries(entries, saveOrder);
 
             // Load default layout
             Layout defLayout;
