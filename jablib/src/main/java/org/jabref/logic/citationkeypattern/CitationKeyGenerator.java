@@ -100,7 +100,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     ///
     /// @param key the citation key to sanitize
     /// @return the key with illegal and unwanted characters removed
-    public static String removeIllegalCharacters(String key, String unwantedCharacters) {
+    public static String removeUnwantedCharactersWithKeepDiacritics(String key, String unwantedCharacters) {
         return key.chars()
                   .filter(c -> !Character.isWhitespace(c))
                   .filter(c -> unwantedCharacters.indexOf(c) == -1)
