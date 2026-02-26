@@ -8,15 +8,14 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
-import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -31,7 +30,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import org.controlsfx.control.action.Action;
+import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,21 +128,7 @@ public class ExportCommand extends SimpleCommand {
                             abbreviationRepository);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
-                .onSuccess(save -> {
-                    LibraryTab.DatabaseNotification notificationPane = tabSupplier.get().getNotificationPane();
-                    notificationPane.notify(
-                            IconTheme.JabRefIcons.FOLDER.getGraphicNode(),
-                            Localization.lang("Export operation finished successfully."),
-                            List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
-                                try {
-                                    NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
-                                } catch (IOException e) {
-                                    LOGGER.error("Could not open export folder.", e);
-                                }
-                                notificationPane.hide();
-                            })),
-                            Duration.seconds(5));
-                })
+                .onSuccess(_ -> dialogService.notify(new ExportSuccessNotification(file)))
                 .onFailure(this::handleError)
                 .executeWith(taskExecutor);
     }
@@ -153,5 +138,22 @@ public class ExportCommand extends SimpleCommand {
         dialogService.notify(Localization.lang("Could not save file."));
         // Need to warn the user that saving failed!
         dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+    }
+
+    private class ExportSuccessNotification extends JabRefDialogService.FileNotification {
+        public ExportSuccessNotification(Path path) {
+            super(Localization.lang("Export operation finished successfully."), path.toString());
+
+            NotificationAction<Path> action = new NotificationAction<>("Reveal", _ -> {
+                try {
+                    NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
+                } catch (IOException e) {
+                    LOGGER.error("Could not open export folder.", e);
+                }
+                return OnClickBehaviour.REMOVE;
+            });
+
+            getActions().add(action);
+        }
     }
 }

@@ -80,7 +80,7 @@ public class JabRefDialogService implements DialogService {
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
-    private final NotificationGroup<Object, FileNotification> fileNotifications = new NotificationGroup<>("Files");
+    private final NotificationGroup<Path, FileNotification> fileNotifications = new NotificationGroup<>("Files");
     private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>("Preview");
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>("Notifications");
     private final NotificationGroup<Task<?>, Notification<Task<?>>> taskNotifications = new NotificationGroup<>("Tasks") {
@@ -562,7 +562,7 @@ public class JabRefDialogService implements DialogService {
         };
     }
 
-    public static class FileNotification extends Notification<Object> {
+    public static class FileNotification extends Notification<Path> {
         public FileNotification(String title, String description) {
             super(title, description);
             setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
