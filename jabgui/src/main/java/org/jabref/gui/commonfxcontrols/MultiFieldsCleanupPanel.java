@@ -23,15 +23,18 @@ public class MultiFieldsCleanupPanel extends VBox {
     private final MultiFieldsCleanupViewModel viewModel;
 
     public MultiFieldsCleanupPanel() {
+        this.viewModel = new MultiFieldsCleanupViewModel();
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        this.viewModel = new MultiFieldsCleanupViewModel();
-
-        bindProperties();
     }
 
+    @FXML
+    private void initialize() {
+        bindProperties();
+    }
+    
     private void bindProperties() {
         cleanupDoi.selectedProperty().bindBidirectional(viewModel.doiSelected);
         cleanupEprint.selectedProperty().bindBidirectional(viewModel.eprintSelected);
@@ -41,7 +44,7 @@ public class MultiFieldsCleanupPanel extends VBox {
         cleanupTimestampToCreationDate.selectedProperty().bindBidirectional(viewModel.timestampToCreationSelected);
         cleanupTimestampToModificationDate.selectedProperty().bindBidirectional(viewModel.timestampToModificationSelected);
     }
-    
+
     public SetProperty<CleanupPreferences.CleanupStep> selectedJobsProperty() {
         return viewModel.selectedJobsProperty();
     }

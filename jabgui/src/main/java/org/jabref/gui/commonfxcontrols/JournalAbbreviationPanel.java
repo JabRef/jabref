@@ -28,16 +28,14 @@ public class JournalAbbreviationPanel extends VBox {
     private final JournalAbbreviationViewModel viewModel;
 
     public JournalAbbreviationPanel() {
+        this.viewModel = new JournalAbbreviationViewModel();
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        this.viewModel = new JournalAbbreviationViewModel();
-
-        initialize();
-        bindProperties();
     }
 
+    @FXML
     private void initialize() {
         cleanupJournalAbbreviationsLabel.setText(Localization.lang("Manage journal abbreviations"));
 
@@ -58,6 +56,8 @@ public class JournalAbbreviationPanel extends VBox {
 
         noChanges.setText(Localization.lang("No changes"));
         noChanges.setUserData(CleanupPreferences.CleanupStep.NO_CHANGES);
+
+        bindProperties();
     }
 
     private void bindProperties() {
