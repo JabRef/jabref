@@ -20,7 +20,7 @@ val pdfbox = "3.0.6"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.10.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.11.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
@@ -60,7 +60,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-web:$javafx")
     api("org.openjfx:jdk-jsobject:$javafx")
 
-    api("cc.jilt:jilt:1.9")
+    api("cc.jilt:jilt:1.9.1")
 
     api("com.dlsc.gemsfx:gemsfx:3.8.3")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
@@ -74,7 +74,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
-    api("com.google.errorprone:error_prone_core:2.46.0")
+    api("com.google.errorprone:error_prone_core:2.47.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.4.240")
@@ -122,7 +122,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
-    api("org.apache.httpcomponents.client5:httpclient5:5.5")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.3")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
@@ -148,7 +148,7 @@ dependencies.constraints {
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2-1")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.10")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.1")
     api("org.jspecify:jspecify:1.0.0")
@@ -158,7 +158,7 @@ dependencies.constraints {
     api("org.libreoffice:unoloader:24.8.4")
     api("org.mockito:mockito-core:5.21.0")
     api("org.ow2.asm:asm:9.9.1")
-    api("org.postgresql:postgresql:42.7.8")
+    api("org.postgresql:postgresql:42.7.9")
     api("org.slf4j:jul-to-slf4j:2.0.17")
     api("org.slf4j:slf4j-api:2.0.17")
     api("org.testfx:testfx-core:4.0.18")

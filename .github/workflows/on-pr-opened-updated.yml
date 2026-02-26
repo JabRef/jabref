@@ -1,4 +1,4 @@
-name: On PR opened/updated (check)
+name: On PR opened/updated
 
 on:
   # _target is required
@@ -46,7 +46,7 @@ jobs:
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
             echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
-            gh issue edit $PR_NUMBER --remove-label "status: ready-for-review" --add-label "status: changes-required"
+            gh issue edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments" --add-label "status: changes-required"
 
             # "workflow dispatch" does not trigger subsequent "on completion" runs.
             # Therefore, we emulate ghprcomment here
