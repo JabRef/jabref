@@ -14,6 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
+- We replaced the various notifications for file changes, tasks and popup toasts with a new info center. [#14762](https://github.com/JabRef/jabref/issues/14762)
 
 ### Fixed
 
