@@ -6,11 +6,12 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
@@ -262,11 +263,11 @@ public class MetaDataParser {
         }
     }
 
-    public static HashSet<CleanupPreferences.CleanupStep> multiFieldCleanupsParse(List<String> multiFieldMetaList) {
+    public static Set<CleanupPreferences.CleanupStep> multiFieldCleanupsParse(List<String> multiFieldMetaList) {
         if ((multiFieldMetaList != null) && (multiFieldMetaList.size() == 1)) {
             String multiFieldMetaString = StringUtil.unifyLineBreaks(multiFieldMetaList.getFirst(), "");
 
-            HashSet<CleanupPreferences.CleanupStep> steps = new HashSet<>();
+            EnumSet<CleanupPreferences.CleanupStep> steps = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
             for (String stringStep : multiFieldMetaString.split(";")) {
                 try {
                     steps.add(CleanupPreferences.CleanupStep.valueOf(stringStep));
@@ -276,7 +277,7 @@ public class MetaDataParser {
             }
             return steps;
         } else {
-            return new HashSet<>();
+            return EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
         }
     }
 
