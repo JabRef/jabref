@@ -32,8 +32,6 @@ public class MultiFieldsCleanupViewModel {
 
     private final SetProperty<CleanupPreferences.CleanupStep> selectedJobs = new SimpleSetProperty<>(FXCollections.observableSet());
 
-    private boolean updating = false;
-
     public MultiFieldsCleanupViewModel() {
         bibTexSelected.addListener((_, _, newVal) -> {
             if (newVal) {
@@ -65,43 +63,25 @@ public class MultiFieldsCleanupViewModel {
         addStepListener(timestampToModificationSelected, CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
 
         selectedJobs.addListener((SetChangeListener<CleanupPreferences.CleanupStep>) change -> {
-            if (updating) {
-                return;
+            if (change.wasAdded()) {
+                CleanupPreferences.CleanupStep addedStep = change.getElementAdded();
+                if (!MULTI_FIELD_JOBS.contains(addedStep)) {
+                    throw new UnsupportedOperationException(addedStep + ": is unsupported by multi field jobs");
+                }
+                setBooleanPropertyForStep(addedStep, true);
             }
-
-            try {
-                updating = true;
-                if (change.wasAdded()) {
-                    CleanupPreferences.CleanupStep addedStep = change.getElementAdded();
-                    if (!MULTI_FIELD_JOBS.contains(addedStep)) {
-                        throw new UnsupportedOperationException(addedStep + ": is unsupported by multi field jobs");
-                    }
-                    setBooleanPropertyForStep(addedStep, true);
-                }
-                if (change.wasRemoved()) {
-                    setBooleanPropertyForStep(change.getElementRemoved(), false);
-                }
-            } finally {
-                updating = false;
+            if (change.wasRemoved()) {
+                setBooleanPropertyForStep(change.getElementRemoved(), false);
             }
         });
     }
 
     private void addStepListener(BooleanProperty property, CleanupPreferences.CleanupStep step) {
-        property.addListener((_, _, newVal) -> {
-            if (updating) {
-                return;
-            }
-
-            try {
-                updating = true;
-                if (newVal) {
-                    selectedJobs.add(step);
-                } else {
-                    selectedJobs.remove(step);
-                }
-            } finally {
-                updating = false;
+        property.addListener((_, _, isSelected) -> {
+            if (isSelected) {
+                selectedJobs.add(step);
+            } else {
+                selectedJobs.remove(step);
             }
         });
     }
