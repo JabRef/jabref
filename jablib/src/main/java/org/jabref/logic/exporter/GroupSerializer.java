@@ -9,6 +9,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticDateGroup;
+import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -126,6 +127,8 @@ public class GroupSerializer {
                     serializeAutomaticPersonsGroup(personsGroup);
             case AutomaticDateGroup dateGroup ->
                     serializeAutomaticDateGroup(dateGroup);
+            case AutomaticEntryTypeGroup entryTypeGroup ->
+                    serializeAutomaticEntryTypeGroup(entryTypeGroup);
             case TexGroup texGroup ->
                     serializeTexGroup(texGroup);
             case null ->
@@ -189,6 +192,14 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.quote(group.getKeywordHierarchicalDelimiter().toString(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        appendGroupDetails(sb, group);
+        return sb.toString();
+    }
+
+    private String serializeAutomaticEntryTypeGroup(AutomaticEntryTypeGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.AUTOMATIC_ENTRY_TYPE_GROUP_ID);
+        appendAutomaticGroupDetails(sb, group);
         appendGroupDetails(sb, group);
         return sb.toString();
     }

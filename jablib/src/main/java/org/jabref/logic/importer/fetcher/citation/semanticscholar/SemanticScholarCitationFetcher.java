@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +13,6 @@ import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
@@ -29,6 +30,8 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
+    private static final String PAPER_FIELDS = "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url";
+
     private static final Gson GSON = new Gson();
 
     private final ImporterPreferences importerPreferences;
@@ -37,53 +40,60 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         this.importerPreferences = importerPreferences;
     }
 
-    public String getAPIUrl(String entryPoint, BibEntry entry) {
-        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString() + "/" + entryPoint
-                + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
-                + "&limit=1000";
-    }
+    public Optional<URI> getCitationCountApiUri(BibEntry entry) {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
 
-    public String getUrlForCitationCount(BibEntry entry) {
-        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
-                + "?fields=" + "citationCount"
-                + "&limit=1";
+        try {
+            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString()
+                    + "?fields=citationCount"
+                    + "&limit=1";
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create citation count API URI", e);
+            return Optional.empty();
+        }
     }
 
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getCitationsApiUri(entry);
+        if (apiUri.isEmpty()) {
             return List.of();
         }
 
         URL citationsUrl;
         try {
-            citationsUrl = URLUtil.create(getAPIUrl("citations", entry));
-            LOGGER.debug("Cited URL {} ", citationsUrl);
+            citationsUrl = apiUri.get().toURL();
+            LOGGER.debug("Citations URL: {}", citationsUrl);
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
-        URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
 
+        URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
-        CitationsResponse citationsResponse = GSON
-                .fromJson(urlDownload.asString(), CitationsResponse.class);
+        CitationsResponse citationsResponse = GSON.fromJson(urlDownload.asString(), CitationsResponse.class);
 
         return citationsResponse.getData()
-                                .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
-                                .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
+                                .stream()
+                                .filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
+                                .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry())
+                                .toList();
     }
 
     @Override
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getReferencesApiUri(entry);
+        if (apiUri.isEmpty()) {
             return List.of();
         }
 
         URL referencesUrl;
         try {
-            referencesUrl = URLUtil.create(getAPIUrl("references", entry));
-            LOGGER.debug("Citing URL {} ", referencesUrl);
+            referencesUrl = apiUri.get().toURL();
+            LOGGER.debug("References URL: {}", referencesUrl);
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
@@ -94,38 +104,40 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         ReferencesResponse referencesResponse = GSON.fromJson(response, ReferencesResponse.class);
 
         if (referencesResponse.getData() == null) {
-            // Get error message from citingPaperInfo.openAccessPdf.disclaimer
             JSONObject responseObject = new JSONObject(response);
             Optional.ofNullable(responseObject.optJSONObject("citingPaperInfo"))
                     .flatMap(citingPaperInfo -> Optional.ofNullable(citingPaperInfo.optJSONObject("openAccessPdf")))
                     .flatMap(openAccessPdf -> Optional.ofNullable(openAccessPdf.optString("disclaimer")))
                     .ifPresent(Unchecked.consumer(disclaimer -> {
-                                LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
-                                if (disclaimer.contains("references")) {
-                                    throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
-                                }
-                            }
-                    ));
+                        LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
+                        if (disclaimer.contains("references")) {
+                            throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
+                        }
+                    }));
             return List.of();
         }
 
         return referencesResponse.getData()
                                  .stream()
                                  .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
-                                 .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
+                                 .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry())
+                                 .toList();
     }
 
     @Override
     public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isEmpty()) {
+        Optional<URI> apiUri = getCitationCountApiUri(entry);
+        if (apiUri.isEmpty()) {
             return Optional.empty();
         }
+
         URL referencesUrl;
         try {
-            referencesUrl = URLUtil.create(getUrlForCitationCount(entry));
+            referencesUrl = apiUri.get().toURL();
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
+
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         String result;
@@ -148,6 +160,32 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
             return Optional.empty();
         }
         return Optional.of(paperDetails.getCitationCount());
+    }
+
+    private Optional<URI> getApiUrl(String endpoint, BibEntry entry) {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            String apiUrl = SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().get().asString() + endpoint
+                    + "?fields=" + PAPER_FIELDS
+                    + "&limit=1000";
+            return Optional.of(new URI(apiUrl));
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not create API URI for endpoint {}: {}", endpoint, e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return getApiUrl("/references", entry);
+    }
+
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return getApiUrl("/citations", entry);
     }
 
     @Override

@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -82,6 +84,17 @@ class CSLStyleUtilsTest {
         assertEquals(expectedUsesHangingIndent, styleInfo.get().usesHangingIndent());
     }
 
+    @EnabledOnOs(OS.WINDOWS)
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "\\\\ieee.csl",
+            "//ieee.csl",
+    })
+    void createStyleFromFileReturnsEmptyOptionalForInvalidPath(String filename) {
+        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(filename);
+        assertEquals(Optional.empty(), citationStyle);
+    }
+
     @ParameterizedTest
     @MethodSource("styleTestData")
     void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) {
@@ -140,7 +153,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of("IEEE Reference Guide version 11.29.2023", IEEE),
                 Arguments.of("APA Style 7th edition", APA),
-                Arguments.of("NLM Style Guide (Vancouver): Citing Medicine 2nd edition (citation-sequence)", NLM_CITATION_SEQUENCE_VANCOUVER),
+                Arguments.of("NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)", NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of("Chicago Manual of Style 18th edition (author-date)", CHICAGO_AUTHOR_DATE),
                 Arguments.of("Nature", NATURE),
                 Arguments.of("MLA Handbook 9th edition (in-text citations)", MLA),

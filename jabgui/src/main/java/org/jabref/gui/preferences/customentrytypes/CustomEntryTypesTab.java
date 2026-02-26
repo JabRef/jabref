@@ -89,8 +89,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         addNewField.disableProperty().bind(viewModel.selectedEntryTypeProperty().isNull());
 
-        addNewEntryType.setOnAction(event -> viewModel.addNewCustomEntryType());
-        addNewField.setOnAction(event -> viewModel.addNewField());
+        addNewEntryType.setOnAction(event -> addEntryType());
+        addNewField.setOnAction(event -> addNewField());
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
         addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
@@ -266,6 +266,19 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addEntryType() {
+        if (!viewModel.entryTypeValidationStatus().isValid()) {
+            return;
+        }
+
+        String entryTypeName = viewModel.entryTypeToAddProperty().getValue();
+        for (EntryTypeViewModel existingEntryType : entryTypesTable.getItems()) {
+            if (existingEntryType.entryType().getValue().getType().getName().equalsIgnoreCase(entryTypeName)) {
+                this.entryTypesTable.getSelectionModel().select(existingEntryType);
+                this.entryTypesTable.scrollTo(existingEntryType);
+                return;
+            }
+        }
+
         EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
         this.entryTypesTable.getSelectionModel().select(newlyAdded);
         this.entryTypesTable.scrollTo(newlyAdded);
@@ -273,7 +286,14 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addNewField() {
-        viewModel.addNewField();
+        if (!viewModel.fieldValidationStatus().isValid()) {
+            return;
+        }
+
+        viewModel.addNewField().ifPresent(newlyAdded -> {
+            this.fields.getSelectionModel().select(newlyAdded);
+            this.fields.scrollTo(newlyAdded);
+        });
     }
 
     @FXML
