@@ -50,16 +50,13 @@ public class NatbibFormatter implements CAYWFormatter {
         return entry.bibEntry().getCitationKey().map(key -> {
             CitationProperties props = entry.citationProperties();
 
-            String prenote = props.getPrefix().orElse("");
-            String postnote = props.getPostnote().orElse("");
-
             /// No prenote/postnote: \command{key}
-            if (prenote.isEmpty() && postnote.isEmpty()) {
+            if (props.getPrefix().isEmpty() && props.getPostnote().isEmpty()) {
                 return "\\%s{%s}".formatted(command, key);
             }
 
             /// With prenote/postnote: \command[prenote][postnote]{key}
-            return "\\%s[%s][%s]{%s}".formatted(command, prenote, postnote, key);
+            return "\\%s[%s][%s]{%s}".formatted(command, props.getPrefix().orElse(""), props.getPostnote().orElse(""), key);
         });
     }
 }
