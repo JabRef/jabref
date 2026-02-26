@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -52,7 +53,7 @@ class SaveDatabaseActionTest {
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
     private final DialogService dialogService = mock(DialogService.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final GuiPreferences preferences = mock(GuiPreferences.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class, RETURNS_DEEP_STUBS);
     private final StateManager stateManager = mock(StateManager.class);
     private LibraryTab libraryTab = mock(LibraryTab.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
@@ -64,6 +65,7 @@ class SaveDatabaseActionTest {
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getExportPreferences()).thenReturn(mock(ExportPreferences.class));
+        when(preferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
         saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class), stateManager));
     }
 

@@ -7,12 +7,15 @@ import java.util.Map;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.BibDatabase;
@@ -69,7 +72,7 @@ class DBMSSynchronizerTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost");
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, mock(FilePreferences.class), mock(TimestampPreferences.class), pattern, new DummyFileUpdateMonitor(), "UserAndHost", mock(JournalAbbreviationRepository.class));
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
@@ -233,7 +236,7 @@ class DBMSSynchronizerTest {
         bibDatabase.insertEntry(bibEntry);
 
         MetaData testMetaData = new MetaData();
-        testMetaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
+        testMetaData.setFieldFormatterCleanupActions(new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
         dbmsSynchronizer.setMetaData(testMetaData);
 
         dbmsSynchronizer.applyMetaData();
