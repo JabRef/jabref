@@ -14,6 +14,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
+- We upgraded to Lucene 10.4 for the fulltext search.
+    Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+    ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+    Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+    [#15220](https://github.com/JabRef/jabref/pull/15220)
 
 ### Fixed
 
@@ -23,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Fixed issues with escaping keywords in "Keywords Editor" [#14780](https://github.com/JabRef/jabref/issues/14780)
 - We fixed an issue where resetting preference does not reset External File Type to default. [#15117](https://github.com/JabRef/jabref/issues/15117)
 - We fixed an issue where institutional authors in braces {Institutional Author} triggered a "Names are not in the standard format" warning. [#15157](https://github.com/JabRef/jabref/issues/15157)
+- We fixed an issue where the Windows installer was missing the JabRef icon. [#14965](https://github.com/JabRef/jabref/issues/14965)
 
 ### Removed
 
