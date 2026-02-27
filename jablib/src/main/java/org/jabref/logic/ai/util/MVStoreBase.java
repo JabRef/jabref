@@ -20,12 +20,14 @@ public abstract class MVStoreBase implements AutoCloseable {
     public MVStoreBase(@NonNull Path path, NotificationService dialogService) {
         Path mvStorePath = path;
 
-        try {
-            Files.createDirectories(path.getParent());
-        } catch (IOException e) {
-            LOGGER.error(errorMessageForOpening(), e);
-            dialogService.notify(errorMessageForOpeningLocalized());
-            mvStorePath = null;
+        if (path.getParent() != null) {
+            try {
+                Files.createDirectories(path.getParent());
+            } catch (IOException e) {
+                LOGGER.error(errorMessageForOpening(), e);
+                dialogService.notify(errorMessageForOpeningLocalized());
+                mvStorePath = null;
+            }
         }
 
         try {
@@ -43,11 +45,15 @@ public abstract class MVStoreBase implements AutoCloseable {
     }
 
     public void commit() {
-        mvStore.commit();
+        if (mvStore != null) {
+            mvStore.commit();
+        }
     }
 
     public void close() {
-        mvStore.close();
+        if (mvStore != null) {
+            mvStore.close();
+        }
     }
 
     protected abstract String errorMessageForOpening();

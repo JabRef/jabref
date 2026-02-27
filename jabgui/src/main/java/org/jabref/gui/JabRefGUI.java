@@ -228,7 +228,8 @@ public class JabRefGUI extends Application {
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
                 JabRefGUI.aiService,
-                entryTypesManager
+                entryTypesManager,
+                dialogService
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
     }
