@@ -156,7 +156,7 @@ dependencies.constraints {
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.21.0")
+    api("org.mockito:mockito-core:5.22.0")
     api("org.ow2.asm:asm:9.9.1")
     api("org.postgresql:postgresql:42.7.10")
     api("org.slf4j:jul-to-slf4j:2.0.17")
