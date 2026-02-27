@@ -24,7 +24,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -83,7 +82,7 @@ public class FileSelectionPage extends WizardPane {
         fileCountLabel.setStyle("-fx-font-weight: bold;");
 
         unlinkedFilesList = new CheckTreeView<>();
-        new ViewModelTreeCellFactory<FileNodeViewModel>().withText(FileNodeViewModel::getDisplayTextWithEditDate).install(unlinkedFilesList);
+        unlinkedFilesList.setCellFactory(_ -> new UnlinkedFilesCellFactory(this.viewModel.getStateManager(), viewModel));
 
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList.setContextMenu(createContextMenu());
