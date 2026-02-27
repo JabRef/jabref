@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
@@ -870,5 +871,47 @@ class AutoSetFileLinksUtilTest {
                 assertEquals(expect, actual);
             }
         }
+    }
+    @Test
+    void issueH_ignoresAlreadyLinkedFile(@TempDir Path tempDir) throws Exception {
+        String citationKey = "TestName";
+
+        Path expectedPdg = tempDir.resolve(citationKey + ".pdf");
+        Files.createFile(expectedPdg);
+
+        // LinkedFile object that explicitly points to the PDF that was just created
+        // This represents a file that the user has already attached in the past
+        LinkedFile existingLink = new LinkedFile("", expectedPdg.toAbsolutePath().toString(), "PDF");
+
+        // Here we use .withFiles() to attach the file right from the start (unlike in test case A)
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey(citationKey)
+                .withFiles(List.of(existingLink));
+
+
+        // Search our fake hard drive folder
+        when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(tempDir));
+        // Allow any file name format to be matched
+        when(autoLinkPrefs.getRegularExpression()).thenReturn(".*");
+
+        // Configure the fake external file types so it is looking for PDFs
+        ExternalFileType pdfFileType = mock(ExternalFileType.class);
+        when(pdfFileType.getExtension()).thenReturn("pdf");
+        when(pdfFileType.getName()).thenReturn("PDF");
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(javafx.collections.FXCollections.observableSet(pdfFileType));
+
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                databaseContext,
+                externalApplicationsPreferences,
+                filePreferences,
+                autoLinkPrefs
+        );
+
+        Collection<LinkedFile> foundFiles = util.findAssociatedNotLinkedFiles(entry);
+
+
+        // Because the PDF on the hard drive is already stored inside the BibEntry's file list, 
+        // the utility should filter it out. We expect exactly 0 new files to be discovered
+        assertEquals(0, foundFiles.size(), "Should discover exactly zero unlinked files since it is already linked.");
     }
 }
