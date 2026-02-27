@@ -357,8 +357,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Checks whether the {@link EntriesEventSource} of an {@link EntriesEvent} is crucial for this class.
     ///
     /// @param event An {@link EntriesEvent}
-    /// @return `true` if the event is able to trigger operations in {@linkDBMSSynchronizer}, else
-    ///`false`
+    /// @return `true` if the event is able to trigger operations in {@link DBMSSynchronizer}, else
+    /// `false`
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();
         return (eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO);
