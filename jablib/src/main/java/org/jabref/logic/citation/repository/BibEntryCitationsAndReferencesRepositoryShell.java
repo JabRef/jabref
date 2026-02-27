@@ -49,8 +49,7 @@ public class BibEntryCitationsAndReferencesRepositoryShell extends MVStoreBase i
             BibEntryRelationRepository citationsDao,
             BibEntryRelationRepository referencesDao
     ) {
-        super(Path.of(""), _ -> {
-        }); // Dummy Path for testing
+        super();
         this.citationsDao = citationsDao;
         this.referencesDao = referencesDao;
     }
