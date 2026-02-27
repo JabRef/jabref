@@ -42,9 +42,9 @@
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.2
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.0.4
-//DEPS tools.jackson.core:jackson-databind:3.0.4
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.4
+//DEPS tools.jackson.core:jackson-core:3.1.0
+//DEPS tools.jackson.core:jackson-databind:3.1.0
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.0
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
@@ -56,6 +56,8 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CitationProperties.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/LocatorType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/BibLatexFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/NatbibFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/MMDFormatter.java
@@ -65,6 +67,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormatterService.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/SimpleJsonFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CitationPropertiesPopup.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchDialog.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
