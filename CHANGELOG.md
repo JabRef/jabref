@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
     ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
     Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
     [#15220](https://github.com/JabRef/jabref/pull/15220)
+- We refined the "Search for unlinked local files" dialog to show the entries that the files can be linked to. [#13689](https://github.com/JabRef/jabref/issues/13689)
 
 ### Fixed
 
@@ -72,7 +73,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - macOS distributions now take "intel" and "silicon" as suffixes. [#14057](https://github.com/JabRef/jabref/pull/14057)
 - Moved "Rename subgroup" below "Edit group" and renamed it to "Rename group". [#15041](https://github.com/JabRef/jabref/issues/15041)
 - We hanged the bibliographic information update process to show a notification instead of a blocking dialog in case of errors. [#15097](https://github.com/JabRef/jabref/issues/15097)
-- We refined the "Search for unlinked local files" dialog to show the entries that the files can be linked to. [#13689](https://github.com/JabRef/jabref/issues/13689)
 
 ### Fixed
 
