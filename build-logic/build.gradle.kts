@@ -11,7 +11,7 @@ dependencies {
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
     implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.6.0")
     implementation("com.github.andygoossens:gradle-modernizer-plugin:1.12.0")
-    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.3.1")
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.3.2")
     implementation("de.undercouch.download:de.undercouch.download.gradle.plugin:5.7.0")
     implementation("org.gradlex:extra-java-module-info:1.14")
     implementation("org.gradlex:java-module-dependencies:1.12")
