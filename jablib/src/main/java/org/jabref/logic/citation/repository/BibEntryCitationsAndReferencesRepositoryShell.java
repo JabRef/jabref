@@ -16,7 +16,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -50,7 +49,8 @@ public class BibEntryCitationsAndReferencesRepositoryShell extends MVStoreBase i
             BibEntryRelationRepository citationsDao,
             BibEntryRelationRepository referencesDao
     ) {
-        super(Path.of(""), _ -> { }); // Dummy Path for testing
+        super(Path.of(""), _ -> {
+        }); // Dummy Path for testing
         this.citationsDao = citationsDao;
         this.referencesDao = referencesDao;
     }
