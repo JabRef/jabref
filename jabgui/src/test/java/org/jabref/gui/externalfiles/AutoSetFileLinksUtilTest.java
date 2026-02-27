@@ -909,7 +909,6 @@ class AutoSetFileLinksUtilTest {
 
         Collection<LinkedFile> foundFiles = util.findAssociatedNotLinkedFiles(entry);
 
-
         // Because the PDF on the hard drive is already stored inside the BibEntry's file list, 
         // the utility should filter it out. We expect exactly 0 new files to be discovered
         assertEquals(0, foundFiles.size(), "Should discover exactly zero unlinked files since it is already linked.");
