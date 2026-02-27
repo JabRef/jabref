@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
+
 ### Changed
 
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
@@ -23,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed a false "Invalid citation key" warning for keys with diacritical marks. [#14953](https://github.com/JabRef/jabref/issues/14953)
 - We fixed an issue where duplicate fields can be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
 - We fixed an issue where blank fields could be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
 - Fixed issues with escaping keywords in "Keywords Editor" [#14780](https://github.com/JabRef/jabref/issues/14780)
