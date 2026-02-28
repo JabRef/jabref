@@ -313,12 +313,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         }
     }
 
-    /**
-     * For multiline property, fields with the same name in each entry type will be updated as the standard fields are global.
-     *
-     * @param item
-     * @return BooleanProperty
-     */
+    /// For multiline property, fields with the same name in each entry type will be updated as the standard fields are global.
     private BooleanProperty createMultilinePropertyListener(TableColumn.CellDataFeatures<FieldViewModel, Boolean> item) {
         BooleanProperty property = item.getValue().multilineProperty();
         property.addListener((obs, wasSelected, isSelected) -> {
