@@ -244,6 +244,21 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
+    void removeIllegalCharactersPreservesDiacritics() {
+        assertEquals("kṛṣṇā", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("kṛṣṇā", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("Müller2020", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("Müller2020", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("taṇḍulīyaka", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("taṇḍulīyaka", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("García_2021", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("García_2021", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+    }
+
+    @Test
+    void removeIllegalCharactersRemovesDisallowedChars() {
+        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("ke{y}", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("ke y", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("k#e%y", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+    }
+
+    @Test
     void crossrefUniversity() {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");

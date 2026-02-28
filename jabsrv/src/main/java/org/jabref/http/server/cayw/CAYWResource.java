@@ -255,7 +255,7 @@ public class CAYWResource {
         String label = entry.getCitationKey().orElse("");
         String shortLabel = label;
         String description = entry.getField(StandardField.TITLE).orElse(entry.getAuthorTitleYear());
-        return new CAYWEntry(entry, label, shortLabel, description);
+        return new CAYWEntry(entry, label, shortLabel, description, new CitationProperties());
     }
 
     private boolean matches(CAYWEntry entry, String searchText) {
