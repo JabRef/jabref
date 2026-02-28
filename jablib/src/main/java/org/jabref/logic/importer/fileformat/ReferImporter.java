@@ -128,7 +128,7 @@ public class ReferImporter extends Importer {
                     case "E" ->
                             addEditor(editor, val);
                     case "F" ->
-                            fieldMap.put(InternalField.KEY_FIELD, CitationKeyGenerator.cleanKey(val, ""));
+                            fieldMap.put(InternalField.KEY_FIELD, CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics(val, CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
                     case "G" ->
                             fieldMap.put(StandardField.LANGUAGE, val);
                     case "I" ->

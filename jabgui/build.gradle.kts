@@ -1,5 +1,3 @@
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.jvm.toolchain.JavaToolchainService
 
 plugins {
     id("org.jabref.gradle.module")
@@ -195,7 +193,7 @@ javaModulePackaging {
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
             "--file-associations", "$projectDir\\buildres\\windows\\bibtexAssociations.properties",
-            // "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
+            "--resource-dir", layout.projectDirectory.dir("buildres").dir("windows").asFile.absolutePath,
 
             // Target-speccific options
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
@@ -209,6 +207,8 @@ javaModulePackaging {
             include("jabref-chrome.json")
             include("JabRefHost.bat")
             include("JabRefHost.ps1")
+            include("JabRefTopBanner.bmp")
+            include("JabRef.VisualElementsManifest.xml")
         })
     }
 
@@ -256,7 +256,7 @@ javaModulePackaging {
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef"
         )
-        if (providers.environmentVariable("OSXCERT").orNull?.isNotBlank() ?: false) {
+        if (providers.environmentVariable("OSXCERT").map { it == "true" }.orNull ?: false) {
             options.addAll(
                 "--mac-sign",
                 "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
