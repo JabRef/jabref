@@ -161,7 +161,7 @@ public class GitPullAction extends SimpleCommand {
     }
 
     private BookkeepingResult saveAndFinalize(Path bibPath, BibDatabaseContext databaseContext, PullPlan pullPlan) throws IOException, GitAPIException, JabRefException {
-        GitFileWriter.write(bibPath, databaseContext, guiPreferences.getImportFormatPreferences());
+        GitFileWriter.write(bibPath, databaseContext, guiPreferences);
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry);
         return gitSyncService.finalizeMerge(bibPath, pullPlan);
     }

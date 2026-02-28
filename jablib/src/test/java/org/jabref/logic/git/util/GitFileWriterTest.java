@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +48,9 @@ class GitFileWriterTest {
                 """, importFormatPreferences);
 
         Path tempFile = Files.createTempFile("tempgitwriter", ".bib");
-        GitFileWriter.write(tempFile, inputDatabaseContext, importFormatPreferences);
+        CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
+        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        GitFileWriter.write(tempFile, inputDatabaseContext, cliPreferences);
 
         String written = Files.readString(tempFile);
         BibDatabaseContext parsedContext = BibDatabaseContext.of(written, importFormatPreferences);

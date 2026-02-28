@@ -1,14 +1,20 @@
 package org.jabref.gui.libraryproperties.saving;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
@@ -46,8 +52,12 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
     // FieldFormatterCleanupsPanel
-    private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
-    private final ListProperty<FieldFormatterCleanup> cleanupsProperty = new SimpleListProperty<>(FXCollections.emptyObservableList());
+    private final BooleanProperty fieldFormatterCleanupsDisableProperty = new SimpleBooleanProperty();
+    private final ListProperty<FieldFormatterCleanup> fieldFormatterCleanupsProperty = new SimpleListProperty<>(FXCollections.emptyObservableList());
+
+    private final SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
+
+    private final ObjectProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupProperty = new SimpleObjectProperty<>();
 
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
@@ -92,15 +102,22 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         // FieldFormatterCleanupsPanel, included via <?import ...> in FXML
 
-        Optional<FieldFormatterCleanupActions> saveActions = initialMetaData.getSaveActions();
-        saveActions.ifPresentOrElse(value -> {
-            cleanupsDisableProperty.setValue(!value.isEnabled());
-            cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
+        Optional<FieldFormatterCleanupActions> fieldFormatterCleanupActions = initialMetaData.getFieldFormatterCleanupActions();
+        fieldFormatterCleanupActions.ifPresentOrElse(value -> {
+            fieldFormatterCleanupsDisableProperty.setValue(!value.isEnabled());
+            fieldFormatterCleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
             CleanupPreferences defaultPreset = preferences.getDefaultCleanupPreset();
-            cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
-            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
+            fieldFormatterCleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
+            fieldFormatterCleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
         });
+
+        Optional<Set<CleanupPreferences.CleanupStep>> multiFieldCleanups = initialMetaData.getMultiFieldCleanups();
+        multiFieldCleanups.ifPresent(set -> multiFieldCleanupsProperty.set(FXCollections.observableSet(set))
+        );
+
+        Optional<CleanupPreferences.CleanupStep> journalAbbreviationCleanup = initialMetaData.getJournalAbbreviationCleanup();
+        journalAbbreviationCleanup.ifPresent(journalAbbreviationCleanupProperty::set);
     }
 
     @Override
@@ -114,18 +131,30 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(
-                !cleanupsDisableProperty().getValue(),
-                cleanupsProperty());
+                !fieldFormatterCleanupsDisableProperty().getValue(),
+                fieldFormatterCleanupsProperty());
 
         if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
-            newMetaData.clearSaveActions();
+            newMetaData.clearFieldFormatterActions();
         } else {
             // if all actions have been removed, remove the save actions from the MetaData
             if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
-                newMetaData.clearSaveActions();
+                newMetaData.clearFieldFormatterActions();
             } else {
-                newMetaData.setSaveActions(fieldFormatterCleanupActions);
+                newMetaData.setFieldFormatterCleanupActions(fieldFormatterCleanupActions);
             }
+        }
+
+        if (multiFieldCleanupsProperty.get().isEmpty()) {
+            newMetaData.clearMultiFieldCleanups();
+        } else {
+            newMetaData.setMultiFieldCleanups(EnumSet.copyOf(multiFieldCleanupsProperty.get()));
+        }
+
+        if (journalAbbreviationCleanupProperty.get() == null) {
+            newMetaData.clearJournalAbbreviationCleanup();
+        } else {
+            newMetaData.setJournalAbbreviationCleanup(journalAbbreviationCleanupProperty.get());
         }
 
         SaveOrder newSaveOrder = new SaveOrder(
@@ -149,6 +178,14 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     public BooleanProperty libraryProtectedProperty() {
         return libraryProtectedProperty;
+    }
+
+    public SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsPropertyProperty() {
+        return multiFieldCleanupsProperty;
+    }
+
+    public ObjectProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupPropertyProperty() {
+        return journalAbbreviationCleanupProperty;
     }
 
     // SaveOrderConfigPanel
@@ -175,11 +212,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     // FieldFormatterCleanupsPanel
 
-    public BooleanProperty cleanupsDisableProperty() {
-        return cleanupsDisableProperty;
+    public BooleanProperty fieldFormatterCleanupsDisableProperty() {
+        return fieldFormatterCleanupsDisableProperty;
     }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
-        return cleanupsProperty;
+    public ListProperty<FieldFormatterCleanup> fieldFormatterCleanupsProperty() {
+        return fieldFormatterCleanupsProperty;
     }
 }

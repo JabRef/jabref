@@ -6,13 +6,16 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
@@ -126,8 +129,12 @@ public class MetaDataParser {
                 // The user-host string starts directly after FILE_DIRECTORY_LATEX + '-'
                 String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
                 metaData.setLatexFileDirectory(userHostString, parseDirectory(entry.getValue()));
-            } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
-                metaData.setSaveActions(fieldFormatterCleanupsParse(values));
+            } else if (MetaData.FIELDFORMATTERCLEANUPACTIONS.equals(entry.getKey())) {
+                metaData.setFieldFormatterCleanupActions(fieldFormatterCleanupsParse(values));
+            } else if (MetaData.MULTIFIELDCLEANUPACTIONS.equals(entry.getKey())) {
+                metaData.setMultiFieldCleanups(multiFieldCleanupsParse(values));
+            } else if (MetaData.JOURNALABBREVIATIONCLEANUP.equals(entry.getKey())) {
+                metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.valueOf(values.getFirst()));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
@@ -253,6 +260,24 @@ public class MetaDataParser {
         } else {
             // return default actions
             return new FieldFormatterCleanupActions(false, DEFAULT_SAVE_ACTIONS);
+        }
+    }
+
+    public static Set<CleanupPreferences.CleanupStep> multiFieldCleanupsParse(List<String> multiFieldMetaList) {
+        if ((multiFieldMetaList != null) && (multiFieldMetaList.size() == 1)) {
+            String multiFieldMetaString = StringUtil.unifyLineBreaks(multiFieldMetaList.getFirst(), "");
+
+            EnumSet<CleanupPreferences.CleanupStep> steps = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
+            for (String stringStep : multiFieldMetaString.split(";")) {
+                try {
+                    steps.add(CleanupPreferences.CleanupStep.valueOf(stringStep));
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException(stringStep + " is not CleanupStep", e);
+                }
+            }
+            return steps;
+        } else {
+            return EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
         }
     }
 

@@ -11,7 +11,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibDatabaseSaver;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.pseudonymization.Pseudonymization;
@@ -82,11 +82,10 @@ public class PseudonymizeAction extends SimpleCommand {
             LOGGER.error("Invalid output file type provided.");
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pseudoBibPath, StandardCharsets.UTF_8)) {
-            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
+            BibDatabaseSaver bibDatabaseSaver = new BibDatabaseSaver(preferences,
                     fileWriter,
-                    result.bibDatabaseContext(),
-                    preferences);
-            databaseWriter.writeDatabase(result.bibDatabaseContext());
+                    result.bibDatabaseContext());
+            bibDatabaseSaver.saveDatabase(result.bibDatabaseContext());
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {

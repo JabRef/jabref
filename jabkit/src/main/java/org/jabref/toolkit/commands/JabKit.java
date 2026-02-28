@@ -13,7 +13,7 @@ import javafx.util.Pair;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibDatabaseSaver;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -174,8 +174,8 @@ public class JabKit implements Runnable {
         JabKit.generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
 
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
-            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences);
-            bibWriter.writeDatabase(bibDatabaseContext);
+            BibDatabaseSaver bibDatabaseSaver = new BibDatabaseSaver(cliPreferences, writer, bibDatabaseContext);
+            bibDatabaseSaver.saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
             LOGGER.error("Could not write BibTeX", e);
             System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
@@ -196,13 +196,9 @@ public class JabKit implements Runnable {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                         .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
-                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
-                        bibWriter,
-                        saveConfiguration,
-                        cliPreferences.getFieldPreferences(),
-                        cliPreferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager);
-                databaseWriter.writeDatabase(bibDatabaseContext);
+
+                BibDatabaseSaver databaseSaver = new BibDatabaseSaver(bibWriter, saveConfiguration, cliPreferences, entryTypesManager);
+                databaseSaver.saveDatabase(bibDatabaseContext);
 
                 // Show just a warning message if encoding did not work for all characters:
                 if (fileWriter.hasEncodingProblems()) {

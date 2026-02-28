@@ -18,6 +18,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -48,6 +49,7 @@ import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyResolved
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -225,7 +227,9 @@ class GitSyncServiceTest {
         assertFalse(pullPlan.get().isNoopAhead(), "Should not be AHEAD");
 
         applyAutoPlan(context, pullPlan.get().autoPlan());
-        GitFileWriter.write(library, context, importFormatPreferences);
+        CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
+        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        GitFileWriter.write(library, context, cliPreferences);
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
 
         assertFalse(bookkeepingResult.isFastForward(), "DIVERGED without conflicts should produce a merge commit");
@@ -259,7 +263,9 @@ class GitSyncServiceTest {
         assertEquals(List.of(), pullPlan.get().conflicts(), "This case expects an auto-merge only");
 
         applyAutoPlan(context, pullPlan.get().autoPlan());
-        GitFileWriter.write(library, context, importFormatPreferences);
+        CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
+        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        GitFileWriter.write(library, context, cliPreferences);
 
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
@@ -355,7 +361,9 @@ class GitSyncServiceTest {
         verify(resolver).resolveConflicts(anyList());
         applyResolved(context, resolvedEntries);
 
-        GitFileWriter.write(library, context, importFormatPreferences);
+        CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
+        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        GitFileWriter.write(library, context, cliPreferences);
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
 

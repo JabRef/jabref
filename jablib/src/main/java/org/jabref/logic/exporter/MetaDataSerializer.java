@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeMap;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringUtil;
@@ -40,8 +42,10 @@ public class MetaDataSerializer {
         // First write all meta data except groups
         metaData.getSaveOrder().ifPresent(
                 saveOrderConfig -> stringyMetaData.put(MetaData.SAVE_ORDER_CONFIG, saveOrderConfig.getAsStringList()));
-        metaData.getSaveActions().ifPresent(
-                saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, getAsStringList(saveActions, OS.NEWLINE)));
+        metaData.getFieldFormatterCleanupActions().ifPresent(
+                fieldFormatterCleanupActions -> stringyMetaData.put(MetaData.FIELDFORMATTERCLEANUPACTIONS, getAsStringList(fieldFormatterCleanupActions, OS.NEWLINE)));
+        metaData.getMultiFieldCleanups().ifPresent(multiFieldCleanupActions -> stringyMetaData.put(MetaData.MULTIFIELDCLEANUPACTIONS, getAsStringList(multiFieldCleanupActions, OS.NEWLINE)));
+        metaData.getJournalAbbreviationCleanup().ifPresent(journalAbbreviationCleanup -> stringyMetaData.put(MetaData.JOURNALABBREVIATIONCLEANUP, List.of(journalAbbreviationCleanup.toString())));
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of("true"));
         }
@@ -95,20 +99,20 @@ public class MetaDataSerializer {
                 continue;
             }
 
-            boolean isSaveActions = MetaData.SAVE_ACTIONS.equals(metaItem.getKey());
+            boolean isFieldFormatterCleanupActions = MetaData.FIELDFORMATTERCLEANUPACTIONS.equals(metaItem.getKey());
             // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
             StringJoiner joiner = new StringJoiner(MetaData.SEPARATOR_STRING, "", MetaData.SEPARATOR_STRING);
-            boolean lastWasSaveActionsEnablement = false;
+            boolean lastWasFieldFormatterActionsEnablement = false;
             for (String dataItem : itemList) {
                 String string;
-                if (lastWasSaveActionsEnablement) {
+                if (lastWasFieldFormatterActionsEnablement) {
                     string = OS.NEWLINE;
                 } else {
                     string = "";
                 }
                 string += StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER);
                 // in case of save actions, add an additional newline after the enabled flag
-                lastWasSaveActionsEnablement = isSaveActions
+                lastWasFieldFormatterActionsEnablement = isFieldFormatterCleanupActions
                         && (FieldFormatterCleanupActions.ENABLED.equals(dataItem)
                         || FieldFormatterCleanupActions.DISABLED.equals(dataItem));
                 joiner.add(string);
@@ -179,6 +183,18 @@ public class MetaDataSerializer {
         String formatterString = FieldFormatterCleanupActions.getMetaDataString(
                 fieldFormatterCleanupActions.getConfiguredActions(), delimiter);
         stringRepresentation.add(formatterString);
+        return stringRepresentation;
+    }
+
+    public static List<String> getAsStringList(Set<CleanupPreferences.CleanupStep> multiFieldCleanupActions, String delimiter) {
+        List<String> stringRepresentation = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (CleanupPreferences.CleanupStep step : multiFieldCleanupActions) {
+            stringBuilder.append(step);
+            stringBuilder.append(";");
+            stringBuilder.append(delimiter);
+        }
+        stringRepresentation.add(stringBuilder.toString());
         return stringRepresentation;
     }
 }

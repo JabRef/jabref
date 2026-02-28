@@ -22,6 +22,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -217,9 +218,12 @@ public class SharedDatabaseUIManager {
                 bibDatabaseContext,
                 preferences.getBibEntryPreferences().getKeywordSeparator(),
                 preferences.getFieldPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getTimestampPreferences(),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor,
-                preferences.getFilePreferences().getUserAndHost());
+                preferences.getFilePreferences().getUserAndHost(),
+                JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;
     }

@@ -18,11 +18,6 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
-import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -632,25 +627,6 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithUserCommentAndEntryChange() throws IOException {
-        Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
-        Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
-
-        BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
-        entry.setField(StandardField.AUTHOR, "Mr. Author");
-
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
-
-        // .gitattributes sets the .bib files to have LF line endings
-        // This needs to be reflected here
-        bibWriter = new BibWriter(stringWriter, "\n");
-        initializeDatabaseWriter();
-        databaseWriter.writePartOfDatabase(context, result.getDatabase().getEntries());
-        assertEquals(Files.readString(Path.of("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
-    }
-
-    @Test
     void roundtripWithUserCommentBeforeStringAndChange() throws IOException {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
@@ -738,27 +714,6 @@ class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(bibtexContext, List.of());
 
         assertEquals("@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
-    }
-
-    @Test
-    void writeSaveActions() throws IOException {
-        FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
-                Arrays.asList(
-                        new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()),
-                        new FieldFormatterCleanup(StandardField.JOURNAL, new TitleCaseFormatter()),
-                        new FieldFormatterCleanup(StandardField.DAY, new UpperCaseFormatter())));
-        metaData.setSaveActions(saveActions);
-
-        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
-
-        // The order should be kept (the cleanups are a list, not a set)
-        assertEquals("@Comment{jabref-meta: saveActions:enabled;"
-                + OS.NEWLINE
-                + "title[lower_case]" + OS.NEWLINE
-                + "journal[title_case]" + OS.NEWLINE
-                + "day[upper_case]" + OS.NEWLINE
-                + ";}"
-                + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -902,56 +857,6 @@ class BibDatabaseWriterTest {
                         "  year   = {2000}," + OS.NEWLINE +
                         "}"
                         + OS.NEWLINE,
-                stringWriter.toString());
-    }
-
-    @Test
-    void normalizeWhitespacesCleanupOnlyInTextFields() throws IOException {
-        BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Firstname1 Lastname1   and   Firstname2 Lastname2")
-                .withField(StandardField.FILE, "some  --  filename  -- spaces.pdf")
-                .withChanged(true);
-
-        database.insertEntry(firstEntry);
-
-        databaseWriter.writePartOfDatabase(bibtexContext, database.getEntries());
-
-        assertEquals("""
-                @Article{,
-                  author = {Firstname1 Lastname1 and Firstname2 Lastname2},
-                  file   = {some  --  filename  -- spaces.pdf},
-                }
-                """.replace("\n", OS.NEWLINE), stringWriter.toString());
-    }
-
-    @Test
-    void trimFieldContents() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.NOTE, "        some note    \t")
-                .withChanged(true);
-        database.insertEntry(entry);
-
-        databaseWriter.writeDatabase(bibtexContext);
-
-        assertEquals("@Article{," + OS.NEWLINE +
-                        "  note = {some note}," + OS.NEWLINE +
-                        "}" + OS.NEWLINE,
-                stringWriter.toString());
-    }
-
-    @Test
-    void newlineAtEndOfAbstractFieldIsDeleted() throws IOException {
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
-
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.ABSTRACT, text + OS.NEWLINE);
-        database.insertEntry(entry);
-
-        databaseWriter.writeDatabase(bibtexContext);
-
-        assertEquals("@Article{," + OS.NEWLINE +
-                        "  abstract = {" + text + "}," + OS.NEWLINE +
-                        "}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 

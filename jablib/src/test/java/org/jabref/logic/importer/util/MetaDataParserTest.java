@@ -1,11 +1,14 @@
 package org.jabref.logic.importer.util;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
@@ -66,14 +69,39 @@ public class MetaDataParserTest {
     }
 
     @Test
-    void saveActions() throws ParseException {
-        Map<String, String> data = Map.of("saveActions", "enabled;title[lower_case]");
+    void parseFieldFormatterCleanupActions() throws ParseException {
+        Map<String, String> data = Map.of("fieldFormatterCleanupActions", "enabled;title[lower_case]");
         MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
         MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
 
         MetaData expected = new MetaData();
         FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
-        expected.setSaveActions(fieldFormatterCleanupActions);
+        expected.setFieldFormatterCleanupActions(fieldFormatterCleanupActions);
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void parseMultiFieldCleanups() throws ParseException {
+        Map<String, String> data = Map.of("multiFieldCleanupActions", "DO_NOT_CONVERT_TIMESTAMP");
+        MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
+
+        MetaData expected = new MetaData();
+        Set<CleanupPreferences.CleanupStep> cleanupStepSet = new HashSet<>();
+        cleanupStepSet.add(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP);
+        expected.setMultiFieldCleanups(cleanupStepSet);
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void parseJournalAbbreviationCleanup() throws ParseException {
+        Map<String, String> data = Map.of("journalAbbreviationCleanup", "ABBREVIATE_DEFAULT");
+        MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
+
+        MetaData expected = new MetaData();
+        CleanupPreferences.CleanupStep cleanupStep = CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT;
+        expected.setJournalAbbreviationCleanup(cleanupStep);
         assertEquals(expected, parsed);
     }
 
