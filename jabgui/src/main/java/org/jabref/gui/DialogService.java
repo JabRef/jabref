@@ -23,6 +23,9 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.NotificationService;
 
+import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.NotificationGroup;
+
 /// This interface provides methods to create dialogs and show them to the user.
 public interface DialogService extends NotificationService {
 
@@ -256,4 +259,8 @@ public interface DialogService extends NotificationService {
     ///
     /// @return the selected file or an empty {@link Optional} if no file has been selected
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
+
+    List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups();
+
+    void notify(Notification<?> notification);
 }

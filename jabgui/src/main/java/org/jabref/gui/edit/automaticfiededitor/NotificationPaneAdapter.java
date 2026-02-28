@@ -1,23 +1,28 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import java.util.List;
-
+import javafx.animation.PauseTransition;
 import javafx.scene.Node;
 import javafx.util.Duration;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.icon.IconTheme;
 
-public class NotificationPaneAdapter extends LibraryTab.DatabaseNotification {
+import org.controlsfx.control.NotificationPane;
+
+public class NotificationPaneAdapter extends NotificationPane {
 
     public NotificationPaneAdapter(Node content) {
         super(content);
     }
 
     public void notify(int affectedEntries, int totalEntries) {
-        String notificationMessage = "%d/%d affected entries".formatted(affectedEntries, totalEntries);
-        Node notificationGraphic = IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
+        String text = "%d/%d affected entries".formatted(affectedEntries, totalEntries);
+        Node graphic = IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
 
-        notify(notificationGraphic, notificationMessage, List.of(), Duration.seconds(2));
+        this.setGraphic(graphic);
+        this.setText(text);
+        this.show();
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(_ -> hide());
+        delay.play();
     }
 }

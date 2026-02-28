@@ -9,6 +9,8 @@ import javax.swing.undo.UndoManager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -58,6 +60,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.dlsc.gemsfx.PowerPane;
+import com.dlsc.gemsfx.infocenter.InfoCenterPane;
+import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
@@ -209,6 +214,16 @@ public class JabRefGUI extends Application {
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
 
+        stateManager.getRunningBackgroundTasks().addListener((ListChangeListener<? super Task<?>>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Task<?> task : change.getAddedSubList()) {
+                        dialogService.notify(new JabRefDialogService.TaskNotification(task));
+                    }
+                }
+            }
+        });
+
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
@@ -300,7 +315,13 @@ public class JabRefGUI extends Application {
         mainStage.setMaximized(windowMaximised);
         debugLogWindowState(mainStage);
 
-        Scene scene = new Scene(JabRefGUI.mainFrame);
+        PowerPane powerpane = new PowerPane();
+        powerpane.getInfoCenterPane().getInfoCenterView().getGroups().addAll(dialogService.getNotificationGroups());
+        Injector.setModelOrService(InfoCenterPane.class, powerpane.getInfoCenterPane());
+        powerpane.setContent(JabRefGUI.mainFrame);
+        powerpane.getInfoCenterPane().setInfoCenterViewPos(InfoCenterViewPos.BOTTOM_RIGHT);
+
+        Scene scene = new Scene(powerpane);
 
         LOGGER.debug("installing CSS");
         themeManager.installCssImmediately(scene);
