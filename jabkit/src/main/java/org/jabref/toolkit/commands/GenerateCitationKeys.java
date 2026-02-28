@@ -1,17 +1,21 @@
 package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +71,9 @@ class GenerateCitationKeys implements Runnable {
     @Option(names = "--generate-before-saving", description = "Generate citation keys before saving")
     private Boolean generateBeforeSaving;
 
+    @Option(names = "--key-patterns", description = "Key patterns for specific entry types")
+    private Map<String, String> keyPatterns;
+
     @Override
     public void run() {
         Optional<ParserResult> parserResult = JabKit.importFile(
@@ -119,10 +126,25 @@ class GenerateCitationKeys implements Runnable {
                 keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
-                existingPreferences.getKeyPatterns(),
+                prepareKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
                 pattern != null ? pattern : existingPreferences.getDefaultPattern(),
                 keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
         );
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
+    }
+
+    /// Creates keyPatterns from preferences and --key-patterns option
+    ///
+    /// @param keyPatternsOption      patterns submitted by a user via --key-patterns option
+    /// @param keyPatternsPreferences patterns from preferences
+    /// @return keyPatterns from preferences or overridden by user-supplied patterns
+    private GlobalCitationKeyPatterns prepareKeyPatterns(@Nullable Map<String, String> keyPatternsOption, GlobalCitationKeyPatterns keyPatternsPreferences) {
+        if (keyPatternsOption == null) {
+            return keyPatternsPreferences;
+        }
+        keyPatternsOption.forEach((type, pattern) -> {
+            keyPatternsPreferences.addCitationKeyPattern(EntryTypeFactory.parse(type), pattern);
+        });
+        return keyPatternsPreferences;
     }
 }
