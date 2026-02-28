@@ -1,5 +1,5 @@
 name: Source Code Tests
-# This workflow runs the unit tests for the JabRef codebase.
+# This workflow runs the unit tests for the JabRef codebase
 on:
   push:
     branches:
