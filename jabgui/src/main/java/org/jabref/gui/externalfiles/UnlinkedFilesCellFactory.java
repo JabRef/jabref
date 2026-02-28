@@ -63,6 +63,14 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
         doNotLinkButton.setOnAction(_ -> {
             relatedEntries.getSelectionModel().clearSelection();
             relatedEntries.setPromptText(Localization.lang("Select entry to link"));
+            viewModel.setSelectedEntryForFile(getTreeItem().getValue().getPath(), null);
+        });
+
+        relatedEntries.valueProperty().addListener((_, _, newEntry) -> {
+            viewModel.setSelectedEntryForFile(
+                    getTreeItem().getValue().getPath(),
+                    newEntry
+            );
         });
     }
 

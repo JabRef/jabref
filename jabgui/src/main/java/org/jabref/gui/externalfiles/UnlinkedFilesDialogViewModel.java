@@ -9,7 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -58,6 +60,7 @@ public class UnlinkedFilesDialogViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesDialogViewModel.class);
 
     private final ImportHandler importHandler;
+    private final Map<Path, BibEntry> fileToSelectedEntryMap = new HashMap<>();
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
     private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
@@ -160,8 +163,23 @@ public class UnlinkedFilesDialogViewModel {
         }
         resultList.clear();
 
+        List<Path> filesToLink = fileList.stream()
+                                         .filter(path -> getSelectedEntryForFile(path).isPresent())
+                                         .toList();
+
+        List<Path> filesToImport = fileList.stream()
+                                           .filter(path -> getSelectedEntryForFile(path).isEmpty())
+                                           .toList();
+
+        for (Path file : filesToLink) {
+            BibEntry targetEntry = fileToSelectedEntryMap.get(file);
+            importHandler.getFileLinker().linkFilesToEntry(targetEntry, List.of(file));
+            resultList.add(new ImportFilesResultItemViewModel(file, true,
+                    Localization.lang("File was linked to existing entry")));
+        }
+
         importFilesBackgroundTask = importHandler
-                .importFilesInBackground(fileList, TransferMode.LINK)
+                .importFilesInBackground(filesToImport, TransferMode.LINK)
                 .onRunning(() -> {
                     progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
                     progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
@@ -174,6 +192,18 @@ public class UnlinkedFilesDialogViewModel {
                 })
                 .onSuccess(resultList::addAll);
         importFilesBackgroundTask.executeWith(taskExecutor);
+    }
+
+    public void setSelectedEntryForFile(Path filePath, BibEntry entry) {
+        if (entry == null) {
+            fileToSelectedEntryMap.remove(filePath);
+        } else {
+            fileToSelectedEntryMap.put(filePath, entry);
+        }
+    }
+
+    public Optional<BibEntry> getSelectedEntryForFile(Path filePath) {
+        return Optional.ofNullable(fileToSelectedEntryMap.get(filePath));
     }
 
     /// This starts the export of all files of all selected nodes in the file tree view.
