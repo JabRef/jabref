@@ -42,14 +42,15 @@ import org.xml.sax.SAXException;
 ///
 /// For further information see
 ///
-///   - https://www.bib-bvb.de/web/kkb-online/rda-felderverzeichnis-des-b3kat-aseq
-///   - https://www.loc.gov/marc/bibliographic/ for detailed documentation
-///   - for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
-///   - https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html
-///   - https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/AGV/marc21VereinbarungDatentauschTeil1.pdf?__blob=publicationFile&v=2
-///   - about multiple books in a series https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/marc21FormatumstiegAbbildungBegrenzterWerke2008.pdf?__blob=publicationFile&v=2>
+/// - https://www.bib-bvb.de/web/kkb-online/rda-felderverzeichnis-des-b3kat-aseq
+/// - https://www.loc.gov/marc/bibliographic/ for detailed documentation
+/// - for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
+/// - https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html
+/// - https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/AGV/marc21VereinbarungDatentauschTeil1.pdf?__blob=publicationFile&v=2
+/// - about multiple books in a series https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/marc21FormatumstiegAbbildungBegrenzterWerke2008.pdf?__blob=publicationFile&v=2>
 ///
 public class MarcXmlParser implements Parser {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
@@ -137,13 +138,13 @@ public class MarcXmlParser implements Parser {
     private void putIsbn(BibEntry bibEntry, Element datafield) {
         String isbn = getSubfield("a", datafield);
         if (StringUtil.isNullOrEmpty(isbn)) {
-            LOGGER.debug("Empty ISBN recieved");
+            LOGGER.debug("Empty ISBN received");
             return;
         }
 
         int length = isbn.length();
         if (length != 10 && length != 13) {
-            LOGGER.debug("Malformed ISBN recieved, length: {}", length);
+            LOGGER.debug("Malformed ISBN received, length: {}", length);
             return;
         }
 
@@ -166,16 +167,16 @@ public class MarcXmlParser implements Parser {
         if (StringUtil.isNotBlank(author) && StringUtil.isNotBlank(relation)) {
             name = new AuthorListParser().parse(author);
             Optional<StandardField> field = Optional.ofNullable(
-                    switch (relation) {
-                        case "aut" ->
-                                StandardField.AUTHOR;
-                        case "edt" ->
-                                StandardField.EDITOR;
-                        case "pbl" ->
-                                StandardField.PUBLISHER;
-                        default ->
-                                null;
-                    });
+                                                                switch (relation) {
+                                                                    case "aut" ->
+                                                                        StandardField.AUTHOR;
+                                                                    case "edt" ->
+                                                                        StandardField.EDITOR;
+                                                                    case "pbl" ->
+                                                                        StandardField.PUBLISHER;
+                                                                    default ->
+                                                                        null;
+                                                                });
 
             if (field.isPresent()) {
                 String ind1 = datafield.getAttribute("ind1");
@@ -360,17 +361,17 @@ public class MarcXmlParser implements Parser {
                 if (StringUtil.isNotBlank(value)) {
                     switch (key) {
                         case "number" ->
-                                bibEntry.setField(StandardField.NUMBER, value);
+                            bibEntry.setField(StandardField.NUMBER, value);
                         case "year" ->
-                                bibEntry.setField(StandardField.YEAR, value);
+                            bibEntry.setField(StandardField.YEAR, value);
                         case "pages" ->
-                                bibEntry.setField(StandardField.PAGES, value);
+                            bibEntry.setField(StandardField.PAGES, value);
                         case "volume" ->
-                                bibEntry.setField(StandardField.VOLUME, value);
+                            bibEntry.setField(StandardField.VOLUME, value);
                         case "day" ->
-                                bibEntry.setField(StandardField.DAY, value);
+                            bibEntry.setField(StandardField.DAY, value);
                         case "month" ->
-                                bibEntry.setField(StandardField.MONTH, value);
+                            bibEntry.setField(StandardField.MONTH, value);
                     }
                 }
             }
@@ -414,18 +415,18 @@ public class MarcXmlParser implements Parser {
 
     private void putNotes(BibEntry bibEntry, Element datafield) {
         String[] notes = new String[] {
-                getSubfield("a", datafield),
-                getSubfield("0", datafield),
-                getSubfield("h", datafield),
-                getSubfield("S", datafield),
-                getSubfield("c", datafield),
-                getSubfield("f", datafield),
-                getSubfield("i", datafield),
-                getSubfield("k", datafield),
-                getSubfield("l", datafield),
-                getSubfield("z", datafield),
-                getSubfield("3", datafield),
-                getSubfield("5", datafield)
+                                       getSubfield("a", datafield),
+                                       getSubfield("0", datafield),
+                                       getSubfield("h", datafield),
+                                       getSubfield("S", datafield),
+                                       getSubfield("c", datafield),
+                                       getSubfield("f", datafield),
+                                       getSubfield("i", datafield),
+                                       getSubfield("k", datafield),
+                                       getSubfield("l", datafield),
+                                       getSubfield("z", datafield),
+                                       getSubfield("3", datafield),
+                                       getSubfield("5", datafield)
         };
 
         String notesJoined = Arrays.stream(notes)
