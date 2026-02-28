@@ -185,7 +185,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
-        //        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multilineProperty());
         fieldTypeMultilineColumn.setCellValueFactory(this::createMultilinePropertyListener);
         makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
@@ -306,6 +305,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 Localization.lang("Reset to default"));
         if (reset) {
             viewModel.resetAllCustomEntryTypes();
+            viewModel.resetMultilineFieldsToDefault();
             fields.getSelectionModel().clearSelection();
             entryTypesTable.getSelectionModel().clearSelection();
             viewModel.setValues();
@@ -313,6 +313,12 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         }
     }
 
+    /**
+     * For multiline property, fields with the same name in each entry type will be updated as the standard fields are global.
+     *
+     * @param item
+     * @return BooleanProperty
+     */
     private BooleanProperty createMultilinePropertyListener(TableColumn.CellDataFeatures<FieldViewModel, Boolean> item) {
         BooleanProperty property = item.getValue().multilineProperty();
         property.addListener((obs, wasSelected, isSelected) -> {
@@ -324,6 +330,4 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         });
         return property;
     }
-
-    // TODO: implement reset to default on fields
 }

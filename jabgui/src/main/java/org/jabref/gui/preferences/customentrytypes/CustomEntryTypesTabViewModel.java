@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -32,6 +33,7 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -49,6 +51,11 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty newFieldToAdd = new SimpleStringProperty("");
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
+    private final Set<StandardField> DEFAULT_MULTILINE_FIELDS = Set.of(
+            StandardField.ABSTRACT,
+            StandardField.COMMENT,
+            StandardField.REVIEW
+    );
 
     private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -217,5 +224,31 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus fieldValidationStatus() {
         return fieldValidator.getValidationStatus();
+    }
+
+    public void resetMultilineFieldsToDefault() {
+        resetStandardFieldMultilineToDefaults();
+        List<Field> defaultNonWrappableFields = getDefaultNonWrappableFields();
+        preferences.getFieldPreferences().setNonWrappableFields(defaultNonWrappableFields);
+        multiLineFields.clear();
+        multiLineFields.addAll(defaultNonWrappableFields);
+    }
+
+    private void resetStandardFieldMultilineToDefaults() {
+        for (StandardField field : StandardField.values()) {
+            if (DEFAULT_MULTILINE_FIELDS.contains(field)) {
+                field.getProperties().add(FieldProperty.MULTILINE_TEXT);
+            } else {
+                field.getProperties().remove(FieldProperty.MULTILINE_TEXT);
+            }
+        }
+    }
+
+    private List<Field> getDefaultNonWrappableFields() {
+        Object defaultNonWrappableFields = preferences.getDefaults().get(JabRefCliPreferences.NON_WRAPPABLE_FIELDS);
+        if (defaultNonWrappableFields instanceof String defaultFields) {
+            return new ArrayList<>(FieldFactory.parseFieldList(defaultFields));
+        }
+        return List.of();
     }
 }
