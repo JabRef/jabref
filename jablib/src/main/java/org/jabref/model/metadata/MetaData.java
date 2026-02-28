@@ -38,6 +38,7 @@ import org.jspecify.annotations.Nullable;
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
+    public static final String META_FLAG_V1 = "jabref-meta-0.1.0";
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String SAVE_ACTIONS = "saveActions";

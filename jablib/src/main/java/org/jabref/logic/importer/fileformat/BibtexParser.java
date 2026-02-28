@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.GroupsFactory;
@@ -60,6 +64,9 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -113,6 +120,7 @@ public class BibtexParser implements Parser {
 
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
+    private Optional<JsonObject> parsedJsonMetaData = Optional.empty();
     private final Map<String, String> parsedBibDeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
@@ -295,6 +303,12 @@ public class BibtexParser implements Parser {
                 );
             }
             parserResult.setMetaData(metaData);
+
+            parsedJsonMetaData.ifPresent(json -> {
+                if (json.has(MetaData.SAVE_ACTIONS)) {
+                    metaData.setSaveActions(parseSaveActionsFromJson(json.getAsJsonObject(MetaData.SAVE_ACTIONS)));
+                }
+            });
         } catch (ParseException exception) {
             parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), exception);
         }
@@ -401,7 +415,36 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);
             }
+        } else if (comment.startsWith(MetaData.META_FLAG_V1)) {
+            parsedJsonMetaData = parseCommentToJson(comment);
         }
+    }
+
+    Optional<JsonObject> parseCommentToJson(String comment) {
+        Gson gson = new Gson();
+        String content = comment.substring(MetaData.META_FLAG_V1.length());
+        return Optional.ofNullable(gson.fromJson(content, JsonObject.class));
+    }
+
+    private FieldFormatterCleanupActions parseSaveActionsFromJson(JsonObject saveActionsJson) {
+        boolean enabled = saveActionsJson.get("state").getAsBoolean();
+        StringBuilder actionsStringBuilder = new StringBuilder();
+        for (Map.Entry<String, JsonElement> entry : saveActionsJson.entrySet()) {
+            // Already parsed before
+            if ("state".equals(entry.getKey())) {
+                continue;
+            }
+            StringJoiner joiner = new StringJoiner(",");
+            for (JsonElement formatter : entry.getValue().getAsJsonArray()) {
+                joiner.add(formatter.getAsString());
+            }
+            actionsStringBuilder.append(entry.getKey())
+                                .append("[")
+                                .append(joiner)
+                                .append(']');
+        }
+        List<FieldFormatterCleanup> actions = FieldFormatterCleanupMapper.parseActions(actionsStringBuilder.toString());
+        return new FieldFormatterCleanupActions(enabled, actions);
     }
 
     /// Adds BibDesk group entries to the JabRef database
