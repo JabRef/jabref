@@ -19,7 +19,6 @@ import org.jabref.model.entry.BibEntry;
 
 public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel> {
     private final ComboBox<BibEntry> relatedEntries = new ComboBox<>();
-    private final Label entryLink = new Label();
     private final Button jumpToEntryButton = new Button();
     private final HBox cellContent = new HBox();
     private final HBox leftSide = new HBox();
@@ -42,7 +41,6 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
         HBox.setHgrow(leftSide, Priority.ALWAYS);
         relatedEntries.setPrefWidth(200);
 
-        entryLink.getStyleClass().add("hyperlink");
         jumpToEntryButton.setGraphic(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         jumpToEntryButton.getStyleClass().add("icon-button");
         jumpToEntryButton.setTooltip(new Tooltip(Localization.lang("Jump to entry")));
@@ -82,17 +80,7 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
         ObservableList<BibEntry> fileRelatedEntries =
                 viewModel.getRelatedEntriesForFiles(item.getPath());
 
-        if (fileRelatedEntries.size() == 1) {
-            BibEntry singleEntry = fileRelatedEntries.getFirst();
-            entryLink.setText(singleEntry.getCitationKey().orElse(Localization.lang("new")));
-            entryLink.setOnMouseClicked(_ -> {
-                stateManager.activeTabProperty().get().ifPresent(tab -> {
-                    tab.clearAndSelect(singleEntry);
-                    tab.showAndEdit(singleEntry);
-                });
-            });
-            cellContent.getChildren().add(entryLink);
-        } else if (fileRelatedEntries.size() > 1) {
+        if (!fileRelatedEntries.isEmpty()) {
             relatedEntries.setPromptText(Localization.lang("Select entry to link"));
             relatedEntries.setItems(fileRelatedEntries);
             jumpIcon.getChildren().clear();
