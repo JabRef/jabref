@@ -1,4 +1,4 @@
-﻿package org.jabref.gui.openoffice;
+package org.jabref.gui.openoffice;
 
 import java.io.IOException;
 import java.nio.file.Path;
