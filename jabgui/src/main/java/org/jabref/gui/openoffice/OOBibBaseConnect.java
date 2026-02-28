@@ -1,4 +1,4 @@
-package org.jabref.gui.openoffice;
+﻿package org.jabref.gui.openoffice;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -198,7 +198,7 @@ public class OOBibBaseConnect {
 
     /// A simple test for document availability.
     ///
-    /// See also `isDocumentConnectionMissing` for a test actually attempting to use teh connection.
+    /// See also `isDocumentConnectionMissing` for a test actually attempting to use the connection.
     public boolean isConnectedToDocument() {
         return this.xTextDocument != null;
     }
