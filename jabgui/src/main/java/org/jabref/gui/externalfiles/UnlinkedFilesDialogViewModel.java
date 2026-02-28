@@ -326,8 +326,4 @@ public class UnlinkedFilesDialogViewModel {
         LOGGER.debug("Found {} related entries for file {}", relatedEntriesList.size(), filePath);
         return FXCollections.observableArrayList(relatedEntriesList);
     }
-
-    public StateManager getStateManager() {
-        return importHandler.getStateManager();
-    }
 }

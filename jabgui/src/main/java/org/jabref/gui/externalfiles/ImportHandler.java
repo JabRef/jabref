@@ -551,8 +551,4 @@ public class ImportHandler {
                                          .ifPresent(importGroup -> importGroup.addEntriesToGroup(entriesToInsert));
         }
     }
-
-    public StateManager getStateManager() {
-        return stateManager;
-    }
 }
