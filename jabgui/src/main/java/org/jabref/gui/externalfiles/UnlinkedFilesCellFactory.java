@@ -23,6 +23,7 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
     private final HBox cellContent = new HBox();
     private final HBox leftSide = new HBox();
     private final HBox jumpIcon = new HBox();
+    private final Button doNotLinkButton = new Button();
 
     private final StateManager stateManager;
     private final UnlinkedFilesDialogViewModel viewModel;
@@ -40,6 +41,7 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
                 .install(relatedEntries);
         HBox.setHgrow(leftSide, Priority.ALWAYS);
         relatedEntries.setPrefWidth(200);
+        relatedEntries.setTooltip(new Tooltip(Localization.lang("Select an existing entry to link the file to")));
 
         jumpToEntryButton.setGraphic(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         jumpToEntryButton.getStyleClass().add("icon-button");
@@ -53,6 +55,14 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
                     tab.showAndEdit(selectedEntry);
                 });
             }
+        });
+
+        doNotLinkButton.setText(Localization.lang("Do not link"));
+        doNotLinkButton.getStyleClass().add("icon-button");
+        doNotLinkButton.setTooltip(new Tooltip(Localization.lang("Import the file in a new entry")));
+        doNotLinkButton.setOnAction(_ -> {
+            relatedEntries.getSelectionModel().clearSelection();
+            relatedEntries.setPromptText(Localization.lang("Select entry to link"));
         });
     }
 
@@ -84,7 +94,7 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
             relatedEntries.setPromptText(Localization.lang("Select entry to link"));
             relatedEntries.setItems(fileRelatedEntries);
             jumpIcon.getChildren().clear();
-            jumpIcon.getChildren().addAll(relatedEntries, jumpToEntryButton);
+            jumpIcon.getChildren().addAll(relatedEntries, jumpToEntryButton, doNotLinkButton);
             cellContent.getChildren().add(jumpIcon);
         }
         setGraphic(cellContent);
