@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
@@ -8,10 +9,12 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -22,6 +25,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +44,7 @@ class CustomEntryTypesTabViewModelTest {
         fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
+        when(preferences.getDefaults()).thenReturn(Map.of(JabRefCliPreferences.NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn"));
         entryTypesManager = new BibEntryTypesManager();
         online = BiblatexEntryTypeDefinitions.ALL.stream().filter(type -> type.getType().equals(StandardEntryType.Online)).findAny().get();
     }
@@ -91,5 +97,25 @@ class CustomEntryTypesTabViewModelTest {
 
         TreeSet<BibEntryType> expected = new TreeSet<>(List.of(modified));
         assertEquals(expected, entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    void resetMultilinePropertyOfStandardFieldsToDefault() {
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.resetMultilineFieldsToDefault();
+
+        StandardField fieldTitle = StandardField.TITLE;
+        assertFalse(fieldTitle.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        fieldTitle.getProperties().add(FieldProperty.MULTILINE_TEXT);
+        assertTrue(fieldTitle.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        model.resetMultilineFieldsToDefault();
+        assertFalse(fieldTitle.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+
+        StandardField fieldAbstract = StandardField.ABSTRACT;
+        assertTrue(fieldAbstract.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        fieldAbstract.getProperties().remove(FieldProperty.MULTILINE_TEXT);
+        assertFalse(fieldAbstract.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        model.resetMultilineFieldsToDefault();
+        assertTrue(fieldAbstract.getProperties().contains(FieldProperty.MULTILINE_TEXT));
     }
 }
