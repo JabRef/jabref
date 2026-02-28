@@ -225,6 +225,7 @@ public class JabRefGUI extends Application {
                 preferences.getImportFormatPreferences(),
                 preferences.getFieldPreferences(),
                 preferences.getEntryEditorPreferences().citationFetcherTypeProperty(),
+                preferences.getEntryEditorPreferences().citationCountFetcherTypeProperty(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
                 JabRefGUI.aiService,
