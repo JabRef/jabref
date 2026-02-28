@@ -9,8 +9,6 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
-
 /// Tests are located in `org.jabref.logic.search.query.SearchQueryLuceneConversionTest`.
 public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     private final EnumSet<SearchFlags> searchFlags;
@@ -70,7 +68,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
                 return "/" + term + "/";
             }
-            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : escapeForLucene(term);
         }
 
         // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
@@ -99,7 +97,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             String expression = field + "/" + term + "/";
             return isNegationOp ? "NOT " + expression : expression;
         } else {
-            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : escapeForLucene(term);
             String expression = field + term;
             return isNegationOp ? "NOT " + expression : expression;
         }
@@ -107,6 +105,17 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
     private static String escapeQuotes(String term) {
         return term.replace("\"", "\\\"");
+    }
+
+    private static String escapeForLucene(String term) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : term.toCharArray()) {
+            if ("\\+-!():^[]{} ~".indexOf(c) >= 0) {
+                sb.append('\\');
+            }
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     private static boolean isNegationOperator(int operator) {
