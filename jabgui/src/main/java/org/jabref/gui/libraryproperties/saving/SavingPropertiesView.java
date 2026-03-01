@@ -3,8 +3,8 @@ package org.jabref.gui.libraryproperties.saving;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 
+import org.jabref.gui.cleanup.JournalAbbreviationPanel;
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
-import org.jabref.gui.commonfxcontrols.JournalAbbreviationPanel;
 import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;

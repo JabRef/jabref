@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.commonfxcontrols.JournalAbbreviationPanel;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
 

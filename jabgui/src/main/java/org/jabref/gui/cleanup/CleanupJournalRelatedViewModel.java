@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.jabref.gui.commonfxcontrols.JournalAbbreviationPanel;
 import org.jabref.logic.cleanup.CleanupPreferences;
 
 public class CleanupJournalRelatedViewModel {

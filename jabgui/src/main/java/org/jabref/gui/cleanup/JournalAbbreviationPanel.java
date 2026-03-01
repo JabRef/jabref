@@ -1,4 +1,4 @@
-package org.jabref.gui.commonfxcontrols;
+package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
 

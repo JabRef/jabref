@@ -2,7 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.VBox?>
-<?import org.jabref.gui.commonfxcontrols.JournalAbbreviationPanel?>
+<?import org.jabref.gui.cleanup.JournalAbbreviationPanel?>
 <fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.cleanup.CleanupJournalRelatedPanel"
          spacing="10.0" type="VBox">
