@@ -43,7 +43,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -215,7 +214,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML
     public void initialize() {
         viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
-
+        viewModel.initializeFetchers();
         visualizer.setDecoration(new IconValidationDecorator());
 
         EasyBind.subscribe(
@@ -317,7 +316,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                                 // [impl->req~newentry.clipboard.autofocus~1]
                                 idLookupSpecify.setSelected(true);
                                 WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences)
-                                           .ifPresent(idFetcher::setValue);
+                                           .ifPresent(foundFetcher -> {
+                                               idFetcher.getItems().stream()
+                                                        .filter(f -> f.getName().equals(foundFetcher.getName()))
+                                                        .findFirst()
+                                                        .ifPresent(viewModel.idFetcherProperty()::set);
+                                           });
                             });
                         },
                         () -> Platform.runLater(() -> idLookupGuess.setSelected(true)));
@@ -331,14 +335,21 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         });
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
-        new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
+        ViewModelListCellFactory<IdBasedFetcher> factory =
+                new ViewModelListCellFactory<IdBasedFetcher>()
+                        .withText(WebFetcher::getName);
+
+        factory.install(idFetcher);
+        idFetcher.setCellFactory(_ -> factory.call(null));
+        idFetcher.setButtonCell(factory.call(null));
         idFetcher.disableProperty().bind(idLookupSpecify.selectedProperty().not());
         idFetcher.valueProperty().bindBidirectional(viewModel.idFetcherProperty());
-        IdBasedFetcher initialFetcher = fetcherFromName(newEntryPreferences.getLatestIdFetcher());
-        if (initialFetcher == null) {
-            initialFetcher = fetcherFromName(DoiFetcher.NAME);
-        }
-        idFetcher.setValue(initialFetcher);
+        Platform.runLater(() -> {
+            if (viewModel.idFetcherProperty().get() == null
+                    && !idFetcher.getItems().isEmpty()) {
+                viewModel.idFetcherProperty().set(idFetcher.getItems().get(0));
+            }
+        });
         idFetcher.setOnAction(_ -> newEntryPreferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
         // Auto-detect identifier type when typing in the identifier field
@@ -690,8 +701,12 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private void updateFetcherFromIdentifierText(@Nullable String text) {
         Identifier.from(text)
                   .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences))
-                  .map(fetcher -> fetcherFromName(fetcher.getName()))
-                  .ifPresent(idFetcher::setValue);
+                  .ifPresent(foundFetcher -> {
+                      idFetcher.getItems().stream()
+                               .filter(f -> f.getName().equals(foundFetcher.getName()))
+                               .findFirst()
+                               .ifPresent(viewModel.idFetcherProperty()::set);
+                  });
     }
 
     private Optional<Identifier> extractIdentifierFromClipboard() {
