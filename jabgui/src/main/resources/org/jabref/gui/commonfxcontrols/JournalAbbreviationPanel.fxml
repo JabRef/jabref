@@ -14,7 +14,7 @@
     </padding>
 
     <VBox>
-        <Label fx:id="cleanupJournalAbbreviationsLabel" />
+        <Label fx:id="cleanupJournalAbbreviationsLabel" text="%Manage journal abbreviations"/>
         <fx:define>
             <ToggleGroup fx:id="journalAbbreviationsToggleGroup"/>
         </fx:define>

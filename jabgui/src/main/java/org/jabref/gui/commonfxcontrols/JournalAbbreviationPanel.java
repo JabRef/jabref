@@ -37,8 +37,6 @@ public class JournalAbbreviationPanel extends VBox {
 
     @FXML
     private void initialize() {
-        cleanupJournalAbbreviationsLabel.setText(Localization.lang("Manage journal abbreviations"));
-
         abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
         abbreviateDefault.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
 
