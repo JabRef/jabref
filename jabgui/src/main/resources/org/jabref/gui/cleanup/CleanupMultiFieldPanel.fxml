@@ -2,7 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.VBox?>
-<?import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel?>
+<?import org.jabref.gui.cleanup.MultiFieldsCleanupPanel?>
 <fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.cleanup.CleanupMultiFieldPanel"
          spacing="10.0" type="VBox">

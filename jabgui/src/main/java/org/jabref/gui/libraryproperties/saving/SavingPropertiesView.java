@@ -4,8 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 
 import org.jabref.gui.cleanup.JournalAbbreviationPanel;
+import org.jabref.gui.cleanup.MultiFieldsCleanupPanel;
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
-import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;

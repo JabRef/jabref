@@ -6,7 +6,6 @@ import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel;
 import org.jabref.logic.cleanup.CleanupPreferences;
 
 public class CleanupMultiFieldViewModel {

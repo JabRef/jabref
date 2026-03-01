@@ -4,7 +4,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.layout.VBox?>
 <fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel"
+         fx:controller="org.jabref.gui.cleanup.MultiFieldsCleanupPanel"
          spacing="10.0" type="VBox">
 
     <padding>

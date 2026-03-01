@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
-<?import org.jabref.gui.commonfxcontrols.MultiFieldsCleanupPanel?>
+<?import org.jabref.gui.cleanup.MultiFieldsCleanupPanel?>
 <?import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel?>
 <?import org.jabref.gui.cleanup.JournalAbbreviationPanel?>
 <fx:root spacing="10.0" type="VBox"
