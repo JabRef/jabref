@@ -163,7 +163,7 @@ public class UiTaskExecutor implements TaskExecutor {
                 BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
                 BindingsHelper.subscribeFuture(task.isCancelledProperty(), cancelled -> {
                     if (cancelled) {
-                        cancel();
+                        cancel(task.mayInterruptIfRunningProperty().get());
                     }
                 });
                 setOnCancelled(_ -> task.cancel());

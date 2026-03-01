@@ -171,7 +171,7 @@ public class CitationsRelationsTabViewModel {
         }
 
         status.set(SciteStatus.IN_PROGRESS);
-        searchTask.cancel(true);
+        searchTask.cancel(false);
     }
 
     public void lookUpDoi(BibEntry entry) {

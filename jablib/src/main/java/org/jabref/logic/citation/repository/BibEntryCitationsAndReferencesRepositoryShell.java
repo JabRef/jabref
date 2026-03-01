@@ -1,36 +1,32 @@
 package org.jabref.logic.citation.repository;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
 import javafx.beans.property.ObjectProperty;
 
+import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCitationsAndReferencesRepository, AutoCloseable {
+public class BibEntryCitationsAndReferencesRepositoryShell extends MVStoreBase implements BibEntryCitationsAndReferencesRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryCitationsAndReferencesRepositoryShell.class);
 
     private static final String CITATION_RELATIONS_STORE = "citation-relations.mv";
-
-    // when testing constructor is used
-    @Nullable
-    private final MVStore mvStore;
 
     private final BibEntryRelationRepository citationsDao;
     private final BibEntryRelationRepository referencesDao;
@@ -40,20 +36,9 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
                                                          ImportFormatPreferences importFormatPreferences,
                                                          FieldPreferences fieldPreferences,
                                                          BibEntryTypesManager entryTypesManager,
-                                                         ObjectProperty<CitationFetcherType> citationFetcherTypeProperty) {
-        Path storePath = citationsRelationsDirectory.resolve(CITATION_RELATIONS_STORE);
-        try {
-            Files.createDirectories(storePath.getParent());
-            if (!Files.exists(storePath)) {
-                Files.createFile(storePath);
-            }
-        } catch (IOException e) {
-            LOGGER.error("An error occurred while opening {} storage", storePath, e);
-        }
-
-        mvStore = new MVStore.Builder()
-                .fileName(storePath.toAbsolutePath().toString())
-                .open();
+                                                         ObjectProperty<CitationFetcherType> citationFetcherTypeProperty,
+                                                         NotificationService notificationService) {
+        super(citationsRelationsDirectory.resolve(CITATION_RELATIONS_STORE), notificationService);
 
         this.referencesDao = new MVStoreBibEntryRelationRepository(mvStore, "references", storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences, citationFetcherTypeProperty);
         this.citationsDao = new MVStoreBibEntryRelationRepository(mvStore, "citations", storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences, citationFetcherTypeProperty);
@@ -64,9 +49,9 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
             BibEntryRelationRepository citationsDao,
             BibEntryRelationRepository referencesDao
     ) {
+        super();
         this.citationsDao = citationsDao;
         this.referencesDao = referencesDao;
-        this.mvStore = null;
     }
 
     @Override
@@ -74,6 +59,7 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
         citationsDao.addRelations(
                 entry, Objects.requireNonNullElseGet(citations, List::of)
         );
+        commit();
     }
 
     @Override
@@ -99,6 +85,7 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
         referencesDao.addRelations(
                 entry, Objects.requireNonNullElseGet(references, List::of)
         );
+        commit();
     }
 
     @Override
@@ -120,7 +107,12 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
     }
 
     @Override
-    public void close() {
-        this.mvStore.close();
+    protected String errorMessageForOpening() {
+        return "An error occurred while opening citation relations storage";
+    }
+
+    @Override
+    protected String errorMessageForOpeningLocalized() {
+        return Localization.lang("An error occurred while opening citation relations storage");
     }
 }
