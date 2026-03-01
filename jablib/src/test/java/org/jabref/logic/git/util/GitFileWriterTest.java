@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -50,7 +51,7 @@ class GitFileWriterTest {
         Path tempFile = Files.createTempFile("tempgitwriter", ".bib");
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
         when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
-        GitFileWriter.write(tempFile, inputDatabaseContext, cliPreferences);
+        GitFileWriter.write(tempFile, inputDatabaseContext, cliPreferences, mock(JournalAbbreviationRepository.class));
 
         String written = Files.readString(tempFile);
         BibDatabaseContext parsedContext = BibDatabaseContext.of(written, importFormatPreferences);

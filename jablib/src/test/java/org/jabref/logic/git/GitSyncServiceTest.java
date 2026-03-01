@@ -18,6 +18,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -229,7 +230,7 @@ class GitSyncServiceTest {
         applyAutoPlan(context, pullPlan.get().autoPlan());
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
         when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
-        GitFileWriter.write(library, context, cliPreferences);
+        GitFileWriter.write(library, context, cliPreferences, mock(JournalAbbreviationRepository.class));
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
 
         assertFalse(bookkeepingResult.isFastForward(), "DIVERGED without conflicts should produce a merge commit");
@@ -265,7 +266,7 @@ class GitSyncServiceTest {
         applyAutoPlan(context, pullPlan.get().autoPlan());
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
         when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
-        GitFileWriter.write(library, context, cliPreferences);
+        GitFileWriter.write(library, context, cliPreferences, mock(JournalAbbreviationRepository.class));
 
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
@@ -363,7 +364,7 @@ class GitSyncServiceTest {
 
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
         when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
-        GitFileWriter.write(library, context, cliPreferences);
+        GitFileWriter.write(library, context, cliPreferences, mock(JournalAbbreviationRepository.class));
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
 
