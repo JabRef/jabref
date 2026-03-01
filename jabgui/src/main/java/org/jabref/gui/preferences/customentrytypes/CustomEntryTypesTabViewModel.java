@@ -51,11 +51,6 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty newFieldToAdd = new SimpleStringProperty("");
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
-    private final Set<StandardField> DEFAULT_MULTILINE_FIELDS = Set.of(
-            StandardField.ABSTRACT,
-            StandardField.COMMENT,
-            StandardField.REVIEW
-    );
 
     private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -236,7 +231,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     private void resetStandardFieldMultilineToDefaults() {
         for (StandardField field : StandardField.values()) {
-            if (DEFAULT_MULTILINE_FIELDS.contains(field)) {
+            if (StandardField.DEFAULT_MULTILINE_FIELDS.contains(field)) {
                 field.getProperties().add(FieldProperty.MULTILINE_TEXT);
             } else {
                 field.getProperties().remove(FieldProperty.MULTILINE_TEXT);
