@@ -11,7 +11,8 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDatabaseSaver;
+import org.jabref.logic.exporter.BibDataBaseSaveManager;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.pseudonymization.Pseudonymization;
@@ -19,6 +20,7 @@ import org.jabref.logic.pseudonymization.PseudonymizationResultCsvWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,10 +84,11 @@ public class PseudonymizeAction extends SimpleCommand {
             LOGGER.error("Invalid output file type provided.");
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pseudoBibPath, StandardCharsets.UTF_8)) {
-            BibDatabaseSaver bibDatabaseSaver = new BibDatabaseSaver(preferences,
+            BibDataBaseSaveManager bibDataBaseSaveManager = new BibDataBaseSaveManager(preferences,
                     fileWriter,
-                    result.bibDatabaseContext());
-            bibDatabaseSaver.saveDatabase(result.bibDatabaseContext());
+                    result.bibDatabaseContext(),
+                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+            bibDataBaseSaveManager.saveDatabase(result.bibDatabaseContext());
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {

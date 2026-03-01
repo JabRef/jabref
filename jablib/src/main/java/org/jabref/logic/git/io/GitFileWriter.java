@@ -7,9 +7,10 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDatabaseSaver;
+import org.jabref.logic.exporter.BibDataBaseSaveManager;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -18,7 +19,7 @@ public class GitFileWriter {
     private static final ConcurrentHashMap<Path, Object> FILE_LOCKS = new ConcurrentHashMap<>();
 
     /// @implNote this should be in sync with {@link org.jabref.gui.exporter.SaveDatabaseAction#saveDatabase}
-    public static void write(Path file, BibDatabaseContext bibDatabaseContext, CliPreferences cliPreferences) throws IOException {
+    public static void write(Path file, BibDatabaseContext bibDatabaseContext, CliPreferences cliPreferences, JournalAbbreviationRepository journalAbbreviationRepository) throws IOException {
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration();
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
 
@@ -26,7 +27,7 @@ public class GitFileWriter {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
 
-                BibDatabaseSaver saver = new BibDatabaseSaver(bibWriter, saveConfiguration, cliPreferences, new BibEntryTypesManager());
+                BibDataBaseSaveManager saver = new BibDataBaseSaveManager(bibWriter, saveConfiguration, cliPreferences, new BibEntryTypesManager(), journalAbbreviationRepository);
                 saver.saveDatabase(bibDatabaseContext);
 
                 if (fileWriter.hasEncodingProblems()) {

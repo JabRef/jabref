@@ -20,12 +20,14 @@ import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
@@ -161,7 +163,7 @@ public class GitPullAction extends SimpleCommand {
     }
 
     private BookkeepingResult saveAndFinalize(Path bibPath, BibDatabaseContext databaseContext, PullPlan pullPlan) throws IOException, GitAPIException, JabRefException {
-        GitFileWriter.write(bibPath, databaseContext, guiPreferences);
+        GitFileWriter.write(bibPath, databaseContext, guiPreferences, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry);
         return gitSyncService.finalizeMerge(bibPath, pullPlan);
     }

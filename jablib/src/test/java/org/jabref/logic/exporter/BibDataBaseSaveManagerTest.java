@@ -21,6 +21,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -40,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BibDatabaseSaverTest {
+public class BibDataBaseSaveManagerTest {
     private BibDatabase database;
     private MetaData metaData;
     private BibDatabaseContext bibtexContext;
@@ -51,8 +52,9 @@ public class BibDatabaseSaverTest {
     private BibEntryTypesManager entryTypesManager;
     private StringWriter stringWriter;
     private BibWriter bibWriter;
-    private BibDatabaseSaver bibDatabaseSaver;
+    private BibDataBaseSaveManager bibDataBaseSaveManager;
     private CliPreferences cliPreferences;
+    private JournalAbbreviationRepository journalAbbreviationRepository;
 
     @BeforeEach
     void setUp() {
@@ -64,6 +66,7 @@ public class BibDatabaseSaverTest {
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         database = new BibDatabase();
         metaData = new MetaData();
+        journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
         bibtexContext = new BibDatabaseContext(database, metaData);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldPreferences);
@@ -80,7 +83,7 @@ public class BibDatabaseSaverTest {
     }
 
     private void initializeBibDatabaseSaver() {
-        bibDatabaseSaver = new BibDatabaseSaver(bibWriter, saveConfiguration, cliPreferences, entryTypesManager);
+        bibDataBaseSaveManager = new BibDataBaseSaveManager(bibWriter, saveConfiguration, cliPreferences, entryTypesManager, journalAbbreviationRepository);
     }
 
     @Test
@@ -92,7 +95,7 @@ public class BibDatabaseSaverTest {
 
         database.insertEntry(firstEntry);
 
-        bibDatabaseSaver.saveDatabase(bibtexContext);
+        bibDataBaseSaveManager.saveDatabase(bibtexContext);
 
         assertEquals("""
                 @Article{,
@@ -117,7 +120,7 @@ public class BibDatabaseSaverTest {
         // This needs to be reflected here
         bibWriter = new BibWriter(stringWriter, "\n");
         initializeBibDatabaseSaver();
-        bibDatabaseSaver.saveDatabase(context);
+        bibDataBaseSaveManager.saveDatabase(context);
         assertEquals(Files.readString(Path.of("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
     }
 
@@ -130,7 +133,7 @@ public class BibDatabaseSaverTest {
                         new FieldFormatterCleanup(StandardField.DAY, new UpperCaseFormatter())));
         metaData.setFieldFormatterCleanupActions(saveActions);
 
-        bibDatabaseSaver.saveDatabase(bibtexContext);
+        bibDataBaseSaveManager.saveDatabase(bibtexContext);
 
         // The order should be kept (the cleanups are a list, not a set)
         assertEquals("@Comment{jabref-meta: fieldFormatterCleanupActions:enabled;"
@@ -149,7 +152,7 @@ public class BibDatabaseSaverTest {
                 .withChanged(true);
         database.insertEntry(entry);
 
-        bibDatabaseSaver.saveDatabase(bibtexContext);
+        bibDataBaseSaveManager.saveDatabase(bibtexContext);
 
         assertEquals("@Article{," + OS.NEWLINE +
                         "  note = {some note}," + OS.NEWLINE +
@@ -165,7 +168,7 @@ public class BibDatabaseSaverTest {
         entry.setField(StandardField.ABSTRACT, text + OS.NEWLINE);
         database.insertEntry(entry);
 
-        bibDatabaseSaver.saveDatabase(bibtexContext);
+        bibDataBaseSaveManager.saveDatabase(bibtexContext);
 
         assertEquals("@Article{," + OS.NEWLINE +
                         "  abstract = {" + text + "}," + OS.NEWLINE +

@@ -15,13 +15,14 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDatabaseSaver;
+import org.jabref.logic.exporter.BibDataBaseSaveManager;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
@@ -401,7 +402,7 @@ public class StudyRepository {
                     .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
 
-            BibDatabaseSaver databaseSaver = new BibDatabaseSaver(bibWriter, saveConfiguration, preferences, bibEntryTypesManager);
+            BibDataBaseSaveManager databaseSaver = new BibDataBaseSaveManager(bibWriter, saveConfiguration, preferences, bibEntryTypesManager, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
             databaseSaver.saveDatabase(context);
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));

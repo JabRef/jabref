@@ -117,7 +117,7 @@ public class BibDatabaseWriter {
         writeStrings(bibDatabaseContext.getDatabase());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = BibDatabaseSaver.getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
+        List<BibEntry> sortedEntries = BibDataBaseSaveManager.getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
 
         // Map to collect entry type definitions that we must save along with entries using them.
         SortedSet<BibEntryType> typesToWrite = new TreeSet<>();

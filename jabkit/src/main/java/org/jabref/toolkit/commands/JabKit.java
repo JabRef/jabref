@@ -13,7 +13,7 @@ import javafx.util.Pair;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDatabaseSaver;
+import org.jabref.logic.exporter.BibDataBaseSaveManager;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -21,6 +21,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
@@ -33,6 +34,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,8 +176,8 @@ public class JabKit implements Runnable {
         JabKit.generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
 
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
-            BibDatabaseSaver bibDatabaseSaver = new BibDatabaseSaver(cliPreferences, writer, bibDatabaseContext);
-            bibDatabaseSaver.saveDatabase(bibDatabaseContext);
+            BibDataBaseSaveManager bibDataBaseSaveManager = new BibDataBaseSaveManager(cliPreferences, writer, bibDatabaseContext, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+            bibDataBaseSaveManager.saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
             LOGGER.error("Could not write BibTeX", e);
             System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
@@ -197,7 +199,7 @@ public class JabKit implements Runnable {
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                         .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
-                BibDatabaseSaver databaseSaver = new BibDatabaseSaver(bibWriter, saveConfiguration, cliPreferences, entryTypesManager);
+                BibDataBaseSaveManager databaseSaver = new BibDataBaseSaveManager(bibWriter, saveConfiguration, cliPreferences, entryTypesManager, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                 databaseSaver.saveDatabase(bibDatabaseContext);
 
                 // Show just a warning message if encoding did not work for all characters:

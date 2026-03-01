@@ -14,8 +14,7 @@ import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
@@ -28,25 +27,30 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jspecify.annotations.NonNull;
 
-public class BibDatabaseSaver {
+/// Applies save action and generates citation keys before writing a .bib file
+///
+/// Relies on {@link BibDatabaseWriter} to write database
+public class BibDataBaseSaveManager {
     private final BibWriter bibWriter;
     private final SelfContainedSaveConfiguration saveConfiguration;
     private final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     private final BibEntryTypesManager entryTypesManager;
     private final CliPreferences cliPreferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
-    public BibDatabaseSaver(BibWriter bibWriter, SelfContainedSaveConfiguration saveConfiguration, CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
+    public BibDataBaseSaveManager(BibWriter bibWriter, SelfContainedSaveConfiguration saveConfiguration, CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.bibWriter = bibWriter;
         this.saveConfiguration = saveConfiguration;
         this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
-    public BibDatabaseSaver(@NonNull CliPreferences cliPreferences, @NonNull Writer writer, @NonNull BibDatabaseContext bibDatabaseContext) {
+    public BibDataBaseSaveManager(@NonNull CliPreferences cliPreferences, @NonNull Writer writer, @NonNull BibDatabaseContext bibDatabaseContext, JournalAbbreviationRepository journalAbbreviationRepository) {
         this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
                 cliPreferences.getSelfContainedExportConfiguration(),
                 cliPreferences,
-                cliPreferences.getCustomEntryTypesRepository());
+                cliPreferences.getCustomEntryTypesRepository(), journalAbbreviationRepository);
     }
 
     public void saveDatabase(@NonNull BibDatabaseContext bibDatabaseContext) throws IOException {
@@ -60,18 +64,24 @@ public class BibDatabaseSaver {
     public void savePartOfDatabase(@NonNull BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         List<BibEntry> sortedEntries = getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
 
-        JournalAbbreviationPreferences journalAbbreviationPreferences = cliPreferences.getJournalAbbreviationPreferences();
-        SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext, cliPreferences.getFilePreferences(), cliPreferences.getTimestampPreferences(), cliPreferences.getFieldPreferences(),
-                journalAbbreviationPreferences.shouldUseFJournalField(), JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences));
+        //  Apply save actions
+        SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext,
+                cliPreferences.getFilePreferences(),
+                cliPreferences.getTimestampPreferences(),
+                cliPreferences.getFieldPreferences(),
+                cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                journalAbbreviationRepository);
         List<FieldChange> saveActionChanges = saveActionsWorker.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
 
+        //  Generate citation keys (if needed)
         CitationKeyPatternPreferences keyPatternPreferences = cliPreferences.getCitationKeyPatternPreferences();
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries, keyPatternPreferences);
             saveActionsFieldChanges.addAll(keyChanges);
         }
 
+        //  write database
         BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter, saveConfiguration, cliPreferences.getFieldPreferences(), keyPatternPreferences, entryTypesManager);
         bibDatabaseWriter.writePartOfDatabase(bibDatabaseContext, sortedEntries);
     }
