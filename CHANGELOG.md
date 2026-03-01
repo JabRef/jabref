@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
     ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
     Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
     [#15220](https://github.com/JabRef/jabref/pull/15220)
+- Allowed drag and drop of Windows shortcut (.lnk) files to open libraries [#15036](https://github.com/JabRef/jabref/issues/15036)
 
 ### Fixed
 

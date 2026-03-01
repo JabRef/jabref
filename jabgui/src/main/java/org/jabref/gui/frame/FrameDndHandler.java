@@ -235,8 +235,12 @@ public class FrameDndHandler {
         if (!dragboard.hasFiles()) {
             return List.of();
         } else {
-            return dragboard.getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
+            return dragboard.getFiles().stream().map(File::toPath).filter(this::isAcceptedFile).collect(Collectors.toList());
         }
+    }
+
+    private boolean isAcceptedFile(Path path) {
+        return FileUtil.isBibFile(FileUtil.resolveIfShortcut(path));
     }
 
     private boolean hasGroups(Dragboard dragboard) {
