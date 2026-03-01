@@ -3,28 +3,18 @@ package org.jabref.gui.libraryproperties.saving;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 
-import org.jabref.gui.cleanup.JournalAbbreviationPanel;
-import org.jabref.gui.cleanup.MultiFieldsCleanupPanel;
-import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
 
 public class SavingPropertiesView extends AbstractPropertiesTabView<SavingPropertiesViewModel> implements PropertiesTab {
 
     @FXML private CheckBox protect;
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
-    @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
-    @FXML private MultiFieldsCleanupPanel multiFieldsCleanupPanel;
-    @FXML private JournalAbbreviationPanel journalAbbreviationPanel;
-
-    @Inject private CliPreferences preferences;
 
     public SavingPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -40,7 +30,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     }
 
     public void initialize() {
-        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferences);
+        this.viewModel = new SavingPropertiesViewModel(databaseContext);
 
         protect.disableProperty().bind(viewModel.protectDisableProperty());
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
@@ -50,10 +40,5 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
         saveOrderConfigPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
         saveOrderConfigPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         saveOrderConfigPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
-
-        fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.fieldFormatterCleanupsProperty());
-        multiFieldsCleanupPanel.selectedJobsProperty().bindBidirectional(viewModel.multiFieldCleanupsPropertyProperty());
-        journalAbbreviationPanel.selectedJournalCleanupOption().bindBidirectional(viewModel.journalAbbreviationCleanupPropertyProperty());
-        fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.fieldFormatterCleanupsDisableProperty());
     }
 }
