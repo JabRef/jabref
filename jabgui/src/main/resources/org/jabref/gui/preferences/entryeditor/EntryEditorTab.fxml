@@ -29,6 +29,7 @@
     <CheckBox fx:id="journalPopupEnabled" text="%Fetch journal information online to show"/>
     <CheckBox fx:id="showUserCommentsField" text="%Show user comments field"/>
     <CheckBox fx:id="enableSciteTab" text="%Show tab 'Citation information'"/>
+    <CheckBox fx:id="enableCitationContextTab" text="%Show tab 'Citation contexts'"/>
     <CheckBox fx:id="enableRelatedArticlesTab" text="%Show tab 'Related articles'"/>
     <CheckBox fx:id="acceptRecommendations" text="%Accept recommendations from Mr. DLib"
               disable="${!enableRelatedArticlesTab.selected}">

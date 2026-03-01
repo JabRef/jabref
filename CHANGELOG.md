@@ -42,6 +42,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Improved merge dialog decisions for the `month` field by using a new plausibility comparator. JabRef now prefers normalized months (e.g., `#jun#`) or integers over unnormalized strings. [#14457](https://github.com/JabRef/jabref/issues/14457)
 - We added web search capability to ScienceDirect using the [Scopus](https://www.scopus.com/) Search API, enabling users to search for academic literature directly from JabRef. [#14421](https://github.com/JabRef/jabref/issues/14421)
 - We fixed an issue where a redundant validation listener was causing duplicate error dialogs when invalid BibTeX source was detected in the SourceTab. [#14805](https://github.com/JabRef/jabref/issues/14805)
+- We added support for selecting citation fetcher in Citations Tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
+- We added a new "Citation contexts" tab in the entry editor that extracts citation contexts from attached PDFs and adds them to cited entries' comment fields. [#14085](https://github.com/JabRef/jabref/issues/14085)
 - We added support for selecting citation fetchers in the Citations tab. [#14430](https://github.com/JabRef/jabref/issues/14430)
 - In the "New Entry" dialog the identifier type is now automatically updated on typing. [#14660](https://github.com/JabRef/jabref/issues/14660)
 - Consistency check is now aware of custom entry types, custom fields, and reports missing required fields. [#14257](https://github.com/JabRef/jabref/pull/14257)

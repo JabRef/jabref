@@ -83,8 +83,8 @@ public class AiDefaultPreferences {
 
     public static final int FALLBACK_CONTEXT_WINDOW_SIZE = 8196;
 
-    public static final Map<AiTemplate, String> TEMPLATES = Map.of(
-            AiTemplate.CHATTING_SYSTEM_MESSAGE, """
+    public static final Map<AiTemplate, String> TEMPLATES = Map.ofEntries(
+            Map.entry(AiTemplate.CHATTING_SYSTEM_MESSAGE, """
                     You are an AI assistant that analyses research papers. You answer questions about papers.
                     You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.
                     Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key.
@@ -92,34 +92,34 @@ public class AiDefaultPreferences {
                     Here are the papers you are analyzing:
                     #foreach( $entry in $entries )
                     ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
-                    #end""",
+                    #end"""),
 
-            AiTemplate.CHATTING_USER_MESSAGE, """
+            Map.entry(AiTemplate.CHATTING_USER_MESSAGE, """
                     $message
 
                     Here is some relevant information for you:
                     #foreach( $excerpt in $excerpts )
                     ${excerpt.citationKey()}:
                     ${excerpt.text()}
-                    #end""",
+                    #end"""),
 
-            AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, """
+            Map.entry(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, """
                     Please provide an overview of the following text. It is a part of a scientific paper.
                     The summary should include the main objectives, methodologies used, key findings, and conclusions.
-                    Mention any significant experiments, data, or discussions presented in the paper.""",
+                    Mention any significant experiments, data, or discussions presented in the paper."""),
 
-            AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, "$text",
+            Map.entry(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, "$text"),
 
-            AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, """
+            Map.entry(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, """
                     You have written an overview of a scientific paper. You have been collecting notes from various parts
-                    of the paper. Now your task is to combine all of the notes in one structured message.""",
+                    of the paper. Now your task is to combine all of the notes in one structured message."""),
 
-            AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, "$chunks",
+            Map.entry(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, "$chunks"),
 
-            AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, "You are a bot to convert a plain text citation to a BibTeX entry. The user you talk to understands only BibTeX code, so provide it plainly without any wrappings.",
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTeX code as your message.",
+            Map.entry(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, "You are a bot to convert a plain text citation to a BibTeX entry. The user you talk to understands only BibTeX code, so provide it plainly without any wrappings."),
+            Map.entry(AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTeX code as your message."),
 
-            AiTemplate.FOLLOW_UP_QUESTIONS, """
+            Map.entry(AiTemplate.FOLLOW_UP_QUESTIONS, """
                     Based on this conversation:
                     User: $userMessage
                     Assistant: $aiResponse
@@ -130,7 +130,31 @@ public class AiDefaultPreferences {
                     2. [question]
                     3. [question]
 
-                    Only provide the numbered list, nothing else."""
+                    Only provide the numbered list, nothing else."""),
+
+            Map.entry(AiTemplate.CITATION_CONTEXT_EXTRACTION_SYSTEM_MESSAGE, """
+                    You are an expert at analyzing academic papers. Your task is to extract citations and their descriptive contexts from the given text.
+
+                    For each citation you find, extract:
+                    1. The citation marker exactly as it appears (e.g., "(Smith 2020)", "[1]", "Jones et al. (2021)")
+                    2. The text that describes what the cited work is about
+
+                    Format your response as a structured list:
+                    ---CITATION---
+                    MARKER: [exact citation marker]
+                    CONTEXT: [the descriptive text about this citation]
+                    ---END---
+
+                    Important rules:
+                    - Only extract citations that have descriptive context about the cited work
+                    - The context should describe what the cited paper/source is about, not just mention it
+                    - Keep the context concise but complete (1-3 sentences typically)
+                    - Do not make up information; only extract what is explicitly stated"""),
+
+            Map.entry(AiTemplate.CITATION_CONTEXT_EXTRACTION_USER_MESSAGE, """
+                    Please extract all citations and their descriptive contexts from the following text:
+
+                    $text""")
     );
 
     public static List<String> getAvailableModels(AiProvider aiProvider) {

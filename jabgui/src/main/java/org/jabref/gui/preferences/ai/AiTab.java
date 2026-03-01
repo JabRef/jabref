@@ -73,6 +73,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Tab summarizationCombineUserMessageTab;
     @FXML private Tab citationParsingSystemMessageTab;
     @FXML private Tab citationParsingUserMessageTab;
+    @FXML private Tab citationContextExtractionSystemMessageTab;
+    @FXML private Tab citationContextExtractionUserMessageTab;
 
     @FXML private TextArea systemMessageTextArea;
     @FXML private TextArea userMessageTextArea;
@@ -82,6 +84,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private TextArea summarizationCombineUserMessageTextArea;
     @FXML private TextArea citationParsingSystemMessageTextArea;
     @FXML private TextArea citationParsingUserMessageTextArea;
+    @FXML private TextArea citationContextExtractionSystemMessageTextArea;
+    @FXML private TextArea citationContextExtractionUserMessageTextArea;
 
     @FXML private Button generalSettingsHelp;
     @FXML private Button expertSettingsHelp;
@@ -125,6 +129,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         citationParsingSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
         citationParsingUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
         followUpQuestionsTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.FOLLOW_UP_QUESTIONS));
+        citationContextExtractionSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_CONTEXT_EXTRACTION_SYSTEM_MESSAGE));
+        citationContextExtractionUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_CONTEXT_EXTRACTION_USER_MESSAGE));
         templatesTabPane.getSelectionModel().selectedItemProperty().addListener(_ -> viewModel.selectedTemplateProperty().set(getAiTemplate()));
     }
 
@@ -306,6 +312,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             return Optional.of(AiTemplate.CITATION_PARSING_USER_MESSAGE);
         } else if (selectedTab == followUpQuestionsTab) {
             return Optional.of(AiTemplate.FOLLOW_UP_QUESTIONS);
+        } else if (selectedTab == citationContextExtractionSystemMessageTab) {
+            return Optional.of(AiTemplate.CITATION_CONTEXT_EXTRACTION_SYSTEM_MESSAGE);
+        } else if (selectedTab == citationContextExtractionUserMessageTab) {
+            return Optional.of(AiTemplate.CITATION_CONTEXT_EXTRACTION_USER_MESSAGE);
         }
 
         return Optional.empty();
