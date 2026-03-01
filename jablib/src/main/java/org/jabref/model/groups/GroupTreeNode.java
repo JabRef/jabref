@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
 /// A node in the groups tree that holds exactly one AbstractGroup.
 public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
+    public static final String PATH_DELIMITER = " > ";
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNode.class);
 
-    private static final String PATH_DELIMITER = " > ";
     private ObjectProperty<AbstractGroup> groupProperty = new SimpleObjectProperty<>();
 
     /// Creates this node and associates the specified group with it.
