@@ -955,41 +955,36 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private NameDisplayPreferences.DisplayStyle getNameDisplayStyleFromBackingStore(NameDisplayPreferences defaults) {
-        boolean natbib = getBoolean(NAMES_NATBIB, false);
-        boolean asIs = getBoolean(NAMES_AS_IS, false);
-        boolean firstLast = getBoolean(NAMES_FIRST_LAST, false);
+        if (!hasKey(NAMES_NATBIB) && !hasKey(NAMES_AS_IS) && !hasKey(NAMES_FIRST_LAST)) {
+            return defaults.getDisplayStyle();
+        }
 
-        if (natbib) {
+        if (getBoolean(NAMES_NATBIB, false)) {
             return NameDisplayPreferences.DisplayStyle.NATBIB;
         }
-        if (asIs) {
+        if (getBoolean(NAMES_AS_IS, false)) {
             return NameDisplayPreferences.DisplayStyle.AS_IS;
         }
-        if (firstLast) {
+        if (getBoolean(NAMES_FIRST_LAST, false)) {
             return NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
         }
 
-        if (hasKey(NAMES_NATBIB) || hasKey(NAMES_AS_IS) || hasKey(NAMES_FIRST_LAST)) {
-            return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
-        }
-        return defaults.getDisplayStyle();
+        return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
     }
 
     private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyleFromBackingStore(NameDisplayPreferences defaults) {
-        boolean abbrAuthorNames = getBoolean(ABBR_AUTHOR_NAMES, false);
-        boolean namesLastOnly = getBoolean(NAMES_LAST_ONLY, false);
+        if (!hasKey(ABBR_AUTHOR_NAMES) && !hasKey(NAMES_LAST_ONLY)) {
+            return defaults.getAbbreviationStyle();
+        }
 
-        if (abbrAuthorNames) {
+        if (getBoolean(ABBR_AUTHOR_NAMES, false)) {
             return NameDisplayPreferences.AbbreviationStyle.FULL;
         }
-        if (namesLastOnly) {
+        if (getBoolean(NAMES_LAST_ONLY, false)) {
             return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
         }
-        if (hasKey(ABBR_AUTHOR_NAMES) || hasKey(NAMES_LAST_ONLY)) {
-            return NameDisplayPreferences.AbbreviationStyle.NONE;
-        }
-        
-        return defaults.getAbbreviationStyle();
+
+        return NameDisplayPreferences.AbbreviationStyle.NONE;
     }
     // endregion
 
