@@ -1,12 +1,14 @@
 [Desktop Entry]
 Name=APPLICATION_NAME
-GenericName=BibTeX Editor
 Comment=APPLICATION_DESCRIPTION
 Exec=APPLICATION_LAUNCHER
+STARTUP_DIRECTORY
 Icon=APPLICATION_ICON
 Terminal=false
 Type=Application
-DESKTOP_MIMES
 Categories=DEPLOY_BUNDLE_CATEGORY
+DESKTOP_MIMES
+
+GenericName=BibTeX Editor
 Keywords=bibtex;biblatex;latex;bibliography
 StartupWMClass=org.jabref.gui.JabRefGUI

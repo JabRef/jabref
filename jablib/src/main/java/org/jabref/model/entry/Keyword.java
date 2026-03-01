@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
 
     public static Character DEFAULT_HIERARCHICAL_DELIMITER = '>';
+    public static final Character DEFAULT_ESCAPE_SYMBOL = '\\';
     private final String keyword;
 
     public Keyword(@NonNull String keyword) {

@@ -233,13 +233,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
             mrDlibPreferences.setSendOs(cbOS.isSelected());
             mrDlibPreferences.setSendTimezone(cbTimezone.isSelected());
 
-            dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
             setContent(getRelatedArticlesPane(entry));
         });
 
         hideTab.setOnAction(event -> {
             preferences.getEntryEditorPreferences().setShouldShowRecommendationsTab(false);
-            dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
         });
 
         hbox.getChildren().addAll(button, hideTab);

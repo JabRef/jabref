@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 
 /// Searches web resources for citing related articles based on a {@link BibEntry}.
 @NullMarked
-public interface CitationFetcher {
+public interface CitationFetcher extends CitationCountFetcher {
 
     /// Possible search methods
     enum SearchType {
@@ -42,12 +42,6 @@ public interface CitationFetcher {
     /// @param entry entry to search articles for
     /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
     List<BibEntry> getCitations(BibEntry entry) throws FetcherException;
-
-    /// Get the paper details that includes citation count field for a given {@link BibEntry}.
-    ///
-    /// @param entry entry to search citation count field
-    /// @return returns a {@link Integer} for citation count field (may be empty)
-    Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException;
 
     /// Returns the API URL for fetching references
     ///

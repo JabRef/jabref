@@ -12,7 +12,7 @@ dependencies {
 
     // LSP4J for LSP Server
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j")
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta")
 
     implementation("com.google.guava:guava")
 

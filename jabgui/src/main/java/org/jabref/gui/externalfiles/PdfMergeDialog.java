@@ -32,18 +32,14 @@ public class PdfMergeDialog {
     /// @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
-
         dialog.addSource(Localization.lang("Entry"), entry);
-
         finishDialog(dialog, filePath, preferences);
         return dialog;
     }
 
     public static MultiMergeEntriesView createMergeDialog(Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
-
         finishDialog(dialog, filePath, preferences);
-
         return dialog;
     }
 
