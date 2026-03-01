@@ -17,6 +17,7 @@ import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.PreviewPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;

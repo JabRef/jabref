@@ -42,6 +42,9 @@ dependencies {
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation("org.glassfish.jersey.media:jersey-media-json-gson")
 
+    // HTTP Client
+    implementation("org.jsoup:jsoup")
+
     implementation("com.google.guava:guava")
 
     implementation("org.jabref:afterburner.fx")
