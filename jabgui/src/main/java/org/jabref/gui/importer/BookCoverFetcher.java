@@ -90,7 +90,7 @@ public class BookCoverFetcher {
         return Optional.empty();
     }
 
-    private void downloadCoverImage(String url, final String name, final Path directory) {
+    protected void downloadCoverImage(String url, final String name, final Path directory) {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -121,8 +121,12 @@ public class BookCoverFetcher {
             LOGGER.warn("Skipping cover download: Could not resolve valid path for name {}", name);
             return;
         }
+        downloadCoverHelper(download, destination.get(), directory, name, url);
+    }
+
+    protected void downloadCoverHelper(URLDownload download, Path destination, Path directory, String name, String url) {
         try {
-            download.toFile(destination.get());
+            download.toFile(destination);
             deleteNotAvailableFileIfExists(name, directory);
         } catch (FetcherClientException | FetcherServerException e) {
             LOGGER.info("Remote book cover does not exist or server returned an error for URL: {}", url);
