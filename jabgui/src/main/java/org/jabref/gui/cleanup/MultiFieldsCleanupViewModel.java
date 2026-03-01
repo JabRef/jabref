@@ -2,9 +2,12 @@ package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SetProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.SetChangeListener;
 
 import org.jabref.logic.cleanup.CleanupPreferences;
 
@@ -19,32 +22,109 @@ public class MultiFieldsCleanupViewModel {
             CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
     );
 
+    public final BooleanProperty doiSelected = new SimpleBooleanProperty();
+    public final BooleanProperty eprintSelected = new SimpleBooleanProperty();
+    public final BooleanProperty urlSelected = new SimpleBooleanProperty();
+    public final BooleanProperty bibTexSelected = new SimpleBooleanProperty();
+    public final BooleanProperty bibLaTexSelected = new SimpleBooleanProperty();
+    public final BooleanProperty timestampToCreationSelected = new SimpleBooleanProperty();
+    public final BooleanProperty timestampToModificationSelected = new SimpleBooleanProperty();
+
     private final SetProperty<CleanupPreferences.CleanupStep> selectedJobs = new SimpleSetProperty<>(FXCollections.observableSet());
 
+    //  flag for synchronization between changes in set of steps and boolean properties
+    private boolean updating = false;
+
     public MultiFieldsCleanupViewModel() {
+        bibTexSelected.addListener((_, _, newVal) -> {
+            if (newVal) {
+                bibLaTexSelected.set(false);
+            }
+        });
+        bibLaTexSelected.addListener((_, _, newVal) -> {
+            if (newVal) {
+                bibTexSelected.set(false);
+            }
+        });
+        timestampToCreationSelected.addListener((_, _, newVal) -> {
+            if (newVal) {
+                timestampToModificationSelected.set(false);
+            }
+        });
+        timestampToModificationSelected.addListener((_, _, newVal) -> {
+            if (newVal) {
+                timestampToCreationSelected.set(false);
+            }
+        });
+
+        addStepListener(doiSelected, CleanupPreferences.CleanupStep.CLEAN_UP_DOI);
+        addStepListener(eprintSelected, CleanupPreferences.CleanupStep.CLEANUP_EPRINT);
+        addStepListener(urlSelected, CleanupPreferences.CleanupStep.CLEAN_UP_URL);
+        addStepListener(bibTexSelected, CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);
+        addStepListener(bibLaTexSelected, CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);
+        addStepListener(timestampToCreationSelected, CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
+        addStepListener(timestampToModificationSelected, CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
+
+        selectedJobs.addListener((SetChangeListener<CleanupPreferences.CleanupStep>) change -> {
+            if (updating) {
+                return;
+            }
+
+            try {
+                updating = true;
+                if (change.wasAdded()) {
+                    CleanupPreferences.CleanupStep addedStep = change.getElementAdded();
+                    if (!MULTI_FIELD_JOBS.contains(addedStep)) {
+                        throw new UnsupportedOperationException(addedStep + ": is unsupported by multi field jobs");
+                    }
+                    setBooleanPropertyForStep(addedStep, true);
+                }
+                if (change.wasRemoved()) {
+                    setBooleanPropertyForStep(change.getElementRemoved(), false);
+                }
+            } finally {
+                updating = false;
+            }
+        });
     }
 
-    public void toggleStep(CleanupPreferences.CleanupStep step, boolean isSelected) {
-        if (isSelected) {
-            mutuallyExclusiveSteps(step);
-            selectedJobs.add(step);
-        } else {
-            selectedJobs.remove(step);
-        }
+    private void addStepListener(BooleanProperty property, CleanupPreferences.CleanupStep step) {
+        property.addListener((_, _, newVal) -> {
+            if (updating) {
+                return;
+            }
+
+            try {
+                updating = true;
+                if (newVal) {
+                    selectedJobs.add(step);
+                } else {
+                    selectedJobs.remove(step);
+                }
+            } finally {
+                updating = false;
+            }
+        });
     }
 
-    private void mutuallyExclusiveSteps(CleanupPreferences.CleanupStep addedStep) {
-        switch (addedStep) {
+    private void setBooleanPropertyForStep(CleanupPreferences.CleanupStep step, boolean isSelected) {
+        switch (step) {
+            case CLEAN_UP_DOI ->
+                    doiSelected.set(isSelected);
+            case CLEANUP_EPRINT ->
+                    eprintSelected.set(isSelected);
+            case CLEAN_UP_URL ->
+                    urlSelected.set(isSelected);
             case CONVERT_TO_BIBTEX ->
-                    selectedJobs.remove(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);
+                    bibTexSelected.set(isSelected);
             case CONVERT_TO_BIBLATEX ->
-                    selectedJobs.remove(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);
+                    bibLaTexSelected.set(isSelected);
             case CONVERT_TIMESTAMP_TO_CREATIONDATE ->
-                    selectedJobs.remove(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
+                    timestampToCreationSelected.set(isSelected);
             case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
-                    selectedJobs.remove(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
+                    timestampToModificationSelected.set(isSelected);
             default -> {
-                //  Do nothing for other steps
+                //  Ignore steps that are not managed by checkboxes
             }
         }
     }
