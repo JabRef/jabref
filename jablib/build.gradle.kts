@@ -18,7 +18,7 @@ plugins {
 
     id("dev.jbang") version "0.4.0"
 
-    id("net.ltgt.errorprone") version "5.0.0"
+    id("net.ltgt.errorprone") version "5.1.0"
     id("net.ltgt.nullaway") version "3.0.0"
 }
 
@@ -210,7 +210,7 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core")
     // TODO: Use versions of versions/build.gradle.kts
-    mockitoAgent("org.mockito:mockito-core:5.21.0") { isTransitive = false }
+    mockitoAgent("org.mockito:mockito-core:5.22.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")

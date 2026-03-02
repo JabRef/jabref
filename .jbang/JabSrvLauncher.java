@@ -56,6 +56,8 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CitationProperties.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/LocatorType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/BibLatexFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/NatbibFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/MMDFormatter.java
@@ -65,6 +67,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormatterService.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/SimpleJsonFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CitationPropertiesPopup.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchDialog.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
