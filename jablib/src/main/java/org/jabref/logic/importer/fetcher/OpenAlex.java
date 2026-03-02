@@ -2,15 +2,16 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -40,6 +41,7 @@ import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -306,7 +308,10 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
 
     // region CitationFetcher
 
-    private Stream<BibEntry> workUrlsToBibEntryStream(JSONArray workUrlArray) {
+    private List<BibEntry> workUrlsToBibEntryList(@Nullable JSONArray workUrlArray) {
+        if (workUrlArray == null) {
+            List.of();
+        }
         // TODO: This could be batched - see https://github.com/JabRef/jabref/pull/15023#issuecomment-3846630255
         return IntStream.range(0, workUrlArray.length())
                         .mapToObj(workUrlArray::getString)
@@ -332,39 +337,68 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                                 LOGGER.debug("Could not fetch work at URL: {}", redactedUrl, e);
                                 return new BibEntry().withField(StandardField.URL, redactedUrl).withChanged(true);
                             }
-                        }));
+                        }))
+                        .toList();
     }
 
-    @Override
-    public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
-        try {
-            LOGGER.trace("Getting references for entry: {}", entry.getKeyAuthorTitleYear(10));
-            return getWorkObject(entry, List.of("referenced_works"))
-                    .map(work -> work.optJSONArray("referenced_works"))
-                    .filter(Objects::nonNull)
-                    .stream()
-                    .flatMap(workUrlArray -> workUrlsToBibEntryStream(workUrlArray))
-                    .toList();
-        } catch (RuntimeException e) {
-            LOGGER.warn("Could not get references", e);
-            if (e.getCause() instanceof FetcherException fetcherException) {
-                throw fetcherException;
-            }
-            throw new FetcherException("Could not get references", e.getCause());
+    private List<BibEntry> workArrayToBibEntryList(@Nullable JSONArray workUrlArray) {
+        if (workUrlArray == null) {
+            return List.of();
+        }
+        return IntStream.range(0, workUrlArray.length())
+                        .mapToObj(workUrlArray::getJSONObject)
+                        .map(Unchecked.function(jsonItem -> jsonItemToBibEntry(jsonItem)))
+                        .toList();
+    }
+
+    private List<BibEntry> fetch(Optional<URI> apiUri, String arrayElementName, Function<JSONArray, List<BibEntry>> handler) throws FetcherException {
+        if (apiUri.isEmpty()) {
+            return List.of();
+        }
+        try (ProgressInputStream stream = getUrlDownload(apiUri.get().toURL()).asInputStream()) {
+            JSONObject response = JsonReader.toJsonObject(stream);
+            JSONArray results = response.getJSONArray(arrayElementName);
+            return handler.apply(results);
+        } catch (IOException | ParseException e) {
+            throw new FetcherException("Could not fetch data from OpenAlex", e);
         }
     }
 
-    private Stream<BibEntry> workArrayToBibEntryStream(JSONArray workUrlArray) {
-        return IntStream.range(0, workUrlArray.length())
-                        .mapToObj(workUrlArray::getJSONObject)
-                        .map(Unchecked.function(jsonItem -> jsonItemToBibEntry(jsonItem)));
+    /// @implNote This method is similar to  [#getCitations(BibEntry)]. Streamlining this into one is not leading to more maintainable code, because handling the exceptions properly
+    @Override
+    public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
+        LOGGER.trace("Getting references for entry: {}", entry.getKeyAuthorTitleYear(10));
+        return fetch(getReferencesApiUri(entry), "referenced_works", this::workUrlsToBibEntryList);
     }
 
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
+        LOGGER.trace("Getting citations for entry: {}", entry.getKeyAuthorTitleYear(10));
+        return fetch(getCitationsApiUri(entry), "results", this::workArrayToBibEntryList);
+    }
+
+    @Override
+    public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
+        return getWorkObject(entry, List.of("cited_by_count"))
+                .map(work -> work.optInt("cited_by_count"))
+                .filter(Objects::nonNull);
+    }
+
+    @Override
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
         try {
-            /* Officially, `cited_by_api_url` is to be used to get citations.
-             * However, this URL may be missing */
+            return getUrl(entry, List.of("referenced_works"))
+                    .map(Unchecked.function(URL::toURI));
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Could not create references API URI", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        /* Officially, `cited_by_api_url` is to be used to get citations.
+         * However, this URL may be missing */
             /*
             return getWorkObject(entry, List.of("cited_by_api_url"))
                     .map(work -> work.optString("cited_by_api_url"))
@@ -380,7 +414,8 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                     .toList();
              */
 
-            // Instead, we perform a search for works that cite the given work's ID
+        // Instead, we perform a search for works that cite the given work's ID
+        try {
             return getWorkObject(entry, List.of("id"))
                     .map(work -> work.optString("id"))
                     .filter(Objects::nonNull)
@@ -388,35 +423,11 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                             getUriBuilder("", List.of())
                                     .addParameter("filter", "cites:" + id)
                                     .build()
-                                    .toURL()
-                    ))
-                    .map(Unchecked.function(url -> {
-                        try (ProgressInputStream stream = getUrlDownload(url).asInputStream()) {
-                            JSONObject response = JsonReader.toJsonObject(stream);
-                            return response.getJSONArray("results");
-                        } catch (RuntimeException e) {
-                            String redactedUrl = FetcherException.getRedactedUrl(url.toString());
-                            LOGGER.warn("Could not fetch work at URL: {}", redactedUrl, e);
-                            throw e;
-                        }
-                    }))
-                    .stream()
-                    .flatMap(worksArray -> workArrayToBibEntryStream(worksArray))
-                    .toList();
-        } catch (RuntimeException e) {
-            LOGGER.warn("Could not get citations", e);
-            if (e.getCause() instanceof FetcherException fetcherException) {
-                throw fetcherException;
-            }
-            throw new FetcherException("Could not get citations", e.getCause());
+                    ));
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not create citations API URI", e);
+            return Optional.empty();
         }
-    }
-
-    @Override
-    public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
-        return getWorkObject(entry, List.of("cited_by_count"))
-                .map(work -> work.optInt("cited_by_count"))
-                .filter(Objects::nonNull);
     }
 
     // endregion

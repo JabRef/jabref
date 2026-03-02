@@ -1,5 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor.renamefield;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -11,6 +12,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -23,21 +25,20 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
+    private final List<BibEntry> selectedEntries;
+    private final BibDatabase database;
+    private final StateManager stateManager;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     @FXML
     private Button renameButton;
     @FXML
     private ComboBox<Field> fieldComboBox;
     @FXML
     private TextField newFieldNameTextField;
-    private final List<BibEntry> selectedEntries;
-    private final BibDatabase database;
-    private final StateManager stateManager;
     private RenameFieldViewModel viewModel;
 
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-
     public RenameFieldTabView(BibDatabase database, StateManager stateManager) {
-        this.selectedEntries = stateManager.getSelectedEntries();
+        this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
         this.stateManager = stateManager;
 
@@ -50,8 +51,11 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     public void initialize() {
         viewModel = new RenameFieldViewModel(selectedEntries, database, stateManager);
 
-        fieldComboBox.getItems().setAll(viewModel.getAllFields());
-        fieldComboBox.getSelectionModel().selectFirst();
+        fieldComboBox.getItems().setAll(FieldHelper.getSetFieldsOnly(selectedEntries, viewModel.getAllFields()));
+
+        if (!fieldComboBox.getItems().isEmpty()) {
+            fieldComboBox.getSelectionModel().selectFirst();
+        }
 
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 

@@ -11,6 +11,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -31,6 +32,7 @@ class SemanticScholarCitationFetcherTest {
     }
 
     @Test
+    @Disabled("'references' are removed by the publisher")
     void smoke() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Macht_2007")

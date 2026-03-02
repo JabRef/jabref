@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher.citation;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 
 /// Searches web resources for citing related articles based on a {@link BibEntry}.
 @NullMarked
-public interface CitationFetcher {
+public interface CitationFetcher extends CitationCountFetcher {
 
     /// Possible search methods
     enum SearchType {
@@ -42,9 +43,19 @@ public interface CitationFetcher {
     /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
     List<BibEntry> getCitations(BibEntry entry) throws FetcherException;
 
-    /// Get the paper details that includes citation count field for a given {@link BibEntry}.
+    /// Returns the API URL for fetching references
     ///
-    /// @param entry entry to search citation count field
-    /// @return returns a {@link Integer} for citation count field (may be empty)
-    Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException;
+    /// @param entry the entry to get references for
+    /// @return the URI for the references API, or empty if not supported
+    default Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return Optional.empty();
+    }
+
+    /// Returns the API URL for fetching citations
+    ///
+    /// @param entry the entry to get citations for
+    /// @return the URI for the citations API, or empty if not supported
+    default Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return Optional.empty();
+    }
 }

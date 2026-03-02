@@ -21,7 +21,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
 
       - name: Generate aggregated CycloneDX SBOM
-        run: ./gradlew cyclonedxBom
+        run: gradle cyclonedxBom
 
       - name: Copy SBOMs to repository root
         run: |

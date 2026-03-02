@@ -8,3 +8,4 @@ JBang
 OpenFastTrace
 OpenRewrite
 Temurin
+jpackage
