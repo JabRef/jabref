@@ -86,6 +86,9 @@ public class WebSearchPaneViewModel {
                         SearchQuery.getStartContext(queryText);
                         return null;
                     } catch (ParseCancellationException e) {
+                        // Query will still be sent as a raw search term to the fetcher
+                        // but we show a warning so the user knows advanced syntax was not recognized.
+
                         // RecognitionException can point out the exact error
                         if (e.getCause() instanceof RecognitionException recEx) {
                             Token offendingToken = recEx.getOffendingToken();
@@ -94,11 +97,11 @@ public class WebSearchPaneViewModel {
                             int line = offendingToken.getLine();
                             int charPositionInLine = offendingToken.getCharPositionInLine() + 1;
 
-                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
+                            return ValidationMessage.warning(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
                         }
 
                         // Fallback for other failing reasons
-                        return ValidationMessage.error(Localization.lang("Invalid query"));
+                        return ValidationMessage.warning(Localization.lang("Invalid query"));
                     }
                 });
     }
