@@ -40,7 +40,8 @@ public class App {
 
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
             BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, context, preferences);
+            var abbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+            var bibWriter = new BibDatabaseWriter(writer, context, preferences, abbreviationRepository);
             bibWriter.writeDatabase(context);
         } catch (IOException e) {
             Logger.error("Could not write library", e);

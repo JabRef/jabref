@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -6,6 +6,8 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 import org.tinylog.Logger;
 
@@ -30,7 +32,8 @@ void main() throws Exception {
 
     try (var writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
         var context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        var bibWriter = new BibDatabaseWriter(writer, context, preferences);
+        var abbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+        var bibWriter = new BibDatabaseWriter(writer, context, preferences, abbreviationRepository);
         bibWriter.writeDatabase(context);
     }
 }

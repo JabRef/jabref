@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -40,7 +40,8 @@ void main() throws Exception {
     var context = result.getDatabaseContext();
     try (var writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
         var entries = result.getDatabase().getEntries();
-        var bibWriter = new BibDatabaseWriter(writer, context, preferences);
+        var abbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+        var bibWriter = new BibDatabaseWriter(writer, context, preferences, abbreviationRepository);
         bibWriter.writeDatabase(context);
     }
 }
