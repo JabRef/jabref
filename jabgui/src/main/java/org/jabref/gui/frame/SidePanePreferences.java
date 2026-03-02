@@ -21,13 +21,10 @@ public class SidePanePreferences {
     public SidePanePreferences(Set<SidePaneType> visiblePanes,
                                Map<SidePaneType, Integer> preferredPositions,
                                int webSearchFetcherSelected) {
-        EnumSet<SidePaneType> mutableVisiblePanes = EnumSet.noneOf(SidePaneType.class);
-        mutableVisiblePanes.addAll(visiblePanes);
-        EnumMap<SidePaneType, Integer> mutablePreferredPositions = new EnumMap<>(SidePaneType.class);
-        mutablePreferredPositions.putAll(preferredPositions);
-
-        this.visiblePanes = FXCollections.observableSet(mutableVisiblePanes);
-        this.preferredPositions = FXCollections.observableMap(mutablePreferredPositions);
+        this.visiblePanes = FXCollections.observableSet(EnumSet.noneOf(SidePaneType.class));
+        this.visiblePanes.addAll(visiblePanes);
+        this.preferredPositions = FXCollections.observableMap(new EnumMap<>(SidePaneType.class));
+        this.preferredPositions.putAll(preferredPositions);
         this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
