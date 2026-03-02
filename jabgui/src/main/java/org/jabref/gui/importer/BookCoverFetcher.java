@@ -58,7 +58,7 @@ public class BookCoverFetcher {
         entry.getISBN().ifPresent(isbn -> downloadCoverForISBN(isbn, Directories.getCoverDirectory()));
     }
 
-    private void downloadCoverForISBN(ISBN isbn, Path directory) {
+    protected void downloadCoverForISBN(ISBN isbn, Path directory) {
         final String name = "isbn-" + isbn.asString();
         if (findExistingImage(name, directory).isEmpty()) {
             Optional<Duration> timeSincePreviousAttempt = timeSincePreviousAttempt(name, directory);
@@ -71,7 +71,7 @@ public class BookCoverFetcher {
         }
     }
 
-    private Optional<Duration> timeSincePreviousAttempt(String name, Path directory) {
+    protected Optional<Duration> timeSincePreviousAttempt(String name, Path directory) {
         Optional<Path> notAvailablePathOptional = resolveNameWithType(directory, name, NOT_AVAILABLE_FILE_TYPE);
         if (notAvailablePathOptional.isEmpty()) {
             LOGGER.warn("Could not find not available file path for: {}", name);
@@ -171,7 +171,7 @@ public class BookCoverFetcher {
         }
     }
 
-    private Optional<Path> findExistingImage(final String name, final Path directory) {
+    protected Optional<Path> findExistingImage(final String name, final Path directory) {
         return externalApplicationsPreferences.getExternalFileTypes().stream()
                                               .filter(fileType -> fileType.getMimeType().startsWith("image/"))
                                               .flatMap(fileType -> resolveNameWithType(directory, name, fileType).stream())
