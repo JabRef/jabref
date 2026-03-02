@@ -59,14 +59,14 @@ public final class BstPreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(BibEntry originalEntry, BibDatabaseContext databaseContext) {
+    public String generatePreview(List<BibEntry> originalEntries, BibDatabaseContext databaseContext) {
         if (error != null) {
             return error;
         }
         // Ensure that the entry is of BibTeX format (and do not modify the original entry)
-        BibEntry entry = new BibEntry(originalEntry);
-        new ConvertToBibtexCleanup().cleanup(entry);
-        String result = bstVM.render(List.of(entry));
+        List<BibEntry> entries = originalEntries.stream().map(BibEntry::new).toList();
+        entries.forEach(entry -> new ConvertToBibtexCleanup().cleanup(entry));
+        String result = bstVM.render(entries);
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
         // Remove all LaTeX comments

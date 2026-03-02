@@ -29,6 +29,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.PreviewPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

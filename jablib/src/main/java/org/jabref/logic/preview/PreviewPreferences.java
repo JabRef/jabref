@@ -1,4 +1,4 @@
-package org.jabref.gui.preview;
+package org.jabref.logic.preview;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -15,7 +15,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.layout.TextBasedPreviewLayout;
-import org.jabref.logic.preview.PreviewLayout;
 
 public class PreviewPreferences {
 

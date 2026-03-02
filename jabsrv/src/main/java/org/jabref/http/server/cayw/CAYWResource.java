@@ -114,7 +114,7 @@ public class CAYWResource {
         }
 
         // Format parameter handling
-        CAYWFormatter formatter = formatterService.getFormatter(queryParams);
+        CAYWFormatter formatter = formatterService.getFormatter(queryParams, preferences, databaseContext);
         String formattedResponse = formatter.format(queryParams, searchResults);
 
         // Clipboard parameter handling
@@ -132,7 +132,7 @@ public class CAYWResource {
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }
 
-        return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
+        return Response.ok(formattedResponse).type(formatter.getMediaType() + ";charset=UTF-8").build();
     }
 
     private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries) throws InterruptedException, ExecutionException {

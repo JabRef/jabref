@@ -53,19 +53,19 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CitationProperties.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/LocatorType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/BibLatexFormatter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/NatbibFormatter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/MMDFormatter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/PandocFormatter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/TypstFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/CAYWFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormattedBibliographyFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormatterService.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/MMDFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/NatbibFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/PandocFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/SimpleJsonFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/TypstFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CitationPropertiesPopup.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchDialog.java
@@ -77,16 +77,17 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/FocusCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/OpenLibrariesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntriesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntryResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 

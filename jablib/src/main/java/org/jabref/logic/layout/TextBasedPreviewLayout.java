@@ -2,6 +2,8 @@ package org.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -44,9 +46,9 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
+    public String generatePreview(List<BibEntry> entries, BibDatabaseContext databaseContext) {
         if (layout != null) {
-            return layout.doLayout(entry, databaseContext.getDatabase());
+            return entries.stream().map(entry -> layout.doLayout(entry, databaseContext.getDatabase())).collect(Collectors.joining());
         } else {
             return "";
         }
