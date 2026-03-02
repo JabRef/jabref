@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,14 +17,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
+import org.jabref.logic.bibtex.comparator.FieldComparator;
+import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import org.jabref.logic.bibtex.comparator.IdComparator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -32,6 +40,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
@@ -54,36 +63,78 @@ public class BibDatabaseWriter {
 
     protected final BibWriter bibWriter;
     protected final SelfContainedSaveConfiguration saveConfiguration;
-    protected final CitationKeyPatternPreferences keyPatternPreferences;
+    protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
-    protected final FieldPreferences fieldPreferences;
+    private final CliPreferences preferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public BibDatabaseWriter(@NonNull BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
-                             FieldPreferences fieldPreferences,
-                             CitationKeyPatternPreferences keyPatternPreferences,
-                             BibEntryTypesManager entryTypesManager) {
+                             CliPreferences preferences,
+                             BibEntryTypesManager entryTypesManager,
+                             JournalAbbreviationRepository journalAbbreviationRepository) {
         this.bibWriter = bibWriter;
         this.saveConfiguration = saveConfiguration;
-        this.keyPatternPreferences = keyPatternPreferences;
-        this.fieldPreferences = fieldPreferences;
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
         assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
     }
 
     /// Convenience constructor. One can directly call [#writeDatabase(BibDatabaseContext)] afterward.
     ///
-    /// @param writer             the output to use
-    /// @param bibDatabaseContext - used to get the newline
-    /// @param preferences        - used to read all the preferences
+    /// @param writer                 the output to use
+    /// @param bibDatabaseContext     - used to get the newline
+    /// @param preferences            - used to read all the preferences
+    /// @param abbreviationRepository - used to apply save actions
     public BibDatabaseWriter(@NonNull Writer writer,
                              @NonNull BibDatabaseContext bibDatabaseContext,
-                             @NonNull CliPreferences preferences) {
+                             @NonNull CliPreferences preferences,
+                             @NonNull JournalAbbreviationRepository abbreviationRepository) {
         this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
                 preferences.getSelfContainedExportConfiguration(),
-                preferences.getFieldPreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getCustomEntryTypesRepository());
+                preferences,
+                preferences.getCustomEntryTypesRepository(),
+                abbreviationRepository);
+    }
+
+    private static List<Comparator<BibEntry>> getSaveComparators(SaveOrder saveOrder) {
+        List<Comparator<BibEntry>> comparators = new ArrayList<>();
+
+        // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
+        // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
+        comparators.add(new CrossRefEntryComparator());
+
+        if (saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL) {
+            // entries will be sorted based on their internal IDs
+            comparators.add(new IdComparator());
+        } else {
+            // use configured sorting strategy
+            List<FieldComparator> fieldComparators = saveOrder.getSortCriteria().stream()
+                                                              .map(FieldComparator::new)
+                                                              .toList();
+            comparators.addAll(fieldComparators);
+            comparators.add(new FieldComparator(InternalField.KEY_FIELD));
+        }
+
+        return comparators;
+    }
+
+    /// We have begun to use getSortedEntries() for both database save operations and non-database save operations. In a
+    /// non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
+    /// saving in standard order.
+    public static List<BibEntry> getSortedEntries(@NonNull List<BibEntry> entriesToSort,
+                                                  @NonNull SelfContainedSaveOrder saveOrder) {
+        List<Comparator<BibEntry>> comparators = getSaveComparators(saveOrder);
+        FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
+
+        List<BibEntry> sorted = new ArrayList<>(entriesToSort);
+        sorted.sort(comparatorStack);
+        return sorted;
+    }
+
+    public List<FieldChange> getSaveActionsFieldChanges() {
+        return Collections.unmodifiableList(saveActionsFieldChanges);
     }
 
     /// Saves the complete database.
@@ -117,7 +168,22 @@ public class BibDatabaseWriter {
         writeStrings(bibDatabaseContext.getDatabase());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = BibDataBaseSaveManager.getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
+        List<BibEntry> sortedEntries = getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
+
+        // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
+        //        The cleanup should be done before the write operation
+        SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext,
+                preferences.getFilePreferences(),
+                preferences.getTimestampPreferences(),
+                preferences.getFieldPreferences(),
+                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                journalAbbreviationRepository);
+        List<FieldChange> saveActionChanges = saveActionsWorker.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+        saveActionsFieldChanges.addAll(saveActionChanges);
+        if (preferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
+            List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
+            saveActionsFieldChanges.addAll(keyChanges);
+        }
 
         // Map to collect entry type definitions that we must save along with entries using them.
         SortedSet<BibEntryType> typesToWrite = new TreeSet<>();
@@ -137,7 +203,7 @@ public class BibDatabaseWriter {
 
         if (saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPatterns());
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getCitationKeyPatternPreferences().getKeyPatterns());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -162,7 +228,7 @@ public class BibDatabaseWriter {
     }
 
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
         bibtexEntryWriter.write(entry, bibWriter, mode, saveConfiguration.shouldReformatFile());
     }
 
@@ -286,7 +352,7 @@ public class BibDatabaseWriter {
             bibWriter.write("{}");
         } else {
             try {
-                String formatted = new FieldWriter(fieldPreferences)
+                String formatted = new FieldWriter(preferences.getFieldPreferences())
                         .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
                 bibWriter.write(formatted);
             } catch (InvalidFieldValueException ex) {
@@ -308,5 +374,19 @@ public class BibDatabaseWriter {
         bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
         bibWriter.writeLine("}");
         bibWriter.finishBlock();
+    }
+
+    /// Generate keys for all entries that are lacking keys.
+    protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
+        List<FieldChange> changes = new ArrayList<>();
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+        for (BibEntry bes : entries) {
+            Optional<String> oldKey = bes.getCitationKey();
+            if (StringUtil.isBlank(oldKey)) {
+                Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
+                change.ifPresent(changes::add);
+            }
+        }
+        return changes;
     }
 }

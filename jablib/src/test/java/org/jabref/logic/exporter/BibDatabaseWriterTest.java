@@ -18,12 +18,20 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -75,30 +83,44 @@ class BibDatabaseWriterTest {
     private BibEntryTypesManager entryTypesManager;
     private StringWriter stringWriter;
     private BibWriter bibWriter;
+    private JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private JournalAbbreviationRepository journalAbbreviationRepository;
+    private CliPreferences preferences;
 
     @BeforeEach
     void setUp() {
-        fieldPreferences = new FieldPreferences(true, List.of(), List.of());
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        initializeDatabaseWriter();
         database = new BibDatabase();
         metaData = new MetaData();
         bibtexContext = new BibDatabaseContext(database, metaData);
+
+        journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+        journalAbbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        fieldPreferences = new FieldPreferences(true, List.of(), List.of());
+        citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(CliPreferences.class);
+
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldPreferences);
+        when(journalAbbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferences.getJournalAbbreviationPreferences()).thenReturn(journalAbbreviationPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
+
+        initializeDatabaseWriter();
     }
 
     private void initializeDatabaseWriter() {
         databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository);
     }
 
     @Test
@@ -472,9 +494,9 @@ class BibDatabaseWriterTest {
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    fieldPreferences,
-                    citationKeyPatternPreferences,
-                    entryTypesManager);
+                    preferences,
+                    entryTypesManager,
+                    journalAbbreviationRepository);
             databaseWriter.writeDatabase(context);
         }
 
@@ -496,9 +518,9 @@ class BibDatabaseWriterTest {
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    fieldPreferences,
-                    citationKeyPatternPreferences,
-                    entryTypesManager);
+                    preferences,
+                    entryTypesManager,
+                    journalAbbreviationRepository);
             databaseWriter.writeDatabase(context);
         }
 
@@ -520,9 +542,9 @@ class BibDatabaseWriterTest {
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    fieldPreferences,
-                    citationKeyPatternPreferences,
-                    entryTypesManager);
+                    preferences,
+                    entryTypesManager,
+                    journalAbbreviationRepository);
             databaseWriter.writeDatabase(context);
         }
 
@@ -541,9 +563,9 @@ class BibDatabaseWriterTest {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository);
         databaseWriter.writePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
     }
@@ -587,9 +609,9 @@ class BibDatabaseWriterTest {
         databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository);
         databaseWriter.writePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(bibEntry, stringWriter.toString());
     }
@@ -619,11 +641,30 @@ class BibDatabaseWriterTest {
         databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository);
         databaseWriter.writePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(bibEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundtripWithUserCommentAndEntryChange() throws IOException {
+        Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
+
+        BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
+        entry.setField(StandardField.AUTHOR, "Mr. Author");
+
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        // .gitattributes sets the .bib files to have LF line endings
+        // This needs to be reflected here
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
+        databaseWriter.writePartOfDatabase(context, result.getDatabase().getEntries());
+        assertEquals(Files.readString(Path.of("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
     }
 
     @Test
@@ -692,6 +733,27 @@ class BibDatabaseWriterTest {
         assertEquals("@Article{," + OS.NEWLINE + "  author = {Mr. author}," + OS.NEWLINE + "}"
                         + OS.NEWLINE,
                 stringWriter.toString());
+    }
+
+    @Test
+    void writeFieldFormatterCleanupActions() throws IOException {
+        FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
+                Arrays.asList(
+                        new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()),
+                        new FieldFormatterCleanup(StandardField.JOURNAL, new TitleCaseFormatter()),
+                        new FieldFormatterCleanup(StandardField.DAY, new UpperCaseFormatter())));
+        metaData.setFieldFormatterCleanupActions(saveActions);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        // The order should be kept (the cleanups are a list, not a set)
+        assertEquals("@Comment{jabref-meta: fieldFormatterCleanupActions:enabled;"
+                + OS.NEWLINE
+                + "title[lower_case]" + OS.NEWLINE
+                + "journal[title_case]" + OS.NEWLINE
+                + "day[upper_case]" + OS.NEWLINE
+                + ";}"
+                + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -909,9 +971,9 @@ class BibDatabaseWriterTest {
         databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository);
         databaseWriter.writePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         assertEquals("@Article{test," + OS.NEWLINE +
@@ -986,9 +1048,9 @@ class BibDatabaseWriterTest {
         databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository);
         databaseWriter.writePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         // returns tu original entry, not to the last saved one

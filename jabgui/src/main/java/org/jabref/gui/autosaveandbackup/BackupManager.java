@@ -27,6 +27,7 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -40,6 +41,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -261,9 +263,9 @@ public class BackupManager {
             new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    entryTypesManager)
+                    preferences,
+                    entryTypesManager,
+                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class))
                     // we save the clone to prevent the original database (and thus the UI) from being changed
                     .writeDatabase(bibDatabaseContextClone);
             backupFilesQueue.add(backupPath);

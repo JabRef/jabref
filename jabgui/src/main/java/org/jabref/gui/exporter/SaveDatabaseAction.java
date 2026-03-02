@@ -28,7 +28,6 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDataBaseSaveManager;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
@@ -256,15 +255,15 @@ public class SaveDatabaseAction {
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-                BibDataBaseSaveManager bibDataBaseSaveManager = new BibDataBaseSaveManager(bibWriter, saveConfiguration, preferences, entryTypesManager, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter, saveConfiguration, preferences, entryTypesManager, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
 
                 if (selectedOnly) {
-                    bibDataBaseSaveManager.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                    bibDatabaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
                 } else {
-                    bibDataBaseSaveManager.saveDatabase(bibDatabaseContext);
+                    bibDatabaseWriter.writeDatabase(bibDatabaseContext);
                 }
 
-                libraryTab.registerUndoableChanges(bibDataBaseSaveManager.getSaveActionsFieldChanges());
+                libraryTab.registerUndoableChanges(bibDatabaseWriter.getSaveActionsFieldChanges());
 
                 if (fileWriter.hasEncodingProblems()) {
                     saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);

@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibDataBaseSaveManager;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -27,8 +27,8 @@ public class GitFileWriter {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
 
-                BibDataBaseSaveManager saver = new BibDataBaseSaveManager(bibWriter, saveConfiguration, cliPreferences, new BibEntryTypesManager(), journalAbbreviationRepository);
-                saver.saveDatabase(bibDatabaseContext);
+                BibDatabaseWriter writer = new BibDatabaseWriter(bibWriter, saveConfiguration, cliPreferences, new BibEntryTypesManager(), journalAbbreviationRepository);
+                writer.writeDatabase(bibDatabaseContext);
 
                 if (fileWriter.hasEncodingProblems()) {
                     throw new IOException("Encoding problem detected when saving .bib file: "
