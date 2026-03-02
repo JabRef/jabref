@@ -5,6 +5,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.importer.fileformat.pdf.CitationsFromPdf;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 import org.tinylog.Logger;
 

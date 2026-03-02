@@ -6,7 +6,6 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 import org.tinylog.Logger;
