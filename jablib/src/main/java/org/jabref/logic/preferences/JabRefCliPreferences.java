@@ -1163,8 +1163,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getStringList(EXTERNAL_JOURNAL_LISTS),
                 getBoolean(USE_AMS_FJOURNAL));
 
-        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
-                putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
+        journalAbbreviationPreferences.getExternalLists().addListener((InvalidationListener) _ ->
+                putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalLists()));
         EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
                 (_, _, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
 

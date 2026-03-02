@@ -14,7 +14,7 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 val javafx = "25.0.2"
 
-val lucene = "10.3.2"
+val lucene = "10.4.0"
 
 val pdfbox = "3.0.6"
 
@@ -74,7 +74,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.github.vatbub:mslinks:1.0.6.2")
-    api("com.google.errorprone:error_prone_core:2.47.0")
+    api("com.google.errorprone:error_prone_core:2.48.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.29")
     api("com.h2database:h2-mvstore:2.4.240")
@@ -156,7 +156,7 @@ dependencies.constraints {
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.21.0")
+    api("org.mockito:mockito-core:5.22.0")
     api("org.ow2.asm:asm:9.9.1")
     api("org.postgresql:postgresql:42.7.10")
     api("org.slf4j:jul-to-slf4j:2.0.17")
@@ -168,6 +168,6 @@ dependencies.constraints {
     api("org.tinylog:tinylog-impl:2.7.0")
     api("org.xmlunit:xmlunit-core:2.11.0")
     api("org.xmlunit:xmlunit-matchers:2.11.0")
-    api("org.yaml:snakeyaml:2.5")
+    api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.3")
 }
