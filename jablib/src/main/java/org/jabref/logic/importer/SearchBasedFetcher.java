@@ -1,14 +1,17 @@
 package org.jabref.logic.importer;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchQueryNode;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.LoggerFactory;
 
 /// Searches web resources for bibliographic information based on a free-text query.
 /// May return multiple search hits.
@@ -34,15 +37,20 @@ public interface SearchBasedFetcher extends WebFetcher {
         }
 
         SearchQuery searchQueryObject = new SearchQuery(searchQuery);
-        if (!searchQueryObject.isValid()) {
-            throw new FetcherException("The query is not valid");
-        }
         BaseQueryNode queryNode;
-        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
-        try {
-            queryNode = visitor.visitStart(searchQueryObject.getContext());
-        } catch (ParseCancellationException e) {
-            throw new FetcherException("A syntax error occurred during parsing of the query");
+
+        if (searchQueryObject.isValid()) {
+            SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+            try {
+                queryNode = visitor.visitStart(searchQueryObject.getContext());
+            } catch (ParseCancellationException e) {
+                LoggerFactory.getLogger(SearchBasedFetcher.class).debug("Search query visitor failed for '{}', falling back to raw term search", searchQuery, e);
+                queryNode = new SearchQueryNode(Optional.empty(), searchQuery);
+            }
+        } else {
+            // Treat unparseable input as a raw unfielded term so fetchers pass it directly to their web API
+            LoggerFactory.getLogger(SearchBasedFetcher.class).debug("Search query '{}' is not valid ANTLR syntax, falling back to raw term search", searchQuery);
+            queryNode = new SearchQueryNode(Optional.empty(), searchQuery);
         }
 
         return this.performSearch(queryNode);

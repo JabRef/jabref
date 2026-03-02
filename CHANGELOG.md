@@ -26,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- Fixed web search rejecting queries with non-standard syntax [#12637](https://github.com/JabRef/jabref/issues/12637)
 - We fixed a false "Invalid citation key" warning for keys with diacritical marks. [#14953](https://github.com/JabRef/jabref/issues/14953)
 - We fixed an issue where duplicate fields can be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
 - We fixed an issue where blank fields could be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
