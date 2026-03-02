@@ -26,7 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where exception dialog will show up when moving side panels down/up. [#15207](https://github.com/JabRef/jabref/issues/15207)
+- We fixed an issue where an exception dialog was shown when moving side panels down/up. [#15207](https://github.com/JabRef/jabref/issues/15207)
 - We fixed a false "Invalid citation key" warning for keys with diacritical marks. [#14953](https://github.com/JabRef/jabref/issues/14953)
 - We fixed an issue where duplicate fields can be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
 - We fixed an issue where blank fields could be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
