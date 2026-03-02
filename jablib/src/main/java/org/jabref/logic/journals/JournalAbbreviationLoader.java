@@ -55,7 +55,7 @@ public class JournalAbbreviationLoader {
         }
 
         // Read external lists
-        List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
+        List<String> lists = journalAbbreviationPreferences.getExternalLists();
         // might produce NPE in tests
         if (lists != null && !lists.isEmpty()) {
             // reversing ensures that the latest lists overwrites the former one
