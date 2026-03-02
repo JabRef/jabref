@@ -177,7 +177,6 @@ public class SaveActionsWorkerTest {
                 .withField(StandardField.DATE, "");
 
         metaData.setMultiFieldCleanups(Set.of(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
-
         saveActionsWorker.applySaveActions(entry, metaData);
 
         assertEquals("""
@@ -194,9 +193,8 @@ public class SaveActionsWorkerTest {
                 .withField(StandardField.BOOKTITLE, "some title");
 
         metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
-        
-        when(journalAbbreviationRepository.get("Journal of Something")).thenReturn(Optional.of(new Abbreviation("name", "abbreviated")));
 
+        when(journalAbbreviationRepository.get("Journal of Something")).thenReturn(Optional.of(new Abbreviation("name", "abbreviated")));
         saveActionsWorker.applySaveActions(entry, metaData);
 
         assertEquals("""
