@@ -28,13 +28,11 @@ import static org.mockito.Mockito.verify;
 
 public class BookCoverFetcherTest {
 
-    /**
-     * Test the cooldown for trying to download a bookcover
-     * <p>
-     * Asserts that the system does not try to download
-     * a book cover again if timeSincePrevious returns
-     * a time in hours < 24
-     */
+    /// Test the cooldown for trying to download a bookcover
+    ///
+    /// Asserts that the system does not try to download
+    /// a book cover again if timeSincePrevious returns
+    /// a time in hours < 24
     @Test
     public void checkBookCoverFetchCooldown(@TempDir Path path) {
         ExternalApplicationsPreferences preferences = mock(ExternalApplicationsPreferences.class);
@@ -51,16 +49,14 @@ public class BookCoverFetcherTest {
         verify(fetcher, times(1)).downloadCoverImage(any(), any(), any());
     }
 
-    /**
-     * Test creation of a not-available file
-     * <p>
-     * Should create a new file with the extension
-     * ".not-available" if a book cover is not available.
-     * The test mocks a URLDownloader, and makes it throw
-     * an appropriate exception when trying to use the method
-     * "toFile". This should then cause the expected file to
-     * be created.
-     */
+    /// Test creation of a not-available file
+    ///
+    /// Should create a new file with the extension
+    /// ".not-available" if a book cover is not available.
+    /// The test mocks a URLDownloader, and makes it throw
+    /// an appropriate exception when trying to use the method
+    /// "toFile". This should then cause the expected file to
+    /// be created.
     @Test
     public void flagAsAvailableTest(@TempDir Path path) throws Exception {
         ExternalApplicationsPreferences preferences = mock(ExternalApplicationsPreferences.class);
