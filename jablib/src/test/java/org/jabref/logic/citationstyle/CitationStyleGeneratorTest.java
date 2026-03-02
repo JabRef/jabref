@@ -795,7 +795,7 @@ class CitationStyleGeneratorTest {
 
                 // Test 6: DOI with unusual characters
                 Arguments.of(
-                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/10.1161/circ.108_827022 special\n",
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/10.1161/circ.108_827022\u00a0special\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
