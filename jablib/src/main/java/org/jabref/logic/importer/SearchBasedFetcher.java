@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
@@ -35,14 +34,6 @@ public interface SearchBasedFetcher extends WebFetcher {
     default List<BibEntry> performSearch(String searchQuery) throws FetcherException {
         if (searchQuery.isBlank()) {
             return List.of();
-        }
-
-        // DOIs bypass ANTLR parsing because they contain characters ('/', '.') invalid in the search grammar
-        Optional<DOI> doi = DOI.parse(searchQuery);
-        if (doi.isPresent() && this instanceof IdBasedFetcher idBasedFetcher) {
-            return idBasedFetcher.performSearchById(searchQuery)
-                                 .map(List::of)
-                                 .orElse(List.of());
         }
 
         SearchQuery searchQueryObject = new SearchQuery(searchQuery);
