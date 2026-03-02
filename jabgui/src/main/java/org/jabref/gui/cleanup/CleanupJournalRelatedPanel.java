@@ -1,6 +1,7 @@
 package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
@@ -38,10 +39,9 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
     public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> selectedMethods = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
-        CleanupPreferences.CleanupStep selected = viewModel.selectedJournalCleanupOption.get();
-        if (selected != null) {
-            selectedMethods.add(selected);
-        }
+        Optional<CleanupPreferences.CleanupStep> selected = viewModel.selectedJournalCleanupOption.get();
+
+        selected.ifPresent(selectedMethods::add);
 
         return CleanupTabSelection.ofJobs(viewModel.allSupportedJobs, selectedMethods);
     }

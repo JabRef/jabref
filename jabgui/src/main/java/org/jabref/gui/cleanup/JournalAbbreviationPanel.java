@@ -1,6 +1,7 @@
 package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
@@ -38,22 +39,22 @@ public class JournalAbbreviationPanel extends VBox {
     @FXML
     private void initialize() {
         abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
-        abbreviateDefault.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
+        abbreviateDefault.setUserData(Optional.of(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT));
 
         abbreviateDottles.setText(Localization.lang("Abbreviate (dotless)"));
-        abbreviateDottles.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
+        abbreviateDottles.setUserData(Optional.of(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS));
 
         abbreviateShortestUnique.setText(Localization.lang("Abbreviate (shortest unique)"));
-        abbreviateShortestUnique.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
+        abbreviateShortestUnique.setUserData(Optional.of(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE));
 
         abbreviateLTWA.setText(Localization.lang("Abbreviate (LTWA)"));
-        abbreviateLTWA.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA);
+        abbreviateLTWA.setUserData(Optional.of(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA));
 
         unabbreviate.setText(Localization.lang("Unabbreviate"));
-        unabbreviate.setUserData(CleanupPreferences.CleanupStep.UNABBREVIATE);
+        unabbreviate.setUserData(Optional.of(CleanupPreferences.CleanupStep.UNABBREVIATE));
 
         noChanges.setText(Localization.lang("No changes"));
-        noChanges.setUserData(CleanupPreferences.CleanupStep.NO_CHANGES);
+        noChanges.setUserData(Optional.empty());
 
         bindProperties();
     }
@@ -68,14 +69,14 @@ public class JournalAbbreviationPanel extends VBox {
         // Listener for user pressing button
         journalAbbreviationsToggleGroup.selectedToggleProperty().addListener((_, _, newToggle) -> {
             if (newToggle != null) {
-                CleanupPreferences.CleanupStep step = (CleanupPreferences.CleanupStep) newToggle.getUserData();
+                Optional<CleanupPreferences.CleanupStep> step = (Optional<CleanupPreferences.CleanupStep>) newToggle.getUserData();
                 viewModel.selectedJournalCleanupOption.set(step);
             }
         });
 
         //  Listener for external bindings
         viewModel.selectedJournalCleanupOption.addListener((_, _, newCleanupStep) -> {
-            if (newCleanupStep != null) {
+            if (newCleanupStep.isPresent()) {
                 journalAbbreviationsToggleGroup.getToggles().stream()
                                                .filter(toggle -> newCleanupStep.equals(toggle.getUserData()))
                                                .findFirst()
@@ -84,7 +85,7 @@ public class JournalAbbreviationPanel extends VBox {
         });
     }
 
-    public ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption() {
+    public ObjectProperty<Optional<CleanupPreferences.CleanupStep>> selectedJournalCleanupOption() {
         return viewModel.selectedJournalCleanupOption;
     }
 

@@ -1,6 +1,7 @@
 package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -8,7 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.logic.cleanup.CleanupPreferences;
 
 public class CleanupJournalRelatedViewModel {
-    public final ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleObjectProperty<>();
+    public final ObjectProperty<Optional<CleanupPreferences.CleanupStep>> selectedJournalCleanupOption = new SimpleObjectProperty<>();
     public final EnumSet<CleanupPreferences.CleanupStep> allSupportedJobs;
     public final CleanupPreferences preferences;
 
@@ -19,10 +20,9 @@ public class CleanupJournalRelatedViewModel {
         selectedJournalCleanupOption.set(getInitialMethod());
     }
 
-    private CleanupPreferences.CleanupStep getInitialMethod() {
+    private Optional<CleanupPreferences.CleanupStep> getInitialMethod() {
         return allSupportedJobs.stream()
                                .filter(preferences::isActive)
-                               .findFirst()
-                               .orElse(CleanupPreferences.CleanupStep.NO_CHANGES);
+                               .findFirst();
     }
 }

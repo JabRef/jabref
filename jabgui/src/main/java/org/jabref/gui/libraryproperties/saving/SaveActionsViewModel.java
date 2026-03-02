@@ -30,7 +30,7 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
 
     private final SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
 
-    private final ObjectProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<Optional<CleanupPreferences.CleanupStep>> journalAbbreviationCleanupProperty = new SimpleObjectProperty<>(Optional.empty());
 
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
@@ -44,8 +44,6 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
 
     @Override
     public void setValues() {
-        // FieldFormatterCleanupsPanel, included via <?import ...> in FXML
-
         Optional<FieldFormatterCleanupActions> fieldFormatterCleanupActions = initialMetaData.getFieldFormatterCleanupActions();
         fieldFormatterCleanupActions.ifPresentOrElse(value -> {
             fieldFormatterCleanupsDisableProperty.setValue(!value.isEnabled());
@@ -57,11 +55,9 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
         });
 
         Optional<Set<CleanupPreferences.CleanupStep>> multiFieldCleanups = initialMetaData.getMultiFieldCleanups();
-        multiFieldCleanups.ifPresent(set -> multiFieldCleanupsProperty.set(FXCollections.observableSet(set))
-        );
+        multiFieldCleanups.ifPresent(set -> multiFieldCleanupsProperty.set(FXCollections.observableSet(set)));
 
-        Optional<CleanupPreferences.CleanupStep> journalAbbreviationCleanup = initialMetaData.getJournalAbbreviationCleanup();
-        journalAbbreviationCleanup.ifPresent(journalAbbreviationCleanupProperty::set);
+        journalAbbreviationCleanupProperty.set(initialMetaData.getJournalAbbreviationCleanup());
     }
 
     @Override
@@ -75,7 +71,6 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
         if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
             newMetaData.clearFieldFormatterActions();
         } else {
-            // if all actions have been removed, remove the save actions from the MetaData
             if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
                 newMetaData.clearFieldFormatterActions();
             } else {
@@ -89,10 +84,11 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
             newMetaData.setMultiFieldCleanups(EnumSet.copyOf(multiFieldCleanupsProperty.get()));
         }
 
-        if (journalAbbreviationCleanupProperty.get() == null) {
+        Optional<CleanupPreferences.CleanupStep> journalCleanup = journalAbbreviationCleanupProperty.get();
+        if (journalCleanup.isEmpty()) {
             newMetaData.clearJournalAbbreviationCleanup();
         } else {
-            newMetaData.setJournalAbbreviationCleanup(journalAbbreviationCleanupProperty.get());
+            newMetaData.setJournalAbbreviationCleanup(journalCleanup.get());
         }
 
         databaseContext.setMetaData(newMetaData);
@@ -102,7 +98,7 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
         return multiFieldCleanupsProperty;
     }
 
-    public ObjectProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupPropertyProperty() {
+    public ObjectProperty<Optional<CleanupPreferences.CleanupStep>> journalAbbreviationCleanupPropertyProperty() {
         return journalAbbreviationCleanupProperty;
     }
 

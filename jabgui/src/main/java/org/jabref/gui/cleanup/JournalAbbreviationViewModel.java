@@ -1,6 +1,7 @@
 package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,13 +14,12 @@ public class JournalAbbreviationViewModel {
             CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
             CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
             CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-            CleanupPreferences.CleanupStep.UNABBREVIATE,
-            CleanupPreferences.CleanupStep.NO_CHANGES
+            CleanupPreferences.CleanupStep.UNABBREVIATE
     );
 
-    public final ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleObjectProperty<>();
+    public final ObjectProperty<Optional<CleanupPreferences.CleanupStep>> selectedJournalCleanupOption = new SimpleObjectProperty<>();
 
     public JournalAbbreviationViewModel() {
-        selectedJournalCleanupOption.set(CleanupPreferences.CleanupStep.NO_CHANGES);
+        selectedJournalCleanupOption.set(Optional.empty());
     }
 }

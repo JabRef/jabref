@@ -56,9 +56,7 @@ public class CleanupWorker {
 
         // Add active jobs from preset panel
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
-            if (!action.equals(CleanupPreferences.CleanupStep.NO_CHANGES)) {
-                jobs.add(toJob(action));
-            }
+            jobs.add(toJob(action));
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {

@@ -1921,8 +1921,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
                 CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
                 CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-                CleanupPreferences.CleanupStep.UNABBREVIATE,
-                CleanupPreferences.CleanupStep.NO_CHANGES));
+                CleanupPreferences.CleanupStep.UNABBREVIATE));
         return activeJobs;
     }
 
