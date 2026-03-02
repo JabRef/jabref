@@ -26,7 +26,7 @@ dependencies {
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.2.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
 
     api(platform("org.junit:junit-bom:6.0.3"))
     api("org.junit.jupiter:junit-jupiter-api")
@@ -106,7 +106,7 @@ dependencies.constraints {
     api("io.github.thibaultmeyer:cuid:2.0.5")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
-    api("io.zonky.test:embedded-postgres:2.2.1")
+    api("io.zonky.test:embedded-postgres:2.2.2")
     api("jakarta.annotation:jakarta.annotation-api:3.0.0")
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
