@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -43,7 +46,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
 
+    private static final int KEEP_ALIVE_INTERVAL_MINUTES = 30;
+
     private DBMSProcessor dbmsProcessor;
+    private ScheduledExecutorService keepAliveExecutor;
     private String dbName;
     private final BibDatabaseContext bibDatabaseContext;
     private MetaData metaData;
@@ -155,6 +161,33 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         dbmsProcessor.startNotificationListener(this);
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
+    }
+
+    /// Starts a periodic keep-alive task that sends a lightweight query to the database to prevent idle connections timeout
+    private void startKeepAlive() {
+        keepAliveExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "DB-KeepAlive");
+            t.setDaemon(true);
+            return t;
+        });
+        keepAliveExecutor.scheduleAtFixedRate(() -> {
+            try {
+                if (currentConnection != null && !currentConnection.isClosed()) {
+                    currentConnection.createStatement().execute("SELECT 1");
+                    LOGGER.debug("Database keep-alive ping successful");
+                }
+            } catch (SQLException e) {
+                LOGGER.warn("Database keep-alive ping failed", e);
+                checkCurrentConnection();
+            }
+        }, KEEP_ALIVE_INTERVAL_MINUTES, KEEP_ALIVE_INTERVAL_MINUTES, TimeUnit.MINUTES);
+    }
+
+    private void stopKeepAlive() {
+        if (keepAliveExecutor != null) {
+            keepAliveExecutor.shutdownNow();
+            keepAliveExecutor = null;
+        }
     }
 
     /// Synchronizes the local database with shared one. Possible update types are: removal, update, or insert of a
@@ -356,11 +389,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.currentConnection = connection.getConnection();
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection);
         initializeDatabases();
+        startKeepAlive();
     }
 
     @Override
     public void closeSharedDatabase() {
         // Submit remaining entry changes
+        stopKeepAlive();
         pullLastEntryChanges();
         try {
             dbmsProcessor.stopNotificationListener();

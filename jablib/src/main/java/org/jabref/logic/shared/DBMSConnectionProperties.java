@@ -150,6 +150,10 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         props.setProperty("user", user);
         props.setProperty("password", password);
         props.setProperty("serverTimezone", serverTimezone);
+
+        props.setProperty("tcpKeepAlive", "true");
+        props.setProperty("socketTimeout", "30");
+
         if (useSSL) {
             props.setProperty("ssl", Boolean.toString(true));
             props.setProperty("useSSL", Boolean.toString(true));

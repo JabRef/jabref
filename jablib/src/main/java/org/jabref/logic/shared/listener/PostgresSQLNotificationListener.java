@@ -43,8 +43,14 @@ public class PostgresSQLNotificationListener implements Runnable {
                 // Wait a while before checking again for new notifications
                 Thread.sleep(500);
             }
-        } catch (SQLException | InterruptedException exception) {
-            LOGGER.error("Error while listening for updates to PostgresSQL", exception);
+        } catch (SQLException exception) {
+            LOGGER.warn("PostgreSQL notification listener lost connection", exception);
+            if (!stop) {
+                dbmsSynchronizer.checkCurrentConnection();
+            }
+        } catch (InterruptedException exception) {
+            LOGGER.debug("PostgreSQL notification listener interrupted", exception);
+            Thread.currentThread().interrupt();
         }
     }
 

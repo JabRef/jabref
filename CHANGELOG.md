@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We implemented a keep-alive mechanism and improved connection loss handling for the shared PostgreSQL database to prevent disconnections after 2 hours. [#11211](https://github.com/JabRef/jabref/issues/11211)
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
 
 ### Changed
