@@ -23,7 +23,7 @@ public class DBMSConnectionPropertiesTest {
         assertEquals("true", props.getProperty("tcpKeepAlive"),
                 "TCP keep-alive should be enabled to prevent idle connection drops");
         assertEquals("30", props.getProperty("socketTimeout"),
-                "Socket timeout should be set to prevent infinite hangs on dead connections");
+                "Socket timeout should be set to avoid hanging when the connection is lost");
     }
 }
 

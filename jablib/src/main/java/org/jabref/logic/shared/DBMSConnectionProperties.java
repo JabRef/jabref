@@ -151,8 +151,10 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         props.setProperty("password", password);
         props.setProperty("serverTimezone", serverTimezone);
 
-        props.setProperty("tcpKeepAlive", "true");
-        props.setProperty("socketTimeout", "30");
+        if (type == DBMSType.POSTGRESQL) {
+            props.setProperty("tcpKeepAlive", "true");
+            props.setProperty("socketTimeout", "30");
+        }
 
         if (useSSL) {
             props.setProperty("ssl", Boolean.toString(true));
