@@ -564,21 +564,21 @@ public class JabRefDialogService implements DialogService {
     public static class FileNotification extends Notification<Path> {
         public FileNotification(String title, String description) {
             super(title, description);
-            setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+            setOnClick(_ -> OnClickBehaviour.NONE);
         }
     }
 
     public static class UndefinedNotification extends Notification<Object> {
         public UndefinedNotification(String title, String description) {
             super(title, description);
-            setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+            setOnClick(_ -> OnClickBehaviour.REMOVE);
         }
     }
 
     public static class PreviewNotification extends Notification<Object> {
         public PreviewNotification(String title, String description) {
             super(title, description);
-            setOnClick(_ -> OnClickBehaviour.HIDE_AND_REMOVE);
+            setOnClick(_ -> OnClickBehaviour.REMOVE);
         }
     }
 
@@ -593,17 +593,21 @@ public class JabRefDialogService implements DialogService {
                 undefinedTask = true;
             }
             setOnClick(_ -> OnClickBehaviour.NONE);
-            task.setOnSucceeded(_ -> {
-                if (undefinedTask) {
-                    UiTaskExecutor.runInJavaFXThread(this::remove);
-                }
-                setOnClick(_ -> OnClickBehaviour.REMOVE);
-            });
-
             getActions().add(new NotificationAction<>(Localization.lang("Cancel"), _ -> {
                 task.cancel();
                 return OnClickBehaviour.REMOVE;
             }));
+            task.setOnSucceeded(_ -> finishTask());
+            task.setOnFailed(_ -> finishTask());
+            task.setOnCancelled(_ -> finishTask());
+        }
+
+        private void finishTask() {
+            if (undefinedTask) {
+                UiTaskExecutor.runInJavaFXThread(this::remove);
+            }
+            setOnClick(_ -> OnClickBehaviour.REMOVE);
+            getActions().clear();
         }
     }
 

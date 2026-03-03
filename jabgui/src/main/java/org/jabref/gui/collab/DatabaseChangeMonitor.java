@@ -97,7 +97,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                     }
                 }
 
-                return OnClickBehaviour.REMOVE;
+                return OnClickBehaviour.NONE;
             });
 
             getActions().addAll(dismissAction, reviewAction);
