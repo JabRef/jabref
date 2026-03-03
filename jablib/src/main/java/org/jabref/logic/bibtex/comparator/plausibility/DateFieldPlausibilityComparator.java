@@ -8,7 +8,7 @@ import org.jabref.model.entry.Date;
 
 public class DateFieldPlausibilityComparator implements FieldValuePlausibilityComparator {
 
-    // Only the factory may instantiate this
+    // Only {@link PlausibilityComparatorFactory} may instantiate this
     DateFieldPlausibilityComparator() {
     }
 
