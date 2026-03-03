@@ -30,7 +30,7 @@ import org.jspecify.annotations.NonNull;
 
 /// Exports a JabRef library to the <a href="https://academicpages.github.io">academicpages</a> Jekyll template format.
 /// Each {@link BibEntry} is written to a separate Markdown file in the given output directory.
-/// The file name follows the pattern {@code YYYY-MM-DD-citationkey.md}.
+/// The file name follows the pattern `YYYY-MM-DD-citationkey.md`.
 public class AcademicPagesExporter extends Exporter {
 
     private static final String COLLECTION = "publications";
