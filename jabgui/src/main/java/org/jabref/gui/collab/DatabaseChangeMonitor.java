@@ -69,7 +69,11 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private class ExternalLibraryChangeNotification extends Notifications.FileNotification {
         public ExternalLibraryChangeNotification(List<DatabaseChange> changes) {
-            super(Localization.lang("The library has been modified by another program."), database.getDatabasePath().toString());
+            super(Localization.lang("External changes detected"),
+                    Localization.lang("The library has been modified by another program.") + "\n" +
+                            database.getDatabasePath()
+                                    .map(Path::toString)
+                                    .orElse(""));
             setOnClick(_ -> OnClickBehaviour.NONE);
 
             NotificationAction<Path> dismissAction = new NotificationAction<>(Localization.lang("Dismiss changes"), _ -> {
