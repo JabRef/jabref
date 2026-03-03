@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.UnabbreviateJournalCleanup;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -31,6 +32,7 @@ class JournalAbbreviationRepositoryTest {
 
     private JournalAbbreviationRepository repository;
     private final BibDatabase bibDatabase = new BibDatabase();
+    private final ConferenceAbbreviationRepository conferenceRepository = new ConferenceAbbreviationRepository();
 
     @BeforeEach
     void setUp() {
@@ -183,7 +185,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry entryWithEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
 
-        new AbbreviateJournalCleanup(bibDatabase, repository, AbbreviationType.DEFAULT, false).cleanup(entryWithEscapedAmpersandInJournal);
+        new AbbreviateJournalCleanup(bibDatabase, repository, conferenceRepository, AbbreviationType.DEFAULT, false).cleanup(entryWithEscapedAmpersandInJournal);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
@@ -196,7 +198,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
@@ -208,7 +210,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
 
-        new AbbreviateJournalCleanup(bibDatabase, repository, AbbreviationType.DEFAULT, false).cleanup(entry);
+        new AbbreviateJournalCleanup(bibDatabase, repository, conferenceRepository, AbbreviationType.DEFAULT, false).cleanup(entry);
 
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
@@ -219,7 +221,7 @@ class JournalAbbreviationRepositoryTest {
     void journalAbbreviateWithEmptyFJournal() {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces").withField(AMSField.FJOURNAL, "&nbsp;");
 
-        new AbbreviateJournalCleanup(bibDatabase, repository, AbbreviationType.DEFAULT, true).cleanup(entry);
+        new AbbreviateJournalCleanup(bibDatabase, repository, conferenceRepository, AbbreviationType.DEFAULT, true).cleanup(entry);
 
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
@@ -233,7 +235,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
@@ -246,7 +248,7 @@ class JournalAbbreviationRepositoryTest {
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
                 .withField(AMSField.FJOURNAL, "ACS Applied Materials \\& Interfaces");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
@@ -258,7 +260,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl Mater Interfaces");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
@@ -270,7 +272,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "{ACS Appl Mater Interfaces}");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
@@ -283,7 +285,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.JOURNAL, "{The Visualization Handbook}");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.JOURNAL, "{The Visualization Handbook}");
@@ -296,7 +298,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.BOOKTITLE, "2015 {IEEE} International Conference on Digital Signal Processing, {DSP} 2015, Singapore, July 21-24, 2015");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.BOOKTITLE, "2015 {IEEE} International Conference on Digital Signal Processing, {DSP} 2015, Singapore, July 21-24, 2015");
@@ -308,7 +310,7 @@ class JournalAbbreviationRepositoryTest {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "Phys Rev B");
 
-        new UnabbreviateJournalCleanup(bibDatabase, repository).cleanup(abbreviatedJournalEntry);
+        new UnabbreviateJournalCleanup(bibDatabase, repository, conferenceRepository).cleanup(abbreviatedJournalEntry);
 
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "Physical Review B");

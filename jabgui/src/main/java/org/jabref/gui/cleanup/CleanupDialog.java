@@ -18,6 +18,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -42,11 +43,12 @@ public class CleanupDialog extends BaseDialog<Void> {
                          UndoManager undoManager,
                          Supplier<LibraryTab> tabSupplier,
                          TaskExecutor taskExecutor,
-                         JournalAbbreviationRepository journalAbbreviationRepository) {
+                         JournalAbbreviationRepository journalAbbreviationRepository,
+                         ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
         super();
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
-                stateManager, undoManager, tabSupplier, taskExecutor, journalAbbreviationRepository
+                stateManager, undoManager, tabSupplier, taskExecutor, journalAbbreviationRepository, conferenceAbbreviationRepository
         );
 
         init(databaseContext, preferences);
@@ -59,11 +61,12 @@ public class CleanupDialog extends BaseDialog<Void> {
                          DialogService dialogService,
                          StateManager stateManager,
                          UndoManager undoManager,
-                         JournalAbbreviationRepository journalAbbreviationRepository) {
+                         JournalAbbreviationRepository journalAbbreviationRepository,
+                         ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
 
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
-                stateManager, undoManager, null, null, journalAbbreviationRepository
+                stateManager, undoManager, null, null, journalAbbreviationRepository, conferenceAbbreviationRepository
         );
 
         viewModel.setTargetEntries(List.of(targetEntry));

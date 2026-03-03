@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -18,19 +19,22 @@ public class CleanupSingleAction extends SimpleCommand {
     private final BibEntry entry;
     private final UndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
 
     public CleanupSingleAction(BibEntry entry,
                                CliPreferences preferences,
                                DialogService dialogService,
                                StateManager stateManager,
                                UndoManager undoManager,
-                               JournalAbbreviationRepository journalAbbreviationRepository) {
+                               JournalAbbreviationRepository journalAbbreviationRepository,
+                               ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
         this.entry = entry;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -48,7 +52,8 @@ public class CleanupSingleAction extends SimpleCommand {
                 dialogService,
                 stateManager,
                 undoManager,
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                conferenceAbbreviationRepository
         );
 
         dialogService.showCustomDialogAndWait(cleanupDialog);

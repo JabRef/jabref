@@ -2,8 +2,9 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -19,10 +20,14 @@ import org.jspecify.annotations.NullMarked;
 public class UnabbreviateJournalCleanup implements CleanupJob {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final BibDatabase database;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
 
-    public UnabbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository) {
+    public UnabbreviateJournalCleanup(BibDatabase database,
+                                      JournalAbbreviationRepository journalAbbreviationRepository,
+                                      ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
         this.database = database;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
     }
 
     @Override
@@ -31,6 +36,7 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
 
         allChanges.addAll(unabbreviate(entry, StandardField.JOURNAL));
         allChanges.addAll(unabbreviate(entry, StandardField.JOURNALTITLE));
+        allChanges.addAll(unabbreviate(entry, StandardField.BOOKTITLE));
 
         return allChanges;
     }
@@ -38,6 +44,10 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
     private List<FieldChange> unabbreviate(BibEntry entry, Field field) {
         if (!entry.hasField(field)) {
             return List.of();
+        }
+
+        if (StandardField.BOOKTITLE == field) {
+            return unabbreviateBookTitle(entry, field);
         }
 
         List<FieldChange> changes = new ArrayList<>(restoreUnabbreviatedJournalTitleFromFJournal(entry, field));
@@ -57,11 +67,28 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
             return List.of(); // Cannot unabbreviate unabbreviated name.
         }
 
-        Abbreviation abbreviation = journalAbbreviationRepository.get(text).orElseThrow();
-        String newText = abbreviation.getName().replaceAll("(?<!\\\\)&", "\\\\&");
+        String newText = journalAbbreviationRepository.get(text)
+                                                      .orElseThrow()
+                                                      .getName()
+                                                      .replaceAll("(?<!\\\\)&", "\\\\&");
         entry.setField(field, newText);
         changes.add(new FieldChange(entry, field, origText, newText));
         return changes;
+    }
+
+    private List<FieldChange> unabbreviateBookTitle(BibEntry entry, Field field) {
+        String text = entry.getFieldLatexFree(field).orElse("");
+        String origText = text;
+        text = database.resolveForStrings(origText);
+
+        Optional<String> newTextOptional = conferenceAbbreviationRepository.getFullName(text);
+        if (newTextOptional.isEmpty() || newTextOptional.get().equals(origText)) {
+            return List.of();
+        }
+
+        String newText = newTextOptional.get().replaceAll("(?<!\\\\)&", "\\\\&");
+        entry.setField(field, newText);
+        return List.of(new FieldChange(entry, field, origText, newText));
     }
 
     private List<FieldChange> restoreUnabbreviatedJournalTitleFromFJournal(BibEntry entry, Field field) {

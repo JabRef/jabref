@@ -11,12 +11,20 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
+
 ### Changed
 
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
+- We upgraded to Lucene 10.4 for the fulltext search.
+    Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+    ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+    Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+    [#15220](https://github.com/JabRef/jabref/pull/15220)
 
 ### Fixed
 
+- We fixed a false "Invalid citation key" warning for keys with diacritical marks. [#14953](https://github.com/JabRef/jabref/issues/14953)
 - We fixed an issue where duplicate fields can be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
 - We fixed an issue where blank fields could be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
 - Fixed issues with escaping keywords in "Keywords Editor" [#14780](https://github.com/JabRef/jabref/issues/14780)

@@ -82,6 +82,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
@@ -115,6 +116,7 @@ public class MainMenu extends MenuBar {
     private final PreviewControls previewControls;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -133,7 +135,8 @@ public class MainMenu extends MenuBar {
                     AiService aiService,
                     PreviewControls previewControls,
                     GitHandlerRegistry gitHandlerRegistry,
-                    JournalAbbreviationRepository journalAbbreviationRepository
+                    JournalAbbreviationRepository journalAbbreviationRepository,
+                    ConferenceAbbreviationRepository conferenceAbbreviationRepository
     ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
@@ -153,6 +156,7 @@ public class MainMenu extends MenuBar {
         this.previewControls = previewControls;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
 
         createMenu();
     }
@@ -277,7 +281,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository, conferenceAbbreviationRepository)),
 
                 new SeparatorMenuItem(),
 

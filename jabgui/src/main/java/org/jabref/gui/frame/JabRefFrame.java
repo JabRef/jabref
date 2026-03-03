@@ -56,6 +56,7 @@ import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
@@ -102,6 +103,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -127,7 +129,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        GitHandlerRegistry gitHandlerRegistry,
-                       JournalAbbreviationRepository journalAbbreviationRepository) {
+                       JournalAbbreviationRepository journalAbbreviationRepository,
+                       ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -140,6 +143,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
 
         setId("frame");
 
@@ -233,7 +237,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 clipBoardManager,
                 undoManager,
-                journalAbbreviationRepository);
+                journalAbbreviationRepository,
+                conferenceAbbreviationRepository);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -253,7 +258,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 aiService,
                 entryEditor,
                 gitHandlerRegistry,
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                conferenceAbbreviationRepository
         );
 
         VBox head = new VBox(mainMenu, mainToolBar);

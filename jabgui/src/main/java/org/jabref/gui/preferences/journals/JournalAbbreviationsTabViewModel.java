@@ -114,7 +114,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     /// Read all saved file paths and read their abbreviations.
     public void createFileObjects() {
-        List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
+        List<String> externalFiles = abbreviationsPreferences.getExternalLists();
         externalFiles.forEach(name -> openFile(Path.of(name)));
     }
 
@@ -307,7 +307,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                                                                  .map(path -> path.getAbsolutePath().get().toAbsolutePath().toString())
                                                                  .collect(Collectors.toList());
 
-                    abbreviationsPreferences.setExternalJournalLists(journalStringList);
+                    abbreviationsPreferences.setExternalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
 
                     if (shouldWriteLists) {

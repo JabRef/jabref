@@ -9,6 +9,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -22,6 +23,7 @@ public class CleanupAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
 
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
                          CliPreferences preferences,
@@ -29,7 +31,8 @@ public class CleanupAction extends SimpleCommand {
                          StateManager stateManager,
                          TaskExecutor taskExecutor,
                          UndoManager undoManager,
-                         JournalAbbreviationRepository journalAbbreviationRepository) {
+                         JournalAbbreviationRepository journalAbbreviationRepository,
+                         ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -37,6 +40,7 @@ public class CleanupAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -55,7 +59,8 @@ public class CleanupAction extends SimpleCommand {
                 undoManager,
                 tabSupplier,
                 taskExecutor,
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                conferenceAbbreviationRepository
         );
 
         dialogService.showCustomDialogAndWait(cleanupDialog);

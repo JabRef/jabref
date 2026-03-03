@@ -23,6 +23,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
 import org.jabref.logic.cleanup.CleanupWorker;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -54,6 +55,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
 
     private final ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
@@ -67,7 +69,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
             UndoManager undoManager,
             @Nullable Supplier<LibraryTab> tabSupplier,
             @Nullable TaskExecutor taskExecutor,
-            JournalAbbreviationRepository journalAbbreviationRepository
+            JournalAbbreviationRepository journalAbbreviationRepository,
+            ConferenceAbbreviationRepository conferenceAbbreviationRepository
     ) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
@@ -77,6 +80,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         this.tabSupplier = tabSupplier;
         this.taskExecutor = taskExecutor;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
     }
 
     public void setTargetEntries(List<BibEntry> entries) {
@@ -164,7 +168,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
                 preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                conferenceAbbreviationRepository
         );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);

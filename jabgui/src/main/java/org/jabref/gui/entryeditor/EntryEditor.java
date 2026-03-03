@@ -63,6 +63,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -122,6 +123,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private ConferenceAbbreviationRepository conferenceAbbreviationRepository;
     @Inject private AiService aiService;
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
@@ -335,7 +337,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     @FXML
     private void generateCleanupButton() {
-        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository);
+        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository, conferenceAbbreviationRepository);
         action.execute();
     }
 

@@ -12,6 +12,7 @@ import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
@@ -89,7 +90,14 @@ class CleanupWorkerTest {
         xmpPreferences = mock(XmpPreferences.class);
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
-        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class), false, mock(JournalAbbreviationRepository.class));
+        worker = new CleanupWorker(
+                context,
+                fileDirPrefs,
+                mock(TimestampPreferences.class),
+                false,
+                mock(JournalAbbreviationRepository.class),
+                mock(ConferenceAbbreviationRepository.class)
+        );
     }
 
     @Test

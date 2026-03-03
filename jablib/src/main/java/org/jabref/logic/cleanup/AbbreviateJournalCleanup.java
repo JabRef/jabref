@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -22,11 +23,13 @@ public class AbbreviateJournalCleanup implements CleanupJob {
     private final BibDatabase database;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final AbbreviationType abbreviationType;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
     private final boolean useFJournalField;
 
-    public AbbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
+    public AbbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, ConferenceAbbreviationRepository conferenceAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
         this.database = database;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
         this.abbreviationType = abbreviationType;
         this.useFJournalField = useFJournalField;
     }
@@ -37,7 +40,26 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         // Journal is BibTeX, JournalTitle is BibLaTeX. See also org/jabref/model/entry/EntryConverter.java:20
         allChanges.addAll(abbreviateField(entry, StandardField.JOURNAL));
         allChanges.addAll(abbreviateField(entry, StandardField.JOURNALTITLE));
+        allChanges.addAll(abbreviateBookTitle(entry));
         return allChanges;
+    }
+
+    private List<FieldChange> abbreviateBookTitle(BibEntry entry) {
+        if (!entry.hasField(StandardField.BOOKTITLE)) {
+            return List.of();
+        }
+
+        String origText = entry.getField(StandardField.BOOKTITLE).orElse("");
+        String text = database.resolveForStrings(origText);
+
+        Optional<String> newTextOptional = conferenceAbbreviationRepository.getAbbreviation(text);
+        if (newTextOptional.isEmpty() || newTextOptional.get().equals(origText)) {
+            return List.of();
+        }
+
+        String newText = newTextOptional.get().replaceAll("(?<!\\\\)&", "\\\\&");
+        entry.setField(StandardField.BOOKTITLE, newText);
+        return List.of(new FieldChange(entry, StandardField.BOOKTITLE, origText, newText));
     }
 
     private List<FieldChange> abbreviateField(BibEntry entry, Field fieldName) {

@@ -15,6 +15,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.citationkeypattern;
     exports org.jabref.logic.exporter;
     exports org.jabref.logic.importer.fileformat;
+    exports org.jabref.logic.conferences;
     exports org.jabref.logic.journals;
     exports org.jabref.logic.l10n;
     exports org.jabref.logic.net;
@@ -241,7 +242,7 @@ open module org.jabref.jablib {
     /*
      * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
+    uses org.apache.lucene.codecs.lucene104.Lucene104Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;

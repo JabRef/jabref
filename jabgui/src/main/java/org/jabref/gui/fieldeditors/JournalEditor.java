@@ -15,11 +15,13 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -35,6 +37,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
+    @Inject private ConferenceAbbreviationRepository conferenceAbbreviationRepository;
     @Inject private UndoManager undoManager;
 
     public JournalEditor(Field field,
@@ -51,10 +54,16 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 field,
                 suggestionProvider,
                 abbreviationRepository,
+                conferenceAbbreviationRepository,
                 fieldCheckers,
                 taskExecutor,
                 dialogService,
                 undoManager);
+
+        if (field == StandardField.BOOKTITLE) {
+            journalInfoButton.setManaged(false);
+            journalInfoButton.setVisible(false);
+        }
 
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textField.initContextMenu(new DefaultMenu(textField), keyBindingRepository);

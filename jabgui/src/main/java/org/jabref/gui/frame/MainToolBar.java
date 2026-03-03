@@ -36,6 +36,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -63,6 +64,7 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand forwardCommand;
     private final CountingUndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -80,7 +82,8 @@ public class MainToolBar extends ToolBar {
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        CountingUndoManager undoManager,
-                       JournalAbbreviationRepository journalAbbreviationRepository) {
+                       JournalAbbreviationRepository journalAbbreviationRepository,
+                       ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -94,6 +97,7 @@ public class MainToolBar extends ToolBar {
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
 
         createToolBar();
     }
@@ -147,7 +151,7 @@ public class MainToolBar extends ToolBar {
                 new HBox(
                         pushToApplicationButton,
                         factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository))),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository, conferenceAbbreviationRepository))),
 
                 new Separator(Orientation.VERTICAL),
 

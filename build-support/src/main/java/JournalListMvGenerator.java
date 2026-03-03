@@ -14,6 +14,8 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationPreferences.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
@@ -104,5 +106,48 @@ public class JournalListMvGenerator {
         }
 
         LOGGER.info("Generated journal list at {}", journalListMvFile.toAbsolutePath());
+
+        Path conferenceabbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", "conferences");
+        if (!Files.exists(conferenceabbreviationsDirectory)) {
+            System.out.println("Path " + conferenceabbreviationsDirectory.toAbsolutePath() + " does not exist");
+            System.exit(0);
+        }
+        // Directory layout aligns to other plugins (e.g., XJF plugin (https://github.com/bjornvester/xjc-gradle-plugin))
+        Path conferencesListMvFile = Path.of("jablib", "build", "generated", "resources", "journals", "conferences-list.mv");
+
+        Files.createDirectories(conferencesListMvFile.getParent());
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(conferenceabbreviationsDirectory, "*.csv");
+             MVStore store = new MVStore.Builder().
+                     fileName(conferencesListMvFile.toString()).
+                     compressHigh().
+                     open()) {
+            MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
+            stream.forEach(Unchecked.consumer(path -> {
+                String fileName = path.getFileName().toString();
+                System.out.print("Checking ");
+                System.out.print(fileName);
+                if (ignoredNames.contains(fileName)) {
+                    System.out.println(" ignored");
+                } else {
+                    System.out.println("...");
+                    Collection<Abbreviation> abbreviations = ConferenceAbbreviationLoader.readAbbreviationsFromCsvFile(path);
+                    Map<String, Abbreviation> abbreviationMap = abbreviations
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    Abbreviation::getName,
+                                    abbreviation -> abbreviation,
+                                    (abbreviation1, abbreviation2) -> {
+                                        if (verbose) {
+                                            System.out.println("Double entry " + abbreviation1.getName());
+                                        }
+                                        return abbreviation2;
+                                    }));
+                    fullToAbbreviation.putAll(abbreviationMap);
+                }
+            }));
+        }
+
+        LOGGER.info("Generated conferences list at {}", conferencesListMvFile.toAbsolutePath());
     }
 }

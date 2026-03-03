@@ -4,27 +4,15 @@ import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
-public class JournalAbbreviationPreferences {
+public class JournalAbbreviationPreferences extends AbbreviationPreferences {
 
-    private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
 
-    public JournalAbbreviationPreferences(List<String> externalJournalLists,
+    public JournalAbbreviationPreferences(List<String> externalLists,
                                           boolean useFJournalField) {
-        this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
+        super(externalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
-    }
-
-    public ObservableList<String> getExternalJournalLists() {
-        return externalJournalLists;
-    }
-
-    public void setExternalJournalLists(List<String> list) {
-        externalJournalLists.clear();
-        externalJournalLists.addAll(list);
     }
 
     public boolean shouldUseFJournalField() {
