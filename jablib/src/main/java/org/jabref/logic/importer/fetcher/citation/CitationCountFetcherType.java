@@ -7,10 +7,7 @@ import org.jabref.logic.importer.fetcher.citation.opencitations.OpenCitationsFet
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 
 public enum CitationCountFetcherType {
-    SEMANTIC_SCHOLAR(SemanticScholarCitationFetcher.FETCHER_NAME),
-    OPEN_ALEX(OpenAlex.FETCHER_NAME),
-    OPEN_CITATIONS(OpenCitationsFetcher.FETCHER_NAME),
-    SCITE_AI(SciteAiFetcher.FETCHER_NAME);
+    SEMANTIC_SCHOLAR(SemanticScholarCitationFetcher.FETCHER_NAME), OPEN_ALEX(OpenAlex.FETCHER_NAME), OPEN_CITATIONS(OpenCitationsFetcher.FETCHER_NAME), SCITE_AI(SciteAiFetcher.FETCHER_NAME);
 
     private final String name;
 
@@ -27,8 +24,7 @@ public enum CitationCountFetcherType {
         return name;
     }
 
-    public static CitationCountFetcher getCitationCountFetcher(CitationCountFetcherType type,
-                                                                ImporterPreferences importerPreferences) {
+    public static CitationCountFetcher getCitationCountFetcher(CitationCountFetcherType type, ImporterPreferences importerPreferences) {
         return switch (type) {
             case SEMANTIC_SCHOLAR ->
                     new SemanticScholarCitationFetcher(importerPreferences);
