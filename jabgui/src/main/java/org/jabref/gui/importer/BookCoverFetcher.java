@@ -116,12 +116,13 @@ public class BookCoverFetcher {
                                   .filter(fileType -> fileType.getMimeType().startsWith("image/")))
                 .orElse(StandardExternalFileType.JPG);
 
-        Optional<Path> destination = resolveNameWithType(directory, name, inferredFileType);
-        if (destination.isEmpty()) {
+        Optional<Path> destinationOptional = resolveNameWithType(directory, name, inferredFileType);
+        if (destinationOptional.isEmpty()) {
             LOGGER.warn("Skipping cover download: Could not resolve valid path for name {}", name);
             return;
         }
-        downloadCoverHelper(download, destination.get(), directory, name, url);
+        Path destination = destinationOptional.get();
+        downloadCoverHelper(download, destination, directory, name, url);
     }
 
     protected void downloadCoverHelper(URLDownload download, Path destination, Path directory, String name, String url) {
@@ -142,21 +143,22 @@ public class BookCoverFetcher {
     }
 
     private void flagAsNotAvailable(final String name, final Path directory) {
-        Optional<Path> destination = resolveNameWithType(directory, name, NOT_AVAILABLE_FILE_TYPE);
-        if (destination.isEmpty()) {
+        Optional<Path> destinationOptional = resolveNameWithType(directory, name, NOT_AVAILABLE_FILE_TYPE);
+        if (destinationOptional.isEmpty()) {
             LOGGER.warn("Skipping flagging as not available: Could not resolve valid path for name {}", name);
             return;
         }
-        if (Files.exists(destination.get())) {
+        Path destination = destinationOptional.get();
+        if (Files.exists(destination)) {
             try {
                 Instant now = Instant.now();
-                Files.setLastModifiedTime(destination.get(), FileTime.from(now));
+                Files.setLastModifiedTime(destination, FileTime.from(now));
             } catch (IOException e) {
                 LOGGER.error("Could not update last modified time of .not-available file", e);
             }
         } else {
             try {
-                Files.createFile(destination.get());
+                Files.createFile(destination);
             } catch (IOException e) {
                 LOGGER.error("Could not create .not-available file", e);
             }
@@ -164,12 +166,13 @@ public class BookCoverFetcher {
     }
 
     private void deleteNotAvailableFileIfExists(final String name, final Path directory) {
-        Optional<Path> destination = resolveNameWithType(directory, name, NOT_AVAILABLE_FILE_TYPE);
-        if (destination.isEmpty()) {
+        Optional<Path> destinationOptional = resolveNameWithType(directory, name, NOT_AVAILABLE_FILE_TYPE);
+        if (destinationOptional.isEmpty()) {
             return;
         }
+        Path destination = destinationOptional.get();
         try {
-            Files.deleteIfExists(destination.get());
+            Files.deleteIfExists(destination);
         } catch (IOException e) {
             LOGGER.error("Could not delete .not-available file", e);
         }
