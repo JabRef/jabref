@@ -103,10 +103,10 @@ public class AcademicPagesExporter extends Exporter {
 
         List<BibEntry> sorted = entries.stream().sorted(ENTRY_TYPE_ORDER).toList();
         for (BibEntry entry : sorted) {
-            String fileName = buildFileName(entry, publicationsDir);
+            String fileName = generateFileName(entry, publicationsDir);
             Path mdFile = publicationsDir.resolve(fileName);
             try {
-                Files.writeString(mdFile, buildContent(entry, filesDir, databaseContext, fileDirForDatabase));
+                Files.writeString(mdFile, generateMarkdownContent(entry, filesDir, databaseContext, fileDirForDatabase));
             } catch (IOException ex) {
                 throw new SaveException(ex);
             }
@@ -118,14 +118,14 @@ public class AcademicPagesExporter extends Exporter {
         return FileUtil.getValidFileName(key);
     }
 
-    private String buildFileName(BibEntry entry, Path targetDir) {
+    private String generateFileName(BibEntry entry, Path targetDir) {
         String key = sanitizeKey(entry.getCitationKey().orElse("unknown"));
-        String baseName = buildDate(entry) + "-" + key;
+        String baseName = resolveDate(entry) + "-" + key;
         String fullName = FileUtil.getValidFileName(baseName + ".md");
         return FileNameUniqueness.generateUniqueFileName(targetDir, fullName);
     }
 
-    private String buildDate(BibEntry entry) {
+    private String resolveDate(BibEntry entry) {
         return entry.getFieldOrAlias(StandardField.DATE)
                     .flatMap(Date::parse)
                     .map(date -> formatDate(date.toTemporalAccessor()))
@@ -150,8 +150,8 @@ public class AcademicPagesExporter extends Exporter {
 
     /// Builds the full Markdown file content: YAML front matter + abstract body.
     /// Format based on the [academicpages template](https://github.com/academicpages/academicpages.github.io/blob/master/_publications/2009-10-01-paper-title-number-1.md).
-    private String buildContent(BibEntry entry, Path outputDir, BibDatabaseContext databaseContext, List<Path> fileDirForDatabase) {
-        String date = buildDate(entry);
+    private String generateMarkdownContent(BibEntry entry, Path outputDir, BibDatabaseContext databaseContext, List<Path> fileDirForDatabase) {
+        String date = resolveDate(entry);
         String key = sanitizeKey(entry.getCitationKey().orElse("unknown"));
 
         Map<String, Object> yamlMap = new LinkedHashMap<>();
@@ -160,12 +160,12 @@ public class AcademicPagesExporter extends Exporter {
         yamlMap.put("permalink", "/" + PUBLICATION_PATH + "/" + date + "-" + key);
         yamlMap.put("date", date);
 
-        buildVenue(entry).ifPresent(venue -> yamlMap.put("venue", venue));
+        resolveVenue(entry).ifPresent(venue -> yamlMap.put("venue", venue));
         copyPdfAndGetUrl(entry, outputDir, key, fileDirForDatabase)
                 .ifPresent(paperUrl -> yamlMap.put("paperurl", "/files/" + paperUrl));
         writeBibFile(entry, outputDir, key)
                 .ifPresent(bibUrl -> yamlMap.put("bibtexurl", "/files/" + bibUrl));
-        yamlMap.put("citation", buildCitation(entry, databaseContext));
+        yamlMap.put("citation", generateCitation(entry, databaseContext));
         yamlMap.put("category", mapCategory(entry.getType()));
 
         DumperOptions options = new DumperOptions();
@@ -187,7 +187,7 @@ public class AcademicPagesExporter extends Exporter {
     }
 
     /// Returns the venue name from `JOURNAL` (which includes the `JOURNALTITLE` alias) or `BOOKTITLE`.
-    private Optional<String> buildVenue(BibEntry entry) {
+    private Optional<String> resolveVenue(BibEntry entry) {
         return entry.getFieldOrAliasLatexFree(StandardField.JOURNAL)
                     .or(() -> entry.getFieldOrAliasLatexFree(StandardField.BOOKTITLE));
     }
@@ -241,7 +241,7 @@ public class AcademicPagesExporter extends Exporter {
     }
 
     /// Generates a citation string from the entry using citation style IEEE
-    private String buildCitation(BibEntry entry, BibDatabaseContext databaseContext) {
+    private String generateCitation(BibEntry entry, BibDatabaseContext databaseContext) {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
         context.setMode(databaseContext.getMode());
         String style = CSLStyleLoader.getDefaultStyle().getSource();
