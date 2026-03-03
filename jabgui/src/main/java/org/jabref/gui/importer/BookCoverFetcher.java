@@ -58,7 +58,7 @@ public class BookCoverFetcher {
         entry.getISBN().ifPresent(isbn -> downloadCoverForISBN(isbn, Directories.getCoverDirectory()));
     }
 
-    protected void downloadCoverForISBN(ISBN isbn, Path directory) {
+    private void downloadCoverForISBN(ISBN isbn, Path directory) {
         final String name = "isbn-" + isbn.asString();
         if (findExistingImage(name, directory).isEmpty()) {
             Optional<Duration> timeSincePreviousAttempt = timeSincePreviousAttempt(name, directory);
@@ -71,7 +71,7 @@ public class BookCoverFetcher {
         }
     }
 
-    protected Optional<Duration> timeSincePreviousAttempt(String name, Path directory) {
+    private Optional<Duration> timeSincePreviousAttempt(String name, Path directory) {
         Optional<Path> notAvailablePathOptional = resolveNameWithType(directory, name, NOT_AVAILABLE_FILE_TYPE);
         if (notAvailablePathOptional.isEmpty()) {
             LOGGER.warn("Could not find not available file path for: {}", name);
@@ -90,7 +90,7 @@ public class BookCoverFetcher {
         return Optional.empty();
     }
 
-    protected void downloadCoverImage(String url, final String name, final Path directory) {
+    private void downloadCoverImage(String url, final String name, final Path directory) {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -122,10 +122,6 @@ public class BookCoverFetcher {
             return;
         }
         Path destination = destinationOptional.get();
-        downloadCoverHelper(download, destination, directory, name, url);
-    }
-
-    protected void downloadCoverHelper(URLDownload download, Path destination, Path directory, String name, String url) {
         try {
             download.toFile(destination);
             deleteNotAvailableFileIfExists(name, directory);
@@ -178,7 +174,7 @@ public class BookCoverFetcher {
         }
     }
 
-    protected Optional<Path> findExistingImage(final String name, final Path directory) {
+    private Optional<Path> findExistingImage(final String name, final Path directory) {
         return externalApplicationsPreferences.getExternalFileTypes().stream()
                                               .filter(fileType -> fileType.getMimeType().startsWith("image/"))
                                               .flatMap(fileType -> resolveNameWithType(directory, name, fileType).stream())

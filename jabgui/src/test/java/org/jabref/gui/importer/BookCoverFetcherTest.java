@@ -6,7 +6,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -22,7 +21,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.http.SimpleHttpResponse;
 
@@ -34,10 +32,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -75,22 +71,22 @@ class BookCoverFetcherTest {
         mockedDirectories.close();
     }
 
-    /// Test the cooldown for trying to download a bookcover
+    /// Test the cooldown for trying to download a book cover
     ///
     /// Asserts that the system does not try to download
-    /// a book cover again if timeSincePrevious returns
-    /// a time in hours < 24
+    /// a book cover again if it just attempted to do so
     @Test
-    void checkBookCoverFetchCooldown() {
-        ISBN isbn = new ISBN("123");
+    void checkBookCoverFetchCooldown() throws Exception {
+        doThrow(new FetcherClientException(mock(URL.class), mock(SimpleHttpResponse.class))).when(mockDownload).toFile(any());
+        when(mockDownload.asString()).thenReturn("mocked string");
 
-        doReturn(Optional.empty()).when(bookCoverFetcher).findExistingImage(any(), any());
-        doNothing().when(bookCoverFetcher).downloadCoverImage(any(), any(), any());
-        doReturn(Optional.of(Duration.ofHours(25))).doReturn(Optional.of(Duration.ofHours(1))).when(bookCoverFetcher).timeSincePreviousAttempt(any(), any());
-        bookCoverFetcher.downloadCoverForISBN(isbn, Directories.getCoverDirectory());
-        bookCoverFetcher.downloadCoverForISBN(isbn, Directories.getCoverDirectory());
+        // We should make a real download attempt, indicated by toFile being called once.
+        bookCoverFetcher.downloadCoversForEntry(entry);
+        verify(mockDownload, times(1)).toFile(any());
 
-        verify(bookCoverFetcher, times(1)).downloadCoverImage(any(), any(), any());
+        // We should not make a download attempt, indicated by toFile still only being called once in total.
+        bookCoverFetcher.downloadCoversForEntry(entry);
+        verify(mockDownload, times(1)).toFile(any());
     }
 
     /// Test creation of a not-available file
@@ -102,18 +98,13 @@ class BookCoverFetcherTest {
     /// "toFile". This should then cause the expected file to
     /// be created.
     @Test
-    void flagAsAvailableTest() throws Exception {
-        String name = "testCover";
-        String urlString = "https://example.com/thisisabookcoverthatdoesntexist.jpg";
+    void createNotAvailableFileAfterFailedDownload() throws Exception {
+        doThrow(new FetcherClientException(mock(URL.class), mock(SimpleHttpResponse.class))).when(mockDownload).toFile(any());
+        when(mockDownload.asString()).thenReturn("mocked string");
 
-        URLDownload download = mock(URLDownload.class);
-        Path destination = Directories.getCoverDirectory().resolve(name + ".not-available");
+        bookCoverFetcher.downloadCoversForEntry(entry);
 
-        doThrow(new FetcherClientException(mock(URL.class), mock(SimpleHttpResponse.class))).when(download).toFile(any());
-
-        assertFalse(Files.exists(destination));
-        bookCoverFetcher.downloadCoverHelper(download, destination, Directories.getCoverDirectory(), name, urlString);
-        assertTrue(Files.exists(destination));
+        assertTrue(Files.exists(notAvailablePath));
     }
 
     /// Test retrieval of downloaded book cover when there is no such file in
@@ -124,7 +115,7 @@ class BookCoverFetcherTest {
     /// When we try to get the book cover, we should not get anything since
     /// there is not such file in the directory.
     @Test
-    void getNoCoverWhenDirectoryIsEmpty() throws IOException {
+    void getNoCoverWhenDirectoryIsEmpty() {
         Optional<Path> optionalPath = bookCoverFetcher.getDownloadedCoverForEntry(entry);
         assertTrue(optionalPath.isEmpty());
     }
