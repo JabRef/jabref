@@ -174,10 +174,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             try {
                 if (currentConnection != null && !currentConnection.isClosed()) {
                     currentConnection.createStatement().execute("SELECT 1");
-                    LOGGER.debug("Database keep-alive ping successful");
+                    LOGGER.info("Database keep-alive ping successful");
                 }
             } catch (SQLException e) {
-                LOGGER.warn("Database keep-alive ping failed", e);
+                LOGGER.info("Database keep-alive ping failed", e);
                 checkCurrentConnection();
             }
         }, KEEP_ALIVE_INTERVAL_MINUTES, KEEP_ALIVE_INTERVAL_MINUTES, TimeUnit.MINUTES);
