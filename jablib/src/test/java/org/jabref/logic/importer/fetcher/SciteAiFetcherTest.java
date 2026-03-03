@@ -58,7 +58,7 @@ public class SciteAiFetcherTest {
     @Test
     void getCitationCountReturnsCitationCount() throws FetcherException {
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.DOI, "10.1145/1028174.971312");
+        entry.withField(StandardField.DOI, "10.1145/1028174.971312");
 
         Optional<Integer> result = fetcher.getCitationCount(entry);
 
