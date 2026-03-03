@@ -170,7 +170,7 @@ public enum StandardActions implements Action {
     DOWNLOAD_FILE(Localization.lang("Download file(s)"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     REDOWNLOAD_FILE(Localization.lang("Redownload file(s)"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     RENAME_FILE_TO_PATTERN(Localization.lang("Rename file to defined pattern"), IconTheme.JabRefIcons.AUTO_RENAME),
-    RENAME_FILE_TO_NAME(Localization.lang("Rename file(s) to configured filename format pattern"), IconTheme.JabRefIcons.RENAME, KeyBinding.REPLACE_STRING),
+    RENAME_FILE_TO_NAME(Localization.lang("Rename file(s) to configured filename format pattern"), IconTheme.JabRefIcons.RENAME, KeyBinding.RENAME_FILE_TO_NAME),
     MOVE_FILE_TO_FOLDER(Localization.lang("Move file(s) to file directory"), IconTheme.JabRefIcons.MOVE_TO_FOLDER),
     MOVE_FILE_TO_FOLDER_AND_RENAME(Localization.lang("Move file to file directory and rename file")),
     COPY_FILE_TO_FOLDER(Localization.lang("Copy linked file(s) to folder..."), IconTheme.JabRefIcons.COPY_TO_FOLDER, KeyBinding.COPY),
