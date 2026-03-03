@@ -352,6 +352,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         String volume = null;
         String doi = null;
         String isbn = null;
+        String citationKey = null;
 
         while (reader.hasNext()) {
             int event = reader.next();
@@ -377,13 +378,15 @@ public class CitaviXmlImporter extends Importer implements Parser {
                                 doi = reader.getElementText();
                         case "Isbn" ->
                                 isbn = reader.getElementText();
+                        case "CitationKey" ->
+                                citationKey = reader.getElementText();
                         default ->
                                 consumeElement(reader);
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
                     if ("Reference".equals(reader.getLocalName())) {
-                        references.add(new Reference(id, referenceType, title, year, abstractText, pageRange, pageCount, volume, doi, isbn));
+                        references.add(new Reference(id, referenceType, title, year, abstractText, pageRange, pageCount, volume, doi, isbn, citationKey));
                         return;
                     }
                 }
@@ -519,6 +522,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private void setEntryFieldsFromReference(BibEntry entry, Reference reference) {
         entry.setType(getType(reference));
 
+        Optional.ofNullable(reference.citationKey())
+                .filter(key -> !key.isBlank())
+                .map(key -> key.replaceAll("\\s+", ""))
+                .ifPresent(entry::setCitationKey);
         Optional.ofNullable(reference.title())
                 .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
         Optional.ofNullable(reference.abstractText())
