@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
@@ -9,7 +8,6 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -44,7 +42,6 @@ class CustomEntryTypesTabViewModelTest {
         fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
-        when(preferences.getDefaults()).thenReturn(Map.of(JabRefCliPreferences.NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn"));
         entryTypesManager = new BibEntryTypesManager();
         online = BiblatexEntryTypeDefinitions.ALL.stream().filter(type -> type.getType().equals(StandardEntryType.Online)).findAny().get();
     }
