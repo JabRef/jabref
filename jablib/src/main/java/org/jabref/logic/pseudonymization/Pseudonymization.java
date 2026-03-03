@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
-
+import java.util.concurrent.atomic.AtomicInteger;
 import org.jspecify.annotations.NullMarked;
 
 /// This class is used to anonymize a library. It is required to make private libraries available for public use.
@@ -41,13 +41,12 @@ public class Pseudonymization {
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
 
-        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
+        Optional<GroupTreeNode> groups= bibDatabaseContext.getMetaData().getGroups();
         if (groups.isPresent()) {
-            int[] counter = {1};
+            AtomicInteger counter = new AtomicInteger(1);
             GroupTreeNode newGroups = pseudonymizeGroupTree(groups.get(), valueMapping, counter);
             result.getMetaData().setGroups(newGroups);
         }
-
         return new Result(result, valueMapping);
     }
 
@@ -71,11 +70,10 @@ public class Pseudonymization {
         return newEntries;
     }
 
-    private static GroupTreeNode pseudonymizeGroupTree(GroupTreeNode node, Map<String, String> valueMapping, int[] counter) {
+    private static GroupTreeNode pseudonymizeGroupTree(GroupTreeNode node, Map<String, String> valueMapping, AtomicInteger counter) {
         AbstractGroup originalGroup = node.getGroup();
         String originalName = originalGroup.getName();
-        String pseudoName = "group-" + counter[0];
-        counter[0]++;
+        String pseudoName = "group-" + counter.getAndIncrement();
         valueMapping.put(pseudoName, originalName);
         AbstractGroup newGroup = new ExplicitGroup(pseudoName, originalGroup.getHierarchicalContext(), ',');
         GroupTreeNode newNode = new GroupTreeNode(newGroup);

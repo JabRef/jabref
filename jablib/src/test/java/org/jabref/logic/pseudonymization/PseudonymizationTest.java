@@ -23,7 +23,10 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -92,7 +95,28 @@ class PseudonymizationTest {
 
         assertEquals(expected, result);
     }
-
+    @Test
+    void shouldPseudonymizeGroupTree() {
+        // created a simple entry pt so database isn't empty
+        BibEntry entry = new BibEntry("test");
+        entry.setField(StandardField.AUTHOR, "Test Author");
+        BibDatabase db = new BibDatabase();
+        db.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(db);
+        GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode child = GroupTreeNode.fromGroup(
+                new ExplicitGroup("Research", GroupHierarchyType.INDEPENDENT, ',')
+        );
+        root.addChild(child);
+        context.getMetaData().setGroups(root);
+        Pseudonymization.Result res =
+                new Pseudonymization().pseudonymizeLibrary(context);
+        GroupTreeNode pseudonymizedRoot =
+                res.bibDatabaseContext().getMetaData().getGroups().orElseThrow();
+        assertEquals("group-1", pseudonymizedRoot.getGroup().getName());
+        assertEquals("group-2",
+                pseudonymizedRoot.getChildren().getFirst().getGroup().getName());
+    }
     @Test
     void pseudonymizeLibrary() throws URISyntaxException, IOException {
         Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
