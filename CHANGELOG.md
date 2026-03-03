@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
+-Added export format for academicpages. [#12727](https://github.com/JabRef/jabref/issues/12727)
 
 ### Changed
 
