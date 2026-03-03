@@ -19,9 +19,9 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -223,7 +223,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public void resetMultilineFieldsToDefault() {
         resetStandardFieldMultilineToDefaults();
-        List<Field> defaultNonWrappableFields = getDefaultNonWrappableFields();
+        List<Field> defaultNonWrappableFields = FieldPreferences.getDefault().getNonWrappableFields();
         preferences.getFieldPreferences().setNonWrappableFields(defaultNonWrappableFields);
         multiLineFields.clear();
         multiLineFields.addAll(defaultNonWrappableFields);
@@ -237,13 +237,5 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                 field.getProperties().remove(FieldProperty.MULTILINE_TEXT);
             }
         }
-    }
-
-    private List<Field> getDefaultNonWrappableFields() {
-        Object defaultNonWrappableFields = preferences.getDefaults().get(JabRefCliPreferences.NON_WRAPPABLE_FIELDS);
-        if (defaultNonWrappableFields instanceof String defaultFields) {
-            return new ArrayList<>(FieldFactory.parseFieldList(defaultFields));
-        }
-        return List.of();
     }
 }

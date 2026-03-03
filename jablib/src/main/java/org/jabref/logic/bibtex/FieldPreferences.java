@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 public class FieldPreferences {
 
@@ -23,6 +24,24 @@ public class FieldPreferences {
         this.resolveStrings.set(resolveStrings);
         this.resolvableFields = FXCollections.observableArrayList(resolvableFields);
         this.nonWrappableFields = FXCollections.observableArrayList(nonWrappableFields);
+    }
+
+    private FieldPreferences() {
+        this(
+                true,
+                List.copyOf(FieldFactory.parseFieldList("author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon")),
+                List.copyOf(FieldFactory.parseFieldList("pdf;ps;url;doi;file;isbn;issn"))
+        );
+    }
+
+    public static FieldPreferences getDefault() {
+        return new FieldPreferences();
+    }
+
+    public void setAll(FieldPreferences preferences) {
+        setResolveStrings(preferences.shouldResolveStrings());
+        setResolvableFields(preferences.getResolvableFields());
+        setNonWrappableFields(preferences.getNonWrappableFields());
     }
 
     public boolean shouldResolveStrings() {
