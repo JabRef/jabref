@@ -89,6 +89,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         if (!this.entryTypesWithFields.isEmpty()) {
             this.entryTypesWithFields.clear();
+            this.resetMultilineFieldsToDefault();
         }
         Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
