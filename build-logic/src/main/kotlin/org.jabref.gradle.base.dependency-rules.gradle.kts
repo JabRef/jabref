@@ -485,6 +485,7 @@ extraJavaModuleInfo {
 
     module("org.openjfx:javafx-controls", "javafx.controls") {
         preserveExisting()
+        opens("javafx.scene.control.skin", "org.controlsfx.controls")
         exports("com.sun.javafx.scene.control")
     }
 
