@@ -100,6 +100,7 @@ public class AcademicPagesExporter extends Exporter {
         } catch (IOException ex) {
             throw new SaveException(ex);
         }
+
         List<BibEntry> sorted = entries.stream().sorted(ENTRY_TYPE_ORDER).toList();
         for (BibEntry entry : sorted) {
             String fileName = buildFileName(entry, publicationsDir);
@@ -110,6 +111,11 @@ public class AcademicPagesExporter extends Exporter {
                 throw new SaveException(ex);
             }
         }
+    }
+
+    /// Sanitizes a citation key for safe use as a filename
+    private String sanitizeKey(String key) {
+        return FileUtil.getValidFileName(key);
     }
 
     private String buildFileName(BibEntry entry, Path targetDir) {
@@ -180,6 +186,7 @@ public class AcademicPagesExporter extends Exporter {
         return joiner.toString() + "\n";
     }
 
+    /// Returns the venue name from `JOURNAL` (which includes the `JOURNALTITLE` alias) or `BOOKTITLE`.
     private Optional<String> buildVenue(BibEntry entry) {
         return entry.getFieldOrAliasLatexFree(StandardField.JOURNAL)
                     .or(() -> entry.getFieldOrAliasLatexFree(StandardField.BOOKTITLE));
@@ -250,10 +257,5 @@ public class AcademicPagesExporter extends Exporter {
         } else {
             return "manuscripts";
         }
-    }
-
-    /// Sanitizes a citation key for safe use as a filename
-    private String sanitizeKey(String key) {
-        return FileUtil.getValidFileName(key);
     }
 }
