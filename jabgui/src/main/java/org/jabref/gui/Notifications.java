@@ -7,7 +7,6 @@ import javafx.scene.control.ProgressBar;
 
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -18,22 +17,23 @@ public class Notifications {
     private Notifications() {
     }
 
+    public static class UndefinedNotification extends Notification<Object> {
+        public UndefinedNotification(String title, String description) {
+            super(title, description);
+            setOnClick(_ -> OnClickBehaviour.REMOVE);
+        }
+    }
+
     public static class FileNotification extends Notification<Path> {
+
         public FileNotification(String title, String description) {
             super(title, description);
             setOnClick(_ -> OnClickBehaviour.NONE);
         }
     }
 
-    public static class PreviewNotification extends Notification<PreviewLayout> {
-        public PreviewNotification(PreviewLayout previewLayout) {
-            super(Localization.lang("Preview style changed"), previewLayout.getDisplayName());
-            setOnClick(_ -> OnClickBehaviour.REMOVE);
-        }
-    }
-
-    public static class UndefinedNotification extends Notification<Object> {
-        public UndefinedNotification(String title, String description) {
+    public static class UiNotification extends Notification<Object> {
+        public UiNotification(String title, String description) {
             super(title, description);
             setOnClick(_ -> OnClickBehaviour.REMOVE);
         }

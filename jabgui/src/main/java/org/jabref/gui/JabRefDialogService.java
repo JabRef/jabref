@@ -50,7 +50,6 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.http.SimpleHttpResponse;
 
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -76,9 +75,9 @@ public class JabRefDialogService implements DialogService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
-    private final NotificationGroup<Path, Notifications.FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
-    private final NotificationGroup<PreviewLayout, Notifications.PreviewNotification> previewNotifications = new NotificationGroup<>(Localization.lang("Preview"));
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>(Localization.lang("Notifications"));
+    private final NotificationGroup<Path, Notifications.FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
+    private final NotificationGroup<Object, Notifications.UiNotification> uiNotifications = new NotificationGroup<>(Localization.lang("Preview"));
     private final NotificationGroup<Task<?>, Notifications.TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks")) {
         {
             setViewFactory(Notifications.TaskNotificationView::new);
@@ -457,8 +456,8 @@ public class JabRefDialogService implements DialogService {
         switch (notification) {
             case Notifications.FileNotification fileNotification ->
                     fileNotifications.getNotifications().add(fileNotification);
-            case Notifications.PreviewNotification previewNotification ->
-                    previewNotifications.getNotifications().add(previewNotification);
+            case Notifications.UiNotification uiNotification ->
+                    uiNotifications.getNotifications().add(uiNotification);
             case Notifications.TaskNotification taskNotification ->
                     taskNotifications.getNotifications().add(taskNotification);
             default ->
@@ -557,6 +556,6 @@ public class JabRefDialogService implements DialogService {
     }
 
     public List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups() {
-        return List.of(fileNotifications, undefinedNotifications, previewNotifications, taskNotifications);
+        return List.of(undefinedNotifications, fileNotifications, uiNotifications, taskNotifications);
     }
 }

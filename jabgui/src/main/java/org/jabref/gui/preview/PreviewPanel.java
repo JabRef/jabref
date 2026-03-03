@@ -180,6 +180,6 @@ public class PreviewPanel extends VBox implements PreviewControls {
 
         PreviewLayout layout = previewPreferences.getSelectedPreviewLayout();
         previewView.setLayout(layout);
-        dialogService.notify(new Notifications.PreviewNotification(layout));
+        dialogService.notify(new Notifications.UiNotification(Localization.lang("Preview style changed"), layout.getDisplayName()));
     }
 }

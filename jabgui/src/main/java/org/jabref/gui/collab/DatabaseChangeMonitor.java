@@ -72,7 +72,11 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             super(Localization.lang("The library has been modified by another program."), database.getDatabasePath().toString());
             setOnClick(_ -> OnClickBehaviour.NONE);
 
-            NotificationAction<Path> dismissAction = new NotificationAction<>(Localization.lang("Dismiss changes"), _ -> OnClickBehaviour.REMOVE);
+            NotificationAction<Path> dismissAction = new NotificationAction<>(Localization.lang("Dismiss changes"), _ -> {
+                remove();
+                return OnClickBehaviour.REMOVE;
+            });
+
             NotificationAction<Path> reviewAction = new NotificationAction<>(Localization.lang("Review changes"), _ -> {
                 DatabaseChangesResolverDialog databaseChangesResolverDialog = new DatabaseChangesResolverDialog(
                         changes,
@@ -97,7 +101,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                     }
                 }
 
-                return OnClickBehaviour.NONE;
+                remove();
+                return OnClickBehaviour.REMOVE;
             });
 
             getActions().addAll(dismissAction, reviewAction);
