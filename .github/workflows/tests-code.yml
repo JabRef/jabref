@@ -55,6 +55,19 @@ jobs:
       - name: Run checkstyle using gradle
         run: gradle checkstyleMain checkstyleTest checkstyleJmh
 
+  dependencyscopes:
+    name: Dependency Scopes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run checkAllModuleInfo using gradle
+        run: gradle checkAllModuleInfo
+
   openrewrite:
     name: OpenRewrite
     runs-on: ubuntu-slim
