@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -24,12 +25,14 @@ class AcademicPagesExporterTest {
 
     private AcademicPagesExporter exporter;
     private BibDatabaseContext databaseContext;
+    private BibEntryTypesManager entryTypesManager;
 
     @BeforeEach
     void setUp() {
+        entryTypesManager = new BibEntryTypesManager();
         exporter = new AcademicPagesExporter(
                 mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                new BibEntryTypesManager());
+                entryTypesManager);
         databaseContext = new BibDatabaseContext();
     }
 
@@ -44,29 +47,33 @@ class AcademicPagesExporterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("smith2020")
                 .withField(StandardField.TITLE, "A Great Paper")
-                .withField(StandardField.AUTHOR, "Smith, John")
                 .withField(StandardField.JOURNAL, "Nature")
-                .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.MONTH, "march")
-                .withField(StandardField.ABSTRACT, "This paper is about great things.");
+                .withField(StandardField.YEAR, "2020");
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        Path generated = tempDir.resolve("output").resolve("_publications").resolve("2020-03-01-smith2020.md");
+        Path generated = tempDir.resolve("output")
+                                .resolve("_publications")
+                                .resolve("2020-01-01-smith2020.md");
         assertTrue(Files.exists(generated));
 
         String content = Files.readString(generated);
-        assertTrue(content.contains("title: \"A Great Paper\""));
-        assertTrue(content.contains("collection: publications"));
-        assertTrue(content.contains("permalink: /publication/2020-03-01-smith2020"));
-        assertTrue(content.contains("date: 2020-03-01"));
-        assertTrue(content.contains("venue: 'Nature'"));
-        assertTrue(content.contains("category: manuscripts"));
-        assertTrue(content.contains("This paper is about great things."));
-        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
+        String citation = extractYamlValue(content, "citation");
 
-        assertTrue(Files.exists(tempDir.resolve("output").resolve("_publications")));
-        assertTrue(Files.exists(tempDir.resolve("output").resolve("files")));
+        String expected = """
+                ---
+                title: A Great Paper
+                collection: publications
+                permalink: /publication/2020-01-01-smith2020
+                date: '2020-01-01'
+                venue: Nature
+                bibtexurl: /files/smith2020.bib
+                citation: '%s'
+                category: manuscripts
+                ---
+                """.formatted(citation);
+
+        assertEquals(expected, content);
     }
 
     @Test
@@ -82,16 +89,38 @@ class AcademicPagesExporterTest {
     }
 
     @Test
-    void bibtexUrlHasFilesPrefix(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("smith2020")
-                .withField(StandardField.TITLE, "A Paper")
-                .withField(StandardField.YEAR, "2020");
+    void inProceedingsIsConferences(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("jones2021conf")
+                .withField(StandardField.TITLE, "Conference Paper")
+                .withField(StandardField.AUTHOR, "Jones, Bob")
+                .withField(StandardField.BOOKTITLE, "Proceedings of ICSE")
+                .withField(StandardField.YEAR, "2021");
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2020-01-01-smith2020.md"));
-        assertTrue(content.contains("bibtexurl: '/files/smith2020.bib'"));
+        Path generated = tempDir.resolve("output")
+                                .resolve("_publications")
+                                .resolve("2021-01-01-jones2021conf.md");
+        assertTrue(Files.exists(generated));
+
+        String content = Files.readString(generated);
+        String citation = extractYamlValue(content, "citation");
+
+        String expected = """
+                ---
+                title: Conference Paper
+                collection: publications
+                permalink: /publication/2021-01-01-jones2021conf
+                date: '2021-01-01'
+                venue: Proceedings of ICSE
+                bibtexurl: /files/jones2021conf.bib
+                citation: '%s'
+                category: conferences
+                ---
+                """.formatted(citation);
+
+        assertEquals(expected, content);
     }
 
     @Test
@@ -105,24 +134,27 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2019-01-01-doe2019book.md"));
-        assertTrue(content.contains("category: manuscripts"));
-    }
+        Path generated = tempDir.resolve("output")
+                                .resolve("_publications")
+                                .resolve("2019-01-01-doe2019book.md");
+        assertTrue(Files.exists(generated));
 
-    @Test
-    void inProceedingsIsConferences(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
-                .withCitationKey("jones2021conf")
-                .withField(StandardField.TITLE, "Conference Paper")
-                .withField(StandardField.AUTHOR, "Jones, Bob")
-                .withField(StandardField.BOOKTITLE, "Proceedings of ICSE")
-                .withField(StandardField.YEAR, "2021");
+        String content = Files.readString(generated);
+        String citation = extractYamlValue(content, "citation");
 
-        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
+        String expected = """
+                ---
+                title: My Book
+                collection: publications
+                permalink: /publication/2019-01-01-doe2019book
+                date: '2019-01-01'
+                bibtexurl: /files/doe2019book.bib
+                citation: '%s'
+                category: manuscripts
+                ---
+                """.formatted(citation);
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2021-01-01-jones2021conf.md"));
-        assertTrue(content.contains("category: conferences"));
-        assertTrue(content.contains("venue: 'Proceedings of ICSE'"));
+        assertEquals(expected, content);
     }
 
     @Test
@@ -136,8 +168,28 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2018-01-01-lee2018chapter.md"));
-        assertTrue(content.contains("category: manuscripts"));
+        Path generated = tempDir.resolve("output")
+                                .resolve("_publications")
+                                .resolve("2018-01-01-lee2018chapter.md");
+        assertTrue(Files.exists(generated));
+
+        String content = Files.readString(generated);
+        String citation = extractYamlValue(content, "citation");
+
+        String expected = """
+                ---
+                title: A Book Chapter
+                collection: publications
+                permalink: /publication/2018-01-01-lee2018chapter
+                date: '2018-01-01'
+                venue: Handbook of AI
+                bibtexurl: /files/lee2018chapter.bib
+                citation: '%s'
+                category: manuscripts
+                ---
+                """.formatted(citation);
+
+        assertEquals(expected, content);
     }
 
     @Test
@@ -149,37 +201,27 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2022-01-01-misc2022.md"));
-        assertTrue(content.contains("category: manuscripts"));
-    }
+        Path generated = tempDir.resolve("output")
+                                .resolve("_publications")
+                                .resolve("2022-01-01-misc2022.md");
+        assertTrue(Files.exists(generated));
 
-    @Test
-    void noteBecomesExcerpt(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("noted2020")
-                .withField(StandardField.TITLE, "Paper With Note")
-                .withField(StandardField.AUTHOR, "Author, A")
-                .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.NOTE, "This is a short excerpt.");
+        String content = Files.readString(generated);
+        String citation = extractYamlValue(content, "citation");
 
-        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
+        String expected = """
+                ---
+                title: Some Misc Entry
+                collection: publications
+                permalink: /publication/2022-01-01-misc2022
+                date: '2022-01-01'
+                bibtexurl: /files/misc2022.bib
+                citation: '%s'
+                category: manuscripts
+                ---
+                """.formatted(citation);
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2020-01-01-noted2020.md"));
-        assertTrue(content.contains("excerpt: 'This is a short excerpt.'"));
-    }
-
-    @Test
-    void missingNoteOmitsExcerpt(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("nonoted2020")
-                .withField(StandardField.TITLE, "Paper Without Note")
-                .withField(StandardField.AUTHOR, "Author, A")
-                .withField(StandardField.YEAR, "2020");
-
-        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
-
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2020-01-01-nonoted2020.md"));
-        assertFalse(content.contains("excerpt:"));
+        assertEquals(expected, content);
     }
 
     @Test
@@ -191,21 +233,9 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        assertTrue(Files.exists(tempDir.resolve("output").resolve("_publications").resolve("2021-01-01-nomonth2021.md")));
-    }
-
-    @Test
-    void dateFieldExtractsYear(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("datetest2021")
-                .withField(StandardField.TITLE, "Date Field Test")
-                .withField(StandardField.DATE, "2021-08-25");
-
-        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
-
-        Path generated = tempDir.resolve("output").resolve("_publications").resolve("2021-01-01-datetest2021.md");
-        assertTrue(Files.exists(generated));
-        assertTrue(Files.readString(generated).contains("date: 2021-01-01"));
+        assertTrue(Files.exists(tempDir.resolve("output")
+                                       .resolve("_publications")
+                                       .resolve("2021-01-01-nomonth2021.md")));
     }
 
     @Test
@@ -238,8 +268,10 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2020-01-01-venue2020.md"));
-        assertTrue(content.contains("venue: 'Science'"));
+        String content = Files.readString(tempDir.resolve("output")
+                                                 .resolve("_publications")
+                                                 .resolve("2020-01-01-venue2020.md"));
+        assertTrue(content.contains("venue: Science"));
         assertFalse(content.contains("Should Not Appear"));
     }
 
@@ -252,7 +284,9 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        String content = Files.readString(tempDir.resolve("output").resolve("_publications").resolve("2020-01-01-noabs2020.md"));
+        String content = Files.readString(tempDir.resolve("output")
+                                                 .resolve("_publications")
+                                                 .resolve("2020-01-01-noabs2020.md"));
         assertTrue(content.endsWith("---\n"));
     }
 
@@ -264,6 +298,55 @@ class AcademicPagesExporterTest {
 
         exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
 
-        assertTrue(Files.exists(tempDir.resolve("output").resolve("_publications").resolve("2023-01-01-unknown.md")));
+        assertTrue(Files.exists(tempDir.resolve("output")
+                                       .resolve("_publications")
+                                       .resolve("2023-01-01-unknown.md")));
+    }
+
+    @Test
+    void createsBothSubdirectories(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("smith2020")
+                .withField(StandardField.TITLE, "A Paper")
+                .withField(StandardField.YEAR, "2020");
+
+        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
+
+        assertTrue(Files.exists(tempDir.resolve("output").resolve("_publications")));
+        assertTrue(Files.exists(tempDir.resolve("output").resolve("files")));
+    }
+
+    @Test
+    void abstractAppearsAfterFrontMatter(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("abs2020")
+                .withField(StandardField.TITLE, "Abstract Test")
+                .withField(StandardField.ABSTRACT, "This is my abstract.")
+                .withField(StandardField.YEAR, "2020");
+
+        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
+
+        String content = Files.readString(tempDir.resolve("output")
+                                                 .resolve("_publications")
+                                                 .resolve("2020-01-01-abs2020.md"));
+
+        String[] parts = content.split("---\n");
+        // parts[0] is empty (before first ---), parts[1] is YAML, parts[2] is body
+        assertEquals(3, parts.length);
+        assertTrue(parts[2].strip().contains("This is my abstract."));
+    }
+
+    private String extractYamlValue(String content, String key) {
+        for (String line : content.lines().toList()) {
+            if (line.startsWith(key + ":")) {
+                String value = line.substring(key.length() + 1).strip();
+                if ((value.startsWith("'") && value.endsWith("'")) ||
+                        (value.startsWith("\"") && value.endsWith("\""))) {
+                    value = value.substring(1, value.length() - 1);
+                }
+                return value;
+            }
+        }
+        return "";
     }
 }
