@@ -228,6 +228,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
+    private static final String CITATION_FETCHER_TYPE = "citationFetcherType";
+    private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
     // endregion
 
     private static JabRefGuiPreferences singleton;
@@ -256,6 +258,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         super();
 
         defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
+        defaults.put(CITATION_FETCHER_TYPE, CitationFetcherType.SEMANTIC_SCHOLAR.name());
+        defaults.put(CITATION_COUNT_FETCHER_TYPE, CitationCountFetcherType.SEMANTIC_SCHOLAR.name());
         // endregion
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
@@ -395,6 +399,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (_, _, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
         EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
+        EasyBind.listen(entryEditorPreferences.citationFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_FETCHER_TYPE, newValue.name()));
+        EasyBind.listen(entryEditorPreferences.citationCountFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_COUNT_FETCHER_TYPE, newValue.name()));
         return entryEditorPreferences;
     }
 
@@ -412,8 +418,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
                 getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
-                CitationFetcherType.SEMANTIC_SCHOLAR, // always use default
-                CitationCountFetcherType.SEMANTIC_SCHOLAR, // always use default
+                CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaults.getCitationFetcherType().name())),
+                CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
                 getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
