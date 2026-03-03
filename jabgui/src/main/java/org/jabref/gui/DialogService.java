@@ -262,5 +262,8 @@ public interface DialogService extends NotificationService {
 
     List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups();
 
+    /// Notify the user in a non-blocking way (e.g. a toast).
+    ///
+    /// @param notification the message to show.
     void notify(Notification<?> notification);
 }

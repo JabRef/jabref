@@ -9,8 +9,8 @@ import java.util.Optional;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
@@ -67,7 +67,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         addListener(changes -> dialogService.notify(new ExternalLibraryChangeNotification(changes)));
     }
 
-    private class ExternalLibraryChangeNotification extends JabRefDialogService.FileNotification {
+    private class ExternalLibraryChangeNotification extends Notifications.FileNotification {
         public ExternalLibraryChangeNotification(List<DatabaseChange> changes) {
             super(Localization.lang("The library has been modified by another program."), database.getDatabasePath().toString());
             setOnClick(_ -> OnClickBehaviour.NONE);

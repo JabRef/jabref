@@ -26,7 +26,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
@@ -51,13 +50,11 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.http.SimpleHttpResponse;
 
 import com.dlsc.gemsfx.infocenter.Notification;
-import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
-import com.dlsc.gemsfx.infocenter.NotificationView;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.control.textfield.CustomPasswordField;
@@ -79,12 +76,12 @@ public class JabRefDialogService implements DialogService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
-    private final NotificationGroup<Path, FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
-    private final NotificationGroup<Object, PreviewNotification> previewNotifications = new NotificationGroup<>(Localization.lang("Preview"));
+    private final NotificationGroup<Path, Notifications.FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
+    private final NotificationGroup<PreviewLayout, Notifications.PreviewNotification> previewNotifications = new NotificationGroup<>(Localization.lang("Preview"));
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>(Localization.lang("Notifications"));
-    private final NotificationGroup<Task<?>, TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks")) {
+    private final NotificationGroup<Task<?>, Notifications.TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks")) {
         {
-            setViewFactory(TaskNotificationView::new);
+            setViewFactory(Notifications.TaskNotificationView::new);
         }
     };
 
@@ -452,22 +449,20 @@ public class JabRefDialogService implements DialogService {
         // TODO: Change to a notification overview instead of event log when that is available.
         //       The event log is not that user friendly (different purpose).
         LOGGER.debug(message);
-        UiTaskExecutor.runInJavaFXThread(() -> notify(new UndefinedNotification("Info", message)));
+        UiTaskExecutor.runInJavaFXThread(() -> notify(new Notifications.UndefinedNotification("Info", message)));
     }
 
     @Override
     public void notify(Notification<?> notification) {
         switch (notification) {
-            case FileNotification fileNotification ->
+            case Notifications.FileNotification fileNotification ->
                     fileNotifications.getNotifications().add(fileNotification);
-            case PreviewNotification previewNotification ->
+            case Notifications.PreviewNotification previewNotification ->
                     previewNotifications.getNotifications().add(previewNotification);
-            case TaskNotification taskNotification ->
+            case Notifications.TaskNotification taskNotification ->
                     taskNotifications.getNotifications().add(taskNotification);
-            case UndefinedNotification undefinedNotification ->
-                    undefinedNotifications.getNotifications().add(undefinedNotification);
             default ->
-                    undefinedNotifications.getNotifications().add(new UndefinedNotification(notification.getTitle(), notification.getSummary()));
+                    undefinedNotifications.getNotifications().add(new Notifications.UndefinedNotification(notification.getTitle(), notification.getSummary()));
         }
     }
 
@@ -559,67 +554,6 @@ public class JabRefDialogService implements DialogService {
             default ->
                     Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.");
         };
-    }
-
-    public static class FileNotification extends Notification<Path> {
-        public FileNotification(String title, String description) {
-            super(title, description);
-            setOnClick(_ -> OnClickBehaviour.NONE);
-        }
-    }
-
-    public static class UndefinedNotification extends Notification<Object> {
-        public UndefinedNotification(String title, String description) {
-            super(title, description);
-            setOnClick(_ -> OnClickBehaviour.REMOVE);
-        }
-    }
-
-    public static class PreviewNotification extends Notification<Object> {
-        public PreviewNotification(String title, String description) {
-            super(title, description);
-            setOnClick(_ -> OnClickBehaviour.REMOVE);
-        }
-    }
-
-    public static class TaskNotification extends Notification<Task<?>> {
-        boolean undefinedTask = false;
-
-        public TaskNotification(Task<?> task) {
-            super(task.getTitle(), task.getMessage());
-            setUserObject(task);
-            if (StringUtil.isBlank(task.getTitle())) {
-                setTitle(Localization.lang("Background task"));
-                undefinedTask = true;
-            }
-            setOnClick(_ -> OnClickBehaviour.NONE);
-            getActions().add(new NotificationAction<>(Localization.lang("Cancel"), _ -> {
-                task.cancel();
-                return OnClickBehaviour.REMOVE;
-            }));
-            task.setOnSucceeded(_ -> finishTask());
-            task.setOnFailed(_ -> finishTask());
-            task.setOnCancelled(_ -> finishTask());
-        }
-
-        private void finishTask() {
-            if (undefinedTask) {
-                UiTaskExecutor.runInJavaFXThread(this::remove);
-            }
-            setOnClick(_ -> OnClickBehaviour.REMOVE);
-            getActions().clear();
-        }
-    }
-
-    public static class TaskNotificationView extends NotificationView<Task<?>, TaskNotification> {
-        ProgressBar progressBar = new ProgressBar();
-
-        public TaskNotificationView(TaskNotification notification) {
-            super(notification);
-            progressBar.progressProperty().bind(notification.getUserObject().progressProperty());
-            setContent(progressBar);
-            setShowContent(true);
-        }
     }
 
     public List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups() {

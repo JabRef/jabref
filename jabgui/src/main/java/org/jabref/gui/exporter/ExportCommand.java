@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefDialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -131,7 +131,7 @@ public class ExportCommand extends SimpleCommand {
         dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
     }
 
-    private class ExportSuccessNotification extends JabRefDialogService.FileNotification {
+    private class ExportSuccessNotification extends Notifications.FileNotification {
         public ExportSuccessNotification(Path path) {
             super(Localization.lang("Export operation finished successfully."), path.toString());
 
