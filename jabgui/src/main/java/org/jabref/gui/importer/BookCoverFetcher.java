@@ -102,7 +102,7 @@ public class BookCoverFetcher {
 
         URLDownload download;
         try {
-            download = new URLDownload(url);
+            download = getURLDownload(url);
         } catch (MalformedURLException e) {
             LOGGER.error("Error while downloading cover image file", e);
             return;
@@ -137,6 +137,10 @@ public class BookCoverFetcher {
         }
     }
 
+    protected URLDownload getURLDownload(String url) throws MalformedURLException {
+        return new URLDownload(url);
+    }
+
     private void flagAsNotAvailable(final String name, final Path directory) {
         Optional<Path> destination = resolveNameWithType(directory, name, NOT_AVAILABLE_FILE_TYPE);
         if (destination.isEmpty()) {
@@ -145,8 +149,8 @@ public class BookCoverFetcher {
         }
         if (Files.exists(destination.get())) {
             try {
-                FileTime now = FileTime.fromMillis(System.currentTimeMillis());
-                Files.setLastModifiedTime(destination.get(), now);
+                Instant now = Instant.now();
+                Files.setLastModifiedTime(destination.get(), FileTime.from(now));
             } catch (IOException e) {
                 LOGGER.error("Could not update last modified time of .not-available file", e);
             }
@@ -186,13 +190,13 @@ public class BookCoverFetcher {
         }
     }
 
-    private static String getImageUrl(ISBN isbn) {
+    private String getImageUrl(ISBN isbn) {
         if (isbn.isIsbn13()) {
             String url = URL_FETCHER_URL + isbn.asString();
             try {
                 LOGGER.info("Downloading book cover url from {}", url);
 
-                URLDownload download = new URLDownload(url);
+                URLDownload download = getURLDownload(url);
                 String json = download.asString();
                 Matcher matches = URL_JSON_PATTERN.matcher(json);
 
