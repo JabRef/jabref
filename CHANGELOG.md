@@ -16,15 +16,18 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We removed the restart prompt when accepting Mr. DLib privacy settings or hiding the Related articles tab in the entry editor. [#15195](https://github.com/JabRef/jabref/issues/15195)
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
 - We upgraded to Lucene 10.4 for the fulltext search.
     Thus, the now created search index cannot be read from older versions of JabRef anylonger.
     ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
     Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
     [#15220](https://github.com/JabRef/jabref/pull/15220)
+- We refined the "Select files to import" page in "Search for unlinked local files" dialog to give the users the choice of linking the file to a related entry or import it to a new entry. [#13689](https://github.com/JabRef/jabref/issues/13689)
 
 ### Fixed
 
+- We fixed an issue where an exception dialog was shown when moving side panels down/up. [#15207](https://github.com/JabRef/jabref/issues/15207)
 - We fixed a false "Invalid citation key" warning for keys with diacritical marks. [#14953](https://github.com/JabRef/jabref/issues/14953)
 - We fixed an issue where duplicate fields can be created. [#15130](https://github.com/JabRef/jabref/issues/15130)
 - We fixed an issue where blank fields could be created. [#15130](https://github.com/JabRef/jabref/issues/15130)

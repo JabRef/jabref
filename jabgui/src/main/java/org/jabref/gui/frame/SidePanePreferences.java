@@ -1,5 +1,6 @@
 package org.jabref.gui.frame;
 
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,8 +21,10 @@ public class SidePanePreferences {
     public SidePanePreferences(Set<SidePaneType> visiblePanes,
                                Map<SidePaneType, Integer> preferredPositions,
                                int webSearchFetcherSelected) {
-        this.visiblePanes = FXCollections.observableSet(visiblePanes);
-        this.preferredPositions = FXCollections.observableMap(preferredPositions);
+        this.visiblePanes = FXCollections.observableSet(EnumSet.noneOf(SidePaneType.class));
+        this.visiblePanes.addAll(visiblePanes);
+        this.preferredPositions = FXCollections.observableMap(new EnumMap<>(SidePaneType.class));
+        this.preferredPositions.putAll(preferredPositions);
         this.webSearchFetcherSelected = new SimpleIntegerProperty(webSearchFetcherSelected);
     }
 
