@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- Book covers now download automatically when you open an entry with an ISBN. [#14848](https://github.com/JabRef/jabref/issues/14848)
+
 ### Changed
 
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
