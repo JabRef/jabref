@@ -32,7 +32,7 @@ jobs:
             Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
             It will also guide you in other aspects of contributing to JabRef.
           # 2: One person could have one PR opened and while waiting for feedback working on another one.
-          max_assignments: 2
+          max_assignments: 3
           max_overall_assignment_labels: "good first issue"
           max_overall_assignment_text: >
             ### ⚠️ Assignment Limit Reached for Good First Issues
@@ -65,9 +65,6 @@ jobs:
 
 
             Happy coding! 🚀
-
-
-            At this point in time, you raised {{ prs_total }} pull request(s) of which {{ prs_merged_percentage }}% ({{ prs_merged }}/{{ prs_total }}) have been merged.
           assigned_text: >
             Thank you for your continued work in JabRef.
             At this point, you probably already know the basics and the important links.
