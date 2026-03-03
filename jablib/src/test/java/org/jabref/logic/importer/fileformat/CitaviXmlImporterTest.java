@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -19,7 +20,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CitaviXmlImporterTest {
 
@@ -57,7 +57,7 @@ class CitaviXmlImporterTest {
         List<BibEntry> entries = importFromXml(xml, tempDir);
 
         assertEquals(1, entries.size());
-        assertEquals("Har97", entries.getFirst().getCitationKey().orElse(""));
+        assertEquals(Optional.of("Har97"), entries.getFirst().getCitationKey());
     }
 
     @Test
@@ -78,7 +78,7 @@ class CitaviXmlImporterTest {
         List<BibEntry> entries = importFromXml(xml, tempDir);
 
         assertEquals(1, entries.size());
-        assertTrue(entries.getFirst().getCitationKey().isEmpty());
+        assertEquals(Optional.empty(), entries.getFirst().getCitationKey());
     }
 
     @Test
@@ -99,7 +99,28 @@ class CitaviXmlImporterTest {
         List<BibEntry> entries = importFromXml(xml, tempDir);
 
         assertEquals(1, entries.size());
-        assertEquals("Doe2021", entries.getFirst().getCitationKey().orElse(""));
+        assertEquals(Optional.of("Doe2021"), entries.getFirst().getCitationKey());
+    }
+
+    @Test
+    void importStripsDisallowedCharactersFromCitationKey(@TempDir Path tempDir) throws IOException {
+        String xml = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <CitaviExchangeData Version="6.0.0.0">
+                  <References>
+                    <Reference id="abc-123">
+                      <ReferenceType>Book</ReferenceType>
+                      <Title>Some Title</Title>
+                      <CitationKey>Smith,2020</CitationKey>
+                    </Reference>
+                  </References>
+                </CitaviExchangeData>
+                """;
+
+        List<BibEntry> entries = importFromXml(xml, tempDir);
+
+        assertEquals(1, entries.size());
+        assertEquals(Optional.of("Smith2020"), entries.getFirst().getCitationKey());
     }
 
     private List<BibEntry> importFromXml(String xml, Path tempDir) throws IOException {

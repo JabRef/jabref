@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
@@ -524,7 +525,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
         Optional.ofNullable(reference.citationKey())
                 .filter(key -> !key.isBlank())
-                .map(key -> key.replaceAll("\\s+", ""))
+                .map(CitaviXmlImporter::sanitizeCitationKey)
+                .filter(key -> !key.isEmpty())
                 .ifPresent(entry::setCitationKey);
         Optional.ofNullable(reference.title())
                 .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
@@ -810,6 +812,18 @@ public class CitaviXmlImporter extends Importer implements Parser {
                                 .setInclude(false)
                                 .setByteOrderMarks(ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE)
                                 .get()));
+    }
+
+    private static String sanitizeCitationKey(String key) {
+        return key.chars()
+                  .filter(c -> !Character.isWhitespace(c))
+                  .filter(c -> !CitationKeyGenerator.DISALLOWED_CHARACTERS.contains((char) c))
+                  .collect(
+                          StringBuilder::new,
+                          StringBuilder::appendCodePoint,
+                          StringBuilder::append
+                  )
+                  .toString();
     }
 
     private String clean(String input) {
