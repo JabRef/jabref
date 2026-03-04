@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.control.NotificationPane;
 
@@ -15,7 +16,7 @@ public class NotificationPaneAdapter extends NotificationPane {
     }
 
     public void notify(int affectedEntries, int totalEntries) {
-        String text = "%d/%d affected entries".formatted(affectedEntries, totalEntries);
+        String text = Localization.lang("%d/%d affected entries", affectedEntries, totalEntries);
         Node graphic = IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
 
         this.setGraphic(graphic);

@@ -1,9 +1,14 @@
 package org.jabref.gui;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.util.Duration;
 
 import org.jabref.gui.util.DelayedExecution;
@@ -66,9 +71,23 @@ public class Notifications {
                 task.cancel();
                 return OnClickBehaviour.REMOVE;
             }));
-            task.setOnSucceeded(_ -> finishTask());
-            task.setOnFailed(_ -> finishTask());
-            task.setOnCancelled(_ -> finishTask());
+
+            // Do not overwrite existing handlers
+            Optional<EventHandler<WorkerStateEvent>> onSucceeded = Optional.of(task.getOnSucceeded());
+            task.setOnSucceeded(event -> {
+                onSucceeded.ifPresent(handler -> handler.handle(event));
+                finishTask();
+            });
+            Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.of(task.getOnFailed());
+            task.setOnFailed(event -> {
+                onFailed.ifPresent(handler -> handler.handle(event));
+                finishTask();
+            });
+            Optional<EventHandler<WorkerStateEvent>> onCancelled = Optional.of(task.getOnCancelled());
+            task.setOnCancelled(event -> {
+                onCancelled.ifPresent(handler -> handler.handle(event));
+                finishTask();
+            });
         }
 
         private void finishTask() {
@@ -86,6 +105,7 @@ public class Notifications {
         public TaskNotificationView(TaskNotification notification) {
             super(notification);
             progressBar.progressProperty().bind(notification.getUserObject().progressProperty());
+            HBox.setHgrow(progressBar, Priority.ALWAYS);
             setContent(progressBar);
             setShowContent(true);
         }
