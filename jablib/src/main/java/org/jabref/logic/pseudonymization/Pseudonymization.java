@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
-import java.util.concurrent.atomic.AtomicInteger;
+
 import org.jspecify.annotations.NullMarked;
 
 /// This class is used to anonymize a library. It is required to make private libraries available for public use.
@@ -41,12 +41,12 @@ public class Pseudonymization {
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
 
-        Optional<GroupTreeNode> groups= bibDatabaseContext.getMetaData().getGroups();
+        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
         if (groups.isPresent()) {
-            AtomicInteger counter = new AtomicInteger(1);
-            GroupTreeNode newGroups = pseudonymizeGroupTree(groups.get(), valueMapping, counter);
+            GroupTreeNode newGroups = pseudonymizeGroupTree(groups.get(), valueMapping, 1).node();
             result.getMetaData().setGroups(newGroups);
         }
+
         return new Result(result, valueMapping);
     }
 
@@ -70,16 +70,22 @@ public class Pseudonymization {
         return newEntries;
     }
 
-    private static GroupTreeNode pseudonymizeGroupTree(GroupTreeNode node, Map<String, String> valueMapping, AtomicInteger counter) {
+    private record GroupTreeResult(GroupTreeNode node, int counter) {
+    }
+
+    private static GroupTreeResult pseudonymizeGroupTree(GroupTreeNode node, Map<String, String> valueMapping, int counter) {
         AbstractGroup originalGroup = node.getGroup();
         String originalName = originalGroup.getName();
-        String pseudoName = "group-" + counter.getAndIncrement();
+        String pseudoName = "group-" + counter;
+        counter++;
         valueMapping.put(pseudoName, originalName);
         AbstractGroup newGroup = new ExplicitGroup(pseudoName, originalGroup.getHierarchicalContext(), ',');
         GroupTreeNode newNode = new GroupTreeNode(newGroup);
         for (GroupTreeNode child : node.getChildren()) {
-            newNode.addChild(pseudonymizeGroupTree(child, valueMapping, counter));
+            GroupTreeResult childResult = pseudonymizeGroupTree(child, valueMapping, counter);
+            newNode.addChild(childResult.node());
+            counter = childResult.counter();
         }
-        return newNode;
+        return new GroupTreeResult(newNode, counter);
     }
 }
