@@ -742,7 +742,7 @@ jobs:
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         # wait: [ jabgui, jabls-cli ]
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           # tbn = to-be-notarized
           name: JabRef-${{ matrix.os }}-tbn
@@ -869,7 +869,7 @@ jobs:
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.displayName }}
           path: |
@@ -883,7 +883,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: pr_number
           path: pr_number.txt
