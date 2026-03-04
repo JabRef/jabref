@@ -126,7 +126,7 @@ class GenerateCitationKeys implements Runnable {
                 keyPatternRegex != null ? keyPatternRegex : existingPreferences.getKeyPatternRegex(),
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
-                prepareKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
+                getKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
                 pattern != null ? pattern : existingPreferences.getDefaultPattern(),
                 keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
         );
@@ -138,7 +138,7 @@ class GenerateCitationKeys implements Runnable {
     /// @param keyPatternsOption      patterns submitted by a user via --key-patterns option
     /// @param keyPatternsPreferences patterns from preferences
     /// @return keyPatterns from preferences or overridden by user-supplied patterns
-    private GlobalCitationKeyPatterns prepareKeyPatterns(@Nullable Map<String, String> keyPatternsOption, GlobalCitationKeyPatterns keyPatternsPreferences) {
+    private GlobalCitationKeyPatterns getKeyPatterns(@Nullable Map<String, String> keyPatternsOption, GlobalCitationKeyPatterns keyPatternsPreferences) {
         if (keyPatternsOption == null) {
             return keyPatternsPreferences;
         }
