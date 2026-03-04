@@ -65,7 +65,7 @@ public class MetaDataParserTest {
                                         new UnknownField("Googlescholar", FieldProperty.EXTERNAL),
                                         new UnknownField("Orcid", FieldProperty.EXTERNAL)
                                 ),
-                        "jabref-entrytype-v2: person: req[Name|PERSON_NAME] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
+                        "jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()

@@ -18,6 +18,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -139,10 +140,50 @@ public class MetaDataSerializerTest {
         );
     }
 
+    public static Stream<Arguments> serializeCustomizedEntryTypeV2() {
+        return Stream.of(
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(new UnknownField("Test1"), new UnknownField("Test2")),
+                        "jabref-entrytype-v2: test: req[Test1;Test2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(new UnknownField("tEST"), new UnknownField("tEsT2")),
+                        "jabref-entrytype-v2: test: req[tEST;tEsT2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("person"))
+                                .withRequiredFields(new UnknownField("Name", FieldProperty.PERSON_NAMES))
+                                .withImportantFields(
+                                        new UnknownField("Googlescholar", FieldProperty.EXTERNAL),
+                                        new UnknownField("Orcid", FieldProperty.EXTERNAL)
+                                ),
+                        "jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("customizedtype"))
+                                .withRequiredFields(StandardField.TITLE, StandardField.AUTHOR, StandardField.DATE)
+                                .withImportantFields(StandardField.YEAR, StandardField.MONTH, StandardField.PUBLISHER),
+                        "jabref-entrytype-v2: customizedtype: req[title;author;date] opt[year;month;publisher]"
+                )
+        );
+    }
+
     @ParameterizedTest
     @MethodSource
     void serializeCustomizedEntryType(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
         assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypes(bibEntryTypeBuilder.build()));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void serializeCustomizedEntryTypeV2(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
+        assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypesV2(bibEntryTypeBuilder.build()));
     }
 
     /// Ensures that user-specific .blg path is correctly serialized
