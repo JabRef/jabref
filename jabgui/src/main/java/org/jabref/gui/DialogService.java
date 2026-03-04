@@ -25,8 +25,10 @@ import org.jabref.logic.util.NotificationService;
 
 import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationGroup;
+import org.jspecify.annotations.NullMarked;
 
 /// This interface provides methods to create dialogs and show them to the user.
+@NullMarked
 public interface DialogService extends NotificationService {
 
     /// This will create and display new {@link javafx.scene.control.ChoiceDialog} of type T with a default choice and a collection of possible choices

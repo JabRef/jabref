@@ -60,6 +60,7 @@ import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,7 @@ import org.slf4j.LoggerFactory;
 /// are useful for displaying small information graphic dialogs
 /// rather than complex windows. For more complex dialogs it is
 /// advised to rather create a new sub class of {@link FXDialog}.
+@NullMarked
 public class JabRefDialogService implements DialogService {
     // Snackbar dialog maximum size
     public static final int DIALOG_SIZE_LIMIT = 300;
