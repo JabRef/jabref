@@ -79,16 +79,14 @@ public class JabRefDialogService implements DialogService {
     private final NotificationGroup<Object, Notification<Object>> undefinedNotifications = new NotificationGroup<>(Localization.lang("Notifications"));
     private final NotificationGroup<Path, Notifications.FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
     private final NotificationGroup<Object, Notifications.UiNotification> uiNotifications = new NotificationGroup<>(Localization.lang("Preview"));
-    private final NotificationGroup<Task<?>, Notifications.TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks")) {
-        {
-            setViewFactory(Notifications.TaskNotificationView::new);
-        }
-    };
+    private final NotificationGroup<Task<?>, Notifications.TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks"));
 
     private final Window mainWindow;
 
     public JabRefDialogService(Window mainWindow) {
         this.mainWindow = mainWindow;
+
+        taskNotifications.setViewFactory(Notifications.TaskNotificationView::new);
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
@@ -119,7 +117,7 @@ public class JabRefDialogService implements DialogService {
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();
                 optOut.setText(optOutMessage);
-                optOut.setOnAction(e -> optOutAction.accept(optOut.isSelected()));
+                optOut.setOnAction(_ -> optOutAction.accept(optOut.isSelected()));
                 return optOut;
             }
         });
@@ -389,11 +387,11 @@ public class JabRefDialogService implements DialogService {
         progressDialog.setContentText(content);
         progressDialog.setGraphic(null);
         ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefImage());
-        progressDialog.setOnCloseRequest(evt -> task.cancel());
+        progressDialog.setOnCloseRequest(_ -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);
         Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
-        cancelButton.setOnAction(evt -> {
+        cancelButton.setOnAction(_ -> {
             task.cancel();
             progressDialog.close();
         });
@@ -434,7 +432,7 @@ public class JabRefDialogService implements DialogService {
         alert.setResizable(true);
         alert.initOwner(mainWindow);
 
-        stateManager.getAnyTasksThatWillNotBeRecoveredRunning().addListener((observable, oldValue, newValue) -> {
+        stateManager.getAnyTasksThatWillNotBeRecoveredRunning().addListener((_, _, newValue) -> {
             if (!newValue) {
                 alert.setResult(ButtonType.YES);
                 alert.close();
