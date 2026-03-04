@@ -1,10 +1,14 @@
 open module org.jabref.testsupport {
-    requires org.junit.jupiter.api;
+    requires transitive com.tngtech.archunit.junit5.api;
+    requires transitive com.tngtech.archunit;
+    requires transitive org.jabref.jablib;
+    requires transitive org.junit.jupiter.api;
+
     requires org.mockito;
-    requires org.jabref.jablib;
-    requires com.tngtech.archunit;
-    requires com.tngtech.archunit.junit5.api;
-    requires javafx.graphics;
+    requires javafx.base;
+    requires org.junit.platform.commons;
+
+    requires static com.fasterxml.jackson.annotation;
 
     exports org.jabref.support;
 }
