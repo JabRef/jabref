@@ -27,6 +27,7 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -59,47 +60,33 @@ class PseudonymizationTest {
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
 
-        databaseWriter = new BibDatabaseWriter(
-                bibWriter,
-                saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+        databaseWriter = new BibDatabaseWriter(bibWriter, saveConfiguration, fieldPreferences, citationKeyPatternPreferences, entryTypesManager);
     }
 
     @Test
     void pseudonymizeTwoEntries() {
-        BibEntry first = new BibEntry("first")
-                .withField(StandardField.AUTHOR, "Author One")
-                .withField(StandardField.PAGES, "some pages");
-        BibEntry second = new BibEntry("second")
-                .withField(StandardField.AUTHOR, "Author Two")
-                .withField(StandardField.PAGES, "some pages");
+        BibEntry first = new BibEntry("first").withField(StandardField.AUTHOR, "Author One").withField(StandardField.PAGES, "some pages");
+        BibEntry second = new BibEntry("second").withField(StandardField.AUTHOR, "Author Two").withField(StandardField.PAGES, "some pages");
 
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(first, second)));
 
         Pseudonymization pseudonymization = new Pseudonymization();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 
-        BibEntry firstPseudo = new BibEntry("citationkey-1")
-                .withField(StandardField.AUTHOR, "author-1")
-                .withField(StandardField.PAGES, "pages-1");
-        BibEntry secondPseudo = new BibEntry("citationkey-2")
-                .withField(StandardField.AUTHOR, "author-2")
-                .withField(StandardField.PAGES, "pages-1");
+        BibEntry firstPseudo = new BibEntry("citationkey-1").withField(StandardField.AUTHOR, "author-1").withField(StandardField.PAGES, "pages-1");
+        BibEntry secondPseudo = new BibEntry("citationkey-2").withField(StandardField.AUTHOR, "author-2").withField(StandardField.PAGES, "pages-1");
         BibDatabaseContext bibDatabaseContextExpected = new BibDatabaseContext(new BibDatabase(List.of(firstPseudo, secondPseudo)));
         bibDatabaseContextExpected.setMode(BibDatabaseMode.BIBLATEX);
-        Pseudonymization.Result expected = new Pseudonymization.Result(
-                bibDatabaseContextExpected,
-                Map.of("author-1", "Author One", "author-2", "Author Two", "pages-1", "some pages", "citationkey-1", "first", "citationkey-2", "second"));
+        Pseudonymization.Result expected = new Pseudonymization.Result(bibDatabaseContextExpected, Map.of("author-1", "Author One", "author-2", "Author Two", "pages-1", "some pages", "citationkey-1", "first", "citationkey-2", "second"));
 
         assertEquals(expected, result);
     }
+
     @Test
     void shouldPseudonymizeGroupTree() {
-        // created a simple entry pt so database isn't empty
-        BibEntry entry = new BibEntry("test");
-        entry.setField(StandardField.AUTHOR, "Test Author");
+        // create simple entry so database isn't empty
+        BibEntry entry = new BibEntry("test")
+                .withField(StandardField.AUTHOR, "Test Author");
         BibDatabase db = new BibDatabase();
         db.insertEntry(entry);
         BibDatabaseContext context = new BibDatabaseContext(db);
@@ -117,6 +104,7 @@ class PseudonymizationTest {
         assertEquals("group-2",
                 pseudonymizedRoot.getChildren().getFirst().getGroup().getName());
     }
+
     @Test
     void pseudonymizeLibrary() throws URISyntaxException, IOException {
         Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
