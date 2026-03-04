@@ -36,6 +36,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
@@ -448,7 +449,9 @@ public class JabRefDialogService implements DialogService {
         // TODO: Change to a notification overview instead of event log when that is available.
         //       The event log is not that user friendly (different purpose).
         LOGGER.debug(message);
-        UiTaskExecutor.runInJavaFXThread(() -> notify(new Notifications.UndefinedNotification("Info", message)));
+        UiTaskExecutor.runInJavaFXThread(() -> notify(
+                new Notifications.UiNotification(Localization.lang("Info"), message)
+                        .withAutoClose(Duration.seconds(5))));
     }
 
     @Override

@@ -148,7 +148,8 @@ public class MainToolBar extends ToolBar {
                         factory.createIconButton(StandardActions.INFOCENTER, new SimpleCommand() {
                             @Override
                             public void execute() {
-                                Injector.instantiateModelOrService(InfoCenterPane.class).setShowInfoCenter(true);
+                                InfoCenterPane infoCenterPane = Injector.instantiateModelOrService(InfoCenterPane.class);
+                                infoCenterPane.setShowInfoCenter(!infoCenterPane.isShowInfoCenter());
                             }
                         })
                 ),

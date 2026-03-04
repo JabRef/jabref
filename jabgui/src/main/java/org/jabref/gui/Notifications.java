@@ -4,7 +4,9 @@ import java.nio.file.Path;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressBar;
+import javafx.util.Duration;
 
+import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -36,6 +38,16 @@ public class Notifications {
         public UiNotification(String title, String description) {
             super(title, description);
             setOnClick(_ -> OnClickBehaviour.REMOVE);
+        }
+
+        public UiNotification(String title, String description, Duration duration) {
+            super(title, description);
+            new DelayedExecution(duration, this::remove).start();
+        }
+
+        public UiNotification withAutoClose(Duration duration) {
+            new DelayedExecution(duration, this::remove).start();
+            return this;
         }
     }
 
