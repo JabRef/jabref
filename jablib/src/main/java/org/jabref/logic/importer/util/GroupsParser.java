@@ -88,6 +88,9 @@ public class GroupsParser {
                     cursor = newNode;
                 }
             }
+            if (root == null) {
+                return GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+            }
             return root;
         } catch (ParseException e) {
             throw new ParseException(Localization.lang("Group tree could not be parsed. If you save the BibTeX library, all groups will be lost."), e);
