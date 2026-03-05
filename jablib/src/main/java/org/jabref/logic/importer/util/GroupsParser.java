@@ -138,7 +138,6 @@ public class GroupsParser {
         if (input.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
             return texGroupFromString(input, fileMonitor, metaData, userAndHost);
         }
-
         
         return null;
     }
