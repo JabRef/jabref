@@ -3,8 +3,10 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabViewModel;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -100,6 +102,9 @@ class CopyOrMoveFieldContentTabViewModelTest {
     }
 
     private CopyOrMoveFieldContentTabViewModel newTwoFieldsViewModel(BibEntry... selectedEntries) {
-        return new CopyOrMoveFieldContentTabViewModel(List.of(selectedEntries), bibDatabase, stateManager);
+        return new CopyOrMoveFieldContentTabViewModel(bibDatabase, List.of(selectedEntries),
+                mock(NamedCompoundEdit.class),
+                mock(DialogService.class),
+                stateManager);
     }
 }

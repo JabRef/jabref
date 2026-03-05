@@ -3,8 +3,10 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldViewModel;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -40,7 +42,12 @@ class RenameFieldViewModelTest {
                 .withField(StandardField.AUTHOR, "Eddie");
 
         bibDatabase = new BibDatabase();
-        renameFieldViewModel = new RenameFieldViewModel(List.of(entryA, entryB), bibDatabase, stateManager);
+        renameFieldViewModel = new RenameFieldViewModel(
+                List.of(entryA, entryB),
+                bibDatabase,
+                mock(NamedCompoundEdit.class),
+                mock(DialogService.class),
+                stateManager);
     }
 
     @Test

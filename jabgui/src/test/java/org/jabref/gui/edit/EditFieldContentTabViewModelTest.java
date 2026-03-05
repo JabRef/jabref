@@ -3,8 +3,10 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentViewModel;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -36,7 +38,12 @@ class EditFieldContentTabViewModelTest {
                 .withField(StandardField.YEAR, "");
 
         bibDatabase = new BibDatabase();
-        editFieldContentViewModel = new EditFieldContentViewModel(bibDatabase, List.of(entryA, entryB), stateManager);
+        editFieldContentViewModel = new EditFieldContentViewModel(
+                bibDatabase,
+                List.of(entryA, entryB),
+                mock(NamedCompoundEdit.class),
+                mock(DialogService.class),
+                stateManager);
     }
 
     @Test

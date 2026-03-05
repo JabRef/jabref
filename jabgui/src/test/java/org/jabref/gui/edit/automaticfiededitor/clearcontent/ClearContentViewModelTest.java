@@ -4,7 +4,9 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -32,7 +34,12 @@ class ClearContentViewModelTest {
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entryA, entryB));
 
         bibDatabase = new BibDatabase();
-        clearContentViewModel = new ClearContentViewModel(stateManager.getSelectedEntries(), stateManager);
+        clearContentViewModel = new ClearContentViewModel(
+                bibDatabase,
+                stateManager.getSelectedEntries(),
+                mock(NamedCompoundEdit.class),
+                mock(DialogService.class),
+                stateManager);
     }
 
     @Test
