@@ -139,7 +139,7 @@ public class GroupsParser {
             return texGroupFromString(input, fileMonitor, metaData, userAndHost);
         }
 
-        LOGGER.warn("Skipping unknown group type: {}", input);
+        
         return null;
     }
 
