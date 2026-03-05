@@ -10,6 +10,7 @@ dependency management, the `org.gradlex.java-module-dependencies` plugin, and th
 utilized. Therefore, the means to define dependencies differ from traditional Gradle-base Java projects.
 
 For more background information please refer to:
+
 - This [video series on Modularity in Java (with Gradle)](https://www.youtube.com/playlist?list=PLWQK2ZdV4Yl092zlY7Dy1knCmi0jhTH3H)
 - The [documentation of the `org.gradlex.java-module-dependencies` plugin](https://github.com/gradlex-org/java-module-dependencies)
 
@@ -69,7 +70,7 @@ contains the rules to adjust or extend the metadata of 3rd party modules to addr
 
 If an issue in this area occurs after modifying dependency versions, you will see an error like this:
 
-```
+```shell
 > Failed to transform javax.inject-1.jar (javax.inject:javax.inject:1) to match attributes {artifactType=jar, javaModule=true, org.gradle.category=library, org.gradle.libraryelements=jar, org.gradle.status=release, org.gradle.usage=java-api}.
    > Execution failed for ExtraJavaModuleInfoTransform: caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar.
       > Not a module and no mapping defined: javax.inject-1.jar
