@@ -67,7 +67,7 @@ as wrong/incomplete metadata in this Gradle setup and the file
 [org.jabref.gradle.base.dependency-rules.gradle.kts](../../build-logic/src/main/kotlin/org.jabref.gradle.base.dependency-rules.gradle.kts)
 contains the rules to adjust or extend the metadata of 3rd party modules to address such problems.
 
-if an issue in this area occurs after modifying dependency versions, you will see an error like this:
+If an issue in this area occurs after modifying dependency versions, you will see an error like this:
 
 ```
 > Failed to transform javax.inject-1.jar (javax.inject:javax.inject:1) to match attributes {artifactType=jar, javaModule=true, org.gradle.category=library, org.gradle.libraryelements=jar, org.gradle.status=release, org.gradle.usage=java-api}.
