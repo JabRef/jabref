@@ -3,6 +3,16 @@ parent: Code Howtos
 ---
 # Dependency management
 
+The structrue and dependency management in the JabRef project uses the
+[Java Module System (JPMS)](https://www.oracle.com/corporate/features/understanding-java-9-modules.html)
+as the primary system for defining _modules_ and their _dependencies_. For a smooth integration of JPMS and Gradle's
+dependency management, the `org.gradlex.java-module-dependencies` plugin, and the additional notations it provides, are
+utilized. Therefore, the means to define dependencies differ from traditional Gradle-base Java projects.
+
+For more background information please refer to:
+- This [video series on Modularity in Java (with Gradle)](https://www.youtube.com/playlist?list=PLWQK2ZdV4Yl092zlY7Dy1knCmi0jhTH3H)
+- The [documentation of the `org.gradlex.java-module-dependencies` plugin](https://github.com/gradlex-org/java-module-dependencies)
+
 ## Adding or changing dependencies
 
 With the _Java Module System (JPMS)_, dependencies between modules are
