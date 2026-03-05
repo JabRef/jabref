@@ -24,7 +24,7 @@ A dependency to the 3rd party library `tools.jackson.databind` is expressed by `
 
 Each dependency definition [contains a scope](https://docs.gradle.org/current/userguide/java_library_plugin.html#declaring_module_dependencies)
 – e.g. `requires` or `requires transitive`. If you are unsure about a scope, use `requires` when adding a dependency.
-Then execute `./gradlew checkAllModuleInfo` which runs a _dependency scope check_ that analysis the code to determine
+Then execute `./gradlew checkAllModuleInfo` which runs a _dependency scope check_ that analyzes the code to determine
 which Java types are visible (and should be visible) to which modules. If the check fails, it will advise you how to
 change the scope.
 
@@ -35,7 +35,7 @@ modules also contain test code (located in [src/test/java](../../jabgui/src/test
 From the JPMS perspective, the test code is a separate module, and could have its own `src/test/java/module-info.java`
 file.
 
-However, it is not possible to treat tests as separate module if they break the encapsulation of the _main_ module.
+However, it is not possible to treat tests as a separate module if they break the encapsulation of the _main_ module.
 This is the case if the tests need access to internals (like _protected_ methods) and are therefore placed in the same
 _Java package_ as the _main_ code. This is also referred to as _whitebox testing_. The JabRef project currently has such
 a _whitebox_ testing setup, where the tests are _patched_ into the main module for test runtime. To still keep the
@@ -50,7 +50,7 @@ testModuleInfo {
 
 ### Adding or changing the version of a 3rd party dependency
 
-If you use a 3rd party module lke `tools.jackson.databind`, a version for that module needs to
+If you use a 3rd party module like `tools.jackson.databind`, a version for that module needs to
 be selected. For this, the [versions/build.gradle.kts](../../versions/build.gradle.kts)
 defines a so-called _Gradle platform_ (also called BOM) that contains the versions of all 3rd party
 modules used. If you want to upgrade the version of a module, do this here. If you need to use a new 3rd party module
