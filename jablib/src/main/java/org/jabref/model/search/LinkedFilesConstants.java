@@ -11,7 +11,7 @@ public enum LinkedFilesConstants {
     /// 1. Index changes require reindexing (e.g., new/removed/renamed fields, analyzer changes)
     /// 2. Lucene codec changes (see module-info.java Lucene section)
     /// Incrementing triggers reindexing.
-    VERSION("5"),
+    VERSION("6"),
     PATH("path"),
     CONTENT("content"),
     ANNOTATIONS("annotations"),
