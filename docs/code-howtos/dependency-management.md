@@ -7,7 +7,7 @@ The structrue and dependency management in the JabRef project uses the
 [Java Module System (JPMS)](https://www.oracle.com/corporate/features/understanding-java-9-modules.html)
 as the primary system for defining _modules_ and their _dependencies_. For a smooth integration of JPMS and Gradle's
 dependency management, the `org.gradlex.java-module-dependencies` plugin, and the additional notations it provides, are
-utilized. Therefore, the means to define dependencies differ from traditional Gradle-base Java projects.
+utilized. Therefore, the means to define dependencies differ from traditional Gradle-based Java projects.
 
 For more background information please refer to:
 
