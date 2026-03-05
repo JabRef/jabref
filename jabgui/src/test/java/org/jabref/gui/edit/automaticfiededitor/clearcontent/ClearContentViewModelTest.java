@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import com.dlsc.gemsfx.infocenter.Notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,8 @@ import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,19 +33,21 @@ class ClearContentViewModelTest {
     BibDatabase bibDatabase;
 
     StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
+    DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
     @BeforeEach
     void setup() {
         entryA = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.YEAR, "2015").withField(StandardField.DATE, "2014");
         entryB = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.YEAR, "2020").withField(StandardField.AUTHOR, "Author");
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entryA, entryB));
+        doNothing().when(dialogService).notify(any(Notification.class));
 
         bibDatabase = new BibDatabase();
         clearContentViewModel = new ClearContentViewModel(
                 bibDatabase,
                 stateManager.getSelectedEntries(),
                 mock(NamedCompoundEdit.class),
-                mock(DialogService.class),
+                dialogService,
                 stateManager);
     }
 
