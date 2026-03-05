@@ -21,13 +21,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NonNull;
 
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class ClearContentTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
 
     private final List<BibEntry> selectedEntries;
-    @org.jetbrains.annotations.NotNull private final StateManager stateManager;
+    @NonNull private final StateManager stateManager;
     private final BibDatabase database;
     private final NamedCompoundEdit compoundEdit;
     private final DialogService dialogService;

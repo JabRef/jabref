@@ -3,6 +3,8 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldViewModel;
@@ -16,10 +18,15 @@ import org.jabref.model.entry.field.UnknownField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(ApplicationExtension.class)
 class RenameFieldViewModelTest {
     RenameFieldViewModel renameFieldViewModel;
     BibEntry entryA;
@@ -27,7 +34,7 @@ class RenameFieldViewModelTest {
 
     BibDatabase bibDatabase;
 
-    StateManager stateManager = mock(StateManager.class);
+    StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
 
     @BeforeEach
     void setup() {
@@ -42,6 +49,7 @@ class RenameFieldViewModelTest {
                 .withField(StandardField.AUTHOR, "Eddie");
 
         bibDatabase = new BibDatabase();
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entryA, entryB));
         renameFieldViewModel = new RenameFieldViewModel(
                 List.of(entryA, entryB),
                 bibDatabase,
