@@ -17,10 +17,10 @@ For more background information please refer to:
 ## Adding or changing dependencies
 
 With the _Java Module System (JPMS)_, dependencies between modules are
-defined in the [src/main/java/module-info.java](../../jabgui/src/main/java/module-info.java) file
+defined in the `src/main/java/module-info.java` file
 that each module contains. A dependency to another module is defined by a `requires` statement and the other module
 is identified by its _Module Name_ there. For example, a dependency to the
-[jablib](../../jablib/src/main/java/module-info.java) module is expressed by `requires org.jabref.jablib`.
+`jablib` module is expressed by `requires org.jabref.jablib`.
 A dependency to the 3rd party library `tools.jackson.databind` is expressed by `requires tools.jackson.databind`.
 
 Each dependency definition [contains a scope](https://docs.gradle.org/current/userguide/java_library_plugin.html#declaring_module_dependencies)
@@ -31,8 +31,8 @@ change the scope.
 
 ## Adding or changing test-only dependencies (without module-info.java)
 
-In addition to the production code of a module (located in [src/main/java](../../jabgui/src/main/java)),
-modules also contain test code (located in [src/test/java](../../jabgui/src/test/java)).
+In addition to the production code of a module (located in `src/main/java`)
+modules also contain test code (located in `src/test/java`).
 From the JPMS perspective, the test code is a separate module, and could have its own `src/test/java/module-info.java`
 file.
 
@@ -41,7 +41,7 @@ This is the case if the tests need access to internals (like _protected_ methods
 _Java package_ as the _main_ code. This is also referred to as _whitebox testing_. The JabRef project currently has such
 a _whitebox_ testing setup, where the tests are _patched_ into the main module for test runtime. To still keep the
 dependency notations consistent, without a separate test module-info, you define `requires` of the test code in the
-[build.gradle.kts](../../jabgui/build.gradle.kts) file.
+`build.gradle.kts` file.
 
 ```kotlin
 testModuleInfo {
@@ -52,10 +52,10 @@ testModuleInfo {
 ### Adding or changing the version of a 3rd party dependency
 
 If you use a 3rd party module like `tools.jackson.databind`, a version for that module needs to
-be selected. For this, the [versions/build.gradle.kts](../../versions/build.gradle.kts)
+be selected. For this, the `versions/build.gradle.kts`
 defines a so-called _Gradle platform_ (also called BOM) that contains the versions of all 3rd party
 modules used. If you want to upgrade the version of a module, do this here. If you need to use a new 3rd party module
-in a [src/main/java/module-info.java](../../jabgui/src/main/java/module-info.java) file, you need to
+in a `src/main/java/module-info.java` file, you need to
 add the version here.
 (If the new module is not completely JPMS compatible, you may also need to add or modify
 [patching rules](#patching-3rd-party-modules)).
@@ -65,7 +65,7 @@ add the version here.
 Some 3rd party libraries are not yet fully Java Module System (JPMS) compatible. And sometimes 3rd party modules pull
 in other modules that are not yet fully compatible (which we may be able to exclude). Situations like this are treated
 as wrong/incomplete metadata in this Gradle setup and the file
-[org.jabref.gradle.base.dependency-rules.gradle.kts](../../build-logic/src/main/kotlin/org.jabref.gradle.base.dependency-rules.gradle.kts)
+`org.jabref.gradle.base.dependency-rules.gradle.kts`
 contains the rules to adjust or extend the metadata of 3rd party modules to address such problems.
 
 If an issue in this area occurs after modifying dependency versions, you will see an error like this:
