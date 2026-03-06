@@ -1,5 +1,6 @@
 package org.jabref.gui.push;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 
@@ -112,6 +114,13 @@ public class GuiPushToApplicationCommand extends SimpleCommand {
     }
 
     private void pushEntries() {
+        // Set the working directory to the LaTeX search directory configured by the user
+        stateManager.getActiveDatabase().ifPresent(dbContext -> {
+            Path latexDirectory = dbContext.getMetaData()
+                                           .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                           .orElse(FileUtil.getInitialDirectory(dbContext, preferences.getFilePreferences().getWorkingDirectory()));
+            application.setWorkingDirectory(latexDirectory);
+        });
         application.pushEntries(stateManager.getSelectedEntries());
     }
 }

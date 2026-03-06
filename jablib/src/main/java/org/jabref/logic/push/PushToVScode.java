@@ -20,11 +20,14 @@ public class PushToVScode extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         // TODO - Implementing this will fix https://github.com/JabRef/jabref/issues/6775
-        return new String[] {commandPath};
+        String directory = workingDirectory != null
+                ? workingDirectory.toString()
+                : ".";
+        return new String[] {commandPath, "--reuse-window", directory};
     }
 
     @Override
     public String[] jumpToLineCommandlineArguments(Path fileName, int line, int column) {
-        return new String[] {commandPath, "--g", "%s:%s:%s".formatted(fileName.toString(), line, column)};
+        return new String[] {commandPath, "--reuse-window", "-g", "%s:%s:%s".formatted(fileName.toString(), line, column)};
     }
 }

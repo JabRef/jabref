@@ -26,6 +26,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
 
     protected String commandPath;
+    protected Path workingDirectory;
 
     protected final NotificationService notificationService;
     protected final PushToApplicationPreferences preferences;
@@ -33,6 +34,10 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     public AbstractPushToApplication(NotificationService notificationService, PushToApplicationPreferences preferences) {
         this.notificationService = notificationService;
         this.preferences = preferences;
+    }
+
+    public void setWorkingDirectory(Path directory) {
+        this.workingDirectory = directory;
     }
 
     protected String getKeyString(List<BibEntry> entries, @NonNull String delimiter) {
