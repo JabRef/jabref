@@ -134,7 +134,9 @@ public class MetaDataParser {
             } else if (MetaData.MULTIFIELDCLEANUPACTIONS.equals(entry.getKey())) {
                 metaData.setMultiFieldCleanups(multiFieldCleanupsParse(values));
             } else if (MetaData.JOURNALABBREVIATIONCLEANUP.equals(entry.getKey())) {
-                metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.valueOf(values.getFirst()));
+                if (!values.isEmpty()) {
+                    metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.valueOf(values.getFirst()));
+                }
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
