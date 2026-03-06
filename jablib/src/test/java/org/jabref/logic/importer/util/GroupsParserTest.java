@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -144,8 +145,9 @@ class GroupsParserTest {
     }
 
     @Test
-    void fromStringUnknownGroupThrowsException() {
-        assertThrows(ParseException.class, () -> GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor, metaData, "userAndHost"));
+    void fromStringUnknownGroupReturnsNull() throws ParseException {
+        AbstractGroup parsed = GroupsParser.fromString("UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor, metaData, "userAndHost");
+        assertNull(parsed);
     }
 
     @Test
