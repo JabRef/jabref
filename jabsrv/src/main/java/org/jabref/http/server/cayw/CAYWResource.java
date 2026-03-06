@@ -133,8 +133,8 @@ public class CAYWResource {
                               .ifPresent(application -> {
                                   try {
                                       java.nio.file.Path latexDirectory = databaseContext.getMetaData()
-                                              .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                              .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
+                                                                                         .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                                                         .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
                                       application.setWorkingDirectory(latexDirectory);
                                   } catch (RuntimeException e) {
                                       LOGGER.warn("Could not resolve LaTeX directory for push application", e);
