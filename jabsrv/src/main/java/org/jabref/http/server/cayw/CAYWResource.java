@@ -32,6 +32,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplications;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -129,7 +130,17 @@ public class CAYWResource {
         if (queryParams.getApplication().isPresent()) {
             CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand().orElse("autocite")).concat("{"), ",", "}");
             PushToApplications.getApplication(queryParams.getApplication().get(), LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
-                              .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
+                              .ifPresent(application -> {
+                                  try {
+                                      java.nio.file.Path latexDirectory = databaseContext.getMetaData()
+                                              .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                              .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
+                                      application.setWorkingDirectory(latexDirectory);
+                                  } catch (RuntimeException e) {
+                                      LOGGER.warn("Could not resolve LaTeX directory for push application", e);
+                                  }
+                                  application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList());
+                              });
         }
 
         return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
