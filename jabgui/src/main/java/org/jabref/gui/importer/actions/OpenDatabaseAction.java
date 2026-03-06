@@ -61,7 +61,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             new CheckForNewEntryTypesAction(),
             // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
             new SearchGroupsMigrationAction(),
-            // Migrate legacy gitEnabled flag to granular flags
+            // Migrate legacy gitEnabled flag to separate flags
             new GitLegacyMetadataMigrationAction());
 
     private final LibraryTabContainer tabContainer;

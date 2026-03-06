@@ -7,7 +7,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.metadata.MetaData;
 
-/// Migrates the legacy 'gitEnabled' metadata key to the granular
+/// Migrates the legacy 'gitEnabled' metadata key to the separate
 /// gitAutoPull, gitAutoCommit, and gitAutoPush keys.
 public class GitLegacyMetadataMigrationAction implements GUIPostOpenAction{
 
@@ -24,7 +24,7 @@ public class GitLegacyMetadataMigrationAction implements GUIPostOpenAction{
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         MetaData metaData = parserResult.getMetaData();
 
-        // Enable the granular settings to match previous behavior
+        // Enable the separate settings to match previous behavior
         metaData.setGitAutoPullEnabled(true);
         metaData.setGitAutoCommitEnabled(true);
         metaData.setGitAutoPushEnabled(true);
