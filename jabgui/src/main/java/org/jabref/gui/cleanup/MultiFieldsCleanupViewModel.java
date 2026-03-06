@@ -74,10 +74,9 @@ public class MultiFieldsCleanupViewModel {
                 updating = true;
                 if (change.wasAdded()) {
                     CleanupPreferences.CleanupStep addedStep = change.getElementAdded();
-                    if (!MULTI_FIELD_JOBS.contains(addedStep)) {
-                        throw new UnsupportedOperationException(addedStep + ": is unsupported by multi field jobs");
+                    if (MULTI_FIELD_JOBS.contains(addedStep)) {
+                        setBooleanPropertyForStep(addedStep, true);
                     }
-                    setBooleanPropertyForStep(addedStep, true);
                 }
                 if (change.wasRemoved()) {
                     setBooleanPropertyForStep(change.getElementRemoved(), false);
