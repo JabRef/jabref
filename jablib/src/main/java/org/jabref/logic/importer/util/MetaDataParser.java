@@ -135,7 +135,11 @@ public class MetaDataParser {
                 metaData.setMultiFieldCleanups(multiFieldCleanupsParse(values));
             } else if (MetaData.JOURNALABBREVIATIONCLEANUP.equals(entry.getKey())) {
                 if (!values.isEmpty()) {
-                    metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.valueOf(values.getFirst()));
+                    try {
+                        metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.valueOf(values.getFirst()));
+                    } catch (IllegalArgumentException e) {
+                        LOGGER.warn("Unrecognized Cleanup step: {}. Skipp.", values.getFirst(), e);
+                    }
                 }
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
@@ -274,7 +278,7 @@ public class MetaDataParser {
                 try {
                     steps.add(CleanupPreferences.CleanupStep.valueOf(stringStep));
                 } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(stringStep + " is not CleanupStep", e);
+                    LOGGER.warn("Unrecognized Cleanup step: {}. Skipp.", stringStep, e);
                 }
             }
             return steps;
