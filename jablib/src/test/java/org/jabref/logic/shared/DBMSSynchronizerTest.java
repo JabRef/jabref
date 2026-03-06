@@ -14,6 +14,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
@@ -72,7 +73,7 @@ class DBMSSynchronizerTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, mock(FilePreferences.class), mock(TimestampPreferences.class), pattern, new DummyFileUpdateMonitor(), "UserAndHost", mock(JournalAbbreviationRepository.class));
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, mock(FilePreferences.class), mock(TimestampPreferences.class), mock(JournalAbbreviationPreferences.class), pattern, new DummyFileUpdateMonitor(), "UserAndHost", mock(JournalAbbreviationRepository.class));
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);

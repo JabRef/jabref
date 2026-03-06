@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
@@ -60,12 +61,12 @@ class SynchronizationSimulatorTest {
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
         clientContextA = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', fieldPreferences, mock(FilePreferences.class), mock(TimestampPreferences.class), pattern, new DummyFileUpdateMonitor(), "UserAndHost", mock(JournalAbbreviationRepository.class));
+        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', fieldPreferences, mock(FilePreferences.class), mock(TimestampPreferences.class), mock(JournalAbbreviationPreferences.class), pattern, new DummyFileUpdateMonitor(), "UserAndHost", mock(JournalAbbreviationRepository.class));
         clientContextA.convertToSharedDatabase(synchronizerA);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
         clientContextB = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, mock(FilePreferences.class), mock(TimestampPreferences.class), pattern, new DummyFileUpdateMonitor(), "UserAndHost", mock(JournalAbbreviationRepository.class));
+        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, mock(FilePreferences.class), mock(TimestampPreferences.class), mock(JournalAbbreviationPreferences.class), pattern, new DummyFileUpdateMonitor(), "UserAndHost", mock(JournalAbbreviationRepository.class));
         clientContextB.convertToSharedDatabase(synchronizerB);
         // use a second connection, because this is another client (typically on another machine)
         clientContextB.getDBMSSynchronizer().openSharedDatabase(ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter()));

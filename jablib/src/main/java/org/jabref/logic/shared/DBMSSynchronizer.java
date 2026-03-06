@@ -16,6 +16,7 @@ import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SaveActionsWorker;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
@@ -58,6 +59,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final FieldPreferences fieldPreferences;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
     private final String userAndHost;
@@ -68,6 +70,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             FieldPreferences fieldPreferences,
                             FilePreferences filePreferences,
                             TimestampPreferences timestampPreferences,
+                            JournalAbbreviationPreferences journalAbbreviationPreferences,
                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                             FileUpdateMonitor fileMonitor,
                             String userAndHost,
@@ -78,6 +81,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.fieldPreferences = fieldPreferences;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.journalAbbreviationPreferences = journalAbbreviationPreferences;
         this.fileMonitor = fileMonitor;
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
@@ -245,7 +249,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         try {
-            SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext, filePreferences, timestampPreferences, fieldPreferences, true, journalAbbreviationRepository);
+            SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext, filePreferences, timestampPreferences, fieldPreferences, journalAbbreviationPreferences.shouldUseFJournalField(), journalAbbreviationRepository);
             saveActionsWorker.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
@@ -357,8 +361,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// Checks whether the {@link EntriesEventSource} of an {@link EntriesEvent} is crucial for this class.
     ///
     /// @param event An {@link EntriesEvent}
-    /// @return `true` if the event is able to trigger operations in {@link DBMSSynchronizer}, else
-    /// `false`
+    /// @return `true` if the event is able to trigger operations in {@linkDBMSSynchronizer}, else
+    ///`false`
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();
         return (eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO);

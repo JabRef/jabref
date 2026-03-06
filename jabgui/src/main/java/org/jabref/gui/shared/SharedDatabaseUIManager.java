@@ -220,6 +220,7 @@ public class SharedDatabaseUIManager {
                 preferences.getFieldPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
+                preferences.getJournalAbbreviationPreferences(),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor,
                 preferences.getFilePreferences().getUserAndHost(),
