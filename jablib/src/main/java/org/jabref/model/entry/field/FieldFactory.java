@@ -96,8 +96,7 @@ public class FieldFactory {
                            .orElse(new UnknownField(fieldName));
     }
 
-    public static boolean isInternalField(Field
-                                                  field) {
+    public static boolean isInternalField(Field field) {
         return field.getName().startsWith("__");
     }
 
