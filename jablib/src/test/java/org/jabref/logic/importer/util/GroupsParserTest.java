@@ -79,14 +79,16 @@ class GroupsParserTest {
     @Test
     void importSubGroups() throws ParseException {
 
-        List<String> orderedData = Arrays.asList("0 AllEntriesGroup:", "1 ExplicitGroup:1;0;", "2 ExplicitGroup:2;0;", "0 ExplicitGroup:3;0;");
+        List<String> orderedData = Arrays.asList("0 AllEntriesGroup:", "1 ExplicitGroup:1;0;",
+                "2 ExplicitGroup:2;0;", "0 ExplicitGroup:3;0;");
         // Create group hierarchy:
         //  Level 0 Name: All entries
         //  Level 1 Name: 1
         //  Level 2 Name: 2
         //  Level 1 Name: 3
 
-        GroupTreeNode rootNode = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode rootNode = new GroupTreeNode(
+                new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
 
         AbstractGroup firstSubGrpLvl1 = new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ',');
         rootNode.addSubgroup(firstSubGrpLvl1);
@@ -145,7 +147,6 @@ class GroupsParserTest {
     @Test
     void fromStringUnknownGroupReturnsNull() throws ParseException {
         AbstractGroup parsed = GroupsParser.fromString("UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor, metaData, "userAndHost");
-
         assertNull(parsed);
     }
 
