@@ -60,7 +60,9 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
             // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
-            new SearchGroupsMigrationAction());
+            new SearchGroupsMigrationAction(),
+            // Migrate legacy gitEnabled flag to granular flags
+            new GitLegacyMetadataMigrationAction());
 
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;

@@ -368,15 +368,15 @@ public class MetaData {
     }
 
     public boolean isGitAutoPullEnabled() {
-        return isBooleanMetaDataEnabled(GIT_AUTO_PULL) || isLegacyGitEnabled();
+        return isBooleanMetaDataEnabled(GIT_AUTO_PULL);
     }
 
     public boolean isGitAutoCommitEnabled() {
-        return isBooleanMetaDataEnabled(GIT_AUTO_COMMIT) || isLegacyGitEnabled();
+        return isBooleanMetaDataEnabled(GIT_AUTO_COMMIT);
     }
 
     public boolean isGitAutoPushEnabled() {
-        return isBooleanMetaDataEnabled(GIT_AUTO_PUSH) || isLegacyGitEnabled();
+        return isBooleanMetaDataEnabled(GIT_AUTO_PUSH);
     }
 
     public void setGitAutoPullEnabled(boolean enabled) {
@@ -404,10 +404,6 @@ public class MetaData {
         } else {
             removeUnknownMetaDataItem(key);
         }
-    }
-
-    private boolean isLegacyGitEnabled() {
-        return unknownMetaData.getOrDefault(LEGACY_GIT_ENABLED, List.of()).contains("true");
     }
 
     private void removeLegacyGitEnabled() {
