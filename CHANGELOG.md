@@ -11,7 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We fixed an issue where pressing ESC now properly closes the global search dialog. [#15133](https://github.com/JabRef/jabref/issues/15133)
 - We added a fetcher selection dropdown to the citation count field in the General tab, allowing users to choose between Semantic Scholar, OpenAlex, OpenCitations, and scite.ai as the source. The selected fetcher is now persisted across restarts and can also be configured in the Entry Editor preferences. [#15134](https://github.com/JabRef/jabref/issues/15134)
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
 
@@ -29,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where pressing ESC now properly closes the global search dialog. [#15133](https://github.com/JabRef/jabref/issues/15133)
 - We fixed the Citavi XML importer to preserve citation keys defined in Citavi (previously all imported entries had empty citation keys). [#14658](https://github.com/JabRef/jabref/issues/14658)
 - We fixed an issue where LaTeX to Unicode conversion replaced tildes with standard spaces instead of non-break spaces. [#15158](https://github.com/JabRef/jabref/issues/15158)
 - We fixed an issue where an exception dialog was shown when moving side panels down/up. [#15207](https://github.com/JabRef/jabref/issues/15207)
