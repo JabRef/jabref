@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- Added a new "Save actions" tab to the Library properties, allowing to configure cleanup actions to run on save. [15231](https://github.com/JabRef/jabref/pull/15231)
+- We added a new "Save actions" tab to the Library properties, allowing to configure cleanup actions to run on save. [#15231](https://github.com/JabRef/jabref/pull/15231)
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
 
 ### Changed
