@@ -11,6 +11,8 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabase;
@@ -29,6 +31,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /// Test for "discarded" flag
 class BackupManagerDiscardedTest {
@@ -40,6 +43,8 @@ class BackupManagerDiscardedTest {
     private CliPreferences preferences;
     private BibEntryTypesManager bibEntryTypesManager;
     private Path backupDir;
+    private JournalAbbreviationRepository journalAbbreviationRepository;
+    private JournalAbbreviationPreferences journalAbbreviationPreferences;
 
     @BeforeEach
     void setup(@TempDir Path tempDir) throws IOException {
@@ -51,9 +56,14 @@ class BackupManagerDiscardedTest {
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
         bibDatabaseContext.setDatabasePath(testBib);
 
+        journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+        journalAbbreviationPreferences = mock(JournalAbbreviationPreferences.class);
         bibEntryTypesManager = new BibEntryTypesManager();
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+
+        when(journalAbbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
+        when(preferences.getJournalAbbreviationPreferences()).thenReturn(journalAbbreviationPreferences);
 
         saveDatabase();
 
@@ -76,9 +86,9 @@ class BackupManagerDiscardedTest {
             new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    bibEntryTypesManager)
+                    preferences,
+                    bibEntryTypesManager,
+                    journalAbbreviationRepository)
                     .writeDatabase(bibDatabaseContext);
         }
     }

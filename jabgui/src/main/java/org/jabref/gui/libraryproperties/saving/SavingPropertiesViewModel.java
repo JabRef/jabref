@@ -2,7 +2,6 @@ package org.jabref.gui.libraryproperties.saving;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,10 +12,6 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
-import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -45,18 +40,12 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
-    // FieldFormatterCleanupsPanel
-    private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
-    private final ListProperty<FieldFormatterCleanup> cleanupsProperty = new SimpleListProperty<>(FXCollections.emptyObservableList());
-
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
     private final SaveOrder saveOrder;
-    private final CliPreferences preferences;
 
-    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {
+    public SavingPropertiesViewModel(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
-        this.preferences = preferences;
         this.initialMetaData = databaseContext.getMetaData();
         this.saveOrder = initialMetaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);
     }
@@ -89,18 +78,6 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         sortCriteriaProperty.addAll(saveOrder.getSortCriteria().stream()
                                              .map(SortCriterionViewModel::new)
                                              .toList());
-
-        // FieldFormatterCleanupsPanel, included via <?import ...> in FXML
-
-        Optional<FieldFormatterCleanupActions> saveActions = initialMetaData.getSaveActions();
-        saveActions.ifPresentOrElse(value -> {
-            cleanupsDisableProperty.setValue(!value.isEnabled());
-            cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
-        }, () -> {
-            CleanupPreferences defaultPreset = preferences.getDefaultCleanupPreset();
-            cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
-            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
-        });
     }
 
     @Override
@@ -111,21 +88,6 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             newMetaData.markAsProtected();
         } else {
             newMetaData.markAsNotProtected();
-        }
-
-        FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(
-                !cleanupsDisableProperty().getValue(),
-                cleanupsProperty());
-
-        if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
-            newMetaData.clearSaveActions();
-        } else {
-            // if all actions have been removed, remove the save actions from the MetaData
-            if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
-                newMetaData.clearSaveActions();
-            } else {
-                newMetaData.setSaveActions(fieldFormatterCleanupActions);
-            }
         }
 
         SaveOrder newSaveOrder = new SaveOrder(
@@ -171,15 +133,5 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
         return sortCriteriaProperty;
-    }
-
-    // FieldFormatterCleanupsPanel
-
-    public BooleanProperty cleanupsDisableProperty() {
-        return cleanupsDisableProperty;
-    }
-
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
-        return cleanupsProperty;
     }
 }
