@@ -35,17 +35,6 @@ class GitPropertiesViewModelTest {
     }
 
     @Test
-    void setValuesReadsLegacyKey() {
-        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, List.of("true"));
-
-        viewModel.setValues();
-
-        assertTrue(viewModel.autoCommitProperty().get());
-        assertTrue(viewModel.autoPullProperty().get());
-        assertTrue(viewModel.autoPushProperty().get());
-    }
-
-    @Test
     void setValuesReadsGranularKeys() {
         metaData.putUnknownMetaDataItem(MetaData.GIT_AUTO_COMMIT, List.of("true"));
 
@@ -69,27 +58,6 @@ class GitPropertiesViewModelTest {
 
         assertTrue(data.containsKey(MetaData.GIT_AUTO_COMMIT));
         assertFalse(data.containsKey(MetaData.GIT_AUTO_PULL));
-        assertTrue(data.containsKey(MetaData.GIT_AUTO_PUSH));
-    }
-
-    @Test
-    void storeSettingsRemovesLegacyKey() {
-        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, List.of("true"));
-
-        viewModel.setValues();
-
-        viewModel.autoCommitProperty().set(true);
-        viewModel.autoPullProperty().set(true);
-        viewModel.autoPushProperty().set(true);
-
-        viewModel.storeSettings();
-
-        Map<String, List<String>> data = metaData.getUnknownMetaData();
-
-        assertFalse(data.containsKey(MetaData.LEGACY_GIT_ENABLED));
-
-        assertTrue(data.containsKey(MetaData.GIT_AUTO_COMMIT));
-        assertTrue(data.containsKey(MetaData.GIT_AUTO_PULL));
         assertTrue(data.containsKey(MetaData.GIT_AUTO_PUSH));
     }
 }
