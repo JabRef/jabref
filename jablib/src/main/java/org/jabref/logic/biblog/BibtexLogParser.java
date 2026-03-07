@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.jabref.model.biblog.BibWarning;
 import org.jabref.model.biblog.SeverityType;
@@ -25,10 +26,11 @@ public class BibtexLogParser {
     private static final String MULTI_INVALID_FIELD_PREFIX = "field - one of '";
 
     public List<BibWarning> parseBiblog(@NonNull Path blgFilePath) throws IOException {
-        return Files.lines(blgFilePath)
-                    .map(this::parseWarningLine)
-                    .flatMap(Optional::stream)
-                    .toList();
+        try (Stream<String> lines = Files.lines(blgFilePath)) {
+            return lines.map(this::parseWarningLine)
+                        .flatMap(Optional::stream)
+                        .toList();
+        }
     }
 
     /// Parses a single line from a .blg file to identify a warning.
