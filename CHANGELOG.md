@@ -28,7 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed PDF import and prevent NPE in TaskNotification and keep merge dialog open when only one importer succeeds. [#15127](https://github.com/JabRef/jabref/issues/15283)
+- We fixed PDF import and prevent NPE in TaskNotification and keep merge dialog open when only one importer succeeds. [#15283](https://github.com/JabRef/jabref/issues/15283)
 - We fixed an issue where pressing ESC now properly closes the global search dialog. [#15133](https://github.com/JabRef/jabref/issues/15133)
 - We fixed the Citavi XML importer to preserve citation keys defined in Citavi (previously all imported entries had empty citation keys). [#14658](https://github.com/JabRef/jabref/issues/14658)
 - We fixed an issue where LaTeX to Unicode conversion replaced tildes with standard spaces instead of non-break spaces. [#15158](https://github.com/JabRef/jabref/issues/15158)
