@@ -386,12 +386,13 @@ class BibDatabaseWriterTest {
         assertEquals("@Customizedtype{key," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype-v2: customizedtype: req[title;author;date] opt[year;month;publisher]}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-entrytype: customizedtype: req[title;author;date] opt[year;month;publisher]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 
     @Test
-    void writeEntryWithCustomizedTypeAlsoWritesTypeDeclarationV2() throws IOException {
+    void writeEntryWithCustomizedTypeAndPropertiesAlsoWritesTypeDeclaration() throws IOException {
         EntryType customizedType = new UnknownEntryType("person");
         BibEntryType customizedBibType = new BibEntryType(
                 customizedType,
@@ -445,9 +446,9 @@ class BibDatabaseWriterTest {
                         + "@Othercustomizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype-v2: customizedtype: req[title] opt[]}" + OS.NEWLINE
+                        + "@Comment{jabref-entrytype-v2: customizedtype: req[title] opt[]}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-entrytype: customizedtype: req[title] opt[]}" + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype-v2: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE
+                        + "@Comment{jabref-entrytype-v2: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-entrytype: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE,
                 stringWriter.toString());
     }

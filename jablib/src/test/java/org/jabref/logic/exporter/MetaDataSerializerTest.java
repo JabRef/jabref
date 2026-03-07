@@ -146,7 +146,7 @@ public class MetaDataSerializerTest {
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE),
-                        "v2-jabref-entrytype: test: req[author;title] opt[]"
+                        "jabref-entrytype-v2: test: req[author;title] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
