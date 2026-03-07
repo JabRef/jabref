@@ -73,20 +73,29 @@ public class Notifications {
             }));
 
             // Do not overwrite existing handlers
-            Optional<EventHandler<WorkerStateEvent>> onSucceeded = Optional.of(task.getOnSucceeded());
+            Optional<EventHandler<WorkerStateEvent>> onSucceeded = Optional.ofNullable(task.getOnSucceeded());
             task.setOnSucceeded(event -> {
-                onSucceeded.ifPresent(handler -> handler.handle(event));
-                finishTask();
+                try {
+                    onSucceeded.ifPresent(handler -> handler.handle(event));
+                } finally {
+                    finishTask();
+                }
             });
-            Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.of(task.getOnFailed());
+            Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.ofNullable(task.getOnFailed());
             task.setOnFailed(event -> {
-                onFailed.ifPresent(handler -> handler.handle(event));
-                finishTask();
+                try {
+                    onFailed.ifPresent(handler -> handler.handle(event));
+                } finally {
+                    finishTask();
+                }
             });
-            Optional<EventHandler<WorkerStateEvent>> onCancelled = Optional.of(task.getOnCancelled());
+            Optional<EventHandler<WorkerStateEvent>> onCancelled = Optional.ofNullable(task.getOnCancelled());
             task.setOnCancelled(event -> {
-                onCancelled.ifPresent(handler -> handler.handle(event));
-                finishTask();
+                try {
+                    onCancelled.ifPresent(handler -> handler.handle(event));
+                } finally {
+                    finishTask();
+                }
             });
         }
 
