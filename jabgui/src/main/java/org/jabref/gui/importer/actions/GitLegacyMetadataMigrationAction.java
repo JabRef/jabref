@@ -9,7 +9,7 @@ import org.jabref.model.metadata.MetaData;
 
 /// Migrates the legacy 'gitEnabled' metadata key to the separate
 /// gitAutoPull, gitAutoCommit, and gitAutoPush keys.
-public class GitLegacyMetadataMigrationAction implements GUIPostOpenAction{
+public class GitLegacyMetadataMigrationAction implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {

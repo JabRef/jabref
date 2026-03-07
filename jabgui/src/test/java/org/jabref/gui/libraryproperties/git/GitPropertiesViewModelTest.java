@@ -37,7 +37,7 @@ class GitPropertiesViewModelTest {
 
     @Test
     void setValuesReadsLegacyKey() {
-        metaData.putUnknownMetaDataItem(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
+        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
 
         viewModel.setValues();
 
@@ -48,7 +48,7 @@ class GitPropertiesViewModelTest {
 
     @Test
     void setValuesReadsGranularKeys() {
-        metaData.putUnknownMetaDataItem(GitPropertiesViewModel.GIT_AUTO_COMMIT, Collections.singletonList("true"));
+        metaData.putUnknownMetaDataItem(MetaData.GIT_AUTO_COMMIT, Collections.singletonList("true"));
 
         viewModel.setValues();
 
@@ -68,14 +68,14 @@ class GitPropertiesViewModelTest {
 
         Map<String, List<String>> data = metaData.getUnknownMetaData();
 
-        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_COMMIT));
-        assertFalse(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PULL));
-        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PUSH));
+        assertTrue(data.containsKey(MetaData.GIT_AUTO_COMMIT));
+        assertFalse(data.containsKey(MetaData.GIT_AUTO_PULL));
+        assertTrue(data.containsKey(MetaData.GIT_AUTO_PUSH));
     }
 
     @Test
     void storeSettingsRemovesLegacyKey() {
-        metaData.putUnknownMetaDataItem(GitPropertiesViewModel.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
+        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
 
         viewModel.setValues();
 
@@ -87,10 +87,10 @@ class GitPropertiesViewModelTest {
 
         Map<String, List<String>> data = metaData.getUnknownMetaData();
 
-        assertFalse(data.containsKey(GitPropertiesViewModel.LEGACY_GIT_ENABLED));
+        assertFalse(data.containsKey(MetaData.LEGACY_GIT_ENABLED));
 
-        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_COMMIT));
-        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PULL));
-        assertTrue(data.containsKey(GitPropertiesViewModel.GIT_AUTO_PUSH));
+        assertTrue(data.containsKey(MetaData.GIT_AUTO_COMMIT));
+        assertTrue(data.containsKey(MetaData.GIT_AUTO_PULL));
+        assertTrue(data.containsKey(MetaData.GIT_AUTO_PUSH));
     }
 }
