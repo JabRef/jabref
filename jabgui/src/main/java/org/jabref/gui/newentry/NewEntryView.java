@@ -334,13 +334,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             idText.setText(clipboard);
             idText.selectAll();
 
-            Platform.runLater(() -> {
-                updateFetcherFromIdentifierText(clipboard);
-
-                if (idFetcher.getValue() != null) {
-                    idLookupSpecify.setSelected(true);
-                }
-            });
+            Platform.runLater(() -> updateFetcherFromIdentifierText(clipboard));
         }
 
         idFetcher.disableProperty().bind(idLookupSpecify.selectedProperty().not());
@@ -693,9 +687,15 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void updateFetcherFromIdentifierText(@Nullable String text) {
-        Identifier.from(text)
-                  .flatMap(identifier -> WebFetchers.getIdBasedFetcherForIdentifier(identifier, importFormatPreferences))
-                  .map(fetcher -> fetcherFromName(fetcher.getName()))
-                  .ifPresent(idFetcher::setValue);
+        if (text == null) {
+            return;
+        }
+
+        Optional<Identifier> identifier = Identifier.from(text);
+
+        identifier
+                .flatMap(id -> WebFetchers.getIdBasedFetcherForIdentifier(id, importFormatPreferences))
+                .map(fetcher -> fetcherFromName(fetcher.getName()))
+                .ifPresent(idFetcher::setValue);
     }
 }
