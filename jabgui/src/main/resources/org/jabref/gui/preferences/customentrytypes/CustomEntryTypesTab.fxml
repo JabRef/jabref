@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.controlsfx.control.CheckComboBox?>
 <?import org.controlsfx.control.SearchableComboBox?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -64,6 +65,7 @@
                 <VBox spacing="5.0">
                     <HBox spacing="10.0" alignment="BASELINE_CENTER">
                         <TextField fx:id="addNewField" prefWidth="150.0" promptText="%Field..."/>
+                        <CheckComboBox fx:id="fieldPropertyCheckComboBox" prefWidth="180.0"/>
                         <Button fx:id="addNewFieldButton"
                                 prefHeight="20.0" prefWidth="20.0"
                                 styleClass="icon-button,narrow" onAction="#addNewField">

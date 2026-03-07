@@ -298,6 +298,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // Prefs node for customized entry types
     public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
+    public static final String CUSTOMIZED_BIBTEX_TYPES_V2 = "customizedBibtexTypesV2";
+    public static final String CUSTOMIZED_BIBLATEX_TYPES_V2 = "customizedBiblatexTypesV2";
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
     public static final String VERSION_CHECK_ENABLED = "versionCheck";
@@ -1184,17 +1186,31 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> storedEntryTypes = new ArrayList<>();
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        Map<String, BibEntryType> storedEntryTypes = new HashMap<>();
+        addEntryTypesFromPreferences(getPrefsNodeForCustomizedEntryTypesV2(bibDatabaseMode), storedEntryTypes, true, "v2");
+        addEntryTypesFromPreferences(getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode), storedEntryTypes, false, "v1");
+        return new ArrayList<>(storedEntryTypes.values());
+    }
+
+    private void addEntryTypesFromPreferences(Preferences prefsNode,
+                                              Map<String, BibEntryType> storedEntryTypes,
+                                              boolean allowOverWrite,
+                                              String versionLabel) {
         try {
             Arrays.stream(prefsNode.keys())
                   .map(key -> prefsNode.get(key, null))
                   .filter(Objects::nonNull)
-                  .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
+                  .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(entryType -> {
+                      String entryTypeName = entryType.getType().getName();
+                      if (allowOverWrite) {
+                          storedEntryTypes.put(entryTypeName, entryType);
+                      } else {
+                          storedEntryTypes.putIfAbsent(entryTypeName, entryType);
+                      }
+                  }));
         } catch (BackingStoreException e) {
-            LOGGER.info("Parsing customized entry types failed.", e);
+            LOGGER.info("Parsing customized entry types ({}) failed.", versionLabel, e);
         }
-        return storedEntryTypes;
     }
 
     private void clearAllBibEntryTypes() {
@@ -1205,9 +1221,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void clearBibEntryTypes(BibDatabaseMode mode) {
         try {
-            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
-            prefsNode.clear();
-            prefsNode.flush();
+            Preferences v1Node = getPrefsNodeForCustomizedEntryTypes(mode);
+            v1Node.clear();
+            v1Node.flush();
+            Preferences v2Node = getPrefsNodeForCustomizedEntryTypesV2(mode);
+            v2Node.clear();
+            v2Node.flush();
         } catch (BackingStoreException e) {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
@@ -1221,16 +1240,19 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        Preferences prefsNodev1 = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        Preferences prefsNodev2 = getPrefsNodeForCustomizedEntryTypesV2(bibDatabaseMode);
 
         try {
             // clear old custom types
             clearBibEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));
+            bibEntryTypes.forEach(type -> prefsNodev1.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));
+            bibEntryTypes.forEach(type -> prefsNodev2.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypesV2(type)));
 
-            prefsNode.flush();
+            prefsNodev1.flush();
+            prefsNodev2.flush();
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
         }
@@ -1240,6 +1262,12 @@ public class JabRefCliPreferences implements CliPreferences {
         return mode == BibDatabaseMode.BIBTEX
                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
+    }
+
+    private static Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBTEX
+               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES_V2)
+               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
     }
 
     //*************************************************************************************************************
