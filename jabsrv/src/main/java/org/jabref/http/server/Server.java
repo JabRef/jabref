@@ -129,8 +129,11 @@ public class Server {
         resourceConfig.register(CommandResource.class);
         resourceConfig.register(CAYWResource.class);
 
-        // Supporting classes
+        // Security filters
+        resourceConfig.register(SecurityFilter.class);
         resourceConfig.register(CORSFilter.class);
+
+        // Supporting classes
         resourceConfig.register(GlobalExceptionMapper.class);
 
         LOGGER.debug("Starting HTTP server...");

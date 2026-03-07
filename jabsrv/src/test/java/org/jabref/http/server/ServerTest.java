@@ -5,6 +5,8 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.remote.RemotePreferences;
+
 import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
@@ -47,6 +49,9 @@ public abstract class ServerTest extends JerseyTest {
         // Grizzly uses java.commons.logging, but we use TinyLog
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+
+        // Allow sending Origin and other restricted headers in test HTTP client
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 
         initializePreferencesService();
     }
@@ -133,6 +138,11 @@ public abstract class ServerTest extends JerseyTest {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getUserAndHost()).thenReturn(new UserHostInfo("user", "host").getUserHostString());
         when(importFormatPreferences.filePreferences()).thenReturn(filePreferences);
+
+        RemotePreferences remotePreferences = new RemotePreferences(
+                6050, true, 23119, false, false, 2087,
+                List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"));
+        when(preferences.getRemotePreferences()).thenReturn(remotePreferences);
     }
 
     protected void addGlobalExceptionMapperToResourceConfig(ResourceConfig resourceConfig) {
