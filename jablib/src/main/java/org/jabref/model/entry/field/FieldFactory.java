@@ -153,7 +153,7 @@ public class FieldFactory {
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
-    public static String serializezOrFieldsV2(OrFields fields) {
+    public static String serializeOrFieldsV2(OrFields fields) {
         return fields.getFields().stream()
                      .map(field -> {
                          if (field instanceof UnknownField unknownField) {
@@ -183,7 +183,7 @@ public class FieldFactory {
     }
 
     public static String serializeOrFieldsListV2(Set<OrFields> fields) {
-        return fields.stream().map(FieldFactory::serializezOrFieldsV2).collect(Collectors.joining(DELIMITER));
+        return fields.stream().map(FieldFactory::serializeOrFieldsV2).collect(Collectors.joining(DELIMITER));
     }
 
     // endregion
