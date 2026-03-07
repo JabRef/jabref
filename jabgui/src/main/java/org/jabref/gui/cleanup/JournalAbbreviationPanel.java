@@ -61,17 +61,17 @@ public class JournalAbbreviationPanel extends VBox {
 
     private void bindProperties() {
         //  Initial buttons setup
-        journalAbbreviationsToggleGroup.selectToggle(
-                journalAbbreviationsToggleGroup.getToggles().stream()
-                                               .filter(toggle -> toggle.getUserData().equals(viewModel.selectedJournalCleanupOption.get()))
-                                               .findFirst().orElse(null));
+        journalAbbreviationsToggleGroup.getToggles().stream()
+                                       .filter(toggle -> toggle.getUserData().equals(viewModel.selectedJournalCleanupOption.get()))
+                                       .findFirst()
+                                       .ifPresent(journalAbbreviationsToggleGroup::selectToggle);
 
         // Listener for user pressing button
         journalAbbreviationsToggleGroup.selectedToggleProperty().addListener((_, _, newToggle) -> {
-            if (newToggle != null) {
-                Optional<CleanupPreferences.CleanupStep> step = (Optional<CleanupPreferences.CleanupStep>) newToggle.getUserData();
+            Optional.ofNullable(newToggle).ifPresent(toggle -> {
+                Optional<CleanupPreferences.CleanupStep> step = (Optional<CleanupPreferences.CleanupStep>) toggle.getUserData();
                 viewModel.selectedJournalCleanupOption.set(step);
-            }
+            });
         });
 
         //  Listener for external bindings
