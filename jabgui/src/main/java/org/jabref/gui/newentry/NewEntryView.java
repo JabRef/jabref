@@ -165,6 +165,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         tabs.requestFocus();
     }
 
+    /// @implSpec req~newentry.clipboard.autofocus~1
     private void finalizeTabs() {
         NewEntryDialogTab approach = initialApproach;
         if (approach == null) {
@@ -283,7 +284,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
     }
 
-    /// @implSpec Implements requirement req~newentry.clipboard.autofocus~1
+    /// @implSpec req~newentry.clipboard.autofocus~1
     private void initializeLookupIdentifier() {
         // TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
         //       model would then iterate through all non-blank lines, passing each of them through the specified lookup
@@ -412,6 +413,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
     }
 
+    /// @implSpec req~newentry.clipboard.autofocus~1
     @FXML
     private void switchLookupIdentifier() {
         if (!tabLookupIdentifier.isSelected()) {
