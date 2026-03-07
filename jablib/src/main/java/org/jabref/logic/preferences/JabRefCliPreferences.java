@@ -1822,7 +1822,7 @@ public class JabRefCliPreferences implements CliPreferences {
         SaveOrder exportSaveOrder = getExportSaveOrder();
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE -> {
-                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
+                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to default save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
             case SPECIFIED ->
