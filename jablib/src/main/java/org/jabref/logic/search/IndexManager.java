@@ -22,6 +22,7 @@ import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.BibFieldsSearcher;
 import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
@@ -51,6 +52,7 @@ public class IndexManager {
     private final LuceneIndexer linkedFilesIndexer;
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
+    private final DelayTaskThrottler indexUpdateThrottler;
 
     public IndexManager(BibDatabaseContext databaseContext,
                         TaskExecutor executor,
@@ -75,6 +77,7 @@ public class IndexManager {
 
         this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection(), bibFieldsIndexer.getTable());
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
+        this.indexUpdateThrottler = new DelayTaskThrottler(200);
         updateOnStart();
     }
 
@@ -157,24 +160,26 @@ public class IndexManager {
     }
 
     public void updateEntry(FieldChangedEvent event) {
-        new BackgroundTask<>() {
-            @Override
-            public Object call() {
-                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
-                return null;
-            }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
-         .executeWith(taskExecutor);
-
-        if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE)) {
+        indexUpdateThrottler.schedule(() -> {
             new BackgroundTask<>() {
                 @Override
                 public Object call() {
-                    linkedFilesIndexer.updateEntry(event.getBibEntry(), event.getOldValue(), event.getNewValue(), this);
+                    bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
                     return null;
                 }
-            }.executeWith(taskExecutor);
-        }
+            }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
+             .executeWith(taskExecutor);
+
+            if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE)) {
+                new BackgroundTask<>() {
+                    @Override
+                    public Object call() {
+                        linkedFilesIndexer.updateEntry(event.getBibEntry(), event.getOldValue(), event.getNewValue(), this);
+                        return null;
+                    }
+                }.executeWith(taskExecutor);
+            }
+        });
     }
 
     public void rebuildFullTextIndex() {
@@ -190,6 +195,7 @@ public class IndexManager {
     }
 
     public void close() {
+        indexUpdateThrottler.shutdown();
         bibFieldsIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
@@ -197,6 +203,7 @@ public class IndexManager {
     }
 
     public void closeAndWait() {
+        indexUpdateThrottler.shutdown();
         bibFieldsIndexer.closeAndWait();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.closeAndWait();
