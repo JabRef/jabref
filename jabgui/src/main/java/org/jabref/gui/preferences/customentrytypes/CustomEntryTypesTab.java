@@ -38,6 +38,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 
@@ -119,23 +120,43 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                       .toList()
         );
 
-        // properties from standard field cannot be modified
         addNewField.textProperty().addListener((obs, oldVal, newVal) -> {
-            EntryType selectedEntryType = viewModel.selectedEntryTypeProperty().get().entryType().getValue().getType();
-            Field field = FieldFactory.parseField(selectedEntryType, newVal);
+            fieldPropertyCheckComboBox.getCheckModel().clearChecks();
+            EntryTypeViewModel selectedEntryTypeViewModel = viewModel.selectedEntryTypeProperty().get();
+            if (selectedEntryTypeViewModel == null) {
+                fieldPropertyCheckComboBox.setDisable(true);
+                return;
+            }
 
+            if (newVal.isBlank()) {
+                fieldPropertyCheckComboBox.setDisable(true);
+                return;
+            }
+
+            EntryType selectedEntryType = selectedEntryTypeViewModel.entryType().getValue().getType();
+            Field field = FieldFactory.parseField(selectedEntryType, newVal);
             boolean isStandardField = !(field instanceof UnknownField);
             fieldPropertyCheckComboBox.setDisable(isStandardField);
 
-            fieldPropertyCheckComboBox.getCheckModel().clearChecks();
             if (isStandardField) {
                 field.getProperties()
                      .stream()
                      .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
                      .forEach(fieldPropertyCheckComboBox.getCheckModel()::check);
-            } else {
-                fieldPropertyCheckComboBox.getCheckModel().clearChecks();
             }
+
+            String displayName = FieldTextMapper.getDisplayName(field);
+            selectedEntryTypeViewModel.fields()
+                                      .stream()
+                                      .filter(fieldViewModel ->
+                                              fieldViewModel.displayNameProperty()
+                                                            .getValue()
+                                                            .equalsIgnoreCase(displayName))
+                                      .findFirst()
+                                      .ifPresent(existingFieldViewModel -> existingFieldViewModel.getProperties()
+                                                                                                 .stream()
+                                                                                                 .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                                                                                                 .forEach(fieldPropertyCheckComboBox.getCheckModel()::check));
         });
     }
 

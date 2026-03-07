@@ -65,7 +65,7 @@
                 <VBox spacing="5.0">
                     <HBox spacing="10.0" alignment="BASELINE_CENTER">
                         <TextField fx:id="addNewField" prefWidth="150.0" promptText="%Field..."/>
-                        <CheckComboBox fx:id="fieldPropertyCheckComboBox" prefWidth="220.0"/>
+                        <CheckComboBox fx:id="fieldPropertyCheckComboBox" prefWidth="180.0"/>
                         <Button fx:id="addNewFieldButton"
                                 prefHeight="20.0" prefWidth="20.0"
                                 styleClass="icon-button,narrow" onAction="#addNewField">
