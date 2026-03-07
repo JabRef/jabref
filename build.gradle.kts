@@ -89,5 +89,6 @@ sonar {
     properties {
         property("sonar.projectKey", "KawshikKumar_jabref")
         property("sonar.organization", "kawshikkumar")
+        property("sonar.java.source", "17")
     }
 }
