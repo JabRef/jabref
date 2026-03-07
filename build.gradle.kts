@@ -4,6 +4,7 @@ plugins {
     id("org.openrewrite.rewrite") version "7.26.0"
     id("org.itsallcode.openfasttrace") version "3.1.0"
     id("org.cyclonedx.bom") version "3.1.0"
+    id("org.sonarqube") version "7.2.3.7755"
 }
 
 // OpenRewrite should rewrite all sources
@@ -83,4 +84,10 @@ tasks.cyclonedxBom {
     includeBuildSystem = true
     componentVersion = project.version.toString()
     componentGroup = "org.jabref"
+}
+sonar {
+    properties {
+        property("sonar.projectKey", "KawshikKumar_jabref")
+        property("sonar.organization", "kawshikkumar")
+    }
 }
