@@ -43,6 +43,7 @@ import org.jabref.model.entry.Season;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
@@ -1328,6 +1329,51 @@ class BibtexParserTest {
                 ));
 
         assertEquals(Set.of(expectedEntryType), result.getEntryTypes());
+    }
+
+    @Test
+    void integrationTestBibEntryTypeReadV2First() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of("@comment{jabref-entrytype-v2: Customtype: req[title] opt[customfield|VERBATIM]}" + OS.NEWLINE
+                        + "@comment{jabref-entrytype: Customtype: req[title] opt[customfield]}"));
+
+        assertEquals(1, result.getEntryTypes().size());
+        BibEntryType entryType = result.getEntryTypes().iterator().next();
+        Optional<Field> customField = entryType.getOptionalFields().stream()
+                                               .map(BibField::field)
+                                               .filter(field -> field.getName().equalsIgnoreCase("customfield"))
+                                               .findFirst();
+        assertTrue(customField.isPresent());
+        assertTrue(customField.get().getProperties().contains(FieldProperty.VERBATIM));
+    }
+
+    @Test
+    void integrationTestBibEntryTypeV2WithProperties() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of("@Comment{jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]}"));
+
+        assertEquals(1, result.getEntryTypes().size());
+        BibEntryType entryType = result.getEntryTypes().iterator().next();
+
+        Optional<Field> requiredName = entryType.getRequiredFields().stream()
+                                                .flatMap(orFields -> orFields.getFields().stream())
+                                                .filter(field -> field.getName().equalsIgnoreCase("name"))
+                                                .findFirst();
+        assertTrue(requiredName.isPresent());
+        assertTrue(requiredName.get().getProperties().contains(FieldProperty.PERSON_NAMES));
+
+        Optional<Field> googleScholar = entryType.getOptionalFields().stream()
+                                                 .map(BibField::field)
+                                                 .filter(field -> field.getName().equalsIgnoreCase("googlescholar"))
+                                                 .findFirst();
+        Optional<Field> orcid = entryType.getOptionalFields().stream()
+                                         .map(BibField::field)
+                                         .filter(field -> field.getName().equalsIgnoreCase("orcid"))
+                                         .findFirst();
+        assertTrue(googleScholar.isPresent());
+        assertTrue(orcid.isPresent());
+        assertTrue(googleScholar.get().getProperties().contains(FieldProperty.EXTERNAL));
+        assertTrue(orcid.get().getProperties().contains(FieldProperty.EXTERNAL));
     }
 
     @Test

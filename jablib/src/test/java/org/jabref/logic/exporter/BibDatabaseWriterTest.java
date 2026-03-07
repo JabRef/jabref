@@ -38,8 +38,10 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -389,6 +391,34 @@ class BibDatabaseWriterTest {
     }
 
     @Test
+    void writeEntryWithCustomizedTypeAlsoWritesTypeDeclarationV2() throws IOException {
+        EntryType customizedType = new UnknownEntryType("person");
+        BibEntryType customizedBibType = new BibEntryType(
+                customizedType,
+                Arrays.asList(
+                        new BibField(new UnknownField("Name", FieldProperty.PERSON_NAMES), FieldPriority.IMPORTANT),
+                        new BibField(new UnknownField("Googlescholar", FieldProperty.EXTERNAL), FieldPriority.IMPORTANT),
+                        new BibField(new UnknownField("Orcid", FieldProperty.EXTERNAL), FieldPriority.IMPORTANT)),
+                Arrays.asList(
+                        new OrFields(new UnknownField("Name", FieldProperty.PERSON_NAMES))));
+        entryTypesManager.addCustomOrModifiedType(customizedBibType, BibDatabaseMode.BIBTEX);
+        BibEntry entry = new BibEntry(customizedType).withCitationKey("key");
+        // needed to get a proper serialization
+        entry.setChanged(true);
+        database.insertEntry(entry);
+        bibtexContext.setMode(BibDatabaseMode.BIBTEX);
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("@Person{key," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-meta: databaseType:bibtex;}"
+                        + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]}" + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype: person: req[Name] opt[Googlescholar;Orcid]}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
     void writeCustomizedTypesInAlphabeticalOrder() throws IOException {
         EntryType customizedType = new UnknownEntryType("customizedType");
         EntryType otherCustomizedType = new UnknownEntryType("otherCustomizedType");
@@ -415,7 +445,9 @@ class BibDatabaseWriterTest {
                         + "@Othercustomizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype-v2: customizedtype: req[title] opt[]}" + OS.NEWLINE
                         + "@Comment{jabref-entrytype: customizedtype: req[title] opt[]}" + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype-v2: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE
                         + "@Comment{jabref-entrytype: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
