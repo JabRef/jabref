@@ -145,6 +145,19 @@ public class MetaDataSerializerTest {
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE),
+                        "v2-jabref-entrytype: test: req[author;title] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(StandardField.AUTHOR)
+                                .withImportantFields(StandardField.TITLE),
+                        "jabref-entrytype-v2: test: req[author] opt[title]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(new UnknownField("Test1"), new UnknownField("Test2")),
                         "jabref-entrytype-v2: test: req[Test1;Test2] opt[]"
                 ),
