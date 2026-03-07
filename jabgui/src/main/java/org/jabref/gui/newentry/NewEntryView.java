@@ -329,8 +329,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idFetcher.setValue(initialFetcher);
 
         String clipboard = ClipBoardManager.getContents().trim();
+        Optional<Identifier> identifier = Identifier.from(clipboard);
 
-        if (!StringUtil.isBlank(clipboard) && !clipboard.contains("\n")) {
+        if (identifier.isPresent()) {
             idText.setText(clipboard);
             idText.selectAll();
 
