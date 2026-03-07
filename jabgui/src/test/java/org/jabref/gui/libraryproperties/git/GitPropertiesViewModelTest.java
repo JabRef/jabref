@@ -1,6 +1,5 @@
 package org.jabref.gui.libraryproperties.git;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ class GitPropertiesViewModelTest {
 
     @Test
     void setValuesReadsLegacyKey() {
-        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
+        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, List.of("true"));
 
         viewModel.setValues();
 
@@ -48,7 +47,7 @@ class GitPropertiesViewModelTest {
 
     @Test
     void setValuesReadsGranularKeys() {
-        metaData.putUnknownMetaDataItem(MetaData.GIT_AUTO_COMMIT, Collections.singletonList("true"));
+        metaData.putUnknownMetaDataItem(MetaData.GIT_AUTO_COMMIT, List.of("true"));
 
         viewModel.setValues();
 
@@ -75,7 +74,7 @@ class GitPropertiesViewModelTest {
 
     @Test
     void storeSettingsRemovesLegacyKey() {
-        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, Collections.singletonList("true"));
+        metaData.putUnknownMetaDataItem(MetaData.LEGACY_GIT_ENABLED, List.of("true"));
 
         viewModel.setValues();
 
