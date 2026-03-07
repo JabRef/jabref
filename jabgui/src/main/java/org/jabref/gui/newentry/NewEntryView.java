@@ -283,6 +283,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
     }
 
+    /**
+     * @implSpec Implements requirement req~newentry.clipboard.autofocus~1
+     */
     private void initializeLookupIdentifier() {
         // TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
         //       model would then iterate through all non-blank lines, passing each of them through the specified lookup
