@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where pressing ESC now properly closes the global search dialog. [#15133](https://github.com/JabRef/jabref/issues/15133)
 - We fixed the Citavi XML importer to preserve citation keys defined in Citavi (previously all imported entries had empty citation keys). [#14658](https://github.com/JabRef/jabref/issues/14658)
 - We fixed an issue where LaTeX to Unicode conversion replaced tildes with standard spaces instead of non-break spaces. [#15158](https://github.com/JabRef/jabref/issues/15158)
 - We fixed an issue where an exception dialog was shown when moving side panels down/up. [#15207](https://github.com/JabRef/jabref/issues/15207)
