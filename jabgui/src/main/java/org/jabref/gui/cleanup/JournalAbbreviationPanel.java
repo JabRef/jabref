@@ -76,12 +76,10 @@ public class JournalAbbreviationPanel extends VBox {
 
         //  Listener for external bindings
         viewModel.selectedJournalCleanupOption.addListener((_, _, newCleanupStep) -> {
-            if (newCleanupStep.isPresent()) {
-                journalAbbreviationsToggleGroup.getToggles().stream()
-                                               .filter(toggle -> newCleanupStep.equals(toggle.getUserData()))
-                                               .findFirst()
-                                               .ifPresent(journalAbbreviationsToggleGroup::selectToggle);
-            }
+            journalAbbreviationsToggleGroup.getToggles().stream()
+                                           .filter(toggle -> newCleanupStep.equals(toggle.getUserData()))
+                                           .findFirst()
+                                           .ifPresent(journalAbbreviationsToggleGroup::selectToggle);
         });
     }
 
