@@ -38,5 +38,7 @@ public interface PushToApplication {
     /// @return The delimiter as a String.
     String getDelimiter();
 
+    void setWorkingDirectory(Path directory);
+
     void jumpToLine(Path fileName, int line, int column);
 }
