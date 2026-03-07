@@ -53,8 +53,7 @@ public class ContextAction extends SimpleCommand {
                                     )
                             );
 
-                    case MOVE_FILE_TO_FOLDER,
-                         MOVE_FILE_TO_FOLDER_AND_RENAME ->
+                    case RENAME_FILE_TO_NAME ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
                                             && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
@@ -85,7 +84,8 @@ public class ContextAction extends SimpleCommand {
 
                     case OPEN_FILE,
                          OPEN_FOLDER,
-                         RENAME_FILE_TO_NAME,
+                         MOVE_FILE_TO_FOLDER,
+                         MOVE_FILE_TO_FOLDER_AND_RENAME,
                          DELETE_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
@@ -126,7 +126,7 @@ public class ContextAction extends SimpleCommand {
             case RENAME_FILE_TO_NAME ->
                     linkedFile.askForNameAndRename();
             case MOVE_FILE_TO_FOLDER ->
-                    linkedFile.moveToDefaultDirectory();
+                    linkedFile.moveToNextPossibleDirectory();
             case MOVE_FILE_TO_FOLDER_AND_RENAME ->
                     linkedFile.moveToDefaultDirectoryAndRename();
             case DELETE_FILE ->
