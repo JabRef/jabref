@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added security hardening to the HTTP server (jabsrv): CORS origin whitelisting replaces the wildcard `*` policy, a new security filter validates custom headers and origins, and configurable allowed origins support browser extensions and JabMap.
+- We added PIN-based pairing and bearer token authentication for browser extensions connecting to the HTTP server. A PIN can be generated in the preferences to pair an extension, and paired tokens can be revoked.
 - We added a fetcher selection dropdown to the citation count field in the General tab, allowing users to choose between Semantic Scholar, OpenAlex, OpenCitations, and scite.ai as the source. The selected fetcher is now persisted across restarts and can also be configured in the Entry Editor preferences. [#15134](https://github.com/JabRef/jabref/issues/15134)
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
 

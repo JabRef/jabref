@@ -6,6 +6,7 @@ import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.Server;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.remote.server.ConnectorTokenManager;
 
 import jakarta.ws.rs.ProcessingException;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -28,12 +29,17 @@ public class HttpServerThread extends Thread {
     private final UiMessageHandler uiMessageHandler;
 
     @Nullable
+    private final ConnectorTokenManager tokenManager;
+
+    @Nullable
     private HttpServer httpServer;
 
     /// @param uiMessageHandler - non-null for GUI usage
-    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
+    /// @param tokenManager - non-null for GUI usage, shared with the preferences UI
+    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, @Nullable ConnectorTokenManager tokenManager, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uiMessageHandler = uiMessageHandler;
+        this.tokenManager = tokenManager;
         this.uri = uri;
         this.server = new Server(cliPreferences);
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
@@ -42,7 +48,7 @@ public class HttpServerThread extends Thread {
     @Override
     public void run() {
         try {
-            httpServer = this.server.run(srvStateManager, uiMessageHandler, uri);
+            httpServer = this.server.run(srvStateManager, uiMessageHandler, tokenManager, uri);
         } catch (ProcessingException e) {
             LOGGER.error("Failed to start HTTP server thread", e);
         }

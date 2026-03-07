@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
@@ -28,6 +29,7 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.remote.server.ConnectorTokenManager;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.model.database.BibDatabaseMode;
 
@@ -40,6 +42,7 @@ import org.controlsfx.control.SearchableComboBox;
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
     @Inject private HttpServerManager httpServerManager;
+    @Inject private ConnectorTokenManager connectorTokenManager;
     @Inject private LanguageServerController languageServerController;
     @Inject private UiMessageHandler uiMessageHandler;
     @Inject private RemoteListenerServerManager remoteListenerServerManager;
@@ -69,6 +72,11 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private TextField remotePort;
     @FXML private CheckBox enableHttpServer;
     @FXML private TextField httpServerPort;
+    @FXML private Button generatePinButton;
+    @FXML private TextField pinDisplay;
+    @FXML private Label pinHintLabel;
+    @FXML private Button revokeTokenButton;
+    @FXML private Label tokenStatusLabel;
     @FXML private CheckBox enableLanguageServer;
     @FXML private TextField languageServerPort;
     @FXML private Button remoteHelp;
@@ -101,6 +109,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 dialogService,
                 preferences,
                 httpServerManager,
+                connectorTokenManager,
                 languageServerController,
                 uiMessageHandler,
                 remoteListenerServerManager,
@@ -175,9 +184,43 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         httpServerPort.textProperty().bindBidirectional(viewModel.httpPortProperty());
         httpServerPort.disableProperty().bind(enableHttpServer.selectedProperty().not());
 
+        updatePairingControls();
+        viewModel.apiTokenProperty().addListener((_, _, _) -> updatePairingControls());
+
         enableLanguageServer.selectedProperty().bindBidirectional(viewModel.enableLanguageServerProperty());
         languageServerPort.textProperty().bindBidirectional(viewModel.languageServerPortProperty());
         languageServerPort.disableProperty().bind(enableLanguageServer.selectedProperty().not());
+    }
+
+    @FXML
+    void generatePin() {
+        String pin = viewModel.generatePin();
+        pinDisplay.setText(pin);
+        pinHintLabel.setText(Localization.lang("Valid for 5 minutes"));
+    }
+
+    @FXML
+    void revokeToken() {
+        viewModel.revokeToken();
+        pinDisplay.setText("");
+        pinHintLabel.setText("");
+        generatePinButton.requestFocus();
+    }
+
+    private void updatePairingControls() {
+        boolean paired = viewModel.hasActiveToken();
+
+        revokeTokenButton.setDisable(!paired);
+
+        if (paired) {
+            tokenStatusLabel.setText(Localization.lang("Extension paired"));
+            tokenStatusLabel.setStyle("-fx-text-fill: green;");
+            pinDisplay.setText("");
+            pinHintLabel.setText("");
+        } else {
+            tokenStatusLabel.setText(Localization.lang("Not paired"));
+            tokenStatusLabel.setStyle("-fx-text-fill: grey;");
+        }
     }
 
     @FXML

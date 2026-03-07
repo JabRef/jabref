@@ -5,8 +5,6 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.remote.RemotePreferences;
-
 import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
@@ -18,6 +16,8 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
+import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.server.ConnectorTokenManager;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.metadata.UserHostInfo;
 
@@ -141,8 +141,18 @@ public abstract class ServerTest extends JerseyTest {
 
         RemotePreferences remotePreferences = new RemotePreferences(
                 6050, true, 23119, false, false, 2087,
-                List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"));
+                List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
+                "");
         when(preferences.getRemotePreferences()).thenReturn(remotePreferences);
+    }
+
+    protected void addTokenManagerToResourceConfig(ResourceConfig resourceConfig, ConnectorTokenManager tokenManager) {
+        resourceConfig.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(tokenManager).to(ConnectorTokenManager.class);
+            }
+        });
     }
 
     protected void addGlobalExceptionMapperToResourceConfig(ResourceConfig resourceConfig) {
