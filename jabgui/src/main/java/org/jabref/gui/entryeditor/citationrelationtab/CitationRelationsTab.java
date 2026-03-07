@@ -576,12 +576,16 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void jumpToEntry(CitationRelationItem entry) {
-        citingTask.cancel();
-        citedByTask.cancel();
+        if (citingTask != null) {
+            citingTask.cancel(false);
+        }
+        if (citedByTask != null) {
+            citedByTask.cancel(false);
+        }
         stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry.localEntry()));
     }
 
-    /// @implNote This code is similar to {@link org.jabref.gui.collab.entrychange.PreviewWithSourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences, BibEntryTypesManager)}.
+    /// @implNote This code is similar to {@link org.jabref.gui.collab.entrychange.PreviewWithSourceTab}.
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
@@ -700,11 +704,11 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // TODO: All this should go to ViewModel
         if (citingTask != null && !citingTask.isCancelled()) {
-            citingTask.cancel();
+            citingTask.cancel(false);
             citingTask = null;
         }
         if (citedByTask != null && !citedByTask.isCancelled()) {
-            citedByTask.cancel();
+            citedByTask.cancel(false);
             citedByTask = null;
         }
 
@@ -787,9 +791,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationComponents.listView().setItems(observableList);
 
         if (citationComponents.searchType() == CitationFetcher.SearchType.CITES && citingTask != null && !citingTask.isCancelled()) {
-            citingTask.cancel();
+            citingTask.cancel(false);
         } else if (citationComponents.searchType() == CitationFetcher.SearchType.CITED_BY && citedByTask != null && !citedByTask.isCancelled()) {
-            citedByTask.cancel();
+            citedByTask.cancel(false);
         }
 
         this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType(), bypassCache)
@@ -823,14 +827,14 @@ public class CitationRelationsTab extends EntryEditorTab {
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
-                this.citingTask = BackgroundTask.wrap(
-                        () -> this.searchCitationsRelationsService.searchCites(entry, bypassCache)
+                citingTask = BackgroundTask.wrap(
+                        () -> this.searchCitationsRelationsService.searchCites(entry, bypassCache, citingTask::isCancelled)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
-                this.citedByTask = BackgroundTask.wrap(
-                        () -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache)
+                citedByTask = BackgroundTask.wrap(
+                        () -> this.searchCitationsRelationsService.searchCitedBy(entry, bypassCache, citedByTask::isCancelled)
                 );
                 yield citedByTask;
             }
@@ -875,7 +879,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationComponents.abortButton().setOnAction(_ -> {
             hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
             showNodes(citationComponents.refreshButton());
-            task.cancel();
+            task.cancel(false);
             dialogService.notify(Localization.lang("Search aborted."));
         });
     }
@@ -892,8 +896,12 @@ public class CitationRelationsTab extends EntryEditorTab {
     ///
     /// @param entriesToImport entries to import
     private void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
-        citingTask.cancel();
-        citedByTask.cancel();
+        if (citingTask != null) {
+            citingTask.cancel(false);
+        }
+        if (citedByTask != null) {
+            citedByTask.cancel(false);
+        }
 
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
 

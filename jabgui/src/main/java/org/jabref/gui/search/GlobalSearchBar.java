@@ -150,14 +150,16 @@ public class GlobalSearchBar extends HBox {
 
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
-                searchField.clear();
-                if (searchType == SearchType.NORMAL_SEARCH) {
-                    LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
-                    if (currentLibraryTab != null) {
-                        currentLibraryTab.getMainTable().requestFocus();
+                if (!searchField.getText().isEmpty()) {
+                    searchField.clear();
+                    if (searchType == SearchType.NORMAL_SEARCH) {
+                        LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
+                        if (currentLibraryTab != null) {
+                            currentLibraryTab.getMainTable().requestFocus();
+                        }
                     }
+                    event.consume();
                 }
-                event.consume();
             }
         });
 
