@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -37,6 +41,12 @@ public class Pseudonymization {
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
 
+        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
+        if (groups.isPresent()) {
+            GroupTreeNode newGroups = pseudonymizeGroupTree(groups.get(), valueMapping, 1).node();
+            result.getMetaData().setGroups(newGroups);
+        }
+
         return new Result(result, valueMapping);
     }
 
@@ -58,5 +68,24 @@ public class Pseudonymization {
             }
         }
         return newEntries;
+    }
+
+    private record GroupTreeResult(GroupTreeNode node, int counter) {
+    }
+
+    private static GroupTreeResult pseudonymizeGroupTree(GroupTreeNode node, Map<String, String> valueMapping, int counter) {
+        AbstractGroup originalGroup = node.getGroup();
+        String originalName = originalGroup.getName();
+        String pseudoName = "group-" + counter;
+        counter++;
+        valueMapping.put(pseudoName, originalName);
+        AbstractGroup newGroup = new ExplicitGroup(pseudoName, originalGroup.getHierarchicalContext(), ',');
+        GroupTreeNode newNode = new GroupTreeNode(newGroup);
+        for (GroupTreeNode child : node.getChildren()) {
+            GroupTreeResult childResult = pseudonymizeGroupTree(child, valueMapping, counter);
+            newNode.addChild(childResult.node());
+            counter = childResult.counter();
+        }
+        return new GroupTreeResult(newNode, counter);
     }
 }
