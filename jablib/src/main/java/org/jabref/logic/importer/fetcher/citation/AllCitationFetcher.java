@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -16,9 +16,7 @@ import org.jabref.logic.importer.fetcher.citation.opencitations.OpenCitationsFet
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -33,7 +31,7 @@ public class AllCitationFetcher implements CitationFetcher {
             LoggerFactory.getLogger(AllCitationFetcher.class);
 
     private final List<CitationFetcher> fetchers;
-    private final DuplicateCheck duplicateCheck;
+    private final char keywordSeparator;
 
     public AllCitationFetcher(
             ImporterPreferences importerPreferences,
@@ -53,13 +51,13 @@ public class AllCitationFetcher implements CitationFetcher {
                 new OpenCitationsFetcher(importerPreferences),
                 new SemanticScholarCitationFetcher(importerPreferences)
         );
-        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        this.keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
     }
 
     // Test constructor
     AllCitationFetcher(List<CitationFetcher> fetchers) {
         this.fetchers = fetchers;
-        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        this.keywordSeparator = ',';
     }
 
     @Override
@@ -69,12 +67,12 @@ public class AllCitationFetcher implements CitationFetcher {
 
     @Override
     public List<BibEntry> getReferences(BibEntry entry) throws FetcherException {
-        return deduplicate(fetch(f -> f.getReferences(entry)));
+        return fetch(f -> f.getReferences(entry));
     }
 
     @Override
     public List<BibEntry> getCitations(BibEntry entry) throws FetcherException {
-        return deduplicate(fetch(f -> f.getCitations(entry)));
+        return fetch(f -> f.getCitations(entry));
     }
 
     @Override
@@ -94,30 +92,22 @@ public class AllCitationFetcher implements CitationFetcher {
     }
 
     private List<BibEntry> fetch(FetchOperation operation) {
-        List<BibEntry> result = new ArrayList<>();
+        BibDatabase target = new BibDatabase();
+        DatabaseMerger merger = new DatabaseMerger(keywordSeparator);
+
         for (CitationFetcher fetcher : fetchers) {
             try {
-                result.addAll(operation.fetch(fetcher));
+                List<BibEntry> results = operation.fetch(fetcher);
+                BibDatabase other = new BibDatabase();
+                other.insertEntries(results);
+                merger.merge(target, other);
             } catch (FetcherException e) {
                 LOGGER.debug("Fetching from {} failed — continuing",
                         fetcher.getName(), e);
             }
         }
-        return result;
-    }
 
-    private List<BibEntry> deduplicate(List<BibEntry> entries) {
-        BibDatabase temp = new BibDatabase();
-        List<BibEntry> unique = new ArrayList<>();
-        for (BibEntry entry : entries) {
-            if (duplicateCheck
-                    .containsDuplicate(temp, entry, BibDatabaseMode.BIBTEX)
-                    .isEmpty()) {
-                temp.insertEntry(entry);
-                unique.add(entry);
-            }
-        }
-        return unique;
+        return new ArrayList<>(target.getEntries());
     }
 
     @FunctionalInterface
