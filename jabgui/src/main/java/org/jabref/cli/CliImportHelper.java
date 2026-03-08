@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 ///  CLI import helper that are needed for importing stuff from the browser extension
 ///
 /// @deprecated used by the browser extension only
-@Deprecated
+@Deprecated(since = "5.13", forRemoval = true)
 public class CliImportHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(CliImportHelper.class);
 
