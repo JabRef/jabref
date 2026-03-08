@@ -31,11 +31,11 @@ public sealed abstract class DatabaseChangeDetailsView extends AnchorPane permit
     /// @see AnchorPane#getChildren()
     /// @see javafx.collections.ObservableList#setAll(Object[])
     protected void setAllAnchorsAndAttachChild(Node child) {
-        double ANCHOR_PANE_OFFSET = 8D;
-        setLeftAnchor(child, ANCHOR_PANE_OFFSET);
-        setTopAnchor(child, ANCHOR_PANE_OFFSET);
-        setRightAnchor(child, ANCHOR_PANE_OFFSET);
-        setBottomAnchor(child, ANCHOR_PANE_OFFSET);
+        double anchorPaneOffset = 8D;
+        setLeftAnchor(child, anchorPaneOffset);
+        setTopAnchor(child, anchorPaneOffset);
+        setRightAnchor(child, anchorPaneOffset);
+        setBottomAnchor(child, anchorPaneOffset);
         this.getChildren().setAll(child);
     }
 }
