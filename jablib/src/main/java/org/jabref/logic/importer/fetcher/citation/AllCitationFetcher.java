@@ -23,31 +23,19 @@ public class AllCitationFetcher implements CitationFetcher {
 
     public static final String FETCHER_NAME = "All";
 
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(AllCitationFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllCitationFetcher.class);
 
     private final List<CitationFetcher> fetchers;
     private final char keywordSeparator;
 
-    public AllCitationFetcher(
-            ImporterPreferences importerPreferences,
-            ImportFormatPreferences importFormatPreferences,
-            CitationKeyPatternPreferences citationKeyPatternPreferences,
-            GrobidPreferences grobidPreferences,
-            AiService aiService) {
+    public AllCitationFetcher(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, CitationKeyPatternPreferences citationKeyPatternPreferences, GrobidPreferences grobidPreferences, AiService aiService) {
 
         List<CitationFetcher> providers = new ArrayList<>();
         for (CitationFetcherType type : CitationFetcherType.values()) {
             if (type == CitationFetcherType.ALL) {
                 continue;
             }
-            providers.add(CitationFetcherType.getCitationFetcher(
-                    type,
-                    importerPreferences,
-                    importFormatPreferences,
-                    citationKeyPatternPreferences,
-                    grobidPreferences,
-                    aiService));
+            providers.add(CitationFetcherType.getCitationFetcher(type, importerPreferences, importFormatPreferences, citationKeyPatternPreferences, grobidPreferences, aiService));
         }
         this.fetchers = List.copyOf(providers);
         this.keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
@@ -85,8 +73,7 @@ public class AllCitationFetcher implements CitationFetcher {
                 Optional<Integer> count = fetcher.getCitationCount(entry);
                 anySuccess = true;
                 if (count.isPresent()) {
-                    max = max.isEmpty() ? count
-                            : Optional.of(Math.max(max.get(), count.get()));
+                    max = max.isEmpty() ? count : Optional.of(Math.max(max.get(), count.get()));
                 }
             } catch (FetcherException e) {
                 LOGGER.debug("Citation count failed for {}", fetcher.getName(), e);
@@ -115,8 +102,7 @@ public class AllCitationFetcher implements CitationFetcher {
                 merger.merge(target, other);
                 anySuccess = true;
             } catch (FetcherException e) {
-                LOGGER.debug("Fetching from {} failed — continuing",
-                        fetcher.getName(), e);
+                LOGGER.debug("Fetching from {} failed — continuing", fetcher.getName(), e);
                 lastException = e;
             }
         }
