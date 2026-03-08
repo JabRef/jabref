@@ -467,6 +467,29 @@ public class JabRefGUI extends Application {
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
+
+        registerProtocolHandler();
+    }
+
+    /// On macOS, URL scheme invocations (`jabref://...`) are delivered as Apple Events,
+    /// not as CLI arguments. This method registers a handler to receive them.
+    /// On Windows and Linux the URL arrives as a CLI argument and is handled by
+    /// [ArgumentProcessor], so this handler is a no-op on those platforms.
+    private void registerProtocolHandler() {
+        if (!java.awt.Desktop.isDesktopSupported()) {
+            return;
+        }
+        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+        if (!desktop.isSupported(java.awt.Desktop.Action.APP_OPEN_URI)) {
+            return;
+        }
+        desktop.setOpenURIHandler(event -> {
+            LOGGER.debug("Received URI via protocol handler: {}", event.getURI());
+            if ("jabref".equals(event.getURI().getScheme())) {
+                Platform.runLater(() -> mainFrame.handleUiCommands(List.of(new UiCommand.Focus())));
+            }
+        });
+        LOGGER.debug("Protocol handler for jabref:// registered");
     }
 
     private void setupHttpServerEnabledListener() {
