@@ -11,35 +11,45 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class AllCitationFetcherTest {
 
-    private CitationFetcher fetcher1;
-    private CitationFetcher fetcher2;
+    private CitationFetcher successfulFetcher;
+    private CitationFetcher failingFetcher;
     private AllCitationFetcher allFetcher;
 
     @BeforeEach
     void setUp() {
-        fetcher1 = mock(CitationFetcher.class);
-        fetcher2 = mock(CitationFetcher.class);
-        when(fetcher1.getName()).thenReturn("MockFetcher1");
-        when(fetcher2.getName()).thenReturn("MockFetcher2");
-        allFetcher = new AllCitationFetcher(List.of(fetcher1, fetcher2));
+        successfulFetcher = mock(CitationFetcher.class);
+        failingFetcher = mock(CitationFetcher.class);
+        when(successfulFetcher.getName()).thenReturn("SuccessfulFetcher");
+        when(failingFetcher.getName()).thenReturn("FailingFetcher");
+        allFetcher = new AllCitationFetcher(List.of(successfulFetcher, failingFetcher));
     }
 
     @Test
-    void toleratesProviderFailure() throws Exception {
+    void toleratesPartialProviderFailure() throws Exception {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/test");
 
-        when(fetcher1.getReferences(entry)).thenThrow(new FetcherException("Failure"));
-        when(fetcher2.getReferences(entry)).thenReturn(List.of(new BibEntry()));
+        when(failingFetcher.getReferences(entry)).thenThrow(new FetcherException("Failure"));
+        when(successfulFetcher.getReferences(entry)).thenReturn(List.of(new BibEntry()));
 
         List<BibEntry> result = allFetcher.getReferences(entry);
 
         assertEquals(1, result.size());
+    }
+
+    @Test
+    void throwsWhenAllProvidersFail() throws Exception {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/test");
+
+        when(failingFetcher.getReferences(entry)).thenThrow(new FetcherException("Failure 1"));
+        when(successfulFetcher.getReferences(entry)).thenThrow(new FetcherException("Failure 2"));
+
+        assertThrows(FetcherException.class, () -> allFetcher.getReferences(entry));
     }
 
     @Test
@@ -49,8 +59,8 @@ class AllCitationFetcherTest {
         BibEntry duplicate1 = new BibEntry().withField(StandardField.DOI, "10.1234/dup");
         BibEntry duplicate2 = new BibEntry().withField(StandardField.DOI, "10.1234/dup");
 
-        when(fetcher1.getReferences(entry)).thenReturn(List.of(duplicate1));
-        when(fetcher2.getReferences(entry)).thenReturn(List.of(duplicate2));
+        when(successfulFetcher.getReferences(entry)).thenReturn(List.of(duplicate1));
+        when(failingFetcher.getReferences(entry)).thenReturn(List.of(duplicate2));
 
         List<BibEntry> result = allFetcher.getReferences(entry);
 
@@ -61,12 +71,19 @@ class AllCitationFetcherTest {
     void returnsMaximumCitationCount() throws Exception {
         BibEntry entry = new BibEntry();
 
-        when(fetcher1.getCitationCount(entry)).thenReturn(Optional.of(5));
-        when(fetcher2.getCitationCount(entry)).thenReturn(Optional.of(20));
+        when(successfulFetcher.getCitationCount(entry)).thenReturn(Optional.of(5));
+        when(failingFetcher.getCitationCount(entry)).thenReturn(Optional.of(20));
 
-        Optional<Integer> result = allFetcher.getCitationCount(entry);
+        assertEquals(Optional.of(20), allFetcher.getCitationCount(entry));
+    }
 
-        assertTrue(result.isPresent());
-        assertEquals(20, result.get());
+    @Test
+    void throwsWhenAllCitationCountProvidersFail() throws Exception {
+        BibEntry entry = new BibEntry();
+
+        when(successfulFetcher.getCitationCount(entry)).thenThrow(new FetcherException("Failure 1"));
+        when(failingFetcher.getCitationCount(entry)).thenThrow(new FetcherException("Failure 2"));
+
+        assertThrows(FetcherException.class, () -> allFetcher.getCitationCount(entry));
     }
 }

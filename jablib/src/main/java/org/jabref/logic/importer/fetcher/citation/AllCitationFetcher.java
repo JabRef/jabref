@@ -10,10 +10,6 @@ import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.fetcher.OpenAlex;
-import org.jabref.logic.importer.fetcher.citation.crossref.CrossRefCitationFetcher;
-import org.jabref.logic.importer.fetcher.citation.opencitations.OpenCitationsFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -40,17 +36,20 @@ public class AllCitationFetcher implements CitationFetcher {
             GrobidPreferences grobidPreferences,
             AiService aiService) {
 
-        this.fetchers = List.of(
-                new CrossRefCitationFetcher(
-                        importerPreferences,
-                        importFormatPreferences,
-                        citationKeyPatternPreferences,
-                        grobidPreferences,
-                        aiService),
-                new OpenAlex(importerPreferences),
-                new OpenCitationsFetcher(importerPreferences),
-                new SemanticScholarCitationFetcher(importerPreferences)
-        );
+        List<CitationFetcher> providers = new ArrayList<>();
+        for (CitationFetcherType type : CitationFetcherType.values()) {
+            if (type == CitationFetcherType.ALL) {
+                continue;
+            }
+            providers.add(CitationFetcherType.getCitationFetcher(
+                    type,
+                    importerPreferences,
+                    importFormatPreferences,
+                    citationKeyPatternPreferences,
+                    grobidPreferences,
+                    aiService));
+        }
+        this.fetchers = List.copyOf(providers);
         this.keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
     }
 
@@ -76,24 +75,37 @@ public class AllCitationFetcher implements CitationFetcher {
     }
 
     @Override
-    public Optional<Integer> getCitationCount(BibEntry entry) {
-        return fetchers.stream()
-                       .map(fetcher -> {
-                           try {
-                               return fetcher.getCitationCount(entry);
-                           } catch (FetcherException e) {
-                               LOGGER.debug("Citation count failed for {}",
-                                       fetcher.getName(), e);
-                               return Optional.<Integer>empty();
-                           }
-                       })
-                       .flatMap(Optional::stream)
-                       .max(Integer::compareTo);
+    public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
+        boolean anySuccess = false;
+        FetcherException lastException = null;
+        Optional<Integer> max = Optional.empty();
+
+        for (CitationFetcher fetcher : fetchers) {
+            try {
+                Optional<Integer> count = fetcher.getCitationCount(entry);
+                anySuccess = true;
+                if (count.isPresent()) {
+                    max = max.isEmpty() ? count
+                            : Optional.of(Math.max(max.get(), count.get()));
+                }
+            } catch (FetcherException e) {
+                LOGGER.debug("Citation count failed for {}", fetcher.getName(), e);
+                lastException = e;
+            }
+        }
+
+        if (!anySuccess && lastException != null) {
+            throw new FetcherException("All citation count providers failed", lastException);
+        }
+
+        return max;
     }
 
-    private List<BibEntry> fetch(FetchOperation operation) {
+    private List<BibEntry> fetch(FetchOperation operation) throws FetcherException {
         BibDatabase target = new BibDatabase();
         DatabaseMerger merger = new DatabaseMerger(keywordSeparator);
+        boolean anySuccess = false;
+        FetcherException lastException = null;
 
         for (CitationFetcher fetcher : fetchers) {
             try {
@@ -101,10 +113,20 @@ public class AllCitationFetcher implements CitationFetcher {
                 BibDatabase other = new BibDatabase();
                 other.insertEntries(results);
                 merger.merge(target, other);
+                anySuccess = true;
             } catch (FetcherException e) {
                 LOGGER.debug("Fetching from {} failed — continuing",
                         fetcher.getName(), e);
+                lastException = e;
             }
+        }
+
+        if (!anySuccess && lastException != null) {
+            throw new FetcherException("All citation providers failed", lastException);
+        }
+
+        if (lastException != null) {
+            LOGGER.warn("Some citation providers failed, returning partial results");
         }
 
         return new ArrayList<>(target.getEntries());
