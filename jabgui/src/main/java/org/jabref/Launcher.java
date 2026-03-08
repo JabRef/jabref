@@ -42,7 +42,7 @@ import org.tinylog.configuration.Configuration;
 /// - Handle the command line arguments
 /// - Start the JavaFX application
 public class Launcher {
-    private static Logger LOGGER;
+    private static Logger logger;
     private static final BuildInfo BUILD_INFO = new BuildInfo();
 
     public enum MultipleInstanceAction {
@@ -54,7 +54,7 @@ public class Launcher {
     static void main(String[] args) {
         try {
             initLogging(args);
-            LOGGER.info("Starting JabRef v{}", BUILD_INFO.version);
+            logger.info("Starting JabRef v{}", BUILD_INFO.version);
 
             Injector.setModelOrService(BuildInfo.class, BUILD_INFO);
 
@@ -100,7 +100,7 @@ public class Launcher {
             JabRefGUI.setup(uiCommands, preferences);
             JabRefGUI.launch(JabRefGUI.class, args);
         } catch (Throwable throwable) {
-            LOGGER.error("Could not launch JabRef", throwable);
+            logger.error("Could not launch JabRef", throwable);
             throw throwable;
         }
     }
@@ -139,8 +139,8 @@ public class Launcher {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            LOGGER = LoggerFactory.getLogger(Launcher.class);
-            LOGGER.error("Could not create log directory {}", directory, e);
+            logger = LoggerFactory.getLogger(Launcher.class);
+            logger.error("Could not create log directory {}", directory, e);
             return;
         }
 
@@ -157,11 +157,11 @@ public class Launcher {
         Configuration.set("writerFile.policies", "startup");
         Configuration.set("writerFile.backups", "30");
 
-        LOGGER = LoggerFactory.getLogger(Launcher.class);
+        logger = LoggerFactory.getLogger(Launcher.class);
     }
 
     private static void systemExit() {
-        LOGGER.debug("JabRef shut down after processing command line arguments");
+        logger.debug("JabRef shut down after processing command line arguments");
         // A clean shutdown takes 60s time
         // We don't need the clean shutdown here
         System.exit(0);
@@ -169,33 +169,33 @@ public class Launcher {
 
     /// @return MultipleInstanceAction: CONTINUE if JabRef should continue starting up, SHUTDOWN if it should quit, FOCUS if it should focus the existing instance.
     private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
-        LOGGER.trace("Checking for remote handling...");
+        logger.trace("Checking for remote handling...");
 
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
             if (remoteClient.ping()) {
-                LOGGER.debug("Pinging other instance succeeded.");
+                logger.debug("Pinging other instance succeeded.");
                 if (args.length == 0) {
                     // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
-                    LOGGER.warn("A JabRef instance is already running. Switching to that instance.");
+                    logger.warn("A JabRef instance is already running. Switching to that instance.");
                     return MultipleInstanceAction.FOCUS;
                 } else {
                     // We are not alone, there is already a server out there, send command line arguments to other instance
-                    LOGGER.debug("Passing arguments passed on to running JabRef...");
+                    logger.debug("Passing arguments passed on to running JabRef...");
                     if (remoteClient.sendCommandLineArguments(args)) {
                         // So we assume it's all taken care of, and quit.
                         // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
-                        LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
+                        logger.info("Arguments passed on to running JabRef instance. Shutting down.");
                         return MultipleInstanceAction.SHUTDOWN;
                     } else {
-                        LOGGER.warn("Could not communicate with other running JabRef instance.");
+                        logger.warn("Could not communicate with other running JabRef instance.");
                     }
                 }
                 // We do not launch a new instance in presence if there is another instance running
                 return MultipleInstanceAction.SHUTDOWN;
             } else {
-                LOGGER.debug("Could not ping JabRef instance.");
+                logger.debug("Could not ping JabRef instance.");
             }
         }
         return MultipleInstanceAction.CONTINUE;
