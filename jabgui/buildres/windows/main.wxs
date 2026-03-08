@@ -168,6 +168,9 @@
         <RegistryKey Root="HKMU" Key="SOFTWARE\Classes\jabref\DefaultIcon" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
           <RegistryValue Type="string" Value="[INSTALLDIR]JabRef.exe,0"/>
         </RegistryKey>
+        <RegistryKey Root="HKMU" Key="SOFTWARE\Classes\jabref\shell\open" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Name="FriendlyAppName" Value="JabRef"/>
+        </RegistryKey>
         <RegistryKey Root="HKMU" Key="SOFTWARE\Classes\jabref\shell\open\command" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
           <RegistryValue Type="string" Value="&quot;[INSTALLDIR]JabRef.exe&quot; &quot;%1&quot;"/>
         </RegistryKey>
