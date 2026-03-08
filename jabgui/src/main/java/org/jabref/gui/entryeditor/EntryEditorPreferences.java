@@ -79,7 +79,7 @@ public class EntryEditorPreferences {
                 true,                                 // Allow integers in 'edition' filed in BibTeX mode
                 true,                                 // Automatically search and show unlinked files in the entry editor
                 JournalPopupEnabled.DISABLED,         // Fetch journal information online to show
-                CitationFetcherType.ALL, // Citation Fetcher Type
+                CitationFetcherType.SEMANTIC_SCHOLAR, // Citation Fetcher Type
                 CitationCountFetcherType.SEMANTIC_SCHOLAR, // Citation Count Fetcher Type
                 true,                                 // Show tab 'Citation information'
                 true,                                 // Show user comments field
