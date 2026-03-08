@@ -22,7 +22,7 @@ class ArgumentProcessorTest {
     @ValueSource(strings = {"jabref://", "jabref://open", "jabref:", "jabref://some/path"})
     void protocolHandlerUrlProducesFocusCommand(String url) {
         ArgumentProcessor processor = new ArgumentProcessor(
-                new String[]{url},
+                new String[] {url},
                 ArgumentProcessor.Mode.REMOTE_START,
                 preferences);
 
@@ -34,7 +34,7 @@ class ArgumentProcessorTest {
     @Test
     void normalArgumentsAreNotAffectedByProtocolFilter() {
         ArgumentProcessor processor = new ArgumentProcessor(
-                new String[]{"--blank"},
+                new String[] {"--blank"},
                 ArgumentProcessor.Mode.REMOTE_START,
                 preferences);
 
@@ -47,7 +47,7 @@ class ArgumentProcessorTest {
     @Test
     void protocolHandlerUrlCombinedWithNormalArguments() {
         ArgumentProcessor processor = new ArgumentProcessor(
-                new String[]{"jabref://", "--blank"},
+                new String[] {"jabref://", "--blank"},
                 ArgumentProcessor.Mode.REMOTE_START,
                 preferences);
 
@@ -71,7 +71,7 @@ class ArgumentProcessorTest {
     @Test
     void onlyProtocolHandlerUrlProducesOnlyFocusCommand() {
         ArgumentProcessor processor = new ArgumentProcessor(
-                new String[]{"jabref://"},
+                new String[] {"jabref://"},
                 ArgumentProcessor.Mode.REMOTE_START,
                 preferences);
 
