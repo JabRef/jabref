@@ -35,7 +35,7 @@ public class HttpServerThread extends Thread {
     private HttpServer httpServer;
 
     /// @param uiMessageHandler - non-null for GUI usage
-    /// @param tokenManager - non-null for GUI usage, shared with the preferences UI
+    /// @param tokenManager     - non-null for GUI usage, shared with the preferences UI
     public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, @Nullable ConnectorTokenManager tokenManager, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uiMessageHandler = uiMessageHandler;

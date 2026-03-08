@@ -27,6 +27,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.server.ConnectorTokenManager;
 
+import jakarta.ws.rs.Priorities;
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
@@ -115,8 +116,8 @@ public class Server {
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
         ConnectorTokenManager tokenManager = externalTokenManager != null
-                ? externalTokenManager
-                : new ConnectorTokenManager(preferences.getRemotePreferences());
+                                             ? externalTokenManager
+                                             : new ConnectorTokenManager(preferences.getRemotePreferences());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, tokenManager);
 
         // see https://stackoverflow.com/a/33794265/873282
@@ -140,7 +141,7 @@ public class Server {
         resourceConfig.register(CAYWResource.class);
 
         // Security filters
-        resourceConfig.register(SecurityFilter.class);
+        resourceConfig.register(SecurityFilter.class, Priorities.AUTHENTICATION);
         resourceConfig.register(CORSFilter.class);
 
         // Supporting classes

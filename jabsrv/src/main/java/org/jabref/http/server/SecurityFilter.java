@@ -6,16 +6,13 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.ConnectorTokenManager;
 
-import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-@Priority(Priorities.AUTHENTICATION)
 public class SecurityFilter implements ContainerRequestFilter {
 
     private static final String CUSTOM_HEADER = "X-JabRef-Connector";
