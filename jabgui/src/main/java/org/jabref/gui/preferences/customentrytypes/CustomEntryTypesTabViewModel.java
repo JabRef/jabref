@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         fieldValidator = new FunctionBasedValidator<>(
                 newFieldToAdd,
                 input -> StringUtil.isNotBlank(input) && !input.contains(" "),
-                ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name."))
+                ValidationMessage.error(Localization.lang("Field cannot be empty and must not contain spaces."))
         );
     }
 
@@ -139,11 +140,11 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public EntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), List.of());
-        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
-        this.entryTypesWithFields.add(viewModel);
+        EntryTypeViewModel entryTypeViewModel = new CustomEntryTypeViewModel(type, isMultiline);
+        this.entryTypesWithFields.add(entryTypeViewModel);
         this.entryTypeToAdd.setValue("");
 
-        return viewModel;
+        return entryTypeViewModel;
     }
 
     public void removeEntryType(EntryTypeViewModel focusedItem) {
@@ -151,7 +152,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         entryTypesToDelete.add(focusedItem.entryType().getValue());
     }
 
-    public void addNewField() {
+    public Optional<FieldViewModel> addNewField() {
         String fieldName = newFieldToAdd.get().trim();
         Field newField = new UnknownField(fieldName);
 
@@ -161,20 +162,24 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             dialogService.showWarningDialogAndWait(
                     Localization.lang("Duplicate fields"),
                     Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", FieldTextMapper.getDisplayName(newField)));
-        } else {
-            this.selectedEntryType.getValue().addField(new FieldViewModel(
-                    newField,
-                    FieldViewModel.Mandatory.REQUIRED,
-                    FieldPriority.IMPORTANT,
-                    false));
+
+            return Optional.empty();
         }
+
+        FieldViewModel fieldViewModel = new FieldViewModel(newField,
+                FieldViewModel.Mandatory.REQUIRED,
+                FieldPriority.IMPORTANT,
+                false);
+        this.selectedEntryType.getValue().addField(fieldViewModel);
         newFieldToAdd.set("");
+
+        return Optional.of(fieldViewModel);
     }
 
     public boolean displayNameExists(String displayName) {
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
         return entryFields.stream().anyMatch(fieldViewModel ->
-                fieldViewModel.displayNameProperty().getValue().equals(displayName));
+                fieldViewModel.displayNameProperty().getValue().equalsIgnoreCase(displayName));
     }
 
     public void removeField(FieldViewModel focusedItem) {

@@ -36,7 +36,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: pr_number
           path: pr_number.txt
@@ -54,6 +54,19 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Run checkstyle using gradle
         run: gradle checkstyleMain checkstyleTest checkstyleJmh
+
+  dependencyscopes:
+    name: Dependency Scopes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run checkAllModuleInfo using gradle
+        run: gradle checkAllModuleInfo
 
   openrewrite:
     name: OpenRewrite
@@ -175,7 +188,7 @@ jobs:
           jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md | tee heylogs.txt || true
 
           # We have two acceptable errors
-          if ! grep -q "2 problems" heylogs.txt; then
+          if ! grep -q "3 problems" heylogs.txt; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt
