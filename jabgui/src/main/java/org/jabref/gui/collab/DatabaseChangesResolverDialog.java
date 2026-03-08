@@ -34,9 +34,10 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     /// Reconstructing the details view to preview an {@link DatabaseChange} every time it's selected is a heavy operation.
     /// It is also useless because changes are static and if the change data is static then the view doesn't have to change
     /// either. This cache is used to ensure that we only create the detail view instance once for each {@link DatabaseChange}.
-    private final Map<DatabaseChange, DatabaseChangeDetailsView> DETAILS_VIEW_CACHE = new HashMap<>();
+    private final Map<DatabaseChange, DatabaseChangeDetailsView> detailsViewCache = new HashMap<>();
 
     @FXML
+    
     private TableView<DatabaseChange> changesTableView;
     @FXML
     private TableColumn<DatabaseChange, String> changeName;
@@ -112,7 +113,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
         EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
             if (selectedChange != null) {
-                DatabaseChangeDetailsView detailsView = DETAILS_VIEW_CACHE.computeIfAbsent(selectedChange, databaseChangeDetailsViewFactory::create);
+                DatabaseChangeDetailsView detailsView = detailsViewCache.computeIfAbsent(selectedChange, databaseChangeDetailsViewFactory::create);
                 changeInfoPane.setCenter(detailsView);
             }
         });
