@@ -1,6 +1,7 @@
 package org.jabref.logic.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
@@ -29,9 +30,9 @@ public class MscCodeUtils {
     public static Optional<HashBiMap<String, String>> loadMscCodesFromJson(URL resourceUrl) throws MscCodeLoadingException {
 
         ObjectMapper mapper = new JsonMapper();
-        try {
+        try (InputStream inputStream = resourceUrl.openStream()) {
             Map<String, String> mapping =
-                    mapper.readValue(resourceUrl.openStream(), new TypeReference<>() {
+                    mapper.readValue(inputStream, new TypeReference<>() {
                     });
             HashBiMap<String, String> result = HashBiMap.create(mapping);
 
