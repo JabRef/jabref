@@ -44,7 +44,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragEntered;
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
-    private BiConsumer<T, DragEvent> toOnDragDone;
+    private BiConsumer<T, ? super DragEvent> toOnDragDone;
     private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
     private Callback<T, ValidationStatus> validationStatusProperty;
 
