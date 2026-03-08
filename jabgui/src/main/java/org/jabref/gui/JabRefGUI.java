@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.awt.Desktop;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
