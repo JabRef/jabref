@@ -11,7 +11,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
@@ -30,10 +32,19 @@ public class Pseudonymization {
         // TODO: Anonymize metadata
         // TODO: Anonymize strings
 
-        Map<Field, Map<String, Integer>> fieldToValueToIdMap = new HashMap<>();
-        List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, fieldToValueToIdMap);
-
         Map<String, String> valueMapping = new HashMap<>();
+        Map<String, String> groupNameMapping = new HashMap<>();
+
+        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
+        Optional<GroupTreeNode> pseudonymizedGroups = Optional.empty();
+        if (groups.isPresent()) {
+            GroupTreeResult groupResult = pseudonymizeGroupTree(groups.get(), valueMapping, groupNameMapping, 1);
+            pseudonymizedGroups = Optional.of(groupResult.node());
+        }
+
+        Map<Field, Map<String, Integer>> fieldToValueToIdMap = new HashMap<>();
+        List<BibEntry> newEntries = pseudonymizeEntries(bibDatabaseContext, fieldToValueToIdMap, groupNameMapping);
+
         fieldToValueToIdMap.forEach((field, stringToIntMap) ->
                 stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
 
@@ -41,17 +52,15 @@ public class Pseudonymization {
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
 
-        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
-        if (groups.isPresent()) {
-            GroupTreeNode newGroups = pseudonymizeGroupTree(groups.get(), valueMapping, 1).node();
-            result.getMetaData().setGroups(newGroups);
-        }
+        pseudonymizedGroups.ifPresent(newGroups -> result.getMetaData().setGroups(newGroups));
 
         return new Result(result, valueMapping);
     }
 
     /// @param fieldToValueToIdMap map containing the mapping from field to value to id, will be filled by this method
-    private static List<BibEntry> pseudonymizeEntries(BibDatabaseContext bibDatabaseContext, Map<Field, Map<String, Integer>> fieldToValueToIdMap) {
+    private static List<BibEntry> pseudonymizeEntries(BibDatabaseContext bibDatabaseContext,
+                                                      Map<Field, Map<String, Integer>> fieldToValueToIdMap,
+                                                      Map<String, String> groupNameMapping) {
         List<BibEntry> entries = bibDatabaseContext.getEntries();
         List<BibEntry> newEntries = new ArrayList<>(entries.size());
 
@@ -59,6 +68,22 @@ public class Pseudonymization {
             BibEntry newEntry = new BibEntry(entry.getType());
             newEntries.add(newEntry);
             for (Field field : entry.getFields()) {
+                if (field.equals(StandardField.GROUPS)) {
+                    String fieldContent = entry.getField(field).orElse("");
+                    if (!fieldContent.isBlank()) {
+                        String[] groupNames = fieldContent.split(",");
+                        for (int i = 0; i < groupNames.length; i++) {
+                            String originalName = groupNames[i].trim();
+                            String pseudoName = groupNameMapping.get(originalName);
+                            if (pseudoName != null) {
+                                groupNames[i] = pseudoName;
+                            }
+                        }
+                        newEntry.setField(field, String.join(", ", groupNames));
+                    }
+                    continue;
+                }
+
                 Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, k -> new HashMap<>());
                 // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
                 //       See {@link org.jabref.model.entry.field.StandardField} for usages.
@@ -73,16 +98,27 @@ public class Pseudonymization {
     private record GroupTreeResult(GroupTreeNode node, int counter) {
     }
 
-    private static GroupTreeResult pseudonymizeGroupTree(GroupTreeNode node, Map<String, String> valueMapping, int counter) {
+    private static GroupTreeResult pseudonymizeGroupTree(GroupTreeNode node,
+                                                         Map<String, String> valueMapping,
+                                                         Map<String, String> groupNameMapping,
+                                                         int counter) {
         AbstractGroup originalGroup = node.getGroup();
         String originalName = originalGroup.getName();
         String pseudoName = "group-" + counter;
         counter++;
         valueMapping.put(pseudoName, originalName);
-        AbstractGroup newGroup = new ExplicitGroup(pseudoName, originalGroup.getHierarchicalContext(), ',');
+        groupNameMapping.put(originalName, pseudoName);
+
+        AbstractGroup newGroup;
+        if (originalGroup instanceof AllEntriesGroup) {
+            newGroup = new AllEntriesGroup(pseudoName);
+        } else {
+            newGroup = new ExplicitGroup(pseudoName, originalGroup.getHierarchicalContext(), ',');
+        }
+
         GroupTreeNode newNode = new GroupTreeNode(newGroup);
         for (GroupTreeNode child : node.getChildren()) {
-            GroupTreeResult childResult = pseudonymizeGroupTree(child, valueMapping, counter);
+            GroupTreeResult childResult = pseudonymizeGroupTree(child, valueMapping, groupNameMapping, counter);
             newNode.addChild(childResult.node());
             counter = childResult.counter();
         }
