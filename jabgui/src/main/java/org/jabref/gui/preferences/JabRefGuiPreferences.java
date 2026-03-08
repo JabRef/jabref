@@ -258,7 +258,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         super();
 
         defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
-        defaults.put(CITATION_FETCHER_TYPE, CitationFetcherType.ALL.name());
+        defaults.put(CITATION_FETCHER_TYPE, CitationFetcherType.SEMANTIC_SCHOLAR.name());
         defaults.put(CITATION_COUNT_FETCHER_TYPE, CitationCountFetcherType.SEMANTIC_SCHOLAR.name());
         // endregion
 
