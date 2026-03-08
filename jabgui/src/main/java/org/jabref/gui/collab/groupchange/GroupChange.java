@@ -23,7 +23,6 @@ public final class GroupChange extends DatabaseChange {
 
     @Override
     public void applyChange(NamedCompoundEdit undoEdit) {
-        GroupTreeNode oldRoot = groupDiff.getOriginalGroupRoot();
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
