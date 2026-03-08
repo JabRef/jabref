@@ -59,7 +59,7 @@ class ArgumentProcessorTest {
     @Test
     void emptyArgumentsProduceNoFocusCommand() {
         ArgumentProcessor processor = new ArgumentProcessor(
-                new String[]{},
+                new String[] {},
                 ArgumentProcessor.Mode.REMOTE_START,
                 preferences);
 
