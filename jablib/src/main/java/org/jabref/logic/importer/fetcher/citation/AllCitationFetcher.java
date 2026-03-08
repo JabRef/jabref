@@ -29,7 +29,6 @@ public class AllCitationFetcher implements CitationFetcher {
     private final char keywordSeparator;
 
     public AllCitationFetcher(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, CitationKeyPatternPreferences citationKeyPatternPreferences, GrobidPreferences grobidPreferences, AiService aiService) {
-
         List<CitationFetcher> providers = new ArrayList<>();
         for (CitationFetcherType type : CitationFetcherType.values()) {
             if (type == CitationFetcherType.ALL) {
