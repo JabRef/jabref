@@ -9,6 +9,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+- We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
+
 ### Added
 
 - We added a fetcher selection dropdown to the citation count field in the General tab, allowing users to choose between Semantic Scholar, OpenAlex, OpenCitations, and scite.ai as the source. The selected fetcher is now persisted across restarts and can also be configured in the Entry Editor preferences. [#15134](https://github.com/JabRef/jabref/issues/15134)
