@@ -14,6 +14,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import org.jspecify.annotations.Nullable;
+
 /// Used for displaying a rendered entry in the UI. Due to historical reasons, "rendering" is called "layout".
 public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePreviewLayout, TextBasedPreviewLayout {
     String generatePreview(BibEntry entry, BibDatabaseContext databaseContext);
@@ -31,6 +33,7 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
                 || this.getShortTitle().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT));
     }
 
+    @Nullable
     static PreviewLayout of(String layout,
                             String customPreviewLayout,
                             List<Path> bstLayoutPaths,
