@@ -327,6 +327,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
+        getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
     }
 
     // region EntryEditorPreferences
