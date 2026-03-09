@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 
@@ -46,9 +45,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
-import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -83,12 +80,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // region Preview - public for pref migrations
     public static final String PREVIEW_STYLE = "previewStyle";
-    public static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
-    public static final String CYCLE_PREVIEW = "cyclePreview";
+    public static final String PREVIEW_CYCLE_POS = "cyclePreviewPos";
+    public static final String PREVIEW_CYCLE = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
     public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
     public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
-    public static final String COVER_IMAGE_DOWNLOAD = "coverDownload";
+    public static final String PREVIEW_COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
 
     // region column names
@@ -254,41 +251,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private NewEntryPreferences newEntryPreferences;
     private DonationPreferences donationPreferences;
 
-    private JabRefGuiPreferences() {
-        super();
-
-        // region PreviewStyle
-        defaults.put(CYCLE_PREVIEW, "Preview;" + CSLStyleLoader.DEFAULT_STYLE);
-        defaults.put(CYCLE_PREVIEW_POS, 0);
-        defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
-        defaults.put(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, Boolean.FALSE);
-        defaults.put(PREVIEW_STYLE,
-                "<font face=\"sans-serif\">" +
-                        "<b>\\bibtextype</b><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>\\end{citationkey}__NEWLINE__" +
-                        "\\begin{author}<BR><BR>\\format[Authors(LastFirst, FullName,Sep= / ,LastSep= / ),HTMLChars]{\\author}\\end{author}__NEWLINE__" +
-                        "\\begin{editor & !author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & !author}__NEWLINE__" +
-                        "\\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b> \\end{title}__NEWLINE__" +
-                        "<BR>\\begin{date}\\date\\end{date}\\begin{edition}, \\edition. edition\\end{edition}__NEWLINE__" +
-                        "\\begin{editor & author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & author}__NEWLINE__" +
-                        "\\begin{booktitle}<BR><i>\\format[HTMLChars]{\\booktitle}</i>\\end{booktitle}__NEWLINE__" +
-                        "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}" +
-                        "\\begin{editor & !author}<BR>\\end{editor & !author}\\begin{!editor}<BR>\\end{!editor}\\begin{journal}<BR><i>\\format[HTMLChars]{\\journal}</i> \\end{journal} \\begin{volume}, Vol. \\volume\\end{volume}\\begin{series}<BR>\\format[HTMLChars]{\\series}\\end{series}\\begin{number}, No. \\format[HTMLChars]{\\number}\\end{number}__NEWLINE__" +
-                        "\\begin{school} \\format[HTMLChars]{\\school}, \\end{school}__NEWLINE__" +
-                        "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" +
-                        "\\begin{publisher}<BR>\\format[HTMLChars]{\\publisher}\\end{publisher}\\begin{location}: \\format[HTMLChars]{\\location} \\end{location}__NEWLINE__" +
-                        "\\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__" +
-                        "\\begin{doi}<BR>doi <a href=\"https://doi.org/\\format[DOIStrip]{\\doi}\">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__" +
-                        "\\begin{url}<BR>URL <a href=\"\\url\">\\url</a>\\end{url}__NEWLINE__" +
-                        "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
-                        "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
-                        "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}\\end{comment}__NEWLINE__" +
-                        "</font>__NEWLINE__");
-        // endregion
-
-        // Disabled per default - similar to Mr. DLib; see [org.jabref.logic.preferences.JabRefCliPreferences.ACCEPT_RECOMMENDATIONS].
-        defaults.put(COVER_IMAGE_DOWNLOAD, Boolean.FALSE);
-    }
-
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).
     /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
@@ -340,6 +302,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
+        getPreviewPreferences().setAll(PreviewPreferences.getDefault());
     }
 
     @Override
@@ -349,7 +312,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
-        getGroupsPreferences().setAll(getGroupsPreferencesfromBackingStore(getGroupsPreferences()));
+        getGroupsPreferences().setAll(getGroupsPreferencesFromBackingStore(getGroupsPreferences()));
         getCopyToPreferences().setAll(getCopyToPreferencesFromBackingStore(getCopyToPreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
@@ -789,7 +752,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return groupsPreferences;
         }
 
-        groupsPreferences = getGroupsPreferencesfromBackingStore(GroupsPreferences.getDefault());
+        groupsPreferences = getGroupsPreferencesFromBackingStore(GroupsPreferences.getDefault());
 
         groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
             putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
@@ -803,7 +766,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return groupsPreferences;
     }
 
-    private GroupsPreferences getGroupsPreferencesfromBackingStore(GroupsPreferences defaults) {
+    private GroupsPreferences getGroupsPreferencesFromBackingStore(GroupsPreferences defaults) {
         return new GroupsPreferences(
                 getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION)),
                 getBoolean(GROUP_VIEW_FILTER, defaults.groupViewModeProperty().contains(GroupViewMode.FILTER)),
@@ -843,86 +806,81 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return previewPreferences;
         }
 
-        String style = get(PREVIEW_STYLE);
-        List<PreviewLayout> layouts = getPreviewLayouts(style);
+        this.previewPreferences = getPreviewPreferencesFromBackingStore(PreviewPreferences.getDefault());
 
-        this.previewPreferences = new PreviewPreferences(
-                layouts,
-                getPreviewCyclePosition(layouts),
-                new TextBasedPreviewLayout(
-                        style,
-                        getLayoutFormatterPreferences(),
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
-                (String) defaults.get(PREVIEW_STYLE),
-                getBoolean(PREVIEW_AS_TAB),
-                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
-                getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
-                                                       .map(Path::of)
-                                                       .collect(Collectors.toList()),
-                getBoolean(COVER_IMAGE_DOWNLOAD)
-        );
-
-        previewPreferences.getLayoutCycle().addListener((InvalidationListener) _ -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
-        EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (_, _, newValue) -> putInt(CYCLE_PREVIEW_POS, newValue));
-        // must be stored with __NEWLINE__ instead of \n so that our migration correclty triggers, in getText it will be replaced by \n
-        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (_, _, newValue) -> put(PREVIEW_STYLE, newValue.getText().replace("\n", "__NEWLINE__")));
+        previewPreferences.getLayoutCycle().addListener((InvalidationListener) _ -> putStringList(PREVIEW_CYCLE, previewLayoutsToStrings(previewPreferences.getLayoutCycle())));
+        EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (_, _, newValue) -> putInt(PREVIEW_CYCLE_POS, newValue));
+        // must be stored with __NEWLINE__ instead of \n so that our migration correctly triggers, in getText it will be replaced by \n
+        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (_, _, newValue) -> put(PREVIEW_STYLE, newValue.replace("\n", "__NEWLINE__")));
         EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (_, _, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
         EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (_, _, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
         previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) _ -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
-        EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(COVER_IMAGE_DOWNLOAD, newValue));
+        EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, newValue));
         return this.previewPreferences;
+    }
+
+    private PreviewPreferences getPreviewPreferencesFromBackingStore(PreviewPreferences defaults) {
+        String customPreviewLayout = get(PREVIEW_STYLE, defaults.getCustomPreviewLayout());
+        List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayout);
+        if (layouts.isEmpty()) {
+            layouts = defaults.getLayoutCycle();
+        }
+
+        List<Path> bstPaths;
+        if (hasKey(PREVIEW_BST_LAYOUT_PATHS)) {
+            bstPaths = getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
+                                                              .map(Path::of)
+                                                              .collect(Collectors.toList());
+        } else {
+            bstPaths = defaults.getBstPreviewLayoutPaths();
+        }
+
+        return new PreviewPreferences(
+                layouts,
+                getPreviewCyclePosition(layouts, getInt(PREVIEW_CYCLE_POS, defaults.getLayoutCyclePosition())),
+                customPreviewLayout,
+                getBoolean(PREVIEW_AS_TAB, defaults.shouldShowPreviewAsExtraTab()),
+                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaults.shouldShowPreviewEntryTableTooltip()),
+                bstPaths,
+                getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaults.shouldDownloadCovers())
+        );
     }
 
     private void storeBstPaths(List<Path> bstPaths) {
         putStringList(PREVIEW_BST_LAYOUT_PATHS, bstPaths.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
     }
 
-    private List<PreviewLayout> getPreviewLayouts(String style) {
-        List<String> cycle = getStringList(CYCLE_PREVIEW);
-
+    private List<PreviewLayout> getPreviewLayouts(List<String> cycle, String customPreviewLayout) {
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
-            cycle.add("Preview");
+            cycle.addAll(List.of(TextBasedPreviewLayout.NAME, CSLStyleLoader.DEFAULT_STYLE));
         }
 
         return cycle.stream()
-                    .map(layout -> {
-                        if (CSLStyleUtils.isCitationStyleFile(layout)) {
-                            BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-                            return CSLStyleUtils.createCitationStyleFromFile(layout)
-                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
-                                                .orElse(null);
-                        }
-                        if (BstPreviewLayout.isBstStyleFile(layout)) {
-                            return getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
-                                                                          .filter(path -> path.endsWith(layout)).map(Path::of)
-                                                                          .map(BstPreviewLayout::new)
-                                                                          .findFirst()
-                                                                          .orElse(null);
-                        } else {
-                            return new TextBasedPreviewLayout(
-                                    style,
-                                    getLayoutFormatterPreferences(),
-                                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-                        }
-                    }).filter(Objects::nonNull)
+                    .map(layout -> PreviewLayout.of(
+                            layout,
+                            customPreviewLayout,
+                            getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList(),
+                            getLayoutFormatterPreferences(),
+                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class))
+                    ).filter(Objects::nonNull)
                     .collect(Collectors.toList());
     }
 
-    private void storePreviewLayouts(ObservableList<PreviewLayout> previewCycle) {
-        putStringList(CYCLE_PREVIEW, previewCycle.stream()
-                                                 .map(layout -> {
-                                                     if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
-                                                         return citationStyleLayout.getFilePath();
-                                                     } else {
-                                                         return layout.getDisplayName();
-                                                     }
-                                                 }).toList()
-        );
+    private List<String> previewLayoutsToStrings(List<PreviewLayout> previewCycle) {
+        return previewCycle.stream()
+                           .map(layout -> {
+                               if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
+                                   return citationStyleLayout.getFilePath();
+                               } else {
+                                   return layout.getName();
+                               }
+                           }).toList();
     }
 
-    private int getPreviewCyclePosition(List<PreviewLayout> layouts) {
-        int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
+    private int getPreviewCyclePosition(List<PreviewLayout> layouts, int defaultPosition) {
+        int storedCyclePos = getInt(PREVIEW_CYCLE_POS, defaultPosition);
         if (storedCyclePos < layouts.size()) {
             return storedCyclePos;
         } else {

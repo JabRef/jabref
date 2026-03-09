@@ -35,6 +35,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bst.BstPreviewLayout;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
@@ -68,6 +69,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
+    @Inject private JournalAbbreviationRepository abbreviationRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -125,7 +127,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new PreviewTabViewModel(dialogService, preferences.getPreviewPreferences(), taskExecutor, stateManager);
+        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager, abbreviationRepository);
         lastKeyPressTime = System.currentTimeMillis();
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());

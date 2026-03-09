@@ -28,6 +28,7 @@ import javafx.scene.input.TransferMode;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -35,6 +36,7 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
@@ -79,7 +81,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final PreviewPreferences previewPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
+    @org.jetbrains.annotations.NotNull private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     private final Validator chosenListValidator;
@@ -89,15 +92,17 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
     public PreviewTabViewModel(DialogService dialogService,
-                               PreviewPreferences previewPreferences,
+                               GuiPreferences preferences,
                                TaskExecutor taskExecutor,
-                               StateManager stateManager) {
+                               StateManager stateManager,
+                               JournalAbbreviationRepository abbreviationRepository) {
         this.dialogService = dialogService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.localDragboard = stateManager.getLocalDragboard();
-        this.previewPreferences = previewPreferences;
+        this.abbreviationRepository = abbreviationRepository;
 
-        sourceTextProperty.addListener((observable, oldValue, newValue) -> {
+        sourceTextProperty.addListener((_, _, _) -> {
             if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
                 layout.setText(sourceTextProperty.getValue());
             }
@@ -117,6 +122,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         showAsExtraTabProperty.set(previewPreferences.shouldShowPreviewAsExtraTab());
         showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
         chosenListProperty().getValue().clear();
@@ -124,7 +130,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         availableListProperty.clear();
         if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {
-            availableListProperty.getValue().add(previewPreferences.getCustomPreviewLayout());
+            availableListProperty.getValue().add(TextBasedPreviewLayout.of(
+                    TextBasedPreviewLayout.DEFAULT,
+                    preferences.getLayoutFormatterPreferences(),
+                    abbreviationRepository));
         }
 
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
@@ -192,20 +201,28 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     /// Store the changes of preference-preview settings.
     @Override
     public void storeSettings() {
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+
         if (chosenListProperty.isEmpty()) {
-            chosenListProperty.add(previewPreferences.getCustomPreviewLayout());
+            PreviewLayout textBasedPreviewLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
+            if (textBasedPreviewLayout != null) {
+                chosenListProperty.add(textBasedPreviewLayout);
+            } else {
+                chosenListProperty.add(TextBasedPreviewLayout.of(
+                        TextBasedPreviewLayout.DEFAULT,
+                        preferences.getLayoutFormatterPreferences(),
+                        abbreviationRepository));
+            }
         }
 
-        PreviewLayout customLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
-        if (customLayout == null) {
-            customLayout = previewPreferences.getCustomPreviewLayout();
+        if (findLayoutByName(TextBasedPreviewLayout.NAME) instanceof TextBasedPreviewLayout customLayout) {
+            previewPreferences.setCustomPreviewLayout(customLayout.getText());
         }
 
         previewPreferences.getLayoutCycle().clear();
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
         previewPreferences.setShowPreviewAsExtraTab(showAsExtraTabProperty.getValue());
         previewPreferences.setShowPreviewEntryTableTooltip(showPreviewInEntryTableTooltip.getValue());
-        previewPreferences.setCustomPreviewLayout((TextBasedPreviewLayout) customLayout);
         previewPreferences.setBstPreviewLayoutPaths(bstStylesPaths);
 
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
@@ -294,7 +311,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public void resetDefaultLayout() {
         PreviewLayout defaultLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (defaultLayout instanceof TextBasedPreviewLayout layout) {
-            layout.setText(previewPreferences.getDefaultCustomPreviewLayout());
+            layout.setText(TextBasedPreviewLayout.of(
+                    TextBasedPreviewLayout.DEFAULT,
+                    preferences.getLayoutFormatterPreferences(),
+                    abbreviationRepository).getText());
         }
         refreshPreview();
     }

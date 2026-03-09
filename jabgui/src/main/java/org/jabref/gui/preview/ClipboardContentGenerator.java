@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.input.ClipboardContent;
 
@@ -131,7 +132,15 @@ public record ClipboardContentGenerator(
     }
 
     private List<String> generateTextBasedPreviewLayoutCitations(List<BibEntry> selectedEntries, BibDatabaseContext bibDatabaseContext) throws IOException {
-        TextBasedPreviewLayout customPreviewLayout = previewPreferences.getCustomPreviewLayout();
+        Optional<TextBasedPreviewLayout> layoutOpt = previewPreferences.getLayoutCycle().stream()
+                                                                       .filter(TextBasedPreviewLayout.class::isInstance)
+                                                                       .map(TextBasedPreviewLayout.class::cast)
+                                                                       .findFirst();
+        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(
+                TextBasedPreviewLayout.DEFAULT,
+                layoutFormatterPreferences,
+                abbreviationRepository));
+
         Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
         List<String> citations = new ArrayList<>(selectedEntries.size());
