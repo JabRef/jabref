@@ -3,6 +3,8 @@ package org.jabref.gui.preferences.websearch;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
@@ -93,6 +95,13 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         searchEngineUrlTemplate.setEditable(true);
 
         searchEngineTable.setItems(viewModel.getSearchEngines());
+
+        searchEngineTable.setFixedCellSize(32);
+        NumberBinding visibleRows = Bindings.min(Bindings.size(viewModel.getSearchEngines()), 8);
+        NumberBinding tableHeight = visibleRows.multiply(searchEngineTable.getFixedCellSize()).add(34);
+        searchEngineTable.prefHeightProperty().bind(tableHeight);
+        searchEngineTable.minHeightProperty().bind(searchEngineTable.prefHeightProperty());
+        searchEngineTable.maxHeightProperty().bind(searchEngineTable.prefHeightProperty());
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
