@@ -82,7 +82,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
-    @org.jetbrains.annotations.NotNull private final GuiPreferences preferences;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     private final Validator chosenListValidator;
