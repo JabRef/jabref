@@ -20,7 +20,7 @@ val pdfbox = "3.0.6"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.11.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.12.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
@@ -102,7 +102,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
-    api("org.apache.httpcomponents.core5:httpcore5:5.4.1")
+    api("org.apache.httpcomponents.core5:httpcore5:5.4.2")
     api("org.apache.httpcomponents.client5:httpclient5:5.6")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.3")
     api("org.apache.lucene:lucene-analysis-common:$lucene")

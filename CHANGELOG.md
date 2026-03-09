@@ -11,12 +11,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a fetcher selection dropdown to the citation count field in the General tab, allowing users to choose between Semantic Scholar, OpenAlex, OpenCitations, and scite.ai as the source. The selected fetcher is now persisted across restarts and can also be configured in the Entry Editor preferences. [#15134](https://github.com/JabRef/jabref/issues/15134)
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
 
 ### Changed
 
 - We removed the restart prompt when accepting Mr. DLib privacy settings or hiding the Related articles tab in the entry editor. [#15195](https://github.com/JabRef/jabref/issues/15195)
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
+- We replaced the various notifications for file changes, tasks and popup toasts with a new info center. [#14762](https://github.com/JabRef/jabref/issues/14762)
 - We upgraded to Lucene 10.4 for the fulltext search.
     Thus, the now created search index cannot be read from older versions of JabRef anylonger.
     ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
@@ -27,6 +29,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where multiline property of fields cannot be removed properly. [#11897](https://github.com/JabRef/jabref/issues/11897)
+- We fixed the merge dialog closing immediately when only one PDF importer returns metadata during PDF drag-and-drop import. [#15127](https://github.com/JabRef/jabref/issues/15127)
+- We fixed an issue where pressing ESC now properly closes the global search dialog. [#15133](https://github.com/JabRef/jabref/issues/15133)
 - We fixed the Citavi XML importer to preserve citation keys defined in Citavi (previously all imported entries had empty citation keys). [#14658](https://github.com/JabRef/jabref/issues/14658)
 - We fixed an issue where LaTeX to Unicode conversion replaced tildes with standard spaces instead of non-break spaces. [#15158](https://github.com/JabRef/jabref/issues/15158)
 - We fixed an issue where an exception dialog was shown when moving side panels down/up. [#15207](https://github.com/JabRef/jabref/issues/15207)

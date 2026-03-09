@@ -3,17 +3,28 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.core.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
 public class SciteAiFetcherTest {
+    private SciteAiFetcher fetcher;
+
+    @BeforeEach
+    void setUp() {
+        fetcher = new SciteAiFetcher();
+    }
+
     @Test
     void sciteTallyDTO() {
         JSONObject jsonObject = new JSONObject();
@@ -42,5 +53,25 @@ public class SciteAiFetcherTest {
         DOI doi = new DOI("10.1109/ICECS.2010.5724443");
         Optional<DOI> actual = DOI.parse(viewModel.fetchTallies(doi).doi());
         assertEquals(Optional.of(doi), actual);
+    }
+
+    @Test
+    void getCitationCountReturnsCitationCount() throws FetcherException {
+        BibEntry entry = new BibEntry();
+        entry.withField(StandardField.DOI, "10.1145/1028174.971312");
+
+        Optional<Integer> result = fetcher.getCitationCount(entry);
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get() > 0);
+    }
+
+    @Test
+    void getCitationCountReturnsEmptyWhenNoDoi() throws FetcherException {
+        BibEntry entry = new BibEntry();
+
+        Optional<Integer> result = fetcher.getCitationCount(entry);
+
+        assertTrue(result.isEmpty());
     }
 }
