@@ -104,7 +104,7 @@ public class WebSearchPaneView extends VBox {
         return query;
     }
 
-    /// Create label that shows the current search mode (DOI, advanced, raw, or hidden for basic)
+    /// Creates a label that indicates how the current query will be interpreted
     private Label createModeIndicatorLabel() {
         Label modeIndicator = new Label();
         modeIndicator.textProperty().bind(viewModel.searchModeIndicatorProperty());

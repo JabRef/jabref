@@ -83,7 +83,7 @@ public class WebSearchPaneViewModel {
                     }
 
                     if (DOI.parse(queryText).isPresent()) {
-                        searchModeIndicator.set(Localization.lang("DOI detected - routing to DOI fetcher"));
+                        searchModeIndicator.set(Localization.lang("Routing to DOI fetcher"));
                         return null;
                     }
 
@@ -101,7 +101,7 @@ public class WebSearchPaneViewModel {
                     } catch (ParseCancellationException e) {
                         // Query will still be sent as a raw search term to the fetcher
                         // but we show a warning so the user knows advanced syntax was not recognized.
-                        searchModeIndicator.set(Localization.lang("Raw search - syntax not recognized"));
+                        searchModeIndicator.set(Localization.lang("Query sent as raw search term"));
 
                         // RecognitionException can point out the exact error
                         if (e.getCause() instanceof RecognitionException recEx) {
@@ -167,12 +167,15 @@ public class WebSearchPaneViewModel {
         Callable<ParserResult> parserResultCallable;
 
         String fetcherName = activeFetcher.getName();
+        SearchBasedFetcher effectiveFetcher = activeFetcher;
 
         if (DOI.parse(query).isPresent()) {
             // DOI detected — route to DoiFetcher regardless of selected fetcher
             DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(doiFetcher.performSearchById(query)));
             fetcherName = DoiFetcher.NAME;
+            // DoiFetcher is not a SearchBasedFetcher, so effectiveFetcher stays null for this branch
+            effectiveFetcher = null;
         } else if (CompositeIdFetcher.containsValidId(query)) {
             CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
@@ -186,7 +189,12 @@ public class WebSearchPaneViewModel {
                                                           .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
-        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task, activeFetcher, query);
+        ImportEntriesDialog dialog;
+        if (effectiveFetcher != null) {
+            dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task, effectiveFetcher, query);
+        } else {
+            dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
+        }
         dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
