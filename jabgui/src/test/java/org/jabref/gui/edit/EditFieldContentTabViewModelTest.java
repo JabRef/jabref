@@ -3,19 +3,33 @@ package org.jabref.gui.edit;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentViewModel;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.NotificationGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(ApplicationExtension.class)
 class EditFieldContentTabViewModelTest {
     EditFieldContentViewModel editFieldContentViewModel;
     BibEntry entryA;
@@ -23,7 +37,9 @@ class EditFieldContentTabViewModelTest {
 
     BibDatabase bibDatabase;
 
-    StateManager stateManager = mock(StateManager.class);
+    StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
+    DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
+    NotificationGroup<Object, Notification<Object>> notificationGroup = new NotificationGroup<>("");
 
     @BeforeEach
     void setup() {
@@ -36,7 +52,20 @@ class EditFieldContentTabViewModelTest {
                 .withField(StandardField.YEAR, "");
 
         bibDatabase = new BibDatabase();
-        editFieldContentViewModel = new EditFieldContentViewModel(bibDatabase, List.of(entryA, entryB), stateManager);
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entryA, entryB));
+
+        when(dialogService.getNotificationGroups()).thenReturn(List.of(notificationGroup));
+        doAnswer(invocation -> {
+            notificationGroup.getNotifications().add(invocation.getArgument(0));
+            return null;
+        }).when(dialogService).notify(any(Notifications.UiNotification.class));
+
+        editFieldContentViewModel = new EditFieldContentViewModel(
+                bibDatabase,
+                List.of(entryA, entryB),
+                mock(NamedCompoundEdit.class),
+                dialogService,
+                stateManager);
     }
 
     @Test
