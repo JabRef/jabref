@@ -100,6 +100,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         addNewEntryType.setOnAction(event -> addEntryType());
         addNewField.setOnAction(event -> addNewField());
+        addNewField.textProperty().addListener((observable, oldValue, newValue) -> updateAddNewFieldButtonText());
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
         addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
@@ -254,7 +255,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         new ValueTableCellFactory<FieldViewModel, String>()
                 .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
-                .withOnMouseClickedEvent(_ -> _ -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
+                .withOnMouseClickedEvent(_ -> _ -> {
+                    viewModel.removeField(fields.getSelectionModel().getSelectedItem());
+                    updateAddNewFieldButtonText();
+                })
                 .install(fieldTypeActionColumn);
 
         new ViewModelTableRowFactory<FieldViewModel>()
@@ -336,6 +340,19 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     private void handleOnDragExited(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, DragEvent dragEvent) {
         ControlHelper.removeDroppingPseudoClasses(row);
+    }
+
+    private void updateAddNewFieldButtonText() {
+        EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
+        if ((selectedEntryType == null) || addNewField.getText().isBlank()) {
+            addNewFieldButton.setText(Localization.lang("Add"));
+            return;
+        }
+
+        EntryType entryType = selectedEntryType.entryType().getValue().getType();
+        Field field = FieldFactory.parseField(entryType, addNewField.getText().trim());
+        boolean fieldExists = viewModel.displayNameExists(FieldTextMapper.getDisplayName(field));
+        addNewFieldButton.setText(fieldExists ? Localization.lang("Modify") : Localization.lang("Add"));
     }
 
     @FXML

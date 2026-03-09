@@ -170,7 +170,8 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
             // customized field
             ObservableList<FieldProperty> fieldProperties = existingFieldViewModel.getProperties();
-            if (!fieldProperties.isEmpty() && fieldProperties.equals(selectedProperties)) {
+            if ((!fieldProperties.isEmpty() && fieldProperties.equals(selectedProperties))
+                    || (fieldProperties.isEmpty() && fieldProperties.equals(selectedProperties))) {
                 dialogService.showWarningDialogAndWait(
                         Localization.lang("Duplicate properties"),
                         Localization.lang("Warning: Current properties are the same as before."));
