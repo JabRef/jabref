@@ -40,12 +40,6 @@ public class AllCitationFetcher implements CitationFetcher {
         this.keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
     }
 
-    // Test constructor
-    AllCitationFetcher(List<CitationFetcher> fetchers) {
-        this.fetchers = fetchers;
-        this.keywordSeparator = ',';
-    }
-
     @Override
     public String getName() {
         return FETCHER_NAME;
@@ -64,7 +58,7 @@ public class AllCitationFetcher implements CitationFetcher {
     @Override
     public Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException {
         boolean anySuccess = false;
-        FetcherException lastException = null;
+        Exception lastException = null;
         Optional<Integer> max = Optional.empty();
 
         for (CitationFetcher fetcher : fetchers) {
@@ -74,7 +68,7 @@ public class AllCitationFetcher implements CitationFetcher {
                 if (count.isPresent()) {
                     max = max.isEmpty() ? count : Optional.of(Math.max(max.get(), count.get()));
                 }
-            } catch (FetcherException e) {
+            } catch (Exception e) {
                 LOGGER.debug("Citation count failed for {}", fetcher.getName(), e);
                 lastException = e;
             }
@@ -91,7 +85,7 @@ public class AllCitationFetcher implements CitationFetcher {
         BibDatabase target = new BibDatabase();
         DatabaseMerger merger = new DatabaseMerger(keywordSeparator);
         boolean anySuccess = false;
-        FetcherException lastException = null;
+        Exception lastException = null;
 
         for (CitationFetcher fetcher : fetchers) {
             try {
@@ -100,7 +94,7 @@ public class AllCitationFetcher implements CitationFetcher {
                 other.insertEntries(results);
                 merger.merge(target, other);
                 anySuccess = true;
-            } catch (FetcherException e) {
+            } catch (Exception e) {
                 LOGGER.debug("Fetching from {} failed — continuing", fetcher.getName(), e);
                 lastException = e;
             }

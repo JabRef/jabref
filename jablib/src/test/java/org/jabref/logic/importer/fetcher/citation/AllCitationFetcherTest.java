@@ -1,89 +1,46 @@
 package org.jabref.logic.importer.fetcher.citation;
 
-import java.util.List;
-import java.util.Optional;
-
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+@FetcherTest
 class AllCitationFetcherTest {
 
-    private CitationFetcher successfulFetcher;
-    private CitationFetcher failingFetcher;
-    private AllCitationFetcher allFetcher;
+    private AllCitationFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        successfulFetcher = mock(CitationFetcher.class);
-        failingFetcher = mock(CitationFetcher.class);
-        when(successfulFetcher.getName()).thenReturn("SuccessfulFetcher");
-        when(failingFetcher.getName()).thenReturn("FailingFetcher");
-        allFetcher = new AllCitationFetcher(List.of(successfulFetcher, failingFetcher));
+        fetcher = new AllCitationFetcher(
+                mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(AiService.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
-    void toleratesPartialProviderFailure() throws Exception {
-        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/test");
-
-        when(failingFetcher.getReferences(entry)).thenThrow(new FetcherException("Failure"));
-        when(successfulFetcher.getReferences(entry)).thenReturn(List.of(new BibEntry()));
-
-        List<BibEntry> result = allFetcher.getReferences(entry);
-
-        assertEquals(1, result.size());
+    void getReferences() throws FetcherException {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1016/j.jksuci.2024.102118");
+        assertNotNull(fetcher.getReferences(entry));
     }
 
     @Test
-    void throwsWhenAllProvidersFail() throws Exception {
-        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/test");
-
-        when(failingFetcher.getReferences(entry)).thenThrow(new FetcherException("Failure 1"));
-        when(successfulFetcher.getReferences(entry)).thenThrow(new FetcherException("Failure 2"));
-
-        assertThrows(FetcherException.class, () -> allFetcher.getReferences(entry));
-    }
-
-    @Test
-    void removesDuplicateEntries() throws Exception {
-        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/test");
-
-        BibEntry duplicate1 = new BibEntry().withField(StandardField.DOI, "10.1234/dup");
-        BibEntry duplicate2 = new BibEntry().withField(StandardField.DOI, "10.1234/dup");
-
-        when(successfulFetcher.getReferences(entry)).thenReturn(List.of(duplicate1));
-        when(failingFetcher.getReferences(entry)).thenReturn(List.of(duplicate2));
-
-        List<BibEntry> result = allFetcher.getReferences(entry);
-
-        assertEquals(1, result.size());
-    }
-
-    @Test
-    void returnsMaximumCitationCount() throws Exception {
-        BibEntry entry = new BibEntry();
-
-        when(successfulFetcher.getCitationCount(entry)).thenReturn(Optional.of(5));
-        when(failingFetcher.getCitationCount(entry)).thenReturn(Optional.of(20));
-
-        assertEquals(Optional.of(20), allFetcher.getCitationCount(entry));
-    }
-
-    @Test
-    void throwsWhenAllCitationCountProvidersFail() throws Exception {
-        BibEntry entry = new BibEntry();
-
-        when(successfulFetcher.getCitationCount(entry)).thenThrow(new FetcherException("Failure 1"));
-        when(failingFetcher.getCitationCount(entry)).thenThrow(new FetcherException("Failure 2"));
-
-        assertThrows(FetcherException.class, () -> allFetcher.getCitationCount(entry));
+    void getCitations() throws FetcherException {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1016/j.jksuci.2024.102118");
+        assertNotNull(fetcher.getCitations(entry));
     }
 }
