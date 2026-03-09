@@ -843,9 +843,8 @@ public class JabRefCliPreferences implements CliPreferences {
         return JabRefCliPreferences.singleton;
     }
 
-    /// **********************************************************************************************************
-    /// Common serializer logic
-    /// ************************************************************************************************************
+
+    // region: Common serializer logic
 
     @VisibleForTesting
     static String convertListToString(List<String> value) {
@@ -860,11 +859,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
     }
+    // endregion
 
-    /// ************************************************************************************************************
-    /// Backingstore access logic
-    /// ************************************************************************************************************
-
+    // region: Backingstore access logic
     /// Check whether a key is set (differently from null).
     ///
     /// @param key The key to check.
@@ -876,6 +873,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public String get(String key) {
         return PREFS_NODE.get(key, (String) defaults.get(key));
     }
+    // endregion
 
     public String getEmptyIsDefault(String key) {
         String defaultValue = (String) defaults.get(key);
@@ -1141,9 +1139,7 @@ public class JabRefCliPreferences implements CliPreferences {
                     ex);
         }
     }
-    //*************************************************************************************************************
-    // ToDo: Cleanup
-    //*************************************************************************************************************
+    // region: Cleanup
 
     @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
@@ -1170,10 +1166,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return journalAbbreviationPreferences;
     }
+    // endRegion
 
-    //*************************************************************************************************************
-    // CustomEntryTypes
-    //*************************************************************************************************************
+    // region: CustomEntryTypes
 
     @Override
     public BibEntryTypesManager getCustomEntryTypesRepository() {
@@ -1212,6 +1207,7 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
+    // endRegion
 
     @Override
     public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
@@ -1242,9 +1238,7 @@ public class JabRefCliPreferences implements CliPreferences {
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
-    //*************************************************************************************************************
-    // Misc
-    //*************************************************************************************************************
+    // region: Misc
 
     @Override
     public LibraryPreferences getLibraryPreferences() {
@@ -1327,10 +1321,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return timestampPreferences;
     }
+    // endRegion
 
-    //*************************************************************************************************************
-    // Network preferences
-    //*************************************************************************************************************
+    // region: Network preferences
 
     @Override
     public RemotePreferences getRemotePreferences() {
@@ -1355,6 +1348,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return remotePreferences;
     }
+    // endRegion
 
     // region: Proxy Preferences
     @Override
@@ -1444,9 +1438,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return sslPreferences;
     }
 
-    //*************************************************************************************************************
-    // CitationKeyPatternPreferences
-    //*************************************************************************************************************
+    // region: CitationKeyPatternPreferences
 
     private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
@@ -1464,6 +1456,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPattern;
     }
+    // endRegion
 
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
@@ -1550,10 +1543,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return keySuffix;
     }
 
-    //*************************************************************************************************************
-    // BibEntryPreferences
-    //*************************************************************************************************************
-
+    // region: BibEntryPreferences
     @Override
     public BibEntryPreferences getBibEntryPreferences() {
         if (bibEntryPreferences != null) {
@@ -1568,11 +1558,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return bibEntryPreferences;
     }
+    // endRegion
 
-    //*************************************************************************************************************
     // InternalPreferences
-    //*************************************************************************************************************
-
     protected Path getDefaultPath() {
         return Path.of("/");
     }
@@ -1647,10 +1635,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return fieldPreferences;
     }
 
-    //*************************************************************************************************************
-    // Linked files preferences
-    //*************************************************************************************************************
-
+    // region: Linked files preferences
     protected boolean moveToTrashSupported() {
         return false;
     }
@@ -1709,6 +1694,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return filePreferences;
     }
+    /// endRegion
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
@@ -1746,9 +1732,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return citationKeyDependency;
     }
 
-    //*************************************************************************************************************
-    // Import/Export preferences
-    //*************************************************************************************************************
+    // region: Import/Export preferences
 
     @Override
     public ExportPreferences getExportPreferences() {
@@ -1816,6 +1800,7 @@ public class JabRefCliPreferences implements CliPreferences {
             putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
         }
     }
+    // endRegion
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
@@ -2182,9 +2167,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return protectedTermsPreferences;
     }
 
-    //*************************************************************************************************************
-    // Importer preferences
-    //*************************************************************************************************************
+    // region: Importer preferences
 
     @Override
     public ImporterPreferences getImporterPreferences() {
@@ -2373,6 +2356,7 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Unable to open key store");
         }
     }
+    // endRegion
 
     @Override
     public GrobidPreferences getGrobidPreferences() {

@@ -11,11 +11,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.BaseQueryNode;
 
 /// Provides a convenient interface for search-based fetcher, which follows the usual three-step procedure:
-/// <ol>
+///
 /// - Open a URL based on the search query
 /// - Parse the response to get a list of {@link BibEntry}
 /// - Post-process fetched entries
-/// </ol>
+///
 ///
 /// This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
 /// JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
