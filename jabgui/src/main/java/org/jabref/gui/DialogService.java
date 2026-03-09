@@ -23,7 +23,12 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.NotificationService;
 
+import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.NotificationGroup;
+import org.jspecify.annotations.NullMarked;
+
 /// This interface provides methods to create dialogs and show them to the user.
+@NullMarked
 public interface DialogService extends NotificationService {
 
     /// This will create and display new {@link javafx.scene.control.ChoiceDialog} of type T with a default choice and a collection of possible choices
@@ -256,4 +261,11 @@ public interface DialogService extends NotificationService {
     ///
     /// @return the selected file or an empty {@link Optional} if no file has been selected
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
+
+    List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups();
+
+    /// Notify the user in a non-blocking way (e.g. a toast).
+    ///
+    /// @param notification the message to show.
+    void notify(Notification<?> notification);
 }
