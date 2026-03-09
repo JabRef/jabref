@@ -1694,7 +1694,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return filePreferences;
     }
-    /// endRegion
+    // endRegion
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
