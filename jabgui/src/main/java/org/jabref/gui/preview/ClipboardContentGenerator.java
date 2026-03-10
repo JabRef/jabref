@@ -137,7 +137,7 @@ public record ClipboardContentGenerator(
                                                                        .map(TextBasedPreviewLayout.class::cast)
                                                                        .findFirst();
         TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(
-                TextBasedPreviewLayout.DEFAULT,
+                previewPreferences.getCustomPreviewLayout(),
                 layoutFormatterPreferences,
                 abbreviationRepository));
 
