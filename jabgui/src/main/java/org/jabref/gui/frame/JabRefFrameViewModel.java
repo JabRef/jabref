@@ -52,6 +52,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -373,7 +374,8 @@ public class JabRefFrameViewModel {
         addParserResult(importResult.parserResult());
     }
 
-    private void addParserResult(ParserResult parserResult) {
+    @VisibleForTesting
+    void addParserResult(ParserResult parserResult) {
         LOGGER.trace("Adding the entries to the open tab.");
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         if (libraryTab == null) {
