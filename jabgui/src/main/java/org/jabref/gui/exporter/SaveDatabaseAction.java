@@ -255,8 +255,11 @@ public class SaveDatabaseAction {
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter, saveConfiguration, preferences, entryTypesManager, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-
+                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter,
+                        saveConfiguration,
+                        preferences,
+                        entryTypesManager,
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                 if (selectedOnly) {
                     bibDatabaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
                 } else {
