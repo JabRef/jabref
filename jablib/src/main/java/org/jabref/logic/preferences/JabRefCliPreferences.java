@@ -1166,7 +1166,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return journalAbbreviationPreferences;
     }
-    // endRegion
+    // endregion
 
     // region: CustomEntryTypes
 
@@ -1207,7 +1207,7 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
-    // endRegion
+    // endregion
 
     @Override
     public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
@@ -1321,7 +1321,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return timestampPreferences;
     }
-    // endRegion
+    // endregion
 
     // region: Network preferences
 
@@ -1348,7 +1348,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return remotePreferences;
     }
-    // endRegion
+    // endregion
 
     // region: Proxy Preferences
     @Override
@@ -1558,7 +1558,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return bibEntryPreferences;
     }
-    // endRegion
+    // endregion
 
     // InternalPreferences
     protected Path getDefaultPath() {
@@ -1694,7 +1694,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return filePreferences;
     }
-    // endRegion
+    // endregion
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
@@ -2356,7 +2356,7 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Unable to open key store");
         }
     }
-    // endRegion
+    // endregion
 
     @Override
     public GrobidPreferences getGrobidPreferences() {
