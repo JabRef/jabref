@@ -16,7 +16,7 @@ val javafx = "25.0.2"
 
 val lucene = "10.4.0"
 
-val pdfbox = "3.0.6"
+val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
