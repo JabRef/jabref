@@ -131,7 +131,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         availableListProperty.clear();
         if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {
             availableListProperty.getValue().add(TextBasedPreviewLayout.of(
-                    TextBasedPreviewLayout.DEFAULT,
+                    previewPreferences.getCustomPreviewLayout(),
                     preferences.getLayoutFormatterPreferences(),
                     abbreviationRepository));
         }
