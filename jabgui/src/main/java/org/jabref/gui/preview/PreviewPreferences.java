@@ -1,7 +1,6 @@
 package org.jabref.gui.preview;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -46,12 +45,12 @@ public class PreviewPreferences {
 
     private PreviewPreferences() {
         this(
-                new ArrayList<>(),  // Layout cycle - list of predefined layouts, see getDefault(LayoutFormatterPreferences, JournalAbbreviationRepository)
+                List.of(),  // Layout cycle - list of predefined layouts, see getDefault(LayoutFormatterPreferences, JournalAbbreviationRepository)
                 0,          // Layout cycle position
                 TextBasedPreviewLayout.DEFAULT,
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
-                new ArrayList<>(),  // BST-Paths
+                List.of(),  // BST-Paths
                 false       // Download cover images disabled per default - similar to Mr. DLib; see [org.jabref.logic.preferences.JabRefCliPreferences.ACCEPT_RECOMMENDATIONS].
         );
     }

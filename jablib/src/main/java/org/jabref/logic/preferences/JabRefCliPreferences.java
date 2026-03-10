@@ -856,6 +856,7 @@ public class JabRefCliPreferences implements CliPreferences {
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
             // list needs to be mutable in observable preferences
+            // keep consistency with Splitter#splitToList
             return new ArrayList<>();
         }
 

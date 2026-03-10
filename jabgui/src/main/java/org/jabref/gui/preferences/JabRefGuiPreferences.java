@@ -821,19 +821,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private PreviewPreferences getPreviewPreferencesFromBackingStore(PreviewPreferences defaults) {
+        // Mutable lists required
         String customPreviewLayout = get(PREVIEW_STYLE, defaults.getCustomPreviewLayout());
         List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayout);
         if (layouts.isEmpty()) {
-            layouts = defaults.getLayoutCycle();
+            layouts = new ArrayList<>(defaults.getLayoutCycle());
         }
 
         List<Path> bstPaths;
         if (hasKey(PREVIEW_BST_LAYOUT_PATHS)) {
-            bstPaths = getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
-                                                              .map(Path::of)
-                                                              .collect(Collectors.toList());
+            bstPaths = getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).collect(Collectors.toList());
         } else {
-            bstPaths = defaults.getBstPreviewLayoutPaths();
+            bstPaths = new ArrayList<>(defaults.getBstPreviewLayoutPaths());
         }
 
         return new PreviewPreferences(
