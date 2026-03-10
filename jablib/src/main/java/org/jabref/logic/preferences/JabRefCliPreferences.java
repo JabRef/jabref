@@ -843,7 +843,6 @@ public class JabRefCliPreferences implements CliPreferences {
         return JabRefCliPreferences.singleton;
     }
 
-
     // region: Common serializer logic
 
     @VisibleForTesting
@@ -862,6 +861,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     // region: Backingstore access logic
+
     /// Check whether a key is set (differently from null).
     ///
     /// @param key The key to check.

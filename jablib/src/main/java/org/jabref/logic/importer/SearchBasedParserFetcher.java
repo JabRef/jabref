@@ -28,7 +28,6 @@ import org.jabref.model.search.query.BaseQueryNode;
 /// Note that this interface "should" be an abstract class.
 /// However, Java does not support multi inheritance with classes (but with interfaces).
 /// We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
-///
 
 public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
 
