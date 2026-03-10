@@ -380,6 +380,7 @@ public class JabRefFrameViewModel {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         if (libraryTab == null) {
             BibDatabaseContext databaseContext = new BibDatabaseContext();
+            databaseContext.setMode(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
             tabContainer.addTab(databaseContext, true);
             libraryTab = tabContainer.getCurrentLibraryTab();
         }
