@@ -70,7 +70,7 @@ class BackupManagerDiscardedTest {
         // We need a real CoarseChangeFilter to ensure that the BackupManager works correctly
         CoarseChangeFilter coarseChangeFilter = new CoarseChangeFilter(bibDatabaseContext);
 
-        backupManager = BackupManager.start(mock(LibraryTab.class), bibDatabaseContext, coarseChangeFilter, bibEntryTypesManager, preferences);
+        backupManager = BackupManager.start(mock(LibraryTab.class), bibDatabaseContext, coarseChangeFilter, bibEntryTypesManager, preferences, mock(JournalAbbreviationRepository.class));
 
         makeBackup();
     }

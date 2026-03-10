@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -150,7 +151,8 @@ class BackupManagerTest {
                 databaseContext,
                 mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
-                preferences);
+                preferences,
+                mock(JournalAbbreviationRepository.class));
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
         BackupManager.shutdown(databaseContext, filePreferences.getBackupDirectory(), filePreferences.shouldCreateBackup());
@@ -178,7 +180,8 @@ class BackupManagerTest {
                 databaseContext,
                 mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
-                preferences);
+                preferences,
+                mock(JournalAbbreviationRepository.class));
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
         Optional<Path> fullBackupPath = manager.determineBackupPathForNewBackup(backupDir);
