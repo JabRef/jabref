@@ -240,7 +240,7 @@ class BibEntryTest {
     @Test
     void getFieldOrAliasLatexFreeComplexConversionInAlias() {
         entry.setField(StandardField.JOURNAL, "A 32~{mA} {$\\Sigma\\Delta$}-modulator");
-        assertEquals(Optional.of("A 32 mA ΣΔ-modulator"), entry.getFieldOrAliasLatexFree(StandardField.JOURNALTITLE));
+        assertEquals(Optional.of("A 32\u00a0mA ΣΔ-modulator"), entry.getFieldOrAliasLatexFree(StandardField.JOURNALTITLE));
     }
 
     @Test

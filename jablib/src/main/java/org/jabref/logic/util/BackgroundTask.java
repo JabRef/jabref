@@ -50,6 +50,7 @@ public abstract class BackgroundTask<V> {
     private Consumer<Exception> onException;
     private Runnable onFinished;
     private final BooleanProperty isCancelled = new SimpleBooleanProperty(false);
+    private final BooleanProperty mayInterruptIfRunning = new SimpleBooleanProperty(true);
     private final ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
     private final StringProperty message = new SimpleStringProperty("");
     private final StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
@@ -100,8 +101,17 @@ public abstract class BackgroundTask<V> {
     }
 
     public void cancel() {
-        LOGGER.debug("Canceling task");
+        this.cancel(true);
+    }
+
+    public void cancel(boolean mayInterruptIfRunning) {
+        LOGGER.debug("Canceling task (mayInterruptIfRunning: {})", mayInterruptIfRunning);
+        this.mayInterruptIfRunning.set(mayInterruptIfRunning);
         this.isCancelled.set(true);
+    }
+
+    public BooleanProperty mayInterruptIfRunningProperty() {
+        return mayInterruptIfRunning;
     }
 
     public BooleanProperty isCancelledProperty() {
