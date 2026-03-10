@@ -98,9 +98,9 @@ public class PreviewPreferences {
         if (layoutCycle.isEmpty()
                 || layoutCyclePosition.getValue() < 0
                 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
-            // Fallback layout
+            // Fallback dummy layout
             return new TextBasedPreviewLayout(
-                    TextBasedPreviewLayout.DEFAULT,
+                    getCustomPreviewLayout(),
                     LayoutFormatterPreferences.getDefault(),
                     new JournalAbbreviationRepository());
         } else {
