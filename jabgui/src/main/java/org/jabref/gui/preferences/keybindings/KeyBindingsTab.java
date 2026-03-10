@@ -67,9 +67,11 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         keyBindingsTable.setOnKeyPressed(viewModel::setNewBindingForCurrent);
 
         keyBindingsTable.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            event.consume();
-            viewModel.setNewBindingForCurrent(event);
-        });
+    if (!event.isControlDown() && !event.isAltDown() && !event.isShiftDown()) {
+        event.consume();
+        viewModel.setNewBindingForCurrent(event);
+    }
+    });
 
         keyBindingsTable.rootProperty().bind(
                 EasyBind.map(viewModel.rootKeyBindingProperty(),
