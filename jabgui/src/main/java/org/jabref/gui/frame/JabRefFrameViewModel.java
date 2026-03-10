@@ -376,6 +376,17 @@ public class JabRefFrameViewModel {
     private void addParserResult(ParserResult parserResult) {
         LOGGER.trace("Adding the entries to the open tab.");
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        if (libraryTab == null) {
+            BibDatabaseContext databaseContext = new BibDatabaseContext();
+            tabContainer.addTab(databaseContext, true);
+            libraryTab = tabContainer.getCurrentLibraryTab();
+        }
+
+        if (libraryTab == null) {
+            // Should not happen as we just added a tab
+            LOGGER.error("Could not get a library tab to add the entries to.");
+            return;
+        }
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
         ImportCleanup cleanup = ImportCleanup.targeting(libraryTab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
