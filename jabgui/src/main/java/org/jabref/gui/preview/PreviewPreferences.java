@@ -64,6 +64,7 @@ public class PreviewPreferences {
     public void setAll(PreviewPreferences previewPreferences) {
         this.layoutCycle.setAll(previewPreferences.layoutCycle);
         this.layoutCyclePosition.setValue(previewPreferences.layoutCyclePosition.getValue());
+        this.customPreviewLayout.setValue(previewPreferences.customPreviewLayout.getValue());
         this.showPreviewAsExtraTab.setValue(previewPreferences.showPreviewAsExtraTab.getValue());
         this.showPreviewEntryTableTooltip.setValue(previewPreferences.showPreviewEntryTableTooltip.getValue());
         this.bstPreviewLayoutPaths.setAll(previewPreferences.bstPreviewLayoutPaths);
