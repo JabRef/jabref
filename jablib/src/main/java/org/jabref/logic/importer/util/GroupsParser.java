@@ -61,7 +61,6 @@ public class GroupsParser {
             GroupTreeNode cursor = null;
             GroupTreeNode root = null;
             for (String string : orderedData) {
-                // This allows reading databases that have been modified by, e.g., BibDesk
                 string = string.trim();
                 if (string.isEmpty()) {
                     continue;
@@ -73,13 +72,14 @@ public class GroupsParser {
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
                 AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData, userAndHost);
+                if (group == null) {
+                    continue;
+                }
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
-                    // create new root
                     cursor = newNode;
                     root = cursor;
                 } else {
-                    // insert at desired location
                     while ((level <= cursor.getLevel()) && (cursor.getParent().isPresent())) {
                         cursor = cursor.getParent().get();
                     }
@@ -137,7 +137,8 @@ public class GroupsParser {
             return texGroupFromString(input, fileMonitor, metaData, userAndHost);
         }
 
-        throw new ParseException("Unknown group: " + input);
+        LOGGER.warn("Unknown group type, skipping: {}", input);
+        return null;
     }
 
     private static AbstractGroup texGroupFromString(String input, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost) throws ParseException {
@@ -155,7 +156,6 @@ public class GroupsParser {
                 addGroupDetails(token, newGroup);
                 return newGroup;
             } catch (IOException ex) {
-                // Problem accessing file -> create without file monitoring
                 LOGGER.warn("Could not access file {}. The group {} will not reflect changes to the aux file.", path, name, ex);
 
                 TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), metaData, userAndHost);
