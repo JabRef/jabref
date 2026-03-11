@@ -39,11 +39,11 @@ public class RelatedWorkReferenceResolver {
 
         Map<String, BibEntry> entriesByMarker = new HashMap<>();
         for (BibEntry parsedEntry : parsedEntries) {
-            Optional<String> citationKey = parsedEntry.getCitationKey();
-            if (citationKey.isPresent()) {
-                String citationMarker = "[" + citationKey.get() + "]";
+            Optional<String> citationMarkerNumber = parsedEntry.getCitationKey();
+            citationMarkerNumber.ifPresent(number -> {
+                String citationMarker = "[" + number + "]";
                 entriesByMarker.putIfAbsent(citationMarker, parsedEntry);
-            }
+            });
         }
 
         return entriesByMarker;
