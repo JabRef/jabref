@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
 - We fixed the merge dialog closing immediately when only one PDF importer returns metadata during PDF drag-and-drop import. [#15127](https://github.com/JabRef/jabref/issues/15127)
 - We fixed an issue where pressing ESC now properly closes the global search dialog. [#15133](https://github.com/JabRef/jabref/issues/15133)
 - We fixed the Citavi XML importer to preserve citation keys defined in Citavi (previously all imported entries had empty citation keys). [#14658](https://github.com/JabRef/jabref/issues/14658)
