@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.Desktop;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -19,8 +18,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -71,7 +70,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Represents the outer stage and the scene of the JabRef window.
-@AllowedToUseAwt("Uses java.awt.Desktop for macOS protocol handler registration")
 public class JabRefGUI extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
@@ -471,28 +469,10 @@ public class JabRefGUI extends Application {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
 
-        registerProtocolHandler();
-    }
-
-    /// On macOS, URL scheme invocations (`jabref://...`) are delivered as Apple Events,
-    /// not as CLI arguments. This method registers a handler to receive them.
-    /// On Windows and Linux the URL arrives as a CLI argument and is handled by
-    /// [ArgumentProcessor], so this handler is a no-op on those platforms.
-    private void registerProtocolHandler() {
-        if (!Desktop.isDesktopSupported()) {
-            return;
-        }
-        Desktop desktop = Desktop.getDesktop();
-        if (!desktop.isSupported(Desktop.Action.APP_OPEN_URI)) {
-            return;
-        }
-        desktop.setOpenURIHandler(event -> {
-            LOGGER.debug("Received URI via protocol handler: {}", event.getURI());
-            if ("jabref".equals(event.getURI().getScheme())) {
-                Platform.runLater(() -> mainFrame.handleUiCommands(List.of(new UiCommand.Focus())));
-            }
+        NativeDesktop.get().registerJabRefProtocolHandler(uri -> {
+            LOGGER.debug("Received URI via protocol handler: {}", uri);
+            Platform.runLater(() -> mainFrame.handleUiCommands(List.of(new UiCommand.Focus())));
         });
-        LOGGER.debug("Protocol handler for jabref:// registered");
     }
 
     private void setupHttpServerEnabledListener() {
