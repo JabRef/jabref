@@ -99,6 +99,7 @@ public enum StandardActions implements Action {
     REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
+    INFOCENTER(Localization.lang("Show notifications"), IconTheme.JabRefIcons.EMAIL),
 
     BACK(Localization.lang("Back"), IconTheme.JabRefIcons.LEFT, KeyBinding.BACK),
     FORWARD(Localization.lang("Forward"), Localization.lang("Forward"), IconTheme.JabRefIcons.RIGHT, KeyBinding.FORWARD),

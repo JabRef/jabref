@@ -54,25 +54,35 @@ jobs:
             core.setOutput("pr_user", pr.user?.login ?? "");
       - name: Pick outputs
         id: pick
+        env:
+          EVENT_NAME:      ${{ github.event_name }}
+          PR_BODY:         ${{ github.event.pull_request.body }}
+          PR_NUMBER:       ${{ github.event.pull_request.number }}
+          PR_URL:          ${{ github.event.pull_request.html_url }}
+          PR_USER:         ${{ github.event.pull_request.user.login }}
+          DISPATCH_BODY:   ${{ steps.from_dispatch.outputs.pr_body }}
+          DISPATCH_NUMBER: ${{ steps.from_dispatch.outputs.pr_number }}
+          DISPATCH_URL:    ${{ steps.from_dispatch.outputs.pr_url }}
+          DISPATCH_USER:   ${{ steps.from_dispatch.outputs.pr_user }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "pr_number=${{ steps.from_dispatch.outputs.pr_number }}" >> "$GITHUB_OUTPUT"
-            echo "pr_url=${{ steps.from_dispatch.outputs.pr_url }}"       >> "$GITHUB_OUTPUT"
-            echo "pr_user=${{ steps.from_dispatch.outputs.pr_user }}"       >> "$GITHUB_OUTPUT"
-            cat >> "$GITHUB_OUTPUT" <<'EOF'
-          pr_body<<BODY
-          ${{ steps.from_dispatch.outputs.pr_body }}
-          BODY
-          EOF
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "pr_number=$DISPATCH_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "pr_url=$DISPATCH_URL"       >> "$GITHUB_OUTPUT"
+            echo "pr_user=$DISPATCH_USER"     >> "$GITHUB_OUTPUT"
+            {
+              printf 'pr_body<<GH_BODY\n'
+              printf '%s\n' "$DISPATCH_BODY"
+              printf 'GH_BODY\n'
+            } >> "$GITHUB_OUTPUT"
           else
-            echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
-            echo "pr_url=${{ github.event.pull_request.html_url }}"  >> "$GITHUB_OUTPUT"
-            echo "pr_user=${{ github.event.pull_request.user.login }}"  >> "$GITHUB_OUTPUT"
-            cat >> "$GITHUB_OUTPUT" <<'EOF'
-          pr_body<<BODY
-          ${{ github.event.pull_request.body }}
-          BODY
-          EOF
+            echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "pr_url=$PR_URL"       >> "$GITHUB_OUTPUT"
+            echo "pr_user=$PR_USER"     >> "$GITHUB_OUTPUT"
+            {
+              printf 'pr_body<<GH_BODY\n'
+              printf '%s\n' "$PR_BODY"
+              printf 'GH_BODY\n'
+            } >> "$GITHUB_OUTPUT"
           fi
 
   determine_issue_number:
@@ -94,10 +104,7 @@ jobs:
           echo "PR Number: $PR_NUMBER"
           echo "PR URL: $PR_URL"
           echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
-          cat <<EOF
-          PR Body:
-          $PR_BODY
-          EOF
+          printf 'PR Body: %s\n' "$PR_BODY" >> $GITHUB_STEP_SUMMARY
           ticketNumber=$(printf '%s\n' "$PR_BODY" \
             | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
             | grep -Eo '[0-9]+' \
