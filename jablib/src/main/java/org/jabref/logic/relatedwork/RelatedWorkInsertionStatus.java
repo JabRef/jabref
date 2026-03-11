@@ -1,10 +1,13 @@
 package org.jabref.logic.relatedwork;
 
 /// INSERTED: Insert successfully
-/// UNCHANGED: [citation-key]: xxxxx already exists, do not insert
-/// SKIPPED: Cannot find a matched related work
 public enum RelatedWorkInsertionStatus {
+    /// Insert successfully
     INSERTED,
+
+    /// `[citation-key]`: `xxxxx` already exists, not inserted
     UNCHANGED,
+
+    /// Cannot find a matched related work
     SKIPPED,
 }
