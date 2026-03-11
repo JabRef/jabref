@@ -9,6 +9,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+- We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
+
 ### Added
 
 - We added a fetcher selection dropdown to the citation count field in the General tab, allowing users to choose between Semantic Scholar, OpenAlex, OpenCitations, and scite.ai as the source. The selected fetcher is now persisted across restarts and can also be configured in the Entry Editor preferences. [#15134](https://github.com/JabRef/jabref/issues/15134)
@@ -29,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
+- We fixed an issue where shortcut keys did not work for linked files in the entry editor. [#12564](https://github.com/JabRef/jabref/issues/12564)
 - We fixed the merge dialog closing immediately when only one PDF importer returns metadata during PDF drag-and-drop import. [#15127](https://github.com/JabRef/jabref/issues/15127)
 - We fixed an issue where pressing ESC now properly closes the global search dialog. [#15133](https://github.com/JabRef/jabref/issues/15133)
 - We fixed the Citavi XML importer to preserve citation keys defined in Citavi (previously all imported entries had empty citation keys). [#14658](https://github.com/JabRef/jabref/issues/14658)
@@ -43,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Windows installer was missing the JabRef icon. [#14965](https://github.com/JabRef/jabref/issues/14965)
 - We fixed an issue where quickly navigating up and down with the entry editor opened at the citations tab would lead to exception. [#15233](https://github.com/JabRef/jabref/pull/15233)
 - Fixed identifier selection not working on fresh start [#15000](https://github.com/JabRef/jabref/issues/15000)
+- We fixed an issue where an exception would be thrown when trying to extract references from a PDF [#15308](https://github.com/JabRef/jabref/pull/15308)
 
 ### Removed
 
