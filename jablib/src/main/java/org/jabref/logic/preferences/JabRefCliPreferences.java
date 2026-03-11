@@ -644,7 +644,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(HTTP_SERVER_PORT, 23119);
         defaults.put(ENABLE_LANGUAGE_SERVER, Boolean.FALSE);
         defaults.put(LANGUAGE_SERVER_PORT, 2087);
-        defaults.put(DIRECT_HTTP_IMPORT, Boolean.TRUE);
+        defaults.put(DIRECT_HTTP_IMPORT, Boolean.FALSE);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
