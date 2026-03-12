@@ -30,34 +30,24 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiService;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.gui.openoffice.PreferencesBundle;
+import org.jabref.gui.openoffice.ServicesBundle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -97,14 +87,8 @@ public class OpenOfficePanel {
     private final Button help;
     private final VBox vbox = new VBox();
 
-    private final GuiPreferences preferences;
-    private final OpenOfficePreferences openOfficePreferences;
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private final StateManager stateManager;
-    private final ClipBoardManager clipBoardManager;
-    private final UndoManager undoManager;
-    private final UiTaskExecutor taskExecutor;
-    private final AiService aiService;
+    private final PreferencesBundle preferencesBundle;
+    private final ServicesBundle servicesBundle;
     private final JStyleLoader jStyleLoader;
     private final CSLStyleLoader cslStyleLoader;
     private final LibraryTabContainer tabContainer;
@@ -115,43 +99,29 @@ public class OpenOfficePanel {
 
     private final SimpleObjectProperty<OOStyle> currentStyleProperty;
 
-    public OpenOfficePanel(LibraryTabContainer tabContainer,
-                           GuiPreferences preferences,
-                           OpenOfficePreferences openOfficePreferences,
-                           ExternalApplicationsPreferences externalApplicationsPreferences,
-                           LayoutFormatterPreferences layoutFormatterPreferences,
-                           CitationKeyPatternPreferences citationKeyPatternPreferences,
-                           JournalAbbreviationRepository abbreviationRepository,
-                           UiTaskExecutor taskExecutor,
-                           DialogService dialogService,
-                           AiService aiService,
-                           StateManager stateManager,
-                           FileUpdateMonitor fileUpdateMonitor,
-                           BibEntryTypesManager entryTypesManager,
-                           ClipBoardManager clipBoardManager,
-                           UndoManager undoManager) {
+        public OpenOfficePanel(LibraryTabContainer tabContainer,
+                   PreferencesBundle preferencesBundle,
+                   ServicesBundle servicesBundle,
+                   ExternalApplicationsPreferences externalApplicationsPreferences,
+                   JournalAbbreviationRepository abbreviationRepository,
+                   FileUpdateMonitor fileUpdateMonitor,
+                   BibEntryTypesManager entryTypesManager) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.preferences = preferences;
-        this.openOfficePreferences = openOfficePreferences;
-        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
-        this.taskExecutor = taskExecutor;
-        this.dialogService = dialogService;
-        this.aiService = aiService;
-        this.stateManager = stateManager;
-        this.clipBoardManager = clipBoardManager;
-        this.undoManager = undoManager;
-        this.currentStyle = openOfficePreferences.getCurrentStyle();
+        this.preferencesBundle = preferencesBundle;
+        this.servicesBundle = servicesBundle;
+        this.dialogService = servicesBundle.dialogService;
+        this.currentStyle = preferencesBundle.openOfficePreferences.getCurrentStyle();
 
         this.currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
 
         jStyleLoader = new JStyleLoader(
-                openOfficePreferences,
-                layoutFormatterPreferences,
-                abbreviationRepository);
+            preferencesBundle.openOfficePreferences,
+            preferencesBundle.layoutFormatterPreferences,
+            abbreviationRepository);
 
-        cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
+        cslStyleLoader = new CSLStyleLoader(preferencesBundle.openOfficePreferences);
 
         ActionFactory factory = new ActionFactory();
 

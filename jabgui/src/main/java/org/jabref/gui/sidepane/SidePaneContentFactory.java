@@ -65,38 +65,46 @@ public class SidePaneContentFactory {
     public Node create(SidePaneType sidePaneType) {
         return switch (sidePaneType) {
             case GROUPS ->
-                    new GroupTreeView(
-                            stateManager,
-                            entryTypesManager,
-                            preferences,
-                            dialogService,
-                            aiService,
-                            undoManager,
-                            fileUpdateMonitor,
-                            adaptVisibleTabs,
-                            taskExecutor);
-            case OPEN_OFFICE ->
-                    new OpenOfficePanel(
-                            tabContainer,
-                            preferences,
-                            preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
-                            preferences.getExternalApplicationsPreferences(),
-                            preferences.getLayoutFormatterPreferences(),
-                            preferences.getCitationKeyPatternPreferences(),
-                            abbreviationRepository,
-                            (UiTaskExecutor) taskExecutor,
-                            dialogService,
-                            aiService,
-                            stateManager,
-                            fileUpdateMonitor,
-                            entryTypesManager,
-                            clipBoardManager,
-                            undoManager).getContent();
+                new GroupTreeView(
+                    stateManager,
+                    entryTypesManager,
+                    preferences,
+                    dialogService,
+                    aiService,
+                    undoManager,
+                    fileUpdateMonitor,
+                    adaptVisibleTabs,
+                    taskExecutor);
+            case OPEN_OFFICE -> {
+            var preferencesBundle = new org.jabref.gui.openoffice.PreferencesBundle(
+                preferences,
+                preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
+                preferences.getLayoutFormatterPreferences(),
+                preferences.getCitationKeyPatternPreferences()
+            );
+            var servicesBundle = new org.jabref.gui.openoffice.ServicesBundle(
+                dialogService,
+                aiService,
+                stateManager,
+                (UiTaskExecutor) taskExecutor,
+                clipBoardManager,
+                undoManager
+            );
+            yield new OpenOfficePanel(
+                tabContainer,
+                preferencesBundle,
+                servicesBundle,
+                preferences.getExternalApplicationsPreferences(),
+                abbreviationRepository,
+                fileUpdateMonitor,
+                entryTypesManager
+            ).getContent();
+            }
             case WEB_SEARCH ->
-                    new WebSearchPaneView(
-                            preferences,
-                            dialogService,
-                            stateManager);
+                new WebSearchPaneView(
+                    preferences,
+                    dialogService,
+                    stateManager);
         };
     }
 }
