@@ -1,6 +1,5 @@
 package org.jabref.logic.relatedwork;
 
-/// INSERTED: Insert successfully
 public enum RelatedWorkInsertionStatus {
     /// Insert successfully
     INSERTED,

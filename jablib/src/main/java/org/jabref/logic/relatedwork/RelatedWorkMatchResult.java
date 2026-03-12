@@ -7,12 +7,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-/// parsedReference: parsed bib entry in Reference section
-/// matchedLibraryBibEntry: matched bib entry in the library
 public record RelatedWorkMatchResult(
         String contextText,
         String citationKey,
+        /// parsed bib entry in Reference section
         BibEntry parsedReference,
+        /// matched bib entry in the library
         Optional<BibEntry> matchedLibraryBibEntry
 ) {
     public boolean hasMatchedLibraryEntry() {
