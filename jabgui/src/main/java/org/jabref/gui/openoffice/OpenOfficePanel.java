@@ -64,7 +64,6 @@ import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
@@ -136,7 +135,7 @@ public class OpenOfficePanel {
         this.aiService = aiService;
 
         this.preferences = preferences;
-        this.openOfficePreferences = preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+        this.openOfficePreferences = preferences.getOpenOfficePreferences(abbreviationRepository);
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         this.currentStyle = openOfficePreferences.getCurrentStyle();
 
