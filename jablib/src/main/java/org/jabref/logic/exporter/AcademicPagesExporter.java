@@ -236,15 +236,18 @@ public class AcademicPagesExporter extends Exporter {
     }
 
     private String formatDate(TemporalAccessor temporal) {
-        for (String pattern : List.of("uuuu-MM-dd", "uuuu-MM", "uuuu")) {
+        try {
+            return DateTimeFormatter.ofPattern("uuuu-MM-dd").format(temporal);
+        } catch (DateTimeException e1) {
             try {
-                String formatted = DateTimeFormatter.ofPattern(pattern).format(temporal);
-                return formatted + "-01".repeat((int) pattern.chars().filter(c -> c == '-').count() < 2
-                                                ? 2 - (int) pattern.chars().filter(c -> c == '-').count() : 0);
-            } catch (DateTimeException ignored) {
-                // try next pattern
+                return DateTimeFormatter.ofPattern("uuuu-MM").format(temporal) + "-01";
+            } catch (DateTimeException e2) {
+                try {
+                    return DateTimeFormatter.ofPattern("uuuu").format(temporal) + "-01-01";
+                } catch (DateTimeException e3) {
+                    return "0000-01-01";
+                }
             }
         }
-        return "0000-01-01";
     }
 }
