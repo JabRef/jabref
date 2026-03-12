@@ -193,21 +193,15 @@ public class LinkedFileHandler {
         }
 
         final Path oldPath = oldFile.get();
-        //        int lengthParentPath = oldPath.getParent().toString().length();
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
 
         Path newPath;
-        String extension = "";
+
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
-            if (newExtension.isPresent()) {
-                extension = "." + newExtension.get();
-            }
-            //            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - extension.length()) + extension;
             newPath = oldPath.resolveSibling(targetFileName);
         } else {
             assert oldExtension.isPresent() && newExtension.isEmpty();
-            //            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - oldExtension.get().length());
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
 
@@ -246,13 +240,6 @@ public class LinkedFileHandler {
     /// Uses file extension from original file.
     ///
     /// @return the suggested filename, including extension
-    //    public String getSuggestedFileName() {
-    //        String filename = linkedFile.getFileName().orElse("file");
-    //        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
-    //                                              .orElse(FileUtil.getBaseName(filename));
-    //
-    //        return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(ext -> targetFileName + "." + ext).orElse(targetFileName));
-    //    }
     public String getSuggestedFileName() {
         String filename = linkedFile.getFileName().orElse("file");
 
@@ -276,11 +263,16 @@ public class LinkedFileHandler {
     /// @return the suggested filename, including extension
     public String getSuggestedFileName(@NonNull String extension) {
         assert !StringUtil.isBlank(extension);
+
         String filename = linkedFile.getFileName().orElse("file");
         final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
                                               .orElse(FileUtil.getBaseName(filename));
 
-        return FileUtil.getValidFileName(targetFileName + "." + extension);
+        String rawFileName = targetFileName + "." + extension;
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
+        return currentDir.map(dir -> FileUtil.getValidFileNameForDirectory(dir, rawFileName))
+                         .orElseGet(() -> FileUtil.getValidFileName(rawFileName));
     }
 
     /// Check to see if a file already exists in the target directory.  Search is not case sensitive.
