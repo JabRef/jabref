@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -31,6 +32,7 @@ class AcademicPagesExporterTest {
     void setUp() {
         entryTypesManager = new BibEntryTypesManager();
         exporter = new AcademicPagesExporter(
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 entryTypesManager);
         databaseContext = new BibDatabaseContext();
@@ -62,14 +64,14 @@ class AcademicPagesExporterTest {
 
         String expected = """
                 ---
-                title: A Great Paper
+                title: "A Great Paper"
                 collection: publications
-                permalink: /publication/2020-01-01-smith2020
-                date: '2020-01-01'
-                venue: Nature
-                bibtexurl: /files/smith2020.bib
-                citation: '%s'
+                venue: "Nature"
                 category: manuscripts
+                permalink: /publication/2020-01-01-smith2020
+                date: 2020-01-01
+                bibtexurl: '/files/smith2020.bib'
+                citation: '%s'
                 ---
                 """.formatted(citation);
 
@@ -109,14 +111,14 @@ class AcademicPagesExporterTest {
 
         String expected = """
                 ---
-                title: Conference Paper
+                title: "Conference Paper"
                 collection: publications
-                permalink: /publication/2021-01-01-jones2021conf
-                date: '2021-01-01'
-                venue: Proceedings of ICSE
-                bibtexurl: /files/jones2021conf.bib
-                citation: '%s'
+                venue: "Proceedings of ICSE"
                 category: conferences
+                permalink: /publication/2021-01-01-jones2021conf
+                date: 2021-01-01
+                bibtexurl: '/files/jones2021conf.bib'
+                citation: '%s'
                 ---
                 """.formatted(citation);
 
@@ -144,13 +146,13 @@ class AcademicPagesExporterTest {
 
         String expected = """
                 ---
-                title: My Book
+                title: "My Book"
                 collection: publications
-                permalink: /publication/2019-01-01-doe2019book
-                date: '2019-01-01'
-                bibtexurl: /files/doe2019book.bib
-                citation: '%s'
                 category: manuscripts
+                permalink: /publication/2019-01-01-doe2019book
+                date: 2019-01-01
+                bibtexurl: '/files/doe2019book.bib'
+                citation: '%s'
                 ---
                 """.formatted(citation);
 
@@ -178,14 +180,14 @@ class AcademicPagesExporterTest {
 
         String expected = """
                 ---
-                title: A Book Chapter
+                title: "A Book Chapter"
                 collection: publications
-                permalink: /publication/2018-01-01-lee2018chapter
-                date: '2018-01-01'
-                venue: Handbook of AI
-                bibtexurl: /files/lee2018chapter.bib
-                citation: '%s'
+                venue: "Handbook of AI"
                 category: manuscripts
+                permalink: /publication/2018-01-01-lee2018chapter
+                date: 2018-01-01
+                bibtexurl: '/files/lee2018chapter.bib'
+                citation: '%s'
                 ---
                 """.formatted(citation);
 
@@ -211,13 +213,13 @@ class AcademicPagesExporterTest {
 
         String expected = """
                 ---
-                title: Some Misc Entry
+                title: "Some Misc Entry"
                 collection: publications
-                permalink: /publication/2022-01-01-misc2022
-                date: '2022-01-01'
-                bibtexurl: /files/misc2022.bib
-                citation: '%s'
                 category: manuscripts
+                permalink: /publication/2022-01-01-misc2022
+                date: 2022-01-01
+                bibtexurl: '/files/misc2022.bib'
+                citation: '%s'
                 ---
                 """.formatted(citation);
 
@@ -271,7 +273,7 @@ class AcademicPagesExporterTest {
         String content = Files.readString(tempDir.resolve("output")
                                                  .resolve("_publications")
                                                  .resolve("2020-01-01-venue2020.md"));
-        assertTrue(content.contains("venue: Science"));
+        assertTrue(content.contains("venue: \"Science\""));
         assertFalse(content.contains("Should Not Appear"));
     }
 
