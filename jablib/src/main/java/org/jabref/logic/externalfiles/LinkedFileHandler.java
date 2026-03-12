@@ -191,28 +191,23 @@ public class LinkedFileHandler {
             LOGGER.debug("No file found for linked file {}", linkedFile);
             return false;
         }
-        //        targetFileName = targetFileName.substring(0, (255-oldFile))
 
         final Path oldPath = oldFile.get();
-        int lengthParentPath = oldPath.getParent().toString().length();
-        LOGGER.debug("parent path is {}", oldPath.getParent().toString());
+        //        int lengthParentPath = oldPath.getParent().toString().length();
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
-        LOGGER.debug("Old extension length: {}", oldExtension.get().length());
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
-        LOGGER.debug("TARGET FILE NAME FROM LINKED: {}", targetFileName);
 
         Path newPath;
         String extension = "";
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
             if (newExtension.isPresent()) {
-                extension = newExtension.get();
+                extension = "." + newExtension.get();
             }
-            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - newExtension.get().length()) + "." + extension;
+            //            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - extension.length()) + extension;
             newPath = oldPath.resolveSibling(targetFileName);
         } else {
             assert oldExtension.isPresent() && newExtension.isEmpty();
-            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - oldExtension.get().length());
-            //            targetFileName = targetFileName.substring(0, 255 - lengthParentPath);
+            //            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - oldExtension.get().length());
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
 
@@ -226,12 +221,7 @@ public class LinkedFileHandler {
             LOGGER.info("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
             return false;
         }
-
-        //        LOGGER.debug("Renaming file {} to {}", oldPath, newPath);
-        LOGGER.debug("NEW FILE NAME: {}", newPath.getFileName());
-        LOGGER.debug("NEW FILE NAME: {}", newPath.getFileName().toString().length());
-        LOGGER.debug("Length of the new path {}", newPath.toString().length());
-        LOGGER.debug("Length of the old path {}", oldPath.toString().length());
+        LOGGER.debug("Renaming file {} to {}", oldPath, newPath);
 
         if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
             Files.createDirectories(newPath.getParent());
@@ -256,12 +246,27 @@ public class LinkedFileHandler {
     /// Uses file extension from original file.
     ///
     /// @return the suggested filename, including extension
+    //    public String getSuggestedFileName() {
+    //        String filename = linkedFile.getFileName().orElse("file");
+    //        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
+    //                                              .orElse(FileUtil.getBaseName(filename));
+    //
+    //        return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(ext -> targetFileName + "." + ext).orElse(targetFileName));
+    //    }
     public String getSuggestedFileName() {
         String filename = linkedFile.getFileName().orElse("file");
-        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
-                                              .orElse(FileUtil.getBaseName(filename));
 
-        return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(ext -> targetFileName + "." + ext).orElse(targetFileName));
+        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
+                                        .orElse(FileUtil.getBaseName(filename));
+
+        String rawFileName = FileUtil.getFileExtension(filename)
+                                     .map(ext -> targetFileName + "." + ext)
+                                     .orElse(targetFileName);
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
+
+        return currentDir.map(dir -> FileUtil.getValidFileNameForDirectory(dir, rawFileName))
+                         .orElseGet(() -> FileUtil.getValidFileName(rawFileName));
     }
 
     /// Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
