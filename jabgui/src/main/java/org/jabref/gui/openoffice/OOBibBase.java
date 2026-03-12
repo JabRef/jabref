@@ -845,28 +845,7 @@ public class OOBibBase {
                     return;
                 }
 
-                List<String> unresolvedKeys;
-                try {
-                    UnoUndo.enterUndoContext(doc, "Refresh bibliography");
-
-                    Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
-                    syncOptions
-                            .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages());
-
-                    unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
-                } finally {
-                    UnoUndo.leaveUndoContext(doc);
-                    fcursor.get().restore(doc);
-                }
-
-                if (!unresolvedKeys.isEmpty()) {
-                    String msg = Localization.lang(
-                            "Your OpenOffice/LibreOffice document references the citation key '%0',"
-                                    + " which could not be found in your current library.",
-                            unresolvedKeys.getFirst());
-                    dialogService.showErrorDialogAndWait(errorTitle, msg);
-                }
+                refreshBibliography(databases, jStyle, doc, frontend, fcursor, errorTitle);
             } catch (NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } catch (DisposedException ex) {
@@ -897,53 +876,88 @@ public class OOBibBase {
                     return;
                 }
 
-                try {
-                    UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
-
-                    // Collect only cited entries from all databases
-                    List<BibEntry> citedEntries = new ArrayList<>();
-                    for (BibDatabase database : databases) {
-                        for (BibEntry entry : database.getEntries()) {
-                            if (cslCitationOOAdapter.isCitedEntry(entry)) {
-                                citedEntries.add(entry);
-                            }
-                        }
-                    }
-
-                    // If no entries are cited, show a message and return
-                    if (citedEntries.isEmpty()) {
-                        dialogService.showInformationDialogAndWait(
-                                Localization.lang("Bibliography"),
-                                Localization.lang("No cited entries found in the document.")
-                        );
-                        return;
-                    }
-
-                    // A separate database and database context
-                    BibDatabase bibDatabase = new BibDatabase(citedEntries);
-                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
-
-                    // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
-                    // MUST always be paired with an unlockControllers() call
-                    doc.lockControllers();
-
-                    cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-                } catch (NoDocumentException
-                         | NoSuchElementException
-                         | PropertyVetoException
-                         | UnknownPropertyException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    doc.unlockControllers();
-                    UnoUndo.leaveUndoContext(doc);
-                    fcursor.get().restore(doc);
-                }
+                createCSLBibliography(databases, citationStyle, doc, fcursor);
             } catch (CreationException
                      | WrappedTargetException
                      | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
+        }
+    }
+
+    /// Helper function for guiActionUpdateDocument, creates a CSL bibliography.
+    ///
+    /// @param databases Must have at least one.
+    private void createCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc, OOResult<FunctionalTextViewCursor, OOError> fcursor) throws WrappedTargetException, CreationException {
+        try {
+            UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
+
+            // Collect only cited entries from all databases
+            List<BibEntry> citedEntries = new ArrayList<>();
+            for (BibDatabase database : databases) {
+                for (BibEntry entry : database.getEntries()) {
+                    if (cslCitationOOAdapter.isCitedEntry(entry)) {
+                        citedEntries.add(entry);
+                    }
+                }
+            }
+
+            // If no entries are cited, show a message and return
+            if (citedEntries.isEmpty()) {
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Bibliography"),
+                        Localization.lang("No cited entries found in the document.")
+                );
+                return;
+            }
+
+            // A separate database and database context
+            BibDatabase bibDatabase = new BibDatabase(citedEntries);
+            BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+
+            // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
+            // MUST always be paired with an unlockControllers() call
+            doc.lockControllers();
+
+            cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+        } catch (NoDocumentException
+                 | NoSuchElementException
+                 | PropertyVetoException
+                 | UnknownPropertyException e) {
+            throw new RuntimeException(e);
+        } finally {
+            doc.unlockControllers();
+            UnoUndo.leaveUndoContext(doc);
+            fcursor.get().restore(doc);
+        }
+    }
+
+    /// Helper function for guiActionUpdateDocument, refreshes the bibliography.
+    ///
+    /// @param databases Must have at least one.
+    private void refreshBibliography(List<BibDatabase> databases, JStyle jStyle, XTextDocument doc, OOFrontend frontend, OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) throws CreationException, NoDocumentException, WrappedTargetException {
+        List<String> unresolvedKeys;
+        try {
+            UnoUndo.enterUndoContext(doc, "Refresh bibliography");
+
+            Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
+            syncOptions
+                    .setUpdateBibliography(true)
+                    .setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages());
+
+            unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
+        } finally {
+            UnoUndo.leaveUndoContext(doc);
+            fcursor.get().restore(doc);
+        }
+
+        if (!unresolvedKeys.isEmpty()) {
+            String msg = Localization.lang(
+                    "Your OpenOffice/LibreOffice document references the citation key '%0',"
+                            + " which could not be found in your current library.",
+                    unresolvedKeys.getFirst());
+            dialogService.showErrorDialogAndWait(errorTitle, msg);
         }
     }
 }
