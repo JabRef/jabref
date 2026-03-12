@@ -98,6 +98,8 @@ public class OpenOfficePanel {
     private final GuiPreferences preferences;
     private final OpenOfficePreferences openOfficePreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
+
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -135,7 +137,8 @@ public class OpenOfficePanel {
         this.aiService = aiService;
 
         this.preferences = preferences;
-        this.openOfficePreferences = preferences.getOpenOfficePreferences(abbreviationRepository);
+        this.journalAbbreviationRepository = abbreviationRepository;
+        this.openOfficePreferences = preferences.getOpenOfficePreferences(journalAbbreviationRepository);
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         this.currentStyle = openOfficePreferences.getCurrentStyle();
 
@@ -228,7 +231,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(_ -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader, journalAbbreviationRepository);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;
