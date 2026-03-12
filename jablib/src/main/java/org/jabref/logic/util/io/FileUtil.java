@@ -390,6 +390,10 @@ public class FileUtil {
         targetName = REMOVE_LATEX_COMMANDS_FORMATTER.format(targetName);
         // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
+        LOGGER.debug("Target name is {}", targetName);
+        //        possible fix
+        //        targetName = targetName.substring(0, 100);
+        //        LOGGER.debug("")
 
         return Optional.of(targetName);
     }

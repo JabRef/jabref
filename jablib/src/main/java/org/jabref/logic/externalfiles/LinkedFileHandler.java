@@ -191,16 +191,28 @@ public class LinkedFileHandler {
             LOGGER.debug("No file found for linked file {}", linkedFile);
             return false;
         }
+        //        targetFileName = targetFileName.substring(0, (255-oldFile))
 
         final Path oldPath = oldFile.get();
+        int lengthParentPath = oldPath.getParent().toString().length();
+        LOGGER.debug("parent path is {}", oldPath.getParent().toString());
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
+        LOGGER.debug("Old extension length: {}", oldExtension.get().length());
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
+        LOGGER.debug("TARGET FILE NAME FROM LINKED: {}", targetFileName);
 
         Path newPath;
+        String extension = "";
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
+            if (newExtension.isPresent()) {
+                extension = newExtension.get();
+            }
+            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - newExtension.get().length()) + "." + extension;
             newPath = oldPath.resolveSibling(targetFileName);
         } else {
             assert oldExtension.isPresent() && newExtension.isEmpty();
+            targetFileName = targetFileName.substring(0, 255 - lengthParentPath - oldExtension.get().length());
+            //            targetFileName = targetFileName.substring(0, 255 - lengthParentPath);
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
 
@@ -215,7 +227,12 @@ public class LinkedFileHandler {
             return false;
         }
 
-        LOGGER.debug("Renaming file {} to {}", oldPath, newPath);
+        //        LOGGER.debug("Renaming file {} to {}", oldPath, newPath);
+        LOGGER.debug("NEW FILE NAME: {}", newPath.getFileName());
+        LOGGER.debug("NEW FILE NAME: {}", newPath.getFileName().toString().length());
+        LOGGER.debug("Length of the new path {}", newPath.toString().length());
+        LOGGER.debug("Length of the old path {}", oldPath.toString().length());
+
         if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
             Files.createDirectories(newPath.getParent());
             LOGGER.debug("Overwriting existing file {}", newPath);
