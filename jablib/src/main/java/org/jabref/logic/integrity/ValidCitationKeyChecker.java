@@ -8,6 +8,11 @@ import org.jabref.logic.util.strings.StringUtil;
 
 /// Makes sure the key is legal
 public class ValidCitationKeyChecker implements ValueChecker {
+    private final String unwantedCharacters;
+
+    public ValidCitationKeyChecker(String unwantedCharacters) {
+        this.unwantedCharacters = unwantedCharacters;
+    }
 
     @Override
     public Optional<String> checkValue(String value) {
@@ -15,7 +20,7 @@ public class ValidCitationKeyChecker implements ValueChecker {
             return Optional.of(Localization.lang("empty citation key"));
         }
 
-        String cleaned = CitationKeyGenerator.cleanKey(value, "");
+        String cleaned = CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics(value, unwantedCharacters);
 
         if (cleaned.equals(value)) {
             return Optional.empty();
