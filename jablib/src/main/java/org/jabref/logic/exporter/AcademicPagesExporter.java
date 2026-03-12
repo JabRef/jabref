@@ -43,8 +43,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class AcademicPagesExporter extends Exporter {
 
-    private static final String LAYOUT_PREFIX = "/resource/layout/academicpages/academicpages";
-    private static final String LAYOUT_EXTENSION = ".layout";
     private static final String PUBLICATION_PATH = "publication";
 
     /// Orders entries by type priority: book -> article -> incollection -> inproceedings -> others
@@ -156,8 +154,9 @@ public class AcademicPagesExporter extends Exporter {
                                           List<Path> fileDirForDatabase,
                                           JournalAbbreviationRepository abbreviationRepository) {
         String typeName = entry.getType().getName().toLowerCase();
-        return loadLayout(LAYOUT_PREFIX + "." + typeName + LAYOUT_EXTENSION, fileDirForDatabase, abbreviationRepository)
-                .or(() -> loadLayout(LAYOUT_PREFIX + LAYOUT_EXTENSION, fileDirForDatabase, abbreviationRepository))
+        String layoutDir = TemplateExporter.LAYOUT_PREFIX + "academicpages/academicpages";
+        return loadLayout(layoutDir + "." + typeName + TemplateExporter.LAYOUT_EXTENSION, fileDirForDatabase, abbreviationRepository)
+                .or(() -> loadLayout(layoutDir + TemplateExporter.LAYOUT_EXTENSION, fileDirForDatabase, abbreviationRepository))
                 .map(layout -> layout.doLayout(entry, database));
     }
 

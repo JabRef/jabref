@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
 public class TemplateExporter extends Exporter {
 
     private static final String BLANK_LINE_PATTERN = "\\r\\n|\\n";
-    private static final String LAYOUT_PREFIX = "/resource/layout/";
-    private static final String LAYOUT_EXTENSION = ".layout";
+    static final String LAYOUT_PREFIX = "/resource/layout/";
+    static final String LAYOUT_EXTENSION = ".layout";
     private static final String FORMATTERS_EXTENSION = ".formatters";
     private static final String BEGIN_INFIX = ".begin";
     private static final String END_INFIX = ".end";
