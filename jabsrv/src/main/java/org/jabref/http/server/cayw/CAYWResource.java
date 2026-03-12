@@ -131,14 +131,10 @@ public class CAYWResource {
             CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand().orElse("autocite")).concat("{"), ",", "}");
             PushToApplications.getApplication(queryParams.getApplication().get(), LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
                               .ifPresent(application -> {
-                                  try {
-                                      java.nio.file.Path latexDirectory = databaseContext.getMetaData()
-                                                                                         .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                                                                         .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
-                                      application.setWorkingDirectory(latexDirectory);
-                                  } catch (RuntimeException e) {
-                                      LOGGER.warn("Could not resolve LaTeX directory for push application", e);
-                                  }
+                                  java.nio.file.Path latexDirectory = databaseContext.getMetaData()
+                                                                                     .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                                                     .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
+                                  application.setWorkingDirectory(latexDirectory);
                                   application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList());
                               });
         }

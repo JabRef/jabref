@@ -115,16 +115,12 @@ public class GuiPushToApplicationCommand extends SimpleCommand {
 
     private void pushEntries() {
         // Set the working directory to the LaTeX search directory configured by the user
-        try {
-            stateManager.getActiveDatabase().ifPresent(dbContext -> {
-                Path latexDirectory = dbContext.getMetaData()
-                                               .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                               .orElse(FileUtil.getInitialDirectory(dbContext, preferences.getFilePreferences().getWorkingDirectory()));
-                application.setWorkingDirectory(latexDirectory);
-            });
-        } catch (RuntimeException e) {
-            LOGGER.warn("Could not resolve LaTeX directory, falling back to default", e);
-        }
+        stateManager.getActiveDatabase().ifPresent(dbContext -> {
+            Path latexDirectory = dbContext.getMetaData()
+                                           .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                           .orElse(FileUtil.getInitialDirectory(dbContext, preferences.getFilePreferences().getWorkingDirectory()));
+            application.setWorkingDirectory(latexDirectory);
+        });
         application.pushEntries(stateManager.getSelectedEntries());
     }
 }
