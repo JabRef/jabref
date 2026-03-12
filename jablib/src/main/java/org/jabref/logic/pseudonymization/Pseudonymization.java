@@ -13,8 +13,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.groups.AllEntriesGroup;
-import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
@@ -109,12 +107,8 @@ public class Pseudonymization {
         valueMapping.put(pseudoName, originalName);
         groupNameMapping.put(originalName, pseudoName);
 
-        AbstractGroup newGroup;
-        if (originalGroup instanceof AllEntriesGroup) {
-            newGroup = new AllEntriesGroup(pseudoName);
-        } else {
-            newGroup = new ExplicitGroup(pseudoName, originalGroup.getHierarchicalContext(), ',');
-        }
+        AbstractGroup newGroup = originalGroup.deepCopy();
+        newGroup.nameProperty().set(pseudoName);
 
         GroupTreeNode newNode = new GroupTreeNode(newGroup);
         for (GroupTreeNode child : node.getChildren()) {
