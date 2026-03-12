@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -41,13 +42,25 @@ public class PushToVScode extends AbstractPushToApplication {
 
         try {
             String keyString = this.getKeyString(entries, getDelimiter());
-            /// The base class wraps commands with "open -a ... -n" on macOS, which
-            /// conflicts with --reuse-window: -n forces a new instance, and open -a
-            /// expects an .app bundle, not the 'code' CLI binary.
-            ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
+            ProcessBuilder processBuilder = new ProcessBuilder();
+
+            if (OS.OS_X && commandPath.endsWith(".app")) {
+                processBuilder.command(
+                        "open",
+                        "-a",
+                        commandPath,
+                        "--args",
+                        "--reuse-window",
+                        workingDirectory.toString()
+                );
+            } else {
+                // The base class wraps commands with "open -a ... -n" on macOS, which
+                // conflicts with --reuse-window: -n forces a new instance
+                processBuilder.command(getCommandLine(keyString));
+            }
             processBuilder.start();
-        } catch (IOException excep) {
-            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
+        } catch (IOException exception) {
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, exception);
             couldNotCall = true;
         }
     }
@@ -55,10 +68,7 @@ public class PushToVScode extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         // TODO - Implementing this will fix https://github.com/JabRef/jabref/issues/6775
-        String directory = workingDirectory != null
-                           ? workingDirectory.toString()
-                           : ".";
-        return new String[] {commandPath, "--reuse-window", directory};
+        return new String[] {commandPath, "--reuse-window", workingDirectory.toString()};
     }
 
     @Override

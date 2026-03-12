@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -34,6 +35,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     public AbstractPushToApplication(NotificationService notificationService, PushToApplicationPreferences preferences) {
         this.notificationService = notificationService;
         this.preferences = preferences;
+        this.workingDirectory = Directories.getUserDirectory();
     }
 
     public void setWorkingDirectory(Path directory) {
