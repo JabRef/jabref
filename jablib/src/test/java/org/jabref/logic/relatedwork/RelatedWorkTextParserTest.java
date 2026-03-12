@@ -4,13 +4,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RelatedWorkTextParserTest {
 
@@ -82,6 +80,21 @@ class RelatedWorkTextParserTest {
                 Arguments.of(
                         "A study on the Colombian context.",
                         List.of()
+                ),
+                Arguments.of(
+                        "A sentence contains multiple citations [1-3]. Another sentence contains multiple citations [4, 7]. Blah blah [4-6, 9, 10].",
+                        List.of(
+                                new RelatedWorkSnippet("A sentence contains multiple citations.", "[1]"),
+                                new RelatedWorkSnippet("A sentence contains multiple citations.", "[2]"),
+                                new RelatedWorkSnippet("A sentence contains multiple citations.", "[3]"),
+                                new RelatedWorkSnippet("Another sentence contains multiple citations.", "[4]"),
+                                new RelatedWorkSnippet("Another sentence contains multiple citations.", "[7]"),
+                                new RelatedWorkSnippet("Blah blah.", "[4]"),
+                                new RelatedWorkSnippet("Blah blah.", "[5]"),
+                                new RelatedWorkSnippet("Blah blah.", "[6]"),
+                                new RelatedWorkSnippet("Blah blah.", "[9]"),
+                                new RelatedWorkSnippet("Blah blah.", "[10]")
+                        )
                 )
         );
     }
@@ -109,21 +122,5 @@ class RelatedWorkTextParserTest {
                         "Colombia is a middle-income country with a population of approximately 50 million [1]."
                 )
         );
-    }
-
-    ///  WIP
-    @Test
-    void parseCommaSeparatedCitations() {
-        List<RelatedWorkSnippet> snippets = parser.parseRelatedWork("A study on the Colombian context [1,2].");
-
-        assertTrue(snippets.isEmpty());
-    }
-
-    ///  WIP
-    @Test
-    void parseCitationContainingRanges() {
-        List<RelatedWorkSnippet> snippets = parser.parseRelatedWork("A study on the Colombian context [1-3].");
-
-        assertTrue(snippets.isEmpty());
     }
 }

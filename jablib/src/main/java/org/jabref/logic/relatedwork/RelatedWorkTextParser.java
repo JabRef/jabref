@@ -1,5 +1,6 @@
 package org.jabref.logic.relatedwork;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
@@ -8,7 +9,8 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class RelatedWorkTextParser {
-    private static final Pattern SINGLE_CITE_PATTERN = Pattern.compile("\\[(\\d{1,3})\\]");
+    /// Support [1] / [1-3] / [1, 2, 3]  / [1-3, 7, 9]
+    private static final Pattern CITE_PATTERN = Pattern.compile("\\[(\\d{1,3}(?:\\s*(?:,|-|–)\\s*\\d{1,3})*)\\]");
     private static final Pattern SEGMENT_SPLIT_PATTERN = Pattern.compile("(?<=[.!?])\\s+");
     private static final Pattern HYPHENATED_LINE_BREAK_PATTERN = Pattern.compile("-\\R");
     private static final Pattern NEWLINE_WITHOUT_SENTENCE_END_PATTERN = Pattern.compile("(?<![.:])\\R");
@@ -30,10 +32,11 @@ public class RelatedWorkTextParser {
 
     /// Parse a sentence into citationKeys and text.
     public List<RelatedWorkSnippet> parseTextSegment(String text) {
-        List<String> citationMarkers = SINGLE_CITE_PATTERN.matcher(text)
-                                                          .results()
-                                                          .map(MatchResult::group)
-                                                          .toList();
+        List<String> citationMarkers = CITE_PATTERN.matcher(text)
+                                                   .results()
+                                                   .map(MatchResult::group)
+                                                   .flatMap(citation -> splitCitation(citation).stream())
+                                                   .toList();
 
         if (citationMarkers.isEmpty()) {
             return List.of();
@@ -46,9 +49,33 @@ public class RelatedWorkTextParser {
                               .toList();
     }
 
+    /// Split citations groups by comma, and then split into single citation by connector (if contains)
+    private List<String> splitCitation(String citation) {
+        String content = citation.substring(1, citation.length() - 1);
+        List<String> singleCitations = new ArrayList<>();
+
+        for (String part : content.split(",")) {
+            part = part.trim();
+
+            if (part.contains("-")) {
+                String[] bounds = part.split("-");
+                int start = Integer.parseInt(bounds[0]);
+                int end = Integer.parseInt(bounds[1]);
+
+                for (int number = start; number <= end; number++) {
+                    singleCitations.add("[" + number + "]");
+                }
+            } else {
+                singleCitations.add("[" + Integer.parseInt(part) + "]");
+            }
+        }
+
+        return singleCitations;
+    }
+
     /// Remove citationKeys
     private String extractContextText(String text) {
-        text = SINGLE_CITE_PATTERN.matcher(text).replaceAll(" ");
+        text = CITE_PATTERN.matcher(text).replaceAll(" ");
         text = WHITESPACE_PATTERN.matcher(text.trim()).replaceAll(" ");
         text = SPACE_BEFORE_PUNCTUATION_PATTERN.matcher(text).replaceAll("$1");
         text = TRAILING_CONJUNCTION_WITH_PUNCTUATION_PATTERN.matcher(text).replaceAll("$1");
