@@ -134,9 +134,10 @@ public class ConvertTest extends AbstractJabKitTest {
         Path outputPath = tempDir.resolve("output");
 
         commandLine.execute("convert",
-                "--input=" + newPath, "--input-format=bibtex",
-                "--output-format=bibtex",
+                "--input=" + newPath,
+                "--input-format=bibtex",
                 "--output=" + outputPath,
+                "--output-format=bibtex",
                 "--field-formatters=pages[normalize_page_numbers],month[normalize_month],All-text-fields[replace_unicode_ligatures],comment[clear]");
 
         assertFileExists(outputPath);
