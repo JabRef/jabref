@@ -13,4 +13,5 @@ open module org.jabref.testsupport {
     requires static com.fasterxml.jackson.annotation;
 
     exports org.jabref.support;
+    
 }
