@@ -8,7 +8,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -29,6 +31,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
@@ -53,6 +56,8 @@ public class IndexManager {
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
     private final DelayTaskThrottler indexUpdateThrottler;
+    private final ConcurrentHashMap<BibEntry, Set<Field>> pendingFieldsByEntry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BibEntry, String[]> pendingFileValuesByEntry = new ConcurrentHashMap<>();
 
     public IndexManager(BibDatabaseContext databaseContext,
                         TaskExecutor executor,
@@ -160,25 +165,61 @@ public class IndexManager {
     }
 
     public void updateEntry(FieldChangedEvent event) {
-        indexUpdateThrottler.schedule(() -> {
-            new BackgroundTask<>() {
-                @Override
-                public Object call() {
-                    bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
-                    return null;
-                }
-            }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
-             .executeWith(taskExecutor);
+        BibEntry entry = event.getBibEntry();
+        Field field = event.getField();
 
-            if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE)) {
-                new BackgroundTask<>() {
-                    @Override
-                    public Object call() {
-                        linkedFilesIndexer.updateEntry(event.getBibEntry(), event.getOldValue(), event.getNewValue(), this);
-                        return null;
+        /// Accumulate which fields need updating for this entry
+        pendingFieldsByEntry.computeIfAbsent(entry, _ -> ConcurrentHashMap.newKeySet()).add(field);
+
+        /// For FILE field: track baseline old value and latest new value
+        if (field.equals(StandardField.FILE)) {
+            pendingFileValuesByEntry.compute(entry, (_, existing) -> {
+                if (existing == null) {
+                    /// First event in this window — capture the true baseline
+                    return new String[] {event.getOldValue(), event.getNewValue()};
+                } else {
+                    /// Keep baseline old, update to latest new
+                    existing[1] = event.getNewValue();
+                    return existing;
+                }
+            });
+        }
+
+        indexUpdateThrottler.schedule(() -> {
+            /// Snapshot and clear pending state atomically
+            List<BibEntry> updatedEntries = new ArrayList<>();
+
+            pendingFieldsByEntry.forEach((pendingEntry, fields) -> {
+                if (pendingFieldsByEntry.remove(pendingEntry, fields)) {
+                    updatedEntries.add(pendingEntry);
+                    Set<Field> fieldsSnapshot = Set.copyOf(fields);
+
+                    new BackgroundTask<>() {
+                        @Override
+                        public Object call() {
+                            for (Field f : fieldsSnapshot) {
+                                bibFieldsIndexer.updateEntry(pendingEntry, f);
+                            }
+                            return null;
+                        }
+                    }.onFinished(() -> this.databaseContext.getDatabase()
+                                                           .postEvent(new IndexAddedOrUpdatedEvent(List.of(pendingEntry))))
+                     .executeWith(taskExecutor);
+
+                    if (shouldIndexLinkedFiles.get() && fieldsSnapshot.contains(StandardField.FILE)) {
+                        String[] fileValues = pendingFileValuesByEntry.remove(pendingEntry);
+                        if (fileValues != null) {
+                            new BackgroundTask<>() {
+                                @Override
+                                public Object call() {
+                                    linkedFilesIndexer.updateEntry(pendingEntry, fileValues[0], fileValues[1], this);
+                                    return null;
+                                }
+                            }.executeWith(taskExecutor);
+                        }
                     }
-                }.executeWith(taskExecutor);
-            }
+                }
+            });
         });
     }
 
