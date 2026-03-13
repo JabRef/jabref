@@ -1,5 +1,7 @@
 package org.jabref.logic.journals;
 
+import org.jabref.support.JournalAbbreviationTestUtil;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,8 +12,8 @@ class AbbreviationsTest {
     private JournalAbbreviationRepository repository;
 
     @BeforeEach
-    void setUp() {
-        repository = JournalAbbreviationLoader.loadBuiltInRepository();
+    void setUp() throws Exception {
+        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
     }
 
     @Test
