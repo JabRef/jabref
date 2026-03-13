@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGeneratorTestUtils;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -22,7 +23,9 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.support.JournalAbbreviationTestUtil;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
@@ -41,6 +44,13 @@ import static org.mockito.Mockito.when;
 /// this test has to go to a test belonging to the respective checker. See PersonNamesCheckerTest for an example test.
 @ResourceLock("Localization.lang")
 class IntegrityCheckTest {
+
+    private static JournalAbbreviationRepository repository;
+
+    @BeforeAll
+    static void initRepository() throws Exception {
+        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+    }
 
     @Test
     void bibTexAcceptsStandardEntryType() {
@@ -137,7 +147,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 CitationKeyGeneratorTestUtils.getInstanceForTesting(),
-                JournalAbbreviationLoader.loadBuiltInRepository(),
+                repository,
                 false)
                 .check();
 
@@ -172,7 +182,7 @@ class IntegrityCheckTest {
         messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 CitationKeyGeneratorTestUtils.getInstanceForTesting(),
-                JournalAbbreviationLoader.loadBuiltInRepository(),
+                repository,
                 false)
                 .check();
 
@@ -187,7 +197,7 @@ class IntegrityCheckTest {
         messages = new IntegrityCheck(context,
                 filePreferencesMock,
                 CitationKeyGeneratorTestUtils.getInstanceForTesting(),
-                JournalAbbreviationLoader.loadBuiltInRepository(),
+                repository,
                 false)
                 .check();
 
