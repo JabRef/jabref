@@ -5,6 +5,7 @@ import java.util.concurrent.Callable;
 import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.search.PostgreServer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,8 @@ public class ServerCli implements Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException {
-        LspLauncher lspLauncher = new LspLauncher(JabRefCliPreferences.getInstance(), port);
+        PostgreServer postgreServer = new PostgreServer();
+        LspLauncher lspLauncher = new LspLauncher(JabRefCliPreferences.getInstance(), postgreServer.getDataSource(), port);
         lspLauncher.run();
 
         // Keep the server running until user kills the process (e.g., presses Ctrl+C)
