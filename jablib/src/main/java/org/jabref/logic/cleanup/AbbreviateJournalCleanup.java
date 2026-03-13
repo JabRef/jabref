@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
@@ -48,17 +47,7 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         String origText = entry.getField(fieldName).orElse("");
         String text = database.resolveForStrings(origText);
 
-        Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
-
-        if (foundAbbreviation.isEmpty() && abbreviationType != AbbreviationType.LTWA) {
-            // Not found abbreviation -> cannot abbreviate anything.
-            // LTWA mode -> handled differently
-            return List.of();
-        }
-
-        Optional<String> newTextOptional = abbreviationType == AbbreviationType.LTWA
-                                           ? journalAbbreviationRepository.getLtwaAbbreviation(text)
-                                           : foundAbbreviation.map(this::getAbbreviatedName);
+        Optional<String> newTextOptional = getAbbreviatedName(text);
 
         // Return early if no abbreviation found or it matches original
         if (newTextOptional.isEmpty() || newTextOptional.get().equals(origText)) {
@@ -70,30 +59,31 @@ public class AbbreviateJournalCleanup implements CleanupJob {
 
         List<FieldChange> changes = new ArrayList<>(2);
 
-        foundAbbreviation.ifPresent(abbr -> {
-            if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
+        if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
+            Optional<String> fullName = journalAbbreviationRepository.getFullName(text);
+            fullName.ifPresent(name -> {
                 String oldFjournalValue = entry.getField(AMSField.FJOURNAL).orElse(null);
-                String newFjournalValue = abbr.getName().replaceAll("(?<!\\\\)&", "\\\\&");
+                String newFjournalValue = name.replaceAll("(?<!\\\\)&", "\\\\&");
                 entry.setField(AMSField.FJOURNAL, newFjournalValue);
                 changes.add(new FieldChange(entry, AMSField.FJOURNAL, oldFjournalValue, newFjournalValue));
-            }
-        });
+            });
+        }
 
         entry.setField(fieldName, newText);
         changes.add(new FieldChange(entry, fieldName, origText, newText));
         return changes;
     }
-
-    private String getAbbreviatedName(Abbreviation text) {
+    
+    private Optional<String> getAbbreviatedName(String text) {
         return switch (abbreviationType) {
             case DEFAULT ->
-                    text.getAbbreviation();
+                    journalAbbreviationRepository.getDefaultAbbreviation(text);
             case DOTLESS ->
-                    text.getDotlessAbbreviation();
+                    journalAbbreviationRepository.getDotless(text);
             case SHORTEST_UNIQUE ->
-                    text.getShortestUniqueAbbreviation();
+                    journalAbbreviationRepository.getShortestUniqueAbbreviation(text);
             case LTWA ->
-                    throw new IllegalStateException("Unexpected value: %s".formatted(abbreviationType));
+                    journalAbbreviationRepository.getLtwaAbbreviation(text);
         };
     }
 }
