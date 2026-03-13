@@ -1,11 +1,13 @@
-package org.jabref.logic.layout;
+package org.jabref.logic.preview;
 
 import java.io.IOException;
 import java.io.Reader;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.layout.Layout;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 

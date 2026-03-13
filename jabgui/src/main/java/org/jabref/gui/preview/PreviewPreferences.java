@@ -14,8 +14,8 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 
 public class PreviewPreferences {
     private final ObservableList<PreviewLayout> layoutCycle;

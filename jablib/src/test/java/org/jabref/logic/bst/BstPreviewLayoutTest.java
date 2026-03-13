@@ -3,6 +3,7 @@ package org.jabref.logic.bst;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
+import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

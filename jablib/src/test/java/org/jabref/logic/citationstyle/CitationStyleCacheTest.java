@@ -3,8 +3,8 @@ package org.jabref.logic.citationstyle;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
