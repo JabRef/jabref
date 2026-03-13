@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -51,6 +50,7 @@ public class TemplateExporter extends Exporter {
     private final SelfContainedSaveOrder saveOrder;
     private final BlankLineBehaviour blankLineBehaviour;
     private boolean customExport;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
     ///
@@ -64,7 +64,7 @@ public class TemplateExporter extends Exporter {
                             String lfFileName,
                             String directory,
                             FileType extension) {
-        this(displayName, consoleName, lfFileName, directory, extension, null, null, null);
+        this(displayName, consoleName, lfFileName, directory, extension, null, null, null, null);
     }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
@@ -100,7 +100,28 @@ public class TemplateExporter extends Exporter {
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
                             SelfContainedSaveOrder saveOrder) {
-        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null);
+        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null, null);
+    }
+
+    /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
+    ///
+    /// @param displayName        Name to display to the user.
+    /// @param consoleName        Name to call this format in the console.
+    /// @param lfFileName         Name of the main layout file.
+    /// @param directory          Directory in which to find the layout file.
+    /// @param extension          Should contain the . (for instance .txt).
+    /// @param layoutPreferences  Preferences for layout
+    /// @param saveOrder          Save order for entries
+    /// @param blankLineBehaviour how to behave regarding blank lines.
+    public TemplateExporter(String displayName,
+                            String consoleName,
+                            @NonNull String lfFileName,
+                            String directory,
+                            FileType extension,
+                            LayoutFormatterPreferences layoutPreferences,
+                            SelfContainedSaveOrder saveOrder,
+                            BlankLineBehaviour blankLineBehaviour) {
+        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, blankLineBehaviour, null);
     }
 
     /// Initialize another export format based on templates stored in dir with layoutFile lfFilename.
@@ -119,7 +140,8 @@ public class TemplateExporter extends Exporter {
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
                             SelfContainedSaveOrder saveOrder,
-                            BlankLineBehaviour blankLineBehaviour) {
+                            BlankLineBehaviour blankLineBehaviour,
+                            JournalAbbreviationRepository abbreviationRepository) {
         super(consoleName, displayName, extension);
         if (lfFileName.endsWith(LAYOUT_EXTENSION)) {
             this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
@@ -130,6 +152,7 @@ public class TemplateExporter extends Exporter {
         this.layoutPreferences = layoutPreferences;
         this.saveOrder = saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;
         this.blankLineBehaviour = blankLineBehaviour;
+        this.abbreviationRepository = abbreviationRepository;
     }
 
     /// Indicate whether this is a custom export.
@@ -180,7 +203,10 @@ public class TemplateExporter extends Exporter {
     public void export(@NonNull BibDatabaseContext databaseContext,
                        Path file,
                        @NonNull List<BibEntry> entries) throws IOException {
-        export(databaseContext, file, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
+        JournalAbbreviationRepository repository = abbreviationRepository != null
+                                                   ? abbreviationRepository
+                                                   : new JournalAbbreviationRepository(); // fallback to demo data
+        export(databaseContext, file, entries, List.of(), repository);
     }
 
     @Override
