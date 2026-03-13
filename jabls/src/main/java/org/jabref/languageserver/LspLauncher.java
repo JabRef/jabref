@@ -48,13 +48,13 @@ public class LspLauncher extends Thread {
         this.setName("JabLs - JabRef LSP Server on: " + port);
         this.messageHandler = messageHandler;
     }
-
-    public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, DataSource dataSource, int port) {
-        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences(), dataSource), cliPreferences.getCustomEntryTypesRepository(), port);
-    }
-
+    
     public LspLauncher(JabRefCliPreferences instance, DataSource dataSource, Integer port) {
-        this(_ -> LOGGER.warn("LSP cannot handle UICommands in standalone mode."), instance, dataSource, port);
+        this(_ -> LOGGER.warn("LSP cannot handle UICommands in standalone mode."),
+                instance,
+                JournalAbbreviationLoader.loadRepository(instance.getJournalAbbreviationPreferences(), dataSource),
+                instance.getCustomEntryTypesRepository(),
+                port);
         this.standalone = true;
     }
 
