@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 /// Fuzzy matching uses Postgres `pg_trgm` extension for efficient trigram similarity search.
 public class JournalAbbreviationRepository {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationRepository.class);
-
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationRepository.class);
 
     /// Minimum trigram similarity score for a fuzzy match candidate (pg_trgm scale: 0.0 to 1.0)
     private static final double FUZZY_SIMILARITY_MIN = 0.3;
@@ -88,7 +88,12 @@ public class JournalAbbreviationRepository {
     }
 
     private static String sanitizeInput(String input) {
-        return input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        String result = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        // Strip surrounding curly braces added by LaTeX protection
+        if (result.startsWith("{") && result.endsWith("}")) {
+            result = result.substring(1, result.length() - 1);
+        }
+        return result;
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -132,7 +137,16 @@ public class JournalAbbreviationRepository {
             return customFuzzy;
         }
 
+        if (hasCustomFuzzyCandidates(journal)) {
+            return Optional.empty();
+        }
+
         return findFuzzyInDatabase(journal);
+    }
+
+    private boolean hasCustomFuzzyCandidates(String input) {
+        return customAbbreviations.stream()
+                                  .anyMatch(abbreviation -> similarity.isSimilar(input, abbreviation.getName()));
     }
 
     /// Fuzzy matches against an in-memory collection using StringSimilarity
