@@ -494,14 +494,14 @@ public class PreferencesMigrations {
     /// <tr> <td colspan="2"> ... </td> </tr>
     /// <tr> <td> &nbsp; </td> </tr>
     /// <tr> <td colspan="2"> CLEANUP_JOBS - new format: </td> </tr>
-    /// <tr> <td> CleanUpJobs            </td> <td> CLEAN_UP_DOI;RENAME_PDF;MOVE_PDF </td> </tr>
+    /// <tr> <td> CleanUpJobs            </td> <td> `CLEAN_UP_DOI;RENAME_PDF;MOVE_PDF `</td> </tr>
     /// <tr> <td> &nbsp; </td> </tr>
     /// <tr> <td colspan="2"> CLEANUP_FORMATTERS - old format: </td> </tr>
-    /// <tr> <td> CleanUpFormatters     </td> <td> ENABLED\nfield[formatter,formatter...]\nfield[...]\nfield[...]... </td> </tr>
+    /// <tr> <td> CleanUpFormatters     </td> <td> `ENABLED\nfield[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
     /// <tr> <td> &nbsp; </td> </tr>
     /// <tr> <td colspan="2"> CLEANUP_FORMATTERS - new format: </td> </tr>
     /// <tr> <td> CleanUpFormattersEnabled </td> <td> TRUE </td> </tr>
-    /// <tr> <td> CleanUpFormatters        </td> <td> field[formatter,formatter...]\nfield[...]\nfield[...]... </td> </tr>
+    /// <tr> <td> CleanUpFormatters        </td> <td> `field[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
     /// </table>
     private static void upgradeCleanups(JabRefCliPreferences prefs) {
         final String V5_8_CLEANUP = "CleanUp";

@@ -468,7 +468,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (_, _, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
         EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (_, _, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
-        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) c ->
+        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) _ ->
                 putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream()
                                                                                     .map(Field::getName)
                                                                                     .collect(Collectors.toList())));
@@ -719,7 +719,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 (_, _, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
         EasyBind.listen(externalApplicationsPreferences.useCustomTerminalProperty(),
                 (_, _, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
-        externalApplicationsPreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
+        externalApplicationsPreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) _ ->
                 put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(externalApplicationsPreferences.getExternalFileTypes())));
         EasyBind.listen(externalApplicationsPreferences.customTerminalCommandProperty(),
                 (_, _, newValue) -> put(CONSOLE_COMMAND, newValue));
@@ -755,7 +755,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         groupsPreferences = getGroupsPreferencesFromBackingStore(GroupsPreferences.getDefault());
 
-        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
+        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) _ -> {
             putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
             putBoolean(GROUP_VIEW_FILTER, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
             putBoolean(GROUP_VIEW_INVERT, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
@@ -983,12 +983,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         mainTableColumnPreferences = getMainTableColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
 
-        mainTableColumnPreferences.getColumns().addListener((InvalidationListener) change -> {
+        mainTableColumnPreferences.getColumns().addListener((InvalidationListener) _ -> {
             putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
             putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(mainTableColumnPreferences));
             putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(mainTableColumnPreferences));
         });
-        mainTableColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) change ->
+        mainTableColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) _ ->
                 putStringList(COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(mainTableColumnPreferences)));
 
         return mainTableColumnPreferences;
@@ -1012,13 +1012,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         searchDialogColumnPreferences = getSearchDialogColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
 
-        searchDialogColumnPreferences.getColumns().addListener((InvalidationListener) change -> {
+        searchDialogColumnPreferences.getColumns().addListener((InvalidationListener) _ -> {
             // MainTable and SearchResultTable use the same set of columnNames
             // putStringList(SEARCH_DIALOG_COLUMN_NAMES, getColumnNamesAsStringList(columnPreferences));
             putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(searchDialogColumnPreferences));
             putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(searchDialogColumnPreferences));
         });
-        searchDialogColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) change ->
+        searchDialogColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) _ ->
                 putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(searchDialogColumnPreferences)));
 
         return searchDialogColumnPreferences;

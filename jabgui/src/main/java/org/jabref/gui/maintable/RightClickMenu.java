@@ -22,7 +22,6 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
@@ -49,9 +48,7 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class RightClickMenu {
 
-    public static ContextMenu create(BibEntryTableViewModel entry,
-                                     KeyBindingRepository keyBindingRepository,
-                                     LibraryTab libraryTab,
+    public static ContextMenu create(LibraryTab libraryTab,
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      GuiPreferences preferences,

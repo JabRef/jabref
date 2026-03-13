@@ -5,7 +5,6 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -116,7 +115,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     @FXML
-    private void selectBstFile(ActionEvent event) {
+    private void selectBstFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BST)
                 .withDefaultExtension(StandardFileType.BST)
@@ -160,7 +159,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.setOnMouseClicked(this::mouseClickedAvailable);
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
@@ -176,7 +175,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.setOnMouseClicked(this::mouseClickedChosen);
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
@@ -207,16 +206,16 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
                     viewModel.refreshPreview();
                 });
 
-        editArea.textProperty().addListener((obs, oldValue, newValue) ->
+        editArea.textProperty().addListener((_, _, newValue) ->
                 editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue)));
 
-        editArea.focusedProperty().addListener((observable, oldValue, newValue) -> {
+        editArea.focusedProperty().addListener((_, _, newValue) -> {
             if (!newValue) {
                 viewModel.refreshPreview();
             }
         });
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
+        searchBox.textProperty().addListener((_, _, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
@@ -323,7 +322,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         if (layout instanceof BstPreviewLayout) {
             ContextMenu menu = new ContextMenu();
             MenuItem deleteItem = new MenuItem(Localization.lang("Remove"));
-            deleteItem.setOnAction(event -> viewModel.removeCustomStyle(layout));
+            deleteItem.setOnAction(_ -> viewModel.removeCustomStyle(layout));
             menu.getItems().add(deleteItem);
             return menu;
         }

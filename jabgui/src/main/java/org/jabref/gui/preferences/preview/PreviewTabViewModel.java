@@ -110,7 +110,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         chosenListValidator = new FunctionBasedValidator<>(
                 chosenListProperty,
-                input -> !chosenListProperty.getValue().isEmpty(),
+                _ -> !chosenListProperty.getValue().isEmpty(),
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                                 Localization.lang("Entry preview"),
                                 Localization.lang("Selected"),
@@ -526,10 +526,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public void removeCustomStyle(PreviewLayout layout) {
         if (layout instanceof BstPreviewLayout bstLayout) {
-            availableListProperty.remove(layout);
-            chosenListProperty.remove(layout);
+            availableListProperty.remove(bstLayout);
+            chosenListProperty.remove(bstLayout);
             // Remove the path so it doesn't come back on restart
-            bstStylesPaths.remove(((BstPreviewLayout) layout).getFilePath());
+            bstStylesPaths.remove((bstLayout.getFilePath()));
         }
     }
 }

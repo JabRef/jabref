@@ -151,8 +151,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         libraryTab.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry -> RightClickMenu.create(entry,
-                        keyBindingRepository,
+                .withContextMenu(_ -> RightClickMenu.create(
                         libraryTab,
                         dialogService,
                         stateManager,

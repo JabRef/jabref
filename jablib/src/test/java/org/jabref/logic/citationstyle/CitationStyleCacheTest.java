@@ -23,12 +23,6 @@ import static org.mockito.Mockito.when;
 @Execution(ExecutionMode.SAME_THREAD)
 class CitationStyleCacheTest {
 
-    private BibEntry bibEntry;
-    private List<BibEntry> entries;
-    private BibDatabase database;
-    private BibDatabaseContext databaseContext;
-    private CitationStyleCache csCache;
-
     @Test
     void getCitationForTest() {
         BibEntry bibEntry = new BibEntry().withCitationKey("test");

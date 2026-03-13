@@ -143,13 +143,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
                 .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(item -> evt -> {
+                .withOnMouseClickedEvent(_ -> _ -> {
                     CSLStyleSelectViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
                     if (selectedStyle != null) {
                         viewModel.deleteCslStyle(selectedStyle.getLayout().citationStyle());
                     }
                 })
-                .withTooltip(item -> Localization.lang("Remove style"))
+                .withTooltip(_ -> Localization.lang("Remove style"))
                 .install(cslDeleteColumn);
 
         new ViewModelTableRowFactory<CSLStyleSelectViewModel>()
@@ -197,11 +197,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         new ValueTableCellFactory<JStyleSelectViewModel, Boolean>()
                 .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
-                .withTooltip(item -> Localization.lang("Remove style"))
+                .withOnMouseClickedEvent(_ -> _ -> viewModel.deleteJStyle())
+                .withTooltip(_ -> Localization.lang("Remove style"))
                 .install(jStyleDeleteColumn);
 
-        edit.setOnAction(e -> viewModel.editJStyle());
+        edit.setOnAction(_ -> viewModel.editJStyle());
 
         new ViewModelTableRowFactory<JStyleSelectViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
@@ -212,7 +212,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                         this.close();
                     }
                 })
-                .withContextMenu(item -> createContextMenu())
+                .withContextMenu(_ -> createContextMenu())
                 .install(jStylesTable);
 
         jStylesTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
