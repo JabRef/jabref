@@ -16,11 +16,11 @@ val javafx = "25.0.2"
 
 val lucene = "10.4.0"
 
-val pdfbox = "3.0.6"
+val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.12.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.12.2"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
@@ -61,7 +61,7 @@ dependencies.constraints {
     api("com.konghq:unirest-modules-gson:4.7.4")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.3.2")
-    api("com.squareup.okio:okio-jvm:3.16.4")
+    api("com.squareup.okio:okio-jvm:3.17.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
@@ -70,7 +70,7 @@ dependencies.constraints {
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.21.0")
-    api("commons-logging:commons-logging:1.3.5")
+    api("commons-logging:commons-logging:1.3.6")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
@@ -137,7 +137,7 @@ dependencies.constraints {
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.22.0")
+    api("org.mockito:mockito-core:5.23.0")
     api("org.ow2.asm:asm:9.9.1")
     api("org.postgresql:postgresql:42.7.10")
     api("org.slf4j:jul-to-slf4j:2.0.17")
