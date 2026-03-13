@@ -129,7 +129,6 @@ public class JournalListSqlGenerator {
 
             for (int j = i; j < end; j++) {
                 Abbreviation abbr = entries[j];
-                String dotless = abbr.getDotlessAbbreviation();
                 String shortest = abbr.getShortestUniqueAbbreviation();
 
                 writer.write("(");
