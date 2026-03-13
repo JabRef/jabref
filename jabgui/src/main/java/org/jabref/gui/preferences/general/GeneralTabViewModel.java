@@ -41,6 +41,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
+import org.jabref.logic.remote.server.ConnectorTokenManager;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
@@ -96,6 +97,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
     private final HttpServerManager httpServerManager;
+    private final ConnectorTokenManager connectorTokenManager;
     private final LanguageServerController languageServerController;
     private final UiMessageHandler uiMessageHandler;
     private final RemoteListenerServerManager remoteListenerServerManager;
@@ -119,6 +121,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public GeneralTabViewModel(DialogService dialogService,
                                GuiPreferences preferences,
                                HttpServerManager httpServerManager,
+                               ConnectorTokenManager connectorTokenManager,
                                LanguageServerController languageServerController,
                                UiMessageHandler uiMessageHandler,
                                RemoteListenerServerManager remoteListenerServerManager,
@@ -130,6 +133,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
         this.httpServerManager = httpServerManager;
+        this.connectorTokenManager = connectorTokenManager;
         this.languageServerController = languageServerController;
         this.uiMessageHandler = uiMessageHandler;
         this.remoteListenerServerManager = remoteListenerServerManager;
@@ -512,6 +516,22 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }
+    }
+
+    public String generatePin() {
+        return connectorTokenManager.generatePin();
+    }
+
+    public void revokeToken() {
+        connectorTokenManager.revokeToken();
+    }
+
+    public boolean hasActiveToken() {
+        return connectorTokenManager.hasActiveToken();
+    }
+
+    public StringProperty apiTokenProperty() {
+        return remotePreferences.apiTokenProperty();
     }
 
     private Optional<Integer> getPortAsInt(String value) {

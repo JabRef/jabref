@@ -19,12 +19,15 @@ import org.jabref.http.server.resources.EntryResource;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
+import org.jabref.http.server.resources.PairingResource;
 import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.remote.server.ConnectorTokenManager;
 
+import jakarta.ws.rs.Priorities;
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
@@ -71,7 +74,7 @@ public class Server {
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
-        HttpServer httpServer = startServer(serviceLocator, uri);
+        HttpServer httpServer = startServer(serviceLocator, null, uri);
 
         // Required for CLI only
         // GUI uses HttpServerManager
@@ -90,11 +93,11 @@ public class Server {
 
     /// Entry point for the GUI
     public HttpServer run(SrvStateManager srvStateManager, URI uri) {
-        return run(srvStateManager, null, uri);
+        return run(srvStateManager, null, null, uri);
     }
 
-    /// Entry point for the GUI with UiMessageHandler
-    public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
+    /// Entry point for the GUI with UiMessageHandler and ConnectorTokenManager
+    public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, @Nullable ConnectorTokenManager externalTokenManager, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
@@ -104,13 +107,18 @@ public class Server {
             ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler, "uimessagehandler", UiMessageHandler.class);
         }
 
-        return startServer(serviceLocator, uri);
+        return startServer(serviceLocator, externalTokenManager, uri);
     }
 
-    private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
+    private HttpServer startServer(ServiceLocator serviceLocator, @Nullable ConnectorTokenManager externalTokenManager, URI uri) {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
+
+        ConnectorTokenManager tokenManager = externalTokenManager != null
+                                             ? externalTokenManager
+                                             : new ConnectorTokenManager(preferences.getRemotePreferences());
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, tokenManager);
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
@@ -125,12 +133,18 @@ public class Server {
         resourceConfig.register(EntriesResource.class);
         resourceConfig.register(EntryResource.class);
 
+        // Auth resources
+        resourceConfig.register(PairingResource.class);
+
         // Other resources
         resourceConfig.register(CommandResource.class);
         resourceConfig.register(CAYWResource.class);
 
-        // Supporting classes
+        // Security filters
+        resourceConfig.register(SecurityFilter.class, Priorities.AUTHENTICATION);
         resourceConfig.register(CORSFilter.class);
+
+        // Supporting classes
         resourceConfig.register(GlobalExceptionMapper.class);
 
         LOGGER.debug("Starting HTTP server...");

@@ -37,6 +37,20 @@ See [`jabsrv/src/test/commands.http`](https://github.com/JabRef/jabref/blob/main
 To be standards based, [JAX-RS](https://projects.eclipse.org/projects/ee4j.rest) is used as the API specification language.
 As implementation of JAX-RS, the reference implementation [Jersey](https://eclipse-ee4j.github.io/jersey/) is used.
 
+## Security
+
+The server binds to `localhost` only.
+Two JAX-RS filters in [`Server`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/Server.java) protect against cross-origin abuse.
+
+[`CORSFilter`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java) sets `Access-Control-Allow-Origin` to the requesting origin only if it appears in the whitelist configured in `RemotePreferences.getAllowedOrigins()` (browser extension schemes and selected web origins).
+
+[`SecurityFilter`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/SecurityFilter.java) validates incoming requests in three steps: origin check, custom `X-JabRef-Connector` header, and `Authorization: Bearer <token>`.
+Requests without an `Origin` header (e.g., `curl`) and the root health-check endpoint are exempt.
+
+Tokens are obtained through [`PairingResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/resources/PairingResource.java) at `POST /auth/pair`.
+JabRef displays a one-time PIN in the preferences; the extension sends it and receives a bearer token in return.
+Token management (generation, validation, revocation) lives in [`ConnectorTokenManager`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/remote/server/ConnectorTokenManager.java).
+
 ## Starting the http server
 
 In IntelliJ: Gradle > JabRef > jabsrv-cli > Tasks > application > run

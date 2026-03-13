@@ -16,6 +16,8 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
+import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.server.ConnectorTokenManager;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.metadata.UserHostInfo;
 
@@ -47,6 +49,9 @@ public abstract class ServerTest extends JerseyTest {
         // Grizzly uses java.commons.logging, but we use TinyLog
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+
+        // Allow sending Origin and other restricted headers in test HTTP client
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 
         initializePreferencesService();
     }
@@ -133,6 +138,21 @@ public abstract class ServerTest extends JerseyTest {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getUserAndHost()).thenReturn(new UserHostInfo("user", "host").getUserHostString());
         when(importFormatPreferences.filePreferences()).thenReturn(filePreferences);
+
+        RemotePreferences remotePreferences = new RemotePreferences(
+                6050, true, 23119, false, false, 2087,
+                List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
+                "");
+        when(preferences.getRemotePreferences()).thenReturn(remotePreferences);
+    }
+
+    protected void addTokenManagerToResourceConfig(ResourceConfig resourceConfig, ConnectorTokenManager tokenManager) {
+        resourceConfig.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(tokenManager).to(ConnectorTokenManager.class);
+            }
+        });
     }
 
     protected void addGlobalExceptionMapperToResourceConfig(ResourceConfig resourceConfig) {

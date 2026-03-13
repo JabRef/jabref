@@ -4,11 +4,16 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -28,13 +33,18 @@ public class RemotePreferences {
     private final BooleanProperty enableLanguageServer;
     private final IntegerProperty languageServerPort;
 
-    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort) {
+    private final ObservableList<String> allowedOrigins;
+    private final StringProperty apiToken;
+
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort, List<String> allowedOrigins, String apiToken) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
         this.httpPort = new SimpleIntegerProperty(httpPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
         this.enableLanguageServer = new SimpleBooleanProperty(enableLanguageServer);
         this.languageServerPort = new SimpleIntegerProperty(languageServerPort);
+        this.allowedOrigins = FXCollections.observableArrayList(allowedOrigins);
+        this.apiToken = new SimpleStringProperty(apiToken);
     }
 
     public int getPort() {
@@ -119,6 +129,26 @@ public class RemotePreferences {
 
     public void setEnableLanguageServer(boolean enableLanguageServer) {
         this.enableLanguageServer.setValue(enableLanguageServer);
+    }
+
+    public ObservableList<String> getAllowedOrigins() {
+        return allowedOrigins;
+    }
+
+    public void setAllowedOrigins(List<String> allowedOrigins) {
+        this.allowedOrigins.setAll(allowedOrigins);
+    }
+
+    public String getApiToken() {
+        return apiToken.getValue();
+    }
+
+    public StringProperty apiTokenProperty() {
+        return apiToken;
+    }
+
+    public void setApiToken(String apiToken) {
+        this.apiToken.setValue(apiToken);
     }
 
     /// Gets the IP address where both the remote server and the http server are listening.

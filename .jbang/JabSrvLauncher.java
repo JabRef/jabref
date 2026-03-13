@@ -86,7 +86,9 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/SecurityFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/PairingResource.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 

@@ -1,5 +1,7 @@
 package org.jabref.logic.remote;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,7 @@ class RemotePreferencesTest {
 
     @BeforeEach
     void setUp() {
-        preferences = new RemotePreferences(1000, true, 3000, false, false, 2087);
+        preferences = new RemotePreferences(1000, true, 3000, false, false, 2087, List.of(), "");
     }
 
     @Test
