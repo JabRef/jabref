@@ -18,5 +18,5 @@ module org.jabref.jabls {
     requires org.eclipse.lsp4j.jsonrpc;
     requires transitive org.jspecify;
     requires java.sql;
-
+    
 }
