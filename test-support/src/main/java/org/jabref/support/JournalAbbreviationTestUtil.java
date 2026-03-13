@@ -1,6 +1,5 @@
 package org.jabref.support;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Statement;
 
@@ -26,16 +25,6 @@ public class JournalAbbreviationTestUtil {
             }
             // Pre-populate once so parallel test workers never race on table creation
             JournalAbbreviationLoader.loadBuiltInRepository(dataSource);
-
-            // Stop the embedded Postgres instance when the JVM shuts down
-            final EmbeddedPostgres pgToClose = pg;
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    pgToClose.close();
-                } catch (IOException e) {
-                    // best effort cleanup
-                }
-            }));
         }
         return dataSource;
     }
