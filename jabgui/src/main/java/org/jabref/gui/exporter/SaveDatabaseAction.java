@@ -32,6 +32,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -43,6 +44,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,20 +255,18 @@ public class SaveDatabaseAction {
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
-                        bibWriter,
+                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter,
                         saveConfiguration,
-                        preferences.getFieldPreferences(),
-                        preferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager);
-
+                        preferences,
+                        entryTypesManager,
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                 if (selectedOnly) {
-                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                    bibDatabaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
                 } else {
-                    databaseWriter.writeDatabase(bibDatabaseContext);
+                    bibDatabaseWriter.writeDatabase(bibDatabaseContext);
                 }
 
-                libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
+                libraryTab.registerUndoableChanges(bibDatabaseWriter.getSaveActionsFieldChanges());
 
                 if (fileWriter.hasEncodingProblems()) {
                     saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);

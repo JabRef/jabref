@@ -17,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
@@ -26,12 +25,8 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
-import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
@@ -68,66 +63,39 @@ public class BibDatabaseWriter {
 
     protected final BibWriter bibWriter;
     protected final SelfContainedSaveConfiguration saveConfiguration;
-    protected final CitationKeyPatternPreferences keyPatternPreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
-    protected final FieldPreferences fieldPreferences;
+    private final CliPreferences preferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public BibDatabaseWriter(@NonNull BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
-                             FieldPreferences fieldPreferences,
-                             CitationKeyPatternPreferences keyPatternPreferences,
-                             BibEntryTypesManager entryTypesManager) {
+                             CliPreferences preferences,
+                             BibEntryTypesManager entryTypesManager,
+                             JournalAbbreviationRepository journalAbbreviationRepository) {
         this.bibWriter = bibWriter;
         this.saveConfiguration = saveConfiguration;
-        this.keyPatternPreferences = keyPatternPreferences;
-        this.fieldPreferences = fieldPreferences;
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
         assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
     }
 
     /// Convenience constructor. One can directly call [#writeDatabase(BibDatabaseContext)] afterward.
     ///
-    /// @param writer             the output to use
-    /// @param bibDatabaseContext - used to get the newline
-    /// @param preferences        - used to read all the preferences
+    /// @param writer                 the output to use
+    /// @param bibDatabaseContext     - used to get the newline
+    /// @param preferences            - used to read all the preferences
+    /// @param abbreviationRepository - used to apply save actions
     public BibDatabaseWriter(@NonNull Writer writer,
                              @NonNull BibDatabaseContext bibDatabaseContext,
-                             @NonNull CliPreferences preferences) {
+                             @NonNull CliPreferences preferences,
+                             @NonNull JournalAbbreviationRepository abbreviationRepository) {
         this(new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator()),
                 preferences.getSelfContainedExportConfiguration(),
-                preferences.getFieldPreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getCustomEntryTypesRepository());
-    }
-
-    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
-        List<FieldChange> changes = new ArrayList<>();
-
-        Optional<FieldFormatterCleanupActions> saveActions = metaData.getSaveActions();
-        saveActions.ifPresent(actions -> {
-            // save actions defined -> apply for every entry
-            for (BibEntry entry : toChange) {
-                changes.addAll(actions.applySaveActions(entry));
-            }
-        });
-
-        // Trim and normalize all white spaces
-        FieldFormatterCleanup trimWhiteSpaces = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new TrimWhitespaceFormatter());
-        NormalizeWhitespacesCleanup normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
-        for (BibEntry entry : toChange) {
-            // Only apply the trimming if the entry itself has other changes (e.g., by the user or by save actions)
-            if (entry.hasChanged()) {
-                changes.addAll(trimWhiteSpaces.cleanup(entry));
-                changes.addAll(normalizeWhitespacesCleanup.cleanup(entry));
-            }
-        }
-
-        return changes;
-    }
-
-    public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData, FieldPreferences fieldPreferences) {
-        return applySaveActions(List.of(entry), metaData, fieldPreferences);
+                preferences,
+                preferences.getCustomEntryTypesRepository(),
+                abbreviationRepository);
     }
 
     private static List<Comparator<BibEntry>> getSaveComparators(SaveOrder saveOrder) {
@@ -204,9 +172,15 @@ public class BibDatabaseWriter {
 
         // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
         //        The cleanup should be done before the write operation
-        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences);
+        SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext,
+                preferences.getFilePreferences(),
+                preferences.getTimestampPreferences(),
+                preferences.getFieldPreferences(),
+                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                journalAbbreviationRepository);
+        List<FieldChange> saveActionChanges = saveActionsWorker.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
-        if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
+        if (preferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
         }
@@ -229,7 +203,7 @@ public class BibDatabaseWriter {
 
         if (saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPatterns());
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getCitationKeyPatternPreferences().getKeyPatterns());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -254,7 +228,7 @@ public class BibDatabaseWriter {
     }
 
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
         bibtexEntryWriter.write(entry, bibWriter, mode, saveConfiguration.shouldReformatFile());
     }
 
@@ -378,7 +352,7 @@ public class BibDatabaseWriter {
             bibWriter.write("{}");
         } else {
             try {
-                String formatted = new FieldWriter(fieldPreferences)
+                String formatted = new FieldWriter(preferences.getFieldPreferences())
                         .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
                 bibWriter.write(formatted);
             } catch (InvalidFieldValueException ex) {
@@ -405,7 +379,7 @@ public class BibDatabaseWriter {
     /// Generate keys for all entries that are lacking keys.
     protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<FieldChange> changes = new ArrayList<>();
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, keyPatternPreferences);
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCitationKey();
             if (StringUtil.isBlank(oldKey)) {
