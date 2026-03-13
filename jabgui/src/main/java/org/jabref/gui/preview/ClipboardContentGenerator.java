@@ -15,7 +15,6 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
@@ -71,7 +70,7 @@ public record ClipboardContentGenerator(
         }
     }
 
-    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link BstPreviewLayout})
+    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link org.jabref.logic.preview.BstPreviewLayout})
     /// and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
     @VisibleForTesting
     static ClipboardContent processPreview(List<String> citations) {
