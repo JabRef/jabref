@@ -9,9 +9,9 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     private static final long serialVersionUID = 1;
 
-    private transient String name;
+    private final String name;
     private final String abbreviation;
-    private transient String dotlessAbbreviation;
+    private final String dotlessAbbreviation;
 
     // Is the empty string if not available
     private String shortestUniqueAbbreviation;
