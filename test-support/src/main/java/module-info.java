@@ -7,13 +7,10 @@ open module org.jabref.testsupport {
     requires org.mockito;
     requires javafx.base;
     requires org.junit.platform.commons;
-    requires java.sql;
-    requires embedded.postgres;
 
     requires static com.fasterxml.jackson.annotation;
     requires java.sql;
     requires embedded.postgres;
 
     exports org.jabref.support;
-    
 }
