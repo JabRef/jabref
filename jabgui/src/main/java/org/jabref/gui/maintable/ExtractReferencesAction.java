@@ -14,7 +14,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
@@ -45,6 +44,7 @@ public class ExtractReferencesAction extends SimpleCommand {
     private final StateManager stateManager;
     private final CliPreferences preferences;
     private final BibEntry entry;
+    private final LinkedFile linkedFile;
 
     private final RuleBasedBibliographyPdfImporter ruleBasedBibliographyPdfImporter;
 
@@ -67,9 +67,10 @@ public class ExtractReferencesAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.entry = entry;
+        this.linkedFile = linkedFile;
         ruleBasedBibliographyPdfImporter = new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
 
-        if (linkedFile == null) {
+        if (this.linkedFile == null) {
             this.executable.bind(
                     ActionHelper.needsEntriesSelected(stateManager)
                                 .and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager))
@@ -154,9 +155,7 @@ public class ExtractReferencesAction extends SimpleCommand {
         }
 
         String cites = getCites(result.getDatabase().getEntries(), currentEntry);
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            currentEntry.setField(StandardField.CITES, cites);
-        });
+        currentEntry.setField(StandardField.CITES, cites);
     }
 
     /// Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
