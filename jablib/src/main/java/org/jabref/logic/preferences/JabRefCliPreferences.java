@@ -1169,7 +1169,6 @@ public class JabRefCliPreferences implements CliPreferences {
         return journalAbbreviationPreferences;
     }
 
-
     // region CustomEntryTypes
 
     @Override
