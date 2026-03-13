@@ -411,11 +411,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             Path databasePath = file.get();
             tabTitle.append(databasePath.getFileName().toString());
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
-            uniquePathPart.ifPresent(part -> tabTitle.append(" – ").append(part));
+            // Unicode codepoint deliberately chosen to avoid semantical confusion
+            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
             toolTipText.append(databasePath.toAbsolutePath());
 
             if (databaseLocation == DatabaseLocation.SHARED) {
-                tabTitle.append(" – ");
+                tabTitle.append(" \u2013 ");
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 toolTipText.append(' ');
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
