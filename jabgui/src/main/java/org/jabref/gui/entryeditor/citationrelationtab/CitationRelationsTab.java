@@ -589,7 +589,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void handleDragDetected(CheckListView<CitationRelationItem> listView, CitationRelationItem item, MouseEvent event) {
         shouldClearSelectionOnDrop = false;
         List<BibEntry> entriesToDrag = new ArrayList<>();
-        var checkedItems = listView.getCheckModel().getCheckedItems();
+        ObservableList<CitationRelationItem> checkedItems = listView.getCheckModel().getCheckedItems();
 
         if (checkedItems.contains(item)) {
             shouldClearSelectionOnDrop = true;
