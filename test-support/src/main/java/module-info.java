@@ -15,4 +15,5 @@ open module org.jabref.testsupport {
     requires embedded.postgres;
 
     exports org.jabref.support;
+    
 }
