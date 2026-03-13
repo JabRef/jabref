@@ -9,4 +9,4 @@ Exec=JabRef %U
 Keywords=bibtex;biblatex;latex;bibliography
 Categories=Office;
 StartupWMClass=org-jabref-JabRefMain
-MimeType=text/x-bibtex;
+MimeType=text/x-bibtex;x-scheme-handler/jabref;

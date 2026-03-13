@@ -1,8 +1,11 @@
 package org.jabref.gui.desktop.os;
 
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
@@ -10,12 +13,14 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
+import org.slf4j.LoggerFactory;
+
 /// This class contains macOS (OSX) specific implementations for file directories and file/application open handling methods.
 ///
 /// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration/
-@AllowedToUseAwt("Requires AWT to open a file")
+@AllowedToUseAwt("Requires AWT to open a file and to register the jabref:// protocol handler")
 public class OSX extends NativeDesktop {
 
     @Override
@@ -51,5 +56,23 @@ public class OSX extends NativeDesktop {
     @Override
     public Path getApplicationDirectory() {
         return Path.of("/Applications");
+    }
+
+    @Override
+    public void registerJabRefProtocolHandler(Consumer<URI> whenJabRefUriOpened) {
+        if (!Desktop.isDesktopSupported()) {
+            return;
+        }
+        Desktop desktop = Desktop.getDesktop();
+        if (!desktop.isSupported(Desktop.Action.APP_OPEN_URI)) {
+            return;
+        }
+        desktop.setOpenURIHandler(event -> {
+            URI uri = event.getURI();
+            if ("jabref".equals(uri.getScheme())) {
+                whenJabRefUriOpened.accept(uri);
+            }
+        });
+        LoggerFactory.getLogger(OSX.class).debug("Protocol handler for jabref:// registered");
     }
 }
