@@ -16,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.JournalAbbreviationTestUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ class JournalAbbreviationRepositoryTest {
     private final BibDatabase bibDatabase = new BibDatabase();
 
     @BeforeEach
-    void setUp() {
-        repository = JournalAbbreviationLoader.loadBuiltInRepository();
+    void setUp() throws Exception {
+        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
     }
 
     @Test
