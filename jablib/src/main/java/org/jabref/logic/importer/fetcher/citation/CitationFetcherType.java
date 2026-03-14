@@ -11,6 +11,7 @@ import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticSchola
 import org.jabref.logic.importer.util.GrobidPreferences;
 
 public enum CitationFetcherType {
+    ALL(AllCitationFetcher.FETCHER_NAME),
     CROSSREF(CrossRefCitationFetcher.FETCHER_NAME),
     OPEN_ALEX(OpenAlex.FETCHER_NAME),
     OPEN_CITATIONS(OpenCitationsFetcher.FETCHER_NAME),
@@ -31,16 +32,29 @@ public enum CitationFetcherType {
         return name;
     }
 
-    public static CitationFetcher getCitationFetcher(CitationFetcherType citationFetcherName,
-                                                     ImporterPreferences importerPreferences,
-                                                     ImportFormatPreferences importFormatPreferences,
-                                                     CitationKeyPatternPreferences citationKeyPatternPreferences,
-                                                     GrobidPreferences grobidPreferences,
-                                                     AiService aiService) {
+    public static CitationFetcher getCitationFetcher(
+            CitationFetcherType citationFetcherName,
+            ImporterPreferences importerPreferences,
+            ImportFormatPreferences importFormatPreferences,
+            CitationKeyPatternPreferences citationKeyPatternPreferences,
+            GrobidPreferences grobidPreferences,
+            AiService aiService) {
+
         return switch (citationFetcherName) {
+            case ALL ->
+                    new AllCitationFetcher(
+                            importerPreferences,
+                            importFormatPreferences,
+                            citationKeyPatternPreferences,
+                            grobidPreferences,
+                            aiService);
             case CROSSREF ->
-                    new CrossRefCitationFetcher(importerPreferences, importFormatPreferences,
-                            citationKeyPatternPreferences, grobidPreferences, aiService);
+                    new CrossRefCitationFetcher(
+                            importerPreferences,
+                            importFormatPreferences,
+                            citationKeyPatternPreferences,
+                            grobidPreferences,
+                            aiService);
             case OPEN_ALEX ->
                     new OpenAlex(importerPreferences);
             case OPEN_CITATIONS ->
