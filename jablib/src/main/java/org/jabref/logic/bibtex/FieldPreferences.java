@@ -28,8 +28,11 @@ public class FieldPreferences {
 
     private FieldPreferences() {
         this(
+                // Default resolve string setting
                 true,
+                // Default resolvable field
                 List.copyOf(FieldFactory.parseFieldList("author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon")),
+                // Default non wrappable field
                 List.copyOf(FieldFactory.parseFieldList("pdf;ps;url;doi;file;isbn;issn"))
         );
     }
