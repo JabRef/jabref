@@ -43,6 +43,9 @@ class GenerateBibFromAux implements Runnable {
     @Option(names = "--output")
     private Path outputFile;
 
+    @Option(names = {"--field-formatters"}, description = "Field Formatter")
+    private String fieldFormatters;
+
     @Override
     public void run() {
         Optional<ParserResult> pr = JabKit.importFile(
@@ -76,6 +79,8 @@ class GenerateBibFromAux implements Runnable {
             System.out.println(Localization.lang("No library generated."));
             return;
         }
+
+        Convert.applyFormatters(fieldFormatters, subDatabase.getEntries());
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()
