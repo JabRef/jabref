@@ -33,7 +33,7 @@ Needs: impl, utest
 
 When a linked file is moved via `Move file(s) to file directory`, the file should be moved to the next available file directory.
 
-Here available means the next configured file directory present in the database context. 
+Here available means the next configured file directory present in the database context.
 
 Needs: impl
 
