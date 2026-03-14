@@ -2,6 +2,8 @@ package org.jabref.logic.journals;
 
 import java.util.stream.Stream;
 
+import org.jabref.support.JournalAbbreviationTestUtil;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -16,8 +18,8 @@ public class LtwaRepositoryTest {
     private JournalAbbreviationRepository repository;
 
     @BeforeEach
-    void setUp() {
-        this.repository = JournalAbbreviationLoader.loadBuiltInRepository();
+    void setUp() throws Exception {
+        this.repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
     }
 
     @ParameterizedTest
