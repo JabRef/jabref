@@ -323,34 +323,147 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public void moveToDefaultDirectory() {
+    public void moveToNextPossibleDirectory() {
         if (linkedFile.isOnlineLink()) {
             // Cannot move remote links
             return;
         }
 
-        // Get target folder
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
-        if (fileDir.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist."));
+        List<Optional<Path>> possibleDirPaths = databaseContext.getAllFileDirectories(preferences.getFilePreferences()).asOrderedList();
+
+        if (possibleDirPaths.stream().allMatch(Optional::isEmpty)) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No directory found"),
+                    Localization.lang("Configure a file directory to move file(s).")
+            );
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-        if (file.isPresent()) {
-            // Found the linked file, so move it
-            try {
-                linkedFileHandler.moveToDefaultDirectory();
-            } catch (IOException exception) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Move file"),
-                        Localization.lang("Could not move file '%0'.", file.get().toString()),
-                        exception);
-            }
-        } else {
-            // File doesn't exist, so we can't move it.
-            dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        Optional<Path> currentFile = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+
+        if (currentFile.isEmpty()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("File not found"),
+                    Localization.lang("Could not find file '%0'.", linkedFile.getLink())
+            );
+            return;
         }
+
+        Optional<Path> destinationDir = getNextTargetPath(currentFile.get(), possibleDirPaths);
+        if (destinationDir.isEmpty()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No directory found"),
+                    Localization.lang("Configure another directory to move file(s).")
+            );
+            return;
+        }
+
+        try {
+            // [impl->req~gui.fieldeditors.file-transfer.next-available-directory~1]
+            linkedFileHandler.moveToExactDirectory(destinationDir.get());
+        } catch (IOException exception) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Move file"),
+                    Localization.lang("Could not move file '%0'.", currentFile.get().toString()),
+                    exception);
+        }
+    }
+
+    /// Finds the next valid directory to which a linked file can be moved.
+    ///
+    /// A **valid directory** is one that:
+    /// - is configured
+    /// - is **not** the directory where the file is currently present
+    ///
+    /// @param currentFile the file that is being moved
+    /// @return the {@link Path} to which the file can be moved
+    private Optional<Path> getNextTargetPath(Path currentFile, List<Optional<Path>> possibleDirPaths) {
+        Path currentFileDir = currentFile.getParent();
+        int currentDirIndex = findMostSpecificDirectoryIndex(currentFileDir, possibleDirPaths);
+
+        Path targetPatternPath = getTargetPatternPath();
+
+        // Move according to the preference order in a loop (User -> Library -> BIB) and skip directories that are not configured
+        int startIndex = (currentDirIndex + 1) % possibleDirPaths.size();
+        for (int i = 0; i < possibleDirPaths.size(); i++) {
+            int candidateIndex = (startIndex + i) % possibleDirPaths.size();
+            Optional<Path> candidate = possibleDirPaths.get(candidateIndex);
+            if (candidate.isPresent() && candidateIndex != currentDirIndex) {
+                Path destinationDir = candidate.get().resolve(targetPatternPath);
+                if (currentDirIndex >= 0) {
+                    Path currentPath = possibleDirPaths.get(currentDirIndex).get();
+                    Optional<Path> mirroredRelativeParent = getRelativeParentWithoutDirectoryPattern(currentPath, currentFile);
+                    if (mirroredRelativeParent.isPresent()) {
+                        return Optional.of(destinationDir.resolve(mirroredRelativeParent.get()).normalize());
+                    }
+                }
+                return Optional.of(destinationDir.normalize());
+            }
+        }
+        return Optional.empty();
+    }
+
+    /// Finds the index of the most specific directory in the list of possible directories that matches the current file directory.
+    ///
+    /// The most specific directory is the one that is the longest parent of the current file directory.
+    /// eg: if User directory: data/lib/user, Lib directory: data/lib and file is data/lib/user/file.pdf, file is present in the User directory and not Lib
+    private int findMostSpecificDirectoryIndex(Path currentFileDir, List<Optional<Path>> possibleDirPaths) {
+        if (currentFileDir == null) {
+            return -1;
+        }
+
+        int currentDirIndex = -1;
+        int longestMatchNameCount = -1;
+        for (int i = 0; i < possibleDirPaths.size(); i++) {
+            Optional<Path> dir = possibleDirPaths.get(i);
+            if (dir.isPresent() && (dir.get().equals(currentFileDir) || currentFileDir.startsWith(dir.get()))) {
+                // If a configured directory is nested inside another configured directory, the nested directory should be treated as the parent for the file
+                int nameCount = dir.get().getNameCount();
+                if (nameCount > longestMatchNameCount) {
+                    currentDirIndex = i;
+                    longestMatchNameCount = nameCount;
+                }
+            }
+        }
+        return currentDirIndex;
+    }
+
+    private Path getTargetPatternPath() {
+        String directoryPattern = preferences.getFilePreferences().getFileDirectoryPattern();
+        if (directoryPattern.isEmpty()) {
+            return Path.of("");
+        }
+
+        String targetDirectoryName = FileUtil.createDirNameFromPattern(
+                databaseContext.getDatabase(),
+                entry,
+                directoryPattern);
+
+        return Path.of(targetDirectoryName);
+    }
+
+    /// Strips out the file directory pattern if present and returns the true path relative to the parent directory
+    /// This is done to prevent repeated directory pattern creation when moving files across multiple directories
+    private Optional<Path> getRelativeParentWithoutDirectoryPattern(Path currentPath, Path currentFile) {
+        Path relativePath = currentPath.relativize(currentFile);
+        Path relativeParent = relativePath.getParent();
+
+        if (relativeParent == null) {
+            return Optional.empty();
+        }
+
+        Path targetPatternPath = getTargetPatternPath();
+        if (!targetPatternPath.toString().isEmpty() && relativeParent.startsWith(targetPatternPath)) {
+            Path patternRelativeParent = targetPatternPath.relativize(relativeParent);
+
+            if (patternRelativeParent.toString().isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(patternRelativeParent);
+        }
+
+        return Optional.of(relativeParent);
     }
 
     /// Gets the filename for the current linked file and compares it to the new suggested filename.
@@ -400,7 +513,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void moveToDefaultDirectoryAndRename() {
-        moveToDefaultDirectory();
+        moveToNextPossibleDirectory();
         renameToSuggestion();
     }
 
