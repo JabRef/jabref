@@ -51,6 +51,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -393,9 +394,22 @@ public class JabRefFrameViewModel {
         addParserResult(importResult.parserResult());
     }
 
-    private void addParserResult(ParserResult parserResult) {
+    @VisibleForTesting
+    void addParserResult(ParserResult parserResult) {
         LOGGER.trace("Adding the entries to the open tab.");
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        if (libraryTab == null) {
+            BibDatabaseContext databaseContext = new BibDatabaseContext();
+            databaseContext.setMode(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
+            tabContainer.addTab(databaseContext, true);
+            libraryTab = tabContainer.getCurrentLibraryTab();
+        }
+
+        if (libraryTab == null) {
+            // Should not happen as we just added a tab
+            LOGGER.error("Could not get a library tab to add the entries to.");
+            return;
+        }
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
         ImportCleanup cleanup = ImportCleanup.targeting(libraryTab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());

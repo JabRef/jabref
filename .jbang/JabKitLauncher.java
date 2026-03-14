@@ -17,6 +17,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CaseInsensitiveEnumConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java
