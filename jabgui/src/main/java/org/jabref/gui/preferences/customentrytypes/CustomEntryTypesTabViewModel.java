@@ -232,7 +232,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     private void resetStandardFieldMultilineToDefaults() {
         for (StandardField field : StandardField.values()) {
-            if (StandardField.DEFAULT_MULTILINE_FIELDS.contains(field)) {
+            if (StandardField.BUILT_IN_MULTILINE_FIELDS.contains(field)) {
                 field.getProperties().add(FieldProperty.MULTILINE_TEXT);
             } else {
                 field.getProperties().remove(FieldProperty.MULTILINE_TEXT);

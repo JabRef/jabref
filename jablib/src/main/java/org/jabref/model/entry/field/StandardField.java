@@ -149,7 +149,7 @@ public enum StandardField implements Field {
     // endregion
 
     public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
-    public static final Set<StandardField> DEFAULT_MULTILINE_FIELDS = Set.of(
+    public static final Set<StandardField> BUILT_IN_MULTILINE_FIELDS = Set.of(
             ABSTRACT,
             COMMENT,
             REVIEW
