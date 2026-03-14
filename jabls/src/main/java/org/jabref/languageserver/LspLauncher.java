@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
+import javax.sql.DataSource;
+
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
@@ -47,12 +49,12 @@ public class LspLauncher extends Thread {
         this.messageHandler = messageHandler;
     }
 
-    public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, int port) {
-        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences()), cliPreferences.getCustomEntryTypesRepository(), port);
+    public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, DataSource dataSource, int port) {
+        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences(), dataSource), cliPreferences.getCustomEntryTypesRepository(), port);
     }
 
-    public LspLauncher(JabRefCliPreferences instance, Integer port) {
-        this(_ -> LOGGER.warn("LSP cannot handle UICommands in standalone mode."), instance, port);
+    public LspLauncher(JabRefCliPreferences instance, DataSource dataSource, Integer port) {
+        this(_ -> LOGGER.warn("LSP cannot handle UICommands in standalone mode."), instance, dataSource, port);
         this.standalone = true;
     }
 
