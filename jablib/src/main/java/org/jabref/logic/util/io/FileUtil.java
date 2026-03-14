@@ -33,6 +33,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import mslinks.ShellLink;
+import mslinks.ShellLinkException;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -519,6 +521,43 @@ public class FileUtil {
     /// @return True if file extension is ".bib", false otherwise
     public static boolean isBibFile(Path file) {
         return getFileExtension(file).filter("bib"::equals).isPresent();
+    }
+
+    /// Test if the file is a shortcut file by checking the extension to be ".lnk" (case-insensitive)
+    ///
+    /// @param file The file to check
+    /// @return True if file extension is ".lnk", false otherwise
+    public static boolean isShortcutFile(Path file) {
+        return getFileExtension(file).filter("lnk"::equalsIgnoreCase).isPresent();
+    }
+
+    /// Resolves a Windows shortcut (.lnk) file to its target path.
+    /// Uses the mslinks library which is already a project dependency.
+    /// Only works on Windows systems. On other systems or if resolution fails, returns the original path.
+    ///
+    /// @param path The path to check (may be .lnk or any other file)
+    /// @return The resolved path if file is a .lnk on Windows and the target is a valid file, otherwise returns the original path
+    public static Path resolveIfShortcut(Path path) {
+        if (!OS.WINDOWS || !isShortcutFile(path)) {
+            return path;
+        }
+
+        try {
+            ShellLink link = new ShellLink(path.toFile());
+            String targetPath = link.resolveTarget();
+
+            if (targetPath != null && !targetPath.isEmpty()) {
+                Path resolvedPath = Path.of(targetPath);
+
+                if (Files.exists(resolvedPath) && !Files.isDirectory(resolvedPath)) {
+                    return resolvedPath;
+                }
+            }
+        } catch (IOException | ShellLinkException e) {
+            LOGGER.warn("Could not resolve shortcut file", e);
+        }
+
+        return path;
     }
 
     /// Test if the file is an image file by simply checking if its extension is an image extension

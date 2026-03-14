@@ -61,6 +61,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -538,7 +539,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         boolean success = false;
 
         if (event.getDragboard().hasFiles()) {
-            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            List<Path> files = event.getDragboard().getFiles().stream()
+                                    .map(File::toPath)
+                                    .map(FileUtil::resolveIfShortcut)
+                                    .collect(Collectors.toList());
 
             // Depending on the pressed modifier, move/copy/link files to drop target
             // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
@@ -569,7 +573,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         boolean success = false;
 
         if (event.getDragboard().hasFiles()) {
-            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
+            List<Path> files = event.getDragboard().getFiles().stream()
+                                    .map(File::toPath)
+                                    .map(FileUtil::resolveIfShortcut)
+                                    .toList();
             importHandler
                     .importFilesInBackground(files, event.getTransferMode())
                     .executeWith(taskExecutor);
