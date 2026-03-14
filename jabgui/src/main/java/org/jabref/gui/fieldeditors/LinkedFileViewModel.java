@@ -359,7 +359,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         try {
-            linkedFileHandler.moveToDirectory(destinationDir.get());
+            // [impl->req~gui.fieldeditors.file-transfer.next-available-directory~1]
+            linkedFileHandler.moveToExactDirectory(destinationDir.get());
         } catch (IOException exception) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Move file"),
@@ -377,18 +378,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
     /// @param currentFile the file that is being moved
     /// @return the {@link Path} to which the file can be moved
     private Optional<Path> getNextTargetPath(Path currentFile, List<Optional<Path>> possibleDirPaths) {
-        // Current dir index (file's current directory) is -1 if it's not in any Jabref directory, otherwise, it is 0 for User, 1 for Library, 2 for BIB
-        int currentDirIndex = -1;
         Path currentFileDir = currentFile.getParent();
-        if (currentFileDir != null) {
-            for (int i = 0; i < possibleDirPaths.size(); i++) {
-                Optional<Path> dir = possibleDirPaths.get(i);
-                if (dir.isPresent() && (dir.get().equals(currentFileDir) || currentFileDir.startsWith(dir.get()))) {
-                    currentDirIndex = i;
-                    break;
-                }
-            }
-        }
+        int currentDirIndex = findMostSpecificDirectoryIndex(currentFileDir, possibleDirPaths);
+
+        Path targetPatternPath = getTargetPatternPath();
 
         // Move according to the preference order in a loop (User -> Library -> BIB) and skip directories that are not configured
         int startIndex = (currentDirIndex + 1) % possibleDirPaths.size();
@@ -396,18 +389,81 @@ public class LinkedFileViewModel extends AbstractViewModel {
             int candidateIndex = (startIndex + i) % possibleDirPaths.size();
             Optional<Path> candidate = possibleDirPaths.get(candidateIndex);
             if (candidate.isPresent() && candidateIndex != currentDirIndex) {
+                Path destinationDir = candidate.get().resolve(targetPatternPath);
                 if (currentDirIndex >= 0) {
-                    // Relativize the path because the file was present in a configured directory in order to mirror directory structure
                     Path currentPath = possibleDirPaths.get(currentDirIndex).get();
-                    Path relativePath = currentPath.relativize(currentFile);
-                    if (relativePath.getParent() != null) {
-                        return Optional.of(candidate.get().resolve(relativePath.getParent()).normalize());
+                    Optional<Path> mirroredRelativeParent = getRelativeParentWithoutDirectoryPattern(currentPath, currentFile);
+                    if (mirroredRelativeParent.isPresent()) {
+                        return Optional.of(destinationDir.resolve(mirroredRelativeParent.get()).normalize());
                     }
                 }
-                return candidate;
+                return Optional.of(destinationDir.normalize());
             }
         }
         return Optional.empty();
+    }
+
+    /// Finds the index of the most specific directory in the list of possible directories that matches the current file directory.
+    ///
+    /// The most specific directory is the one that is the longest parent of the current file directory.
+    /// eg: if User directory: data/lib/user, Lib directory: data/lib and file is data/lib/user/file.pdf, file is present in the User directory and not Lib
+    private int findMostSpecificDirectoryIndex(Path currentFileDir, List<Optional<Path>> possibleDirPaths) {
+        if (currentFileDir == null) {
+            return -1;
+        }
+
+        int currentDirIndex = -1;
+        int longestMatchNameCount = -1;
+        for (int i = 0; i < possibleDirPaths.size(); i++) {
+            Optional<Path> dir = possibleDirPaths.get(i);
+            if (dir.isPresent() && (dir.get().equals(currentFileDir) || currentFileDir.startsWith(dir.get()))) {
+                // If a configured directory is nested inside another configured directory, the nested directory should be treated as the parent for the file
+                int nameCount = dir.get().getNameCount();
+                if (nameCount > longestMatchNameCount) {
+                    currentDirIndex = i;
+                    longestMatchNameCount = nameCount;
+                }
+            }
+        }
+        return currentDirIndex;
+    }
+
+    private Path getTargetPatternPath() {
+        String directoryPattern = preferences.getFilePreferences().getFileDirectoryPattern();
+        if (directoryPattern.isEmpty()) {
+            return Path.of("");
+        }
+
+        String targetDirectoryName = FileUtil.createDirNameFromPattern(
+                databaseContext.getDatabase(),
+                entry,
+                directoryPattern);
+
+        return Path.of(targetDirectoryName);
+    }
+
+    /// Strips out the file directory pattern if present and returns the true path relative to the parent directory
+    /// This is done to prevent repeated directory pattern creation when moving files across multiple directories
+    private Optional<Path> getRelativeParentWithoutDirectoryPattern(Path currentPath, Path currentFile) {
+        Path relativePath = currentPath.relativize(currentFile);
+        Path relativeParent = relativePath.getParent();
+
+        if (relativeParent == null) {
+            return Optional.empty();
+        }
+
+        Path targetPatternPath = getTargetPatternPath();
+        if (!targetPatternPath.toString().isEmpty() && relativeParent.startsWith(targetPatternPath)) {
+            Path patternRelativeParent = targetPatternPath.relativize(relativeParent);
+
+            if (patternRelativeParent.toString().isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(patternRelativeParent);
+        }
+
+        return Optional.of(relativeParent);
     }
 
     /// Gets the filename for the current linked file and compares it to the new suggested filename.

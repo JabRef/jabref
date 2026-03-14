@@ -12,11 +12,13 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.FileDirectories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,7 @@ class LinkedFileViewModelFileRotationTest {
 
     private BibDatabaseContext databaseContext;
     private GuiPreferences preferences;
+    private FilePreferences filePreferences;
     private DialogService dialogService;
     private TaskExecutor taskExecutor;
     private BibEntry entry;
@@ -55,7 +58,7 @@ class LinkedFileViewModelFileRotationTest {
     void setUp() throws IOException {
         databaseContext = mock(BibDatabaseContext.class);
         preferences = mock(GuiPreferences.class);
-        FilePreferences filePreferences = mock(FilePreferences.class);
+        filePreferences = mock(FilePreferences.class);
         dialogService = mock(DialogService.class);
         taskExecutor = mock(TaskExecutor.class);
 
@@ -63,7 +66,7 @@ class LinkedFileViewModelFileRotationTest {
         when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
 
-        entry = new BibEntry();
+        entry = new BibEntry(StandardEntryType.Article);
         when(databaseContext.getDatabase()).thenReturn(new BibDatabase());
 
         userDir = tempDir.resolve("user");
@@ -214,6 +217,55 @@ class LinkedFileViewModelFileRotationTest {
 
         assertTrue(Files.exists(userDir.resolve("test.pdf")));
         assertFalse(Files.exists(userDir.resolve("x/y/z/test.pdf")));
+    }
+
+    @Test
+    void moveToNextMirrorsSubdirectoriesWithoutDuplicatingPatternDirectory() throws IOException {
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
+
+        FileDirectories dirs = new FileDirectories(Optional.of(userDir), Optional.of(libDir), Optional.of(bibDir));
+        when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
+
+        String targetDirectoryName = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, "[entrytype]");
+        Path nestedDir = userDir.resolve(targetDirectoryName).resolve("x/y");
+        Files.createDirectories(nestedDir);
+        Path testFile = nestedDir.resolve("test.pdf");
+        Files.createFile(testFile);
+        LinkedFile linkedFile = new LinkedFile("desc", testFile, "pdf");
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+
+        viewModel.moveToNextPossibleDirectory();
+
+        Path movedFile = libDir.resolve(targetDirectoryName).resolve("x/y/test.pdf");
+        assertTrue(Files.exists(movedFile));
+        assertFalse(Files.exists(libDir.resolve(targetDirectoryName).resolve(targetDirectoryName).resolve("x/y/test.pdf")));
+        assertFalse(Files.exists(testFile));
+    }
+
+    @Test
+    void moveToNextUsesMostSpecificConfiguredDirectoryWhenDirectoriesOverlap() throws IOException {
+        Path nestedUserDir = libDir.resolve("nested-user");
+        Files.createDirectories(nestedUserDir);
+
+        FileDirectories dirs = new FileDirectories(Optional.of(nestedUserDir), Optional.of(libDir), Optional.of(bibDir));
+        when(databaseContext.getAllFileDirectories(any())).thenReturn(dirs);
+
+        Path nestedDir = nestedUserDir.resolve("papers");
+        Files.createDirectories(nestedDir);
+        Path testFile = nestedDir.resolve("test.pdf");
+        Files.createFile(testFile);
+        LinkedFile linkedFile = new LinkedFile("desc", testFile, "pdf");
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+
+        viewModel.moveToNextPossibleDirectory();
+
+        Path movedFile = libDir.resolve("papers/test.pdf");
+        assertTrue(Files.exists(movedFile));
+        assertFalse(Files.exists(bibDir.resolve("papers/test.pdf")));
+        assertFalse(Files.exists(libDir.resolve("nested-user/papers/test.pdf")));
+        assertFalse(Files.exists(testFile));
     }
 
     @Test

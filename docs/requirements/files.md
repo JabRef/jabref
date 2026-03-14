@@ -28,4 +28,13 @@ The function `Quality -> Automatically set file links` can help user to auto-lin
 
 Needs: impl, utest
 
+## Move file(s) to file directory should move to next available file directory
+`req~gui.fieldeditors.file-transfer.next-available-directory~1`
+
+When a linked file is moved via `Move file(s) to file directory`, the file should be moved to the next available file directory.
+
+Here available means the next configured file directory present in the database context. 
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
