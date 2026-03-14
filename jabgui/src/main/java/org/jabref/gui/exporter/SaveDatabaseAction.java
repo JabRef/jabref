@@ -32,6 +32,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -40,6 +41,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
@@ -232,8 +234,40 @@ public class SaveDatabaseAction {
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
                 libraryTab.resetChangedProperties();
+
+                dialogService.notify(Localization.lang("Library saved"));
+
+                // Attempt to perform Git auto-save if enabled in Library Properties
+                MetaData metaData = libraryTab.getBibDatabaseContext().getMetaData();
+
+                boolean shouldCommit = metaData.isGitAutoCommitEnabled();
+                boolean shouldPush = metaData.isGitAutoPushEnabled();
+
+                if (shouldCommit || shouldPush) {
+                    GitHandler.fromAnyPath(targetPath, preferences.getGitPreferences())
+                              .ifPresent(gitHandler -> {
+                                  try {
+                                      if (shouldCommit) {
+                                          // We include the path to make it easier for non-git users to see what's going on
+                                          String commitMsg = Localization.lang("Automatic update via JabRef: %0", targetPath.getFileName().toString());
+                                          gitHandler.createCommitOnCurrentBranch(commitMsg, false);
+                                      }
+
+                                      if (shouldPush) {
+                                          gitHandler.pullOnCurrentBranch();
+
+                                          try {
+                                              gitHandler.pushCommitsToRemoteRepository();
+                                          } catch (Exception pushEx) {
+                                              LOGGER.warn("Git push failed", pushEx);
+                                          }
+                                      }
+                                  } catch (Exception e) {
+                                      LOGGER.error("Git auto-commit failed", e);
+                                  }
+                              });
+                }
             }
-            dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
             LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
