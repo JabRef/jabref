@@ -197,6 +197,7 @@ public class LinkedFileHandler {
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
 
         Path newPath;
+
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
             newPath = oldPath.resolveSibling(targetFileName);
         } else {
@@ -214,8 +215,8 @@ public class LinkedFileHandler {
             LOGGER.info("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
             return false;
         }
-
         LOGGER.debug("Renaming file {} to {}", oldPath, newPath);
+
         if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
             Files.createDirectories(newPath.getParent());
             LOGGER.debug("Overwriting existing file {}", newPath);
@@ -241,10 +242,18 @@ public class LinkedFileHandler {
     /// @return the suggested filename, including extension
     public String getSuggestedFileName() {
         String filename = linkedFile.getFileName().orElse("file");
-        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
-                                              .orElse(FileUtil.getBaseName(filename));
 
-        return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(ext -> targetFileName + "." + ext).orElse(targetFileName));
+        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
+                                        .orElse(FileUtil.getBaseName(filename));
+
+        String rawFileName = FileUtil.getFileExtension(filename)
+                                     .map(ext -> targetFileName + "." + ext)
+                                     .orElse(targetFileName);
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
+
+        return currentDir.map(dir -> FileUtil.getValidFileNameForDirectory(dir, rawFileName))
+                         .orElseGet(() -> FileUtil.getValidFileName(rawFileName));
     }
 
     /// Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
@@ -254,11 +263,16 @@ public class LinkedFileHandler {
     /// @return the suggested filename, including extension
     public String getSuggestedFileName(@NonNull String extension) {
         assert !StringUtil.isBlank(extension);
+
         String filename = linkedFile.getFileName().orElse("file");
         final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
                                               .orElse(FileUtil.getBaseName(filename));
 
-        return FileUtil.getValidFileName(targetFileName + "." + extension);
+        String rawFileName = targetFileName + "." + extension;
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
+        return currentDir.map(dir -> FileUtil.getValidFileNameForDirectory(dir, rawFileName))
+                         .orElseGet(() -> FileUtil.getValidFileName(rawFileName));
     }
 
     /// Check to see if a file already exists in the target directory.  Search is not case sensitive.

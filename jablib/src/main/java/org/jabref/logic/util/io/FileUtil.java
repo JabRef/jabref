@@ -660,6 +660,38 @@ public class FileUtil {
         return Path.of(filePath);
     }
 
+    public static String getValidFileNameForDirectory(Path directory, String targetFileName) {
+        // cleaning file
+        String cleaned = getValidFileName(targetFileName);
+
+        // returning the cleaned filename if not Windows
+        if (!OS.WINDOWS) {
+            return cleaned;
+        }
+
+        // full path length: dir + separator + filename
+        String separator = directory.getFileSystem().getSeparator();
+        int maxFileNameLengthForPath = 260 - directory.toString().length() - separator.length();
+
+        // returning if dir already too long or already fits
+        if (maxFileNameLengthForPath <= 0 || cleaned.length() <= maxFileNameLengthForPath) {
+            return cleaned;
+        }
+
+        Optional<String> extension = getFileExtension(cleaned);
+        String base = getBaseName(cleaned);
+        int extLen = extension.map(ext -> ext.length() + 1).orElse(0); // +1 for dot
+        int maxBaseLen = maxFileNameLengthForPath - extLen;
+
+        if (maxBaseLen <= 0) {
+            // If even ".pdf" doesn’t fit, just hard-truncate whole filename
+            return cleaned.substring(0, maxFileNameLengthForPath);
+        }
+
+        String truncatedBase = base.substring(0, Math.min(base.length(), maxBaseLen));
+        return extension.map(ext -> truncatedBase + "." + ext).orElse(truncatedBase);
+    }
+
     /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
     ///
     /// @param path        the input file path
