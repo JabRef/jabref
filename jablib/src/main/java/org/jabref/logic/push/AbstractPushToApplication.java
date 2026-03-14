@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -26,6 +27,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
 
     protected String commandPath;
+    protected Path workingDirectory;
 
     protected final NotificationService notificationService;
     protected final PushToApplicationPreferences preferences;
@@ -33,6 +35,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     public AbstractPushToApplication(NotificationService notificationService, PushToApplicationPreferences preferences) {
         this.notificationService = notificationService;
         this.preferences = preferences;
+        this.workingDirectory = Directories.getUserDirectory();
+    }
+
+    public void setWorkingDirectory(Path directory) {
+        this.workingDirectory = directory;
     }
 
     protected String getKeyString(List<BibEntry> entries, @NonNull String delimiter) {

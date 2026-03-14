@@ -742,7 +742,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");
         defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-        defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("Code", "Microsoft VS Code"));
+        defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("code", "Microsoft VS Code"));
         defaults.put(PUSH_CITE_COMMAND, "\\cite{key1,key2}");
 
         if (OS.OS_X) {
