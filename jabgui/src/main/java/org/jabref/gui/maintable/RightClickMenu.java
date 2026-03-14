@@ -31,6 +31,7 @@ import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
+import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -68,6 +69,7 @@ public class RightClickMenu {
         // Two menu items required, because of menu item display. Action checks preference internal what to do
         MenuItem extractFileReferencesOnline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_ONLINE, extractReferencesAction);
         MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, extractReferencesAction);
+        RelatedWorkAction relatedWorkAction = new RelatedWorkAction(dialogService, stateManager);
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
@@ -97,6 +99,7 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor)),
                 extractFileReferencesOnline,
                 extractFileReferencesOffline,
+                factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, relatedWorkAction),
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
 
