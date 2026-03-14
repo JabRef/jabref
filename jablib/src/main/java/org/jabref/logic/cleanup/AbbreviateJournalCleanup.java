@@ -84,16 +84,16 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         return changes;
     }
 
-    private String getAbbreviatedName(Abbreviation text) {
+    private Optional<String> getAbbreviatedName(String text) {
         return switch (abbreviationType) {
             case DEFAULT ->
-                    text.getAbbreviation();
+                    journalAbbreviationRepository.getDefaultAbbreviation(text);
             case DOTLESS ->
-                    text.getDotlessAbbreviation();
+                    journalAbbreviationRepository.getDotless(text);
             case SHORTEST_UNIQUE ->
-                    text.getShortestUniqueAbbreviation();
+                    journalAbbreviationRepository.getShortestUniqueAbbreviation(text);
             case LTWA ->
-                    throw new IllegalStateException("Unexpected value: %s".formatted(abbreviationType));
+                    journalAbbreviationRepository.getLtwaAbbreviation(text);
         };
     }
 }
