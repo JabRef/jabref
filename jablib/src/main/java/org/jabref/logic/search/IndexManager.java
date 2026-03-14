@@ -57,7 +57,10 @@ public class IndexManager {
     private final LinkedFilesSearcher linkedFilesSearcher;
     private final DelayTaskThrottler indexUpdateThrottler;
     private final ConcurrentHashMap<BibEntry, Set<Field>> pendingFieldsByEntry = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<BibEntry, String[]> pendingFileValuesByEntry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BibEntry, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
+
+    private record FileDelta(String oldValue, String newValue) {
+    }
 
     public IndexManager(BibDatabaseContext databaseContext,
                         TaskExecutor executor,
@@ -82,7 +85,7 @@ public class IndexManager {
 
         this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection(), bibFieldsIndexer.getTable());
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
-        this.indexUpdateThrottler = new DelayTaskThrottler(200);
+        this.indexUpdateThrottler = taskExecutor.createThrottler(200);
         updateOnStart();
     }
 
@@ -175,23 +178,17 @@ public class IndexManager {
         if (field.equals(StandardField.FILE)) {
             pendingFileValuesByEntry.compute(entry, (_, existing) -> {
                 if (existing == null) {
-                    /// First event in this window — capture the true baseline
-                    return new String[] {event.getOldValue(), event.getNewValue()};
+                    return new FileDelta(event.getOldValue(), event.getNewValue());
                 } else {
-                    /// Keep baseline old, update to latest new
-                    existing[1] = event.getNewValue();
-                    return existing;
+                    return new FileDelta(existing.oldValue(), event.getNewValue());
                 }
             });
         }
 
         indexUpdateThrottler.schedule(() -> {
             /// Snapshot and clear pending state atomically
-            List<BibEntry> updatedEntries = new ArrayList<>();
-
             pendingFieldsByEntry.forEach((pendingEntry, fields) -> {
                 if (pendingFieldsByEntry.remove(pendingEntry, fields)) {
-                    updatedEntries.add(pendingEntry);
                     Set<Field> fieldsSnapshot = Set.copyOf(fields);
 
                     new BackgroundTask<>() {
@@ -207,12 +204,12 @@ public class IndexManager {
                      .executeWith(taskExecutor);
 
                     if (shouldIndexLinkedFiles.get() && fieldsSnapshot.contains(StandardField.FILE)) {
-                        String[] fileValues = pendingFileValuesByEntry.remove(pendingEntry);
+                        FileDelta fileValues = pendingFileValuesByEntry.remove(pendingEntry);
                         if (fileValues != null) {
                             new BackgroundTask<>() {
                                 @Override
                                 public Object call() {
-                                    linkedFilesIndexer.updateEntry(pendingEntry, fileValues[0], fileValues[1], this);
+                                    linkedFilesIndexer.updateEntry(pendingEntry, fileValues.oldValue(), fileValues.newValue(), this);
                                     return null;
                                 }
                             }.executeWith(taskExecutor);
@@ -236,7 +233,6 @@ public class IndexManager {
     }
 
     public void close() {
-        indexUpdateThrottler.shutdown();
         bibFieldsIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
@@ -244,7 +240,6 @@ public class IndexManager {
     }
 
     public void closeAndWait() {
-        indexUpdateThrottler.shutdown();
         bibFieldsIndexer.closeAndWait();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.closeAndWait();
