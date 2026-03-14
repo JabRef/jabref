@@ -1477,6 +1477,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -fx-focused-text-base-color;
 }
 
+.tags-field > .flow-pane > .tag-view:drag-over {
+    -fx-background-color: -jr-drag-target-hover;
+}
+
 .tags-field-editor {
     -fx-border-width: 0;
     -fx-text-fill: -fx-focused-text-base-color;
