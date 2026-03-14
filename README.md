@@ -1,100 +1,100 @@
-# JabRef Bibliography Management [![APIdia](https://apidia.net/java/JabRef/main/badge.svg)](https://apidia.net/java/JabRef/main)
+# JabRef
 
-JabRef is an open-source, cross-platform citation and reference management tool.
+JabRef is an open-source, cross-platform reference management tool built for researchers. It helps you collect, organize, and cite academic sources throughout your research workflow.
 
-Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
-
-![main table](docs/images/jabref-mainscreen.png)
+---
 
 ## Features
 
-JabRef is available free of charge and is actively developed.
-It supports you in every step of your research work.
-
 ### Collect
 
-- Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
-- Import options for over 15 reference formats
-- Easily retrieve and link full-text articles
-- Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
-- Extract metadata from PDFs
-- Import new references directly from the browser with one click using the [official browser extension](https://github.com/JabRef/JabRef-Browser-Extension) for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/jabref/?src=external-github),  [Chrome](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh), [Edge](https://microsoftedge.microsoft.com/addons/detail/pgkajmkfgbehiomipedjhoddkejohfna), and [Vivaldi](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh)
+- Search scientific databases including CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
+- Import references from over 15 file formats
+- Retrieve full-text articles and link them to your entries
+- Fetch bibliographic data using ISBN, DOI, PubMed-ID, or arXiv-ID
+- Extract metadata directly from PDF files
+- Save references from your browser using the official extension for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/jabref/?src=external-github), [Chrome](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh), [Edge](https://microsoftedge.microsoft.com/addons/detail/pgkajmkfgbehiomipedjhoddkejohfna), and [Vivaldi](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh)
 
 ### Organize
 
-- Group your research into hierarchical collections and organize research items based on keywords/tags, search terms, or your manual assignments
-- Advanced search and filter features
-- Complete and fix bibliographic data by comparing with curated online catalogs such as Google Scholar, Springer, or MathSciNet
-- Customizable citation key generator
-- Customize and add new metadata fields or reference types
-- Find and merge duplicates
-- Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
-- Automatically rename and move associated documents according to customizable rules
-- Keep track of what you read: ranking, priority, printed, quality-assured
+- Group references into hierarchical collections using keywords, tags, search terms, or manual assignment
+- Advanced search and filtering
+- Verify and fix bibliographic data against Google Scholar, Springer, and MathSciNet
+- Configurable citation key generation
+- Add custom metadata fields and reference types
+- Detect and merge duplicate entries
+- Attach documents to references — 20 supported file types out of the box, with full customization
+- Automatically rename and move attached files using configurable rules
+- Track reading status with ratings, priority flags, and quality markers
 
 ### Cite
 
-- Native BibTeX and BibLaTeX support
-- Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
-- Format references using one of thousands of built-in citation styles or create your own style
-- Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
+- Full support for BibTeX and BibLaTeX
+- Cite-as-you-write support for Emacs, Kile, LyX, Texmaker, TeXstudio, Vim, and WinEdt
+- Format citations using thousands of built-in styles or define your own
+- Insert and format citations in Word and LibreOffice/OpenOffice
 
 ### Share
 
-- Many built-in export options or create your export format
-- Library is saved as a simple text file, and thus it is easy to share with others via Dropbox and is version-control friendly
-- Work in a team: sync the contents of your library via a SQL database
+- Multiple built-in export formats, with the option to define custom formats
+- Library files are plain text — easy to share via Dropbox or manage with version control
+- Team collaboration via SQL database sync
+
+---
 
 ## Installation
 
-Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/main/).
-The [latest stable release is available at FossHub](https://downloads.jabref.org/).
+The latest stable release is available at [downloads.jabref.org](https://downloads.jabref.org/).
 
-Please see our [Installation Guide](https://docs.jabref.org/installation).
+Development builds are available at [builds.jabref.org](https://builds.jabref.org/main/).
 
-## JabKit
+See the [Installation Guide](https://docs.jabref.org/installation) for full setup instructions.
 
-JabRef offers a CLI application.
+---
 
-You can run it using JBang.
-We provide details at [`.jbang/README.md`](.jbang/README.md).
+## Command Line Interface (JabKit)
 
-You can also run JabKit using docker:
+JabRef includes a CLI tool called JabKit. You can run it using JBang — see [`.jbang/README.md`](.jbang/README.md) for details.
+
+You can also run JabKit via Docker:
 
 ```terminal
 docker run ghcr.io/jabref/jabkit:edge --help
 ```
 
-## Bug Reports, Suggestions, Other Feedback
+---
 
-[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
-[![PayPal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
+## Documentation and Support
 
-We are thankful for any bug reports or other feedback.
-If you have ideas for new features you want to be included in JabRef, tell us in [the feature section](http://discourse.jabref.org/c/features) of our forum!
-If you need support in using JabRef, please read the [user documentation](https://docs.jabref.org/), especially the [frequently asked questions (FAQ)](https://docs.jabref.org/faq) and also take a look at our [community forum](https://discourse.jabref.org/c/help/7).
-You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
+- [User documentation](https://docs.jabref.org/)
+- [Frequently asked questions](https://docs.jabref.org/faq)
+- [Community forum](https://discourse.jabref.org/c/help/7)
+- [Feature requests](http://discourse.jabref.org/c/features)
+- [Bug tracker](https://github.com/JabRef/jabref/issues)
 
-An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
+---
 
 ## Contributing
 
-Want to be part of a free and open-source project that tens of thousands of researchers use every day?
-Please take a look at our [guidelines for contributing](CONTRIBUTING.md).
+JabRef is used by tens of thousands of researchers and is actively maintained. Contributions are welcome.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved.
+
+---
 
 ## Building from Source
 
-Please see [Building from source](https://docs.jabref.org/installation#building-from-source) for instructions on how to build JabRef from sources.
+See [Building from Source](https://docs.jabref.org/installation#building-from-source) in the documentation.
+
+---
 
 ## Research and Education
 
-JabRef welcomes research applied to it.
-The current list of papers where JabRef helped to enhance science is maintained at <https://github.com/JabRef/jabref/wiki/JabRef-in-the-Media>.
+A list of papers that have used or studied JabRef is maintained at the [JabRef wiki](https://github.com/JabRef/jabref/wiki/JabRef-in-the-Media).
 
-The JabRef team also fosters to use JabRef in Software Engineering training.
-We offer guidelines for this at <https://devdocs.jabref.org/teaching.html>.
+Guidelines for using JabRef in software engineering courses are available at [devdocs.jabref.org/teaching.html](https://devdocs.jabref.org/teaching.html).
 
-When citing JabRef, please use the following citation:
+To cite JabRef in a publication, use the following:
 
 ```bibtex
 @Article{jabref,
@@ -111,11 +111,16 @@ When citing JabRef, please use the following citation:
 }
 ```
 
-DOI (also includes [full text](https://tug.org/TUGboat/tb44-3/tb138kopp-jabref.pdf)): [10.47397/tb/44-3/tb138kopp-jabref](https://doi.org/10.47397/tb/44-3/tb138kopp-jabref).
+DOI: [10.47397/tb/44-3/tb138kopp-jabref](https://doi.org/10.47397/tb/44-3/tb138kopp-jabref) — includes a [link to the full text](https://tug.org/TUGboat/tb44-3/tb138kopp-jabref.pdf).
 
-## Sponsoring
+---
 
-JabRef development is powered by YourKit Java Profiler  
-[![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
+## Donations
 
-<!-- markdownlint-disable-file MD060 -->
+JabRef is free to use. If you find it useful, you can support development via the [donations page](https://donations.jabref.org) or [PayPal](https://paypal.me/JabRef).
+
+---
+
+## Sponsorship
+
+JabRef development is supported by [YourKit Java Profiler](https://www.yourkit.com/java/profiler/).
