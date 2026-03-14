@@ -397,6 +397,11 @@ public class BibDatabaseWriter {
 
     protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
         bibWriter.write(COMMENT_PREFIX + "{");
+        bibWriter.write(MetaDataSerializer.serializeCustomEntryTypesV2(customType));
+        bibWriter.writeLine("}");
+        bibWriter.finishBlock();
+
+        bibWriter.write(COMMENT_PREFIX + "{");
         bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
         bibWriter.writeLine("}");
         bibWriter.finishBlock();

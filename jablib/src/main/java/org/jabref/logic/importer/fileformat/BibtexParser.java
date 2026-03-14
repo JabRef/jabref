@@ -383,7 +383,7 @@ public class BibtexParser implements Parser {
                 // meta comments are always re-written by JabRef and not stored in the file
                 dumpTextReadSoFarToString();
             }
-        } else if (comment.startsWith(MetaData.ENTRYTYPE_FLAG)) {
+        } else if (comment.startsWith(MetaData.ENTRYTYPE_FLAG_V2) || comment.startsWith(MetaData.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
             Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);

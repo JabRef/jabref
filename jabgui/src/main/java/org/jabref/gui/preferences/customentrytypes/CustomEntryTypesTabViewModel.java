@@ -32,7 +32,6 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
@@ -152,28 +151,61 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         entryTypesToDelete.add(focusedItem.entryType().getValue());
     }
 
-    public Optional<FieldViewModel> addNewField() {
+    public Optional<FieldViewModel> addNewField(List<FieldProperty> selectedProperties) {
         String fieldName = newFieldToAdd.get().trim();
-        Field newField = new UnknownField(fieldName);
+        EntryType entryType = selectedEntryType.getValue().entryType().getValue().getType();
+        Field newField = FieldFactory.parseField(entryType, fieldName);
 
         boolean fieldExists = displayNameExists(FieldTextMapper.getDisplayName(newField));
 
         if (fieldExists) {
-            dialogService.showWarningDialogAndWait(
-                    Localization.lang("Duplicate fields"),
-                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", FieldTextMapper.getDisplayName(newField)));
+            FieldViewModel existingFieldViewModel = findExistingField(newField);
+            if (newField.isStandardField()) {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Duplicate fields"),
+                        Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", FieldTextMapper.getDisplayName(newField)));
 
-            return Optional.empty();
+                return Optional.of(existingFieldViewModel);
+            }
+
+            // customized field
+            ObservableList<FieldProperty> fieldProperties = existingFieldViewModel.getProperties();
+            if ((!fieldProperties.isEmpty() && fieldProperties.equals(selectedProperties))
+                    || (fieldProperties.isEmpty() && fieldProperties.equals(selectedProperties))) {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Duplicate properties"),
+                        Localization.lang("Warning: Current properties are the same as before."));
+                return Optional.of(existingFieldViewModel);
+            }
+
+            existingFieldViewModel.getProperties().clear();
+            existingFieldViewModel.getProperties().addAll(selectedProperties);
+
+            // TODO： update action is not visually obvious, can use notify function in JabRefDialogService.java
+            return Optional.of(existingFieldViewModel);
         }
 
         FieldViewModel fieldViewModel = new FieldViewModel(newField,
                 FieldViewModel.Mandatory.REQUIRED,
                 FieldPriority.IMPORTANT,
                 false);
+        fieldViewModel.getProperties().addAll(selectedProperties);
+
         this.selectedEntryType.getValue().addField(fieldViewModel);
         newFieldToAdd.set("");
 
         return Optional.of(fieldViewModel);
+    }
+
+    public FieldViewModel findExistingField(Field field) {
+        String displayName = FieldTextMapper.getDisplayName(field);
+        return selectedEntryType.getValue()
+                                .fields()
+                                .stream()
+                                .filter(fieldViewModel ->
+                                        fieldViewModel.displayNameProperty().getValue()
+                                                      .equalsIgnoreCase(displayName))
+                                .findFirst().get();
     }
 
     public boolean displayNameExists(String displayName) {
