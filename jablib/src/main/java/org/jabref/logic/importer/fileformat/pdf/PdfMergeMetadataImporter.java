@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.RelativePathsCleanup;
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 public class PdfMergeMetadataImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
+    private static final Pattern FILENAME_TITLE_PATTERN = Pattern.compile("(?i)(.*\\.(docx|doc|pdf|tex|odt|rtf|ps|eps|html|htm|pptx|ppt|xlsx)$|microsoft (word|powerpoint|excel).*|.*\\\\.*)");
 
     private final List<PdfImporter> metadataImporters;
 
@@ -82,7 +83,8 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);
 
-        Stream<BibEntry> allCandidates = Stream.concat(fetchedCandidates.stream(), extractedCandidates.stream());
+        List<BibEntry> allCandidates = new ArrayList<>(fetchedCandidates);
+        allCandidates.addAll(extractedCandidates);
         BibEntry entry = mergeCandidates(allCandidates);
 
         // We use the absolute path here as we do not know the context where this import will be used.
@@ -148,9 +150,26 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                  });
     }
 
-    private static BibEntry mergeCandidates(Stream<BibEntry> candidates) {
+    private static boolean isTitleLikelyFilename(String title) {
+        if ((title == null) || title.isBlank()) {
+            return false;
+        }
+
+        return FILENAME_TITLE_PATTERN.matcher(title.trim()).matches();
+    }
+
+    private static BibEntry mergeCandidates(List<BibEntry> candidates) {
         final BibEntry entry = new BibEntry();
         candidates.forEach(entry::mergeWith);
+
+        entry.getField(StandardField.TITLE)
+             .filter(PdfMergeMetadataImporter::isTitleLikelyFilename)
+             .ifPresent(title -> candidates.stream()
+                                           .map(candidate -> candidate.getField(StandardField.TITLE))
+                                           .flatMap(Optional::stream)
+                                           .filter(candidateTitle -> !isTitleLikelyFilename(candidateTitle))
+                                           .findFirst()
+                                           .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle)));
 
         // Retain online links only
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();
