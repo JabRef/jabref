@@ -11,7 +11,7 @@ public record RelatedWorkMatchResult(
         String contextText,
         String citationKey,
         /// parsed bib entry in Reference section
-        BibEntry parsedReference,
+        Optional<BibEntry> parsedReference,
         /// matched bib entry in the library
         Optional<BibEntry> matchedLibraryBibEntry
 ) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.database.DuplicateCheck;
@@ -17,6 +18,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
 public class RelatedWorkService {
+    private static final Pattern COMMENT_LINE_SEPARATOR_PATTERN = Pattern.compile("\\R\\R+");
 
     private final RelatedWorkTextParser relatedWorkTextParser;
     private final RelatedWorkReferenceResolver relatedWorkReferenceResolver;
@@ -91,8 +93,8 @@ public class RelatedWorkService {
         List<RelatedWorkMatchResult> matchResults = new ArrayList<>(relatedWorkSnippets.size());
 
         for (RelatedWorkSnippet relatedWorkSnippet : relatedWorkSnippets) {
-            BibEntry parsedReference = referencesByMarker.get(relatedWorkSnippet.citationMarker());
-            Optional<BibEntry> matchedLibraryEntry = findDuplicateBibEntry(sourceEntry, parsedReference, databaseContext);
+            Optional<BibEntry> parsedReference = Optional.ofNullable(referencesByMarker.get(relatedWorkSnippet.citationMarker()));
+            Optional<BibEntry> matchedLibraryEntry = parsedReference.flatMap(reference -> findDuplicateBibEntry(sourceEntry, reference, databaseContext));
             matchResults.add(new RelatedWorkMatchResult(
                     relatedWorkSnippet.contextText(),
                     relatedWorkSnippet.citationMarker(),
@@ -122,10 +124,17 @@ public class RelatedWorkService {
                                                            BibEntry matchedLibraryEntry,
                                                            UserSpecificCommentField userSpecificCommentField) {
         String formattedComment = "[%s]: %s".formatted(sourceCitationKey, contextText);
-        String updatedComment = matchedLibraryEntry.getField(userSpecificCommentField)
-                                                   .filter(existingComment -> !existingComment.isBlank())
-                                                   .map(existingComment -> existingComment.stripTrailing() + OS.NEWLINE + OS.NEWLINE + formattedComment)
-                                                   .orElse(formattedComment);
+        Optional<String> existingComment = matchedLibraryEntry.getField(userSpecificCommentField);
+        if (existingComment.stream()
+                           .flatMap(comment -> COMMENT_LINE_SEPARATOR_PATTERN.splitAsStream(comment.strip()))
+                           .anyMatch(formattedComment::equals)) {
+            return Optional.empty();
+        }
+
+        String updatedComment = existingComment
+                .filter(comment -> !comment.isBlank())
+                .map(comment -> comment.stripTrailing() + OS.NEWLINE + OS.NEWLINE + formattedComment)
+                .orElse(formattedComment);
 
         return matchedLibraryEntry.setField(userSpecificCommentField, updatedComment);
     }

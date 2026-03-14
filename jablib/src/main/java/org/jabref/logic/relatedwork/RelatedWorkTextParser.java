@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 public class RelatedWorkTextParser {
     /// Support [1] / [1-3] / [1, 2, 3]  / [1-3, 7, 9]
     private static final Pattern CITE_PATTERN = Pattern.compile("\\[(\\d{1,3}(?:\\s*(?:,|-|–)\\s*\\d{1,3})*)\\]");
-    private static final Pattern SEGMENT_SPLIT_PATTERN = Pattern.compile("(?<=[.!?])\\s+");
+    private static final Pattern SEGMENT_SPLIT_PATTERN = Pattern.compile("(?<=[.!?])\\s+|(?<=[.!?])(?=\\p{Lu})");
     private static final Pattern HYPHENATED_LINE_BREAK_PATTERN = Pattern.compile("-\\R");
     private static final Pattern NEWLINE_WITHOUT_SENTENCE_END_PATTERN = Pattern.compile("(?<![.:])\\R");
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
@@ -57,8 +57,8 @@ public class RelatedWorkTextParser {
         for (String part : content.split(",")) {
             part = part.trim();
 
-            if (part.contains("-")) {
-                String[] bounds = part.split("-");
+            if (part.matches("\\d+\\s*[-–]\\s*\\d+")) {
+                String[] bounds = part.split("\\s*[-–]\\s*", 2);
                 int start = Integer.parseInt(bounds[0]);
                 int end = Integer.parseInt(bounds[1]);
 

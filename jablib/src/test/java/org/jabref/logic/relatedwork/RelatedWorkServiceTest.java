@@ -46,7 +46,7 @@ class RelatedWorkServiceTest {
         assertEquals("They are facing several challenges in this transformation described along the BAPO framework.", matchedResult.contextText());
         assertEquals("[80]", matchedResult.citationKey());
         assertEquals("[80] Frank van der Linden, Klaus Schmid, and Eelco Rommes. 2007. Software product lines in action - the best industrial practice in product line engineering. Springer.",
-                matchedResult.parsedReference().getField(StandardField.COMMENT).orElseThrow());
+                matchedResult.parsedReference().orElseThrow().getField(StandardField.COMMENT).orElseThrow());
         assertFalse(matchedResult.hasMatchedLibraryEntry());
     }
 
@@ -101,7 +101,7 @@ class RelatedWorkServiceTest {
         RelatedWorkMatchResult matchResult = new RelatedWorkMatchResult(
                 "Colombia is a middle-income country with a population of approximately 50 million.",
                 "[1]",
-                new BibEntry(StandardEntryType.Misc),
+                Optional.of(new BibEntry(StandardEntryType.Misc)),
                 Optional.of(matchedLibraryEntry)
         );
 
@@ -126,7 +126,7 @@ class RelatedWorkServiceTest {
         RelatedWorkMatchResult matchResult = new RelatedWorkMatchResult(
                 "Colombia is a middle-income country with a population of approximately 50 million.",
                 "[1]",
-                new BibEntry(StandardEntryType.Misc),
+                Optional.of(new BibEntry(StandardEntryType.Misc)),
                 Optional.of(matchedLibraryEntry)
         );
 
@@ -144,7 +144,7 @@ class RelatedWorkServiceTest {
         RelatedWorkMatchResult matchResult = new RelatedWorkMatchResult(
                 "Colombia is a middle-income country with a population of approximately 50 million.",
                 "[1]",
-                new BibEntry(StandardEntryType.Misc).withCitationKey("Agency2021"),
+                Optional.of(new BibEntry(StandardEntryType.Misc).withCitationKey("Agency2021")),
                 Optional.empty()
         );
 
