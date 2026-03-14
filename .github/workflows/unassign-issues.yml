@@ -19,7 +19,7 @@ jobs:
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          reminder_comment: |
+          reminder_text: |
             ### ⏰ Assignment Reminder
 
             Hi @{{ handle }}, this is a friendly reminder about your assignment to this issue.
@@ -42,7 +42,7 @@ jobs:
 
             We appreciate your contribution and are here to help if needed!
           days_until_unassign: 14
-          unassigned_comment: |
+          unassigned_text: |
             ### 📋 Assignment Update
 
             Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.

@@ -1,0 +1,110 @@
+name: PR gate (maintainer/CI/label)
+description: Checks whether actor is maintainer and whether CI is running or "status: changes-required" label is set.
+
+inputs:
+  github-token:
+    description: Token for gh (usually secrets.GITHUB_TOKEN)
+    required: true
+  ci-running-message:
+    required: true
+    description: Message if CI is running
+  changes-required-message:
+    required: true
+    description: Message if label "status: changes-required" exists
+
+outputs:
+  skip-check:
+    description: "true if actor is admin/maintain/write"
+    value: ${{ steps.perm.outputs.skip-check }}
+  ci_running:
+    description: "true if relevant checks are QUEUED/IN_PROGRESS"
+    value: ${{ steps.eval.outputs.ci_running }}
+  changes_required:
+    description: "true if label 'status: changes-required' exists"
+    value: ${{ steps.eval.outputs.changes_required }}
+  pr_number:
+    value: ${{ steps.eval.outputs.pr_number }}
+  pr_url:
+    value: ${{ steps.eval.outputs.pr_url }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Maintainer permission + PR link
+      id: perm
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_URL: ${{ github.event.pull_request.html_url }}
+      run: |
+        echo "PR Number: $PR_NUMBER"
+        echo "PR URL: $PR_URL"
+        echo "PR [#$PR_NUMBER]($PR_URL)" >> "$GITHUB_STEP_SUMMARY"
+
+        user="${{ github.actor }}"
+        perm=$(gh api "repos/${{ github.repository }}/collaborators/$user/permission" --jq '.permission')
+
+        echo "User: $user"
+        echo "Permission: $perm"
+
+        if [[ "$perm" == "admin" || "$perm" == "maintain" || "$perm" == "write" ]]; then
+          echo "skip-check=true" >> "$GITHUB_OUTPUT"
+          echo "Maintainer detected → skipping"
+        else
+          echo "skip-check=false" >> "$GITHUB_OUTPUT"
+          echo "Not a maintainer → checks required"
+        fi
+
+    - name: Evaluate state (CI + label)
+      id: eval
+      if: ${{ steps.perm.outputs.skip-check != 'true' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR: ${{ github.event.pull_request.number }}
+        PR_URL: ${{ github.event.pull_request.html_url }}
+      run: |
+        echo "pr_number=$PR" >> "$GITHUB_OUTPUT"
+        echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+        # label: status: changes-required
+        label=$(gh pr view "$PR" --json labels -q '.labels[].name' | grep -c '^status: changes-required$' || true)
+        if [ "$label" -gt 0 ]; then
+          echo "changes_required=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "changes_required=false" >> "$GITHUB_OUTPUT"
+        fi
+
+        # running checks: Binaries / Source Code Tests
+        running=$(gh pr checks "$PR" --json name,state -q \
+          '[.[] | select((.name=="Binaries" or .name=="Source Code Tests") and (.state=="IN_PROGRESS" or .state=="QUEUED"))] | length')
+        if [ "$running" -gt 0 ]; then
+          echo "ci_running=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "ci_running=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Post comment (CI)
+      if: ${{ steps.perm.outputs.skip-check != 'true'
+              && steps.eval.outputs.ci_running == 'true'
+              && inputs.ci-running-message != '' }}
+      uses: thollander/actions-comment-pull-request@v3
+      with:
+        github-token: ${{ inputs.github-token }}
+        message: ${{ inputs.ci-running-message }}
+        comment-tag: ci_running
+        mode: recreate
+
+    - name: Post comment (changes required)
+      if: ${{ steps.perm.outputs.skip-check != 'true'
+              && steps.eval.outputs.changes_required == 'true'
+              && inputs.changes-required-message != '' }}
+      uses: thollander/actions-comment-pull-request@v3
+      with:
+        github-token: ${{ inputs.github-token }}
+        message: ${{ inputs.changes-required-message }}
+        comment-tag: changes_required
+        mode: recreate

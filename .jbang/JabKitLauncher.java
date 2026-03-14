@@ -9,6 +9,7 @@
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
+//DEPS io.github.adr:e-adr:2.0.0
 
 // requirements needed by jabkit projecxt need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
@@ -16,6 +17,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CaseInsensitiveEnumConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java

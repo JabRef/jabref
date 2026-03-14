@@ -32,6 +32,9 @@ public class MetadataSerializationConfiguration {
     /// Identifier for {@link org.jabref.model.groups.AutomaticKeywordGroup}.
     public static final String AUTOMATIC_KEYWORD_GROUP_ID = "AutomaticKeywordGroup:";
 
+    /// Identifier for {@link org.jabref.model.groups.AutomaticEntryTypeGroup}.
+    public static final String AUTOMATIC_ENTRY_TYPE_GROUP_ID = "AutomaticEntryTypeGroup:";
+
     /// Identifier for {@link org.jabref.model.groups.TexGroup}.
     public static final String TEX_GROUP_ID = "TexGroup:";
 

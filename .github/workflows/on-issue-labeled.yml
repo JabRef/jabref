@@ -78,6 +78,7 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
+      - uses: actions/checkout@v6
       - name: Remove label
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"

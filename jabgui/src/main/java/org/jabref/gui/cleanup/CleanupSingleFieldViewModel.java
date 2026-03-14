@@ -14,7 +14,7 @@ public class CleanupSingleFieldViewModel {
     public final ListProperty<FieldFormatterCleanup> cleanups = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     public CleanupSingleFieldViewModel(FieldFormatterCleanupActions initialCleanups) {
-        cleanupsEnabled.set(initialCleanups.isEnabled());
+        cleanupsEnabled.set(true);
         cleanups.setAll(initialCleanups.getConfiguredActions());
     }
 

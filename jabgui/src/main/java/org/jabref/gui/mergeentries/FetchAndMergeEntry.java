@@ -98,11 +98,11 @@ public class FetchAndMergeEntry {
                                                          .onFailure(exception -> {
                                                              LOGGER.error("Error while fetching bibliographic information", exception);
                                                              if (exception instanceof FetcherClientException) {
-                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("No data was found for the identifier"));
+                                                                 dialogService.notify(Localization.lang("No data was found for the identifier"));
                                                              } else if (exception instanceof FetcherServerException) {
-                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Server not available"));
+                                                                 dialogService.notify(Localization.lang("Server not available"));
                                                              } else {
-                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Error occurred %0", exception.getMessage()));
+                                                                 dialogService.notify(Localization.lang("Error while fetching from %0", idBasedFetcher.getName()));
                                                              }
                                                          })
                                                          .executeWith(taskExecutor),
@@ -188,7 +188,7 @@ public class FetchAndMergeEntry {
                       })
                       .onFailure(exception -> {
                           LOGGER.error("Error while fetching entry with {} ", fetcher.getName(), exception);
-                          dialogService.showErrorDialogAndWait(Localization.lang("Error while fetching from %0", fetcher.getName()), exception);
+                          dialogService.notify(Localization.lang("Error while fetching from %0", fetcher.getName()));
                       })
                       .executeWith(taskExecutor);
     }

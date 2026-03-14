@@ -1,7 +1,9 @@
 package org.jabref.logic.citation;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import javafx.beans.property.ObjectProperty;
 
@@ -13,10 +15,13 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcher;
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
@@ -28,17 +33,20 @@ public class SearchCitationsRelationsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchCitationsRelationsService.class);
 
-    private CitationFetcher citationFetcher;
+    private volatile CitationFetcher citationFetcher;
+    private volatile CitationCountFetcher citationCountFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences,
                                            ImportFormatPreferences importFormatPreferences,
                                            FieldPreferences fieldPreferences,
                                            ObjectProperty<CitationFetcherType> citationFetcherTypeProperty,
+                                           ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty,
                                            CitationKeyPatternPreferences citationKeyPatternPreferences,
                                            GrobidPreferences grobidPreferences,
                                            AiService aiService,
-                                           BibEntryTypesManager entryTypesManager) {
+                                           BibEntryTypesManager entryTypesManager,
+                                           NotificationService notificationService) {
         this.citationFetcher = CitationFetcherType.getCitationFetcher(
                 citationFetcherTypeProperty.get(),
                 importerPreferences,
@@ -46,6 +54,10 @@ public class SearchCitationsRelationsService {
                 citationKeyPatternPreferences,
                 grobidPreferences,
                 aiService);
+
+        this.citationCountFetcher = CitationCountFetcherType.getCitationCountFetcher(
+                citationCountFetcherTypeProperty.get(),
+                importerPreferences);
 
         citationFetcherTypeProperty.addListener((_, _, newValue) -> {
             this.citationFetcher = CitationFetcherType.getCitationFetcher(
@@ -57,13 +69,20 @@ public class SearchCitationsRelationsService {
                     aiService);
         });
 
+        citationCountFetcherTypeProperty.addListener((_, _, newValue) -> {
+            this.citationCountFetcher = CitationCountFetcherType.getCitationCountFetcher(
+                    newValue,
+                    importerPreferences);
+        });
+
         this.relationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
                 Directories.getCitationsRelationsDirectory(),
                 importerPreferences.getCitationsRelationsStoreTTL(),
                 importFormatPreferences,
                 fieldPreferences,
                 entryTypesManager,
-                citationFetcherTypeProperty
+                citationFetcherTypeProperty,
+                notificationService
         );
     }
 
@@ -72,16 +91,24 @@ public class SearchCitationsRelationsService {
                                     BibEntryCitationsAndReferencesRepository repository
     ) {
         this.citationFetcher = citationFetcher;
+        this.citationCountFetcher = citationFetcher;
         this.relationsRepository = repository;
     }
 
     public List<BibEntry> searchCites(BibEntry referencing, boolean bypassCache) throws FetcherException {
+        return searchCites(referencing, bypassCache, () -> false);
+    }
+
+    public List<BibEntry> searchCites(BibEntry referencing, boolean bypassCache, BooleanSupplier isCancelled) throws FetcherException {
         boolean isFetchingAllowed =
                 bypassCache
                         || !relationsRepository.containsReferences(referencing)
                         || relationsRepository.isReferencesUpdatable(referencing);
         if (isFetchingAllowed) {
             List<BibEntry> referencedBy = citationFetcher.getReferences(referencing);
+            if (isCancelled.getAsBoolean()) {
+                return List.of();
+            }
             relationsRepository.addReferences(referencing, referencedBy);
         }
         return relationsRepository.getReferences(referencing);
@@ -91,12 +118,19 @@ public class SearchCitationsRelationsService {
     /// If the store was not empty and nothing was fetched after a successful fetch => the store will be erased and the returned collection will be empty
     /// If the store was not empty and an error occurs while fetching => will return the content of the store
     public List<BibEntry> searchCitedBy(BibEntry cited, boolean bypassCache) throws FetcherException {
+        return searchCitedBy(cited, bypassCache, () -> false);
+    }
+
+    public List<BibEntry> searchCitedBy(BibEntry cited, boolean bypassCache, BooleanSupplier isCancelled) throws FetcherException {
         boolean isFetchingAllowed =
                 bypassCache
                         || !relationsRepository.containsCitations(cited)
                         || relationsRepository.isCitationsUpdatable(cited);
         if (isFetchingAllowed) {
             List<BibEntry> citedBy = citationFetcher.getCitations(cited);
+            if (isCancelled.getAsBoolean()) {
+                return List.of();
+            }
             relationsRepository.addCitations(cited, citedBy);
         }
         return relationsRepository.getCitations(cited);
@@ -106,7 +140,7 @@ public class SearchCitationsRelationsService {
         boolean isFetchingAllowed = actualFieldValue.isEmpty() ||
                 relationsRepository.isCitationsUpdatable(citationCounted);
         if (isFetchingAllowed) {
-            Optional<Integer> citationCountResult = citationFetcher.getCitationCount(citationCounted);
+            Optional<Integer> citationCountResult = citationCountFetcher.getCitationCount(citationCounted);
             return citationCountResult.orElse(0);
         }
         assert actualFieldValue.isPresent();
@@ -115,5 +149,13 @@ public class SearchCitationsRelationsService {
 
     public void close() {
         relationsRepository.close();
+    }
+
+    public Optional<URI> getReferencesApiUri(BibEntry entry) {
+        return citationFetcher.getReferencesApiUri(entry);
+    }
+
+    public Optional<URI> getCitationsApiUri(BibEntry entry) {
+        return citationFetcher.getCitationsApiUri(entry);
     }
 }

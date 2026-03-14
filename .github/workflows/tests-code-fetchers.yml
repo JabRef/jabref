@@ -12,7 +12,8 @@ on:
       - 'src/main/java/org/jabref/logic/crawler/**'
       - 'src/test/java/org/jabref/logic/crawler/**'
       - '.github/workflows/tests-code-fetchers.yml'
-      - 'build.gradle'
+      - '.github/actions/setup-gradle/action.yml'
+      - 'jablib/build.gradle.kts'
   pull_request:
     paths:
       - 'src/main/java/org/jabref/logic/importer/fetcher/**'
@@ -21,8 +22,9 @@ on:
       - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
       - 'src/main/java/org/jabref/logic/crawler/**'
       - 'src/test/java/org/jabref/logic/crawler/**'
+      - '.github/actions/setup-gradle/action.yml'
       - '.github/workflows/tests-code-fetchers.yml'
-      - 'build.gradle'
+      - 'jablib/build.gradle.kts'
   schedule:
     # run on each Monday
     - cron: '2 3 * * 1'
@@ -47,7 +49,8 @@ jobs:
   fetchertests:
     if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
     name: Fetcher tests
-    runs-on: ubuntu-slim
+    # On ubuntu-slim, it takes more than 15 minutes
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -56,6 +59,6 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run fetcher tests
-        run: ./gradlew fetcherTest
+        run: gradle fetcherTest
         env:
           CI: "true"

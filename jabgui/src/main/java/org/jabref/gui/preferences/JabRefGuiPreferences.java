@@ -54,6 +54,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -227,6 +228,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
+    private static final String CITATION_FETCHER_TYPE = "citationFetcherType";
+    private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
     // endregion
 
     private static JabRefGuiPreferences singleton;
@@ -255,6 +258,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         super();
 
         defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
+        defaults.put(CITATION_FETCHER_TYPE, CitationFetcherType.SEMANTIC_SCHOLAR.name());
+        defaults.put(CITATION_COUNT_FETCHER_TYPE, CitationCountFetcherType.SEMANTIC_SCHOLAR.name());
         // endregion
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
@@ -279,18 +284,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" +
                         "\\begin{publisher}<BR>\\format[HTMLChars]{\\publisher}\\end{publisher}\\begin{location}: \\format[HTMLChars]{\\location} \\end{location}__NEWLINE__" +
                         "\\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__" +
+                        "\\begin{doi}<BR>doi <a href=\"https://doi.org/\\format[DOIStrip]{\\doi}\">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__" +
+                        "\\begin{url}<BR>URL <a href=\"\\url\">\\url</a>\\end{url}__NEWLINE__" +
                         "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
                         "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}\\end{comment}__NEWLINE__" +
                         "</font>__NEWLINE__");
-        // endregion
-
-        // region NameDisplayPreferences
-        defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
-        defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
-        defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
-        defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
-        defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
         // endregion
 
         // By default disable "Fit table horizontally on the screen"
@@ -350,6 +349,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
+        getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
     }
 
     @Override
@@ -373,6 +373,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
+        getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
     }
 
     // region EntryEditorPreferences
@@ -398,6 +399,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (_, _, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
         EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
+        EasyBind.listen(entryEditorPreferences.citationFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_FETCHER_TYPE, newValue.name()));
+        EasyBind.listen(entryEditorPreferences.citationCountFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_COUNT_FETCHER_TYPE, newValue.name()));
         return entryEditorPreferences;
     }
 
@@ -415,7 +418,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
                 getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
-                CitationFetcherType.SEMANTIC_SCHOLAR, // always use default
+                CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaults.getCitationFetcherType().name())),
+                CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
                 getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
@@ -859,7 +863,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         previewPreferences.getLayoutCycle().addListener((InvalidationListener) c -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
         EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (obs, oldValue, newValue) -> putInt(CYCLE_PREVIEW_POS, newValue));
-        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (obs, oldValue, newValue) -> put(PREVIEW_STYLE, newValue.getText()));
+        // must be stored with __NEWLINE__ instead of \n so that our migration correclty triggers, in getText it will be replaced by \n
+        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (obs, oldValue, newValue) -> put(PREVIEW_STYLE, newValue.getText().replace("\n", "__NEWLINE__")));
         EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
         EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
         previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) c -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
@@ -933,9 +938,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return nameDisplayPreferences;
         }
 
-        nameDisplayPreferences = new NameDisplayPreferences(
-                getNameDisplayStyle(),
-                getNameAbbreviationStyle());
+        nameDisplayPreferences = getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences.getDefault());
 
         EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
             putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
@@ -950,28 +953,45 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return nameDisplayPreferences;
     }
 
-    private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyle() {
-        NameDisplayPreferences.AbbreviationStyle abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.NONE; // default
-        if (getBoolean(ABBR_AUTHOR_NAMES)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.FULL;
-        } else if (getBoolean(NAMES_LAST_ONLY)) {
-            abbreviationStyle = NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
-        }
-        return abbreviationStyle;
+    private NameDisplayPreferences getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences defaults) {
+        return new NameDisplayPreferences(
+                getNameDisplayStyleFromBackingStore(defaults),
+                getNameAbbreviationStyleFromBackingStore(defaults)
+        );
     }
 
-    private NameDisplayPreferences.DisplayStyle getNameDisplayStyle() {
-        NameDisplayPreferences.DisplayStyle displayStyle = NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME; // default
-        if (getBoolean(NAMES_NATBIB)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.NATBIB;
-        } else if (getBoolean(NAMES_AS_IS)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.AS_IS;
-        } else if (getBoolean(NAMES_FIRST_LAST)) {
-            displayStyle = NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+    private NameDisplayPreferences.DisplayStyle getNameDisplayStyleFromBackingStore(NameDisplayPreferences defaults) {
+        if (!hasKey(NAMES_NATBIB) && !hasKey(NAMES_AS_IS) && !hasKey(NAMES_FIRST_LAST)) {
+            return defaults.getDisplayStyle();
         }
-        return displayStyle;
+
+        if (getBoolean(NAMES_NATBIB, false)) {
+            return NameDisplayPreferences.DisplayStyle.NATBIB;
+        }
+        if (getBoolean(NAMES_AS_IS, false)) {
+            return NameDisplayPreferences.DisplayStyle.AS_IS;
+        }
+        if (getBoolean(NAMES_FIRST_LAST, false)) {
+            return NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
+        }
+
+        return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
     }
 
+    private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyleFromBackingStore(NameDisplayPreferences defaults) {
+        if (!hasKey(ABBR_AUTHOR_NAMES) && !hasKey(NAMES_LAST_ONLY)) {
+            return defaults.getAbbreviationStyle();
+        }
+
+        if (getBoolean(ABBR_AUTHOR_NAMES, false)) {
+            return NameDisplayPreferences.AbbreviationStyle.FULL;
+        }
+        if (getBoolean(NAMES_LAST_ONLY, false)) {
+            return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
+        }
+
+        return NameDisplayPreferences.AbbreviationStyle.NONE;
+    }
     // endregion
 
     // region: Main table, main table column, and search dialog column preferences

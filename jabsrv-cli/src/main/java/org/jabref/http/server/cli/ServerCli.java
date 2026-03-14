@@ -19,14 +19,14 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import picocli.CommandLine;
 
 @AllowedToUseStandardStreams("This is a CLI application. It resides in the package http.server to be close to the other http server related classes.")
-@CommandLine.Command(name = "server", mixinStandardHelpOptions = true, description = "JabSrv - JabRef HTTP server")
+@CommandLine.Command(name = "jabsrv", mixinStandardHelpOptions = true, description = "JabSrv - JabRef HTTP server")
 public class ServerCli implements Callable<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerCli.class);
 
     @CommandLine.Parameters(arity = "0..*", paramLabel = "FILE", description = "the library files (*.bib) to serve")
     List<Path> files;
 
-    @CommandLine.Option(names = {"-h", "--host"}, description = "the host name")
+    @CommandLine.Option(names = {"-H", "--host"}, description = "the host name")
     private String host = "localhost";
 
     @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
