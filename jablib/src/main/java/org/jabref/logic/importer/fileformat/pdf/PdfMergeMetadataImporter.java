@@ -3,11 +3,13 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.RelativePathsCleanup;
@@ -40,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class PdfMergeMetadataImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
-    private static final Pattern FILENAME_TITLE_PATTERN = Pattern.compile("(?i)(.*\\.(docx|doc|pdf|tex|odt|rtf|ps|eps|html|htm|pptx|ppt|xlsx)$|microsoft (word|powerpoint|excel).*|.*\\\\.*)");
+    private static final Pattern FILENAME_TITLE_PATTERN = buildFilenameTitlePattern();
 
     private final List<PdfImporter> metadataImporters;
 
@@ -66,6 +68,15 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         isbnFetcher = new IsbnFetcher(importFormatPreferences);
         // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
+    }
+
+    private static Pattern buildFilenameTitlePattern() {
+        String extensions = Arrays.stream(StandardFileType.values())
+                                  .filter(type -> type != StandardFileType.ANY_FILE)
+                                  .flatMap(type -> type.getExtensions().stream())
+                                  .distinct()
+                                  .collect(Collectors.joining("|"));
+        return Pattern.compile("(?i)(.*\\.(" + extensions + ")$|microsoft (word|powerpoint|excel).*|.*\\\\.*)");
     }
 
     /// Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
