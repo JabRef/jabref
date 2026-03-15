@@ -855,7 +855,9 @@ public class JabRefCliPreferences implements CliPreferences {
     @VisibleForTesting
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
-            return List.of();
+            // list needs to be mutable in observable preferences
+            // keep consistency with Splitter#splitToList
+            return new ArrayList<>();
         }
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
@@ -1822,7 +1824,7 @@ public class JabRefCliPreferences implements CliPreferences {
         SaveOrder exportSaveOrder = getExportSaveOrder();
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE -> {
-                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
+                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to default save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
             case SPECIFIED ->
