@@ -19,6 +19,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
@@ -32,6 +33,7 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -87,6 +89,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         if (!this.entryTypesWithFields.isEmpty()) {
             this.entryTypesWithFields.clear();
+            this.resetMultilineFieldsToDefault();
         }
         Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
@@ -217,5 +220,23 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus fieldValidationStatus() {
         return fieldValidator.getValidationStatus();
+    }
+
+    public void resetMultilineFieldsToDefault() {
+        resetStandardFieldMultilineToDefaults();
+        List<Field> defaultNonWrappableFields = FieldPreferences.getDefault().getNonWrappableFields();
+        preferences.getFieldPreferences().setNonWrappableFields(defaultNonWrappableFields);
+        multiLineFields.clear();
+        multiLineFields.addAll(defaultNonWrappableFields);
+    }
+
+    private void resetStandardFieldMultilineToDefaults() {
+        for (StandardField field : StandardField.values()) {
+            if (StandardField.BUILT_IN_MULTILINE_FIELDS.contains(field)) {
+                field.getProperties().add(FieldProperty.MULTILINE_TEXT);
+            } else {
+                field.getProperties().remove(FieldProperty.MULTILINE_TEXT);
+            }
+        }
     }
 }

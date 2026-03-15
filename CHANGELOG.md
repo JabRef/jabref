@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where multiline property of fields cannot be removed properly. [#11897](https://github.com/JabRef/jabref/issues/11897)
 - We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
 - We fixed an issue where shortcut keys did not work for linked files in the entry editor. [#12564](https://github.com/JabRef/jabref/issues/12564)
 - We fixed the issue where incomplete search produced noisy error logs when entering input in the search bar. [#14632](https://github.com/JabRef/jabref/issues/14632)

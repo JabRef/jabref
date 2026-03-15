@@ -623,9 +623,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
-        defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon");
-        defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);
-        defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
         defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
@@ -997,6 +994,7 @@ public class JabRefCliPreferences implements CliPreferences {
         new SharedDatabasePreferences().clear();
 
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getFieldPreferences().setAll(FieldPreferences.getDefault());
     }
 
     private void clearTruststoreFromCustomCertificates() {
@@ -1130,6 +1128,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getFieldPreferences().setAll(FieldPreferences.getDefault());
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1631,14 +1630,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return fieldPreferences;
         }
 
-        fieldPreferences = new FieldPreferences(
-                !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !
-                getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
-                                                         .map(FieldFactory::parseField)
-                                                         .collect(Collectors.toList()),
-                getStringList(NON_WRAPPABLE_FIELDS).stream()
-                                                   .map(FieldFactory::parseField)
-                                                   .collect(Collectors.toList()));
+        fieldPreferences = getFieldPreferencesFromBackingStore(FieldPreferences.getDefault());
 
         EasyBind.listen(fieldPreferences.resolveStringsProperty(), (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
         fieldPreferences.getResolvableFields().addListener((InvalidationListener) _ ->
@@ -1647,6 +1639,16 @@ public class JabRefCliPreferences implements CliPreferences {
                 put(NON_WRAPPABLE_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields())));
 
         return fieldPreferences;
+    }
+
+    private FieldPreferences getFieldPreferencesFromBackingStore(FieldPreferences defaults) {
+        return new FieldPreferences(
+                !getBoolean(DO_NOT_RESOLVE_STRINGS, !defaults.shouldResolveStrings()),
+                List.copyOf(FieldFactory.parseFieldList(get(RESOLVE_STRINGS_FOR_FIELDS,
+                        FieldFactory.serializeFieldsList(defaults.getResolvableFields())))),
+                List.copyOf(FieldFactory.parseFieldList(get(NON_WRAPPABLE_FIELDS,
+                        FieldFactory.serializeFieldsList(defaults.getNonWrappableFields()))))
+        );
     }
 
     //*************************************************************************************************************
