@@ -302,7 +302,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
-        getPreviewPreferences().setAll(PreviewPreferences.getDefault());
+        getPreviewPreferences().setAll(PreviewPreferences.getDefaultWithStyles(
+                getLayoutFormatterPreferences(),
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                Injector.instantiateModelOrService(BibEntryTypesManager.class)));
     }
 
     @Override

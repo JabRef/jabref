@@ -2,6 +2,7 @@ package org.jabref.gui.preview;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -12,10 +13,12 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 public class PreviewPreferences {
     private final ObservableList<PreviewLayout> layoutCycle;
@@ -45,7 +48,7 @@ public class PreviewPreferences {
 
     private PreviewPreferences() {
         this(
-                List.of(),  // Layout cycle - list of predefined layouts, see getDefault(LayoutFormatterPreferences, JournalAbbreviationRepository)
+                List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
                 0,          // Layout cycle position
                 TextBasedPreviewLayout.DEFAULT,
                 false,      // Show preview as an extra tab
@@ -58,6 +61,22 @@ public class PreviewPreferences {
     /// Provides default values WITHOUT default styles
     public static PreviewPreferences getDefault() {
         return new PreviewPreferences();
+    }
+
+    public static PreviewPreferences getDefaultWithStyles(LayoutFormatterPreferences layoutFormatterPreferences,
+                                                          JournalAbbreviationRepository abbreviationRepository,
+                                                          BibEntryTypesManager entryTypesManager) {
+        PreviewPreferences defaults = getDefault();
+        defaults.getLayoutCycle().addAll(Stream.of(TextBasedPreviewLayout.NAME, CSLStyleLoader.DEFAULT_STYLE).map(layout ->
+                                                       PreviewLayout.of(
+                                                               layout,
+                                                               TextBasedPreviewLayout.DEFAULT,
+                                                               List.of(),
+                                                               layoutFormatterPreferences,
+                                                               abbreviationRepository,
+                                                               entryTypesManager))
+                                               .toList());
+        return defaults;
     }
 
     public void setAll(PreviewPreferences previewPreferences) {
