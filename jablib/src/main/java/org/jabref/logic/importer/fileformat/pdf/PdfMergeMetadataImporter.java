@@ -173,14 +173,15 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         final BibEntry entry = new BibEntry();
         candidates.forEach(entry::mergeWith);
 
-        entry.getField(StandardField.TITLE)
-             .filter(PdfMergeMetadataImporter::isTitleLikelyFilename)
-             .ifPresent(title -> candidates.stream()
-                                           .map(candidate -> candidate.getField(StandardField.TITLE))
-                                           .flatMap(Optional::stream)
-                                           .filter(candidateTitle -> !isTitleLikelyFilename(candidateTitle))
-                                           .findFirst()
-                                           .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle)));
+        if (entry.getField(StandardField.TITLE)
+                 .filter(PdfMergeMetadataImporter::isTitleLikelyFilename)
+                 .isPresent()) {
+            candidates.stream()
+                      .flatMap(candidate -> candidate.getField(StandardField.TITLE).stream())
+                      .filter(candidateTitle -> !isTitleLikelyFilename(candidateTitle))
+                      .findFirst()
+                      .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle));
+        }
 
         // Retain online links only
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();
