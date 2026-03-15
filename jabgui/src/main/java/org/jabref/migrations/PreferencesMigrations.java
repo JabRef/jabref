@@ -59,6 +59,7 @@ public class PreferencesMigrations {
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
+        upgradeBuiltinPreviewName(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
         // backward compatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
@@ -321,9 +322,9 @@ public class PreferencesMigrations {
 
     /// Customizable preview style migrations
     ///
-    /// -  Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
-    /// -  Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
-    /// -  Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
+    /// - Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
+    /// - Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
+    /// - Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
     ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
         String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, TextBasedPreviewLayout.DEFAULT);
@@ -339,6 +340,12 @@ public class PreferencesMigrations {
                                                           \\begin{abstract}\
                                                           """);
         prefs.put(JabRefGuiPreferences.PREVIEW_STYLE, migratedStyle);
+    }
+
+    /// Since v6-alpha6 built in preview style will be stored by internal identifier instead by display name.
+    protected static void upgradeBuiltinPreviewName(JabRefGuiPreferences prefs) {
+        String previewCycle = prefs.get(JabRefGuiPreferences.PREVIEW_CYCLE, "");
+        prefs.put(JabRefGuiPreferences.PREVIEW_CYCLE, previewCycle.replace("Customized preview style", TextBasedPreviewLayout.NAME));
     }
 
     /// The former preferences default of columns was a simple list of strings ("author;title;year;..."). Since 5.0

@@ -127,6 +127,16 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
+    void previewStyleNameChanged() {
+        String oldCycle = "Customized preview style;ieee.csl";
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_CYCLE), anyString())).thenReturn(oldCycle);
+
+        PreferencesMigrations.upgradeBuiltinPreviewName(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_CYCLE, "PREVIEW;ieee.csl");
+    }
+
+    @Test
     void upgradeColumnPreferencesAlreadyMigrated() {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
