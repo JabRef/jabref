@@ -75,7 +75,7 @@ public class DuplicateCheck {
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
         return one.getFields().stream()
                   .filter(field -> field.getProperties().contains(FieldProperty.IDENTIFIER))
-                  .anyMatch(field -> two.getField(field).map(content -> one.getField(field).orElseThrow().equals(content)).orElse(false));
+                  .anyMatch(field -> two.getField(field).map(content -> one.getField(field).orElseThrow().equalsIgnoreCase(content)).orElse(false));
     }
 
     private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
