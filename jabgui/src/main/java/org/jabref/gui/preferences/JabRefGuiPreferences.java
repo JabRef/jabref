@@ -262,25 +262,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return JabRefGuiPreferences.singleton;
     }
 
-    public CopyToPreferences getCopyToPreferences() {
-        if (copyToPreferences != null) {
-            return copyToPreferences;
-        }
-        copyToPreferences = getCopyToPreferencesFromBackingStore(CopyToPreferences.getDefault());
-
-        EasyBind.listen(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), (_, _, newValue) -> putBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, newValue));
-        EasyBind.listen(copyToPreferences.shouldIncludeCrossReferencesProperty(), (_, _, newValue) -> putBoolean(INCLUDE_CROSS_REFERENCES, newValue));
-
-        return copyToPreferences;
-    }
-
-    private CopyToPreferences getCopyToPreferencesFromBackingStore(CopyToPreferences defaults) {
-        return new CopyToPreferences(
-                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaults.getShouldAskForIncludingCrossReferences()),
-                getBoolean(INCLUDE_CROSS_REFERENCES, defaults.getShouldIncludeCrossReferences())
-        );
-    }
-
     @Override
     public void clear() throws BackingStoreException {
         super.clear();
@@ -332,6 +313,27 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
         getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
     }
+
+    // region CopyToPreferences
+    public CopyToPreferences getCopyToPreferences() {
+        if (copyToPreferences != null) {
+            return copyToPreferences;
+        }
+        copyToPreferences = getCopyToPreferencesFromBackingStore(CopyToPreferences.getDefault());
+
+        EasyBind.listen(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), (_, _, newValue) -> putBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, newValue));
+        EasyBind.listen(copyToPreferences.shouldIncludeCrossReferencesProperty(), (_, _, newValue) -> putBoolean(INCLUDE_CROSS_REFERENCES, newValue));
+
+        return copyToPreferences;
+    }
+
+    private CopyToPreferences getCopyToPreferencesFromBackingStore(CopyToPreferences defaults) {
+        return new CopyToPreferences(
+                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaults.getShouldAskForIncludingCrossReferences()),
+                getBoolean(INCLUDE_CROSS_REFERENCES, defaults.getShouldIncludeCrossReferences())
+        );
+    }
+    // endregion
 
     // region EntryEditorPreferences
     public EntryEditorPreferences getEntryEditorPreferences() {
@@ -1156,7 +1158,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
     // endregion
 
-    // region Donation preferences
+    // region DonationPreferences
     public DonationPreferences getDonationPreferences() {
         if (donationPreferences != null) {
             return donationPreferences;
