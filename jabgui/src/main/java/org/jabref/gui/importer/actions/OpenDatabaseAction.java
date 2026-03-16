@@ -1,6 +1,7 @@
 package org.jabref.gui.importer.actions;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -202,6 +204,26 @@ public class OpenDatabaseAction extends SimpleCommand {
             FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
             resolvedFiles.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
+                if (preferences.getInternalPreferences().isMemoryStickMode()) {
+                    try {
+                        /* --- Do not know how to find executable path ---- */
+                        Path jabRefExecutable = Path.of(
+                                Launcher.class
+                                        .getProtectionDomain()
+                                        .getCodeSource()
+                                        .getLocation()
+                                        .toURI()
+                        ).getParent();
+                        /* ------------------------------------------------ */
+
+                        if (theFile.startsWith(jabRefExecutable)) {
+                            theFile = jabRefExecutable.relativize(theFile);
+                        }
+                    } catch (URISyntaxException e) {
+                        // Fall back to absolute path
+                    }
+                }
+
                 openTheFile(theFile);
                 fileHistory.newFile(theFile);
             });
