@@ -59,7 +59,7 @@ class AcademicPagesExporterTest {
                                 .resolve("2020-01-01-smith2020.md");
         assertTrue(Files.exists(generated));
 
-        String content = Files.readString(generated);
+        String content = Files.readString(generated).replace("\r\n", "\n");
         String citation = extractYamlValue(content, "citation");
 
         String expected = """
@@ -106,7 +106,7 @@ class AcademicPagesExporterTest {
                                 .resolve("2021-01-01-jones2021conf.md");
         assertTrue(Files.exists(generated));
 
-        String content = Files.readString(generated);
+        String content = Files.readString(generated).replace("\r\n", "\n");
         String citation = extractYamlValue(content, "citation");
 
         String expected = """
@@ -141,7 +141,7 @@ class AcademicPagesExporterTest {
                                 .resolve("2019-01-01-doe2019book.md");
         assertTrue(Files.exists(generated));
 
-        String content = Files.readString(generated);
+        String content = Files.readString(generated).replace("\r\n", "\n");
         String citation = extractYamlValue(content, "citation");
 
         String expected = """
@@ -175,7 +175,7 @@ class AcademicPagesExporterTest {
                                 .resolve("2018-01-01-lee2018chapter.md");
         assertTrue(Files.exists(generated));
 
-        String content = Files.readString(generated);
+        String content = Files.readString(generated).replace("\r\n", "\n");
         String citation = extractYamlValue(content, "citation");
 
         String expected = """
@@ -208,7 +208,7 @@ class AcademicPagesExporterTest {
                                 .resolve("2022-01-01-misc2022.md");
         assertTrue(Files.exists(generated));
 
-        String content = Files.readString(generated);
+        String content = Files.readString(generated).replace("\r\n", "\n");
         String citation = extractYamlValue(content, "citation");
 
         String expected = """
