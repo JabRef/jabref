@@ -103,7 +103,7 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
         tagsField.setMatcher((tag, searchText) -> tag.get().toLowerCase().startsWith(searchText.toLowerCase()));
         tagsField.setComparator(Comparator.comparing(Keyword::get));
 
-        tagsField.setNewItemProducer(searchText -> converter.fromString(searchText));
+        tagsField.setNewItemProducer(converter::fromString);
 
         tagsField.setShowSearchIcon(false);
         tagsField.setOnMouseClicked(_ -> tagsField.getEditor().requestFocus());
@@ -136,7 +136,7 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
                 String clipboardText = ClipBoardManager.getContents();
                 if (!clipboardText.isEmpty()) {
                     KeywordList parsed = KeywordList.parse(clipboardText, separator);
-                    parsed.forEach(tag -> tagsField.addTags(tag));
+                    parsed.forEach(tagsField::addTags);
                     tagsField.getEditor().clear();
                     event.consume();
                 }
