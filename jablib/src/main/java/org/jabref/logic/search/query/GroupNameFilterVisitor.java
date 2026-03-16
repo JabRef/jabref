@@ -1,22 +1,23 @@
 package org.jabref.logic.search.query;
 
+import java.util.Locale;
+
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-/**
- * Evaluates a Search.g4 parse tree against a group display name string.
- * Key behavioral difference from {@link SearchQueryVisitor}:
- * {@code visitImplicitAndExpression} uses OR semantics (anyMatch) instead of AND,
- * so space-separated bare terms like "machine learning" match any group containing
- * either word. Explicit AND/OR/NOT and parentheses work as expected.
- */
+/// Evaluates a Search.g4 parse tree against a group display name string.
+///
+/// Key behavioral difference from {@link SearchQueryVisitor}:
+/// {@code visitImplicitAndExpression} uses OR semantics (anyMatch) instead of AND,
+/// so space-separated bare terms like "machine learning" match any group containing
+/// either word. Explicit AND/OR/NOT and parentheses work as expected.
 
 public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
 
     private final String groupName;
 
     public GroupNameFilterVisitor(String groupName) {
-        this.groupName = groupName.toLowerCase();
+        this.groupName = groupName.toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
 
     @Override
     public Boolean visitComparison(SearchParser.ComparisonContext ctx) {
-        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue()).toLowerCase();
+        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue()).toLowerCase(Locale.ROOT);
         return groupName.contains(term);
     }
 }

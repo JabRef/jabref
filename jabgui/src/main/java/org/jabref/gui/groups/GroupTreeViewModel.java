@@ -31,7 +31,9 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -47,6 +49,8 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.search.query.SearchQuery;
+import org.jabref.search.SearchParser;
 
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
@@ -109,7 +113,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
+        filterPredicate.bind(EasyBind.map(filterText, text -> {
+            if (StringUtil.isBlank(text)) {
+                return group -> true;
+            }
+            try {
+                SearchParser.StartContext ctx = SearchQuery.getStartContext(text);
+                return group -> new GroupNameFilterVisitor(group.getDisplayName()).visit(ctx);
+            } catch (org.antlr.v4.runtime.misc.ParseCancellationException e) {
+                return group -> StringUtil.containsIgnoreCase(group.getDisplayName(), text);
+            }
+        }));
     }
 
     private void refresh() {

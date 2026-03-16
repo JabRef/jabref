@@ -28,7 +28,6 @@ import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -56,8 +55,6 @@ import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
-import org.jabref.model.search.query.SearchQuery;
-import org.jabref.search.SearchParser;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -335,17 +332,7 @@ public class GroupNodeViewModel {
     }
 
     boolean isMatchedBy(String searchString) {
-        if (StringUtil.isBlank(searchString)) {
-            return true;
-        }
-        try {
-            SearchParser.StartContext ctx = SearchQuery.getStartContext(searchString);
-            GroupNameFilterVisitor visitor = new GroupNameFilterVisitor(getDisplayName());
-            return visitor.visit(ctx);
-        } catch (org.antlr.v4.runtime.misc.ParseCancellationException e) {
-            // Malformed query: fall back to plain contains
-            return StringUtil.containsIgnoreCase(getDisplayName(), searchString);
-        }
+        return StringUtil.isBlank(searchString) || StringUtil.containsIgnoreCase(getDisplayName(), searchString);
     }
 
     public Color getColor() {

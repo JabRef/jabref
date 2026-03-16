@@ -69,7 +69,7 @@ class GroupNodeViewModelFilterTest {
     }
 
     @Test
-    void malformedQueryFallsBackToContains() {
+    void simpleTermMatches() {
         assertTrue(matches("test group", "test"));
     }
 
