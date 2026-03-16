@@ -928,14 +928,15 @@ public class OOBibBase {
 
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 } catch (NoDocumentException | com.sun.star.uno.Exception e) {
-                    throw new RuntimeException(e);
+                    dialogService.notify(Localization.lang("No document found or LibreOffice insertion failure"));
+                    LOGGER.error("Could not update CSL bibliography", e);
                 } finally {
                     doc.unlockControllers();
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
             } catch (CreationException | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Could not update CSL bibliography", ex);
+                LOGGER.error("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }
