@@ -28,13 +28,16 @@ public class RemotePreferences {
     private final BooleanProperty enableLanguageServer;
     private final IntegerProperty languageServerPort;
 
-    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort) {
+    private final BooleanProperty directHttpImport;
+
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort, boolean directHttpImport) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
         this.httpPort = new SimpleIntegerProperty(httpPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
         this.enableLanguageServer = new SimpleBooleanProperty(enableLanguageServer);
         this.languageServerPort = new SimpleIntegerProperty(languageServerPort);
+        this.directHttpImport = new SimpleBooleanProperty(directHttpImport);
     }
 
     public int getPort() {
@@ -119,6 +122,18 @@ public class RemotePreferences {
 
     public void setEnableLanguageServer(boolean enableLanguageServer) {
         this.enableLanguageServer.setValue(enableLanguageServer);
+    }
+
+    public boolean directHttpImport() {
+        return directHttpImport.getValue();
+    }
+
+    public BooleanProperty directHttpImportProperty() {
+        return directHttpImport;
+    }
+
+    public void setDirectHttpImport(boolean directHttpImport) {
+        this.directHttpImport.setValue(directHttpImport);
     }
 
     /// Gets the IP address where both the remote server and the http server are listening.

@@ -1,9 +1,11 @@
 package org.jabref.logic.layout;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.layout.format.NameFormatterPreferences;
@@ -23,6 +25,14 @@ public class LayoutFormatterPreferences {
         this.nameFormatterPreferences = nameFormatterPreferences;
         this.mainFileDirectoryProperty = mainFileDirectoryProperty;
         this.doiPreferences = doiPreferences;
+    }
+
+    /// Temporary dummy for PreviewPreferences
+    public static LayoutFormatterPreferences getDefault() {
+        return new LayoutFormatterPreferences(
+                new NameFormatterPreferences(List.of(), List.of()),
+                new DOIPreferences(false, ""),
+                new SimpleStringProperty(""));
     }
 
     public NameFormatterPreferences getNameFormatterPreferences() {
