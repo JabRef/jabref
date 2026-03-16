@@ -1,4 +1,4 @@
 title: "\format[RemoveLatexCommands,RemoveBrackets]{\title}"
 collection: publications
 \begin{note}excerpt: "\format[RemoveLatexCommands,RemoveBrackets]{\note}"
-\end{note}category:
+\end{note}category: manuscripts
