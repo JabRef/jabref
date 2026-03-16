@@ -526,7 +526,7 @@ public class FileUtil {
     /// Test if the file is a shortcut file by checking the extension to be ".lnk" (case-insensitive)
     ///
     /// @param file The file to check
-    /// @return True if file extension is ".lnk", false otherwise
+    /// @return `true` if file extension is `.lnk`, `false` otherwise
     public static boolean isShortcutFile(Path file) {
         return getFileExtension(file).filter("lnk"::equalsIgnoreCase).isPresent();
     }
