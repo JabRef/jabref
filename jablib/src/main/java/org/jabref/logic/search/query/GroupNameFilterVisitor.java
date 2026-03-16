@@ -6,7 +6,6 @@ import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
 /// Evaluates a Search.g4 parse tree against a group display name string.
-///
 /// Key behavioral difference from {@link SearchQueryVisitor}:
 /// {@code visitImplicitAndExpression} uses OR semantics (anyMatch) instead of AND,
 /// so space-separated bare terms like "machine learning" match any group containing
@@ -17,6 +16,7 @@ public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
     private final String groupName;
 
     public GroupNameFilterVisitor(String groupName) {
+        // Lowercase for case-insensitive matching: typing "machine" matches "Machine Learning"
         this.groupName = groupName.toLowerCase(Locale.ROOT);
     }
 

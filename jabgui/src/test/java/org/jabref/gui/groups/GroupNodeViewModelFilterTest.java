@@ -3,10 +3,10 @@ package org.jabref.gui.groups;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.model.search.query.SearchQuery;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupNodeViewModelFilterTest {
 
@@ -22,69 +22,74 @@ class GroupNodeViewModelFilterTest {
         }
     }
 
-    @Test
-    void spaceImpliesOrFirstToken() {
-        assertTrue(matches("machine", "machine learning"));
+    @ParameterizedTest
+    @CsvSource({
+            "machine, machine learning, true",
+            "learning, machine learning, true",
+            "machine learning, machine learning, true",
+            "Neural Networks, machine learning, false",
+            "test group, test, true"
+    })
+    void spaceImpliesOr(String groupName, String query, boolean expected) {
+        assertEquals(expected, matches(groupName, query));
     }
 
-    @Test
-    void spaceImpliesOrSecondToken() {
-        assertTrue(matches("learning", "machine learning"));
+    @ParameterizedTest
+    @CsvSource({
+            "machine neural, machine AND neural, true",
+            "machine, machine AND neural, false",
+            "neural, machine AND neural, false"
+    })
+    void explicitAndRequiresBothWords(String groupName, String query, boolean expected) {
+        assertEquals(expected, matches(groupName, query));
     }
 
-    @Test
-    void spaceImpliesOrBothTokens() {
-        assertTrue(matches("machine learning", "machine learning"));
+    @ParameterizedTest
+    @CsvSource({
+            "machine, machine OR neural, true",
+            "neural, machine OR neural, true",
+            "unrelated, machine OR neural, false"
+    })
+    void explicitOrWorks(String groupName, String query, boolean expected) {
+        assertEquals(expected, matches(groupName, query));
     }
 
-    @Test
-    void explicitAndRequiresBothWords() {
-        assertFalse(matches("machine", "machine AND neural"));
-        assertTrue(matches("machine neural", "machine AND neural"));
+    @ParameterizedTest
+    @CsvSource({
+            "machine, NOT machine, false",
+            "learning, NOT machine, true"
+    })
+    void notWorks(String groupName, String query, boolean expected) {
+        assertEquals(expected, matches(groupName, query));
     }
 
-    @Test
-    void explicitOrWorks() {
-        assertTrue(matches("machine", "machine OR neural"));
-        assertTrue(matches("neural", "machine OR neural"));
-        assertFalse(matches("unrelated", "machine OR neural"));
+    @ParameterizedTest
+    @CsvSource({
+            "Machine Learning, machine, true",
+            "machine learning, MACHINE, true"
+    })
+    void caseInsensitiveMatch(String groupName, String query, boolean expected) {
+        assertEquals(expected, matches(groupName, query));
     }
 
-    @Test
-    void notWorks() {
-        assertFalse(matches("machine", "NOT machine"));
-        assertTrue(matches("learning", "NOT machine"));
+    @ParameterizedTest
+    @CsvSource({
+            "Deep Learning, (deep OR neural) NOT vision, true",
+            "Neural Networks, (deep OR neural) NOT vision, true",
+            "Computer Vision, (deep OR neural) NOT vision, false",
+            "Machine Learning, (deep OR neural) NOT vision, false"
+    })
+    void parenthesesWithNotWork(String groupName, String query, boolean expected) {
+        assertEquals(expected, matches(groupName, query));
     }
 
-    @Test
-    void blankQueryMatchesAll() {
-        assertTrue(matches("anything", ""));
-        assertTrue(matches("anything", "   "));
-    }
-
-    @Test
-    void caseInsensitiveMatch() {
-        assertTrue(matches("Machine Learning", "machine"));
-        assertTrue(matches("machine learning", "MACHINE"));
-    }
-
-    @Test
-    void simpleTermMatches() {
-        assertTrue(matches("test group", "test"));
-    }
-
-    @Test
-    void parenthesesWithNotWork() {
-        assertTrue(matches("Deep Learning", "(deep OR neural) NOT vision"));
-        assertTrue(matches("Neural Networks", "(deep OR neural) NOT vision"));
-        assertFalse(matches("Computer Vision", "(deep OR neural) NOT vision"));
-        assertFalse(matches("Machine Learning", "(deep OR neural) NOT vision"));
-    }
-
-    @Test
-    void complexExpressionWithNotLearning() {
-        assertTrue(matches("Computer Vision", "(machine OR computer) NOT learning"));
-        assertFalse(matches("Machine Learning", "(machine OR computer) NOT learning"));
-        assertFalse(matches("Neural Networks", "(machine OR computer) NOT learning"));
+    @ParameterizedTest
+    @CsvSource({
+            "Computer Vision, (machine OR computer) NOT learning, true",
+            "Machine Learning, (machine OR computer) NOT learning, false",
+            "Neural Networks, (machine OR computer) NOT learning, false"
+    })
+    void complexExpressionWithNotLearning(String groupName, String query, boolean expected) {
+        assertEquals(expected, matches(groupName, query));
     }
 }

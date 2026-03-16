@@ -36,7 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed the group filter to use OR semantics for space-separated terms, so typing "machine learning" now shows all groups containing either word instead of requiring both. [#12721](https://github.com/JabRef/jabref/issues/12721)
+- We improved the group filter to support full boolean search syntax. Space-separated terms now match groups containing any of the words (OR semantics). Explicit operators "AND", "OR", "NOT", and parentheses are also supported — e.g., `NOT learning` hides all learning groups, or `(deep OR neural) NOT vision` shows "Deep Learning" and "Neural Networks" but not "Computer Vision".. [#12721](https://github.com/JabRef/jabref/issues/12721)
 - We fixed PDF import to prefer the content extracted title over filename like XMP metadata titles. [#11999](https://github.com/JabRef/jabref/issues/11999)
 - We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
 - We fixed an issue where shortcut keys did not work for linked files in the entry editor. [#12564](https://github.com/JabRef/jabref/issues/12564)
