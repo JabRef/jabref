@@ -175,6 +175,7 @@ public class CSLCitationOOAdapter {
         if (!selectedStyle.hasBibliography()) {
             return;
         }
+
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
         updateAllCitationsWithNewStyle(selectedStyle, false);
