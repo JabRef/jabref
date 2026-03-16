@@ -28,6 +28,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -221,7 +222,13 @@ public class JabRefFrameViewModel {
                           BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
                           List<BibEntry> entries = parser.parseEntries(importStr);
                           return new ParserResult(entries);
-                      }).onSuccess(this::addParserResult)
+                      }).onSuccess(parserResult -> {
+                          if (preferences.getRemotePreferences().directHttpImport()) {
+                              directImportEntries(parserResult);
+                          } else {
+                              addParserResult(parserResult);
+                          }
+                      })
                       .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
                       .executeWith(taskExecutor);
     }
@@ -233,6 +240,19 @@ public class JabRefFrameViewModel {
                       .onSuccess(result -> result.ifPresent(this::addParserResult))
                       .onFailure(t -> LOGGER.error("Unable to import file {} ", location, t))
                       .executeWith(taskExecutor);
+    }
+
+    private void directImportEntries(ParserResult parserResult) {
+        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        ImportHandler importHandler = new ImportHandler(
+                libraryTab.getBibDatabaseContext(),
+                preferences,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager,
+                dialogService,
+                taskExecutor);
+        importHandler.importEntries(parserResult.getDatabase().getEntries());
     }
 
     private void checkForBibInUpperDir() {
