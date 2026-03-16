@@ -9,11 +9,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
-- We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
-
 ### Added
 
 - We added a new data format and property selection feature, enabling users to select one or more field properties for custom fields. [#9840](https://github.com/JabRef/jabref/issues/9840)
+- We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
+- We added a CLI option `--field-formatters` to the `convert` and `generate-bib-from-aux` commands to apply field formatters during export. [#11520](https://github.com/JabRef/jabref/issues/11520)
 - We added a preference to skip the import dialog for entries received from browser extensions, allowing direct import into the current library. The import dialog is shown by default; users can enable direct import in Preferences.
 - We added support for dragging entries from the "Citation relations" tab to other libraries. [#15135](https://github.com/JabRef/jabref/issues/15135)
 - We added a fetcher selection dropdown to the citation count field in the General tab, allowing users to choose between Semantic Scholar, OpenAlex, OpenCitations, and scite.ai as the source. The selected fetcher is now persisted across restarts and can also be configured in the Entry Editor preferences. [#15134](https://github.com/JabRef/jabref/issues/15134)

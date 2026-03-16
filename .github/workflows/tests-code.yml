@@ -314,7 +314,8 @@ jobs:
           files: |
             jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
             jablib/src/test/java/org/jabref/logic/citationstyle/CSLStyleUtilsTest.java
-
+            jablib/src/main/java/org/jabref/logic/exporter/AcademicPagesExporter.java
+            jablib/src/test/java/org/jabref/logic/exporter/AcademicPagesExporterTest.java
       - uses: ./.github/actions/setup-gradle
         if: steps.changed-windows-related-files.outputs.any_changed == 'true'
       - name: Run jablib tests
