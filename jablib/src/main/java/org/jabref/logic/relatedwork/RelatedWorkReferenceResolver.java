@@ -34,8 +34,14 @@ public class RelatedWorkReferenceResolver {
     public Map<String, BibEntry> parseReferences(LinkedFile linkedFile,
                                                  BibDatabaseContext databaseContext,
                                                  FilePreferences filePreferences) throws IOException {
-        Path pdfPath = resolvePdfPath(linkedFile, databaseContext, filePreferences);
-        List<BibEntry> parsedEntries = parseReferenceEntries(pdfPath);
+        // Get absolute path of PDF file
+        Path pdfPath = linkedFile.findIn(databaseContext, filePreferences)
+                                 .orElseThrow(() -> new IOException("Failed to resolve linked PDF file: " + linkedFile.getLink() + ". Please check the file and try again."));
+
+        // Locate Reference section and parse references
+        PDDocument document = Loader.loadPDF(pdfPath.toFile());
+        ParserResult parserResult = bibliographyPdfImporter.importDatabase(pdfPath, document);
+        List<BibEntry> parsedEntries = List.copyOf(parserResult.getDatabase().getEntries());
 
         Map<String, BibEntry> entriesByMarker = new HashMap<>();
         for (BibEntry parsedEntry : parsedEntries) {
@@ -47,26 +53,5 @@ public class RelatedWorkReferenceResolver {
         }
 
         return entriesByMarker;
-    }
-
-    /// Get absolute path of PDF file
-    private Path resolvePdfPath(LinkedFile linkedFile,
-                                BibDatabaseContext databaseContext,
-                                FilePreferences filePreferences) {
-        Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
-
-        return resolvedPath.get();
-    }
-
-    /// Locate Reference section and parse references
-    ///
-    /// @param pdfPath Absolute path of PDF file
-    /// @return List of reference entries
-    public List<BibEntry> parseReferenceEntries(Path pdfPath) throws IOException {
-        try (PDDocument document = Loader.loadPDF(pdfPath.toFile())) {
-            ParserResult parserResult = bibliographyPdfImporter.importDatabase(pdfPath, document);
-
-            return List.copyOf(parserResult.getDatabase().getEntries());
-        }
     }
 }
