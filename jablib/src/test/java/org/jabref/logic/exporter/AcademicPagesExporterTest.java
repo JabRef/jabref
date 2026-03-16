@@ -227,20 +227,6 @@ class AcademicPagesExporterTest {
     }
 
     @Test
-    void missingMonthDefaultsToJanuary(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("nomonth2021")
-                .withField(StandardField.TITLE, "No Month Paper")
-                .withField(StandardField.YEAR, "2021");
-
-        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
-
-        assertTrue(Files.exists(tempDir.resolve("output")
-                                       .resolve("_publications")
-                                       .resolve("2021-01-01-nomonth2021.md")));
-    }
-
-    @Test
     void multipleEntriesCreateMultipleFiles(@TempDir Path tempDir) throws Exception {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("paper2020")
@@ -336,6 +322,21 @@ class AcademicPagesExporterTest {
         // parts[0] is empty (before first ---), parts[1] is YAML, parts[2] is body
         assertEquals(3, parts.length);
         assertTrue(parts[2].strip().contains("This is my abstract."));
+    }
+
+    @Test
+    void missingDateOmitsDateAndPermalink(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("nodate")
+                .withField(StandardField.TITLE, "No Date Paper");
+
+        exporter.export(databaseContext, tempDir.resolve("output.md"), List.of(entry));
+
+        String content = Files.readString(tempDir.resolve("output")
+                                                 .resolve("_publications")
+                                                 .resolve("nodate.md"));
+        assertFalse(content.contains("date:"));
+        assertFalse(content.contains("permalink:"));
     }
 
     private String extractYamlValue(String content, String key) {
