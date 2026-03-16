@@ -155,34 +155,32 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         String fieldName = newFieldToAdd.get().trim();
         EntryType entryType = selectedEntryType.getValue().entryType().getValue().getType();
         Field newField = FieldFactory.parseField(entryType, fieldName);
-
-        boolean fieldExists = displayNameExists(FieldTextMapper.getDisplayName(newField));
-
-        if (fieldExists) {
-            FieldViewModel existingFieldViewModel = findExistingField(newField);
+        Optional<FieldViewModel> existingFieldViewModel = findExistingField(newField);
+        if (existingFieldViewModel.isPresent()) {
+            FieldViewModel field = existingFieldViewModel.get();
             if (newField.isStandardField()) {
                 dialogService.showWarningDialogAndWait(
                         Localization.lang("Duplicate fields"),
                         Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", FieldTextMapper.getDisplayName(newField)));
 
-                return Optional.of(existingFieldViewModel);
+                return existingFieldViewModel;
             }
 
             // customized field
-            ObservableList<FieldProperty> fieldProperties = existingFieldViewModel.getProperties();
+            ObservableList<FieldProperty> fieldProperties = field.getProperties();
             if ((!fieldProperties.isEmpty() && fieldProperties.equals(selectedProperties))
                     || (fieldProperties.isEmpty() && fieldProperties.equals(selectedProperties))) {
                 dialogService.showWarningDialogAndWait(
                         Localization.lang("Duplicate properties"),
                         Localization.lang("Warning: Current properties are the same as before."));
-                return Optional.of(existingFieldViewModel);
+                return existingFieldViewModel;
             }
 
-            existingFieldViewModel.getProperties().clear();
-            existingFieldViewModel.getProperties().addAll(selectedProperties);
+            field.getProperties().clear();
+            field.getProperties().addAll(selectedProperties);
 
             // TODO： update action is not visually obvious, can use notify function in JabRefDialogService.java
-            return Optional.of(existingFieldViewModel);
+            return existingFieldViewModel;
         }
 
         FieldViewModel fieldViewModel = new FieldViewModel(newField,
@@ -197,7 +195,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         return Optional.of(fieldViewModel);
     }
 
-    public FieldViewModel findExistingField(Field field) {
+    private Optional<FieldViewModel> findExistingField(Field field) {
         String displayName = FieldTextMapper.getDisplayName(field);
         return selectedEntryType.getValue()
                                 .fields()
@@ -205,7 +203,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                                 .filter(fieldViewModel ->
                                         fieldViewModel.displayNameProperty().getValue()
                                                       .equalsIgnoreCase(displayName))
-                                .findFirst().get();
+                                .findFirst();
     }
 
     public boolean displayNameExists(String displayName) {
