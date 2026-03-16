@@ -101,9 +101,13 @@ public class AcademicPagesExporter extends Exporter {
         }
 
         for (BibEntry entry : entries.stream().sorted(ENTRY_TYPE_ORDER).toList()) {
+            String markdown = buildMarkdown(entry, filesDir, databaseContext, fileDirForDatabase, abbreviationRepository);
+            // Normalize line endings to \n for Jekyll compatibility
+            markdown = markdown.replace("\r\n", "\n").replace("\r", "\n");
+
             Path mdFile = publicationsDir.resolve(generateFileName(entry, publicationsDir));
             try {
-                Files.writeString(mdFile, buildMarkdown(entry, filesDir, databaseContext, fileDirForDatabase, abbreviationRepository));
+                Files.writeString(mdFile, markdown);
             } catch (IOException ex) {
                 throw new SaveException(ex);
             }

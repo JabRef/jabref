@@ -258,7 +258,7 @@ class AcademicPagesExporterTest {
 
         String content = Files.readString(tempDir.resolve("output")
                                                  .resolve("_publications")
-                                                 .resolve("2020-01-01-venue2020.md"));
+                                                 .resolve("2020-01-01-venue2020.md")).replace("\r\n", "\n");
         assertTrue(content.contains("venue: \"Science\""));
         assertFalse(content.contains("Should Not Appear"));
     }
@@ -274,7 +274,7 @@ class AcademicPagesExporterTest {
 
         String content = Files.readString(tempDir.resolve("output")
                                                  .resolve("_publications")
-                                                 .resolve("2020-01-01-noabs2020.md"));
+                                                 .resolve("2020-01-01-noabs2020.md")).replace("\r\n", "\n");
         assertTrue(content.endsWith("---\n"));
     }
 
@@ -316,7 +316,7 @@ class AcademicPagesExporterTest {
 
         String content = Files.readString(tempDir.resolve("output")
                                                  .resolve("_publications")
-                                                 .resolve("2020-01-01-abs2020.md"));
+                                                 .resolve("2020-01-01-abs2020.md")).replace("\r\n", "\n");
 
         String[] parts = content.split("---\n");
         // parts[0] is empty (before first ---), parts[1] is YAML, parts[2] is body
@@ -334,7 +334,7 @@ class AcademicPagesExporterTest {
 
         String content = Files.readString(tempDir.resolve("output")
                                                  .resolve("_publications")
-                                                 .resolve("nodate.md"));
+                                                 .resolve("nodate.md")).replace("\r\n", "\n");
         assertFalse(content.contains("date:"));
         assertFalse(content.contains("permalink:"));
     }
