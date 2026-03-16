@@ -428,8 +428,9 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
     private static final String PUSH_VSCODE_PATH = "VScodePath";
     private static final String PUSH_CITE_COMMAND = "citeCommand";
+    // endregion
 
-    // Git
+    // region Git
     private static final String GITHUB_PAT_KEY = "githubPersonalAccessToken";
     private static final String GITHUB_USERNAME_KEY = "githubUsername";
     private static final String GITHUB_REMOTE_URL_KEY = "githubRemoteUrl";
@@ -513,7 +514,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
         defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
 
-        // region: Grobid
+        // region Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_PREFERENCE, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
@@ -694,7 +695,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(LAST_EDITED, "");
         // endregion
 
-        // region:AI
+        // region AI
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
         defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
@@ -721,8 +722,9 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
+        // endregion
 
-        // region:AI templates
+        // region AI templates
         defaults.put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
         defaults.put(AI_CHATTING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_USER_MESSAGE));
         defaults.put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE));
@@ -760,7 +762,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
 
-        // region: Git preferences
+        // region Git preferences
         defaults.put(GITHUB_PAT_KEY, "");
         defaults.put(GITHUB_USERNAME_KEY, "");
         defaults.put(GITHUB_REMOTE_URL_KEY, "");
@@ -845,9 +847,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return JabRefCliPreferences.singleton;
     }
 
-    /// **********************************************************************************************************
-    /// Common serializer logic
-    /// ************************************************************************************************************
+    // region Common serializer logic
 
     @VisibleForTesting
     static String convertListToString(List<String> value) {
@@ -857,15 +857,16 @@ public class JabRefCliPreferences implements CliPreferences {
     @VisibleForTesting
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
-            return List.of();
+            // list needs to be mutable in observable preferences
+            // keep consistency with Splitter#splitToList
+            return new ArrayList<>();
         }
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
     }
+    // endregion
 
-    /// ************************************************************************************************************
-    /// Backingstore access logic
-    /// ************************************************************************************************************
+    // region Backingstore access logic
 
     /// Check whether a key is set (differently from null).
     ///
@@ -878,6 +879,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public String get(String key) {
         return PREFS_NODE.get(key, (String) defaults.get(key));
     }
+    // endregion
 
     public String getEmptyIsDefault(String key) {
         String defaultValue = (String) defaults.get(key);
@@ -1143,10 +1145,8 @@ public class JabRefCliPreferences implements CliPreferences {
                     ex);
         }
     }
-    //*************************************************************************************************************
-    // ToDo: Cleanup
-    //*************************************************************************************************************
 
+    // ToDo: Cleanup
     @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
         return new LayoutFormatterPreferences(
@@ -1173,9 +1173,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return journalAbbreviationPreferences;
     }
 
-    //*************************************************************************************************************
-    // CustomEntryTypes
-    //*************************************************************************************************************
+    // region CustomEntryTypes
 
     @Override
     public BibEntryTypesManager getCustomEntryTypesRepository() {
@@ -1231,6 +1229,7 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
+    // endregion
 
     @Override
     public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
@@ -1273,6 +1272,7 @@ public class JabRefCliPreferences implements CliPreferences {
     //*************************************************************************************************************
     // Misc
     //*************************************************************************************************************
+    // region Misc
 
     @Override
     public LibraryPreferences getLibraryPreferences() {
@@ -1355,10 +1355,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return timestampPreferences;
     }
+    // endregion
 
-    //*************************************************************************************************************
-    // Network preferences
-    //*************************************************************************************************************
+    // region Network preferences
 
     @Override
     public RemotePreferences getRemotePreferences() {
@@ -1383,8 +1382,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return remotePreferences;
     }
+    // endregion
 
-    // region: Proxy Preferences
+    // region Proxy Preferences
     @Override
     public ProxyPreferences getProxyPreferences() {
         if (proxyPreferences != null) {
@@ -1424,7 +1424,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
         );
     }
-    // endRegion: Proxy Preferences
+    // endregion
 
     private String getProxyPassword() {
         if (getBoolean(PROXY_PERSIST_PASSWORD)) {
@@ -1472,9 +1472,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return sslPreferences;
     }
 
-    //*************************************************************************************************************
-    // CitationKeyPatternPreferences
-    //*************************************************************************************************************
+    // region CitationKeyPatternPreferences
 
     private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
@@ -1492,6 +1490,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPattern;
     }
+    // endregion
 
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
@@ -1578,10 +1577,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return keySuffix;
     }
 
-    //*************************************************************************************************************
-    // BibEntryPreferences
-    //*************************************************************************************************************
-
+    // region BibEntryPreferences
     @Override
     public BibEntryPreferences getBibEntryPreferences() {
         if (bibEntryPreferences != null) {
@@ -1596,11 +1592,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return bibEntryPreferences;
     }
+    // endregion
 
-    //*************************************************************************************************************
     // InternalPreferences
-    //*************************************************************************************************************
-
     protected Path getDefaultPath() {
         return Path.of("/");
     }
@@ -1675,10 +1669,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return fieldPreferences;
     }
 
-    //*************************************************************************************************************
-    // Linked files preferences
-    //*************************************************************************************************************
-
+    // region Linked files preferences
     protected boolean moveToTrashSupported() {
         return false;
     }
@@ -1737,6 +1728,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return filePreferences;
     }
+    // endregion
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
@@ -1774,9 +1766,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return citationKeyDependency;
     }
 
-    //*************************************************************************************************************
-    // Import/Export preferences
-    //*************************************************************************************************************
+    // region Import/Export preferences
 
     @Override
     public ExportPreferences getExportPreferences() {
@@ -1844,13 +1834,14 @@ public class JabRefCliPreferences implements CliPreferences {
             putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
         }
     }
+    // endregion
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
         SaveOrder exportSaveOrder = getExportSaveOrder();
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE -> {
-                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
+                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to default save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
             case SPECIFIED ->
@@ -2210,10 +2201,6 @@ public class JabRefCliPreferences implements CliPreferences {
         return protectedTermsPreferences;
     }
 
-    //*************************************************************************************************************
-    // Importer preferences
-    //*************************************************************************************************************
-
     @Override
     public ImporterPreferences getImporterPreferences() {
         if (importerPreferences != null) {
@@ -2432,8 +2419,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getFilePreferences());
     }
 
-    // endregion
-
     @Override
     public OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository) {
         if (openOfficePreferences != null) {
@@ -2516,6 +2501,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return gitPreferences;
     }
+
+    // endregion
 
     private static void deleteGitHubPat() {
         try (final Keyring keyring = Keyring.create()) {
