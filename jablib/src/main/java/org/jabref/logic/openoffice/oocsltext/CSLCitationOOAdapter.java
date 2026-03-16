@@ -179,8 +179,8 @@ public class CSLCitationOOAdapter {
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
         markManager.readAndUpdateExistingMarks();
-        updateAllCitationsWithNewStyle(selectedStyle, false);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
+        updateAllCitationsWithNewStyle(selectedStyle, false);
         markManager.readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
