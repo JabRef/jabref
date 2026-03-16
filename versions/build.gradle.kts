@@ -122,7 +122,7 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-api:3.1.1")
     api("org.glassfish.hk2:hk2-locator:3.1.1")
     api("org.glassfish.hk2:hk2-utils:3.1.1")
-    api("org.glassfish.jaxb:jaxb-runtime:4.0.6")
+    api("org.glassfish.jaxb:jaxb-runtime:4.0.7")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
     api("org.hisp.dhis:json-tree:1.8.1")
