@@ -69,7 +69,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +107,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      DialogService dialogService,
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
+                     JournalAbbreviationRepository journalAbbreviationRepository,
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
@@ -123,7 +123,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
-        this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+        this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -152,8 +152,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         libraryTab.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry -> RightClickMenu.create(entry,
-                        keyBindingRepository,
+                .withContextMenu(_ -> RightClickMenu.create(
                         libraryTab,
                         dialogService,
                         stateManager,
@@ -161,7 +160,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         undoManager,
                         clipBoardManager,
                         taskExecutor,
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                        journalAbbreviationRepository,
                         entryTypesManager,
                         importHandler))
                 .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))

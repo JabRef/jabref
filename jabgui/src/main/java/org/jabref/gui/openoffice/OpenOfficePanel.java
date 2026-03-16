@@ -34,7 +34,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.clipboard.ClipBoardManager;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -50,7 +49,6 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
@@ -100,6 +98,8 @@ public class OpenOfficePanel {
     private final GuiPreferences preferences;
     private final OpenOfficePreferences openOfficePreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
+
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -117,10 +117,6 @@ public class OpenOfficePanel {
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            GuiPreferences preferences,
-                           OpenOfficePreferences openOfficePreferences,
-                           ExternalApplicationsPreferences externalApplicationsPreferences,
-                           LayoutFormatterPreferences layoutFormatterPreferences,
-                           CitationKeyPatternPreferences citationKeyPatternPreferences,
                            JournalAbbreviationRepository abbreviationRepository,
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,
@@ -133,22 +129,24 @@ public class OpenOfficePanel {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.preferences = preferences;
-        this.openOfficePreferences = openOfficePreferences;
-        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
-        this.taskExecutor = taskExecutor;
-        this.dialogService = dialogService;
-        this.aiService = aiService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
+        this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
+        this.aiService = aiService;
+
+        this.preferences = preferences;
+        this.journalAbbreviationRepository = abbreviationRepository;
+        this.openOfficePreferences = preferences.getOpenOfficePreferences(journalAbbreviationRepository);
+        this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         this.currentStyle = openOfficePreferences.getCurrentStyle();
 
         this.currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
 
         jStyleLoader = new JStyleLoader(
                 openOfficePreferences,
-                layoutFormatterPreferences,
+                preferences.getLayoutFormatterPreferences(),
                 abbreviationRepository);
 
         cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
@@ -165,7 +163,7 @@ public class OpenOfficePanel {
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
         manualConnect.setMaxWidth(Double.MAX_VALUE);
 
-        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, externalApplicationsPreferences));
+        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, preferences.getExternalApplicationsPreferences()));
         help.setMaxWidth(Double.MAX_VALUE);
 
         selectDocument = new Button();
@@ -233,7 +231,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(_ -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader, journalAbbreviationRepository);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;

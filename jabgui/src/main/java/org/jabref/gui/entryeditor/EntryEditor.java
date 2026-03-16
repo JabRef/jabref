@@ -162,6 +162,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 adaptVisibleTabs();
             } else {
                 this.allPossibleTabs.clear();
+                close();
             }
         });
 
@@ -198,6 +199,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         if (tab instanceof TabWithPreviewPanel previewTab) {
                             previewTab.handleFocus();
                         }
+                    }
+                });
+
+        EasyBind.listen(preferences.getEntryEditorPreferences().shouldShowRecommendationsTabProperty(),
+                (_, _, newValue) -> {
+                    if (currentlyEditedEntry != null) {
+                        adaptVisibleTabs();
                     }
                 });
     }
