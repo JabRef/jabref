@@ -35,6 +35,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -47,15 +49,15 @@ public class AcademicPagesExporter extends Exporter {
     private static final String PUBLICATION_PATH = "publication";
 
     /// Orders entries by type priority: book -> article -> incollection -> inproceedings -> others
-    private static final Map<String, Integer> ENTRY_TYPE_PRIORITY = Map.of(
-            "book", 1,
-            "article", 2,
-            "incollection", 3,
-            "inproceedings", 4
+    private static final Map<EntryType, Integer> ENTRY_TYPE_PRIORITY = Map.of(
+            StandardEntryType.Book, 1,
+            StandardEntryType.Article, 2,
+            StandardEntryType.InCollection, 3,
+            StandardEntryType.InProceedings, 4
     );
 
     private static final Comparator<BibEntry> ENTRY_TYPE_ORDER = Comparator.comparingInt(
-            entry -> ENTRY_TYPE_PRIORITY.getOrDefault(entry.getType().getName(), 0)
+            entry -> ENTRY_TYPE_PRIORITY.getOrDefault(entry.getType(), 0)
     );
 
     private final LayoutFormatterPreferences layoutPreferences;
