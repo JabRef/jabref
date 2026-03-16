@@ -51,7 +51,6 @@ import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.DisposedException;
@@ -928,19 +927,14 @@ public class OOBibBase {
                     doc.lockControllers();
 
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-                } catch (NoDocumentException
-                         | NoSuchElementException
-                         | PropertyVetoException
-                         | UnknownPropertyException e) {
+                } catch (NoDocumentException | com.sun.star.uno.Exception e) {
                     throw new RuntimeException(e);
                 } finally {
                     doc.unlockControllers();
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
-            } catch (CreationException
-                     | WrappedTargetException
-                     | com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (CreationException | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }

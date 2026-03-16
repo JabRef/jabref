@@ -12,13 +12,11 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoTextSection;
 
-import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +40,7 @@ public class CSLUpdateBibliography {
                                        CitationStyle citationStyle,
                                        BibDatabaseContext bibDatabaseContext,
                                        BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, NoDocumentException, CreationException, NoSuchElementException, PropertyVetoException, UnknownPropertyException {
+            throws Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
 
         // Ensure the bibliography section exists
@@ -88,7 +86,7 @@ public class CSLUpdateBibliography {
                                            CitationStyle citationStyle,
                                            BibDatabaseContext bibDatabaseContext,
                                            BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, NoDocumentException, CreationException {
+            throws Exception, NoDocumentException, CreationException {
         LOGGER.debug("Populating CSL bibliography section");
 
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
