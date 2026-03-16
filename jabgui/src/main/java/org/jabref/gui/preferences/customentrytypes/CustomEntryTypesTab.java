@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -147,6 +148,21 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
             }
 
             String displayName = FieldTextMapper.getDisplayName(field);
+
+            Optional<FieldViewModel> existingField = selectedEntryTypeViewModel.fields()
+                                                                               .stream()
+                                                                               .filter(fieldViewModel ->
+                                                                                       fieldViewModel.displayNameProperty()
+                                                                                                     .getValue()
+                                                                                                     .equalsIgnoreCase(displayName)
+                                                                               )
+                                                                               .findFirst();
+
+            existingField.stream()
+                         .flatMap(fieldViewModel -> fieldViewModel.getProperties().stream())
+                         .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                         .forEach(fieldPropertyCheckComboBox.getCheckModel()::check);
+
             selectedEntryTypeViewModel.fields()
                                       .stream()
                                       .filter(fieldViewModel ->
@@ -154,10 +170,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                                                             .getValue()
                                                             .equalsIgnoreCase(displayName))
                                       .findFirst()
-                                      .ifPresent(existingFieldViewModel -> existingFieldViewModel.getProperties()
-                                                                                                 .stream()
-                                                                                                 .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
-                                                                                                 .forEach(fieldPropertyCheckComboBox.getCheckModel()::check));
+                                      .stream()
+                                      .flatMap(existingFieldViewModel -> existingFieldViewModel.getProperties().stream())
+                                      .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
+                                      .forEach(fieldPropertyCheckComboBox.getCheckModel()::check);
         });
     }
 
