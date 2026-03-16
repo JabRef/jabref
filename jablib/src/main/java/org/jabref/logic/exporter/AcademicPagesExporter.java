@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -46,19 +47,16 @@ public class AcademicPagesExporter extends Exporter {
     private static final String PUBLICATION_PATH = "publication";
 
     /// Orders entries by type priority: book -> article -> incollection -> inproceedings -> others
+    private static final Map<String, Integer> ENTRY_TYPE_PRIORITY = Map.of(
+            "book", 1,
+            "article", 2,
+            "incollection", 3,
+            "inproceedings", 4
+    );
+
     private static final Comparator<BibEntry> ENTRY_TYPE_ORDER = Comparator.comparingInt(
-            entry -> switch (entry.getType().getName()) {
-                case "book" ->
-                        0;
-                case "article" ->
-                        1;
-                case "incollection" ->
-                        2;
-                case "inproceedings" ->
-                        3;
-                default ->
-                        4;
-            });
+            entry -> ENTRY_TYPE_PRIORITY.getOrDefault(entry.getType().getName(), 0)
+    );
 
     private final LayoutFormatterPreferences layoutPreferences;
     private final FieldPreferences fieldPreferences;
@@ -112,7 +110,8 @@ public class AcademicPagesExporter extends Exporter {
 
     private String generateFileName(BibEntry entry, Path targetDir) {
         String key = FileUtil.getValidFileName(entry.getCitationKey().orElse("unknown"));
-        return FileNameUniqueness.generateUniqueFileName(targetDir, resolveDate(entry) + "-" + key + ".md");
+        String prefix = resolveDate(entry).map(d -> d + "-").orElse("");
+        return FileNameUniqueness.generateUniqueFileName(targetDir, prefix + key + ".md");
     }
 
     /// Builds the full Markdown file: YAML front matter (layout + computed fields) + optional abstract body
@@ -121,7 +120,7 @@ public class AcademicPagesExporter extends Exporter {
                                  BibDatabaseContext databaseContext,
                                  List<Path> fileDirForDatabase,
                                  JournalAbbreviationRepository abbreviationRepository) {
-        String date = resolveDate(entry);
+        Optional<String> date = resolveDate(entry);
         String key = FileUtil.getValidFileName(entry.getCitationKey().orElse("unknown"));
 
         StringBuilder sb = new StringBuilder("---\n");
@@ -131,8 +130,10 @@ public class AcademicPagesExporter extends Exporter {
                 .ifPresent(rendered -> sb.append(rendered.stripTrailing()).append("\n"));
 
         // permalink, date, paperurl, bibtexurl, citation
-        sb.append("permalink: /").append(PUBLICATION_PATH).append("/").append(date).append("-").append(key).append("\n");
-        sb.append("date: ").append(date).append("\n");
+        date.ifPresent(d -> {
+            sb.append("permalink: /").append(PUBLICATION_PATH).append("/").append(d).append("-").append(key).append("\n");
+            sb.append("date: ").append(d).append("\n");
+        });
         copyPdfAndGetUrl(entry, filesDir, key, fileDirForDatabase)
                 .ifPresent(url -> sb.append("paperurl: '/files/").append(url).append("'\n"));
         writeBibFile(entry, filesDir, key)
@@ -227,11 +228,10 @@ public class AcademicPagesExporter extends Exporter {
                 entryTypesManager).getFirst().trim();
     }
 
-    private String resolveDate(BibEntry entry) {
+    private Optional<String> resolveDate(BibEntry entry) {
         return entry.getFieldOrAlias(StandardField.DATE)
                     .flatMap(Date::parse)
-                    .map(date -> formatDate(date.toTemporalAccessor()))
-                    .orElse("0000-01-01");
+                    .map(date -> formatDate(date.toTemporalAccessor()));
     }
 
     private String formatDate(TemporalAccessor temporal) {
@@ -241,11 +241,7 @@ public class AcademicPagesExporter extends Exporter {
             try {
                 return DateTimeFormatter.ofPattern("uuuu-MM").format(temporal) + "-01";
             } catch (DateTimeException e2) {
-                try {
-                    return DateTimeFormatter.ofPattern("uuuu").format(temporal) + "-01-01";
-                } catch (DateTimeException e3) {
-                    return "0000-01-01";
-                }
+                return DateTimeFormatter.ofPattern("uuuu").format(temporal) + "-01-01";
             }
         }
     }
