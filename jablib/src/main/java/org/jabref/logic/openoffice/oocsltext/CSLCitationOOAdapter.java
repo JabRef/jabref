@@ -178,6 +178,7 @@ public class CSLCitationOOAdapter {
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
+        markManager.readAndUpdateExistingMarks();
         updateAllCitationsWithNewStyle(selectedStyle, false);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
