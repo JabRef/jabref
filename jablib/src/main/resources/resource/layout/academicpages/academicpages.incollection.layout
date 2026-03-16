@@ -2,4 +2,4 @@ title: "\format[RemoveLatexCommands,RemoveBrackets]{\title}"
 collection: publications
 \begin{note}excerpt: "\format[RemoveLatexCommands,RemoveBrackets]{\note}"
 \end{note}\begin{booktitle}venue: "\format[RemoveLatexCommands,RemoveBrackets]{\booktitle}"
-\end{booktitle}category: manuscripts
+\end{booktitle}category:
