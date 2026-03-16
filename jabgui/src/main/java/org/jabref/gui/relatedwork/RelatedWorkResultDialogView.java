@@ -87,7 +87,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
     }
 
     private String getCommentPreview(RelatedWorkMatchResult matchResult) {
-        String sourceCitationKey = sourceEntry.getCitationKey().orElse("");
+        String sourceCitationKey = sourceEntry.getCitationKey().orElse("undefined");
         return "[%s]: %s".formatted(sourceCitationKey, matchResult.contextText());
     }
 }
