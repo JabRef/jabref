@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -17,7 +16,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -69,7 +67,7 @@ class Convert implements Runnable {
             return;
         }
 
-        applyFormatters(fieldFormatters, parserResult.get().getDatabase().getEntries());
+        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.get().getDatabase().getEntries());
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
@@ -122,18 +120,6 @@ class Convert implements Runnable {
                  | ParserConfigurationException
                  | TransformerException ex) {
             LOGGER.error("Could not export file '{}'.", outputFile, ex);
-        }
-    }
-
-    public static void applyFormatters(String fieldFormatters, List<BibEntry> entries) {
-        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
-            String parseableString = fieldFormatters.replaceAll(",(?![^\\[]*\\])", "\n");
-            List<FieldFormatterCleanup> cleanups = FieldFormatterCleanupMapper.parseActions(parseableString);
-            for (BibEntry entry : entries) {
-                for (FieldFormatterCleanup cleanup : cleanups) {
-                    cleanup.cleanup(entry);
-                }
-            }
         }
     }
 }
