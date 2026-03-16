@@ -62,8 +62,8 @@ Two extra `pdflatex` runs are needed so BibTeX references and cross-references a
 
 ### Test: Extract related work text
 
-The **Related Work** section of `main.pdf` contains three paragraphs, each describing
-one of the referenced papers using IEEE numeric citations `[1]`, `[2]`, `[3]`:
+The **Related Work** section of `main.pdf` contains one sentence per referenced paper,
+using IEEE numeric citations `[1]`, `[2]`, `[3]`:
 
 | Citation | Key in .bib | Paper title |
 |----------|-------------|-------------|
@@ -76,9 +76,7 @@ one of the referenced papers using IEEE numeric citations `[1]`, `[2]`, `[3]`:
 1. Open `main.pdf` in your PDF reader.
 2. In the **Related Work** section, select the sentence describing paper `[1]`:
 
-   > Smith and Brown conducted a comprehensive analysis of sustainable agriculture
-   > methods for tropical regions, demonstrating that organic farming practices can
-   > increase yield by up to 30% while reducing chemical input by 50% [1].
+   > Smith and Brown demonstrated that organic farming practices in tropical regions can increase yield by up to 30% while reducing chemical input by 50% [1].
 
 3. Copy the selected text to the clipboard (`Ctrl+C`).
 4. In JabRef, select the entry `Smith2021` in your library.
@@ -88,7 +86,7 @@ one of the referenced papers using IEEE numeric citations `[1]`, `[2]`, `[3]`:
 8. Verify that the `Smith2021` entry now has a `comment-{username}` field containing:
 
    ```
-   - Smith2021: Smith and Brown conducted a comprehensive analysis ...
+   - Smith2021: Smith and Brown demonstrated that organic farming practices in tropical regions can increase yield by up to 30% while reducing chemical input by 50%.
    ```
 
 Repeat steps 2–8 for citations `[2]` (entry `Garcia2022`) and `[3]` (entry `Chen2023`).
