@@ -174,7 +174,9 @@ public class IndexManager {
         /// Accumulate which fields need updating for this entry
         pendingFieldsByEntry.computeIfAbsent(entry, _ -> ConcurrentHashMap.newKeySet()).add(field);
 
-        /// For FILE field: track baseline old value and latest new value
+        /// FILE field updates rely on oldValue/newValue diffing in linkedFilesIndexer
+        /// Intermediate events dropped by the throttler would corrupt the baseline,
+        /// so we preserve the first oldValue seen and always update to the latest newValue
         if (field.equals(StandardField.FILE)) {
             pendingFileValuesByEntry.compute(entry, (_, existing) -> {
                 if (existing == null) {
