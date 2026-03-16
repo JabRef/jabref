@@ -55,7 +55,8 @@ public class KeywordsEditor extends TagsEditor {
 
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
-                          FieldCheckers fieldCheckers) {
+                          FieldCheckers fieldCheckers,
+                          CliPreferences preferences) {
 
         super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
 
@@ -63,7 +64,7 @@ public class KeywordsEditor extends TagsEditor {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                Injector.instantiateModelOrService(CliPreferences.class),
+                preferences,
                 undoManager);
 
         setupTagsField(
