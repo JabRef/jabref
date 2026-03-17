@@ -22,6 +22,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -329,6 +330,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
+                if (stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof TextInputControl)) {
+                    // We are in a text field. Skip key bindings that are used for text editing.
+                    // On macOS, ALT (option) +LEFT/RIGHT is used for word navigation.
+                    // On all platforms, ALT+1 is usually not used in text fields, but we skip it here as well to be safe and consistent.
+                    if (keyBinding.get() == KeyBinding.BACK
+                            || keyBinding.get() == KeyBinding.FORWARD
+                            || keyBinding.get() == KeyBinding.FOCUS_ENTRY_TABLE
+                            || keyBinding.get() == KeyBinding.FOCUS_GROUP_LIST) {
+                        return;
+                    }
+                }
+
                 switch (keyBinding.get()) {
                     case FOCUS_ENTRY_TABLE:
                         getCurrentLibraryTab().getMainTable().requestFocus();
