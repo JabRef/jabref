@@ -9,10 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupNodeViewModelFilterTest {
 
-    private boolean matches(String groupName, String query) {
-        return GroupNameFilterVisitor.matches(groupName, query);
-    }
-
     @ParameterizedTest
     @CsvSource({
             "machine, machine learning, true",
@@ -22,7 +18,7 @@ class GroupNodeViewModelFilterTest {
             "test group, test, true"
     })
     void spaceImpliesOr(String groupName, String query, boolean expected) {
-        assertEquals(expected, matches(groupName, query));
+        assertEquals(expected, GroupNameFilterVisitor.matches(groupName, query));
     }
 
     @ParameterizedTest
@@ -32,7 +28,7 @@ class GroupNodeViewModelFilterTest {
             "neural, machine AND neural, false"
     })
     void explicitAndRequiresBothWords(String groupName, String query, boolean expected) {
-        assertEquals(expected, matches(groupName, query));
+        assertEquals(expected, GroupNameFilterVisitor.matches(groupName, query));
     }
 
     @ParameterizedTest
@@ -42,7 +38,7 @@ class GroupNodeViewModelFilterTest {
             "unrelated, machine OR neural, false"
     })
     void explicitOrWorks(String groupName, String query, boolean expected) {
-        assertEquals(expected, matches(groupName, query));
+        assertEquals(expected, GroupNameFilterVisitor.matches(groupName, query));
     }
 
     @ParameterizedTest
@@ -51,7 +47,7 @@ class GroupNodeViewModelFilterTest {
             "learning, NOT machine, true"
     })
     void notWorks(String groupName, String query, boolean expected) {
-        assertEquals(expected, matches(groupName, query));
+        assertEquals(expected, GroupNameFilterVisitor.matches(groupName, query));
     }
 
     @ParameterizedTest
@@ -60,7 +56,7 @@ class GroupNodeViewModelFilterTest {
             "machine learning, MACHINE, true"
     })
     void caseInsensitiveMatch(String groupName, String query, boolean expected) {
-        assertEquals(expected, matches(groupName, query));
+        assertEquals(expected, GroupNameFilterVisitor.matches(groupName, query));
     }
 
     @ParameterizedTest
@@ -71,7 +67,7 @@ class GroupNodeViewModelFilterTest {
             "Machine Learning, (deep OR neural) NOT vision, false"
     })
     void parenthesesWithNotWork(String groupName, String query, boolean expected) {
-        assertEquals(expected, matches(groupName, query));
+        assertEquals(expected, GroupNameFilterVisitor.matches(groupName, query));
     }
 
     @ParameterizedTest
@@ -81,6 +77,6 @@ class GroupNodeViewModelFilterTest {
             "Neural Networks, (machine OR computer) NOT learning, false"
     })
     void complexExpressionWithNotLearning(String groupName, String query, boolean expected) {
-        assertEquals(expected, matches(groupName, query));
+        assertEquals(expected, GroupNameFilterVisitor.matches(groupName, query));
     }
 }
