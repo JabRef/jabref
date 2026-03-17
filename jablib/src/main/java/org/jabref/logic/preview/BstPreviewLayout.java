@@ -1,4 +1,4 @@
-package org.jabref.logic.bst;
+package org.jabref.logic.preview;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,13 +6,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
-import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
