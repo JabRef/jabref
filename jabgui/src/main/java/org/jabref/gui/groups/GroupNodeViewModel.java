@@ -351,6 +351,7 @@ public class GroupNodeViewModel {
     ///
     /// - another group (will be added as subgroup on drop)
     /// - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+    ///
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant
         boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
