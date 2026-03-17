@@ -633,7 +633,8 @@ public class OOBibBase {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (com.sun.star.uno.Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not insert entry", e);
+            OOError.fromMisc(e).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
             UnoUndo.leaveUndoContext(doc);
         }
