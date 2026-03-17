@@ -274,6 +274,9 @@ tasks.test {
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 jmh {

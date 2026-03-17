@@ -22,6 +22,7 @@ jvmDependencyConflicts {
     conflictResolution {
         select("org.gradlex:jna", "net.java.dev.jna:jna-jpms")
         select("org.gradlex:jna-platform", "net.java.dev.jna:jna-platform-jpms")
+        select("org.jabref:mslinks", "com.github.vatbub:mslinks")
     }
 }
 
