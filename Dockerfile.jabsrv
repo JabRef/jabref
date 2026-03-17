@@ -48,9 +48,11 @@ RUN ./gradlew --no-daemon :build-logic:jar
 
 COPY . .
 
-RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage && \
-    mkdir /dist && \
-    mv jabsrv-cli/build/packages/*/* /dist
+RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage
+
+RUN mkdir /dist
+
+RUN mv jabsrv-cli/build/packages/*/* /dist
 
 
 # jpackage needs glibc; alpine does not work
