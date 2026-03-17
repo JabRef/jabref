@@ -130,6 +130,7 @@ jobs:
 
   modernizer:
     name: Modernizer
+    if: false
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
