@@ -36,6 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed pages checker to allow suffix letters in the page range like "436S-439S". [#13701](https://github.com/JabRef/jabref/issues/13701)
 - We fixed PDF import to prefer the content extracted title over filename like XMP metadata titles. [#11999](https://github.com/JabRef/jabref/issues/11999)
 - We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
 - We fixed an issue where shortcut keys did not work for linked files in the entry editor. [#12564](https://github.com/JabRef/jabref/issues/12564)
