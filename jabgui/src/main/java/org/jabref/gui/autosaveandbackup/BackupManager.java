@@ -130,7 +130,7 @@ public class BackupManager {
     ///
     /// @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
     /// @return `true` if backup file exists AND differs from originalPath. `false` is the
-    /// "default" return value in the good case. In case a discarded file exists,`false` is returned, too.
+    /// "default" return value in the good case. In case a discarded file exists, `false` is returned, too.
     /// In the case of an exception `true` is returned to ensure that the user checks the output.
     public static boolean backupFileDiffers(Path originalPath, Path backupDir) {
         Path discardedFile = determineDiscardedFile(originalPath, backupDir);
