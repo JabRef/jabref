@@ -24,20 +24,18 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-
-import com.airhacks.afterburner.injection.Injector;
 
 public class StyleSelectDialogViewModel {
 
@@ -65,6 +63,7 @@ public class StyleSelectDialogViewModel {
                                       CSLStyleLoader cslStyleLoader,
                                       JStyleLoader jStyleLoader,
                                       GuiPreferences preferences,
+                                      JournalAbbreviationRepository journalAbbreviationRepository,
                                       TaskExecutor taskExecutor,
                                       BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
@@ -74,7 +73,7 @@ public class StyleSelectDialogViewModel {
 
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.filePreferences = preferences.getFilePreferences();
-        this.openOfficePreferences = preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+        this.openOfficePreferences = preferences.getOpenOfficePreferences(journalAbbreviationRepository);
 
         this.bibEntryTypesManager = bibEntryTypesManager;
 

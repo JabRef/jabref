@@ -9,6 +9,7 @@ import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
 import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -43,6 +44,9 @@ class GenerateBibFromAux implements Runnable {
     @Option(names = "--output")
     private Path outputFile;
 
+    @Option(names = {"--field-formatters"}, description = "Field Formatter")
+    private String fieldFormatters;
+
     @Override
     public void run() {
         Optional<ParserResult> pr = JabKit.importFile(
@@ -76,6 +80,8 @@ class GenerateBibFromAux implements Runnable {
             System.out.println(Localization.lang("No library generated."));
             return;
         }
+
+        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, subDatabase.getEntries());
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()

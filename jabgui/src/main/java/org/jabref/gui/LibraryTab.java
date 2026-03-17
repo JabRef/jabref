@@ -115,6 +115,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
+
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     private final NavigationHistory navigationHistory = new NavigationHistory();
@@ -195,6 +197,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.taskExecutor = taskExecutor;
         this.aiService = aiService;
 
+        this.journalAbbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
         initializeComponentsAndListeners(isDummyContext);
 
         // set LibraryTab ID for drag'n'drop
@@ -408,6 +411,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             Path databasePath = file.get();
             tabTitle.append(databasePath.getFileName().toString());
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
+            // Unicode codepoint deliberately chosen to avoid semantical confusion
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
             toolTipText.append(databasePath.toAbsolutePath());
 
@@ -475,6 +479,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService,
                 stateManager,
                 preferences.getKeyBindingRepository(),
+                journalAbbreviationRepository,
                 clipBoardManager,
                 entryTypesManager,
                 taskExecutor,
@@ -522,7 +527,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(
                     getDatabase(),
-                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                    journalAbbreviationRepository,
                     autoCompletePreferences);
         } else {
             // Create empty suggestion providers if auto-completion is deactivated
