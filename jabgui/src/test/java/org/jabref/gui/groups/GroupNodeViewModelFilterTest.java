@@ -1,7 +1,6 @@
 package org.jabref.gui.groups;
 
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
-import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -11,15 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class GroupNodeViewModelFilterTest {
 
     private boolean matches(String groupName, String query) {
-        if (query == null || query.isBlank()) {
-            return true;
-        }
-        try {
-            var ctx = SearchQuery.getStartContext(query);
-            return new GroupNameFilterVisitor(groupName).visit(ctx);
-        } catch (org.antlr.v4.runtime.misc.ParseCancellationException e) {
-            return groupName.toLowerCase().contains(query.toLowerCase());
-        }
+        return GroupNameFilterVisitor.matches(groupName, query);
     }
 
     @ParameterizedTest

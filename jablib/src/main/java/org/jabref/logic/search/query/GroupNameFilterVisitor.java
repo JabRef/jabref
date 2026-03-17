@@ -2,8 +2,12 @@ package org.jabref.logic.search.query;
 
 import java.util.Locale;
 
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
+
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /// Evaluates a Search.g4 parse tree against a group display name string.
 /// Key behavioral difference from {@link SearchQueryVisitor}:
@@ -83,5 +87,18 @@ public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
 
         String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue()).toLowerCase(Locale.ROOT);
         return groupName.contains(term);
+    }
+
+    /// Implemented a static method that checks whether the group name matches the given query string.
+    public static boolean matches(String groupName, String query) {
+        if (StringUtil.isBlank(query)) {
+            return true;
+        }
+        try {
+            SearchParser.StartContext ctx = SearchQuery.getStartContext(query);
+            return new GroupNameFilterVisitor(groupName).visit(ctx);
+        } catch (ParseCancellationException e) {
+            return StringUtil.containsIgnoreCase(groupName, query);
+        }
     }
 }
