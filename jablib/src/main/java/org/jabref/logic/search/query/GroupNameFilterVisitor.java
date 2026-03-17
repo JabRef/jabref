@@ -10,7 +10,6 @@ import org.jabref.search.SearchParser;
 /// {@code visitImplicitAndExpression} uses OR semantics (anyMatch) instead of AND,
 /// so space-separated bare terms like "machine learning" match any group containing
 /// either word. Explicit AND/OR/NOT and parentheses work as expected.
-
 public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
 
     private final String groupName;
@@ -68,6 +67,20 @@ public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
 
     @Override
     public Boolean visitComparison(SearchParser.ComparisonContext ctx) {
+        // Determine whether this is a simple term or a fielded/operator comparison.
+        // If the full node text differs from the searchValue text, we assume the
+        // presence of a field and/or operator (e.g., "name != learning").
+        String fullText = ctx.getText();
+        String valueText = ctx.searchValue().getText();
+
+        if (!fullText.equals(valueText)) {
+            // Fielded/operator comparisons are not supported by this visitor.
+            // Fall back to treating the entire comparison as a plain-text term,
+            // to avoid misinterpreting operators like "!=" as a positive match.
+            String plain = fullText.toLowerCase(Locale.ROOT);
+            return groupName.contains(plain);
+        }
+
         String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue()).toLowerCase(Locale.ROOT);
         return groupName.contains(term);
     }
