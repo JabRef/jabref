@@ -27,7 +27,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import static org.jabref.logic.git.merge.execution.GitMergeApplier.applyAutoPlan;
@@ -40,17 +39,20 @@ public class GitPullAction extends SimpleCommand {
     private final GuiPreferences guiPreferences;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public GitPullAction(DialogService dialogService,
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
                          TaskExecutor taskExecutor,
-                         GitHandlerRegistry gitHandlerRegistry) {
+                         GitHandlerRegistry gitHandlerRegistry,
+                         JournalAbbreviationRepository journalAbbreviationRepository) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         this.executable.bind(ActionHelper.needsGitRemoteConfigured(stateManager));
     }
@@ -163,7 +165,7 @@ public class GitPullAction extends SimpleCommand {
     }
 
     private BookkeepingResult saveAndFinalize(Path bibPath, BibDatabaseContext databaseContext, PullPlan pullPlan) throws IOException, GitAPIException, JabRefException {
-        GitFileWriter.write(bibPath, databaseContext, guiPreferences, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+        GitFileWriter.write(bibPath, databaseContext, guiPreferences, journalAbbreviationRepository);
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry);
         return gitSyncService.finalizeMerge(bibPath, pullPlan);
     }

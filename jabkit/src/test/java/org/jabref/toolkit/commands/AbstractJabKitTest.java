@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -59,7 +60,7 @@ public abstract class AbstractJabKitTest {
                 0,
                 0));
 
-        JabKit jabKit = new JabKit(preferences, entryTypesManager);
+        JabKit jabKit = new JabKit(preferences, entryTypesManager, mock(JournalAbbreviationRepository.class));
         commandLine = new CommandLine(jabKit);
 
         outWriter = new ByteArrayOutputStream();

@@ -108,7 +108,8 @@ class Search implements Runnable {
                         argumentProcessor.cliPreferences,
                         argumentProcessor.entryTypesManager,
                         new BibDatabase(matches),
-                        outputFile);
+                        outputFile,
+                        argumentProcessor.journalAbbreviationRepository);
                 LOGGER.debug("Finished export");
             } else {
                 // export new database

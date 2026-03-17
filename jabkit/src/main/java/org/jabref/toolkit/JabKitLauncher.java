@@ -75,7 +75,9 @@ public class JabKitLauncher {
             BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
-            JabKit jabKit = new JabKit(preferences, entryTypesManager);
+            JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+
+            JabKit jabKit = new JabKit(preferences, entryTypesManager, journalAbbreviationRepository);
             CommandLine commandLine = new CommandLine(jabKit);
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
@@ -92,7 +94,7 @@ public class JabKitLauncher {
             }
 
             // Heavy initialization only needed when actually executing a command
-            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
+            Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
             configureProxy(preferences.getProxyPreferences());

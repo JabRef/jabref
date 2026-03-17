@@ -82,7 +82,9 @@ class Pseudonymize implements Runnable {
                 argumentProcessor.cliPreferences,
                 argumentProcessor.entryTypesManager,
                 result.bibDatabaseContext(),
-                pseudoBibPath);
+                pseudoBibPath,
+                argumentProcessor.journalAbbreviationRepository
+        );
 
         if (!fileOverwriteCheck(pseudoKeyPath)) {
             return;

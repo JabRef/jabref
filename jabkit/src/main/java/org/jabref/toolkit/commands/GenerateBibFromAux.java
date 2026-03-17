@@ -87,7 +87,8 @@ class GenerateBibFromAux implements Runnable {
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     subDatabase,
-                    outputFile);
+                    outputFile,
+                    argumentProcessor.journalAbbreviationRepository);
         }
 
         if (!sharedOptions.porcelain) {

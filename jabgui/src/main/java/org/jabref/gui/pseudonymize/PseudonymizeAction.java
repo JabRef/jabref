@@ -20,7 +20,6 @@ import org.jabref.logic.pseudonymization.PseudonymizationResultCsvWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +32,13 @@ public class PseudonymizeAction extends SimpleCommand {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final CliPreferences preferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
-    public PseudonymizeAction(StateManager stateManager, DialogService dialogService, CliPreferences preferences) {
+    public PseudonymizeAction(StateManager stateManager, DialogService dialogService, CliPreferences preferences, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
         executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
@@ -88,7 +89,8 @@ public class PseudonymizeAction extends SimpleCommand {
                     fileWriter,
                     result.bibDatabaseContext(),
                     preferences,
-                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+                    journalAbbreviationRepository
+            );
             bibDatabaseWriter.writeDatabase(result.bibDatabaseContext());
 
             // Show just a warning message if encoding did not work for all characters:

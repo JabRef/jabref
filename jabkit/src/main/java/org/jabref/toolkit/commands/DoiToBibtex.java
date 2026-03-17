@@ -67,6 +67,6 @@ class DoiToBibtex implements Callable<Integer> {
             entries.add(entry.get());
         }
 
-        return JabKit.outputEntries(argumentProcessor.cliPreferences, entries);
+        return JabKit.outputEntries(argumentProcessor.cliPreferences, entries, argumentProcessor.journalAbbreviationRepository);
     }
 }

@@ -44,7 +44,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +60,7 @@ public class SaveDatabaseAction {
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -70,12 +70,14 @@ public class SaveDatabaseAction {
                               DialogService dialogService,
                               GuiPreferences preferences,
                               BibEntryTypesManager entryTypesManager,
-                              StateManager stateManager) {
+                              StateManager stateManager,
+                              JournalAbbreviationRepository journalAbbreviationRepository1) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.stateManager = stateManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository1;
     }
 
     public boolean save() {
@@ -259,7 +261,7 @@ public class SaveDatabaseAction {
                         saveConfiguration,
                         preferences,
                         entryTypesManager,
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+                        journalAbbreviationRepository);
                 if (selectedOnly) {
                     bibDatabaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
                 } else {
