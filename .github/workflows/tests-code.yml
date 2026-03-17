@@ -407,7 +407,7 @@ jobs:
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/setup-java@v5
         with:
-          java-version: '25'
+          java-version: '26'
           distribution: 'corretto'
           check-latest: true
 
@@ -463,7 +463,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          java-version: '25'
+          java-version: '26'
           distribution: 'corretto'
           check-latest: true
       - name: Modify ${{ matrix.script }} to include changed classes
@@ -519,7 +519,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 25
+          java-version: 26
           distribution: 'corretto'
           cache: maven
           check-latest: true

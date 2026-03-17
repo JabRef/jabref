@@ -18,7 +18,7 @@ java {
         // - jablib-examples/jbang/*.java
         // - jablib-examples/maven3/*/pom.xml
         // - Dockerfile.* (first line)
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(26)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
         // We also need a JDK without JavaFX, because we patch JavaFX due to modularity issues
@@ -28,7 +28,7 @@ java {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 25
+    options.release = 26
     // See https://docs.gradle.org/current/userguide/performance.html#a_run_the_compiler_as_a_separate_process
     options.isFork = true
 }

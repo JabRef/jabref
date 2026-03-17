@@ -1,7 +1,7 @@
-FROM maven:3.9.12-amazoncorretto-25-debian AS build
+FROM maven:3.9.14-amazoncorretto-25-debian AS build
 
 # Is not debian-based
-# FROM amazoncorretto:25-jdk AS build
+# FROM amazoncorretto:26-jdk AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
