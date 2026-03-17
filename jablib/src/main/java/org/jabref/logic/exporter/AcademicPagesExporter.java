@@ -20,7 +20,6 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -75,7 +74,7 @@ public class AcademicPagesExporter extends Exporter {
 
     @Override
     public void export(BibDatabaseContext databaseContext, Path outputFile, List<BibEntry> entries) throws SaveException {
-        export(databaseContext, outputFile, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
+        export(databaseContext, outputFile, entries, List.of(), new JournalAbbreviationRepository());
     }
 
     @Override
