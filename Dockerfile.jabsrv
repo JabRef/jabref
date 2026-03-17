@@ -32,6 +32,15 @@ COPY jabls-cli/build.gradle.kts jabls-cli/
 COPY jabsrv/build.gradle.kts jabsrv/
 COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
 COPY test-support test-support
+COPY ./jabgui/src/main/java/module-info.java ./jabgui/src/main/java/module-info.java
+COPY ./jabkit/src/main/java/module-info.java ./jabkit/src/main/java/module-info.java
+COPY ./jablib/src/main/java/module-info.java ./jablib/src/main/java/module-info.java
+COPY ./jabls/src/main/java/module-info.java ./jabls/src/main/java/module-info.java
+COPY ./jabls-cli/src/main/java/module-info.java ./jabls-cli/src/main/java/module-info.java
+COPY ./jabsrv/src/main/java/module-info.java ./jabsrv/src/main/java/module-info.java
+COPY ./jabsrv-cli/src/main/java/module-info.java ./jabsrv-cli/src/main/java/module-info.java
+COPY ./test-support/src/main/java/module-info.java ./test-support/src/main/java/module-info.java
+
 COPY versions versions
 
 # Cache gradle and build-logic
