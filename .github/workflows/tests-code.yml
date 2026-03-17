@@ -260,6 +260,11 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
+      - name: Install at-spi2-core
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: at-spi2-core
+          version: 1.0
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
