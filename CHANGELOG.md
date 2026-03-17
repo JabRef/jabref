@@ -60,6 +60,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an exception would be thrown when trying to extract references from a PDF [#15308](https://github.com/JabRef/jabref/pull/15308)
 - We fixed an issue where an exception was thrown when importing via cli and no opened library. [#15314](https://github.com/JabRef/jabref/pull/15314)
 - We fixed an issue where the Citation Relations tab failed to recognize already-imported papers when their DOI differed only in letter casing. [#12967](https://github.com/JabRef/jabref/issues/12967)
+- We fixed an issue where <kbd>Option</kbd>+<kbd>Left</kbd> and <kbd>Option</kbd>+<kbd>Right</kbd> did not work for for word navigation in text fields on macOS. [#15359](https://github.com/JabRef/jabref/pull/15359)
 
 ### Removed
 
