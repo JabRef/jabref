@@ -53,7 +53,7 @@
     <Label text="%( Note: Press return to commit changes in the table! )"/>
     <TableView
             fx:id="searchEngineTable"
-            VBox.vgrow="NEVER"
+            VBox.vgrow="ALWAYS"
             editable="true">
         <columns>
             <TableColumn minWidth="120"
