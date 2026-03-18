@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -81,13 +83,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         return Localization.lang("Web search");
     }
 
-    private static final double TABLE_ROW_HEIGHT = 30.0;
-    private static final double TABLE_HEADER_HEIGHT = 32.0;
-
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);
-
-        searchEngineTable.setFixedCellSize(TABLE_ROW_HEIGHT);
 
         searchEngineName.setCellValueFactory(param -> param.getValue().nameProperty());
         searchEngineName.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -98,8 +95,16 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         searchEngineUrlTemplate.setEditable(true);
 
         searchEngineTable.setItems(viewModel.getSearchEngines());
-        adjustTableHeight();
-        searchEngineTable.getItems().addListener((InvalidationListener) _ -> adjustTableHeight());
+
+        // Dynamic height based on font size and number of items
+        DoubleBinding rowHeight = Bindings.createDoubleBinding(
+                () -> enableWebSearch.getFont() != null ? enableWebSearch.getFont().getSize() * 2.5 : 30.0,
+                enableWebSearch.fontProperty());
+        searchEngineTable.fixedCellSizeProperty().bind(rowHeight);
+        searchEngineTable.prefHeightProperty().bind(
+                Bindings.size(searchEngineTable.getItems())
+                        .add(1.1) // Estimate for header height
+                        .multiply(rowHeight));
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
@@ -181,13 +186,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
         return container;
-    }
-
-    private void adjustTableHeight() {
-        double height = TABLE_HEADER_HEIGHT + (searchEngineTable.getItems().size() * TABLE_ROW_HEIGHT) + 2.0;
-        searchEngineTable.setPrefHeight(height);
-        searchEngineTable.setMinHeight(height);
-        searchEngineTable.setMaxHeight(height);
     }
 
     private void showApiKeyDialog(WebSearchTabViewModel.FetcherViewModel fetcherViewModel) {
