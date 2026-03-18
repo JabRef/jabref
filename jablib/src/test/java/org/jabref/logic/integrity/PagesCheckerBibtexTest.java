@@ -60,7 +60,7 @@ public class PagesCheckerBibtexTest {
                 // bibTexDoesNotAcceptBrackets
                 "{1}-{2}",
                 // single dash forbidden
-                "436SS-439S"
+                "436S-439S"
         );
     }
 
