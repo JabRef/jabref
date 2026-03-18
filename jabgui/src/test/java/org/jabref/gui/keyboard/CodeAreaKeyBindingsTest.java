@@ -5,7 +5,6 @@ import javafx.scene.input.KeyEvent;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.NavigationActions;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
