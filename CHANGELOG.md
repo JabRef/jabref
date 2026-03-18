@@ -61,6 +61,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an exception would be thrown when trying to extract references from a PDF [#15308](https://github.com/JabRef/jabref/pull/15308)
 - We fixed an issue where an exception was thrown when importing via cli and no opened library. [#15314](https://github.com/JabRef/jabref/pull/15314)
 - We fixed an issue where the Citation Relations tab failed to recognize already-imported papers when their DOI differed only in letter casing. [#12967](https://github.com/JabRef/jabref/issues/12967)
+- We fixed macOS cursor movement shortcuts in the BibTeX source editor so Option+Arrow navigates by word and Command+Arrow jumps to line boundaries. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We improved CSL support with JabRef LibreOffice converter extension. [#14387](https://github.com/JabRef/jabref/issues/14387)
 
 ### Removed
