@@ -20,6 +20,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
@@ -64,6 +65,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
+
+import org.fxmisc.richtext.CodeArea;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -380,12 +383,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case BACK:
-                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::back);
-                        event.consume();
+                        if (!(getScene().getFocusOwner() instanceof TextInputControl)
+                                && !(getScene().getFocusOwner() instanceof CodeArea)) {
+                            Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::back);
+                            event.consume();
+                        }
                         break;
                     case FORWARD:
-                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
-                        event.consume();
+                        if (!(getScene().getFocusOwner() instanceof TextInputControl)
+                                && !(getScene().getFocusOwner() instanceof CodeArea)) {
+                            Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
+                            event.consume();
+                        }
                         break;
                     case CLOSE_DATABASE:
                         new CloseDatabaseAction(this, stateManager).execute();

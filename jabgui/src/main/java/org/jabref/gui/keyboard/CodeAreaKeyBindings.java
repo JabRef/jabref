@@ -134,10 +134,9 @@ public class CodeAreaKeyBindings {
                                                    : NavigationActions.SelectionPolicy.CLEAR;
 
         boolean optionOnly = event.isAltDown() && !event.isMetaDown() && !event.isControlDown();
-        boolean controlOnly = event.isControlDown() && !event.isMetaDown() && !event.isAltDown();
         boolean commandOnly = event.isMetaDown() && !event.isAltDown() && !event.isControlDown();
 
-        if (optionOnly || controlOnly) {
+        if (optionOnly) {
             if (code == KeyCode.LEFT) {
                 codeArea.wordBreaksBackwards(2, policy);
             } else {
