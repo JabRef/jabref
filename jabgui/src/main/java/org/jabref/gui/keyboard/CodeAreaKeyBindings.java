@@ -130,8 +130,8 @@ public class CodeAreaKeyBindings {
         }
 
         NavigationActions.SelectionPolicy policy = event.isShiftDown()
-                ? NavigationActions.SelectionPolicy.EXTEND
-                : NavigationActions.SelectionPolicy.CLEAR;
+                               ? NavigationActions.SelectionPolicy.EXTEND
+                               : NavigationActions.SelectionPolicy.CLEAR;
 
         boolean optionOnly = event.isAltDown() && !event.isMetaDown() && !event.isControlDown();
         boolean commandOnly = event.isMetaDown() && !event.isAltDown() && !event.isControlDown();
