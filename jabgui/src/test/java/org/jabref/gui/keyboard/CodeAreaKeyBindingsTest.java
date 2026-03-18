@@ -97,6 +97,28 @@ class CodeAreaKeyBindingsTest {
     }
 
     @Test
+    void controlLeftMovesWordBackward() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.LEFT, false, true, false, false);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).wordBreaksBackwards(2, NavigationActions.SelectionPolicy.CLEAR);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void controlRightMovesWordForward() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.RIGHT, false, true, false, false);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).wordBreaksForwards(2, NavigationActions.SelectionPolicy.CLEAR);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
     void nonArrowKeyIsIgnored() {
         CodeArea codeArea = mock(CodeArea.class);
         KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, false, false, false, true);

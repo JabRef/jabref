@@ -38,7 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed text cursor movement shortcuts (Command+Left/Right for line start/end, Option+Left/Right for word navigation) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
+- We fixed text cursor movement shortcuts (Command+Left/Right for line start/end, Option+Left/Right and Ctrl+Left/Right for word navigation) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We fixed PDF import to prefer the content extracted title over filename like XMP metadata titles. [#11999](https://github.com/JabRef/jabref/issues/11999)
 - We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
 - We fixed an issue where shortcut keys did not work for linked files in the entry editor. [#12564](https://github.com/JabRef/jabref/issues/12564)
@@ -62,7 +62,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an exception would be thrown when trying to extract references from a PDF [#15308](https://github.com/JabRef/jabref/pull/15308)
 - We fixed an issue where an exception was thrown when importing via cli and no opened library. [#15314](https://github.com/JabRef/jabref/pull/15314)
 - We fixed an issue where the Citation Relations tab failed to recognize already-imported papers when their DOI differed only in letter casing. [#12967](https://github.com/JabRef/jabref/issues/12967)
-- We fixed macOS cursor movement shortcuts in the BibTeX source editor so Option+Arrow navigates by word and Command+Arrow jumps to line boundaries. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We improved CSL support with JabRef LibreOffice converter extension. [#14387](https://github.com/JabRef/jabref/issues/14387)
 
 ### Removed
