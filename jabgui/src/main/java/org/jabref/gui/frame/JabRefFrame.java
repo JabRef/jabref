@@ -23,6 +23,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -59,6 +60,7 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -331,13 +333,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 if (stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof TextInputControl)) {
-                    // We are in a text field. Skip key bindings that are used for text editing.
-                    // On macOS, ALT (option) +LEFT/RIGHT is used for word navigation.
-                    // On all platforms, ALT+1 is usually not used in text fields, but we skip it here as well to be safe and consistent.
-                    if (keyBinding.get() == KeyBinding.BACK
-                            || keyBinding.get() == KeyBinding.FORWARD
-                            || keyBinding.get() == KeyBinding.FOCUS_ENTRY_TABLE
-                            || keyBinding.get() == KeyBinding.FOCUS_GROUP_LIST) {
+                    // Skip JabRef shortcuts that conflict with standard text editing shortcuts.
+                    if (isConflictingTextInputKey(event)) {
                         return;
                     }
                 }
@@ -408,6 +405,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 }
             }
         });
+    }
+
+    private boolean isConflictingTextInputKey(KeyEvent event) {
+        KeyCode code = event.getCode();
+        // alt + (LEFT, RIGHT, UP, DOWN, BACK_SPACE, DELETE) are standard text editing shortcuts
+        if (event.isAltDown() && (code == KeyCode.LEFT || code == KeyCode.RIGHT || code == KeyCode.UP || code == KeyCode.DOWN || code == KeyCode.BACK_SPACE || code == KeyCode.DELETE)) {
+            return true;
+        }
+        // On macOS, shortcut (cmd) + (LEFT, RIGHT, UP, DOWN) are used for line/document navigation
+        return OS.OS_X && event.isShortcutDown() && (code == KeyCode.LEFT || code == KeyCode.RIGHT || code == KeyCode.UP || code == KeyCode.DOWN);
     }
 
     private void initBindings() {
@@ -572,7 +579,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     /// Opens a new tab with existing data.
     /// Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-    /// Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
