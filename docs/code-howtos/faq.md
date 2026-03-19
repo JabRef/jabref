@@ -30,9 +30,9 @@ It is easily possible to run Gradle from the command line without installing a s
 
 Alternatively, you can install a JDK 17 (or later) and execute `./gradlew :jabgui:run`.
 
-### Many errors during gradle run - e.g., `Unresolved reference 'jvmDependencyConflicts'.`
+### Many errors during Gradle run - e.g., `Unresolved reference 'jvmDependencyConflicts'.`
 
-Gradle updates are not easy at development versions of gradle.
+Gradle updates are not easy at development versions of Gradle.
 
 1. Ensure that you have some JDK installed ([any version starting from 17 works](https://docs.gradle.org/current/userguide/compatibility.html)).
 2. Close IntelliJ, VSCode, ...
