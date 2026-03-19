@@ -115,10 +115,19 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
         viewModel.mergedEntryProperty().get().getFieldsObservable().addListener((MapChangeListener<Field, String>) change -> {
             if (change.wasAdded() && !fieldRows.containsKey(change.getKey())) {
-                FieldRow fieldRow = new FieldRow(
-                        change.getKey(),
-                        viewModel.mergedEntryProperty().get().getFields().size() - 1);
+                Field newField = change.getKey();
+                int lastRowIndex = viewModel.mergedEntryProperty().get().getFields().size() - 1;
+                FieldRow fieldRow = new FieldRow(newField, lastRowIndex);
                 fieldRows.put(change.getKey(), fieldRow);
+
+                MultiMergeEntriesViewModel.EntrySource originalSource = viewModel.entriesProperty().get().getFirst();
+                BibEntry originalEntry = originalSource.entryProperty().get();
+                if (originalEntry.getField(newField).isEmpty()) {
+                    UiTaskExecutor.runInJavaFXThread(() -> {
+                        Cell emptyCell = new Cell("", newField, 0);
+                        optionsGrid.add(emptyCell, 0, fieldRow.rowIndex);
+                    });
+                }
             }
         });
     }
