@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabsrv - serve BibTeX files using JabRef
 
-//JAVA 25+
+//JAVA 26+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // raw is for https://github.com/unicode-org/icu/pull/2127

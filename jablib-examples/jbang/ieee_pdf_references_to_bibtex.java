@@ -10,7 +10,7 @@ import org.tinylog.Logger;
 
 //DESCRIPTION Opens the given PDF file, parses the references and outputs BibTeX
 
-//JAVA 25+
+//JAVA 26+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 //FILES tinylog.properties=tinylog.properties
 

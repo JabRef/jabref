@@ -11,7 +11,7 @@ import org.tinylog.Logger;
 
 //DESCRIPTION Converts a DOI to BibTeX
 
-//JAVA 25+
+//JAVA 26+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 //FILES tinylog.properties=tinylog.properties
 

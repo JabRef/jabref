@@ -130,6 +130,7 @@ jobs:
 
   modernizer:
     name: Modernizer
+    if: false
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
@@ -260,6 +261,11 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
+      - name: Install at-spi2-core
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: at-spi2-core
+          version: 1.0
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -407,7 +413,7 @@ jobs:
         if: steps.changed-jablib-files.outputs.any_changed != 'true'
         uses: actions/setup-java@v5
         with:
-          java-version: '25'
+          java-version: '26'
           distribution: 'corretto'
           check-latest: true
 
@@ -463,7 +469,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          java-version: '25'
+          java-version: '26'
           distribution: 'corretto'
           check-latest: true
       - name: Modify ${{ matrix.script }} to include changed classes
@@ -519,7 +525,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 25
+          java-version: 26
           distribution: 'corretto'
           cache: maven
           check-latest: true

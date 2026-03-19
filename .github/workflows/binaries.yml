@@ -505,7 +505,7 @@ jobs:
           SED_I=(-i)
           [[ '${{ startsWith(matrix.os, 'macos') }}' == 'true' ]] && SED_I=(-i '')
 
-          sed "${SED_I[@]}" "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed "${SED_I[@]}" "s/JavaLanguageVersion.of(26)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed "${SED_I[@]}" "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           sed "${SED_I[@]}" "s|val javafx = .*|val javafx = \"${{ needs.conditions.outputs.javafxVersion }}\"|" versions/build.gradle.kts
 
