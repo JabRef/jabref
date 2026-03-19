@@ -90,6 +90,10 @@ public class PostgreServer implements AutoCloseable {
         return null;
     }
 
+    public @Nullable DataSource getDataSource() {
+        return dataSource;
+    }
+
     @Override
     public void close() {
         if (embeddedPostgres != null) {

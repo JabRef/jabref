@@ -8,6 +8,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.JournalAbbreviationTestUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,8 @@ class AbbreviationCheckerTest {
     private BibEntry entry;
 
     @BeforeEach
-    void setUp() {
-        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+    void setUp() throws Exception {
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
         abbreviationRepository.addCustomAbbreviation(new Abbreviation("Test Journal", "T. J."));
         entry = new BibEntry(StandardEntryType.InProceedings);
         checker = new AbbreviationChecker(abbreviationRepository);

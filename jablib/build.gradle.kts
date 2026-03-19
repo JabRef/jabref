@@ -89,14 +89,14 @@ tasks.generateGrammarSource {
 }
 
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
-val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
+val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.sql")
 
-var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
+var taskGenerateJournalListSQL = tasks.register<JBangTask>("generateJournalListSQL") {
     group = "JabRef"
-    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    description = "Converts the comma-separated journal abbreviation file to a SQL file for Postgres"
     dependsOn(tasks.named("generateGrammarSource"))
 
-    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath + '"'
+    script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListSqlGenerator.java").asFile.absolutePath + '"'
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
@@ -108,7 +108,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
     // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
-    mustRunAfter(taskGenerateJournalListMV)
+    mustRunAfter(taskGenerateJournalListSQL)
 
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath + '"'
 
@@ -133,7 +133,7 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     val ltwaListMvProv = ltwaListMv
 }
 
-// Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
+// Adds ltwa, journal-list.sql, and citation-style-catalog.json to the resources directory
 sourceSets["main"].resources {
     srcDir(layout.buildDirectory.dir("generated/resources"))
 }
@@ -186,7 +186,7 @@ val unpaywallEmail = providers.environmentVariable("UNPAYWALL_EMAIL").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
-    dependsOn(taskGenerateJournalListMV)
+    dependsOn(taskGenerateJournalListSQL)
     dependsOn(taskGenerateCitationStyleCatalog)
     dependsOn(taskGenerateLtwaListMV)
     filteringCharset = "UTF-8"
@@ -392,7 +392,7 @@ tasks.named<Jar>("sourcesJar") {
         tasks.named("generateGrammarSource"),
 
         // We have generated/resources on the sources path, which needs to be populated
-        taskGenerateJournalListMV,
+        taskGenerateJournalListSQL,
         taskGenerateLtwaListMV,
         taskGenerateCitationStyleCatalog
     )

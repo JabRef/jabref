@@ -27,6 +27,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.strings.StringUtil;
@@ -92,7 +93,9 @@ public class JabKitLauncher {
             }
 
             // Heavy initialization only needed when actually executing a command
-            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
+            PostgreServer postgreServer = new PostgreServer();
+            Injector.setModelOrService(PostgreServer.class, postgreServer);
+            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences(), postgreServer.getDataSource()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
             configureProxy(preferences.getProxyPreferences());

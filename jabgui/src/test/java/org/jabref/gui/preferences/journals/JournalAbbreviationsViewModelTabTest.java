@@ -20,6 +20,7 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.support.JournalAbbreviationTestUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ class JournalAbbreviationsViewModelTabTest {
     private JournalAbbreviationsTabViewModel viewModel;
     private Path emptyTestFile;
     private Path tempFolder;
-    private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
+    private JournalAbbreviationRepository repository;
     private DialogService dialogService;
 
     static class TestAbbreviation extends Abbreviation {
@@ -173,7 +174,9 @@ class JournalAbbreviationsViewModelTabTest {
     }
 
     @BeforeEach
-    void setUpViewModel(@TempDir Path tempFolder) throws IOException {
+    void setUpViewModel(@TempDir Path tempFolder) throws Exception {
+        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+
         JournalAbbreviationPreferences abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
 
         dialogService = mock(DialogService.class);
