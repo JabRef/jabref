@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a new data format and property selection feature, enabling users to select one or more field properties for custom fields. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
 - We added a CLI option `--field-formatters` to the `convert` and `generate-bib-from-aux` commands to apply field formatters during export. [#11520](https://github.com/JabRef/jabref/issues/11520)
 - We added a preference to skip the import dialog for entries received from browser extensions, allowing direct import into the current library. The import dialog is shown by default; users can enable direct import in Preferences.
