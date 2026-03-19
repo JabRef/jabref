@@ -1,7 +1,9 @@
 package org.jabref.gui.keyboard;
 
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringManipulator;
 import org.jabref.model.util.ResultingStringState;
 
@@ -11,6 +13,11 @@ import org.fxmisc.richtext.NavigationActions;
 public class CodeAreaKeyBindings {
 
     public static void call(CodeArea codeArea, KeyEvent event, KeyBindingRepository keyBindingRepository) {
+        handleMacCursorMovementShortcuts(codeArea, event);
+        if (event.isConsumed()) {
+            return;
+        }
+
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
                 case EDITOR_DELETE -> {
@@ -106,6 +113,47 @@ public class CodeAreaKeyBindings {
                 }
             }
         });
+    }
+
+    private static void handleMacCursorMovementShortcuts(CodeArea codeArea, KeyEvent event) {
+        handleMacCursorMovementShortcuts(codeArea, event, OS.OS_X);
+    }
+
+    static void handleMacCursorMovementShortcuts(CodeArea codeArea, KeyEvent event, boolean isMacOs) {
+        if (!isMacOs) {
+            return;
+        }
+
+        KeyCode code = event.getCode();
+        if ((code != KeyCode.LEFT) && (code != KeyCode.RIGHT)) {
+            return;
+        }
+
+        NavigationActions.SelectionPolicy policy = event.isShiftDown()
+                                                   ? NavigationActions.SelectionPolicy.EXTEND
+                                                   : NavigationActions.SelectionPolicy.CLEAR;
+
+        boolean optionOnly = event.isAltDown() && !event.isMetaDown() && !event.isControlDown();
+        boolean commandOnly = event.isMetaDown() && !event.isAltDown() && !event.isControlDown();
+
+        if (optionOnly) {
+            if (code == KeyCode.LEFT) {
+                codeArea.wordBreaksBackwards(2, policy);
+            } else {
+                codeArea.wordBreaksForwards(2, policy);
+            }
+            event.consume();
+            return;
+        }
+
+        if (commandOnly) {
+            if (code == KeyCode.LEFT) {
+                codeArea.lineStart(policy);
+            } else {
+                codeArea.lineEnd(policy);
+            }
+            event.consume();
+        }
     }
 }
 

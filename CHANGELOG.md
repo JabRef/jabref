@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an export format for [`academicpages`](https://academicpages.github.io/) format. [#12727](https://github.com/JabRef/jabref/issues/12727)
 - We added "All" option to the citation fetcher combo box, which queries all providers (CrossRef, OpenAlex, OpenCitations, SemanticScholar) and merges the results into a single deduplicated list.
 - We added a quick setting toggle to enable cover images download. [#15322](https://github.com/JabRef/jabref/pull/15322)
+- We now support refreshing existing CSL citations with respect to their in-text nature in the LibreOffice integration. [#15369](https://github.com/JabRef/jabref/pull/15369)
 
 ### Changed
 
@@ -39,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We improved the group filter to support full boolean search syntax. Space-separated terms now match groups containing any of the words (OR semantics). Explicit operators "AND", "OR", "NOT", and parentheses are also supported — e.g., `NOT learning` hides all learning groups, or `(deep OR neural) NOT vision` shows "Deep Learning" and "Neural Networks" but not "Computer Vision".. [#12721](https://github.com/JabRef/jabref/issues/12721)
+- We fixed text cursor movement shortcuts (Command+Left/Right for line start/end, Option+Left/Right for word navigation) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We fixed PDF import to prefer the content extracted title over filename like XMP metadata titles. [#11999](https://github.com/JabRef/jabref/issues/11999)
 - We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
 - We fixed an issue where shortcut keys did not work for linked files in the entry editor. [#12564](https://github.com/JabRef/jabref/issues/12564)
