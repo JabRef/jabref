@@ -58,6 +58,15 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
+    // Multiplier for row height based on font size
+    private static final double FONT_HEIGHT_MULTIPLIER = 2.5;
+
+    // Default row height if font is not available
+    private static final double DEFAULT_ROW_HEIGHT = 30.0;
+
+    // Estimate for header height (used in table prefHeight calculation)
+    private static final double HEADER_HEIGHT_ESTIMATE = 1.1;
+
     public WebSearchTab(ReadOnlyBooleanProperty refAiEnabled) {
         this.refAiEnabled = refAiEnabled;
 
@@ -98,12 +107,12 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         // Dynamic height based on font size and number of items
         DoubleBinding rowHeight = Bindings.createDoubleBinding(
-                () -> enableWebSearch.getFont() != null ? enableWebSearch.getFont().getSize() * 2.5 : 30.0,
+                () -> enableWebSearch.getFont() != null ? enableWebSearch.getFont().getSize() * FONT_HEIGHT_MULTIPLIER : DEFAULT_ROW_HEIGHT,
                 enableWebSearch.fontProperty());
         searchEngineTable.fixedCellSizeProperty().bind(rowHeight);
         searchEngineTable.prefHeightProperty().bind(
                 Bindings.size(searchEngineTable.getItems())
-                        .add(1.1) // Estimate for header height
+                        .add(HEADER_HEIGHT_ESTIMATE) // Estimate for header height
                         .multiply(rowHeight));
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
