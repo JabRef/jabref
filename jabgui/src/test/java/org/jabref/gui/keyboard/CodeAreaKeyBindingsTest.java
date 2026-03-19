@@ -96,9 +96,75 @@ class CodeAreaKeyBindingsTest {
     }
 
     @Test
-    void nonArrowKeyIsIgnored() {
+    void commandUpMovesToDocumentStart() {
         CodeArea codeArea = mock(CodeArea.class);
         KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, false, false, false, true);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).start(NavigationActions.SelectionPolicy.CLEAR);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void commandDownMovesToDocumentEnd() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.DOWN, false, false, false, true);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).end(NavigationActions.SelectionPolicy.CLEAR);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void optionUpMovesToParagraphStart() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, false, false, true, false);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).paragraphStart(NavigationActions.SelectionPolicy.CLEAR);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void optionDownMovesToParagraphEnd() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.DOWN, false, false, true, false);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).paragraphEnd(NavigationActions.SelectionPolicy.CLEAR);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void shiftCommandUpExtendsSelectionToDocumentStart() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, true, false, false, true);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).start(NavigationActions.SelectionPolicy.EXTEND);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void shiftCommandDownExtendsSelectionToDocumentEnd() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.DOWN, true, false, false, true);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).end(NavigationActions.SelectionPolicy.EXTEND);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void nonArrowKeyIsIgnored() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.A, false, false, false, true);
 
         CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
 
