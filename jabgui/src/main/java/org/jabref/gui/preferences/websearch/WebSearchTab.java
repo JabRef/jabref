@@ -35,7 +35,6 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
-    
     // Multiplier for row height based on font size
     private static final double FONT_HEIGHT_MULTIPLIER = 2.5;
 
