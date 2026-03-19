@@ -115,8 +115,6 @@ public class CSLCitationOOAdapter {
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
         insertReferences(cursor, entries, ooText, isNumericStyle);
-
-        inTextUsed = false;
     }
 
     /// Inserts in-text citations for a group of entries.
