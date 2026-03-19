@@ -48,8 +48,8 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("image OR (processing)", "image OR (title = term OR processing)"),
                 Arguments.of("", "title = \"image processing\" AND author = smith"),
 
-                Arguments.of("neighbou\\?r", "neighbou?r"),
-                Arguments.of("neighbo\\*", "neighbo*"),
+                Arguments.of("neighbou?r", "neighbou?r"),
+                Arguments.of("neighbo*", "neighbo*"),
                 Arguments.of("", "title = neighbou?r"),
                 Arguments.of("", "(title == chocolate) OR (author == smith)"),
 
