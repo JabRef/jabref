@@ -140,6 +140,28 @@ class CodeAreaKeyBindingsTest {
     }
 
     @Test
+    void shiftOptionUpExtendsSelectionToParagraphStart() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, true, false, true, false);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).paragraphStart(NavigationActions.SelectionPolicy.EXTEND);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void shiftOptionDownExtendsSelectionToParagraphEnd() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.DOWN, true, false, true, false);
+
+        CodeAreaKeyBindings.handleMacCursorMovementShortcuts(codeArea, event, true);
+
+        verify(codeArea).paragraphEnd(NavigationActions.SelectionPolicy.EXTEND);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
     void shiftCommandUpExtendsSelectionToDocumentStart() {
         CodeArea codeArea = mock(CodeArea.class);
         KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, true, false, false, true);
