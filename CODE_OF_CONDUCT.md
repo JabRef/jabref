@@ -22,7 +22,7 @@ While acknowledging differences in social norms, we all strive to meet our commu
 With these considerations in mind, we agree to behave mindfully towards each other and act in ways that are centered around our shared values.
 
 Examples of behavior that contribute to a positive environment include:
-    
+
 * Being respectful, polite, and constructive in communication
 * Following contribution guidelines, templates, and project conventions
 * Acknowledging feedback and responding thoughtfully
@@ -68,7 +68,7 @@ Responding within a reasonable timeframe is part of responsible participation. P
 Project maintainers are responsible for clarifying standards and enforcing this Code of Conduct.
 
 In cases of persistent dishonesty, disrespect, or disruptive behavior, maintainers may take actions including:
-    
+
 * Closing pull requests
 * Temporarily restricting issue assignment
 * Revoking access to the project and/or the organization
