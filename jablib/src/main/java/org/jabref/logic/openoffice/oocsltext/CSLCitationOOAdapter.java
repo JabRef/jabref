@@ -49,6 +49,8 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
+    private boolean inTextUsed;
+    private boolean inTextNatureChanged;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
@@ -80,8 +82,15 @@ public class CSLCitationOOAdapter {
             throws CreationException, com.sun.star.uno.Exception {
         setStyle(selectedStyle);
 
+        if (inTextUsed) {
+            inTextNatureChanged = true;
+            inTextUsed = false;
+        } else {
+            inTextNatureChanged = false;
+        }
+
         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
-        if (styleChanged) {
+        if (styleChanged || inTextNatureChanged) {
             updateAllCitationsWithNewStyle(currentStyle, false);
             styleChanged = false;
         }
@@ -116,7 +125,14 @@ public class CSLCitationOOAdapter {
             throws CreationException, com.sun.star.uno.Exception {
         setStyle(selectedStyle);
 
-        if (styleChanged) {
+        if (!inTextUsed) {
+            inTextUsed = true;
+            inTextNatureChanged = true;
+        } else {
+            inTextNatureChanged = false;
+        }
+
+        if (styleChanged || inTextNatureChanged) {
             updateAllCitationsWithNewStyle(currentStyle, true);
             styleChanged = false;
         }
@@ -179,7 +195,7 @@ public class CSLCitationOOAdapter {
 
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
-        updateAllCitationsWithNewStyle(selectedStyle, false);
+        updateAllCitationsWithNewStyle(selectedStyle, inTextUsed);
         markManager.readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
