@@ -40,6 +40,7 @@ class StudyYamlParserTest {
                 new StudyCatalog("Medline/PubMed", true), new StudyCatalog("IEEEXplore", false));
 
         expectedStudy = new Study(authors, studyName, researchQuestions, queryEntries, libraryEntries);
+        expectedStudy.setVersion("2.0");
     }
 
     @Test
