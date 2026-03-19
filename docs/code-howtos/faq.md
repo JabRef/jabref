@@ -193,7 +193,7 @@ Preferably use a GUI-based git manager, such as the one built in IntelliJ or ope
 
 ## Compilation
 
-## `java: package org.jabref.logic.journals does not exist`
+### `java: package org.jabref.logic.journals does not exist`
 
 You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
