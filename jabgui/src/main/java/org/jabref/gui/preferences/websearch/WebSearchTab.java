@@ -35,6 +35,16 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
+    
+    // Multiplier for row height based on font size
+    private static final double FONT_HEIGHT_MULTIPLIER = 2.5;
+
+    // Default row height if font is not available
+    private static final double DEFAULT_ROW_HEIGHT = 30.0;
+
+    // Estimate for header height (used in table prefHeight calculation)
+    private static final double HEADER_HEIGHT_ESTIMATE = 1.1;
+
     @FXML private CheckBox enableWebSearch;
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
@@ -57,15 +67,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private VBox fetchersContainer;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
-
-    // Multiplier for row height based on font size
-    private static final double FONT_HEIGHT_MULTIPLIER = 2.5;
-
-    // Default row height if font is not available
-    private static final double DEFAULT_ROW_HEIGHT = 30.0;
-
-    // Estimate for header height (used in table prefHeight calculation)
-    private static final double HEADER_HEIGHT_ESTIMATE = 1.1;
 
     public WebSearchTab(ReadOnlyBooleanProperty refAiEnabled) {
         this.refAiEnabled = refAiEnabled;
