@@ -36,6 +36,7 @@ Examples of unacceptable behavior include:
 * Lacking self-sufficiency (e.g. treating maintainers as instructors with an obligation to provide extensive guidance or hand-holding)
 * Submitting low-effort or automated contributions without prior review
 * Misrepresenting work (e.g., claiming to have tested, while that did not happen)
+* Misrepresenting your communication (e.g., passing off AI-generated responses as your own genuine understanding or words)
 
 ## Expectations for Students
 
@@ -51,7 +52,7 @@ JabRef is not a classroom, and maintainers are not graders or supervisors.
 ## Use of AI-Generated Contributions
 
 AI tools may be used as assistance, but contributors remain fully responsible for all submitted content.
-Submitting unreviewed, low-effort, or misleading AI-generated contributions (“AI slop”) is not acceptable.
+Submitting unreviewed, low-effort, or misleading AI-generated contributions is not acceptable.
 This includes code, documentation, reviews, or explanations that the contributor does not understand or cannot justify.
 Maintainers may close pull requests immediately if they appear to consist primarily of unreviewed or misrepresented AI-generated content.
 Repeated or deceptive use may lead to temporary or permanent exclusion from the project.
