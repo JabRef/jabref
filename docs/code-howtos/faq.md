@@ -17,7 +17,7 @@ Following is a list of common errors encountered by developers which lead to fai
 
 ### Run `gradle` from command line
 
-Sometimes, one needs to double-check that there is an IDE setup issue - and not an issue with modified Gradle builds files.
+Sometimes, one needs to double-check that there is an IDE setup issue - and not an issue with modified Gradle build files.
 It is easily possible to run Gradle from the command line without installing a separate JDK manually.
 
 1. Download [gg.cmd](https://github.com/eirikb/gg/releases/latest/download/gg.cmd). [`gg.cmd`](https://github.com/eirikb/gg) is an easy-to-use toolchain downloading all requirements.
@@ -36,9 +36,10 @@ Gradle updates are not easy at development versions of Gradle.
 
 1. Ensure that you have some JDK installed ([any version starting from 17 works](https://docs.gradle.org/current/userguide/compatibility.html)).
 2. Close IntelliJ, VSCode, ...
-3. Run `./gradlew clean :jabgui:run --no-build-cache --no-configuration-cache --rerun`
+3. Run `./gradlew --stop`
 4. If step 3 fails, try again.
-5. If step 4 fails, try `./gradlew --stop` and try again.
+5. Run `./gradlew clean :jabgui:run --no-build-cache --no-configuration-cache --rerun`
+6. If step 5 fails, try `./gradlew --stop` and try again.
 
 ## Failing tests
 
@@ -192,7 +193,7 @@ Preferably use a GUI-based git manager, such as the one built in IntelliJ or ope
 
 ## Compilation
 
-## `java: package org.jabref.logic.journals does not exist`
+### `java: package org.jabref.logic.journals does not exist`
 
 You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
