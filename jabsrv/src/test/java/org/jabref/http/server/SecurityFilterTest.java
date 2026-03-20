@@ -6,7 +6,7 @@ import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.PairingResource;
 import org.jabref.http.server.resources.RootResource;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.server.ConnectorTokenManager;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Application;
@@ -24,7 +24,7 @@ class SecurityFilterTest extends ServerTest {
             "",
             false);
 
-    private static final ConnectorTokenManager TOKEN_MANAGER = new ConnectorTokenManager(TEST_REMOTE_PREFS);
+    private static final ConnectorAuthenticationTask CONNECTOR_AUTHENTICATION = new ConnectorAuthenticationTask(TEST_REMOTE_PREFS);
 
     @Override
     protected Application configure() {
@@ -35,7 +35,7 @@ class SecurityFilterTest extends ServerTest {
         addFilesToServeToResourceConfig(resourceConfig);
         addGuiBridgeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
-        addTokenManagerToResourceConfig(resourceConfig, TOKEN_MANAGER);
+        addConnectorAuthenticationTaskToResourceConfig(resourceConfig, CONNECTOR_AUTHENTICATION);
         return resourceConfig.getApplication();
     }
 
@@ -93,8 +93,8 @@ class SecurityFilterTest extends ServerTest {
 
     @Test
     void prefixMatchOriginWithValidTokenIsAllowed() {
-        String pin = TOKEN_MANAGER.generatePin();
-        String token = TOKEN_MANAGER.validatePinAndGenerateToken(pin).orElseThrow();
+        String pin = CONNECTOR_AUTHENTICATION.generatePin();
+        String token = CONNECTOR_AUTHENTICATION.validatePinAndGenerateToken(pin).orElseThrow();
 
         Response response = target("/libraries")
                 .request()

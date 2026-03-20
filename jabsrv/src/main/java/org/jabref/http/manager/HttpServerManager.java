@@ -5,7 +5,7 @@ import java.net.URI;
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.remote.server.ConnectorTokenManager;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -24,10 +24,10 @@ public class HttpServerManager implements AutoCloseable {
     private HttpServerThread httpServerThread;
 
     @Nullable
-    private ConnectorTokenManager tokenManager;
+    private ConnectorAuthenticationTask connectorAuthenticationTask;
 
-    public void setTokenManager(ConnectorTokenManager tokenManager) {
-        this.tokenManager = tokenManager;
+    public void setConnectorAuthenticationTask(@Nullable ConnectorAuthenticationTask connectorAuthenticationTask) {
+        this.connectorAuthenticationTask = connectorAuthenticationTask;
     }
 
     public synchronized void start(CliPreferences preferences, SrvStateManager srvStateManager, URI uri) {
@@ -40,7 +40,7 @@ public class HttpServerManager implements AutoCloseable {
             return;
         }
 
-        httpServerThread = new HttpServerThread(preferences, srvStateManager, uiMessageHandler, tokenManager, uri);
+        httpServerThread = new HttpServerThread(preferences, srvStateManager, uiMessageHandler, connectorAuthenticationTask, uri);
         httpServerThread.start();
         LOGGER.debug("Triggered HTTP server start up.");
     }

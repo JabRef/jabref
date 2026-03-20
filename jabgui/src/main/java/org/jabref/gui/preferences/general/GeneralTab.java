@@ -29,7 +29,7 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.remote.server.ConnectorTokenManager;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.model.database.BibDatabaseMode;
 
@@ -42,7 +42,7 @@ import org.controlsfx.control.SearchableComboBox;
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
     @Inject private HttpServerManager httpServerManager;
-    @Inject private ConnectorTokenManager connectorTokenManager;
+    @Inject private ConnectorAuthenticationTask connectorAuthenticationTask;
     @Inject private LanguageServerController languageServerController;
     @Inject private UiMessageHandler uiMessageHandler;
     @Inject private RemoteListenerServerManager remoteListenerServerManager;
@@ -110,7 +110,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 dialogService,
                 preferences,
                 httpServerManager,
-                connectorTokenManager,
+                connectorAuthenticationTask,
                 languageServerController,
                 uiMessageHandler,
                 remoteListenerServerManager,

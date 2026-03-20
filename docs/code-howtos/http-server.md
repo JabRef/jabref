@@ -49,7 +49,7 @@ Requests without an `Origin` header (e.g., `curl`) and the root health-check end
 
 Tokens are obtained through [`PairingResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/resources/PairingResource.java) at `POST /auth/pair`.
 JabRef displays a one-time PIN in the preferences; the extension sends it and receives a bearer token in return.
-Token management (generation, validation, revocation) lives in [`ConnectorTokenManager`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/remote/server/ConnectorTokenManager.java).
+Pairing and bearer token handling (generation, validation, revocation) lives in [`ConnectorAuthenticationTask`](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/remote/server/ConnectorAuthenticationTask.java).
 
 ## Starting the http server
 

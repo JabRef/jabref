@@ -25,7 +25,7 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.remote.server.ConnectorTokenManager;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 
 import jakarta.ws.rs.Priorities;
 import net.harawata.appdirs.AppDirsFactory;
@@ -96,8 +96,8 @@ public class Server {
         return run(srvStateManager, null, null, uri);
     }
 
-    /// Entry point for the GUI with UiMessageHandler and ConnectorTokenManager
-    public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, @Nullable ConnectorTokenManager externalTokenManager, URI uri) {
+    /// Entry point for the GUI with UiMessageHandler and ConnectorAuthenticationTask
+    public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, @Nullable ConnectorAuthenticationTask externalConnectorAuthentication, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
@@ -107,18 +107,18 @@ public class Server {
             ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler, "uimessagehandler", UiMessageHandler.class);
         }
 
-        return startServer(serviceLocator, externalTokenManager, uri);
+        return startServer(serviceLocator, externalConnectorAuthentication, uri);
     }
 
-    private HttpServer startServer(ServiceLocator serviceLocator, @Nullable ConnectorTokenManager externalTokenManager, URI uri) {
+    private HttpServer startServer(ServiceLocator serviceLocator, @Nullable ConnectorAuthenticationTask externalConnectorAuthentication, URI uri) {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
-        ConnectorTokenManager tokenManager = externalTokenManager != null
-                                             ? externalTokenManager
-                                             : new ConnectorTokenManager(preferences.getRemotePreferences());
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, tokenManager);
+        ConnectorAuthenticationTask connectorAuthenticationTask = externalConnectorAuthentication != null
+                                             ? externalConnectorAuthentication
+                                             : new ConnectorAuthenticationTask(preferences.getRemotePreferences());
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, connectorAuthenticationTask);
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();

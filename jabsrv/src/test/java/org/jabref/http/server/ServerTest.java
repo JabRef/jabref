@@ -17,7 +17,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.server.ConnectorTokenManager;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.metadata.UserHostInfo;
 
@@ -147,11 +147,11 @@ public abstract class ServerTest extends JerseyTest {
         when(preferences.getRemotePreferences()).thenReturn(remotePreferences);
     }
 
-    protected void addTokenManagerToResourceConfig(ResourceConfig resourceConfig, ConnectorTokenManager tokenManager) {
+    protected void addConnectorAuthenticationTaskToResourceConfig(ResourceConfig resourceConfig, ConnectorAuthenticationTask connectorAuthenticationTask) {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(tokenManager).to(ConnectorTokenManager.class);
+                bind(connectorAuthenticationTask).to(ConnectorAuthenticationTask.class);
             }
         });
     }

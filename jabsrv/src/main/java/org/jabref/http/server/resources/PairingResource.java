@@ -2,7 +2,7 @@ package org.jabref.http.server.resources;
 
 import java.util.Optional;
 
-import org.jabref.logic.remote.server.ConnectorTokenManager;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -19,7 +19,7 @@ import jakarta.ws.rs.core.Response;
 public class PairingResource {
 
     @Inject
-    ConnectorTokenManager tokenManager;
+    ConnectorAuthenticationTask connectorAuthenticationTask;
 
     @Inject
     Gson gson;
@@ -28,7 +28,7 @@ public class PairingResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response pair(String body) {
-        if (tokenManager == null) {
+        if (connectorAuthenticationTask == null) {
             return Response.status(Response.Status.SERVICE_UNAVAILABLE)
                            .entity("{\"error\":\"Token manager not available\"}")
                            .build();
@@ -49,7 +49,7 @@ public class PairingResource {
                            .build();
         }
 
-        Optional<String> token = tokenManager.validatePinAndGenerateToken(pin);
+        Optional<String> token = connectorAuthenticationTask.validatePinAndGenerateToken(pin);
         if (token.isPresent()) {
             JsonObject responseJson = new JsonObject();
             responseJson.addProperty("token", token.get());

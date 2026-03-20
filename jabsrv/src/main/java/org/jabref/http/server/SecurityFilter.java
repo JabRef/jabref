@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.server.ConnectorTokenManager;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -28,7 +28,7 @@ public class SecurityFilter implements ContainerRequestFilter {
     CliPreferences preferences;
 
     @Inject
-    ConnectorTokenManager tokenManager;
+    ConnectorAuthenticationTask connectorAuthenticationTask;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -74,7 +74,7 @@ public class SecurityFilter implements ContainerRequestFilter {
             return;
         }
 
-        if (tokenManager == null) {
+        if (connectorAuthenticationTask == null) {
             requestContext.abortWith(
                     Response.status(Response.Status.SERVICE_UNAVAILABLE)
                             .entity("Token authentication not available")
@@ -92,7 +92,7 @@ public class SecurityFilter implements ContainerRequestFilter {
         }
 
         String token = authHeader.substring(BEARER_PREFIX.length());
-        if (!tokenManager.validateToken(token)) {
+        if (!connectorAuthenticationTask.validateToken(token)) {
             requestContext.abortWith(
                     Response.status(Response.Status.UNAUTHORIZED)
                             .entity("Invalid token")

@@ -11,13 +11,13 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Manages PIN-based pairing and bearer token authentication for the HTTP server.
+/// PIN-based pairing and bearer token validation for the browser connector HTTP API.
 ///
-/// PINs are ephemeral (in-memory only, with TTL). Tokens are persisted via RemotePreferences.
+/// The pairing PIN is kept in memory with a TTL. The API bearer token is stored in {@link RemotePreferences}.
 @NullMarked
-public class ConnectorTokenManager {
+public class ConnectorAuthenticationTask {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorTokenManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorAuthenticationTask.class);
 
     private static final int TOKEN_BYTES = 32;
     private static final long PIN_TTL_SECONDS = 300;
@@ -28,7 +28,7 @@ public class ConnectorTokenManager {
     private String activePin = "";
     private Instant pinExpiration = Instant.MIN;
 
-    public ConnectorTokenManager(RemotePreferences remotePreferences) {
+    public ConnectorAuthenticationTask(RemotePreferences remotePreferences) {
         this.remotePreferences = remotePreferences;
     }
 
