@@ -342,7 +342,8 @@ public class ImportHandler {
         UpdateField.setAutomaticFields(
                 entries,
                 preferences.getOwnerPreferences(),
-                preferences.getTimestampPreferences()
+                preferences.getTimestampPreferences(),
+                targetBibDatabaseContext.getMetaData()
         );
     }
 

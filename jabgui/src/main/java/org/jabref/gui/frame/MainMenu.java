@@ -187,6 +187,10 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
+                
+                new SeparatorMenuItem(),
+
+                createScopedJsonMenu(),
 
                 new SeparatorMenuItem(),
 
@@ -426,6 +430,19 @@ public class MainMenu extends MenuBar {
                 view,
                 help);
         setUseSystemMenuBar(true);
+    }
+
+    private Menu createScopedJsonMenu() {
+        Menu menu = new Menu("Scoped Preferences JSON");
+        
+        MenuItem exportItem = new MenuItem("Export JSON...");
+        exportItem.setOnAction(e -> new org.jabref.gui.preferences.ScopedPreferencesExportCommand(dialogService, stateManager, preferences).execute());
+        
+        MenuItem importItem = new MenuItem("Import JSON...");
+        importItem.setOnAction(e -> new org.jabref.gui.preferences.ScopedPreferencesImportCommand(dialogService, stateManager, preferences).execute());
+        
+        menu.getItems().addAll(exportItem, importItem);
+        return menu;
     }
 
     private Menu createSendSubMenu(ActionFactory factory,

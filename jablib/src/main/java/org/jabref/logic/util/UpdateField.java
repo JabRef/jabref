@@ -9,6 +9,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.MetaData;
 
 public class UpdateField {
 
@@ -77,9 +78,10 @@ public class UpdateField {
 
     /// Sets empty or non-existing owner fields of bibtex entries inside a List to a specified default value. Timestamp
     /// field is also set. Preferences are checked to see if these options are enabled.
-    public static void setAutomaticFields(Collection<BibEntry> entries, OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
+    public static void setAutomaticFields(Collection<BibEntry> entries, OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences, MetaData metaData) {
         boolean globalSetOwner = ownerPreferences.isUseOwner();
-        boolean setTimeStamp = timestampPreferences.shouldAddCreationDate();
+        boolean setTimeStamp = metaData == null ? timestampPreferences.shouldAddCreationDate()
+                : metaData.getAddCreationDate().orElse(timestampPreferences.shouldAddCreationDate());
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || setTimeStamp)) {

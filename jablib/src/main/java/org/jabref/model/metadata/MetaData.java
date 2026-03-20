@@ -53,6 +53,7 @@ public class MetaData {
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String BIBDESK_STATIC_FLAG = "BibDesk Static Groups";
+    public static final String ADD_CREATION_DATE = "addCreationDate";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
@@ -76,6 +77,7 @@ public class MetaData {
     @Nullable private BibDatabaseMode mode;
     private boolean isProtected;
     @Nullable private String librarySpecificFileDirectory;
+    @Nullable private Boolean addCreationDate;
 
     @NonNull
     private final ContentSelectors contentSelectors = new ContentSelectors();
@@ -96,6 +98,20 @@ public class MetaData {
 
     public void setSaveOrder(SaveOrder saveOrder) {
         this.saveOrder = saveOrder;
+        postChange();
+    }
+
+    public Optional<Boolean> getAddCreationDate() {
+        return Optional.ofNullable(addCreationDate);
+    }
+
+    public void setAddCreationDate(boolean addCreationDate) {
+        this.addCreationDate = addCreationDate;
+        postChange();
+    }
+
+    public void clearAddCreationDate() {
+        this.addCreationDate = null;
         postChange();
     }
 
@@ -378,18 +394,19 @@ public class MetaData {
                 && (mode == that.mode)
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
+                && Objects.equals(addCreationDate, that.addCreationDate)
                 && Objects.equals(versionDBStructure, that.versionDBStructure);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, addCreationDate, versionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", addCreationDate=" + addCreationDate + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {

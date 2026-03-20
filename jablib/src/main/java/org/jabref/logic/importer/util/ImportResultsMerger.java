@@ -48,7 +48,7 @@ public class ImportResultsMerger {
         }
 
         // set timestamp and owner
-        UpdateField.setAutomaticFields(resultDatabase.getEntries(), ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), ownerPreferences, timestampPreferences, result.getMetaData());
 
         return result;
     }
