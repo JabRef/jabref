@@ -43,6 +43,10 @@ public class LinkedFileHandler {
         return copyOrMoveToDefaultDirectory(true, false);
     }
 
+    public void moveToExactDirectory(Path targetDirectory) throws IOException {
+        copyOrMoveToExactDirectory(targetDirectory, true, false);
+    }
+
     /// @return true if the file was copied/moved or the same file exists in the target directory
     public boolean copyOrMoveToDefaultDirectory(boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         Optional<Path> databaseFileDirectoryOpt = databaseContext.getFirstExistingFileDir(filePreferences);
@@ -51,14 +55,10 @@ public class LinkedFileHandler {
             return false;
         }
         Path databaseFileDirectory = databaseFileDirectoryOpt.get();
+        return copyOrMoveToDirectory(databaseFileDirectory, shouldMove, shouldRenameToFilenamePattern);
+    }
 
-        Optional<Path> sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);
-        if (sourcePathOpt.isEmpty()) {
-            LOGGER.warn("Could not find file {}", linkedFile.getLink());
-            return false;
-        }
-        Path sourcePath = sourcePathOpt.get();
-
+    private boolean copyOrMoveToDirectory(Path databaseFileDirectory, boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         String targetDirectoryName = "";
         if (!filePreferences.getFileDirectoryPattern().isEmpty()) {
             targetDirectoryName = FileUtil.createDirNameFromPattern(
@@ -68,6 +68,17 @@ public class LinkedFileHandler {
         }
 
         Path targetDirectory = databaseFileDirectory.resolve(targetDirectoryName);
+        return copyOrMoveToExactDirectory(targetDirectory, shouldMove, shouldRenameToFilenamePattern);
+    }
+
+    private boolean copyOrMoveToExactDirectory(Path targetDirectory, boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
+        Optional<Path> sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);
+        if (sourcePathOpt.isEmpty()) {
+            LOGGER.warn("Could not find file {}", linkedFile.getLink());
+            return false;
+        }
+        Path sourcePath = sourcePathOpt.get();
+
         // Ensure that this directory exists
         Files.createDirectories(targetDirectory);
 
