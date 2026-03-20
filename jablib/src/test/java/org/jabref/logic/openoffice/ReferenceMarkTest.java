@@ -80,7 +80,7 @@ class ReferenceMarkTest {
                         List.of("Keen_2011"), List.of(100), "cite", false
                 ),
                 Arguments.of(
-                        "JABREF_key8 CID_7 uniqueId8 INTEXT",
+                        "JABREF_key8 CID_7 uniqueId8 IN_TEXT",
                         List.of("key8"), List.of(7), "uniqueId8", true
                 )
         );
