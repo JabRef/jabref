@@ -539,7 +539,7 @@ public class OOBibBase {
 
         OOResult<XTextCursor, OOError> cursor = getUserCursorForTextInsertion(doc, errorTitle);
 
-        if (!preGuiActionInsertEntryTestDialog(entries, errorTitle, odoc, style, frontend, cursor, doc)){
+        if (!preGuiActionInsertEntryTestDialog(entries, errorTitle, odoc, style, frontend, cursor, doc)) {
             return;
         }
 
@@ -584,16 +584,18 @@ public class OOBibBase {
             UnoUndo.leaveUndoContext(doc);
         }
     }
+
     /// Helper method for guiActionInsertEntry. Handles pre-insertion checks
-    /// @param entries            The entries to cite.
-    /// @param style              The bibliography style we are using.
-    /// @param errorTitle         Message String of error
-    /// @param odoc               Open Office text document result
-    /// @param frontend           Open Office result of Open Office frontend
-    /// @param cursor             Open Office result of text cursor
-    /// @param doc                Text document
-    public boolean preGuiActionInsertEntryTestDialog (List<BibEntry> entries, String errorTitle, OOResult<XTextDocument, OOError> odoc, OOStyle style,
-                                                      OOResult<OOFrontend, OOError> frontend, OOResult<XTextCursor, OOError> cursor, XTextDocument doc){
+    ///
+    /// @param entries    The entries to cite.
+    /// @param style      The bibliography style we are using.
+    /// @param errorTitle Message String of error
+    /// @param odoc       Open Office text document result
+    /// @param frontend   Open Office result of Open Office frontend
+    /// @param cursor     Open Office result of text cursor
+    /// @param doc        Text document
+    public boolean preGuiActionInsertEntryTestDialog(List<BibEntry> entries, String errorTitle, OOResult<XTextDocument, OOError> odoc, OOStyle style,
+                                                     OOResult<OOFrontend, OOError> frontend, OOResult<XTextCursor, OOError> cursor, XTextDocument doc) {
         if (testDialog(errorTitle,
                 odoc.asVoidResult(),
                 styleIsRequired(style),
@@ -624,6 +626,7 @@ public class OOBibBase {
     /// Helper method for guiActionInsertEntry. Handles CSL citation insertion
     /// Throws CreationException, com.sun.star.uno.Exception
     /// Caught by guiActionInsertEntry
+    ///
     /// @param entries            The entries to cite.
     /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
     /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
@@ -661,6 +664,7 @@ public class OOBibBase {
     /// Helper method for guiActionInsertEntry
     /// Throws PropertyVetoException, WrappedTargetException, IllegalTypeException, NotRemoveableException, CreationException, NoDocumentException
     /// Exceptions caught by guiActionInsertEntry
+    ///
     /// @param entries            The entries to cite.
     /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
     /// @param jStyle             Indicates citation formating in JStyle
