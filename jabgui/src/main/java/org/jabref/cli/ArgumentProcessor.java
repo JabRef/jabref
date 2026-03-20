@@ -51,8 +51,12 @@ public class ArgumentProcessor {
     /// and must not reach picocli, which would try to parse them as file paths.
     private static String[] filterProtocolHandlerArgs(String[] args) {
         return Arrays.stream(args)
-                     .filter(arg -> !arg.startsWith(JABREF_PROTOCOL_SCHEME))
+                     .filter(arg -> !isJabRefProtocolArgument(arg))
                      .toArray(String[]::new);
+    }
+
+    private static boolean isJabRefProtocolArgument(String arg) {
+        return arg.regionMatches(true, 0, JABREF_PROTOCOL_SCHEME, 0, JABREF_PROTOCOL_SCHEME.length());
     }
 
     public List<UiCommand> processArguments() {
