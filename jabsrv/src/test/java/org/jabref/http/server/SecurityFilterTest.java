@@ -1,7 +1,5 @@
 package org.jabref.http.server;
 
-import java.util.List;
-
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.PairingResource;
 import org.jabref.http.server.resources.RootResource;

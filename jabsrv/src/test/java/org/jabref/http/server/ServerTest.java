@@ -40,10 +40,10 @@ import static org.mockito.Mockito.when;
 /// More information on testing with Jersey is available at <a href="https://eclipse-ee4j.github.io/jersey.github.io/documentation/latest/test-framework.html">the Jersey's testing documentation</a>.
 public abstract class ServerTest extends JerseyTest {
 
-    private static CliPreferences preferences;
-
     /// Shared with {@link CliPreferences#getRemotePreferences()} in tests; same instance as {@link ConnectorAuthenticationTask} should use.
     protected static RemotePreferences serverTestRemotePreferences;
+
+    private static CliPreferences preferences;
 
     private static final FilesToServe FILES_TO_SERVE = new FilesToServe();
 

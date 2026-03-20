@@ -116,8 +116,8 @@ public class Server {
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
         ConnectorAuthenticationTask connectorAuthenticationTask = externalConnectorAuthentication != null
-                                             ? externalConnectorAuthentication
-                                             : new ConnectorAuthenticationTask(preferences.getRemotePreferences());
+                                                                  ? externalConnectorAuthentication
+                                                                  : new ConnectorAuthenticationTask(preferences.getRemotePreferences());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, connectorAuthenticationTask);
 
         // see https://stackoverflow.com/a/33794265/873282
