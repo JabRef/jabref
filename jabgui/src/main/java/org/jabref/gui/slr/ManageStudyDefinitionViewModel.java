@@ -218,12 +218,7 @@ public class ManageStudyDefinitionViewModel {
     }
 
     public SlrStudyAndDirectory saveStudy() {
-        Study study = new Study(
-                authors,
-                title.getValueSafe(),
-                researchQuestions,
-                queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
-                databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
+        Study study = buildStudy();
         Path studyDirectory;
         final String studyDirectoryAsString = directory.getValueSafe();
         try {
@@ -255,6 +250,19 @@ public class ManageStudyDefinitionViewModel {
         }
 
         return new SlrStudyAndDirectory(study, studyDirectory);
+    }
+
+    /// Builds a {@link Study} from the current UI state without persisting it.
+    public Study buildStudy() {
+        return new Study(
+                authors,
+                title.getValueSafe(),
+                researchQuestions,
+                queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
+                databases.stream()
+                         .map(item -> new StudyDatabase(item.getName(), item.isEnabled()))
+                         .filter(StudyDatabase::isEnabled)
+                         .collect(Collectors.toList()));
     }
 
     public Property<String> titleProperty() {
