@@ -49,15 +49,17 @@ public class CSLReferenceMarkManager {
     private final XTextRangeCompare textRangeCompare;
     private int highestCitationNumber = 0;
     private boolean isNumberUpdateRequired;
+    private boolean isInTextCite;
 
     public CSLReferenceMarkManager(XTextDocument document) {
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
         this.isNumberUpdateRequired = false;
+        this.isInTextCite = false;
     }
 
-    public CSLReferenceMark createReferenceMark(List<BibEntry> entries) throws Exception {
+    public CSLReferenceMark createReferenceMark(List<BibEntry> entries, boolean inText) throws Exception {
         List<String> citationKeys = entries.stream()
                                            .map(entry -> entry.getCitationKey().orElse(CUID.randomCUID2(8).toString()))
                                            .collect(Collectors.toList());
@@ -66,15 +68,16 @@ public class CSLReferenceMarkManager {
                                                     .map(this::getCitationNumber)
                                                     .collect(Collectors.toList());
 
-        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKeys, citationNumbers, factory);
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKeys, citationNumbers, inText, factory);
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
+        isInTextCite = isInTextCite || inText;
         return referenceMark;
     }
 
-    public void insertReferenceIntoOO(List<BibEntry> entries, XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter)
+    public void insertReferenceIntoOO(List<BibEntry> entries, XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, boolean inText)
             throws CreationException, Exception {
-        CSLReferenceMark mark = createReferenceMark(entries);
+        CSLReferenceMark mark = createReferenceMark(entries, inText);
         // Ensure the cursor is at the end of its range
         position.collapseToEnd();
 
@@ -127,6 +130,7 @@ public class CSLReferenceMarkManager {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
+        isInTextCite = false;
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
@@ -144,6 +148,7 @@ public class CSLReferenceMarkManager {
                     CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
                     marksByName.put(name, mark);
                     marksInOrder.add(mark);
+                    isInTextCite = isInTextCite || referenceMark.isInText();
 
                     for (int i = 0; i < citationKeys.size(); i++) {
                         String key = citationKeys.get(i);
@@ -171,9 +176,12 @@ public class CSLReferenceMarkManager {
 
     private String getUpdatedReferenceMarkNameWithNewNumbers(String oldName, List<Integer> newNumbers) {
         String[] parts = oldName.split(" ");
-        if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && parts.length >= 3) {
+        boolean inText = ReferenceMark.IN_TEXT_MARKER.equals(parts[parts.length - 1]);
+        int uniqueIdIndex = inText ? parts.length - 2 : parts.length - 1;
+
+        if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && uniqueIdIndex >= 2) {
             StringBuilder newName = new StringBuilder();
-            for (int i = 0; i < parts.length - 1; i += 2) {
+            for (int i = 0; i < uniqueIdIndex; i += 2) {
                 // Each iteration of the loop (incrementing by 2) represents one full citation (key + number)
                 if (i > 0) {
                     newName.append(", ");
@@ -181,7 +189,10 @@ public class CSLReferenceMarkManager {
                 newName.append(parts[i]).append(" ");
                 newName.append(ReferenceMark.PREFIXES[1]).append(newNumbers.get(i / 2));
             }
-            newName.append(" ").append(parts[parts.length - 1]);
+            newName.append(" ").append(parts[uniqueIdIndex]);
+            if (inText) {
+                newName.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
+            }
             return newName.toString();
         }
         return oldName;
@@ -254,10 +265,18 @@ public class CSLReferenceMarkManager {
         mark.setCitationNumbers(newNumbers);
     }
 
-    public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText) throws Exception, CreationException {
+    public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, boolean inText) throws Exception, CreationException {
         String unchangedName = mark.getName();
+        boolean isAlreadyInText = unchangedName.endsWith(" " + ReferenceMark.IN_TEXT_MARKER);
 
-        updateMarkAndText(mark, newText, unchangedName);
+        String updatedName = unchangedName;
+        if (inText && !isAlreadyInText) {
+            updatedName = unchangedName + " " + ReferenceMark.IN_TEXT_MARKER;
+        } else if (!inText && isAlreadyInText) {
+            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
+        }
+
+        updateMarkAndText(mark, newText, updatedName);
     }
 
     private void updateMarkAndText(CSLReferenceMark mark, String newText, String markName) throws Exception, CreationException {
@@ -306,6 +325,10 @@ public class CSLReferenceMarkManager {
 
     public boolean hasCitationForKey(String citationKey) {
         return citationKeyToNumber.containsKey(citationKey);
+    }
+
+    public boolean hasInTextMarks() {
+        return isInTextCite;
     }
 
     public void setRealTimeNumberUpdateRequired(boolean isNumeric) {
