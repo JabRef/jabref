@@ -52,12 +52,16 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             return Optional.empty();
         }
 
-        String urlFromDoi = getUrlByDoi(doi.get().asString());
-        if (urlFromDoi.isEmpty()) {
+        DoiResolution resolved = getUrlByDoi(doi.get().asString());
+        if (resolved.url().isEmpty()) {
             return Optional.empty();
         }
+        if (resolved.isPdfDirect()) {
+            LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", resolved.url());
+            return Optional.of(URLUtil.create(resolved.url()));
+        }
         // Scrape the web page as desktop client (not as mobile client!)
-        Document html = Jsoup.connect(urlFromDoi)
+        Document html = Jsoup.connect(resolved.url())
                              .userAgent(URLDownload.USER_AGENT)
                              .referrer("https://www.google.com")
                              .ignoreHttpErrors(true)
@@ -98,7 +102,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         String fullLinkToPdf;
         if (pdfDownload.has("linkToPdf")) {
             String linkToPdf = pdfDownload.getString("linkToPdf");
-            URL url = URLUtil.create(urlFromDoi);
+            URL url = URLUtil.create(resolved.url());
             fullLinkToPdf = "%s://%s%s".formatted(url.getProtocol(), url.getAuthority(), linkToPdf);
         } else if (pdfDownload.has("urlMetadata")) {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
@@ -130,8 +134,11 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         return TrustLevel.PUBLISHER;
     }
 
-    private String getUrlByDoi(String doi) throws UnirestException {
+    private record DoiResolution(String url, boolean isPdfDirect) { }
+
+    private DoiResolution getUrlByDoi(String doi) throws UnirestException {
         String sciLink = "";
+        String pdfLink = "";
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
@@ -149,12 +156,17 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
                 JSONObject link = links.getJSONObject(i);
                 if ("scidir".equals(link.getString("@rel"))) {
                     sciLink = link.getString("@href");
+                } else if ("scidir-pdf".equals(link.getString("@rel"))) {
+                    pdfLink = link.getString("@href");
                 }
             }
-            return sciLink;
+            if (!pdfLink.isEmpty()) {
+                return new DoiResolution(pdfLink, true);
+            }
+            return new DoiResolution(sciLink, false);
         } catch (JSONException e) {
             LOGGER.debug("No ScienceDirect link found in API request", e);
-            return sciLink;
+            return new DoiResolution(sciLink, false);
         }
     }
 
