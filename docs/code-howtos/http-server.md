@@ -44,8 +44,9 @@ Two JAX-RS filters in [`Server`](https://github.com/JabRef/jabref/blob/main/jabs
 
 [`CORSFilter`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java) sets `Access-Control-Allow-Origin` to the requesting origin only if it appears in the whitelist configured in `RemotePreferences.getAllowedOrigins()` (browser extension schemes and selected web origins).
 
-[`SecurityFilter`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/SecurityFilter.java) validates incoming requests in three steps: origin check, custom `X-JabRef-Connector` header, and `Authorization: Bearer <token>`.
-Requests without an `Origin` header (e.g., `curl`) and the root health-check endpoint are exempt.
+[`SecurityFilter`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/SecurityFilter.java) validates requests that include an `Origin` header: allowlist check, then for extension-style schemes a custom `X-JabRef-Connector` header and `Authorization: Bearer <token>` (pairing at `POST /auth/pair` is exempt from the bearer requirement).
+Requests without an `Origin` header must send a valid bearer token by default; users can opt in (General preferences) to allow those calls without a token for local tools such as CAYW clients.
+The root health-check endpoint remains exempt from these rules.
 
 Tokens are obtained through [`PairingResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/resources/PairingResource.java) at `POST /auth/pair`.
 JabRef displays a one-time PIN in the preferences; the extension sends it and receives a bearer token in return.

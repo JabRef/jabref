@@ -42,6 +42,9 @@ public abstract class ServerTest extends JerseyTest {
 
     private static CliPreferences preferences;
 
+    /// Shared with {@link CliPreferences#getRemotePreferences()} in tests; same instance as {@link ConnectorAuthenticationTask} should use.
+    protected static RemotePreferences serverTestRemotePreferences;
+
     private static final FilesToServe FILES_TO_SERVE = new FilesToServe();
 
     @BeforeAll
@@ -139,12 +142,13 @@ public abstract class ServerTest extends JerseyTest {
         when(filePreferences.getUserAndHost()).thenReturn(new UserHostInfo("user", "host").getUserHostString());
         when(importFormatPreferences.filePreferences()).thenReturn(filePreferences);
 
-        RemotePreferences remotePreferences = new RemotePreferences(
+        serverTestRemotePreferences = new RemotePreferences(
                 6050, true, 23119, false, false, 2087,
                 List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
                 "",
+                false,
                 false);
-        when(preferences.getRemotePreferences()).thenReturn(remotePreferences);
+        when(preferences.getRemotePreferences()).thenReturn(serverTestRemotePreferences);
     }
 
     protected void addConnectorAuthenticationTaskToResourceConfig(ResourceConfig resourceConfig, ConnectorAuthenticationTask connectorAuthenticationTask) {

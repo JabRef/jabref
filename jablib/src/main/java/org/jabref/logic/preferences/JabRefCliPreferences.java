@@ -371,6 +371,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String ALLOWED_ORIGINS = "allowedOrigins";
     private static final String API_TOKEN = "apiToken";
     private static final String DIRECT_HTTP_IMPORT = "directHttpImport";
+    private static final String HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN = "httpServerAllowUnauthenticatedAccessWithoutOrigin";
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
@@ -650,6 +651,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(ALLOWED_ORIGINS, "chrome-extension://;moz-extension://;https://jabref.github.io;https://jabref.org");
         defaults.put(API_TOKEN, "");
         defaults.put(DIRECT_HTTP_IMPORT, Boolean.FALSE);
+        defaults.put(HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN, Boolean.FALSE);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
@@ -1349,7 +1351,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInt(LANGUAGE_SERVER_PORT),
                 getStringList(ALLOWED_ORIGINS),
                 get(API_TOKEN),
-                getBoolean(DIRECT_HTTP_IMPORT));
+                getBoolean(DIRECT_HTTP_IMPORT),
+                getBoolean(HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN));
 
         EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
@@ -1361,6 +1364,8 @@ public class JabRefCliPreferences implements CliPreferences {
         remotePreferences.getAllowedOrigins().addListener((InvalidationListener) _ ->
                 putStringList(ALLOWED_ORIGINS, remotePreferences.getAllowedOrigins()));
         EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(DIRECT_HTTP_IMPORT, newValue));
+        EasyBind.listen(remotePreferences.allowUnauthenticatedAccessWithoutOriginProperty(), (_, _, newValue) ->
+                putBoolean(HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN, newValue));
 
         return remotePreferences;
     }

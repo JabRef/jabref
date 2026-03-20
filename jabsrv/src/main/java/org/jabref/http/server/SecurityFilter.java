@@ -44,6 +44,7 @@ public class SecurityFilter implements ContainerRequestFilter {
 
         String origin = requestContext.getHeaderString("Origin");
         if (origin == null) {
+            handleRequestWithoutOrigin(requestContext, path);
             return;
         }
 
@@ -69,11 +70,27 @@ public class SecurityFilter implements ContainerRequestFilter {
             return;
         }
 
-        boolean isPairingEndpoint = path.startsWith("auth/pair");
-        if (isPairingEndpoint) {
+        if (isPairingPath(path)) {
             return;
         }
 
+        enforceBearerToken(requestContext);
+    }
+
+    private void handleRequestWithoutOrigin(ContainerRequestContext requestContext, String path) {
+        RemotePreferences remotePreferences = getRemotePreferences();
+        if (remotePreferences != null && remotePreferences.allowUnauthenticatedAccessWithoutOrigin()) {
+            return;
+        }
+
+        if (isPairingPath(path)) {
+            return;
+        }
+
+        enforceBearerToken(requestContext);
+    }
+
+    private void enforceBearerToken(ContainerRequestContext requestContext) {
         if (connectorAuthenticationTask == null) {
             requestContext.abortWith(
                     Response.status(Response.Status.SERVICE_UNAVAILABLE)
@@ -98,6 +115,17 @@ public class SecurityFilter implements ContainerRequestFilter {
                             .entity("Invalid token")
                             .build());
         }
+    }
+
+    private RemotePreferences getRemotePreferences() {
+        if (preferences == null) {
+            return null;
+        }
+        return preferences.getRemotePreferences();
+    }
+
+    private static boolean isPairingPath(String path) {
+        return path.startsWith("auth/pair");
     }
 
     OriginMatch classifyOrigin(String origin) {

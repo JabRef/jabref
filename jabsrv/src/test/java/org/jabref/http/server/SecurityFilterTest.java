@@ -5,26 +5,26 @@ import java.util.List;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.PairingResource;
 import org.jabref.http.server.resources.RootResource;
-import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SecurityFilterTest extends ServerTest {
 
-    private static final RemotePreferences TEST_REMOTE_PREFS = new RemotePreferences(
-            6050, true, 23119, false, false, 2087,
-            List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
-            "",
-            false);
+    private static ConnectorAuthenticationTask connectorAuthentication;
 
-    private static final ConnectorAuthenticationTask CONNECTOR_AUTHENTICATION = new ConnectorAuthenticationTask(TEST_REMOTE_PREFS);
+    @BeforeAll
+    static void initConnectorAuthentication() {
+        connectorAuthentication = new ConnectorAuthenticationTask(serverTestRemotePreferences);
+    }
 
     @Override
     protected Application configure() {
@@ -35,8 +35,13 @@ class SecurityFilterTest extends ServerTest {
         addFilesToServeToResourceConfig(resourceConfig);
         addGuiBridgeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
-        addConnectorAuthenticationTaskToResourceConfig(resourceConfig, CONNECTOR_AUTHENTICATION);
+        addConnectorAuthenticationTaskToResourceConfig(resourceConfig, connectorAuthentication);
         return resourceConfig.getApplication();
+    }
+
+    @AfterEach
+    void resetAllowUnauthenticatedWithoutOrigin() {
+        serverTestRemotePreferences.setAllowUnauthenticatedAccessWithoutOrigin(false);
     }
 
     @Test
@@ -56,11 +61,40 @@ class SecurityFilterTest extends ServerTest {
     }
 
     @Test
-    void requestWithoutOriginIsAllowed() {
+    void requestWithoutOriginRequiresBearerWhenStrict() {
+        Response response = target("/libraries")
+                .request()
+                .get();
+        assertEquals(401, response.getStatus());
+    }
+
+    @Test
+    void requestWithoutOriginWithValidBearerIsAllowedWhenStrict() {
+        String pin = connectorAuthentication.generatePin();
+        String token = connectorAuthentication.validatePinAndGenerateToken(pin).orElseThrow();
+
+        Response response = target("/libraries")
+                .request()
+                .header("Authorization", "Bearer " + token)
+                .get();
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    void requestWithoutOriginAllowedWhenPreferenceRelaxesAuth() {
+        serverTestRemotePreferences.setAllowUnauthenticatedAccessWithoutOrigin(true);
         Response response = target("/libraries")
                 .request()
                 .get();
         assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    void pairingWithoutOriginDoesNotRequireBearerWhenStrict() {
+        Response response = target("/auth/pair")
+                .request()
+                .post(Entity.json("{\"pin\":\"000000\"}"));
+        assertEquals(403, response.getStatus());
     }
 
     @Test
@@ -93,8 +127,8 @@ class SecurityFilterTest extends ServerTest {
 
     @Test
     void prefixMatchOriginWithValidTokenIsAllowed() {
-        String pin = CONNECTOR_AUTHENTICATION.generatePin();
-        String token = CONNECTOR_AUTHENTICATION.validatePinAndGenerateToken(pin).orElseThrow();
+        String pin = connectorAuthentication.generatePin();
+        String token = connectorAuthentication.validatePinAndGenerateToken(pin).orElseThrow();
 
         Response response = target("/libraries")
                 .request()

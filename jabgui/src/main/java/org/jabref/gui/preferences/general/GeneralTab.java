@@ -78,6 +78,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button revokeTokenButton;
     @FXML private Label tokenStatusLabel;
     @FXML private CheckBox directHttpImport;
+    @FXML private CheckBox allowUnauthenticatedAccessWithoutOrigin;
     @FXML private CheckBox enableLanguageServer;
     @FXML private TextField languageServerPort;
     @FXML private Button remoteHelp;
@@ -188,6 +189,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         updatePairingControls();
         viewModel.apiTokenProperty().addListener((_, _, _) -> updatePairingControls());
         directHttpImport.selectedProperty().bindBidirectional(viewModel.directHttpImportProperty());
+        allowUnauthenticatedAccessWithoutOrigin.selectedProperty().bindBidirectional(
+                viewModel.allowUnauthenticatedAccessWithoutOriginProperty());
 
         enableLanguageServer.selectedProperty().bindBidirectional(viewModel.enableLanguageServerProperty());
         languageServerPort.textProperty().bindBidirectional(viewModel.languageServerPortProperty());
