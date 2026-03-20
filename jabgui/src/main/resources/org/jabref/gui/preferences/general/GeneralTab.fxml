@@ -95,6 +95,7 @@
         <Button fx:id="revokeTokenButton" text="%Revoke token" onAction="#revokeToken" />
         <Label fx:id="tokenStatusLabel" />
     </HBox>
+    <CheckBox fx:id="directHttpImport" text="%Skip import dialog for entries received from browser extensions" />
 
     <Label styleClass="sectionHeader" text="%LSP Server" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">

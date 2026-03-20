@@ -142,7 +142,8 @@ public abstract class ServerTest extends JerseyTest {
         RemotePreferences remotePreferences = new RemotePreferences(
                 6050, true, 23119, false, false, 2087,
                 List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
-                "");
+                "",
+                false);
         when(preferences.getRemotePreferences()).thenReturn(remotePreferences);
     }
 

@@ -61,6 +61,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -68,7 +69,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +107,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      DialogService dialogService,
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
+                     JournalAbbreviationRepository journalAbbreviationRepository,
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
@@ -122,7 +123,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
-        this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+        this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -151,8 +152,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         libraryTab.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry -> RightClickMenu.create(entry,
-                        keyBindingRepository,
+                .withContextMenu(_ -> RightClickMenu.create(
                         libraryTab,
                         dialogService,
                         stateManager,
@@ -160,7 +160,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         undoManager,
                         clipBoardManager,
                         taskExecutor,
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                        journalAbbreviationRepository,
                         entryTypesManager,
                         importHandler))
                 .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))
@@ -538,7 +538,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         boolean success = false;
 
         if (event.getDragboard().hasFiles()) {
-            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            List<Path> files = event.getDragboard().getFiles().stream()
+                                    .map(File::toPath)
+                                    .map(FileUtil::resolveIfShortcut)
+                                    .collect(Collectors.toList());
 
             // Depending on the pressed modifier, move/copy/link files to drop target
             // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
@@ -569,7 +572,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         boolean success = false;
 
         if (event.getDragboard().hasFiles()) {
-            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
+            List<Path> files = event.getDragboard().getFiles().stream()
+                                    .map(File::toPath)
+                                    .map(FileUtil::resolveIfShortcut)
+                                    .toList();
             importHandler
                     .importFilesInBackground(files, event.getTransferMode())
                     .executeWith(taskExecutor);

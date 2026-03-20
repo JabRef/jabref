@@ -35,8 +35,9 @@ public class RemotePreferences {
 
     private final ObservableList<String> allowedOrigins;
     private final StringProperty apiToken;
+    private final BooleanProperty directHttpImport;
 
-    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort, List<String> allowedOrigins, String apiToken) {
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort, List<String> allowedOrigins, String apiToken, boolean directHttpImport) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
         this.httpPort = new SimpleIntegerProperty(httpPort);
@@ -45,6 +46,7 @@ public class RemotePreferences {
         this.languageServerPort = new SimpleIntegerProperty(languageServerPort);
         this.allowedOrigins = FXCollections.observableArrayList(allowedOrigins);
         this.apiToken = new SimpleStringProperty(apiToken);
+        this.directHttpImport = new SimpleBooleanProperty(directHttpImport);
     }
 
     public int getPort() {
@@ -149,6 +151,18 @@ public class RemotePreferences {
 
     public void setApiToken(String apiToken) {
         this.apiToken.setValue(apiToken);
+    }
+
+    public boolean directHttpImport() {
+        return directHttpImport.getValue();
+    }
+
+    public BooleanProperty directHttpImportProperty() {
+        return directHttpImport;
+    }
+
+    public void setDirectHttpImport(boolean directHttpImport) {
+        this.directHttpImport.setValue(directHttpImport);
     }
 
     /// Gets the IP address where both the remote server and the http server are listening.

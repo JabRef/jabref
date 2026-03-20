@@ -21,7 +21,8 @@ class SecurityFilterTest extends ServerTest {
     private static final RemotePreferences TEST_REMOTE_PREFS = new RemotePreferences(
             6050, true, 23119, false, false, 2087,
             List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
-            "");
+            "",
+            false);
 
     private static final ConnectorTokenManager TOKEN_MANAGER = new ConnectorTokenManager(TEST_REMOTE_PREFS);
 

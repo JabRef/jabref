@@ -501,6 +501,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return httpPortProperty;
     }
 
+    public BooleanProperty directHttpImportProperty() {
+        return remotePreferences.directHttpImportProperty();
+    }
+
     public BooleanProperty enableLanguageServerProperty() {
         return enableLanguageServerProperty;
     }
