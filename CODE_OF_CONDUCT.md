@@ -47,7 +47,7 @@ If you contribute to JabRef as part of a university course or academic requireme
 * Learning is encouraged, but self-driven effort is expected
 * Asking questions is welcome; expecting step-by-step supervision is not
 
-JabRef is not a classroom, and maintainers are not graders or supervisors.
+JabRef is neither a classroom where maintainers are graders or supervisors, nor a factory, to push code contributions on a conveyor belt. Instead, JabRef is an opportunity for learners make some steps in a real world application, with support from experienced guides.
 
 ## Use of AI-Generated Contributions
 
