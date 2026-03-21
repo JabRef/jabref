@@ -59,6 +59,7 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.UserHostInfo;
 
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -1311,6 +1312,28 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestSaveActionsJson() throws IOException {
+        ParserResult parserResult = parser.parse(
+                Reader.of("""
+                        @Comment{jabref-meta-0.1.0
+                        {
+                          "saveActions": {
+                            "state": true,
+                            "title": ["lower_case"]
+                          }
+                        }
+                        }
+                        """));
+
+        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
+
+        assertTrue(saveActions.isEnabled());
+        List<FieldFormatterCleanup> expected = List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()));
+        List<FieldFormatterCleanup> actual = saveActions.getConfiguredActions();
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void integrationTestBibEntryType() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));
@@ -2234,5 +2257,25 @@ class BibtexParserTest {
                 .withFiles(List.of(new LinkedFile("", "../../../Papers/Asheim2005 The Geography of Innovation Regional Innovation Systems.pdf", "")));
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseCommentToJson() {
+        String comment = """
+                jabref-meta-0.1.0
+                {
+                  "saveActions" :
+                  {
+                    "state": true
+                  }
+                }
+                """;
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        Optional<JsonObject> actualJson = parser.parseCommentToJson(comment);
+        JsonObject expectedSaveActions = new JsonObject();
+        expectedSaveActions.addProperty("state", true);
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.add("saveActions", expectedSaveActions);
+        assertEquals(Optional.of(expectedJson), actualJson);
     }
 }
