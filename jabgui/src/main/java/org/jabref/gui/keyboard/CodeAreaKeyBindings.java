@@ -125,7 +125,9 @@ public class CodeAreaKeyBindings {
         }
 
         KeyCode code = event.getCode();
-        if ((code != KeyCode.LEFT) && (code != KeyCode.RIGHT)) {
+        boolean isHorizontal = (code == KeyCode.LEFT) || (code == KeyCode.RIGHT);
+        boolean isVertical = (code == KeyCode.UP) || (code == KeyCode.DOWN);
+        if (!isHorizontal && !isVertical) {
             return;
         }
 
@@ -136,21 +138,34 @@ public class CodeAreaKeyBindings {
         boolean optionOnly = event.isAltDown() && !event.isMetaDown() && !event.isControlDown();
         boolean commandOnly = event.isMetaDown() && !event.isAltDown() && !event.isControlDown();
 
-        if (optionOnly) {
-            if (code == KeyCode.LEFT) {
-                codeArea.wordBreaksBackwards(2, policy);
+        if (isHorizontal) {
+            if (optionOnly) {
+                if (code == KeyCode.LEFT) {
+                    codeArea.wordBreaksBackwards(2, policy);
+                } else {
+                    codeArea.wordBreaksForwards(2, policy);
+                }
+                event.consume();
+            } else if (commandOnly) {
+                if (code == KeyCode.LEFT) {
+                    codeArea.lineStart(policy);
+                } else {
+                    codeArea.lineEnd(policy);
+                }
+                event.consume();
+            }
+        } else if (optionOnly) {
+            if (code == KeyCode.UP) {
+                codeArea.paragraphStart(policy);
             } else {
-                codeArea.wordBreaksForwards(2, policy);
+                codeArea.paragraphEnd(policy);
             }
             event.consume();
-            return;
-        }
-
-        if (commandOnly) {
-            if (code == KeyCode.LEFT) {
-                codeArea.lineStart(policy);
+        } else if (commandOnly) {
+            if (code == KeyCode.UP) {
+                codeArea.start(policy);
             } else {
-                codeArea.lineEnd(policy);
+                codeArea.end(policy);
             }
             event.consume();
         }
