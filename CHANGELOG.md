@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added security hardening to the HTTP server (jabsrv): CORS origin whitelisting replaces the wildcard `*` policy, a new security filter validates custom headers and origins, and configurable allowed origins support browser extensions and JabMap. Requests without an `Origin` header require a bearer token by default. You can allow those requests without a token in General preferences (for local tools such as CAYW clients). [#15295](https://github.com/JabRef/jabref/pull/15295)
+- We added PIN-based pairing and bearer token authentication for browser extensions connecting to the HTTP server. A PIN can be generated in the preferences to pair an extension, and paired tokens can be revoked. [#15295](https://github.com/JabRef/jabref/pull/15295)
 - We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
 - We added a CLI option `--field-formatters` to the `convert` and `generate-bib-from-aux` commands to apply field formatters during export. [#11520](https://github.com/JabRef/jabref/issues/11520)
 - We added a preference to skip the import dialog for entries received from browser extensions, allowing direct import into the current library. The import dialog is shown by default; users can enable direct import in Preferences.

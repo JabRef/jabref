@@ -16,6 +16,8 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
+import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.metadata.UserHostInfo;
 
@@ -38,6 +40,9 @@ import static org.mockito.Mockito.when;
 /// More information on testing with Jersey is available at <a href="https://eclipse-ee4j.github.io/jersey.github.io/documentation/latest/test-framework.html">the Jersey's testing documentation</a>.
 public abstract class ServerTest extends JerseyTest {
 
+    /// Shared with {@link CliPreferences#getRemotePreferences()} in tests; same instance as {@link ConnectorAuthenticationTask} should use.
+    protected static RemotePreferences serverTestRemotePreferences;
+
     private static CliPreferences preferences;
 
     private static final FilesToServe FILES_TO_SERVE = new FilesToServe();
@@ -47,6 +52,9 @@ public abstract class ServerTest extends JerseyTest {
         // Grizzly uses java.commons.logging, but we use TinyLog
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+
+        // Allow sending Origin and other restricted headers in test HTTP client
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 
         initializePreferencesService();
     }
@@ -133,6 +141,23 @@ public abstract class ServerTest extends JerseyTest {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getUserAndHost()).thenReturn(new UserHostInfo("user", "host").getUserHostString());
         when(importFormatPreferences.filePreferences()).thenReturn(filePreferences);
+
+        serverTestRemotePreferences = new RemotePreferences(
+                6050, true, 23119, false, false, 2087,
+                List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
+                "",
+                false,
+                false);
+        when(preferences.getRemotePreferences()).thenReturn(serverTestRemotePreferences);
+    }
+
+    protected void addConnectorAuthenticationTaskToResourceConfig(ResourceConfig resourceConfig, ConnectorAuthenticationTask connectorAuthenticationTask) {
+        resourceConfig.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(connectorAuthenticationTask).to(ConnectorAuthenticationTask.class);
+            }
+        });
     }
 
     protected void addGlobalExceptionMapperToResourceConfig(ResourceConfig resourceConfig) {

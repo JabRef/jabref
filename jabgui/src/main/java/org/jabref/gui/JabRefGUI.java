@@ -48,6 +48,7 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.server.ConnectorAuthenticationTask;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.PostgreServer;
@@ -186,7 +187,11 @@ public class JabRefGUI extends Application {
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
         Injector.setModelOrService(RemoteListenerServerManager.class, JabRefGUI.remoteListenerServerManager);
 
+        ConnectorAuthenticationTask connectorAuthenticationTask = new ConnectorAuthenticationTask(preferences.getRemotePreferences());
+        Injector.setModelOrService(ConnectorAuthenticationTask.class, connectorAuthenticationTask);
+
         JabRefGUI.httpServerManager = new HttpServerManager();
+        JabRefGUI.httpServerManager.setConnectorAuthenticationTask(connectorAuthenticationTask);
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
