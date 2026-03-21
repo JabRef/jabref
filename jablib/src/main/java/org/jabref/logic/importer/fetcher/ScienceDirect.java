@@ -52,81 +52,87 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             return Optional.empty();
         }
 
-        DoiResolution resolved = getUrlByDoi(doi.get().asString());
-        if (resolved.url().isEmpty()) {
-            return Optional.empty();
-        }
-        if (resolved.isPdfDirect()) {
-            LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", resolved.url());
-            return Optional.of(URLUtil.create(resolved.url()));
-        }
-        // Scrape the web page as desktop client (not as mobile client!)
-        Document html = Jsoup.connect(resolved.url())
-                             .userAgent(URLDownload.USER_AGENT)
-                             .referrer("https://www.google.com")
-                             .ignoreHttpErrors(true)
-                             .get();
+        return switch (getUrlByDoi(doi.get().asString())) {
+            case NotFound() ->
+                    Optional.empty();
+            case Pdf(
+                    String url
+            ) -> {
+                LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", url);
+                yield Optional.of(URLUtil.create(url));
+            }
+            case ArticlePage(
+                    String url
+            ) -> {
+                // Scrape the web page as desktop client (not as mobile client!)
+                Document html = Jsoup.connect(url)
+                                     .userAgent(URLDownload.USER_AGENT)
+                                     .referrer("https://www.google.com")
+                                     .ignoreHttpErrors(true)
+                                     .get();
 
-        // Retrieve PDF link from meta data (most recent)
-        Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
-        if (!metaLinks.isEmpty()) {
-            String link = metaLinks.first().attr("content");
-            return Optional.of(URLUtil.create(link));
-        }
+                // Retrieve PDF link from meta data (most recent)
+                Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
+                if (!metaLinks.isEmpty()) {
+                    String link = metaLinks.first().attr("content");
+                    yield Optional.of(URLUtil.create(link));
+                }
 
-        // We use the ScienceDirect web page which contains the article (presented using HTML).
-        // This page contains the link to the PDF in some JavaScript code embedded in the web page.
-        // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
+                // We use the ScienceDirect web page which contains the article (presented using HTML).
+                // This page contains the link to the PDF in some JavaScript code embedded in the web page.
+                // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
 
-        Optional<JSONObject> pdfDownloadOptional = html
-                .getElementsByAttributeValue("type", "application/json")
-                .stream()
-                .flatMap(element -> element.getElementsByTag("script").stream())
-                // The first DOM child of the script element is the script itself (represented as HTML text)
-                .map(element -> element.childNode(0))
-                .map(Node::toString)
-                .map(JSONObject::new)
-                .filter(json -> json.has("article"))
-                .map(json -> json.getJSONObject("article"))
-                .filter(json -> json.has("pdfDownload"))
-                .map(json -> json.getJSONObject("pdfDownload"))
-                .findAny();
+                Optional<JSONObject> pdfDownloadOptional = html
+                        .getElementsByAttributeValue("type", "application/json")
+                        .stream()
+                        .flatMap(element -> element.getElementsByTag("script").stream())
+                        // The first DOM child of the script element is the script itself (represented as HTML text)
+                        .map(element -> element.childNode(0))
+                        .map(Node::toString)
+                        .map(JSONObject::new)
+                        .filter(json -> json.has("article"))
+                        .map(json -> json.getJSONObject("article"))
+                        .filter(json -> json.has("pdfDownload"))
+                        .map(json -> json.getJSONObject("pdfDownload"))
+                        .findAny();
 
-        if (pdfDownloadOptional.isEmpty()) {
-            LOGGER.debug("No 'pdfDownload' key found in JSON information");
-            return Optional.empty();
-        }
+                if (pdfDownloadOptional.isEmpty()) {
+                    LOGGER.debug("No 'pdfDownload' key found in JSON information");
+                    yield Optional.empty();
+                }
 
-        JSONObject pdfDownload = pdfDownloadOptional.get();
+                JSONObject pdfDownload = pdfDownloadOptional.get();
 
-        String fullLinkToPdf;
-        if (pdfDownload.has("linkToPdf")) {
-            String linkToPdf = pdfDownload.getString("linkToPdf");
-            URL url = URLUtil.create(resolved.url());
-            fullLinkToPdf = "%s://%s%s".formatted(url.getProtocol(), url.getAuthority(), linkToPdf);
-        } else if (pdfDownload.has("urlMetadata")) {
-            JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
-            JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
-            String queryParameters = queryParamsObject.keySet().stream()
-                                                      .map(key -> "%s=%s".formatted(key, queryParamsObject.getString(key)))
-                                                      .collect(Collectors.joining("&"));
-            fullLinkToPdf = "https://www.sciencedirect.com/%s/%s%s?%s".formatted(
-                    urlMetadata.getString("path"),
-                    urlMetadata.getString("pii"),
-                    urlMetadata.getString("pdfExtension"),
-                    queryParameters);
-        } else {
-            LOGGER.debug("No suitable data in JSON information");
-            return Optional.empty();
-        }
+                String fullLinkToPdf;
+                if (pdfDownload.has("linkToPdf")) {
+                    String linkToPdf = pdfDownload.getString("linkToPdf");
+                    URL parsedUrl = URLUtil.create(url);
+                    fullLinkToPdf = "%s://%s%s".formatted(parsedUrl.getProtocol(), parsedUrl.getAuthority(), linkToPdf);
+                } else if (pdfDownload.has("urlMetadata")) {
+                    JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
+                    JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
+                    String queryParameters = queryParamsObject.keySet().stream()
+                                                              .map(key -> "%s=%s".formatted(key, queryParamsObject.getString(key)))
+                                                              .collect(Collectors.joining("&"));
+                    fullLinkToPdf = "https://www.sciencedirect.com/%s/%s%s?%s".formatted(
+                            urlMetadata.getString("path"),
+                            urlMetadata.getString("pii"),
+                            urlMetadata.getString("pdfExtension"),
+                            queryParameters);
+                } else {
+                    LOGGER.debug("No suitable data in JSON information");
+                    yield Optional.empty();
+                }
 
-        LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
-        try {
-            return Optional.of(URLUtil.create(fullLinkToPdf));
-        } catch (MalformedURLException e) {
-            LOGGER.error("malformed URL", e);
-            return Optional.empty();
-        }
+                LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
+                try {
+                    yield Optional.of(URLUtil.create(fullLinkToPdf));
+                } catch (MalformedURLException e) {
+                    LOGGER.error("malformed URL", e);
+                    yield Optional.empty();
+                }
+            }
+        };
     }
 
     @Override
@@ -134,7 +140,17 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         return TrustLevel.PUBLISHER;
     }
 
-    private record DoiResolution(String url, boolean isPdfDirect) { }
+    private sealed interface DoiResolution permits Pdf, ArticlePage, NotFound {
+    }
+
+    private record Pdf(String url) implements DoiResolution {
+    }
+
+    private record ArticlePage(String url) implements DoiResolution {
+    }
+
+    private record NotFound() implements DoiResolution {
+    }
 
     private DoiResolution getUrlByDoi(String doi) throws UnirestException {
         String sciLink = "";
@@ -161,12 +177,12 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
                 }
             }
             if (!pdfLink.isEmpty()) {
-                return new DoiResolution(pdfLink, true);
+                return new Pdf(pdfLink);
             }
-            return new DoiResolution(sciLink, false);
+            return sciLink.isEmpty() ? new NotFound() : new ArticlePage(sciLink);
         } catch (JSONException e) {
             LOGGER.debug("No ScienceDirect link found in API request", e);
-            return new DoiResolution(sciLink, false);
+            return sciLink.isEmpty() ? new NotFound() : new ArticlePage(sciLink);
         }
     }
 

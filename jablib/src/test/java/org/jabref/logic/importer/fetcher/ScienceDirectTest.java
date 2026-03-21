@@ -25,7 +25,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -109,8 +108,10 @@ class ScienceDirectTest {
 
             Optional<URL> result = finder.findFullText(entry);
 
-            assertTrue(result.isPresent());
-            assertTrue(result.get().toString().contains("pdfft"));
+            assertEquals(
+                    Optional.of(URLUtil.create("https://www.sciencedirect.com/science/article/pii/S0963869523002050/pdfft?isDTMRedir=true")),
+                    result
+            );
         }
     }
 }
