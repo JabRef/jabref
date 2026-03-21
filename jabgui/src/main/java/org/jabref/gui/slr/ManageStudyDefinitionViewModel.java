@@ -32,7 +32,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -55,7 +55,7 @@ public class ManageStudyDefinitionViewModel {
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<String> queries = FXCollections.observableArrayList();
-    private final ObservableList<StudyCatalogItem> databases = FXCollections.observableArrayList();
+    private final ObservableList<StudyCatalogItem> catalogs = FXCollections.observableArrayList();
 
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
@@ -78,17 +78,17 @@ public class ManageStudyDefinitionViewModel {
                                           @NonNull WorkspacePreferences workspacePreferences,
                                           @NonNull GitPreferences gitPreferences,
                                           @NonNull DialogService dialogService) {
-        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
-                                    .stream()
-                                    .map(SearchBasedFetcher::getName)
-                                    // The user wants to select specific fetchers
-                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
-                                    .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
-                                    .map(name -> {
-                                        boolean enabled = DEFAULT_SELECTION.contains(name);
-                                        return new StudyCatalogItem(name, enabled);
-                                    })
-                                    .toList());
+        catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                   .stream()
+                                   .map(SearchBasedFetcher::getName)
+                                   // The user wants to select specific fetchers
+                                   // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                   .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
+                                   .map(name -> {
+                                       boolean enabled = DEFAULT_SELECTION.contains(name);
+                                       return new StudyCatalogItem(name, enabled);
+                                   })
+                                   .toList());
         this.dialogService = dialogService;
         this.workspacePreferences = workspacePreferences;
         this.gitPreferences = gitPreferences;
@@ -113,18 +113,18 @@ public class ManageStudyDefinitionViewModel {
         title.setValue(study.getTitle());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
-        List<StudyDatabase> studyDatabases = study.getDatabases();
-        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
-                                    .stream()
-                                    .map(SearchBasedFetcher::getName)
-                                    // The user wants to select specific fetchers
-                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
-                                    .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
-                                    .map(name -> {
-                                        boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
-                                        return new StudyCatalogItem(name, enabled);
-                                    })
-                                    .toList());
+        List<StudyCatalog> studyCatalogs = study.getCatalogs();
+        catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                   .stream()
+                                   .map(SearchBasedFetcher::getName)
+                                   // The user wants to select specific fetchers
+                                   // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                   .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
+                                   .map(name -> {
+                                       boolean enabled = studyCatalogs.stream().anyMatch(c -> c.getName().equals(name) && c.isEnabled());
+                                       return new StudyCatalogItem(name, enabled);
+                                   })
+                                   .toList());
 
         this.directory.set(studyDirectory.toString());
         this.workspacePreferences = workspacePreferences;
@@ -152,7 +152,7 @@ public class ManageStudyDefinitionViewModel {
 
         catalogsValidationMessage.bind(Bindings.when(
                                                        Bindings.createBooleanBinding(() ->
-                                                               databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases))
+                                                               catalogs.stream().noneMatch(StudyCatalogItem::isEnabled), catalogs))
                                                .then(Localization.lang("At least one catalog must be selected"))
                                                .otherwise(""));
 
@@ -166,7 +166,7 @@ public class ManageStudyDefinitionViewModel {
                                                                      Bindings.isEmpty(queries)
                                                              ),
                                                              Bindings.createBooleanBinding(() ->
-                                                                     databases.stream().noneMatch(StudyCatalogItem::isEnabled), databases)
+                                                                     catalogs.stream().noneMatch(StudyCatalogItem::isEnabled), catalogs)
                                                      ))
                                              .then(Localization.lang("In order to proceed:"))
                                              .otherwise(""));
@@ -193,7 +193,7 @@ public class ManageStudyDefinitionViewModel {
     }
 
     public ObservableList<StudyCatalogItem> getCatalogs() {
-        return databases;
+        return catalogs;
     }
 
     public void addAuthor(String author) {
@@ -223,7 +223,10 @@ public class ManageStudyDefinitionViewModel {
                 title.getValueSafe(),
                 researchQuestions,
                 queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
-                databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
+                catalogs.stream()
+                        .filter(StudyCatalogItem::isEnabled)
+                        .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
+                        .collect(Collectors.toList()));
         Path studyDirectory;
         final String studyDirectoryAsString = directory.getValueSafe();
         try {
@@ -279,16 +282,16 @@ public class ManageStudyDefinitionViewModel {
 
     public void initializeSelectedCatalogs() {
         List<String> selectedCatalogs = workspacePreferences.getSelectedSlrCatalogs();
-        for (StudyCatalogItem catalog : databases) {
+        for (StudyCatalogItem catalog : catalogs) {
             catalog.setEnabled(selectedCatalogs.contains(catalog.getName()));
         }
     }
 
     public void updateSelectedCatalogs() {
-        List<String> selectedCatalogsList = databases.stream()
-                                                     .filter(StudyCatalogItem::isEnabled)
-                                                     .map(StudyCatalogItem::getName)
-                                                     .collect(Collectors.toList());
+        List<String> selectedCatalogsList = catalogs.stream()
+                                                    .filter(StudyCatalogItem::isEnabled)
+                                                    .map(StudyCatalogItem::getName)
+                                                    .collect(Collectors.toList());
 
         workspacePreferences.setSelectedSlrCatalogs(selectedCatalogsList);
     }

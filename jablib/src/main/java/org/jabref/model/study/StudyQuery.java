@@ -1,14 +1,17 @@
 package org.jabref.model.study;
 
+import java.util.Objects;
+
 public class StudyQuery {
     private String query;
 
     public StudyQuery(String query) {
-        this.query = query;
+        this.query = query != null ? query : "";
     }
 
     /// Used for Jackson deserialization
     public StudyQuery() {
+        this.query = "";
     }
 
     public String getQuery() {
@@ -27,15 +30,13 @@ public class StudyQuery {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         StudyQuery that = (StudyQuery) o;
-
-        return getQuery() != null ? getQuery().equals(that.getQuery()) : that.getQuery() == null;
+        return Objects.equals(query, that.query);
     }
 
     @Override
     public int hashCode() {
-        return getQuery() != null ? getQuery().hashCode() : 0;
+        return Objects.hash(query);
     }
 
     @Override

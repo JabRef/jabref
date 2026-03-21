@@ -12,10 +12,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /// This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
 ///
 /// The file is parsed using by {@link org.jabref.logic.crawler.StudyYamlParser}
-@JsonPropertyOrder({"authors", "title", "research-questions", "queries", "databases"})
+@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogs"})
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
+    @JsonProperty("version")
+    private String version;
+
     private List<String> authors;
 
     private String title;
@@ -25,18 +28,27 @@ public class Study {
 
     private List<StudyQuery> queries;
 
-    private List<StudyDatabase> databases;
+    @JsonProperty("catalogs")
+    private List<StudyCatalog> catalogs;
 
-    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyDatabase> databases) {
+    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs) {
         this.authors = authors;
         this.title = title;
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
-        this.databases = databases;
+        this.catalogs = catalogs;
     }
 
     /// Used for Jackson deserialization
     private Study() {
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public List<String> getAuthors() {
@@ -55,12 +67,12 @@ public class Study {
         this.queries = queries;
     }
 
-    public List<StudyDatabase> getDatabases() {
-        return databases;
+    public List<StudyCatalog> getCatalogs() {
+        return catalogs;
     }
 
-    public void setDatabases(List<StudyDatabase> databases) {
-        this.databases = databases;
+    public void setCatalogs(List<StudyCatalog> catalogs) {
+        this.catalogs = catalogs;
     }
 
     public String getTitle() {
@@ -82,11 +94,12 @@ public class Study {
     @Override
     public String toString() {
         return "Study{" +
-                "authors=" + authors +
+                "version='" + version + '\'' +
+                ", authors=" + authors +
                 ", studyName='" + title + '\'' +
                 ", researchQuestions=" + researchQuestions +
                 ", queries=" + queries +
-                ", libraries=" + databases +
+                ", catalogs=" + catalogs +
                 '}';
     }
 
@@ -101,16 +114,16 @@ public class Study {
 
         Study otherStudy = (Study) other;
 
-        return Objects.equals(authors, otherStudy.authors) &&
+        return Objects.equals(version, otherStudy.version) &&
+                Objects.equals(authors, otherStudy.authors) &&
                 Objects.equals(title, otherStudy.title) &&
                 Objects.equals(researchQuestions, otherStudy.researchQuestions) &&
                 Objects.equals(queries, otherStudy.queries) &&
-                Objects.equals(databases, otherStudy.databases);
+                Objects.equals(catalogs, otherStudy.catalogs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authors, title, researchQuestions, queries, databases);
+        return Objects.hash(version, authors, title, researchQuestions, queries, catalogs);
     }
 }
-
