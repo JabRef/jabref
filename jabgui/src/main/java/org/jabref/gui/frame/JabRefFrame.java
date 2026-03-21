@@ -273,6 +273,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
+        // Log initial width before showing the stage to compare against later computed value
+        LOGGER.debug("initLayout: horizontalSplit.getWidth() = {}, sidePane.children.count = {}", horizontalSplit.getWidth(), sidePane.getChildren().size());
         setCenter(horizontalSplit);
     }
 
@@ -306,13 +308,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void updateHorizontalDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences()
-                                                           .getHorizontalDividerPosition() / horizontalSplit.getWidth());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) ->
-                                                            preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
+            LOGGER.debug("updateHorizontalDividerPosition: horizontalSplit.getWidth() = {}, prefHorizontalDividerPosition = {}, computedPosition = {}",
+                    horizontalSplit.getWidth(),
+                    preferences.getGuiPreferences().getHorizontalDividerPosition(),
+                    preferences.getGuiPreferences().getHorizontalDividerPosition() / horizontalSplit.getWidth());
+            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
+            // Delay attaching the listener until after at least one layout pass has completed.
+            Platform.runLater(() -> Platform.runLater(() -> {
+                // If dividers are not created yet, bail out and wait for a later call.
+                if (horizontalSplit.getDividers().isEmpty()) {
+                    LOGGER.debug("updateHorizontalDividerPosition: no dividers yet, postponing subscription");
+                    return;
+                }
+                if (horizontalDividerSubscription != null) {
+                    horizontalDividerSubscription.unsubscribe();
+                }
+                horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                                                        .mapObservable(SplitPane.Divider::positionProperty)
+                                                        .listenToValues((_, newValue) ->
+                                                                preferences.getGuiPreferences()
+                                                                           .setHorizontalDividerPosition(newValue.doubleValue()));
+            }));
         }
     }
 
