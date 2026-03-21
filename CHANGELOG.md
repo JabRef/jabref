@@ -39,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We improved the group filter to support full boolean search syntax. Space-separated terms now match groups containing any of the words (OR semantics). Explicit operators "AND", "OR", "NOT", and parentheses are also supported — e.g., `NOT learning` hides all learning groups, or `(deep OR neural) NOT vision` shows "Deep Learning" and "Neural Networks" but not "Computer Vision".. [#12721](https://github.com/JabRef/jabref/issues/12721)
 - We fixed vertical cursor movement shortcuts (Command+Up/Down for document start/end, Option+Up/Down for paragraph start/end) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We fixed text cursor movement shortcuts (Command+Left/Right for line start/end, Option+Left/Right for word navigation) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We fixed PDF import to prefer the content extracted title over filename like XMP metadata titles. [#11999](https://github.com/JabRef/jabref/issues/11999)
