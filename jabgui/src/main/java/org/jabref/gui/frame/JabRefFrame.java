@@ -273,7 +273,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
-        // Log initial width before showing the stage to compare against later computed value
+    
         LOGGER.debug("initLayout: horizontalSplit.getWidth() = {}, sidePane.children.count = {}", horizontalSplit.getWidth(), sidePane.getChildren().size());
         setCenter(horizontalSplit);
     }
