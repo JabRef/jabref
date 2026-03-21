@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -467,6 +468,11 @@ public class JabRefGUI extends Application {
         if (remotePreferences.enableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
+
+        NativeDesktop.get().registerJabRefProtocolHandler(uri -> {
+            LOGGER.debug("Received URI via protocol handler: {}", uri);
+            Platform.runLater(() -> mainFrame.handleUiCommands(List.of(new UiCommand.Focus())));
+        });
     }
 
     private void setupHttpServerEnabledListener() {

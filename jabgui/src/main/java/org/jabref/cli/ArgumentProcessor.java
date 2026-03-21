@@ -1,6 +1,7 @@
 package org.jabref.cli;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
@@ -18,6 +19,7 @@ import picocli.CommandLine;
 
 public class ArgumentProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+    private static final String JABREF_PROTOCOL_SCHEME = "jabref:";
 
     public enum Mode { INITIAL_START, REMOTE_START }
 
@@ -28,6 +30,7 @@ public class ArgumentProcessor {
 
     private final List<UiCommand> uiCommands = new ArrayList<>();
     private boolean guiNeeded = true;
+    private final boolean protocolHandlerInvoked;
 
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
@@ -36,8 +39,24 @@ public class ArgumentProcessor {
         this.preferences = preferences;
         this.guiCli = new GuiCommandLine();
 
+        String[] filteredArgs = filterProtocolHandlerArgs(args);
+        this.protocolHandlerInvoked = filteredArgs.length < args.length;
+
         cli = new CommandLine(this.guiCli);
-        cli.parseArgs(args);
+        cli.parseArgs(filteredArgs);
+    }
+
+    /// Removes `jabref://` protocol handler URLs from the argument list.
+    /// These are passed by the OS when the `jabref://` URL scheme is triggered
+    /// and must not reach picocli, which would try to parse them as file paths.
+    private static String[] filterProtocolHandlerArgs(String[] args) {
+        return Arrays.stream(args)
+                     .filter(arg -> !isJabRefProtocolArgument(arg))
+                     .toArray(String[]::new);
+    }
+
+    private static boolean isJabRefProtocolArgument(String arg) {
+        return arg.regionMatches(true, 0, JABREF_PROTOCOL_SCHEME, 0, JABREF_PROTOCOL_SCHEME.length());
     }
 
     public List<UiCommand> processArguments() {
@@ -94,6 +113,11 @@ public class ArgumentProcessor {
         if (guiCli.importBibtex != null) {
             uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex));
         }
+
+        if (protocolHandlerInvoked) {
+            uiCommands.add(new UiCommand.Focus());
+        }
+
         return uiCommands;
     }
 
