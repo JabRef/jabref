@@ -19,12 +19,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -35,6 +35,7 @@ import org.controlsfx.dialog.WizardPane;
 public class FileSelectionPage extends WizardPane {
 
     private final UnlinkedFilesDialogViewModel viewModel;
+    private final StateManager stateManager;
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
 
     private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
@@ -50,8 +51,9 @@ public class FileSelectionPage extends WizardPane {
     private Button collapseAllButton;
     private boolean nextButtonBound = false;
 
-    public FileSelectionPage(UnlinkedFilesDialogViewModel viewModel) {
+    public FileSelectionPage(StateManager stateManager, UnlinkedFilesDialogViewModel viewModel) {
         this.viewModel = viewModel;
+        this.stateManager = stateManager;
 
         setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
@@ -83,7 +85,7 @@ public class FileSelectionPage extends WizardPane {
         fileCountLabel.setStyle("-fx-font-weight: bold;");
 
         unlinkedFilesList = new CheckTreeView<>();
-        new ViewModelTreeCellFactory<FileNodeViewModel>().withText(FileNodeViewModel::getDisplayTextWithEditDate).install(unlinkedFilesList);
+        unlinkedFilesList.setCellFactory(_ -> new UnlinkedFilesCellFactory(stateManager, viewModel));
 
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList.setContextMenu(createContextMenu());

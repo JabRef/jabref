@@ -27,7 +27,6 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
-import com.sun.star.uno.Exception;
 
 /// This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
 /// It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
@@ -50,6 +49,8 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
+    private boolean inTextUsed;
+    private boolean inTextNatureChanged;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
@@ -78,11 +79,18 @@ public class CSLCitationOOAdapter {
     /// Inserts a citation for a group of entries.
     /// Comparable to LaTeX's \cite command.
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws CreationException, Exception {
+            throws CreationException, com.sun.star.uno.Exception {
         setStyle(selectedStyle);
 
+        if (inTextUsed) {
+            inTextNatureChanged = true;
+            inTextUsed = false;
+        } else {
+            inTextNatureChanged = false;
+        }
+
         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
-        if (styleChanged) {
+        if (styleChanged || inTextNatureChanged) {
             updateAllCitationsWithNewStyle(currentStyle, false);
             styleChanged = false;
         }
@@ -114,10 +122,17 @@ public class CSLCitationOOAdapter {
     ///
     /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws CreationException, Exception {
+            throws CreationException, com.sun.star.uno.Exception {
         setStyle(selectedStyle);
 
-        if (styleChanged) {
+        if (!inTextUsed) {
+            inTextUsed = true;
+            inTextNatureChanged = true;
+        } else {
+            inTextNatureChanged = false;
+        }
+
+        if (styleChanged || inTextNatureChanged) {
             updateAllCitationsWithNewStyle(currentStyle, true);
             styleChanged = false;
         }
@@ -163,7 +178,7 @@ public class CSLCitationOOAdapter {
     /// Inserts "empty" citations for a list of entries at the cursor to the document.
     /// Adds the entries to the list for which bibliography is to be generated.
     public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
-            throws CreationException, Exception {
+            throws CreationException, com.sun.star.uno.Exception {
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
         insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle());
     }
@@ -171,12 +186,17 @@ public class CSLCitationOOAdapter {
     /// Creates a "Bibliography" section in the document and inserts a list of references.
     /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, CreationException {
+            throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
         }
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
+
+        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
+        markManager.readAndUpdateExistingMarks();
+        updateAllCitationsWithNewStyle(selectedStyle, inTextUsed);
+        markManager.readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
@@ -214,7 +234,7 @@ public class CSLCitationOOAdapter {
 
     /// Inserts references and also adds a space before the citation if not already present ("smart space").
     private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle)
-            throws CreationException, Exception {
+            throws CreationException, com.sun.star.uno.Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
@@ -259,7 +279,7 @@ public class CSLCitationOOAdapter {
     /// Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
     /// Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
     private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
-            throws Exception, CreationException {
+            throws com.sun.star.uno.Exception, CreationException {
         boolean isNumericStyle = style.isNumericStyle();
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
 

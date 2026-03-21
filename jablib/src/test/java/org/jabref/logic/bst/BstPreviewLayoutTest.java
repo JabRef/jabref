@@ -3,7 +3,7 @@ package org.jabref.logic.bst;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
-import org.jabref.model.database.BibDatabase;
+import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -12,7 +12,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 class BstPreviewLayoutTest {
 
@@ -23,9 +22,8 @@ class BstPreviewLayoutTest {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development");
-        BibDatabase bibDatabase = mock(BibDatabase.class);
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O. Kopp. Thoughts on development.", preview);
+        assertEquals("O.\u00a0Kopp. Thoughts on development.", preview);
     }
 
     @Test
@@ -34,23 +32,22 @@ class BstPreviewLayoutTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development")
                                        .withField(StandardField.MONTH, "#May#");
-        BibDatabase bibDatabase = mock(BibDatabase.class);
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O. Kopp. Thoughts on development, May.", preview);
+        assertEquals("O.\u00a0Kopp. Thoughts on development, May.", preview);
     }
 
     @Test
     void generatePreviewForSliceTheoremPaperUsingAbbr() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
-        assertEquals("T. Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. May 2014.", preview);
+        assertEquals("T.\u00a0Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. May 2014.", preview);
     }
 
     @Test
     void generatePreviewForSliceTheoremPaperUsingIEEE() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
-        assertEquals("T. Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);
+        assertEquals("T.\u00a0Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);
     }
 
     private static BibEntry getSliceTheoremPaper() {

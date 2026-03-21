@@ -36,7 +36,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: pr_number
           path: pr_number.txt
@@ -55,9 +55,24 @@ jobs:
       - name: Run checkstyle using gradle
         run: gradle checkstyleMain checkstyleTest checkstyleJmh
 
+  dependencyscopes:
+    name: Dependency Scopes
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run checkAllModuleInfo using gradle
+        run: gradle checkAllModuleInfo
+
   openrewrite:
     name: OpenRewrite
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -301,7 +316,8 @@ jobs:
           files: |
             jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
             jablib/src/test/java/org/jabref/logic/citationstyle/CSLStyleUtilsTest.java
-
+            jablib/src/main/java/org/jabref/logic/exporter/AcademicPagesExporter.java
+            jablib/src/test/java/org/jabref/logic/exporter/AcademicPagesExporterTest.java
       - uses: ./.github/actions/setup-gradle
         if: steps.changed-windows-related-files.outputs.any_changed == 'true'
       - name: Run jablib tests
