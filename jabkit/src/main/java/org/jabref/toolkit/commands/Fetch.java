@@ -77,7 +77,8 @@ class Fetch implements Runnable {
                         argumentProcessor.cliPreferences,
                         argumentProcessor.entryTypesManager,
                         new BibDatabase(matches),
-                        outputFile);
+                        outputFile,
+                        argumentProcessor.journalAbbreviationRepository);
             } else {
                 System.out.println(matches.stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
             }

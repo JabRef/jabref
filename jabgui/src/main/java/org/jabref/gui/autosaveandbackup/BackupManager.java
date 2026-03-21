@@ -27,6 +27,7 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -64,19 +65,21 @@ public class BackupManager {
     private final ScheduledThreadPoolExecutor executor;
     private final BibEntryTypesManager entryTypesManager;
     private final LibraryTab libraryTab;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     // Contains a list of all backup paths
     // During writing, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
     private boolean needsBackup = false;
 
-    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
+    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.coarseChangeFilter = coarseChangeFilter;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.executor = new ScheduledThreadPoolExecutor(2);
         this.libraryTab = libraryTab;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     /// Determines the most recent backup file name
@@ -95,8 +98,8 @@ public class BackupManager {
     /// This method is not thread-safe. The caller has to ensure that this method is not called in parallel.
     ///
     /// @param bibDatabaseContext Associated {@link BibDatabaseContext}
-    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
-        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences);
+    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences, JournalAbbreviationRepository journalAbbreviationRepository) {
+        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences, journalAbbreviationRepository);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         coarseChangeFilter.registerListener(backupManager);
         RUNNING_INSTANCES.add(backupManager);
@@ -261,9 +264,9 @@ public class BackupManager {
             new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    entryTypesManager)
+                    preferences,
+                    entryTypesManager,
+                    journalAbbreviationRepository)
                     // we save the clone to prevent the original database (and thus the UI) from being changed
                     .writeDatabase(bibDatabaseContextClone);
             backupFilesQueue.add(backupPath);

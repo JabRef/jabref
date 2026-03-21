@@ -21,6 +21,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
@@ -64,6 +65,7 @@ public class JabKit implements Runnable {
 
     protected final CliPreferences cliPreferences;
     protected final BibEntryTypesManager entryTypesManager;
+    protected final JournalAbbreviationRepository journalAbbreviationRepository;
 
     @Mixin
     private SharedOptions sharedOptions = new SharedOptions();
@@ -71,9 +73,10 @@ public class JabKit implements Runnable {
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
     private boolean versionInfoRequested;
 
-    public JabKit(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
+    public JabKit(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     @Override
@@ -160,22 +163,23 @@ public class JabKit implements Runnable {
     protected static void saveDatabase(CliPreferences cliPreferences,
                                        BibEntryTypesManager entryTypesManager,
                                        BibDatabase newBase,
-                                       Path outputFile) {
-        saveDatabaseContext(cliPreferences, entryTypesManager, new BibDatabaseContext(newBase), outputFile);
+                                       Path outputFile,
+                                       JournalAbbreviationRepository journalAbbreviationRepository) {
+        saveDatabaseContext(cliPreferences, entryTypesManager, new BibDatabaseContext(newBase), outputFile, journalAbbreviationRepository);
     }
 
-    static int outputEntries(CliPreferences cliPreferences, List<BibEntry> entries) {
+    static int outputEntries(CliPreferences cliPreferences, List<BibEntry> entries, JournalAbbreviationRepository journalAbbreviationRepository) {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(entries));
-        return outputDatabaseContext(cliPreferences, bibDatabaseContext);
+        return outputDatabaseContext(cliPreferences, bibDatabaseContext, journalAbbreviationRepository);
     }
 
     /// Outputs to StdOut. Generates citation keys if missing.
-    static int outputDatabaseContext(CliPreferences cliPreferences, BibDatabaseContext bibDatabaseContext) {
+    static int outputDatabaseContext(CliPreferences cliPreferences, BibDatabaseContext bibDatabaseContext, JournalAbbreviationRepository journalAbbreviationRepository) {
         JabKit.generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
 
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
-            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences);
-            bibWriter.writeDatabase(bibDatabaseContext);
+            BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences, journalAbbreviationRepository);
+            bibDatabaseWriter.writeDatabase(bibDatabaseContext);
         } catch (IOException e) {
             LOGGER.error("Could not write BibTeX", e);
             System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
@@ -187,7 +191,8 @@ public class JabKit implements Runnable {
     protected static void saveDatabaseContext(CliPreferences cliPreferences,
                                               BibEntryTypesManager entryTypesManager,
                                               BibDatabaseContext bibDatabaseContext,
-                                              Path outputFile) {
+                                              Path outputFile,
+                                              JournalAbbreviationRepository journalAbbreviationRepository) {
         try {
             if (!FileUtil.isBibFile(outputFile)) {
                 System.err.println(Localization.lang("Invalid output file type provided."));
@@ -196,13 +201,9 @@ public class JabKit implements Runnable {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                         .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
-                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
-                        bibWriter,
-                        saveConfiguration,
-                        cliPreferences.getFieldPreferences(),
-                        cliPreferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager);
-                databaseWriter.writeDatabase(bibDatabaseContext);
+
+                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter, saveConfiguration, cliPreferences, entryTypesManager, journalAbbreviationRepository);
+                bibDatabaseWriter.writeDatabase(bibDatabaseContext);
 
                 // Show just a warning message if encoding did not work for all characters:
                 if (fileWriter.hasEncodingProblems()) {

@@ -91,7 +91,8 @@ class Convert implements Runnable {
                     jabKit.cliPreferences,
                     jabKit.entryTypesManager,
                     parserResult.getDatabase(),
-                    outputFile);
+                    outputFile,
+                    jabKit.journalAbbreviationRepository);
             return;
         }
 

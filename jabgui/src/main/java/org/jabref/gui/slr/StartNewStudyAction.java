@@ -12,6 +12,7 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -42,7 +43,8 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                                TaskExecutor taskExecutor,
                                CliPreferences preferences,
                                StateManager stateManager,
-                               DialogService dialogService) {
+                               DialogService dialogService,
+                               JournalAbbreviationRepository journalAbbreviationRepository) {
         super(tabContainer,
                 openDatabaseActionSupplier,
                 dialogService,
@@ -50,7 +52,8 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                 taskExecutor,
                 preferences,
                 stateManager,
-                true);
+                true,
+                journalAbbreviationRepository);
     }
 
     @Override

@@ -111,9 +111,10 @@ class GenerateCitationKeys implements Runnable {
                     parentCommand.getParent().cliPreferences,
                     parentCommand.getParent().entryTypesManager,
                     parserResult.get().getDatabase(),
-                    outputFile);
+                    outputFile,
+                    parentCommand.getParent().journalAbbreviationRepository);
         } else {
-            JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
+            JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext(), parentCommand.getParent().journalAbbreviationRepository);
         }
     }
 

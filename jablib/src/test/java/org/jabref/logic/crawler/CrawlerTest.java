@@ -18,6 +18,7 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -97,7 +98,8 @@ class CrawlerTest {
                 gitHandler,
                 preferences,
                 entryTypesManager,
-                new DummyFileUpdateMonitor());
+                new DummyFileUpdateMonitor(),
+                mock(JournalAbbreviationRepository.class));
 
         testCrawler.performCrawl();
 

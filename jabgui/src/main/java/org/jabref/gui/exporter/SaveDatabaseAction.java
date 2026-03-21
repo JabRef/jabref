@@ -32,6 +32,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -59,6 +60,7 @@ public class SaveDatabaseAction {
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -68,12 +70,14 @@ public class SaveDatabaseAction {
                               DialogService dialogService,
                               GuiPreferences preferences,
                               BibEntryTypesManager entryTypesManager,
-                              StateManager stateManager) {
+                              StateManager stateManager,
+                              JournalAbbreviationRepository journalAbbreviationRepository1) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.stateManager = stateManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository1;
     }
 
     public boolean save() {
@@ -253,20 +257,18 @@ public class SaveDatabaseAction {
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
-                        bibWriter,
+                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter,
                         saveConfiguration,
-                        preferences.getFieldPreferences(),
-                        preferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager);
-
+                        preferences,
+                        entryTypesManager,
+                        journalAbbreviationRepository);
                 if (selectedOnly) {
-                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                    bibDatabaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
                 } else {
-                    databaseWriter.writeDatabase(bibDatabaseContext);
+                    bibDatabaseWriter.writeDatabase(bibDatabaseContext);
                 }
 
-                libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
+                libraryTab.registerUndoableChanges(bibDatabaseWriter.getSaveActionsFieldChanges());
 
                 if (fileWriter.hasEncodingProblems()) {
                     saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);

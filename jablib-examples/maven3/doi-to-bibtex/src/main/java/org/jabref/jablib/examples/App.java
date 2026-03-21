@@ -6,6 +6,7 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -40,7 +41,8 @@ public class App {
 
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
             BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, context, preferences);
+            var abbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+            var bibWriter = new BibDatabaseWriter(writer, context, preferences, abbreviationRepository);
             bibWriter.writeDatabase(context);
         } catch (IOException e) {
             Logger.error("Could not write library", e);
