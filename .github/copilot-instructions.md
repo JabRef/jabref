@@ -1,5 +1,10 @@
+> [!IMPORTANT]
+> This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
+>
+> Read and follow:
+> • [AGENTS.md](./AGENTS.md)
+> • [CONTRIBUTING.md](./CONTRIBUTING.md)
 # Copilot instructions — JabRef
-
 Purpose
 - Short, actionable guidance for Copilot-style assistants working in this repository. Keep responses focused, follow AGENTS.md/CONTRIBUTING.md, and never produce a fully AI-generated PR.
 
