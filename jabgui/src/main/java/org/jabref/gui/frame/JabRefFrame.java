@@ -293,6 +293,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             horizontalDividerAttachPending = false;
             if (horizontalSplit.getDividers().isEmpty()) {
                 LOGGER.debug("executeDeferredHorizontalAttachment: no dividers found");
+                horizontalDividerAttachPending = false;
                 return;
             }
             if (horizontalDividerSubscription != null) {
@@ -301,6 +302,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
                                                     .mapObservable(SplitPane.Divider::positionProperty)
                                                     .listenToValues((_, newValue) -> preferences.getGuiPreferences().setHorizontalDividerPosition(newValue.doubleValue()));
+            horizontalDividerAttachPending = false;
         });
     }
 
