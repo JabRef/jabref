@@ -324,6 +324,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 return;
             }
             if (!horizontalSplit.getDividers().isEmpty()) {
+                horizontalDividerAttachPending = true;
                 executeDeferredHorizontalAttachment();
                 return;
             }
