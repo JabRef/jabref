@@ -88,10 +88,6 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
     }
 
-    public void setDownloadHeaders(Map<String, String> headers) {
-        this.downloadHeaders = Map.copyOf(headers);
-    }
-
     /// Downloads the given linked file to the first existing file directory. It keeps HTML files as URLs.
     public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
                                     BibEntry entry,
@@ -111,6 +107,10 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                 taskExecutor,
                 "",
                 true);
+    }
+
+    public void setDownloadHeaders(Map<String, String> headers) {
+        this.downloadHeaders = Map.copyOf(headers);
     }
 
     @Override
