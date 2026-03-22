@@ -117,6 +117,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
     private Subscription horizontalDividerSubscription;
     private Subscription verticalDividerSubscription;
+    private boolean horizontalDividerAttachPending = false;
+    private ListChangeListener<SplitPane.Divider> horizontalDividersListener;
 
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
@@ -281,6 +283,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (horizontalDividerSubscription != null) {
                 horizontalDividerSubscription.unsubscribe();
             }
+            if (horizontalDividersListener != null) {
+                horizontalSplit.getDividers().removeListener(horizontalDividersListener);
+                horizontalDividersListener = null;
+                horizontalDividerAttachPending = false;
+            }
             horizontalSplit.getItems().remove(sidePane);
         } else {
             if (!horizontalSplit.getItems().contains(sidePane)) {
@@ -306,14 +313,51 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void updateHorizontalDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences()
-                                                           .getHorizontalDividerPosition() / horizontalSplit.getWidth());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) ->
-                                                            preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
+            LOGGER.debug("updateHorizontalDividerPosition: horizontalSplit.getWidth() = {}, prefHorizontalDividerPosition = {}, computedPosition = {}", horizontalSplit.getWidth(), preferences.getGuiPreferences().getHorizontalDividerPosition(), preferences.getGuiPreferences().getHorizontalDividerPosition() / horizontalSplit.getWidth());
+            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
+            // Maintain existing unsubscribe behavior
+            if (horizontalDividerSubscription != null) {
+                horizontalDividerSubscription.unsubscribe();
+            }
+            if (horizontalDividerAttachPending) {
+                LOGGER.debug("updateHorizontalDividerPosition: attachment already pending, skipping");
+                return;
+            }
+            if (!horizontalSplit.getDividers().isEmpty()) {
+                horizontalDividerAttachPending = true;
+                executeDeferredHorizontalAttachment();
+                return;
+            }
+            horizontalDividerAttachPending = true;
+            horizontalDividersListener = change -> {
+                while (change.next()) {
+                    if (change.wasAdded()) {
+                        horizontalSplit.getDividers().removeListener(horizontalDividersListener);
+                        horizontalDividersListener = null;
+                        // Defer actual subscription until after layout pass
+                        executeDeferredHorizontalAttachment();
+                        break;
+                    }
+                }
+            };
+            horizontalSplit.getDividers().addListener(horizontalDividersListener);
+            LOGGER.debug("updateHorizontalDividerPosition: dividers not present yet, listening for additions");
         }
+    }
+
+    private void executeDeferredHorizontalAttachment() {
+        // Attach subscription after ensuring layout has been applied
+        Platform.runLater(() -> {
+            horizontalDividerAttachPending = false;
+            if (horizontalSplit.getDividers().isEmpty()) {
+                LOGGER.debug("executeDeferredHorizontalAttachment: no dividers found");
+                return;
+            }
+            if (horizontalDividerSubscription != null) {
+                horizontalDividerSubscription.unsubscribe();
+            }
+            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0).mapObservable(SplitPane.Divider::positionProperty).listenToValues((_, newValue) -> preferences.getGuiPreferences().setHorizontalDividerPosition(newValue.doubleValue()));
+        });
     }
 
     public void updateVerticalDividerPosition() {
