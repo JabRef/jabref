@@ -88,7 +88,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public GroupTreeViewModel(@NonNull StateManager stateManager,
                               @NonNull BibEntryTypesManager entryTypesManager,
                               @NonNull GuiPreferences preferences,
-                              @NonNull FieldPreferences fieldPreferences,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
                               @NonNull AdaptVisibleTabs adaptVisibleTabs,
@@ -98,7 +97,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.fieldPreferences = fieldPreferences;
+        this.fieldPreferences = preferences.getFieldPreferences();
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.adaptVisibleTabs = adaptVisibleTabs;
@@ -545,7 +544,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 Localization.lang("Remove subgroups"),
                 Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
         if (confirmation) {
-            /// TODO: Add undo
+            // TODO: Add undo
             // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
             // panel.getUndoManager().addEdit(undo);
             for (GroupNodeViewModel child : group.getChildren()) {

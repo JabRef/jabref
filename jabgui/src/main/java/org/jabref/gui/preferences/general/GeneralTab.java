@@ -69,6 +69,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private TextField remotePort;
     @FXML private CheckBox enableHttpServer;
     @FXML private TextField httpServerPort;
+    @FXML private CheckBox directHttpImport;
     @FXML private CheckBox enableLanguageServer;
     @FXML private TextField languageServerPort;
     @FXML private Button remoteHelp;
@@ -174,6 +175,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         enableHttpServer.selectedProperty().bindBidirectional(viewModel.enableHttpServerProperty());
         httpServerPort.textProperty().bindBidirectional(viewModel.httpPortProperty());
         httpServerPort.disableProperty().bind(enableHttpServer.selectedProperty().not());
+
+        directHttpImport.selectedProperty().bindBidirectional(viewModel.directHttpImportProperty());
 
         enableLanguageServer.selectedProperty().bindBidirectional(viewModel.enableLanguageServerProperty());
         languageServerPort.textProperty().bindBidirectional(viewModel.languageServerPortProperty());

@@ -33,8 +33,8 @@ public class SearchCitationsRelationsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchCitationsRelationsService.class);
 
-    private CitationFetcher citationFetcher;
-    private CitationCountFetcher citationCountFetcher;
+    private volatile CitationFetcher citationFetcher;
+    private volatile CitationCountFetcher citationCountFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences,

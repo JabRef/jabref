@@ -28,6 +28,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -50,6 +51,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -220,7 +222,13 @@ public class JabRefFrameViewModel {
                           BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
                           List<BibEntry> entries = parser.parseEntries(importStr);
                           return new ParserResult(entries);
-                      }).onSuccess(this::addParserResult)
+                      }).onSuccess(parserResult -> {
+                          if (preferences.getRemotePreferences().directHttpImport()) {
+                              directImportEntries(parserResult);
+                          } else {
+                              addParserResult(parserResult);
+                          }
+                      })
                       .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
                       .executeWith(taskExecutor);
     }
@@ -232,6 +240,19 @@ public class JabRefFrameViewModel {
                       .onSuccess(result -> result.ifPresent(this::addParserResult))
                       .onFailure(t -> LOGGER.error("Unable to import file {} ", location, t))
                       .executeWith(taskExecutor);
+    }
+
+    private void directImportEntries(ParserResult parserResult) {
+        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        ImportHandler importHandler = new ImportHandler(
+                libraryTab.getBibDatabaseContext(),
+                preferences,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager,
+                dialogService,
+                taskExecutor);
+        importHandler.importEntries(parserResult.getDatabase().getEntries());
     }
 
     private void checkForBibInUpperDir() {
@@ -373,9 +394,22 @@ public class JabRefFrameViewModel {
         addParserResult(importResult.parserResult());
     }
 
-    private void addParserResult(ParserResult parserResult) {
+    @VisibleForTesting
+    void addParserResult(ParserResult parserResult) {
         LOGGER.trace("Adding the entries to the open tab.");
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        if (libraryTab == null) {
+            BibDatabaseContext databaseContext = new BibDatabaseContext();
+            databaseContext.setMode(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
+            tabContainer.addTab(databaseContext, true);
+            libraryTab = tabContainer.getCurrentLibraryTab();
+        }
+
+        if (libraryTab == null) {
+            // Should not happen as we just added a tab
+            LOGGER.error("Could not get a library tab to add the entries to.");
+            return;
+        }
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
         ImportCleanup cleanup = ImportCleanup.targeting(libraryTab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
