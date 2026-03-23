@@ -22,7 +22,6 @@ permissions:
 
 jobs:
   build:
-    if: github.repository == 'JabRef/jabref'
     strategy:
       max-parallel: 1
       matrix:
