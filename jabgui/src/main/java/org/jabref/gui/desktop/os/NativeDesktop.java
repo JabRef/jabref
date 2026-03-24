@@ -259,9 +259,6 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // normalize white spaces
-        command = command.replaceAll("\\s+", " ");
-
         // replace the placeholder if used
         command = command.replace("%DIR", absolutePath);
 
@@ -271,8 +268,9 @@ public abstract class NativeDesktop {
         ArrayList<String> subcommands = new ArrayList<>();
         try {
             subcommands = getSubcommands(command);
-        } catch (IOException exception) {
+        } catch (IllegalArgumentException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error because quotations are not closed", exception);
+            return;
         }
         try {
             new ProcessBuilder(subcommands).start();
@@ -367,15 +365,17 @@ public abstract class NativeDesktop {
         return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
     }
 
-    private static ArrayList<String> getSubcommands(String s) throws IOException {
+    private static ArrayList<String> getSubcommands(String s) throws IllegalArgumentException {
         char[] commandArr = s.toCharArray();
         ArrayList<String> subcommands = new ArrayList<>();
         StringBuilder currSubcommand = new StringBuilder();
         char quoteType = '\'';
         for (int i = 0; i < commandArr.length; i++) {
             if (commandArr[i] == ' ') {
-                subcommands.add(currSubcommand.toString());
-                currSubcommand = new StringBuilder();
+                if (!currSubcommand.isEmpty()) {
+                    subcommands.add(currSubcommand.toString());
+                    currSubcommand.setLength(0);
+                }
             } else {
                 if (commandArr[i] != '\'' && commandArr[i] != '\"') {
                     currSubcommand.append(commandArr[i]);
@@ -387,13 +387,17 @@ public abstract class NativeDesktop {
                         j += 1;
                     }
                     if (j == commandArr.length) {
-                        throw new IOException();
+                        throw new IllegalArgumentException();
                     }
                     i = j;
                 }
             }
         }
         subcommands.add(currSubcommand.toString());
+        if (!currSubcommand.isEmpty()) { // add the last subCommand if it's not a space
+            subcommands.add(currSubcommand.toString());
+            currSubcommand.setLength(0);
+        }
         return subcommands;
     }
 }
