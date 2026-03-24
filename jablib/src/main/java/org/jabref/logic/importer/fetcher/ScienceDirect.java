@@ -40,6 +40,17 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
 
     private final ImporterPreferences importerPreferences;
 
+    private sealed interface DoiResolution permits DoiResolution.ArticlePage, DoiResolution.NotFound, DoiResolution.Pdf {
+        record Pdf(String url) implements DoiResolution {
+        }
+
+        record ArticlePage(String url) implements DoiResolution {
+        }
+
+        record NotFound() implements DoiResolution {
+        }
+    }
+
     public ScienceDirect(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
     }
@@ -53,103 +64,94 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         }
 
         return switch (getUrlByDoi(doi.get().asString())) {
-            case NotFound() ->
+            case DoiResolution.NotFound() ->
                     Optional.empty();
-            case Pdf(
+            case DoiResolution.Pdf(
                     String url
             ) -> {
                 LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", url);
                 yield Optional.of(URLUtil.create(url));
             }
-            case ArticlePage(
+            case DoiResolution.ArticlePage(
                     String url
-            ) -> {
-                // Scrape the web page as desktop client (not as mobile client!)
-                Document html = Jsoup.connect(url)
-                                     .userAgent(URLDownload.USER_AGENT)
-                                     .referrer("https://www.google.com")
-                                     .ignoreHttpErrors(true)
-                                     .get();
-
-                // Retrieve PDF link from meta data (most recent)
-                Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
-                if (!metaLinks.isEmpty()) {
-                    String link = metaLinks.first().attr("content");
-                    yield Optional.of(URLUtil.create(link));
-                }
-
-                // We use the ScienceDirect web page which contains the article (presented using HTML).
-                // This page contains the link to the PDF in some JavaScript code embedded in the web page.
-                // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
-
-                Optional<JSONObject> pdfDownloadOptional = html
-                        .getElementsByAttributeValue("type", "application/json")
-                        .stream()
-                        .flatMap(element -> element.getElementsByTag("script").stream())
-                        // The first DOM child of the script element is the script itself (represented as HTML text)
-                        .map(element -> element.childNode(0))
-                        .map(Node::toString)
-                        .map(JSONObject::new)
-                        .filter(json -> json.has("article"))
-                        .map(json -> json.getJSONObject("article"))
-                        .filter(json -> json.has("pdfDownload"))
-                        .map(json -> json.getJSONObject("pdfDownload"))
-                        .findAny();
-
-                if (pdfDownloadOptional.isEmpty()) {
-                    LOGGER.debug("No 'pdfDownload' key found in JSON information");
-                    yield Optional.empty();
-                }
-
-                JSONObject pdfDownload = pdfDownloadOptional.get();
-
-                String fullLinkToPdf;
-                if (pdfDownload.has("linkToPdf")) {
-                    String linkToPdf = pdfDownload.getString("linkToPdf");
-                    URL parsedUrl = URLUtil.create(url);
-                    fullLinkToPdf = "%s://%s%s".formatted(parsedUrl.getProtocol(), parsedUrl.getAuthority(), linkToPdf);
-                } else if (pdfDownload.has("urlMetadata")) {
-                    JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
-                    JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
-                    String queryParameters = queryParamsObject.keySet().stream()
-                                                              .map(key -> "%s=%s".formatted(key, queryParamsObject.getString(key)))
-                                                              .collect(Collectors.joining("&"));
-                    fullLinkToPdf = "https://www.sciencedirect.com/%s/%s%s?%s".formatted(
-                            urlMetadata.getString("path"),
-                            urlMetadata.getString("pii"),
-                            urlMetadata.getString("pdfExtension"),
-                            queryParameters);
-                } else {
-                    LOGGER.debug("No suitable data in JSON information");
-                    yield Optional.empty();
-                }
-
-                LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
-                try {
-                    yield Optional.of(URLUtil.create(fullLinkToPdf));
-                } catch (MalformedURLException e) {
-                    LOGGER.error("malformed URL", e);
-                    yield Optional.empty();
-                }
-            }
+            ) ->
+                    parseArticlePage(url);
         };
+    }
+
+    private @NonNull Optional<URL> parseArticlePage(String url) throws IOException {
+        // Scrape the web page as desktop client (not as mobile client!)
+        Document html = Jsoup.connect(url)
+                             .userAgent(URLDownload.USER_AGENT)
+                             .referrer("https://www.google.com")
+                             .ignoreHttpErrors(true)
+                             .get();
+
+        // Retrieve PDF link from meta data (most recent)
+        Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
+        if (!metaLinks.isEmpty()) {
+            String link = metaLinks.first().attr("content");
+            return Optional.of(URLUtil.create(link));
+        }
+
+        // We use the ScienceDirect web page which contains the article (presented using HTML).
+        // This page contains the link to the PDF in some JavaScript code embedded in the web page.
+        // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
+
+        Optional<JSONObject> pdfDownloadOptional = html
+                .getElementsByAttributeValue("type", "application/json")
+                .stream()
+                .flatMap(element -> element.getElementsByTag("script").stream())
+                // The first DOM child of the script element is the script itself (represented as HTML text)
+                .map(element -> element.childNode(0))
+                .map(Node::toString)
+                .map(JSONObject::new)
+                .filter(json -> json.has("article"))
+                .map(json -> json.getJSONObject("article"))
+                .filter(json -> json.has("pdfDownload"))
+                .map(json -> json.getJSONObject("pdfDownload"))
+                .findAny();
+
+        if (pdfDownloadOptional.isEmpty()) {
+            LOGGER.debug("No 'pdfDownload' key found in JSON information");
+            return Optional.empty();
+        }
+
+        JSONObject pdfDownload = pdfDownloadOptional.get();
+
+        String fullLinkToPdf;
+        if (pdfDownload.has("linkToPdf")) {
+            String linkToPdf = pdfDownload.getString("linkToPdf");
+            URL parsedUrl = URLUtil.create(url);
+            fullLinkToPdf = "%s://%s%s".formatted(parsedUrl.getProtocol(), parsedUrl.getAuthority(), linkToPdf);
+        } else if (pdfDownload.has("urlMetadata")) {
+            JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
+            JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
+            String queryParameters = queryParamsObject.keySet().stream()
+                                                      .map(key -> "%s=%s".formatted(key, queryParamsObject.getString(key)))
+                                                      .collect(Collectors.joining("&"));
+            fullLinkToPdf = "https://www.sciencedirect.com/%s/%s%s?%s".formatted(
+                    urlMetadata.getString("path"),
+                    urlMetadata.getString("pii"),
+                    urlMetadata.getString("pdfExtension"),
+                    queryParameters);
+        } else {
+            LOGGER.debug("No suitable data in JSON information");
+            return Optional.empty();
+        }
+
+        LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
+        try {
+            return Optional.of(URLUtil.create(fullLinkToPdf));
+        } catch (MalformedURLException e) {
+            LOGGER.error("malformed URL", e);
+            return Optional.empty();
+        }
     }
 
     @Override
     public TrustLevel getTrustLevel() {
         return TrustLevel.PUBLISHER;
-    }
-
-    private sealed interface DoiResolution permits Pdf, ArticlePage, NotFound {
-    }
-
-    private record Pdf(String url) implements DoiResolution {
-    }
-
-    private record ArticlePage(String url) implements DoiResolution {
-    }
-
-    private record NotFound() implements DoiResolution {
     }
 
     private DoiResolution getUrlByDoi(String doi) throws UnirestException {
@@ -159,7 +161,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
                                                          // Shares the same key as Scopus, because both are offered by Elsevier (https://devdocs.jabref.org/code-howtos/fetchers.html#fetchers)
-                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey("Scopus").orElse(""))
+                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(Scopus.FETCHER_NAME).orElse(""))
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 
@@ -177,12 +179,12 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
                 }
             }
             if (!pdfLink.isEmpty()) {
-                return new Pdf(pdfLink);
+                return new DoiResolution.Pdf(pdfLink);
             }
-            return sciLink.isEmpty() ? new NotFound() : new ArticlePage(sciLink);
+            return sciLink.isEmpty() ? new DoiResolution.NotFound() : new DoiResolution.ArticlePage(sciLink);
         } catch (JSONException e) {
             LOGGER.debug("No ScienceDirect link found in API request", e);
-            return sciLink.isEmpty() ? new NotFound() : new ArticlePage(sciLink);
+            return sciLink.isEmpty() ? new DoiResolution.NotFound() : new DoiResolution.ArticlePage(sciLink);
         }
     }
 

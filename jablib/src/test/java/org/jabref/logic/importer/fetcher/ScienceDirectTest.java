@@ -40,7 +40,7 @@ class ScienceDirectTest {
     void setUp() {
         Optional<String> apiKey = Optional.of(new BuildInfo().scopusApiKey);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey("Scopus")).thenReturn(apiKey);
+        when(importerPreferences.getApiKey(Scopus.FETCHER_NAME)).thenReturn(apiKey);
         finder = new ScienceDirect(importerPreferences);
         entry = new BibEntry();
     }
