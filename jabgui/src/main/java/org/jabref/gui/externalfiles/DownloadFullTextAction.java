@@ -125,7 +125,7 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// @param result          the fetcher result containing the URL and any required download headers
     /// @param entry           the entry "value"
     private void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
-        LinkedFile newLinkedFile = new LinkedFile(result.getSource(), "");
+        LinkedFile newLinkedFile = new LinkedFile(result.source(), "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
@@ -135,7 +135,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     taskExecutor,
                     dialogService,
                     preferences);
-            onlineFile.download(true, result.getHeaders());
+            onlineFile.download(true, result.headers());
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));

@@ -249,7 +249,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     .onFinished(() -> fulltextLookupInProgress.setValue(false))
                     .onSuccess(result -> {
                         if (result.isPresent()) {
-                            addFromURLAndDownload(result.get().getSource(), result.get().getHeaders());
+                            addFromURLAndDownload(result.get().source(), result.get().headers());
                         } else {
                             dialogService.notify(Localization.lang("No full text document found"));
                         }

@@ -192,6 +192,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             addedFetcherNames.add(fetcher.getName());
         }
 
+        // TODO: Refactor this loop and the above into one common logic / Use WebFetcher common interface
         // Add customizable key fetchers that are not search-based (for ex: fulltext-only fetchers like WileyFetcher are CustomizableKeyFetchers)
         for (CustomizableKeyFetcher fetcher : WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences)) {
             if (addedFetcherNames.contains(fetcher.getName())) {
