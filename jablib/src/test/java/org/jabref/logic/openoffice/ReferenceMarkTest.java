@@ -73,6 +73,10 @@ class ReferenceMarkTest {
                 Arguments.of(
                         "JABREF_Em—dash CID_2 iijhy4",
                         List.of("Em—dash"), List.of(2), "iijhy4"
+                ),
+                Arguments.of(
+                        "JABREF_Keen_2011 CID_100 cite", // for LO extension
+                        List.of("Keen_2011"), List.of(100), "cite"
                 )
         );
     }

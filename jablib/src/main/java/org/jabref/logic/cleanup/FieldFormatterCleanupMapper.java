@@ -12,10 +12,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 public class FieldFormatterCleanupMapper {
+    private static final String CLEANUP_FOR_PARSING = ",(?![^\\[]*])";
     private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^]]+)]");
 
     private FieldFormatterCleanupMapper() {
@@ -76,5 +78,17 @@ public class FieldFormatterCleanupMapper {
             result.append(entry.getKey().getName()).append(joiner);
         }
         return result.toString();
+    }
+
+    public static void applyFormatters(String fieldFormatters, List<BibEntry> entries) {
+        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
+            String parseableString = fieldFormatters.replaceAll(CLEANUP_FOR_PARSING, "\n");
+            List<FieldFormatterCleanup> cleanups = parseActions(parseableString);
+            for (BibEntry entry : entries) {
+                for (FieldFormatterCleanup cleanup : cleanups) {
+                    cleanup.cleanup(entry);
+                }
+            }
+        }
     }
 }

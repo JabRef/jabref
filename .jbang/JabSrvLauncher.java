@@ -17,7 +17,7 @@
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
 //DEPS com.google.guava:guava:33.5.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.7.4
+//DEPS com.konghq:unirest-modules-gson:4.8.0
 //DEPS de.undercouch:citeproc-java:3.5.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
@@ -34,7 +34,7 @@
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.glassfish.grizzly:grizzly-framework:5.0.0
 //DEPS org.glassfish.grizzly:grizzly-http-server:5.0.0
-//DEPS org.glassfish.hk2:hk2-api:3.1.1
+//DEPS org.glassfish.hk2:hk2-api:4.0.0
 //DEPS org.glassfish.hk2:hk2-locator:3.1.1
 //DEPS org.glassfish.hk2:hk2-utils:3.1.1
 //DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.2

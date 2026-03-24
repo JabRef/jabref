@@ -12,7 +12,7 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafx = "25.0.2"
+val javafx = "26"
 
 val lucene = "10.4.0"
 
@@ -51,14 +51,13 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.0")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
-    api("com.github.vatbub:mslinks:1.0.6.2")
     api("com.google.errorprone:error_prone_core:2.48.0")
     api("com.google.guava:guava:33.5.0-jre")
     api("com.googlecode.plist:dd-plist:1.29")
     api("com.h2database:h2-mvstore:2.4.240")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.7.4")
-    api("com.konghq:unirest-modules-gson:4.7.4")
+    api("com.konghq:unirest-java-core:4.8.0")
+    api("com.konghq:unirest-modules-gson:4.8.0")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.3.2")
     api("com.squareup.okio:okio-jvm:3.17.0")
@@ -122,14 +121,15 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-api:3.1.1")
     api("org.glassfish.hk2:hk2-locator:3.1.1")
     api("org.glassfish.hk2:hk2-utils:3.1.1")
-    api("org.glassfish.jaxb:jaxb-runtime:4.0.6")
+    api("org.glassfish.jaxb:jaxb-runtime:4.0.7")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
     api("org.hisp.dhis:json-tree:1.8.1")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
+    api("org.jabref:mslinks:1.1.1")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.10")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.20")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.1")
     api("org.jspecify:jspecify:1.0.0")
