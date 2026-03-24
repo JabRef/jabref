@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -266,8 +267,13 @@ public abstract class NativeDesktop {
 
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
-
-        String[] subcommands = command.split(" ");
+        // String[] subcommands = command.split(" ");
+        ArrayList<String> subcommands = new ArrayList<>();
+        try {
+            subcommands = getSubcommands(command);
+        } catch (IOException exception) {
+            LoggerFactory.getLogger(NativeDesktop.class).error("Error because quotations are not closed", exception);
+        }
         try {
             new ProcessBuilder(subcommands).start();
         } catch (IOException exception) {
@@ -359,5 +365,35 @@ public abstract class NativeDesktop {
 
     public boolean moveToTrashSupported() {
         return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
+    }
+
+    private static ArrayList<String> getSubcommands(String s) throws IOException {
+        char[] commandArr = s.toCharArray();
+        ArrayList<String> subcommands = new ArrayList<>();
+        StringBuilder currSubcommand = new StringBuilder();
+        char quoteType = '\'';
+        for (int i = 0; i < commandArr.length; i++) {
+            if (commandArr[i] == ' ') {
+                subcommands.add(currSubcommand.toString());
+                currSubcommand = new StringBuilder();
+            } else {
+                if (commandArr[i] != '\'' && commandArr[i] != '\"') {
+                    currSubcommand.append(commandArr[i]);
+                } else {
+                    quoteType = commandArr[i];
+                    int j = i + 1;
+                    while (j < commandArr.length && commandArr[j] != quoteType) {
+                        currSubcommand.append(commandArr[j]);
+                        j += 1;
+                    }
+                    if (j == commandArr.length) {
+                        throw new IOException();
+                    }
+                    i = j;
+                }
+            }
+        }
+        subcommands.add(currSubcommand.toString());
+        return subcommands;
     }
 }
