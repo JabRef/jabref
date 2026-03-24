@@ -196,10 +196,8 @@ public class CSLCitationOOAdapter {
 
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
-        inTextUsed = markManager.hasInTextMarks();
         updateAllCitationsWithNewStyle(selectedStyle, inTextUsed);
         markManager.readAndUpdateExistingMarks();
-        inTextUsed = markManager.hasInTextMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
