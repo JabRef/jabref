@@ -63,20 +63,18 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             return Optional.empty();
         }
 
+        // @formatter:off
         return switch (getUrlByDoi(doi.get().asString())) {
             case DoiResolution.NotFound() ->
                     Optional.empty();
-            case DoiResolution.Pdf(
-                    String url
-            ) -> {
+            case DoiResolution.Pdf(String url) -> {
                 LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", url);
                 yield Optional.of(URLUtil.create(url));
             }
-            case DoiResolution.ArticlePage(
-                    String url
-            ) ->
+            case DoiResolution.ArticlePage(String url) ->
                     parseArticlePage(url);
         };
+        // @formatter:on
     }
 
     private @NonNull Optional<URL> parseArticlePage(String url) throws IOException {
