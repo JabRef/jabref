@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ExecuteCommandTest {
     @Test
@@ -40,11 +39,6 @@ public class ExecuteCommandTest {
     void spaceBetweenDirNameAndEquals() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         String[] exp = {"/usr/bin/gnome-terminal", "--working-directory=jabrefStuff"};
         assertNotEquals(List.of(exp), getSubcommands("/usr/bin/gnome-terminal --working-directory= jabrefStuff")); // will end up opening a normal terminal as there is nothing
-    }
-
-    @Test
-    void quoteTypeMismatch() {
-        assertThrows(InvocationTargetException.class, () -> getSubcommands("/usr/bin/gnome-terminal --working-directory= 'jabrefStuff\""), "Illegal arg happened");
     }
 
     @Test

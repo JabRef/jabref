@@ -225,7 +225,7 @@ public abstract class NativeDesktop {
         }
         String absolutePath = fileLink.toAbsolutePath().getParent().toString();
         String command = externalApplicationsPreferences.getCustomFileBrowserCommand();
-        if (command.isEmpty()) {
+        if (command.trim().isEmpty()) { // you go into if statement when command is empty or command is full of spaces
             LoggerFactory.getLogger(NativeDesktop.class).info("No custom file browser command defined");
             get().openFolderAndSelectFile(fileLink);
             return;
@@ -261,16 +261,9 @@ public abstract class NativeDesktop {
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
         // replace the placeholder if used
         command = command.replace("%DIR", String.format("\"%s\"", absolutePath)); // you want absolute path to be left alone so put it inside quotes
-        System.out.println(command);
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
-        ArrayList<String> subcommands = new ArrayList<>();
-        try {
-            subcommands = getSubcommands(command);
-        } catch (IllegalArgumentException exception) {
-            LoggerFactory.getLogger(NativeDesktop.class).error("Error because quotations are not closed or are not nested correctly", exception);
-            return;
-        }
+        ArrayList<String> subcommands = getSubcommands(command);
         try {
             new ProcessBuilder(subcommands).start();
         } catch (IOException exception) {
@@ -364,7 +357,7 @@ public abstract class NativeDesktop {
         return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
     }
 
-    private static ArrayList<String> getSubcommands(String s) throws IllegalArgumentException {
+    private static ArrayList<String> getSubcommands(String s) {
         char[] commandArr = s.toCharArray();
         ArrayList<String> subcommands = new ArrayList<>();
         StringBuilder currSubcommand = new StringBuilder();
@@ -384,9 +377,6 @@ public abstract class NativeDesktop {
                     while (j < commandArr.length && commandArr[j] != quoteType) {
                         currSubcommand.append(commandArr[j]);
                         j += 1;
-                    }
-                    if (j == commandArr.length) {
-                        throw new IllegalArgumentException();
                     }
                     i = j;
                 }
