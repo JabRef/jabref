@@ -260,10 +260,10 @@ public abstract class NativeDesktop {
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
         // replace the placeholder if used
-        command = command.replace("%DIR", absolutePath);
+        command = command.replace("%DIR", String.format("\"%s\"", absolutePath)); // you want absolute path to be left alone so put it inside quotes
+        System.out.println(command);
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
-        // String[] subcommands = command.split(" ");
         ArrayList<String> subcommands = new ArrayList<>();
         try {
             subcommands = getSubcommands(command);
