@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed the groups filter field to use a filter icon. [#15402](https://github.com/JabRef/jabref/issues/15402)
 - We improved the MultiMergeEntries dialog to automatically select the most plausible field value when merging entries (e.g. a more specific date). [#15027](https://github.com/JabRef/jabref/issues/15027)
 - We removed the restart prompt when accepting Mr. DLib privacy settings or hiding the Related articles tab in the entry editor. [#15195](https://github.com/JabRef/jabref/issues/15195)
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
