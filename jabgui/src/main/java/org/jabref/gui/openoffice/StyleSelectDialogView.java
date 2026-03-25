@@ -13,10 +13,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -143,26 +141,19 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         cslPathColumn.setCellValueFactory(cellData -> cellData.getValue().pathProperty());
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
-        cslDeleteColumn.setCellFactory(_ -> new TableCell<>() {
-            @Override
-            protected void updateItem(Boolean internalStyle, boolean empty) {
-                super.updateItem(internalStyle, empty);
 
-                setText(null);
-                setGraphic(null);
-                setTooltip(null);
-                setOnMouseClicked(null);
+        new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
+                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent((style, internalStyle) -> {
+                    if (internalStyle) {
+                        return _ -> {
+                        };
+                    }
 
-                if (empty || (internalStyle == null) || (getTableRow() == null) || (getTableRow().getItem() == null) || internalStyle) {
-                    return;
-                }
-
-                CSLStyleSelectViewModel style = getTableRow().getItem();
-                setGraphic(IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode());
-                setTooltip(new Tooltip(Localization.lang("Remove style")));
-                setOnMouseClicked(_ -> viewModel.deleteCslStyle(style.getLayout().citationStyle()));
-            }
-        });
+                    return _ -> viewModel.deleteCslStyle(style.getLayout().citationStyle());
+                })
+                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
+                .install(cslDeleteColumn);
 
         new ViewModelTableRowFactory<CSLStyleSelectViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
