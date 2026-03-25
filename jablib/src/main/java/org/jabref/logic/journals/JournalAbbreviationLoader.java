@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
@@ -77,7 +78,7 @@ public class JournalAbbreviationLoader {
     private static void populateDatabase(DataSource dataSource) throws IOException, SQLException {
         // Skip if table already exists — safe for parallel test execution
         try (Connection conn = dataSource.getConnection()) {
-            try (var tables = conn.getMetaData().getTables(null, null, "journal_abbreviation", null)) {
+            try (ResultSet tables = conn.getMetaData().getTables(null, null, "journal_abbreviation", null)) {
                 if (tables.next()) {
                     LOGGER.debug("Journal abbreviation table already exists, skipping population");
                     return;
