@@ -13,13 +13,13 @@ import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 /// Shared test utility for journal abbreviation tests that need a Postgres-backed repository.
 public class JournalAbbreviationTestUtil {
 
-    private static EmbeddedPostgres pg;
+    private static EmbeddedPostgres embeddedPostgres;
     private static DataSource dataSource;
 
     public static synchronized DataSource getDataSource() throws Exception {
-        if (pg == null) {
-            pg = EmbeddedPostgres.builder().start();
-            dataSource = pg.getPostgresDatabase();
+        if (embeddedPostgres == null) {
+            embeddedPostgres = EmbeddedPostgres.builder().start();
+            dataSource = embeddedPostgres.getPostgresDatabase();
             try (Connection conn = dataSource.getConnection();
                  Statement stmt = conn.createStatement()) {
                 stmt.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm");
@@ -28,7 +28,7 @@ public class JournalAbbreviationTestUtil {
             JournalAbbreviationLoader.loadBuiltInRepository(dataSource);
 
             // Stop the embedded Postgres instance when the JVM shuts down
-            final EmbeddedPostgres pgToClose = pg;
+            final EmbeddedPostgres pgToClose = embeddedPostgres;
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     pgToClose.close();
