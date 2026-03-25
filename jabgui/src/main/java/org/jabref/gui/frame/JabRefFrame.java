@@ -609,6 +609,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                             LibraryTab currentTab = getCurrentLibraryTab();
                             return (currentTab == null) ? null : currentTab.getBibDatabaseContext();
                         }, stateManager, preferences, dialogService)),
+                factory.createMenuItem(StandardActions.SORT_TABS_ALPHABETICALLY, new SimpleCommand() {
+                    @Override
+                    public void execute() {
+                        tabbedPane.getTabs().sort((tab1, tab2) ->
+                                tab1.getText().compareToIgnoreCase(tab2.getText())
+                        );
+                    }
+                }),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY,
                         new CloseDatabaseAction(this, tab, stateManager)),
