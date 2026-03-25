@@ -601,4 +601,4 @@ jobs:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
