@@ -667,8 +667,10 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane.hide-tab-bar > .tab-header-area {
+    -fx-min-height: 0;
+    -fx-max-height: 0;
     -fx-pref-height: 0;
-    visibility: collapse;
+    -fx-padding: 0;
 }
 
 .numberColumn > .hits:any-selected {

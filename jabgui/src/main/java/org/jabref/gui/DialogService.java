@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
@@ -263,6 +264,8 @@ public interface DialogService extends NotificationService {
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
 
     List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups();
+
+    ObservableList<? extends Notification<?>> getPersistentNotifications();
 
     /// Notify the user in a non-blocking way (e.g. a toast).
     ///
