@@ -261,7 +261,6 @@ public abstract class NativeDesktop {
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
         // replace the placeholder if used
         command = command.replace("%DIR", absolutePath);
-
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
         // String[] subcommands = command.split(" ");

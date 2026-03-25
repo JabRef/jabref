@@ -49,6 +49,12 @@ public class ExecuteCommandTest {
         assertThrows(InvocationTargetException.class, () -> getSubcommands("/usr/bin/gnome-terminal --working-directory= 'jabrefStuff\""), "Illegal arg happened");
     }
 
+    @Test
+    void doubleQuotes() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        String[] exp = {"/usr/bin/gnome-terminal", "--working-directory=jabref Stuff"};
+        assertEquals(List.of(exp), getSubcommands("/usr/bin/gnome-terminal --working-directory=\"jabref Stuff\""));
+    }
+
     private ArrayList<String> getSubcommands(String s) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method method = NativeDesktop.class.getDeclaredMethod("getSubcommands", String.class);
         method.setAccessible(true);
