@@ -269,7 +269,7 @@ public abstract class NativeDesktop {
         try {
             subcommands = getSubcommands(command);
         } catch (IllegalArgumentException exception) {
-            LoggerFactory.getLogger(NativeDesktop.class).error("Error because quotations are not closed", exception);
+            LoggerFactory.getLogger(NativeDesktop.class).error("Error because quotations are not closed or are not nested correctly", exception);
             return;
         }
         try {
@@ -372,7 +372,7 @@ public abstract class NativeDesktop {
         char quoteType = '\'';
         for (int i = 0; i < commandArr.length; i++) {
             if (commandArr[i] == ' ') {
-                if (!currSubcommand.isEmpty()) {
+                if (!currSubcommand.isEmpty()) { // this is so that you don't append just a space on
                     subcommands.add(currSubcommand.toString());
                     currSubcommand.setLength(0);
                 }
@@ -393,7 +393,6 @@ public abstract class NativeDesktop {
                 }
             }
         }
-        subcommands.add(currSubcommand.toString());
         if (!currSubcommand.isEmpty()) { // add the last subCommand if it's not a space
             subcommands.add(currSubcommand.toString());
             currSubcommand.setLength(0);
