@@ -13,16 +13,33 @@ Following is a list of common errors encountered by developers which lead to fai
 * [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
 * Awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
 
-## Failing GitHub workflow "Sync fork with upstream"
+## Gradle
 
-To ease development, a GitHub workflow automatically updates your `main` branch daily.
-However, it is not allowed to update your files if the GitHub workflows are updated by the JabRef team.
-Therefore, GitHub notifies you now and then that "Sync fork with upstream failed for main branch".
+### Run `gradle` from command line
 
-To solve this issue, open your GitHub repository in your browser.
-Then, click "Sync fork" to get your fork up-to-date and get the workflow passing again.
+Sometimes, one needs to double-check that there is an IDE setup issue - and not an issue with modified Gradle build files.
+It is easily possible to run Gradle from the command line without installing a separate JDK manually.
 
-![Sync fork](https://github.com/user-attachments/assets/5c1b0a17-0fde-4ce8-ac46-d9477a65c345)
+1. Download [gg.cmd](https://github.com/eirikb/gg/releases/latest/download/gg.cmd). [`gg.cmd`](https://github.com/eirikb/gg) is an easy-to-use toolchain downloading all requirements.
+2. Run `gradle`:
+
+   * Linux/macOS: `sh -x ./gg.cmd gradle :jabgui:run`
+   * Windows: `.\gg.cmd gradle :jabgui:run`
+
+---
+
+Alternatively, you can install a JDK 17 (or later) and execute `./gradlew :jabgui:run`.
+
+### Many errors during Gradle run - e.g., `Unresolved reference 'jvmDependencyConflicts'.`
+
+Gradle updates are not easy at development versions of Gradle.
+
+1. Ensure that you have some JDK installed ([any version starting from 17 works](https://docs.gradle.org/current/userguide/compatibility.html)).
+2. Close IntelliJ, VSCode, ...
+3. Run `./gradlew --stop`
+4. If step 3 fails, try again.
+5. Run `./gradlew clean :jabgui:run --no-build-cache --no-configuration-cache --rerun`
+6. If step 5 fails, try `./gradlew --stop` and try again.
 
 ## Failing tests
 
@@ -174,9 +191,11 @@ To avoid this, avoid staging using any of these commands:
 
 Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
 
-## Q: I get `java: package org.jabref.logic.journals does not exist`
+## Compilation
 
-A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+### `java: package org.jabref.logic.journals does not exist`
+
+You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
 Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
 
@@ -207,18 +226,5 @@ In case Gradle does not find a JDK, use [`gg.cmd`](https://github.com/eirikb/gg)
 4. Wait until the command execution completes.
 
 After about one minute, however, you can continue setting up IntelliJ, because the initial Gradle setup succeeded.
-
-## Gradle
-
-### Run `gradle` from command line
-
-Sometimes, one needs to double-check that there is an IDE setup issue - and not an issue with modified Gradle builds files.
-It is easily possible to run Gradle from the command line without installing a separate JDK manually.
-
-1. Download [gg.cmd](https://github.com/eirikb/gg/releases/latest/download/gg.cmd). [`gg.cmd`](https://github.com/eirikb/gg) is an easy-to-use toolchain downloading all requirements.
-2. Run `gradle`:
-
-   * Linux/macOS: `sh -x ./gg.cmd gradle :jabgui:run`
-   * Windows: `.\gg.cmd gradle :jabgui:run`
 
 <!-- markdownlint-disable-file MD033 -->
