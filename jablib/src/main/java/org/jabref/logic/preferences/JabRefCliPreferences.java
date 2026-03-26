@@ -1117,10 +1117,10 @@ public class JabRefCliPreferences implements CliPreferences {
             return;
         }
 
-        if (change.wasAdded()) {
-            put(key, change.getValueAdded());
-        } else if (change.wasRemoved()) {
+        if (change.wasRemoved() || (change.wasAdded() && "".equals(change.getValueAdded()))) {
             remove(key);
+        } else if (change.wasAdded()) {
+            put(key, change.getValueAdded());
         }
     }
 
