@@ -35,23 +35,22 @@ public class PushToApplicationPreferences {
     }
 
     private PushToApplicationPreferences() {
-        Map<String, String> commands = new HashMap<>();
-        commands.put(PushApplications.EMACS.getDisplayName(), OS.OS_X ? "emacsclient" : OS.WINDOWS ? "emacsclient.exe" : "emacsclient");
-        commands.put(PushApplications.LYX.getDisplayName(), System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
-        commands.put(PushApplications.TEXMAKER.getDisplayName(), OS.detectProgramPath("texmaker", "Texmaker"));
-        commands.put(PushApplications.TEXSTUDIO.getDisplayName(), OS.detectProgramPath("texstudio", "TeXstudio"));
-        commands.put(PushApplications.TEXWORKS.getDisplayName(), OS.detectProgramPath("texworks", "TeXworks"));
-        commands.put(PushApplications.VIM.getDisplayName(), "vim");
-        commands.put(PushApplications.WIN_EDT.getDisplayName(), OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        commands.put(PushApplications.SUBLIME_TEXT.getDisplayName(), OS.detectProgramPath("subl", "Sublime"));
-        commands.put(PushApplications.VSCODE.getDisplayName(), OS.detectProgramPath("Code", "Microsoft VS Code"));
-
         this(
                 "TeXstudio",
-                commands,
+                new HashMap<>(),
                 "-n -e",
                 "vim",
                 new CitationCommandString("\\cite{", ",", "}"));
+
+        commandPaths.put(PushApplications.EMACS.getDisplayName(), OS.OS_X ? "emacsclient" : OS.WINDOWS ? "emacsclient.exe" : "emacsclient");
+        commandPaths.put(PushApplications.LYX.getDisplayName(), System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
+        commandPaths.put(PushApplications.TEXMAKER.getDisplayName(), OS.detectProgramPath("texmaker", "Texmaker"));
+        commandPaths.put(PushApplications.TEXSTUDIO.getDisplayName(), OS.detectProgramPath("texstudio", "TeXstudio"));
+        commandPaths.put(PushApplications.TEXWORKS.getDisplayName(), OS.detectProgramPath("texworks", "TeXworks"));
+        commandPaths.put(PushApplications.VIM.getDisplayName(), "vim");
+        commandPaths.put(PushApplications.WIN_EDT.getDisplayName(), OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        commandPaths.put(PushApplications.SUBLIME_TEXT.getDisplayName(), OS.detectProgramPath("subl", "Sublime"));
+        commandPaths.put(PushApplications.VSCODE.getDisplayName(), OS.detectProgramPath("Code", "Microsoft VS Code"));
     }
 
     public static PushToApplicationPreferences getDefault() {
