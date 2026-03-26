@@ -55,6 +55,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -143,7 +144,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void createNodes() {
-        searchField = SearchTextField.create(keyBindingRepository);
+        searchField = SearchTextField.create(keyBindingRepository, IconTheme.JabRefIcons.FILTER);
         searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("groupFilterBar");
         this.setTop(searchField);
