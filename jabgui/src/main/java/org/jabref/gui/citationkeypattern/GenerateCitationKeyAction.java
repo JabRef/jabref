@@ -125,7 +125,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                             new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
                     int entriesDone = 0;
                     for (BibEntry entry : entries) {
-                        // Generate the key on the background thread (pure logic, no FX bindings)
                         String newKey = keyGenerator.generateKey(entry);
                         // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
                         Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
