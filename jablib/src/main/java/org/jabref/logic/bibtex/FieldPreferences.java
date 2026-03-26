@@ -12,6 +12,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 public class FieldPreferences {
+    private static final String DEFAULT_RESOLVABLE_FIELDS = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+    private static final String DEFAULT_NON_WRAPPABLE_FIELDS = "pdf;ps;url;doi;file;isbn;issn";
 
     private final BooleanProperty resolveStrings = new SimpleBooleanProperty();
     private final ObservableList<Field> resolvableFields;
@@ -31,9 +33,9 @@ public class FieldPreferences {
                 // Default resolve string setting
                 true,
                 // Default resolvable field
-                List.copyOf(FieldFactory.parseFieldList("author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon")),
+                List.copyOf(FieldFactory.parseFieldList(DEFAULT_RESOLVABLE_FIELDS)),
                 // Default non wrappable field
-                List.copyOf(FieldFactory.parseFieldList("pdf;ps;url;doi;file;isbn;issn"))
+                List.copyOf(FieldFactory.parseFieldList(DEFAULT_NON_WRAPPABLE_FIELDS))
         );
     }
 
