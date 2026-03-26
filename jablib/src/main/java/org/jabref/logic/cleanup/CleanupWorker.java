@@ -2,6 +2,7 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
@@ -38,10 +39,19 @@ public class CleanupWorker {
     }
 
     public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
+        return cleanup(preset, entry, Runnable::run);
+    }
+
+    /// Cleans up the entry, routing all {@link org.jabref.model.entry.BibEntry} field mutations through
+    /// the provided {@code mutationScheduler}.
+    ///
+    /// Pass {@code UiTaskExecutor::runAndWaitInJavaFXThread} when calling from a background thread
+    /// so that field mutations (which fire JavaFX listeners) are dispatched to the FX thread.
+    public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry, Consumer<Runnable> mutationScheduler) {
         List<CleanupJob> jobs = determineCleanupActions(preset);
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
-            changes.addAll(job.cleanup(entry));
+            changes.addAll(job.cleanup(entry, mutationScheduler));
             if (job instanceof MoveFilesCleanup cleanup) {
                 failures.addAll(cleanup.getIoExceptions());
             } else if (job instanceof XmpMetadataCleanup cleanup) {
