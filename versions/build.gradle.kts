@@ -58,7 +58,6 @@ dependencies.constraints {
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.8.1")
     api("com.konghq:unirest-modules-gson:4.8.1")
-    api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.3.2")
     api("com.squareup.okio:okio-jvm:3.17.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")

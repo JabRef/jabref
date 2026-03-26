@@ -172,7 +172,6 @@ open module org.jabref {
     // region: other libraries (alphabetically)
     // requires cuid;
     requires com.dlsc.pdfviewfx;
-    requires com.pixelduke.fxthemes;
     // requires com.sun.jna;
     // requires dd.plist;
     requires static io.github.eadr;
