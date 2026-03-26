@@ -60,8 +60,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         if (!(eventTarget instanceof Node node)) {
             return false;
         }
-        return node instanceof TableColumnHeader
-                || node.getParent() instanceof TableColumnHeader;
+        return node instanceof TableColumnHeader || node.getParent() instanceof TableColumnHeader;
     }
 
     /// Constructs the items for the list and places them in the menu.
