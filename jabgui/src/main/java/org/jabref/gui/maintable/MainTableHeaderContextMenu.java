@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.skin.TableColumnHeader;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -59,8 +60,8 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         if (!(eventTarget instanceof Node node)) {
             return false;
         }
-        return node.getStyleClass().contains("column-header")
-                || (node.getParent() != null && node.getParent().getStyleClass().contains("column-header"));
+        return node instanceof TableColumnHeader
+                || node.getParent() instanceof TableColumnHeader;
     }
 
     /// Constructs the items for the list and places them in the menu.
