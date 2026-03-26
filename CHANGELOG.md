@@ -70,6 +70,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Citation Relations tab failed to recognize already-imported papers when their DOI differed only in letter casing. [#12967](https://github.com/JabRef/jabref/issues/12967)
 - We fixed an issue where a tab or the tab bar would not show, while the setting "hide tab bar when a single library is present" was toggled off [#12680](https://github.com/JabRef/jabref/issues/12680)
 - We improved CSL support with JabRef LibreOffice converter extension. [#14387](https://github.com/JabRef/jabref/issues/14387)
+- We fixed exceptions occuring when generating citation keys or using certain cleanup operations on macOS [#15366](https://github.com/JabRef/jabref/issues/15366)
 
 ### Removed
 
