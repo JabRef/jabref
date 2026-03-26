@@ -40,7 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- Fixed web search rejecting queries with non-standard syntax [#12637](https://github.com/JabRef/jabref/issues/12637)
+- We fixed web search rejecting queries with non-standard syntax [#12637](https://github.com/JabRef/jabref/issues/12637)
 - We fixed an issue where the side pane (Groups/Web search) width was not remembered after restarting JabRef. [#8907](https://github.com/JabRef/jabref/issues/8907)
 - We fixed the ScienceDirect fulltext fetcher not returning a PDF when the Elsevier API response includes a direct PDF link. [#12161](https://github.com/JabRef/jabref/issues/12161)
 - We fixed vertical cursor movement shortcuts (Command+Up/Down for document start/end, Option+Up/Down for paragraph start/end) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
