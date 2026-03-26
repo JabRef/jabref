@@ -1644,10 +1644,6 @@ public class JabRefCliPreferences implements CliPreferences {
         );
     }
 
-    //*************************************************************************************************************
-    // Linked files preferences
-    //*************************************************************************************************************
-
     // region Linked files preferences
     protected boolean moveToTrashSupported() {
         return false;
