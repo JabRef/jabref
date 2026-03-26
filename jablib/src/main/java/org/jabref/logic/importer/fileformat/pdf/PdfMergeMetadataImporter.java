@@ -3,11 +3,13 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.RelativePathsCleanup;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 public class PdfMergeMetadataImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
+    private static final Pattern FILENAME_TITLE_PATTERN = buildFilenameTitlePattern();
 
     private final List<PdfImporter> metadataImporters;
 
@@ -67,6 +70,15 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
     }
 
+    private static Pattern buildFilenameTitlePattern() {
+        String extensions = Arrays.stream(StandardFileType.values())
+                                  .filter(type -> type != StandardFileType.ANY_FILE)
+                                  .flatMap(type -> type.getExtensions().stream())
+                                  .distinct()
+                                  .collect(Collectors.joining("|"));
+        return Pattern.compile("(?i)(.*\\.(" + extensions + ")$|microsoft (word|powerpoint|excel).*|.*\\\\.*)");
+    }
+
     /// Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
     ///
     /// Algorithm:
@@ -82,7 +94,8 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);
 
-        Stream<BibEntry> allCandidates = Stream.concat(fetchedCandidates.stream(), extractedCandidates.stream());
+        List<BibEntry> allCandidates = new ArrayList<>(fetchedCandidates);
+        allCandidates.addAll(extractedCandidates);
         BibEntry entry = mergeCandidates(allCandidates);
 
         // We use the absolute path here as we do not know the context where this import will be used.
@@ -148,9 +161,27 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                  });
     }
 
-    private static BibEntry mergeCandidates(Stream<BibEntry> candidates) {
+    private static boolean isTitleLikelyFilename(String title) {
+        if ((title == null) || title.isBlank()) {
+            return false;
+        }
+
+        return FILENAME_TITLE_PATTERN.matcher(title.trim()).matches();
+    }
+
+    private static BibEntry mergeCandidates(List<BibEntry> candidates) {
         final BibEntry entry = new BibEntry();
         candidates.forEach(entry::mergeWith);
+
+        if (entry.getField(StandardField.TITLE)
+                 .filter(PdfMergeMetadataImporter::isTitleLikelyFilename)
+                 .isPresent()) {
+            candidates.stream()
+                      .flatMap(candidate -> candidate.getField(StandardField.TITLE).stream())
+                      .filter(candidateTitle -> !isTitleLikelyFilename(candidateTitle))
+                      .findFirst()
+                      .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle));
+        }
 
         // Retain online links only
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();

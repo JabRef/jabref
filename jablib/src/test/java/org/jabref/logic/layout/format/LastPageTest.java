@@ -27,7 +27,10 @@ class LastPageTest {
                 Arguments.of("345", "345"),
                 Arguments.of("350", "345-350"),
                 Arguments.of("350", "345--350"),
-                Arguments.of("", "--")
+                Arguments.of("", "--"),
+                Arguments.of("13911", "13905\u201313911"),
+                Arguments.of("13911", "13905\u201413911"),
+                Arguments.of("13911", "13905 \u2013 13911")
         );
     }
 }
