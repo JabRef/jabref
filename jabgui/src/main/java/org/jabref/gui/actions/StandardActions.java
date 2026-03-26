@@ -77,6 +77,7 @@ public enum StandardActions implements Action {
     RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
     NEW_LIBRARY(Localization.lang("New empty library"), IconTheme.JabRefIcons.NEW),
     OPEN_LIBRARY(Localization.lang("Open library..."), IconTheme.JabRefIcons.OPEN, KeyBinding.OPEN_LIBRARY),
+    MERGE_LIBRARY(Localization.lang("Merge..."), IconTheme.JabRefIcons.MERGE_ENTRIES),
     IMPORT(Localization.lang("Import"), IconTheme.JabRefIcons.IMPORT),
     EXPORT(Localization.lang("Export"), IconTheme.JabRefIcons.EXPORT, KeyBinding.EXPORT),
     SAVE_LIBRARY(Localization.lang("Save library"), IconTheme.JabRefIcons.SAVE, KeyBinding.SAVE_LIBRARY),

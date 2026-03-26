@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "All" option to the citation fetcher combo box, which queries all providers (CrossRef, OpenAlex, OpenCitations, SemanticScholar) and merges the results into a single deduplicated list.
 - We added a quick setting toggle to enable cover images download. [#15322](https://github.com/JabRef/jabref/pull/15322)
 - We now support refreshing existing CSL citations with respect to their in-text nature in the LibreOffice integration. [#15369](https://github.com/JabRef/jabref/pull/15369)
+- We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
 
 ### Changed
 
