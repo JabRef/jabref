@@ -18,9 +18,10 @@ public class Theme {
         SYSTEM, LIGHT, DARK, CUSTOM
     }
 
+    public static final String SYSTEM = "";
+
     private static final String BASE_CSS = "Base.css";
 
-    public static final String SYSTEM = "";
     private static final String LIGHT = "light";
     private static final String DARK = "dark";
 
