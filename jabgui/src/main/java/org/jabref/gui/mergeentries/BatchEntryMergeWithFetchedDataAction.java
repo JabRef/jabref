@@ -61,7 +61,8 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
                 entries,
                 fetcher,
                 undoManager,
-                notificationService);
+                notificationService,
+                preferences.getBibEntryPreferences().getKeywordSeparator());
 
         mergeTask.executeWith(taskExecutor);
     }
