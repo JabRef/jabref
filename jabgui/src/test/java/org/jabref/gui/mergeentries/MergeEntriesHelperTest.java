@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MergeEntriesHelperTest {
 
@@ -48,8 +47,7 @@ class MergeEntriesHelperTest {
         MergeEntriesHelper.mergeEntries(entryFromFetcher, entryFromLibrary, compoundEdit, KEYWORD_SEPARATOR);
 
         String groups = entryFromLibrary.getField(StandardField.GROUPS).orElse("");
-        assertTrue(groups.contains("IEEE"), "IEEE group should be preserved");
-        assertTrue(groups.contains("Springer"), "Springer group should be added");
+        assertEquals("IEEE, Springer", entryFromLibrary.getField(StandardField.GROUPS).orElse(""));
     }
 
     @Test
