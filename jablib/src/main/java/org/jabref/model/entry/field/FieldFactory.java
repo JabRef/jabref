@@ -32,7 +32,11 @@ public class FieldFactory {
     /// (e.g. "author/editor" to use editor where author is not set):
     private static final String FIELD_OR_SEPARATOR = "/";
     private static final String DELIMITER = ";";
+    // Used to separate field and its property
+    // (e.g. "[Googlescholar|EXTERNAL]", "Googlescholar" is field name and "EXTERNAL" is its property)
     private static final String FIELD_NAME_PROPERTY_SEPARATOR = "|";
+    // Used to separate different field properties of a field
+    // (e.g. "[custom1|EXTERNAL,MULTILINE_TEXT]", "custom1" is field name, "EXTERNAL" and ","MULTILINE_TEXT" are its properties)
     private static final String FIELD_PROPERTY_SEPARATOR = ",";
 
     private static final Pattern UNKNOWNFIELD_PATTERN = Pattern.compile("UnknownField\\{name='(?<fieldName>[^']+)'");
@@ -62,7 +66,7 @@ public class FieldFactory {
 
         if (fieldName.contains(FIELD_NAME_PROPERTY_SEPARATOR)) {
             String[] fieldAndProperties = fieldName.split(Pattern.quote(FIELD_NAME_PROPERTY_SEPARATOR));
-
+            // A field can be parsed into "Field name" and "Properties" by FIELD_NAME_PROPERTY_SEPARATOR
             if (fieldAndProperties.length == 2) {
                 String unknownFieldName = fieldAndProperties[0];
                 String[] fieldProperties = fieldAndProperties[1].split(FIELD_PROPERTY_SEPARATOR);
