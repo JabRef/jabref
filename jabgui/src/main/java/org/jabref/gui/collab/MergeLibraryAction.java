@@ -38,7 +38,8 @@ public class MergeLibraryAction extends SimpleCommand {
                               StateManager stateManager,
                               GuiPreferences preferences,
                               TaskExecutor taskExecutor,
-                              CountingUndoManager undoManager, LibraryTabContainer libraryTabContainer) {
+                              CountingUndoManager undoManager,
+                              LibraryTabContainer libraryTabContainer) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -53,8 +54,8 @@ public class MergeLibraryAction extends SimpleCommand {
     public void execute() {
         stateManager.getActiveDatabase().ifPresent(activeDatabase -> {
             Path initialDirectory = activeDatabase.getDatabasePath()
-                                          .map(Path::getParent)
-                                          .orElse(preferences.getImporterPreferences().getImportWorkingDirectory());
+                                                  .map(Path::getParent)
+                                                  .orElse(preferences.getImporterPreferences().getImportWorkingDirectory());
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileFilterConverter.toExtensionFilter(Localization.lang("BibTeX"), StandardFileType.BIBTEX_DB))
