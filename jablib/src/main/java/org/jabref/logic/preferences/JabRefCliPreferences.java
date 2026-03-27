@@ -64,6 +64,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
+import org.jabref.logic.importer.fetcher.WileyFetcher;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -2301,6 +2302,7 @@ public class JabRefCliPreferences implements CliPreferences {
         keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
         keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(WileyFetcher.FETCHER_NAME, buildInfo.wileyTdmApiKey);
 
         return keys;
     }
