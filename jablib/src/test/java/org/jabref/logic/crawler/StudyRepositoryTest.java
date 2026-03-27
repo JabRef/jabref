@@ -325,20 +325,20 @@ class StudyRepositoryTest {
     }
 
     private List<BibEntry> getArXivQuantumMockResultsWithGroups() {
-        List<BibEntry> entries = getArXivQuantumMockResults();
-        entries.forEach(e -> e.setField(StandardField.GROUPS, "ArXiv"));
-        return entries;
+        return getArXivQuantumMockResults().stream()
+                                           .map(e -> e.withField(StandardField.GROUPS, "ArXiv"))
+                                           .toList();
     }
 
     private List<BibEntry> getSpringerQuantumMockResultsWithGroups() {
-        List<BibEntry> entries = getSpringerQuantumMockResults();
-        entries.forEach(e -> e.setField(StandardField.GROUPS, "Springer"));
-        return entries;
+        return getSpringerQuantumMockResults().stream()
+                                              .map(e -> e.withField(StandardField.GROUPS, "Springer"))
+                                              .toList();
     }
 
     private List<BibEntry> getSpringerCloudComputingMockResultsWithGroups() {
-        List<BibEntry> entries = getSpringerCloudComputingMockResults();
-        entries.forEach(e -> e.setField(StandardField.GROUPS, "Springer"));
-        return entries;
+        return getSpringerCloudComputingMockResults().stream()
+                                                     .map(e -> e.withField(StandardField.GROUPS, "Springer"))
+                                                     .toList();
     }
 }
