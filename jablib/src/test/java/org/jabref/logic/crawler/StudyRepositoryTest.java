@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
@@ -29,6 +30,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -41,6 +43,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -153,28 +157,54 @@ class StudyRepositoryTest {
 
     @Test
     void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
-        List<QueryResult> mockResults = getMockResults();
+        studyRepository.persist(getMockResults());
 
-        studyRepository.persist(mockResults);
+        assertEquals(getArXivQuantumMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXiv").getEntries());
+        assertEquals(getSpringerQuantumMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Quantum", "Springer").getEntries());
+        assertEquals(getSpringerCloudComputingMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Cloud Computing", "Springer").getEntries());
+    }
 
-        assertEquals(getArXivQuantumMockResults(), getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXiv").getEntries());
-        assertEquals(getSpringerQuantumMockResults(), getTestStudyRepository().getFetcherResultEntries("Quantum", "Springer").getEntries());
-        assertEquals(getSpringerCloudComputingMockResults(), getTestStudyRepository().getFetcherResultEntries("Cloud Computing", "Springer").getEntries());
+    @Test
+    void fetcherGroupIsCreatedInFetcherResultFile() throws Exception {
+        studyRepository.persist(getMockResults());
+
+        BibDatabaseContext arXivResult = getTestStudyRepository()
+                .getFetcherResultEntries("Quantum", "ArXiv");
+
+        Optional<GroupTreeNode> root = arXivResult.getMetaData().getGroups();
+        assertTrue(root.isPresent());
+        assertTrue(root.get().getChildren().stream()
+                       .anyMatch(child -> "ArXiv".equals(child.getGroup().getName())));
+    }
+
+    @Test
+    void fetcherGroupsCreatedInStudyResultFile() throws Exception {
+        studyRepository.persist(getMockResults());
+
+        BibDatabaseContext studyResult = getTestStudyRepository().getStudyResultEntries();
+
+        Optional<GroupTreeNode> root = studyResult.getMetaData().getGroups();
+        assertTrue(root.isPresent());
+
+        List<String> groupNames = root.get().getChildren().stream()
+                                      .map(child -> child.getGroup().getName())
+                                      .toList();
+
+        assertThat(groupNames, hasItems("ArXiv", "Springer"));
     }
 
     @Test
     void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
         List<BibEntry> expected = new ArrayList<>();
-        expected.addAll(getArXivQuantumMockResults());
-        expected.add(getSpringerQuantumMockResults().get(1));
-        expected.add(getSpringerQuantumMockResults().get(2));
+        expected.addAll(getArXivQuantumMockResultsWithGroups());
+        expected.add(getSpringerQuantumMockResultsWithGroups().get(1));
+        expected.add(getSpringerQuantumMockResultsWithGroups().get(2));
 
         studyRepository.persist(mockResults);
 
-        // All Springer results are duplicates for "Quantum"
         assertEquals(expected, getTestStudyRepository().getQueryResultEntries("Quantum").getEntries());
-        assertEquals(getSpringerCloudComputingMockResults(), getTestStudyRepository().getQueryResultEntries("Cloud Computing").getEntries());
+        assertEquals(getSpringerCloudComputingMockResultsWithGroups(), getTestStudyRepository().getQueryResultEntries("Cloud Computing").getEntries());
     }
 
     @Test
@@ -215,10 +245,10 @@ class StudyRepositoryTest {
     }
 
     private BibDatabase getNonDuplicateBibEntryResult() {
-        BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
+        BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResultsWithGroups());
         DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-        merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
-        merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
+        merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResultsWithGroups()));
+        merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResultsWithGroups()));
         return mockResults;
     }
 
@@ -292,5 +322,23 @@ class StudyRepositoryTest {
                 .withField(StandardField.TITLE, "Design of Framework for Disaster Recovery in Cloud Computing");
         entry2.setType(StandardEntryType.Article);
         return List.of(entry1, entry2);
+    }
+
+    private List<BibEntry> getArXivQuantumMockResultsWithGroups() {
+        List<BibEntry> entries = getArXivQuantumMockResults();
+        entries.forEach(e -> e.setField(StandardField.GROUPS, "ArXiv"));
+        return entries;
+    }
+
+    private List<BibEntry> getSpringerQuantumMockResultsWithGroups() {
+        List<BibEntry> entries = getSpringerQuantumMockResults();
+        entries.forEach(e -> e.setField(StandardField.GROUPS, "Springer"));
+        return entries;
+    }
+
+    private List<BibEntry> getSpringerCloudComputingMockResultsWithGroups() {
+        List<BibEntry> entries = getSpringerCloudComputingMockResults();
+        entries.forEach(e -> e.setField(StandardField.GROUPS, "Springer"));
+        return entries;
     }
 }
