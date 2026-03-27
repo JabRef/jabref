@@ -89,14 +89,6 @@ public class FieldRowViewModel {
 
         selectNonEmptyValue();
 
-        // Auto union merge groups so no source group is lost when both entries have groups
-        if (FieldMergerFactory.canMerge(field)
-                && !hasEqualLeftAndRightValues()
-                && !StringUtil.isNullOrEmpty(getLeftFieldValue())
-                && !StringUtil.isNullOrEmpty(getRightFieldValue())) {
-            mergeFields();
-        }
-
         EasyBind.listen(isFieldsMergedProperty(), (obs, old, areFieldsMerged) -> {
             LOGGER.debug("Field are merged: {}", areFieldsMerged);
             if (areFieldsMerged) {
