@@ -7,7 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -28,7 +31,12 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.study.FetchResult;
@@ -353,6 +361,7 @@ public class StudyRepository {
     private void persistResults(List<QueryResult> crawlResults) throws IOException, SaveException {
         DatabaseMerger merger = new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator());
         BibDatabase newStudyResultEntries = new BibDatabase();
+        Map<String, List<BibEntry>> fetcherEntryMap = new LinkedHashMap<>();
 
         for (QueryResult result : crawlResults) {
             BibDatabase queryResultEntries = new BibDatabase();
@@ -365,6 +374,11 @@ public class StudyRepository {
 
                 // Create citation keys for all entries that do not have one
                 generateCiteKeys(existingFetcherResult, fetcherEntries);
+
+                // tag entries + add group to per-fetcher .bib
+                addFetcherGroup(existingFetcherResult, fetcherResult.getFetcherName(), fetcherEntries.getEntries());
+                fetcherEntryMap.computeIfAbsent(fetcherResult.getFetcherName(), k -> new ArrayList<>())
+                               .addAll(fetcherEntries.getEntries());
 
                 // Aggregate each fetcher result into the query result
                 merger.merge(queryResultEntries, fetcherEntries);
@@ -384,6 +398,10 @@ public class StudyRepository {
 
         // Merge new entries into study result file
         merger.merge(existingStudyResultEntries.getDatabase(), newStudyResultEntries);
+
+        // Add fetcher groups to final result.bib
+        fetcherEntryMap.forEach((fetcherName, entries) ->
+                addFetcherGroup(existingStudyResultEntries, fetcherName, entries));
 
         writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);
     }
@@ -411,6 +429,42 @@ public class StudyRepository {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {
             throw new SaveException("Problems saving", ex);
+        }
+    }
+
+    /// Creates an {@link ExplicitGroup} named after the fetcher and assigns all its entries to it.
+    /// If the group already exists in the database, new entries are added to it.
+    /// If no group tree exists yet in the context, a root {@link AllEntriesGroup} is created first.
+    ///
+    /// @param context     The database context to add the group to
+    /// @param fetcherName The name of the fetcher used as the group name
+    /// @param entries     The entries fetched from that fetcher to assign to the group
+    private void addFetcherGroup(BibDatabaseContext context, String fetcherName, List<BibEntry> entries) {
+        try {
+            ExplicitGroup group = new ExplicitGroup(
+                    fetcherName,
+                    GroupHierarchyType.INDEPENDENT,
+                    preferences.getBibEntryPreferences().getKeywordSeparator());
+
+            group.add(entries);
+
+            // Get existing root node or create a new AllEntriesGroup root if none exists yet
+            GroupTreeNode root = context.getMetaData().getGroups().orElseGet(() -> {
+                GroupTreeNode newRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All Entries"));
+                context.getMetaData().setGroups(newRoot);
+                return newRoot;
+            });
+
+            // add new entries to the existing group instead of creating a duplicate
+            root.getChildren().stream()
+                .filter(child -> fetcherName.equals(child.getGroup().getName()))
+                .findFirst()
+                .ifPresentOrElse(
+                        existingNode -> existingNode.addEntriesToGroup(entries),
+                        () -> root.addSubgroup(group)
+                );
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Problem adding fetcher group '{}' to database", fetcherName, e);
         }
     }
 
