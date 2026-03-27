@@ -225,7 +225,7 @@ public abstract class NativeDesktop {
         }
         String absolutePath = fileLink.toAbsolutePath().getParent().toString();
         String command = externalApplicationsPreferences.getCustomFileBrowserCommand();
-        if (command.trim().isEmpty()) { // you go into if statement when command is empty or command is full of spaces
+        if (command.trim().isEmpty()) {
             LoggerFactory.getLogger(NativeDesktop.class).info("No custom file browser command defined");
             get().openFolderAndSelectFile(fileLink);
             return;
@@ -358,33 +358,33 @@ public abstract class NativeDesktop {
     }
 
     private static ArrayList<String> getSubcommands(String s) {
-        char[] commandArr = s.toCharArray();
+        char[] commandArray = s.toCharArray();
         ArrayList<String> subcommands = new ArrayList<>();
-        StringBuilder currSubcommand = new StringBuilder();
+        StringBuilder currentSubcommand = new StringBuilder();
         char quoteType = '\'';
-        for (int i = 0; i < commandArr.length; i++) {
-            if (commandArr[i] == ' ') {
-                if (!currSubcommand.isEmpty()) { // this is so that you don't append just a space on
-                    subcommands.add(currSubcommand.toString());
-                    currSubcommand.setLength(0);
+        for (int i = 0; i < commandArray.length; i++) {
+            if (commandArray[i] == ' ') {
+                if (!currentSubcommand.isEmpty()) { // this ensures that if you encounter multiple spaces then they won't be added to the subcommands array
+                    subcommands.add(currentSubcommand.toString());
+                    currentSubcommand.setLength(0);
                 }
             } else {
-                if (commandArr[i] != '\'' && commandArr[i] != '\"') {
-                    currSubcommand.append(commandArr[i]);
+                if (commandArray[i] != '\'' && commandArray[i] != '\"') {
+                    currentSubcommand.append(commandArray[i]);
                 } else {
-                    quoteType = commandArr[i];
+                    quoteType = commandArray[i];
                     int j = i + 1;
-                    while (j < commandArr.length && commandArr[j] != quoteType) {
-                        currSubcommand.append(commandArr[j]);
+                    while (j < commandArray.length && commandArray[j] != quoteType) {
+                        currentSubcommand.append(commandArray[j]);
                         j += 1;
                     }
                     i = j;
                 }
             }
         }
-        if (!currSubcommand.isEmpty()) { // add the last subCommand if it's not a space
-            subcommands.add(currSubcommand.toString());
-            currSubcommand.setLength(0);
+        if (!currentSubcommand.isEmpty()) { // this ensures that if you encounter multiple spaces then they won't be added to the subcommands array
+            subcommands.add(currentSubcommand.toString());
+            currentSubcommand.setLength(0);
         }
         return subcommands;
     }
