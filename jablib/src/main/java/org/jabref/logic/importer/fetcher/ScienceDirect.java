@@ -40,6 +40,17 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
 
     private final ImporterPreferences importerPreferences;
 
+    private sealed interface DoiResolution permits DoiResolution.ArticlePage, DoiResolution.NotFound, DoiResolution.Pdf {
+        record Pdf(String url) implements DoiResolution {
+        }
+
+        record ArticlePage(String url) implements DoiResolution {
+        }
+
+        record NotFound() implements DoiResolution {
+        }
+    }
+
     public ScienceDirect(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
     }
@@ -52,12 +63,23 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             return Optional.empty();
         }
 
-        String urlFromDoi = getUrlByDoi(doi.get().asString());
-        if (urlFromDoi.isEmpty()) {
-            return Optional.empty();
-        }
+        // @formatter:off
+        return switch (getUrlByDoi(doi.get().asString())) {
+            case DoiResolution.NotFound() ->
+                    Optional.empty();
+            case DoiResolution.Pdf(String url) -> {
+                LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", url);
+                yield Optional.of(URLUtil.create(url));
+            }
+            case DoiResolution.ArticlePage(String url) ->
+                    parseArticlePage(url);
+        };
+        // @formatter:on
+    }
+
+    private @NonNull Optional<URL> parseArticlePage(String url) throws IOException {
         // Scrape the web page as desktop client (not as mobile client!)
-        Document html = Jsoup.connect(urlFromDoi)
+        Document html = Jsoup.connect(url)
                              .userAgent(URLDownload.USER_AGENT)
                              .referrer("https://www.google.com")
                              .ignoreHttpErrors(true)
@@ -98,8 +120,8 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         String fullLinkToPdf;
         if (pdfDownload.has("linkToPdf")) {
             String linkToPdf = pdfDownload.getString("linkToPdf");
-            URL url = URLUtil.create(urlFromDoi);
-            fullLinkToPdf = "%s://%s%s".formatted(url.getProtocol(), url.getAuthority(), linkToPdf);
+            URL parsedUrl = URLUtil.create(url);
+            fullLinkToPdf = "%s://%s%s".formatted(parsedUrl.getProtocol(), parsedUrl.getAuthority(), linkToPdf);
         } else if (pdfDownload.has("urlMetadata")) {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
             JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
@@ -130,13 +152,14 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         return TrustLevel.PUBLISHER;
     }
 
-    private String getUrlByDoi(String doi) throws UnirestException {
+    private DoiResolution getUrlByDoi(String doi) throws UnirestException {
         String sciLink = "";
+        String pdfLink = "";
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
                                                          // Shares the same key as Scopus, because both are offered by Elsevier (https://devdocs.jabref.org/code-howtos/fetchers.html#fetchers)
-                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey("Scopus").orElse(""))
+                                                         .header("X-ELS-APIKey", importerPreferences.getApiKey(Scopus.FETCHER_NAME).orElse(""))
                                                          .queryString("httpAccept", "application/json")
                                                          .asJson();
 
@@ -149,12 +172,17 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
                 JSONObject link = links.getJSONObject(i);
                 if ("scidir".equals(link.getString("@rel"))) {
                     sciLink = link.getString("@href");
+                } else if ("scidir-pdf".equals(link.getString("@rel"))) {
+                    pdfLink = link.getString("@href");
                 }
             }
-            return sciLink;
+            if (!pdfLink.isEmpty()) {
+                return new DoiResolution.Pdf(pdfLink);
+            }
+            return sciLink.isEmpty() ? new DoiResolution.NotFound() : new DoiResolution.ArticlePage(sciLink);
         } catch (JSONException e) {
             LOGGER.debug("No ScienceDirect link found in API request", e);
-            return sciLink;
+            return sciLink.isEmpty() ? new DoiResolution.NotFound() : new DoiResolution.ArticlePage(sciLink);
         }
     }
 

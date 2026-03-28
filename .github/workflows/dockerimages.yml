@@ -22,7 +22,6 @@ permissions:
 
 jobs:
   build:
-    if: github.repository == 'JabRef/jabref'
     strategy:
       max-parallel: 1
       matrix:
@@ -34,14 +33,14 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            ghcr.io/JabRef/${{ matrix.component }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}
           tags: |
             type=schedule,pattern={{date 'YYYY-MM-DD'}}
             type=ref,event=tag
             type=edge,branch=main
             type=ref,event=pr
           labels: |
-            org.opencontainers.image.source=https://github.com/JabRef/jabref
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.title=${{ matrix.component }}
             org.opencontainers.image.description=${{ matrix.component == 'jabkit' && 'JabRef''s CLI tool' || 'JabRef''s HTTP server' }}
       - name: Login to GitHub Container Registry
