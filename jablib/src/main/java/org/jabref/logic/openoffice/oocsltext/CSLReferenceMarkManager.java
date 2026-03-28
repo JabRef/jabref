@@ -176,6 +176,12 @@ public class CSLReferenceMarkManager {
 
     private String getUpdatedReferenceMarkNameWithNewNumbers(String oldName, List<Integer> newNumbers) {
         String[] parts = oldName.split(" ");
+
+        /*
+         * e.g. "JABREF_Smith_2020 CID_1 abcd1234 EMPTY" is separated into 4 parts
+         * The last part is the citation type
+         * The second to last part is the uniqueId
+         */
         String citationType = parts[parts.length - 1];
         int uniqueIdIndex = parts.length - 2;
 
