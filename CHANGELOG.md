@@ -41,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed pages checker to allow suffix letters in the page range like "436S-439S". [#13701](https://github.com/JabRef/jabref/issues/13701)
 - We fixed an issue where the Web search table had extra space, to improve the layout. [#14556](https://github.com/JabRef/jabref/issues/14556)
 - We fixed an issue where the side pane (Groups/Web search) width was not remembered after restarting JabRef. [#8907](https://github.com/JabRef/jabref/issues/8907)
 - We fixed the ScienceDirect fulltext fetcher not returning a PDF when the Elsevier API response includes a direct PDF link. [#12161](https://github.com/JabRef/jabref/issues/12161)
