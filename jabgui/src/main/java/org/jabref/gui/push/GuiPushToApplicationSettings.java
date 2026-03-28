@@ -1,8 +1,5 @@
 package org.jabref.gui.push;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -77,12 +74,9 @@ public class GuiPushToApplicationSettings {
     }
 
     /// This method is called to indicate that the settings panel returned from the getSettingsPanel() method has been
-    /// shown to the user and that the user has indicated that the settings should be stored. This method must store the
-    /// state of the widgets in the settings panel to Globals.prefs.
+    /// shown to the user and that the user has indicated that the settings should be stored.
     public void storeSettings() {
-        Map<String, String> commandPaths = new HashMap<>(preferences.getCommandPaths());
-        commandPaths.put(application.getDisplayName(), path.getText());
-        preferences.setCommandPaths(commandPaths);
+        preferences.getCommandPaths().put(application.getDisplayName(), path.getText());
     }
 
     public GridPane getSettingsPane() {

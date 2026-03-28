@@ -65,6 +65,7 @@ public class CSLCitationOOAdapter {
         }
 
         markManager.readAndUpdateExistingMarks();
+        this.inTextUsed = markManager.hasInTextMarks();
     }
 
     public void setStyle(CitationStyle newStyle) {
@@ -114,7 +115,7 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertReferences(cursor, entries, ooText, isNumericStyle);
+        insertReferences(cursor, entries, ooText, isNumericStyle, false);
     }
 
     /// Inserts in-text citations for a group of entries.
@@ -171,7 +172,7 @@ public class CSLCitationOOAdapter {
             }
 
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
-            insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle);
+            insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle, true);
         }
     }
 
@@ -180,7 +181,7 @@ public class CSLCitationOOAdapter {
     public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
             throws CreationException, com.sun.star.uno.Exception {
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle());
+        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle(), false);
     }
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
@@ -233,7 +234,7 @@ public class CSLCitationOOAdapter {
     }
 
     /// Inserts references and also adds a space before the citation if not already present ("smart space").
-    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle)
+    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle, boolean isInText)
             throws CreationException, com.sun.star.uno.Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
@@ -250,9 +251,10 @@ public class CSLCitationOOAdapter {
                 preceedingSpaceExists = checkCursor.getString().matches("\\R");
             }
         }
-        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter());
+        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter(), isInText);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
+        inTextUsed = markManager.hasInTextMarks();
     }
 
     /// Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
@@ -348,7 +350,7 @@ public class CSLCitationOOAdapter {
                     }
                 }
 
-                markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString());
+                markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString(), isInTextStyle);
             }
         } else {
             // Same flow as above - for each such reference mark, we get the entries to be updated
@@ -371,7 +373,7 @@ public class CSLCitationOOAdapter {
 
                 String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
 
-                markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation);
+                markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation, isInTextStyle);
             }
         }
     }
