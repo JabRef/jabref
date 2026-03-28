@@ -32,8 +32,7 @@ public class GuiPushToApplications {
                 new GuiPushToTeXworks(dialogService, preferences),
                 new GuiPushToVim(dialogService, preferences),
                 new GuiPushToVScode(dialogService, preferences),
-                new GuiPushToWinEdt(dialogService, preferences),
-                new GuiPushToVScode(dialogService, preferences)));
+                new GuiPushToWinEdt(dialogService, preferences)));
 
         APPLICATIONS.sort(Comparator.comparing(PushToApplication::getDisplayName, String.CASE_INSENSITIVE_ORDER));
 
