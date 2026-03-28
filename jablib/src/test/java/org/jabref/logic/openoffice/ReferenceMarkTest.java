@@ -30,7 +30,7 @@ class ReferenceMarkTest {
         return Stream.of(
                 // Single citation cases
                 Arguments.of(
-                        "JABREF_key1 CID_12345 uniqueId1 NORMAL",
+                        "JABREF_key1 CID_12345 uniqueId1",
                         List.of("key1"), List.of(12345), "uniqueId1", CSLCitationType.NORMAL
                 ),
                 Arguments.of(
@@ -80,6 +80,10 @@ class ReferenceMarkTest {
                 Arguments.of(
                         "JABREF_Keen_2011 CID_100 cite NORMAL", // for LO extension
                         List.of("Keen_2011"), List.of(100), "cite", CSLCitationType.NORMAL
+                ),
+                Arguments.of(
+                        "JABREF_legacyKey CID_42 legacyUniqueId",
+                        List.of("legacyKey"), List.of(42), "legacyUniqueId", CSLCitationType.NORMAL
                 ),
                 Arguments.of(
                         "JABREF_key8 CID_7 uniqueId8 IN_TEXT",

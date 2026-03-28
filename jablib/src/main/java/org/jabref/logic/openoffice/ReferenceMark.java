@@ -66,7 +66,12 @@ public class ReferenceMark {
 
         String entriesString = matcher.group(1).trim();
         this.uniqueId = matcher.group(2) != null ? matcher.group(2).trim() : CUID.randomCUID2(8).toString();
-        this.citationType = switch (matcher.group(3)) {
+
+        String citationTypeMarker = matcher.group(3);
+        if (citationTypeMarker == null) {
+            citationTypeMarker = NORMAL_MARKER;
+        }
+        this.citationType = switch (citationTypeMarker) {
             case IN_TEXT_MARKER ->
                     CSLCitationType.IN_TEXT;
             case EMPTY_MARKER ->

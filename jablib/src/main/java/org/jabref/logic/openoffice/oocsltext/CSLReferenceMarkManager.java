@@ -334,9 +334,11 @@ public class CSLReferenceMarkManager {
         }
         if (referenceMarkName.endsWith(ReferenceMark.EMPTY_MARKER)) {
             return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
+        } else if (referenceMarkName.endsWith(ReferenceMark.NORMAL_MARKER)) {
+            return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
         }
 
-        return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
+        return referenceMarkName;
     }
 
     public void setRealTimeNumberUpdateRequired(boolean isNumeric) {
