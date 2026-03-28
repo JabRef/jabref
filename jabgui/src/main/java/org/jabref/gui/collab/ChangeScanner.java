@@ -39,14 +39,14 @@ public class ChangeScanner {
         }
 
         try {
-            return scanForChanges(database.getDatabasePath().get());
+            return getDatabaseChanges(database.getDatabasePath().get());
         } catch (IOException e) {
             LOGGER.warn("Error while parsing changed file.", e);
             return List.of();
         }
     }
 
-    public List<DatabaseChange> scanForChanges(Path fileToCompare) throws IOException {
+    public List<DatabaseChange> getDatabaseChanges(Path fileToCompare) throws IOException {
         ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
         ParserResult result = OpenDatabase.loadDatabase(fileToCompare, importFormatPreferences, new DummyFileUpdateMonitor());
 
