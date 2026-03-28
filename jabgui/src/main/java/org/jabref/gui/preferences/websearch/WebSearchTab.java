@@ -112,7 +112,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         searchEngineTable.fixedCellSizeProperty().bind(rowHeight);
         searchEngineTable.prefHeightProperty().bind(
                 Bindings.size(searchEngineTable.getItems())
-                        .add(HEADER_HEIGHT_ESTIMATE) // Estimate for header height
+                        .add(HEADER_HEIGHT_ESTIMATE)
                         .multiply(rowHeight));
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
