@@ -22,7 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "All" option to the citation fetcher combo box, which queries all providers (CrossRef, OpenAlex, OpenCitations, SemanticScholar) and merges the results into a single deduplicated list.
 - We added a quick setting toggle to enable cover images download. [#15322](https://github.com/JabRef/jabref/pull/15322)
 - We now support refreshing existing CSL citations with respect to their in-text nature in the LibreOffice integration. [#15369](https://github.com/JabRef/jabref/pull/15369)
-- Added context menu entry "Sort tabs alphabetically" to the library tabs
+- Added context menu entry "Sort tabs alphabetically" to the library tabs [#15423](https://github.com/JabRef/jabref/pull/15425)
 
 ### Changed
 
