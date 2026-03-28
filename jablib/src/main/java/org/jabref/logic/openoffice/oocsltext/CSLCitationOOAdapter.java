@@ -49,8 +49,10 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
-    private boolean inTextUsed;
-    private boolean inTextNatureChanged;
+    // Current citation type in the doc
+    private CSLCitationType citationType;
+    // True when user inserts a citation with different type
+    private boolean citationTypeIsChanged;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
@@ -65,7 +67,7 @@ public class CSLCitationOOAdapter {
         }
 
         markManager.readAndUpdateExistingMarks();
-        this.inTextUsed = markManager.hasInTextMarks();
+        this.citationType = markManager.getCitationType();
     }
 
     public void setStyle(CitationStyle newStyle) {
@@ -83,16 +85,17 @@ public class CSLCitationOOAdapter {
             throws CreationException, com.sun.star.uno.Exception {
         setStyle(selectedStyle);
 
-        if (inTextUsed) {
-            inTextNatureChanged = true;
-            inTextUsed = false;
+        //  If current citation type is not "NORMAL", then change it to "NORMAL".
+        if (this.citationType != CSLCitationType.NORMAL) {
+            this.citationType = CSLCitationType.NORMAL;
+            citationTypeIsChanged = true;
         } else {
-            inTextNatureChanged = false;
+            citationTypeIsChanged = false;
         }
 
         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
-        if (styleChanged || inTextNatureChanged) {
-            updateAllCitationsWithNewStyle(currentStyle, false);
+        if (styleChanged || citationTypeIsChanged) {
+            updateAllCitationsWithNewStyle(currentStyle, CSLCitationType.NORMAL);
             styleChanged = false;
         }
 
@@ -115,7 +118,7 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertReferences(cursor, entries, ooText, isNumericStyle, false);
+        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.NORMAL);
     }
 
     /// Inserts in-text citations for a group of entries.
@@ -125,16 +128,15 @@ public class CSLCitationOOAdapter {
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, com.sun.star.uno.Exception {
         setStyle(selectedStyle);
-
-        if (!inTextUsed) {
-            inTextUsed = true;
-            inTextNatureChanged = true;
+        if (this.citationType != CSLCitationType.IN_TEXT) {
+            this.citationType = CSLCitationType.IN_TEXT;
+            citationTypeIsChanged = true;
         } else {
-            inTextNatureChanged = false;
+            citationTypeIsChanged = false;
         }
 
-        if (styleChanged || inTextNatureChanged) {
-            updateAllCitationsWithNewStyle(currentStyle, true);
+        if (styleChanged || citationTypeIsChanged) {
+            updateAllCitationsWithNewStyle(currentStyle, CSLCitationType.IN_TEXT);
             styleChanged = false;
         }
 
@@ -172,7 +174,7 @@ public class CSLCitationOOAdapter {
             }
 
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
-            insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle, true);
+            insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle, CSLCitationType.IN_TEXT);
         }
     }
 
@@ -180,8 +182,21 @@ public class CSLCitationOOAdapter {
     /// Adds the entries to the list for which bibliography is to be generated.
     public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
             throws CreationException, com.sun.star.uno.Exception {
+        setStyle(selectedStyle);
+        if (this.citationType != CSLCitationType.EMPTY) {
+            this.citationType = CSLCitationType.EMPTY;
+            citationTypeIsChanged = true;
+        } else {
+            citationTypeIsChanged = false;
+        }
+
+        if (styleChanged || citationTypeIsChanged) {
+            updateAllCitationsWithNewStyle(currentStyle, CSLCitationType.EMPTY);
+            styleChanged = false;
+        }
+
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle(), false);
+        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle(), CSLCitationType.EMPTY);
     }
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
@@ -196,7 +211,7 @@ public class CSLCitationOOAdapter {
 
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
-        updateAllCitationsWithNewStyle(selectedStyle, inTextUsed);
+        updateAllCitationsWithNewStyle(selectedStyle, citationType);
         markManager.readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
@@ -234,7 +249,7 @@ public class CSLCitationOOAdapter {
     }
 
     /// Inserts references and also adds a space before the citation if not already present ("smart space").
-    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle, boolean isInText)
+    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle, CSLCitationType citationType)
             throws CreationException, com.sun.star.uno.Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
@@ -251,10 +266,10 @@ public class CSLCitationOOAdapter {
                 preceedingSpaceExists = checkCursor.getString().matches("\\R");
             }
         }
-        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter(), isInText);
+        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter(), citationType);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
-        inTextUsed = markManager.hasInTextMarks();
+        this.citationType = markManager.getCitationType();
     }
 
     /// Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
@@ -280,7 +295,7 @@ public class CSLCitationOOAdapter {
     /// However, all "generation" of CSL style citations (via {@link CitationStyleGenerator}) occur in this class, and not in {@link CSLReferenceMarkManager}.
     /// Furthermore, {@link CSLReferenceMarkManager} is not composed of {@link CitationStyle}.
     /// Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
-    private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
+    private void updateAllCitationsWithNewStyle(CitationStyle style, CSLCitationType citationType)
             throws com.sun.star.uno.Exception, CreationException {
         boolean isNumericStyle = style.isNumericStyle();
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
@@ -309,7 +324,11 @@ public class CSLCitationOOAdapter {
         // Next, we get the list of reference marks sorted in order of appearance in the document
         List<CSLReferenceMark> marksInOrder = markManager.getMarksInOrder();
 
-        if (isInTextStyle) {
+        if (citationType == CSLCitationType.EMPTY) {
+            for (CSLReferenceMark mark : marksInOrder) {
+                markManager.updateMarkAndTextWithNewStyle(mark, "", CSLCitationType.EMPTY);
+            }
+        } else if (citationType == CSLCitationType.IN_TEXT) {
             // Now, for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
                 List<String> citationKeys = mark.getCitationKeys();
@@ -350,7 +369,7 @@ public class CSLCitationOOAdapter {
                     }
                 }
 
-                markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString(), isInTextStyle);
+                markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString(), CSLCitationType.IN_TEXT);
             }
         } else {
             // Same flow as above - for each such reference mark, we get the entries to be updated
@@ -373,7 +392,7 @@ public class CSLCitationOOAdapter {
 
                 String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
 
-                markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation, isInTextStyle);
+                markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation, CSLCitationType.NORMAL);
             }
         }
     }

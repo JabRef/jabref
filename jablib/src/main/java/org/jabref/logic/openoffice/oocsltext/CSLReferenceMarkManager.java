@@ -49,17 +49,17 @@ public class CSLReferenceMarkManager {
     private final XTextRangeCompare textRangeCompare;
     private int highestCitationNumber = 0;
     private boolean isNumberUpdateRequired;
-    private boolean isInTextCite;
+    private CSLCitationType citationType;
 
     public CSLReferenceMarkManager(XTextDocument document) {
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
         this.isNumberUpdateRequired = false;
-        this.isInTextCite = false;
+        this.citationType = CSLCitationType.NORMAL;
     }
 
-    public CSLReferenceMark createReferenceMark(List<BibEntry> entries, boolean inText) throws Exception {
+    public CSLReferenceMark createReferenceMark(List<BibEntry> entries, CSLCitationType citationType) throws Exception {
         List<String> citationKeys = entries.stream()
                                            .map(entry -> entry.getCitationKey().orElse(CUID.randomCUID2(8).toString()))
                                            .collect(Collectors.toList());
@@ -68,16 +68,16 @@ public class CSLReferenceMarkManager {
                                                     .map(this::getCitationNumber)
                                                     .collect(Collectors.toList());
 
-        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKeys, citationNumbers, inText, factory);
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKeys, citationNumbers, citationType, factory);
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
-        isInTextCite = isInTextCite || inText;
+        this.citationType = citationType;
         return referenceMark;
     }
 
-    public void insertReferenceIntoOO(List<BibEntry> entries, XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, boolean inText)
+    public void insertReferenceIntoOO(List<BibEntry> entries, XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, CSLCitationType citationType)
             throws CreationException, Exception {
-        CSLReferenceMark mark = createReferenceMark(entries, inText);
+        CSLReferenceMark mark = createReferenceMark(entries, citationType);
         // Ensure the cursor is at the end of its range
         position.collapseToEnd();
 
@@ -130,7 +130,7 @@ public class CSLReferenceMarkManager {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
-        isInTextCite = false;
+        citationType = CSLCitationType.NORMAL;
 
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
@@ -148,7 +148,7 @@ public class CSLReferenceMarkManager {
                     CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
                     marksByName.put(name, mark);
                     marksInOrder.add(mark);
-                    isInTextCite = isInTextCite || referenceMark.isInText();
+                    citationType = referenceMark.getCitationType();
 
                     for (int i = 0; i < citationKeys.size(); i++) {
                         String key = citationKeys.get(i);
@@ -176,8 +176,8 @@ public class CSLReferenceMarkManager {
 
     private String getUpdatedReferenceMarkNameWithNewNumbers(String oldName, List<Integer> newNumbers) {
         String[] parts = oldName.split(" ");
-        boolean inText = ReferenceMark.IN_TEXT_MARKER.equals(parts[parts.length - 1]);
-        int uniqueIdIndex = inText ? parts.length - 2 : parts.length - 1;
+        String citationType = parts[parts.length - 1];
+        int uniqueIdIndex = parts.length - 2;
 
         if (parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1]) && uniqueIdIndex >= 2) {
             StringBuilder newName = new StringBuilder();
@@ -189,10 +189,7 @@ public class CSLReferenceMarkManager {
                 newName.append(parts[i]).append(" ");
                 newName.append(ReferenceMark.PREFIXES[1]).append(newNumbers.get(i / 2));
             }
-            newName.append(" ").append(parts[uniqueIdIndex]);
-            if (inText) {
-                newName.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
-            }
+            newName.append(" ").append(parts[uniqueIdIndex]).append(" ").append(citationType);
             return newName.toString();
         }
         return oldName;
@@ -265,15 +262,15 @@ public class CSLReferenceMarkManager {
         mark.setCitationNumbers(newNumbers);
     }
 
-    public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, boolean inText) throws Exception, CreationException {
-        String unchangedName = mark.getName();
-        boolean isAlreadyInText = unchangedName.endsWith(" " + ReferenceMark.IN_TEXT_MARKER);
-
-        String updatedName = unchangedName;
-        if (inText && !isAlreadyInText) {
-            updatedName = unchangedName + " " + ReferenceMark.IN_TEXT_MARKER;
-        } else if (!inText && isAlreadyInText) {
-            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
+    public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
+        // Remove citation marker first, then add new marker
+        String updatedName = removeCitationMarker(mark.getName());
+        if (citationType == CSLCitationType.IN_TEXT) {
+            updatedName = updatedName + " " + ReferenceMark.IN_TEXT_MARKER;
+        } else if (citationType == CSLCitationType.EMPTY) {
+            updatedName = updatedName + " " + ReferenceMark.EMPTY_MARKER;
+        } else {
+            updatedName = updatedName + " " + ReferenceMark.NORMAL_MARKER;
         }
 
         updateMarkAndText(mark, newText, updatedName);
@@ -327,8 +324,19 @@ public class CSLReferenceMarkManager {
         return citationKeyToNumber.containsKey(citationKey);
     }
 
-    public boolean hasInTextMarks() {
-        return isInTextCite;
+    public CSLCitationType getCitationType() {
+        return citationType;
+    }
+
+    private String removeCitationMarker(String referenceMarkName) {
+        if (referenceMarkName.endsWith(ReferenceMark.IN_TEXT_MARKER)) {
+            return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
+        }
+        if (referenceMarkName.endsWith(ReferenceMark.EMPTY_MARKER)) {
+            return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
+        }
+
+        return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
     }
 
     public void setRealTimeNumberUpdateRequired(boolean isNumeric) {
