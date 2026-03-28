@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -61,6 +62,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty();
     private final LinkedFileHandler linkedFileHandler;
+    private Map<String, String> downloadHeaders = Map.of();
 
     public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
                                     BibEntry entry,
@@ -107,6 +109,10 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                 true);
     }
 
+    public void setDownloadHeaders(Map<String, String> headers) {
+        this.downloadHeaders = Map.copyOf(headers);
+    }
+
     @Override
     public void execute() {
         LOGGER.info("Downloading file from {}", downloadUrl);
@@ -122,6 +128,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
         try {
             URLDownload urlDownload = new URLDownload(downloadUrl);
+            downloadHeaders.forEach(urlDownload::addHeader);
             if (!checkSSLHandshake(urlDownload)) {
                 return;
             }
@@ -251,7 +258,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
-                .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination, downloadHeaders))
                 .onFailure(ex -> LOGGER.error("Error in download", ex))
                 .onFinished(() -> {
                     downloadProgress.unbind();
@@ -289,15 +296,18 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private static class FileDownloadTask extends BackgroundTask<Path> {
         private final URL source;
         private final Path destination;
+        private final Map<String, String> headers;
 
-        public FileDownloadTask(URL source, Path destination) {
+        public FileDownloadTask(URL source, Path destination, Map<String, String> headers) {
             this.source = source;
             this.destination = destination;
+            this.headers = headers;
         }
 
         @Override
         public Path call() throws FetcherException, IOException {
             URLDownload download = new URLDownload(source);
+            headers.forEach(download::addHeader);
             try (ProgressInputStream inputStream = download.asInputStream()) {
                 EasyBind.subscribe(
                         inputStream.totalNumBytesReadProperty(),
