@@ -897,22 +897,6 @@ public class JabRefCliPreferences implements CliPreferences {
         return StringUtil.isNotBlank(rawPath) ? Path.of(rawPath) : defaultValue;
     }
 
-    /// Clear all preferences.
-    ///
-    /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
-    @Override
-    public void clear() throws BackingStoreException {
-        clearAllBibEntryTypes();
-        clearCitationKeyPatterns();
-        clearTruststoreFromCustomCertificates();
-        clearCustomFetcherKeys();
-        PREFS_NODE.clear();
-        new SharedDatabasePreferences().clear();
-
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getFieldPreferences().setAll(FieldPreferences.getDefault());
-    }
-
     private void clearTruststoreFromCustomCertificates() {
         TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
         trustStoreManager.clearCustomCertificates();
@@ -1045,6 +1029,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
+        getFieldPreferences().setAll(FieldPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
