@@ -79,6 +79,7 @@ class StudyRepositoryTest {
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');  // <-- ADD THIS
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getTimestampPreferences().getTimestampField()).then(_ -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
@@ -196,8 +197,12 @@ class StudyRepositoryTest {
     @Test
     void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
+
+        List<BibEntry> arxivEntries = getArXivQuantumMockResultsWithGroups();
+        arxivEntries.get(0).setField(StandardField.GROUPS, "ArXiv, Springer");
+
         List<BibEntry> expected = new ArrayList<>();
-        expected.addAll(getArXivQuantumMockResultsWithGroups());
+        expected.addAll(arxivEntries);
         expected.add(getSpringerQuantumMockResultsWithGroups().get(1));
         expected.add(getSpringerQuantumMockResultsWithGroups().get(2));
 
