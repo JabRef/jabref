@@ -1,7 +1,8 @@
 package org.jabref.logic.database;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -9,6 +10,8 @@ import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -51,11 +54,30 @@ public class DatabaseMerger {
 
     private void mergeEntries(BibDatabase target, BibDatabase other) {
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
-        List<BibEntry> newEntries = other.getEntries().stream()
-                                         // Remove all entries that are already part of the database (duplicate)
-                                         .filter(entry -> duplicateCheck.containsDuplicate(target, entry, BibDatabaseModeDetection.inferMode(target)).isEmpty())
-                                         .collect(Collectors.toList());
-        target.insertEntries(newEntries);
+        List<BibEntry> entriesToInsert = new ArrayList<>();
+
+        for (BibEntry incoming : other.getEntries()) {
+            Optional<BibEntry> existingDuplicate = duplicateCheck.containsDuplicate(
+                    target, incoming, BibDatabaseModeDetection.inferMode(target));
+            if (existingDuplicate.isPresent()) {
+                mergeGroupsField(existingDuplicate.get(), incoming);
+            } else {
+                entriesToInsert.add(incoming);
+            }
+        }
+
+        target.insertEntries(entriesToInsert);
+    }
+
+    private void mergeGroupsField(BibEntry surviving, BibEntry dropped) {
+        String droppedGroups = dropped.getField(StandardField.GROUPS).orElse("");
+        if (droppedGroups.isEmpty()) {
+            return;
+        }
+        String survivingGroups = surviving.getField(StandardField.GROUPS).orElse("");
+        String merged = KeywordList.merge(survivingGroups, droppedGroups, keywordDelimiter)
+                                   .getAsString(keywordDelimiter);
+        surviving.setField(StandardField.GROUPS, merged);
     }
 
     public void mergeStrings(BibDatabase target, BibDatabase other) {
