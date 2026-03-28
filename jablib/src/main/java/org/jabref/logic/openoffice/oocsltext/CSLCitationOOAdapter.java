@@ -49,9 +49,7 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
-    // Current citation type in the doc
     private CSLCitationType citationType;
-    // True when user inserts a citation with different type
     private boolean citationTypeIsChanged;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
