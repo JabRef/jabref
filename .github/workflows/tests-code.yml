@@ -57,6 +57,7 @@ jobs:
 
   dependencyscopes:
     name: Dependency Scopes
+    # too slow on ubuntu-slim
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -70,7 +71,8 @@ jobs:
 
   openrewrite:
     name: OpenRewrite
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -314,7 +316,8 @@ jobs:
           files: |
             jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
             jablib/src/test/java/org/jabref/logic/citationstyle/CSLStyleUtilsTest.java
-
+            jablib/src/main/java/org/jabref/logic/exporter/AcademicPagesExporter.java
+            jablib/src/test/java/org/jabref/logic/exporter/AcademicPagesExporterTest.java
       - uses: ./.github/actions/setup-gradle
         if: steps.changed-windows-related-files.outputs.any_changed == 'true'
       - name: Run jablib tests

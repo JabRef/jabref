@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SaveException;
@@ -50,6 +51,9 @@ class Convert implements Runnable {
     @Option(names = {"--output-format"}, description = "Output format")
     private String outputFormat = "bibtex";
 
+    @Option(names = {"--field-formatters"}, description = "Field Formatter")
+    private String fieldFormatters;
+
     @Override
     public void run() {
         Optional<ParserResult> parserResult = JabKit.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
@@ -62,6 +66,8 @@ class Convert implements Runnable {
             System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
             return;
         }
+
+        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.get().getDatabase().getEntries());
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
