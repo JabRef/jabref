@@ -2,10 +2,10 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -13,7 +13,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -36,9 +36,11 @@ public class FulltextFetchers {
 
     private final Set<FulltextFetcher> fetchers;
 
-    private final Predicate<String> isPDF = url -> {
+    private final BiPredicate<String, Map<String, String>> isPDF = (url, headers) -> {
         try {
-            return new URLDownload(url).isPdf();
+            URLDownload download = new URLDownload(url);
+            headers.forEach(download::addHeader);
+            return download.isPdf();
         } catch (MalformedURLException e) {
             LOGGER.warn("URL returned by fulltext fetcher is invalid");
         }
@@ -54,7 +56,7 @@ public class FulltextFetchers {
         this.fetchers = new HashSet<>(fetchers);
     }
 
-    public Optional<URL> findFullTextPDF(BibEntry entry) {
+    public Optional<FetcherResult> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = new BibEntry(entry);
         Optional<DOI> doi = clonedEntry.getField(StandardField.DOI).flatMap(DOI::parse);
@@ -69,9 +71,8 @@ public class FulltextFetchers {
                      .map(FulltextFetchers::getResults)
                      .filter(Optional::isPresent)
                      .map(Optional::get)
-                     .filter(res -> (res.getSource()) != null)
-                     .sorted(Comparator.comparingInt((FetcherResult res) -> res.getTrust().getTrustScore()).reversed())
-                     .map(FetcherResult::getSource)
+                     .filter(res -> (res.source()) != null)
+                     .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust().getTrustScore()).reversed())
                      .findFirst();
     }
 
@@ -99,9 +100,10 @@ public class FulltextFetchers {
     private Callable<Optional<FetcherResult>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
         return () -> {
             try {
+                Map<String, String> headers = fetcher.getDownloadHeaders();
                 return fetcher.findFullText(entry)
-                              .filter(url -> isPDF.test(url.toString()))
-                              .map(url -> new FetcherResult(fetcher.getTrustLevel(), url));
+                              .filter(url -> isPDF.test(url.toString(), headers))
+                              .map(url -> new FetcherResult(fetcher.getTrustLevel(), url, headers));
             } catch (IOException | FetcherException e) {
                 LOGGER.debug("Failed to find fulltext PDF at given URL", e);
             }

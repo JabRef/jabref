@@ -51,6 +51,7 @@ import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.SsrnFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
+import org.jabref.logic.importer.fetcher.WileyFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
@@ -271,6 +272,7 @@ public class WebFetchers {
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new ScienceDirect(importerPreferences));
         fetchers.add(new SpringerNatureFullTextFetcher(importerPreferences));
+        fetchers.add(new WileyFetcher(importerPreferences));
 
         // Meta search
         fetchers.add(new CiteSeer());
@@ -297,7 +299,8 @@ public class WebFetchers {
                 new SemanticScholar(importerPreferences),
                 new Scopus(importerPreferences),
                 new SpringerNatureWebFetcher(importerPreferences),
-                new UnpaywallFetcher(importerPreferences)
+                new UnpaywallFetcher(importerPreferences),
+                new WileyFetcher(importerPreferences)
         );
 
         return fetchers;
