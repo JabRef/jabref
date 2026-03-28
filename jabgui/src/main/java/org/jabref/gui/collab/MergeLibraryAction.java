@@ -72,7 +72,7 @@ public class MergeLibraryAction extends SimpleCommand {
                 }
 
                 ChangeScanner changeScanner = new ChangeScanner(activeDatabase, dialogService, preferences, stateManager);
-                BackgroundTask.wrap(() -> changeScanner.scanForChanges(mergeFile))
+                BackgroundTask.wrap(() -> changeScanner.getDatabaseChanges(mergeFile))
                               .onSuccess(changes -> showMergeDialog(activeDatabase, changes))
                               .onFailure(exception -> {
                                   LOGGER.warn("Error while reading merge file {}", mergeFile, exception);
