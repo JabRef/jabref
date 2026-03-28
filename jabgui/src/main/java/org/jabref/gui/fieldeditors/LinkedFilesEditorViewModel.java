@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -246,9 +247,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     .wrap(() -> fetcher.findFullTextPDF(entry))
                     .onRunning(() -> fulltextLookupInProgress.setValue(true))
                     .onFinished(() -> fulltextLookupInProgress.setValue(false))
-                    .onSuccess(url -> {
-                        if (url.isPresent()) {
-                            addFromURLAndDownload(url.get());
+                    .onSuccess(result -> {
+                        if (result.isPresent()) {
+                            addFromURLAndDownload(result.get().source(), result.get().headers());
                         } else {
                             dialogService.notify(Localization.lang("No full text document found"));
                         }
@@ -263,6 +264,10 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void addFromURLAndDownload(URL url) {
+        addFromURLAndDownload(url, Map.of());
+    }
+
+    private void addFromURLAndDownload(URL url, Map<String, String> headers) {
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
                 new LinkedFile(url, ""),
                 entry,
@@ -271,7 +276,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 dialogService,
                 preferences);
         files.add(onlineFile);
-        onlineFile.download(true);
+        onlineFile.download(true, headers);
     }
 
     public void deleteFile(LinkedFileViewModel file) {
