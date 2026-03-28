@@ -171,6 +171,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         Set<String> customizableKeyFetcherNames = WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences).stream().map(WebFetcher::getName).collect(Collectors.toSet());
 
         fetchers.clear();
+        Set<String> addedFetcherNames = new HashSet<>();
         for (SearchBasedFetcher fetcher : allFetchers) {
             if (CompositeSearchBasedFetcher.FETCHER_NAME.equals(fetcher.getName())) {
                 continue;
@@ -187,6 +188,24 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                 fetcherViewModel.useCustomApiKeyProperty().set(apiKey.shouldUse());
                             });
             }
+            fetchers.add(fetcherViewModel);
+            addedFetcherNames.add(fetcher.getName());
+        }
+
+        // TODO: Refactor this loop and the above into one common logic / Use WebFetcher common interface
+        // Add customizable key fetchers that are not search-based (for ex: fulltext-only fetchers like WileyFetcher are CustomizableKeyFetchers)
+        for (CustomizableKeyFetcher fetcher : WebFetchers.getCustomizableKeyFetchers(importFormatPreferences, importerPreferences)) {
+            if (addedFetcherNames.contains(fetcher.getName())) {
+                continue;
+            }
+            FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, false, true);
+            savedApiKeys.stream()
+                        .filter(apiKey -> apiKey.getName().equals(fetcher.getName()))
+                        .findFirst()
+                        .ifPresent(apiKey -> {
+                            fetcherViewModel.apiKeyProperty().set(apiKey.getKey());
+                            fetcherViewModel.useCustomApiKeyProperty().set(apiKey.shouldUse());
+                        });
             fetchers.add(fetcherViewModel);
         }
 

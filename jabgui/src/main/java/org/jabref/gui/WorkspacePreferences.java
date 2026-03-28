@@ -19,7 +19,6 @@ public class WorkspacePreferences {
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
-    private final IntegerProperty defaultFontSize;
     private final ObjectProperty<Theme> theme;
     private final BooleanProperty themeSyncOs;
     private final BooleanProperty shouldOpenLastEdited;
@@ -31,7 +30,6 @@ public class WorkspacePreferences {
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
                                 int mainFontSize,
-                                int defaultFontSize,
                                 Theme theme,
                                 boolean themeSyncOs,
                                 boolean shouldOpenLastEdited,
@@ -42,7 +40,6 @@ public class WorkspacePreferences {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
-        this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
         this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
@@ -58,7 +55,6 @@ public class WorkspacePreferences {
                 Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
                 false,                                                      // Default font size override
                 9,                                                          // Default font size
-                9,                                                          // FixMe: main default and default default is weird
                 new Theme(Theme.BASE_CSS),                                  // Default theme
                 false,                                                      // Default theme sync with OS
                 true,                                                       // Default open last edited
@@ -77,7 +73,6 @@ public class WorkspacePreferences {
         this.language.set(preferences.getLanguage());
         this.shouldOverrideDefaultFontSize.set(preferences.shouldOverrideDefaultFontSize());
         this.mainFontSize.set(preferences.getMainFontSize());
-        this.defaultFontSize.set(preferences.getDefaultFontSize());
         this.theme.set(preferences.getTheme());
         this.themeSyncOs.set(preferences.shouldThemeSyncOs());
         this.shouldOpenLastEdited.set(preferences.shouldOpenLastEdited());
@@ -113,10 +108,6 @@ public class WorkspacePreferences {
 
     public int getMainFontSize() {
         return mainFontSize.get();
-    }
-
-    public int getDefaultFontSize() {
-        return defaultFontSize.get();
     }
 
     public void setMainFontSize(int mainFontSize) {
