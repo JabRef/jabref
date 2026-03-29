@@ -14,8 +14,6 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - uses: ./.github/actions/pr-gate
         id: gate
         with:
