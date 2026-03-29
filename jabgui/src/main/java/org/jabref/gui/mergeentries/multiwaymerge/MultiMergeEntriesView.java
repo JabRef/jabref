@@ -310,26 +310,33 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 }
 
                 if (field.equals(StandardField.DOI)) {
-                    Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
-                    HBox.setHgrow(doiButton, Priority.NEVER);
-                    doiButton.prefHeightProperty().bind(cellButton.heightProperty());
-                    doiButton.setMinHeight(Control.USE_PREF_SIZE);
-                    doiButton.setMaxHeight(Control.USE_PREF_SIZE);
+                    String fromDoiTitle = Localization.lang("From %0", FieldTextMapper.getDisplayName(StandardField.DOI));
+                    boolean doiSourceAlreadyPresent = viewModel.entriesProperty().stream()
+                            .anyMatch(source -> fromDoiTitle.equals(source.titleProperty().get())
+                                    || Localization.lang("From DOI").equals(source.titleProperty().get()));
 
-                    getChildren().add(doiButton);
+                    if (!doiSourceAlreadyPresent) {
+                        Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
+                        HBox.setHgrow(doiButton, Priority.NEVER);
+                        doiButton.prefHeightProperty().bind(cellButton.heightProperty());
+                        doiButton.setMinHeight(Control.USE_PREF_SIZE);
+                        doiButton.setMaxHeight(Control.USE_PREF_SIZE);
 
-                    doiButton.setOnAction(_ -> {
-                        DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
-                        doiButton.setDisable(true);
-                        addSource(Localization.lang("From DOI"), () -> {
-                            try {
-                                return doiFetcher.performSearchById(content).get();
-                            } catch (FetcherException | NoSuchElementException e) {
-                                LOGGER.warn("Failed to fetch BibEntry for DOI {}", content, e);
-                                return null;
-                            }
+                        getChildren().add(doiButton);
+
+                        doiButton.setOnAction(_ -> {
+                            DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
+                            doiButton.setDisable(true);
+                            addSource(Localization.lang("From DOI"), () -> {
+                                try {
+                                    return doiFetcher.performSearchById(content).get();
+                                } catch (FetcherException | NoSuchElementException e) {
+                                    LOGGER.warn("Failed to fetch BibEntry for DOI {}", content, e);
+                                    return null;
+                                }
+                            });
                         });
-                    });
+                    }
                 }
             });
         }
