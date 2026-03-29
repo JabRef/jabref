@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
@@ -352,7 +353,8 @@ public class SourceTab extends EntryEditorTab {
             compound.end();
             undoManager.addEdit(compound);
 
-            if (stateManager.getSelectedEntries().isEmpty()) {
+            ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+            if (selectedEntries == null || selectedEntries.isEmpty()) {
                 stateManager.activeTabProperty().get().ifPresent(libraryTab ->
                         libraryTab.getMainTable().clearAndSelect(outOfFocusEntry)
                 );
