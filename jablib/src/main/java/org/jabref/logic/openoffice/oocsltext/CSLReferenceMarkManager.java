@@ -269,17 +269,27 @@ public class CSLReferenceMarkManager {
     }
 
     public void updateMarkAndTextWithNewStyle(CSLReferenceMark mark, String newText, CSLCitationType citationType) throws Exception, CreationException {
-        // Remove citation marker first, then add new marker
-        String updatedName = removeCitationMarker(mark.getName());
-        if (citationType == CSLCitationType.IN_TEXT) {
-            updatedName = updatedName + " " + ReferenceMark.IN_TEXT_MARKER;
-        } else if (citationType == CSLCitationType.EMPTY) {
-            updatedName = updatedName + " " + ReferenceMark.EMPTY_MARKER;
+        String updatedName = mark.getName();
+        // Remove citation marker first
+        if (updatedName.endsWith(ReferenceMark.IN_TEXT_MARKER)) {
+            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
+        } else if (updatedName.endsWith(ReferenceMark.EMPTY_MARKER)) {
+            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
         } else {
-            updatedName = updatedName + " " + ReferenceMark.NORMAL_MARKER;
+            updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
         }
 
-        updateMarkAndText(mark, newText, updatedName);
+        // Then add the new marker
+        String marker = switch (citationType) {
+            case IN_TEXT ->
+                    ReferenceMark.IN_TEXT_MARKER;
+            case EMPTY ->
+                    ReferenceMark.EMPTY_MARKER;
+            case NORMAL ->
+                    ReferenceMark.NORMAL_MARKER;
+        };
+
+        updateMarkAndText(mark, newText, updatedName + " " + marker);
     }
 
     private void updateMarkAndText(CSLReferenceMark mark, String newText, String markName) throws Exception, CreationException {
@@ -332,19 +342,6 @@ public class CSLReferenceMarkManager {
 
     public CSLCitationType getCitationType() {
         return citationType;
-    }
-
-    private String removeCitationMarker(String referenceMarkName) {
-        if (referenceMarkName.endsWith(ReferenceMark.IN_TEXT_MARKER)) {
-            return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
-        }
-        if (referenceMarkName.endsWith(ReferenceMark.EMPTY_MARKER)) {
-            return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
-        } else if (referenceMarkName.endsWith(ReferenceMark.NORMAL_MARKER)) {
-            return referenceMarkName.substring(0, referenceMarkName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
-        }
-
-        return referenceMarkName;
     }
 
     public void setRealTimeNumberUpdateRequired(boolean isNumeric) {
