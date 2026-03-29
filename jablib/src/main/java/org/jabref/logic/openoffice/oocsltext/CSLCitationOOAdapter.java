@@ -72,7 +72,7 @@ public class CSLCitationOOAdapter {
     public void setCitationStyleParameters(CitationStyle newStyle, CSLCitationType newCitationType) throws CreationException, Exception {
         boolean styleChanged;
         boolean citationTypeIsChanged;
-        
+
         if (currentStyle == null || !currentStyle.getName().equals(newStyle.getName())) {
             styleChanged = true;
             this.currentStyle = newStyle;
