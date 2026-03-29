@@ -48,12 +48,13 @@ public class CSLReferenceMark {
         nameBuilder.append(" ").append(uniqueId);
 
         // Embed citation nature into reference mark
-        if (citationType == CSLCitationType.IN_TEXT) {
-            nameBuilder.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
-        } else if (citationType == CSLCitationType.EMPTY) {
-            nameBuilder.append(" ").append(ReferenceMark.EMPTY_MARKER);
-        } else {
-            nameBuilder.append(" ").append(ReferenceMark.NORMAL_MARKER);
+        switch (citationType) {
+            case IN_TEXT ->
+                    nameBuilder.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
+            case EMPTY ->
+                    nameBuilder.append(" ").append(ReferenceMark.EMPTY_MARKER);
+            case NORMAL ->
+                    nameBuilder.append(" ").append(ReferenceMark.NORMAL_MARKER);
         }
         return nameBuilder.toString();
     }
