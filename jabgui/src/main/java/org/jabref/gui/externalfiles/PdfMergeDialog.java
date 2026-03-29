@@ -126,15 +126,15 @@ public class PdfMergeDialog {
 
     private static BibEntry fetchEntryFromWeb(Field field, String identifier, ImportFormatPreferences importFormatPreferences) {
         return WebFetchers.getIdBasedFetcherForField(field, importFormatPreferences)
-                         .flatMap(fetcher -> {
-                             try {
-                                 return fetcher.performSearchById(identifier);
-                             } catch (FetcherException e) {
-                                 LOGGER.warn("Failed to fetch entry by {} {}", field, identifier, e);
-                                 return Optional.empty();
-                             }
-                         })
-                         .orElse(null);
+                          .flatMap(fetcher -> {
+                              try {
+                                  return fetcher.performSearchById(identifier);
+                              } catch (FetcherException e) {
+                                  LOGGER.warn("Failed to fetch entry by {} {}", field, identifier, e);
+                                  return Optional.empty();
+                              }
+                          })
+                          .orElse(null);
     }
 
     private static Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
