@@ -352,9 +352,11 @@ public class SourceTab extends EntryEditorTab {
             compound.end();
             undoManager.addEdit(compound);
 
-            stateManager.activeTabProperty().get().ifPresent(libraryTab ->
-                    libraryTab.getMainTable().clearAndSelect(outOfFocusEntry)
-            );
+            if (stateManager.getSelectedEntries().isEmpty()) {
+                stateManager.activeTabProperty().get().ifPresent(libraryTab ->
+                        libraryTab.getMainTable().clearAndSelect(outOfFocusEntry)
+                );
+            }
 
             validationMessage.setValue(null);
         } catch (InvalidFieldValueException | IOException ex) {
