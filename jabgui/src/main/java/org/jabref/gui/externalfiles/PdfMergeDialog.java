@@ -78,22 +78,18 @@ public class PdfMergeDialog {
         Map<Field, String>[] identifierCache = new Map[1];
 
         for (Field identifierField : FetchAndMergeEntry.SUPPORTED_FIELDS) {
-            dialog.addSource(
-                Localization.lang("From %0", FieldTextMapper.getDisplayName(identifierField)),
-                () -> {
-                    synchronized (identifierCache) {
-                        if (identifierCache[0] == null) {
-                            identifierCache[0] = extractIdentifiers(
-                                    parsePdfForEntries(filePath, preferences));
-                        }
+            dialog.addSource(Localization.lang("From %0", FieldTextMapper.getDisplayName(identifierField)), () -> {
+                synchronized (identifierCache) {
+                    if (identifierCache[0] == null) {
+                        identifierCache[0] = extractIdentifiers(parsePdfForEntries(filePath, preferences));
                     }
-                    String value = identifierCache[0].get(identifierField);
-                    if (value == null) {
-                        return null;
-                    }
-                    return fetchEntryFromWeb(identifierField, value, preferences.getImportFormatPreferences());
                 }
-            );
+                String value = identifierCache[0].get(identifierField);
+                if (value == null) {
+                    return null;
+                }
+                return fetchEntryFromWeb(identifierField, value, preferences.getImportFormatPreferences());
+            });
         }
     }
 
