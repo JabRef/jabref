@@ -20,6 +20,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.PdfIdentifierExtractor;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -30,7 +31,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
 import org.slf4j.Logger;
@@ -39,14 +39,7 @@ import org.slf4j.LoggerFactory;
 /// Class for fetching and merging bibliographic information
 public class FetchAndMergeEntry {
 
-    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.WebFetchers#getIdBasedFetcherFoIdentifier}
-    public static List<Field> SUPPORTED_FIELDS =
-            List.of(
-                    StandardField.EPRINT, // arXiv
-                    StandardField.DOI,
-                    StandardField.ISBN,
-                    StandardField.ISSN
-            );
+    public static List<Field> SUPPORTED_FIELDS = PdfIdentifierExtractor.SUPPORTED_FIELDS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
 

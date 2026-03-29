@@ -312,8 +312,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 if (field.equals(StandardField.DOI)) {
                     String fromDoiTitle = Localization.lang("From %0", FieldTextMapper.getDisplayName(StandardField.DOI));
                     boolean doiSourceAlreadyPresent = viewModel.entriesProperty().stream()
-                                                               .anyMatch(source -> fromDoiTitle.equals(source.titleProperty().get())
-                                                                       || Localization.lang("From DOI").equals(source.titleProperty().get()));
+                                                               .anyMatch(source -> (fromDoiTitle.equals(source.titleProperty().get())
+                                                                       || Localization.lang("From DOI").equals(source.titleProperty().get()))
+                                                                       && !source.isLoadingProperty().get()
+                                                                       && source.entryProperty().get() != null);
 
                     if (!doiSourceAlreadyPresent) {
                         Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
