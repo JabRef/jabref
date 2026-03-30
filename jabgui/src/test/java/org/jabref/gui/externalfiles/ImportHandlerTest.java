@@ -150,7 +150,7 @@ class ImportHandlerTest {
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_RIGHT
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(any(), any(), any(), any());
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.empty());
 
         // Act
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
@@ -181,7 +181,7 @@ class ImportHandlerTest {
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_BOTH
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(any(), any(), any(), any());
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.empty());
 
         // Act
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
@@ -215,7 +215,7 @@ class ImportHandlerTest {
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_MERGE
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(any(), any(), any(), any());
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.empty());
 
         // Act
         // create and return a default BibEntry or do other computations
@@ -285,17 +285,18 @@ class ImportHandlerTest {
                 .withField(StandardField.AUTHOR, "Smith")
                 .withField(StandardField.YEAR, "2022")
                 .withField(StandardField.TITLE, "Some Title");
-        // Mock findDuplicate to return the existing entry as a duplicate
-        Mockito.doReturn(Optional.of(existingEntry)).when(importHandler).findDuplicate(any());
-
-        // Mock handleDuplicates(4 params) to simulate user choosing KEEP_MERGE with their custom key
-        Mockito.doReturn(Optional.of(mergedEntry)).when(importHandler).handleDuplicates(any(), any(), any(), any());
-
+        
         // Entry to import
         BibEntry importEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Smith")
                 .withField(StandardField.YEAR, "2022")
                 .withField(StandardField.TITLE, "Some Title");
+        // Mock findDuplicate to return the existing entry as a duplicate
+        Mockito.doReturn(Optional.of(existingEntry)).when(importHandler).findDuplicate(importEntry);
+
+        // Mock handleDuplicates(4 params) to simulate user choosing KEEP_MERGE with their custom key
+        Mockito.doReturn(Optional.of(mergedEntry)).when(importHandler).handleDuplicates(importEntry, existingEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.of("Smith2022"));
+        
         // Act
         importHandler.importEntriesWithDuplicateCheck(null, List.of(importEntry));
 
