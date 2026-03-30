@@ -275,7 +275,7 @@ public class CSLReferenceMarkManager {
             updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.IN_TEXT_MARKER.length() - 1);
         } else if (updatedName.endsWith(ReferenceMark.EMPTY_MARKER)) {
             updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.EMPTY_MARKER.length() - 1);
-        } else {
+        } else if (updatedName.endsWith(ReferenceMark.NORMAL_MARKER)) {
             updatedName = updatedName.substring(0, updatedName.length() - ReferenceMark.NORMAL_MARKER.length() - 1);
         }
 
