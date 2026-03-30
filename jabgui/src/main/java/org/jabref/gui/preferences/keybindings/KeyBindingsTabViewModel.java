@@ -30,7 +30,7 @@ import org.jspecify.annotations.NonNull;
 
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
-    private final KeyBindingRepository keyBindingRepository;
+    private KeyBindingRepository keyBindingRepository;
     private final GuiPreferences preferences;
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
@@ -41,8 +41,8 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     private final List<String> restartWarning = new ArrayList<>();
 
     public KeyBindingsTabViewModel(@NonNull KeyBindingRepository keyBindingRepository,
-                                   @NonNull DialogService dialogService,
-                                   @NonNull GuiPreferences preferences) {
+            @NonNull DialogService dialogService,
+            @NonNull GuiPreferences preferences) {
         this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -54,6 +54,10 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     /// Read all keybindings from the keybinding repository and create table keybinding models for them
     @Override
     public void setValues() {
+        // Ensure we start with a fresh copy of preferences' key bindings
+        // This prevents any accumulated changes from being displayed
+        this.keyBindingRepository = new KeyBindingRepository(preferences.getKeyBindingRepository().getKeyBindings());
+
         KeyBindingViewModel root = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
         rootKeyBinding.set(root);
         filterValues("");
@@ -86,12 +90,13 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     /// @param searchTerm term to search for
     /// @return true if the term is found in the keybinding
     private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {
-        if (keyBinding.getLocalization().toLowerCase().contains(searchTerm) ||
-                keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {
+        if (keyBinding.getLocalization().toLowerCase().contains(searchTerm)
+                || keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {
             return true;
         }
         if (keyBindingRepository.getKeyCombination(keyBinding).isPresent()) {
-            return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase().contains(searchTerm);
+            return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase()
+                    .contains(searchTerm);
         }
         return false;
     }
@@ -134,11 +139,11 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         ButtonType resetButtonType = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
         dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, resetButtonType,
                 ButtonType.CANCEL).ifPresent(response -> {
-            if (response == resetButtonType) {
-                keyBindingRepository.resetToDefault();
-                setValues();
-            }
-        });
+                    if (response == resetButtonType) {
+                        keyBindingRepository.resetToDefault();
+                        setValues();
+                    }
+                });
     }
 
     public void loadPreset(KeyBindingPreset preset) {
