@@ -51,7 +51,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         keyBindingPresets.add(new NewEntryBindingPreset());
     }
 
-    /// Read all keybindings from the keybinding repository and create table keybinding models for them
+    // Read all keybindings from the keybinding repository and create table keybinding models for them
     @Override
     public void setValues() {
         // Rebuild the UI tree from current temp repository

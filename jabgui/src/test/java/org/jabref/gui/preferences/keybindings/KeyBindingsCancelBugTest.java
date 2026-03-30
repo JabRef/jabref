@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/// Test for GitHub issue #7959: Key bindings changes should not persist when pressing Cancel
+// Test for GitHub issue #7959: Key bindings changes should not persist when pressing Cancel
 class KeyBindingsCancelBugTest {
 
     @Test
