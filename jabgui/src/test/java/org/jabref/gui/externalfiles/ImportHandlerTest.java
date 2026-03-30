@@ -254,20 +254,20 @@ class ImportHandlerTest {
 
         String generatedKey = "UniqueKey2023";
         Mockito.doReturn(decisionResult).when(importHandler)
-               .getDuplicateDecision(originalEntry, duplicateEntry,
-                     DuplicateResolverDialog.DuplicateResolverResult.BREAK,
-                     Optional.of(generatedKey));
+                .getDuplicateDecision(originalEntry, duplicateEntry,
+                        DuplicateResolverDialog.DuplicateResolverResult.BREAK,
+                        Optional.of(generatedKey));
 
         // Act
         BibEntry result = importHandler.handleDuplicates(originalEntry, duplicateEntry,
-              DuplicateResolverDialog.DuplicateResolverResult.BREAK,
-              Optional.of(generatedKey)).get();
+                DuplicateResolverDialog.DuplicateResolverResult.BREAK,
+                Optional.of(generatedKey)).get();
 
         // Assert: the colliding key should be replaced by the generated one
         assertEquals(generatedKey, result.getCitationKey().orElse(""),
-              "When keeping both entries with the same key, the imported entry should get the generated key");
+                "When keeping both entries with the same key, the imported entry should get the generated key");
         assertEquals("SameKey2023", duplicateEntry.getCitationKey().orElse(""),
-              "The existing entry should keep its original key");
+                "The existing entry should keep its original key");
     }
 
     @Test
@@ -328,7 +328,7 @@ class ImportHandlerTest {
                 .withField(StandardField.AUTHOR, "Smith")
                 .withField(StandardField.YEAR, "2022")
                 .withField(StandardField.TITLE, "Some Title");
-        
+
         // Entry to import
         BibEntry importEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Smith")
@@ -339,7 +339,7 @@ class ImportHandlerTest {
 
         // Mock handleDuplicates(4 params) to simulate user choosing KEEP_MERGE with their custom key
         Mockito.doReturn(Optional.of(mergedEntry)).when(importHandler).handleDuplicates(importEntry, existingEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.of("Smith2022"));
-        
+
         // Act
         importHandler.importEntriesWithDuplicateCheck(null, List.of(importEntry));
 
