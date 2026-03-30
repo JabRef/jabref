@@ -228,6 +228,49 @@ class ImportHandlerTest {
     }
 
     @Test
+    void handleDuplicatesKeepBothWithCollidingKeysAppliesGeneratedKey() {
+        // Arrange
+        BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("SameKey2023")
+                .withField(StandardField.AUTHOR, "Duplicate Author");
+
+        BibEntry originalEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("SameKey2023")
+                .withField(StandardField.AUTHOR, "Original Author");
+
+        BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
+        bibDatabase.insertEntry(duplicateEntry);
+
+        DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(
+                DuplicateResolverDialog.DuplicateResolverResult.KEEP_BOTH, null);
+        importHandler = Mockito.spy(new ImportHandler(
+                bibDatabaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                mock(UndoManager.class),
+                mock(StateManager.class),
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor()));
+
+        String generatedKey = "UniqueKey2023";
+        Mockito.doReturn(decisionResult).when(importHandler)
+               .getDuplicateDecision(originalEntry, duplicateEntry,
+                     DuplicateResolverDialog.DuplicateResolverResult.BREAK,
+                     Optional.of(generatedKey));
+
+        // Act
+        BibEntry result = importHandler.handleDuplicates(originalEntry, duplicateEntry,
+              DuplicateResolverDialog.DuplicateResolverResult.BREAK,
+              Optional.of(generatedKey)).get();
+
+        // Assert: the colliding key should be replaced by the generated one
+        assertEquals(generatedKey, result.getCitationKey().orElse(""),
+              "When keeping both entries with the same key, the imported entry should get the generated key");
+        assertEquals("SameKey2023", duplicateEntry.getCitationKey().orElse(""),
+              "The existing entry should keep its original key");
+    }
+
+    @Test
     void importWithDuplicateCheckPreservesMergedCitationKey() {
         // Arrange: set up key generation with pattern [auth][year]
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
