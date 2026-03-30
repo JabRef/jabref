@@ -346,7 +346,9 @@ public class ImportHandler {
                 }
                 break;
             case KEEP_BOTH:
-                if (originalEntry.getCitationKey().isEmpty()) {
+                Optional<String> originalKey = originalEntry.getCitationKey();
+                Optional<String> duplicateKey = duplicateEntry.getCitationKey();
+                if (originalKey.isEmpty() || originalKey.equals(duplicateKey)) {
                     generatedKey.ifPresent(key -> originalEntry.setCitationKey(key));
                 }
                 break;
