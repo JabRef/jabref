@@ -41,8 +41,8 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     private final List<String> restartWarning = new ArrayList<>();
 
     public KeyBindingsTabViewModel(@NonNull KeyBindingRepository keyBindingRepository,
-                                   @NonNull DialogService dialogService,
-                                   @NonNull GuiPreferences preferences) {
+            @NonNull DialogService dialogService,
+            @NonNull GuiPreferences preferences) {
         this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -51,7 +51,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         keyBindingPresets.add(new NewEntryBindingPreset());
     }
 
-    // Read all keybindings from the keybinding repository and create table keybinding models for them
+    /// Read all keybindings from the keybinding repository and create table keybinding models for them
     @Override
     public void setValues() {
         // Rebuild the UI tree from current temp repository
@@ -94,7 +94,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
         if (keyBindingRepository.getKeyCombination(keyBinding).isPresent()) {
             return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase()
-                                       .contains(searchTerm);
+                    .contains(searchTerm);
         }
         return false;
     }
