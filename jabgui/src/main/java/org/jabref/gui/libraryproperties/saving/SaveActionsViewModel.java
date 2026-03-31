@@ -7,11 +7,9 @@ import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 
@@ -30,7 +28,7 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
 
     private final SetProperty<CleanupPreferences.CleanupStep> multiFieldCleanupsProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
 
-    private final ObjectProperty<Optional<CleanupPreferences.CleanupStep>> journalAbbreviationCleanupProperty = new SimpleObjectProperty<>(Optional.empty());
+    private final SetProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
 
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
@@ -57,7 +55,7 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
         Optional<Set<CleanupPreferences.CleanupStep>> multiFieldCleanups = initialMetaData.getMultiFieldCleanups();
         multiFieldCleanups.ifPresent(set -> multiFieldCleanupsProperty.set(FXCollections.observableSet(set)));
 
-        journalAbbreviationCleanupProperty.set(initialMetaData.getJournalAbbreviationCleanup());
+        initialMetaData.getJournalAbbreviationCleanup().ifPresentOrElse(journalAbbreviationCleanupProperty::add, journalAbbreviationCleanupProperty::clear);
     }
 
     @Override
@@ -84,7 +82,7 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
             newMetaData.setMultiFieldCleanups(EnumSet.copyOf(multiFieldCleanupsProperty.get()));
         }
 
-        Optional<CleanupPreferences.CleanupStep> journalCleanup = journalAbbreviationCleanupProperty.get();
+        Optional<CleanupPreferences.CleanupStep> journalCleanup = journalAbbreviationCleanupProperty.stream().findFirst();
         if (journalCleanup.isEmpty()) {
             newMetaData.clearJournalAbbreviationCleanup();
         } else {
@@ -98,7 +96,7 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
         return multiFieldCleanupsProperty;
     }
 
-    public ObjectProperty<Optional<CleanupPreferences.CleanupStep>> journalAbbreviationCleanupPropertyProperty() {
+    public SetProperty<CleanupPreferences.CleanupStep> journalAbbreviationCleanupPropertyProperty() {
         return journalAbbreviationCleanupProperty;
     }
 

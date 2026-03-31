@@ -39,7 +39,7 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
     public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> selectedMethods = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
-        Optional<CleanupPreferences.CleanupStep> selected = viewModel.selectedJournalCleanupOption.get();
+        Optional<CleanupPreferences.CleanupStep> selected = viewModel.selectedJournalCleanupOption.stream().findFirst();
 
         selected.ifPresent(selectedMethods::add);
 
