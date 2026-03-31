@@ -481,7 +481,6 @@ public class OOBibBase {
     /// -  Missing pageInfo means no action.
     /// -  Missing CitationEntry means no action (no attempt to remove
     /// citation from the text).
-    ///
     public void guiActionApplyCitationEntries(List<CitationEntry> citationEntries) {
         final String errorTitle = Localization.lang("Problem modifying citation");
 
@@ -555,7 +554,7 @@ public class OOBibBase {
             }
         }
 
-        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages()));
+        syncOptions.ifPresent(e -> e.setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages()));
 
         try {
 
@@ -988,14 +987,10 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
             // Collect only cited entries from all databases
-            List<BibEntry> citedEntries = new ArrayList<>();
-            for (BibDatabase database : databases) {
-                for (BibEntry entry : database.getEntries()) {
-                    if (cslCitationOOAdapter.isCitedEntry(entry)) {
-                        citedEntries.add(entry);
-                    }
-                }
-            }
+            List<BibEntry> citedEntries = databases.stream()
+                                                   .flatMap(database -> database.getEntries().stream())
+                                                   .filter(cslCitationOOAdapter::isCitedEntry)
+                                                   .toList();
 
             // If no entries are cited, show a message and return
             if (citedEntries.isEmpty()) {

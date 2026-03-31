@@ -348,18 +348,15 @@ public class OpenOfficePanel {
     }
 
     private List<BibDatabase> getBaseList() {
-        List<BibDatabase> databases = new ArrayList<>();
         if (openOfficePreferences.getUseAllDatabases()) {
-            for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
-                databases.add(database.getDatabase());
-            }
-        } else {
-            databases.add(stateManager.getActiveDatabase()
-                                      .map(BibDatabaseContext::getDatabase)
-                                      .orElse(new BibDatabase()));
+            return new ArrayList<>(stateManager.getOpenDatabases().stream()
+                                               .map(BibDatabaseContext::getDatabase)
+                                               .toList());
         }
-
-        return databases;
+        return new ArrayList<>(List.of(
+                stateManager.getActiveDatabase()
+                            .map(BibDatabaseContext::getDatabase)
+                            .orElseGet(BibDatabase::new)));
     }
 
     private void connectAutomatically() {
@@ -599,14 +596,10 @@ public class OpenOfficePanel {
     /// @return true if all entries have citation keys, if it so may be after generating them
     private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
         // Check if there are empty keys
-        boolean emptyKeys = false;
-        for (BibEntry entry : entries) {
-            if (entry.getCitationKey().isEmpty()) {
-                // Found one, no need to look further for now
-                emptyKeys = true;
-                break;
-            }
-        }
+        // Found one, no need to look further for now
+
+        boolean emptyKeys = entries.stream()
+                                   .anyMatch(entry -> entry.getCitationKey().isEmpty());
 
         // If no empty keys, return true
         if (!emptyKeys) {
