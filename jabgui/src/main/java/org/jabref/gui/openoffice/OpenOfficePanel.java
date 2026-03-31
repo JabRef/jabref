@@ -225,7 +225,8 @@ public class OpenOfficePanel {
                 ooBase.guiActionSelectDocument(false);
             } catch (WrappedTargetException
                      | NoSuchElementException ex) {
-                throw new RuntimeException(ex);
+                LOGGER.warn("Unable to select document to work on", ex);
+                OOError.fromMisc(ex).setTitle("Unable to select document to work on").showErrorDialog(dialogService);
             }
         });
 
@@ -465,7 +466,9 @@ public class OpenOfficePanel {
                 ooBase.guiActionSelectDocument(true);
             } catch (WrappedTargetException
                      | NoSuchElementException e) {
-                throw new RuntimeException(e);
+                LOGGER.warn("Unable to connect to document", e);
+                OOError.fromMisc(e).setTitle("Unable to connect to document").showErrorDialog(dialogService);
+                return;
             }
 
             // Enable actions that depend on a connection
