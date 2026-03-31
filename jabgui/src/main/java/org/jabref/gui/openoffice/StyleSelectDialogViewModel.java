@@ -225,8 +225,6 @@ public class StyleSelectDialogViewModel {
                                                                        .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))
                                                                        .toList();
 
-            availableCslLayouts.setAll(updatedLayouts);
-
             Optional<CitationStylePreviewLayout> newLayoutOptional = updatedLayouts.stream()
                                                                                    .filter(layout -> layout.getFilePath().equals(stylePath))
                                                                                    .findFirst();
@@ -234,6 +232,7 @@ public class StyleSelectDialogViewModel {
             if (newLayoutOptional.isPresent()) {
                 CitationStylePreviewLayout newLayout = newLayoutOptional.get();
                 selectedCslLayoutProperty.set(newLayout);
+                availableCslLayouts.setAll(updatedLayouts);
 
                 openOfficePreferences.setCurrentStyle(citationStyleToAdd);
 
