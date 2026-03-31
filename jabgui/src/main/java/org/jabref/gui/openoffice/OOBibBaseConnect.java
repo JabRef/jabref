@@ -218,19 +218,10 @@ public class OOBibBaseConnect {
         return false;
     }
 
-    /// Either return a valid XTextDocument or throw NoDocumentException.
-    public XTextDocument getXTextDocumentOrThrow()
-            throws
-            NoDocumentException {
-        if (isDocumentConnectionMissing()) {
-            throw new NoDocumentException("Not connected to document");
-        }
-        return this.xTextDocument;
-    }
-
+    /// Returns either a valid XTextDocument in OOResult or a NoDocumentException error
     public OOResult<XTextDocument, OOError> getXTextDocument() {
         if (isDocumentConnectionMissing()) {
-            return OOResult.error(OOError.from(new NoDocumentException()));
+            return OOResult.error(OOError.from(new NoDocumentException("Not connected to document")));
         }
         return OOResult.ok(this.xTextDocument);
     }
