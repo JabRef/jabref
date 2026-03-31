@@ -187,10 +187,10 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md | tee heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.16.1:bin check CHANGELOG.md | tee heylogs.txt || true
 
           # We have two acceptable errors
-          if ! grep -q "3 problems" heylogs.txt; then
+          if ! grep -q "1 problem" heylogs.txt; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt
