@@ -51,7 +51,6 @@ import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.DisposedException;
@@ -634,7 +633,8 @@ public class OOBibBase {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (com.sun.star.uno.Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not insert entry", e);
+            OOError.fromMisc(e).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
             UnoUndo.leaveUndoContext(doc);
         }
@@ -928,20 +928,16 @@ public class OOBibBase {
                     doc.lockControllers();
 
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-                } catch (NoDocumentException
-                         | NoSuchElementException
-                         | PropertyVetoException
-                         | UnknownPropertyException e) {
-                    throw new RuntimeException(e);
+                } catch (NoDocumentException | com.sun.star.uno.Exception e) {
+                    dialogService.notify(Localization.lang("No document found or LibreOffice insertion failure"));
+                    LOGGER.error("Could not update CSL bibliography", e);
                 } finally {
                     doc.unlockControllers();
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
-            } catch (CreationException
-                     | WrappedTargetException
-                     | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Could not update CSL bibliography", ex);
+            } catch (CreationException | com.sun.star.lang.IllegalArgumentException ex) {
+                LOGGER.error("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }

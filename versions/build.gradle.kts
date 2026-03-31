@@ -12,7 +12,7 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafx = "25.0.2"
+val javafx = "26"
 
 val lucene = "10.4.0"
 
@@ -25,7 +25,7 @@ dependencies {
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.1.0"))
+    api(platform("tools.jackson:jackson-bom:3.1.1"))
 }
 
 dependencies.constraints {
@@ -56,8 +56,8 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.29")
     api("com.h2database:h2-mvstore:2.4.240")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.7.4")
-    api("com.konghq:unirest-modules-gson:4.7.4")
+    api("com.konghq:unirest-java-core:4.8.1")
+    api("com.konghq:unirest-modules-gson:4.8.1")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.3.2")
     api("com.squareup.okio:okio-jvm:3.17.0")
@@ -103,7 +103,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.2")
     api("org.apache.httpcomponents.client5:httpclient5:5.6")
-    api("org.apache.logging.log4j:log4j-to-slf4j:2.25.3")
+    api("org.apache.logging.log4j:log4j-to-slf4j:2.25.4")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
     api("org.apache.lucene:lucene-highlighter:$lucene")
@@ -118,9 +118,9 @@ dependencies.constraints {
     api("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
-    api("org.glassfish.hk2:hk2-api:3.1.1")
-    api("org.glassfish.hk2:hk2-locator:3.1.1")
-    api("org.glassfish.hk2:hk2-utils:3.1.1")
+    api("org.glassfish.hk2:hk2-api:4.0.0")
+    api("org.glassfish.hk2:hk2-locator:4.0.0")
+    api("org.glassfish.hk2:hk2-utils:4.0.0")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.7")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
@@ -135,8 +135,8 @@ dependencies.constraints {
     api("org.jspecify:jspecify:1.0.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
-    api("org.libreoffice:libreoffice:24.8.4")
-    api("org.libreoffice:unoloader:24.8.4")
+    api("org.libreoffice:libreoffice:25.2.7")
+    api("org.libreoffice:unoloader:25.2.7")
     api("org.mockito:mockito-core:5.23.0")
     api("org.ow2.asm:asm:9.9.1")
     api("org.postgresql:postgresql:42.7.10")
