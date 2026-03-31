@@ -70,15 +70,15 @@ public class AiChatComponent extends VBox {
 
     private final AiService aiService;
     private final ObservableList<BibEntry> entries;
-    private  BibDatabaseContext bibDatabaseContext;
+    private BibDatabaseContext bibDatabaseContext;
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final BibEntryTypesManager entryTypesManager;
     private final FieldPreferences fieldPreferences;
     private StringProperty name;
-    private ObservableList<ChatMessage>chatHistory;
-    private  AiChatLogic aiChatLogic;
+    private ObservableList<ChatMessage> chatHistory;
+    private AiChatLogic aiChatLogic;
 
     private final ObservableList<Notification> notifications = FXCollections.observableArrayList();
 
@@ -125,6 +125,7 @@ public class AiChatComponent extends VBox {
                   .root(this)
                   .load();
     }
+
     public void updateDatabase(BibDatabaseContext newBibDatabaseContext,
                                ObservableList<ChatMessage> newChatHistory) {
         this.bibDatabaseContext = newBibDatabaseContext;
@@ -133,7 +134,6 @@ public class AiChatComponent extends VBox {
                                     .makeChat(name, newChatHistory, entries, newBibDatabaseContext);
         uiChatHistory.setItems(aiChatLogic.getChatHistory());
     }
-
 
     @FXML
     public void initialize() {
