@@ -254,9 +254,9 @@ class ImportHandlerTest {
 
         String generatedKey = "UniqueKey2023";
         Mockito.doReturn(decisionResult).when(importHandler)
-                .getDuplicateDecision(originalEntry, duplicateEntry,
-                        DuplicateResolverDialog.DuplicateResolverResult.BREAK,
-                        Optional.of(generatedKey));
+               .getDuplicateDecision(originalEntry, duplicateEntry,
+                       DuplicateResolverDialog.DuplicateResolverResult.BREAK,
+                       Optional.of(generatedKey));
 
         // Act
         BibEntry result = importHandler.handleDuplicates(originalEntry, duplicateEntry,
