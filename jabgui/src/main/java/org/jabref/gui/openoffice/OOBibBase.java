@@ -989,7 +989,7 @@ public class OOBibBase {
             List<BibEntry> citedEntries = databases.stream()
                                                    .flatMap(database -> database.getEntries().stream())
                                                    .filter(cslCitationOOAdapter::isCitedEntry)
-                                                   .collect(Collectors.toList());
+                                                   .collect(Collectors.toCollection(ArrayList::new));
 
             // If no entries are cited, show a message and return
             if (citedEntries.isEmpty()) {
