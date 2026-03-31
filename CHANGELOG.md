@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where entries were being deselected after entering a BibTeX source and clicking elsewhere. [#15412](https://github.com/JabRef/jabref/issues/15412)
 - We fixed pages checker to allow suffix letters in the page range like "436S-439S". [#13701](https://github.com/JabRef/jabref/issues/13701)
 - We fixed an issue where the Web search table had extra space, to improve the layout. [#14556](https://github.com/JabRef/jabref/issues/14556)
 - We fixed an issue where the side pane (Groups/Web search) width was not remembered after restarting JabRef. [#8907](https://github.com/JabRef/jabref/issues/8907)
