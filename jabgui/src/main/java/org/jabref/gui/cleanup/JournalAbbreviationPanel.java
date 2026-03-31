@@ -67,7 +67,7 @@ public class JournalAbbreviationPanel extends VBox {
                                        .ifPresent(journalAbbreviationsToggleGroup::selectToggle);
 
         // Listener for user pressing button
-        journalAbbreviationsToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+        journalAbbreviationsToggleGroup.selectedToggleProperty().addListener((_, _, newToggle) -> {
             if (newToggle != null) {
                 EnumSet<CleanupPreferences.CleanupStep> selectedSteps = (EnumSet<CleanupPreferences.CleanupStep>) newToggle.getUserData();
                 viewModel.selectedJournalCleanupOption.set(FXCollections.observableSet(selectedSteps));
