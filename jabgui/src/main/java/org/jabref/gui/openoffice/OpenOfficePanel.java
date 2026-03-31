@@ -597,7 +597,6 @@ public class OpenOfficePanel {
     private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
         // Check if there are empty keys
         // Found one, no need to look further for now
-
         boolean emptyKeys = entries.stream()
                                    .anyMatch(entry -> entry.getCitationKey().isEmpty());
 
