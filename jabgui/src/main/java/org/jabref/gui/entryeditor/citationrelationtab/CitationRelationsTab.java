@@ -470,8 +470,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                 citedByProgress);
 
         // click refresh button will trigger refresh from the remote
-        refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingComponents, citedByComponents, true));
-        refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents, true));
+        refreshCitingButton.setOnMouseClicked(_ -> handleRefresh(citingComponents, citedByComponents));
+        refreshCitedByButton.setOnMouseClicked(_ -> handleRefresh(citedByComponents, citingComponents));
 
         fetcherCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             if (citingComponents.entry().getDOI().isEmpty()) {
@@ -990,5 +990,34 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
+    }
+
+    private void handleRefresh(CitationComponents citationComponents, CitationComponents otherCitationComponents) {
+        BibEntry entry = citationComponents.entry();
+        boolean isCites = citationComponents.searchType() == CitationFetcher.SearchType.CITES;
+
+        boolean hasError = citationComponents.listView().getPlaceholder() instanceof Label label
+                && label.getText().startsWith(Localization.lang("Error"));
+
+        if (hasError) {
+            searchForRelations(citationComponents, otherCitationComponents, true);
+            return;
+        }
+
+        boolean isUpdatable = isCites
+                              ? searchCitationsRelationsService.isReferencesUpdatable(entry)
+                              : searchCitationsRelationsService.isCitationsUpdatable(entry);
+
+        if (!isUpdatable) {
+            boolean confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Refetch citations"),
+                    Localization.lang("The citations were fetched recently. Are you sure you want to refetch?")
+            );
+            if (!confirmed) {
+                return;
+            }
+        }
+
+        searchForRelations(citationComponents, otherCitationComponents, true);
     }
 }
