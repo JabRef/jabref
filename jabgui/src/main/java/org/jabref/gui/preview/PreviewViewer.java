@@ -93,8 +93,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private final BookCoverFetcher bookCoverFetcher;
 
-    private @Nullable FileAnnotationCache annotationCache;
-
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
@@ -219,10 +217,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         BackgroundTask.wrap(() -> {
                           String previewHtml = layout.generatePreview(currentEntry, databaseContext);
-                          annotationCache = new FileAnnotationCache(databaseContext, preferences.getFilePreferences());
-                          Map<Path, List<FileAnnotation>> annotations = annotationCache.getFromCache(currentEntry);
-                          String annotationHtml = FileAnnotationHtmlRenderer.render(annotations);
-                          return previewHtml + annotationHtml;
+                          return injectAnnotations(previewHtml, currentEntry, databaseContext);
                       })
                       .onSuccess(this::setPreviewText)
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
@@ -405,5 +400,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public String getSelectionHtmlContent() {
         return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
     }
+    private String injectAnnotations(String previewHtml, BibEntry entry, BibDatabaseContext databaseContext) {
+        FileAnnotationCache annotationCache = new FileAnnotationCache(databaseContext, preferences.getFilePreferences());
+        Map<Path, List<FileAnnotation>> annotations = annotationCache.getFromCache(entry);
+        if (annotations == null || annotations.isEmpty()) {
+            return previewHtml;
+        }
+        String annotationHtml = FileAnnotationHtmlRenderer.render(annotations);
+        return previewHtml + annotationHtml;
+    }
 
 }
+
