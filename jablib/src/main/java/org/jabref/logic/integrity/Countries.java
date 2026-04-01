@@ -2,20 +2,16 @@ package org.jabref.logic.integrity;
 
 import java.util.Set;
 
-/**
- * A hard-coded set of country names used by the integrity checker to detect
- * location information (countries) embedded in booktitle fields.
- *
- * The list covers all UN-recognized sovereign states and several widely used
- * territories. It can be regenerated from WikiData or a similar authoritative
- * source when updates are required.
- */
+/// A hard-coded set of country names used by the integrity checker to detect
+/// location information (countries) embedded in booktitle fields.
+///
+/// The list covers all UN-recognized sovereign states and several widely used
+/// territories. It can be regenerated from WikiData or a similar authoritative
+/// source when updates are required.
 public final class Countries {
 
-    /**
-     * Set of country names (in English). All entries are stored in lower-case
-     * so that comparisons can be made case-insensitively.
-     */
+    /// Set of country names (in English). All entries are stored in lower-case
+    /// so that comparisons can be made case-insensitively.
     public static final Set<String> COUNTRY_NAMES = Set.of(
             "afghanistan", "albania", "algeria", "andorra", "angola",
             "antigua and barbuda", "argentina", "armenia", "australia", "austria",
