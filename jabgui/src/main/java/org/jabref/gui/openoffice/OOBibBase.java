@@ -911,7 +911,7 @@ public class OOBibBase {
     /// @param errorTitle Message String of error
     /// @param odoc       Open Office text document result
     /// @param frontend   Open Office result of Open Office frontend
-    /// @param fcursor    Open Office result of text cursor
+    /// @param fcursor    Open Office result of functional text view cursor
     /// @param doc        Text document
     public boolean performPreUpdateChecks(String errorTitle, OOResult<XTextDocument, OOError> odoc, OOStyle style,
                                           OOResult<OOFrontend, OOError> frontend, OOResult<FunctionalTextViewCursor, OOError> fcursor, XTextDocument doc) {
