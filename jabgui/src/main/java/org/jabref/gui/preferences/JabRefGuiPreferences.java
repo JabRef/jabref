@@ -289,7 +289,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
                         "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}\\end{comment}__NEWLINE__" +
+                        "__PDFANNOTATIONS__" +
                         "</font>__NEWLINE__");
+
         // endregion
 
         // By default disable "Fit table horizontally on the screen"

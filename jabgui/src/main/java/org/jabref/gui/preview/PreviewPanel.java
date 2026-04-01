@@ -19,6 +19,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
@@ -65,6 +66,14 @@ public class PreviewPanel extends VBox implements PreviewControls {
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.searchQueryProperty());
+
+        //wires annotation cache form the active library tab into the preview
+        stateManager.activeTabProperty().addListener((_, _, newTab) -> {
+            newTab.ifPresent(tab -> previewView.setAnnotationCache(tab.getAnnotationCache()));
+        });
+        stateManager.activeTabProperty().get()
+                    .ifPresent(tab -> previewView.setAnnotationCache(tab.getAnnotationCache()));
+
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);

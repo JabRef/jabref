@@ -3,6 +3,8 @@ package org.jabref.gui.preview;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -18,6 +20,9 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+import org.jabref.logic.pdf.FileAnnotationCache;
+import org.jabref.logic.pdf.FileAnnotationHtmlRenderer;
+import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
@@ -88,6 +93,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private final BookCoverFetcher bookCoverFetcher;
 
+    private @Nullable FileAnnotationCache annotationCache;
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
@@ -210,7 +216,18 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         Number.serialExportNumber = 1;
         BibEntry currentEntry = entry;
 
-        BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
+        //for generating html and replace the __PDFANNOTATIONS__ placeholder
+        BackgroundTask.wrap(() -> {
+                          String previewHtml = layout.generatePreview(currentEntry, databaseContext);
+                          if (annotationCache != null) {
+                              Map<Path, List<FileAnnotation>> annotations = annotationCache.getFromCache(currentEntry);
+                              String annotationHtml = FileAnnotationHtmlRenderer.render(annotations);
+                              previewHtml = previewHtml.replace("__PDFANNOTATIONS__", annotationHtml);
+                          } else {
+                              previewHtml = previewHtml.replace("__PDFANNOTATIONS__", "");
+                          }
+                          return previewHtml;
+                      })
                       .onSuccess(this::setPreviewText)
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
                       .executeWith(taskExecutor);
@@ -391,5 +408,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public String getSelectionHtmlContent() {
         return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
+    }
+
+    ///to set annotation cache sued to resolve pdf annotations in the preview
+    public void setAnnotationCache(@Nullable FileAnnotationCache cache) {
+        this.annotationCache = cache;
     }
 }
