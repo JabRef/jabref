@@ -6,15 +6,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @ResourceLock("Localization.lang")
 class BooktitleCheckerTest {
 
     private final BooktitleChecker checker = new BooktitleChecker();
+    private final BooktitleContainsYearChecker yearChecker = new BooktitleContainsYearChecker();
+    private final BooktitleContainsCountryChecker countryChecker = new BooktitleContainsCountryChecker();
+    private final BooktitleContainsPagesChecker pagesChecker = new BooktitleContainsPagesChecker();
 
     // ------------------------------------------------------------------
-    // Existing "ends with conference on" checks
+    // "ends with conference on" checks
     // ------------------------------------------------------------------
 
     @Test
@@ -24,7 +26,8 @@ class BooktitleCheckerTest {
 
     @Test
     void booktitleDoesNotAcceptIfItEndsWithConferenceOn() {
-        assertNotEquals(Optional.empty(), checker.checkValue("Digital Information and Communication Technology and its Applications (DICTAP), Fourth International Conference on"));
+        assertEquals(Optional.of("booktitle ends with 'conference on'"),
+                checker.checkValue("Digital Information and Communication Technology and its Applications (DICTAP), Fourth International Conference on"));
     }
 
     @Test
@@ -38,18 +41,24 @@ class BooktitleCheckerTest {
 
     @Test
     void booktitleFlagsYearInMiddle() {
-        // Example from the issue: year embedded inside a booktitle
-        assertNotEquals(Optional.empty(), checker.checkValue("European Conference on Circuit Theory and Design, {ECCTD} 2015, Trondheim, Norway"));
+        assertEquals(Optional.of("booktitle should not contain a year"),
+                yearChecker.checkValue("European Conference on Circuit Theory and Design, {ECCTD} 2015, Trondheim, Norway"));
     }
 
     @Test
     void booktitleFlagsYearAtStart() {
-        assertNotEquals(Optional.empty(), checker.checkValue("2015 {IEEE} International Conference on Digital Signal Processing"));
+        assertEquals(Optional.of("booktitle should not contain a year"),
+                yearChecker.checkValue("2015 {IEEE} International Conference on Digital Signal Processing"));
     }
 
     @Test
     void booktitleAcceptsWhenNoYear() {
-        assertEquals(Optional.empty(), checker.checkValue("International Conference on Software Engineering"));
+        assertEquals(Optional.empty(), yearChecker.checkValue("International Conference on Software Engineering"));
+    }
+
+    @Test
+    void booktitleYearCheckerIsBlank() {
+        assertEquals(Optional.empty(), yearChecker.checkValue(" "));
     }
 
     // ------------------------------------------------------------------
@@ -58,18 +67,30 @@ class BooktitleCheckerTest {
 
     @Test
     void booktitleFlagsCountryName() {
-        // "Norway" is a country and should be flagged
-        assertNotEquals(Optional.empty(), checker.checkValue("Service-Oriented Computing, Fifth International Conference, Vienna, Austria, Proceedings"));
+        assertEquals(Optional.of("booktitle should not contain a location"),
+                countryChecker.checkValue("Service-Oriented Computing, Fifth International Conference, Vienna, Austria, Proceedings"));
     }
 
     @Test
     void booktitleFlagsCountryNameSingapore() {
-        assertNotEquals(Optional.empty(), checker.checkValue("{IEEE} International Conference on Digital Signal Processing, Singapore, Proceedings"));
+        assertEquals(Optional.of("booktitle should not contain a location"),
+                countryChecker.checkValue("{IEEE} International Conference on Digital Signal Processing, Singapore, Proceedings"));
     }
 
     @Test
     void booktitleAcceptsWhenNoCountry() {
-        assertEquals(Optional.empty(), checker.checkValue("International Conference on Machine Learning Proceedings"));
+        assertEquals(Optional.empty(), countryChecker.checkValue("International Conference on Machine Learning Proceedings"));
+    }
+
+    @Test
+    void booktitleCountryNotFlaggedInsideAlphanumericToken() {
+        // "USA2015" should NOT be flagged — the abbreviation is part of a larger token
+        assertEquals(Optional.empty(), countryChecker.checkValue("Proceedings USA2015"));
+    }
+
+    @Test
+    void booktitleCountryCheckerIsBlank() {
+        assertEquals(Optional.empty(), countryChecker.checkValue(" "));
     }
 
     // ------------------------------------------------------------------
@@ -78,16 +99,36 @@ class BooktitleCheckerTest {
 
     @Test
     void booktitleFlagsPagesPattern() {
-        assertNotEquals(Optional.empty(), checker.checkValue("Advances in Neural Information Processing Systems, pp. 1234-1242"));
+        assertEquals(Optional.of("booktitle should not contain page numbers"),
+                pagesChecker.checkValue("Advances in Neural Information Processing Systems, pp. 1234-1242"));
     }
 
     @Test
     void booktitleFlagsPagesKeyword() {
-        assertNotEquals(Optional.empty(), checker.checkValue("Advances in Neural Information Processing Systems, pages 1234-1242"));
+        assertEquals(Optional.of("booktitle should not contain page numbers"),
+                pagesChecker.checkValue("Advances in Neural Information Processing Systems, pages 1234-1242"));
     }
 
     @Test
     void booktitleAcceptsWhenNoPageNumbers() {
-        assertEquals(Optional.empty(), checker.checkValue("Advances in Neural Information Processing Systems"));
+        assertEquals(Optional.empty(), pagesChecker.checkValue("Advances in Neural Information Processing Systems"));
+    }
+
+    @Test
+    void booktitlePagesCheckerIsBlank() {
+        assertEquals(Optional.empty(), pagesChecker.checkValue(" "));
+    }
+
+    // ------------------------------------------------------------------
+    // Multiple issues in one booktitle — all reported independently
+    // ------------------------------------------------------------------
+
+    @Test
+    void booktitleWithYearAndCountryFlagsBoth() {
+        // Year checker and country checker are separate — both fire independently
+        assertEquals(Optional.of("booktitle should not contain a year"),
+                yearChecker.checkValue("2015 IEEE Conference, Singapore"));
+        assertEquals(Optional.of("booktitle should not contain a location"),
+                countryChecker.checkValue("2015 IEEE Conference, Singapore"));
     }
 }
