@@ -130,8 +130,7 @@ public class AiChatComponent extends VBox {
                ObservableList<ChatMessage> newChatHistory) {
         this.bibDatabaseContext = newBibDatabaseContext;
         this.chatHistory = newChatHistory;
-        this.aiChatLogic = aiService.getAiChatService()
-                                    .makeChat(name, newChatHistory, entries, newBibDatabaseContext);
+        this.aiChatLogic = aiService.getAiChatService().makeChat(name, newChatHistory, entries, newBibDatabaseContext);
         uiChatHistory.setItems(aiChatLogic.getChatHistory());
     }
 
