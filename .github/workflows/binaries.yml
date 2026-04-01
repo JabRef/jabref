@@ -139,10 +139,6 @@ jobs:
       jdkVersionFlavour: ${{ steps.binary.outputs.jdkVersionFlavour }}
       javafxVersion: ${{ steps.binary.outputs.javafxVersion }}
     steps:
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: jq
-          version: 1.0
       - name: Determine conditions
         id: binary
         shell: bash
@@ -426,28 +422,23 @@ jobs:
 
           echo "matrix=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
 
-  build:
-    needs: [ compute-matrix, conditions, disk-space-check ]
+  pre-build:
+    needs: [ conditions, disk-space-check ]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        ${{ fromJSON(needs.compute-matrix.outputs.matrix) }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     outputs:
-      major: ${{ steps.gitversion.outputs.Major }}
-      minor: ${{ steps.gitversion.outputs.Minor }}
-      branchname: ${{ steps.normalize.outputs.branch }}
+      AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
+      Major: ${{ steps.gitversion.outputs.Major }}
+      Minor: ${{ steps.gitversion.outputs.Minor }}
+      InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+      branch: ${{ steps.normalize.outputs.branch }}
       url: ${{ steps.url.outputs.url }}
-    name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: 'true'
           show-progress: 'false'
-
       - name: Install GitVersion
         id: pre-gitversion
         # background: true
@@ -459,6 +450,61 @@ jobs:
         # background: true
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
+      - name: Normalize branch name
+        id: normalize
+        # wait: gitversion
+        shell: bash
+        run: |
+          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
+          branch="${branch%-merge}"   # removes suffix only if present
+
+          if [[ "$branch" == tag* ]]; then
+            # tag builds go into a sub folder
+            branch="${{ steps.gitversion.outputs.BranchName }}"
+          fi
+
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - name: Output URL
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        id: url
+        run: |
+          echo "Link: https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/"
+          echo "Link: <https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/>" >> $GITHUB_STEP_SUMMARY
+          echo "url=https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/" >> "$GITHUB_OUTPUT"
+      - name: Setup SSH key
+        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Create backlink to PR at builds.jabref.org
+        # background: true
+        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
+        run: |
+          echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
+
+  build:
+    needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
+    if: ${{ needs.conditions.outputs.should-build == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ${{ fromJSON(needs.compute-matrix.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
+    outputs:
+      major: ${{ needs.pre-build.outputs.Major }}
+      minor: ${{ needs.pre-build.outputs.Minor }}
+      branchname: ${{ needs.pre-build.outputs.branch }}
+      url: ${{ needs.pre-build.outputs.url }}
+    name: ${{ matrix.displayName }} installer and portable version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
 
       - name: Setup SSH key
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
@@ -524,35 +570,6 @@ jobs:
           which jlink
           jlink --version
 
-      - name: Normalize branch name
-        id: normalize
-        # wait: gitversion
-        shell: bash
-        run: |
-          branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
-          branch="${branch%-merge}"   # removes suffix only if present
-
-          if [[ "$branch" == tag* ]]; then
-            # tag builds go into a sub folder
-            branch="${{ steps.gitversion.outputs.BranchName }}"
-          fi
-
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
-      - name: Output URL
-        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
-        shell: bash
-        id: url
-        run: |
-          echo "Link: https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/"
-          echo "Link: <https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/>" >> $GITHUB_STEP_SUMMARY
-          echo "url=https://builds.jabref.org/${{ steps.normalize.outputs.branch }}/" >> "$GITHUB_OUTPUT"
-      - name: Create backlink to PR at builds.jabref.org
-        # background: true
-        if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
-        run: |
-          echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
-
       # jablib is used by all components - thus, compile it first
       - name: jablib jar
         id: jablib-jar
@@ -560,8 +577,8 @@ jobs:
         # background: true
         run: ${{ matrix.gradleCommand }} :jablib:jar
         env:
-          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
 
       # Save disk space
       # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
@@ -583,15 +600,15 @@ jobs:
         id: jabls-jar
         run: ${{ matrix.gradleCommand }} :jabls:jar
         env:
-          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
       - name: jabsrv jar
         # background: true
         id: jabsrv-jar
         run: ${{ matrix.gradleCommand }} :jabsrv:jar
         env:
-          VERSION: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ steps.gitversion.outputs.InformationalVersion }}
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
 
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
@@ -644,11 +661,11 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabls-cli
           componentShort: jabls
-          branchName: ${{ steps.normalize.outputs.branch }}
-          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          Major: ${{ steps.gitversion.outputs.Major }}
-          Minor: ${{ steps.gitversion.outputs.Minor }}
-          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
@@ -657,6 +674,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -669,11 +687,11 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabsrv-cli
           componentShort: jabsrv
-          branchName: ${{ steps.normalize.outputs.branch }}
-          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          Major: ${{ steps.gitversion.outputs.Major }}
-          Minor: ${{ steps.gitversion.outputs.Minor }}
-          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
@@ -682,6 +700,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -695,11 +714,11 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabgui
           componentShort: jabgui
-          branchName: ${{ steps.normalize.outputs.branch }}
-          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          Major: ${{ steps.gitversion.outputs.Major }}
-          Minor: ${{ steps.gitversion.outputs.Minor }}
-          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
@@ -708,6 +727,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: ""
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -720,11 +740,11 @@ jobs:
           gradleCommand: ${{ matrix.gradleCommand }}
           component: jabkit
           componentShort: jabkit
-          branchName: ${{ steps.normalize.outputs.branch }}
-          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          Major: ${{ steps.gitversion.outputs.Major }}
-          Minor: ${{ steps.gitversion.outputs.Minor }}
-          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
           diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
           os: ${{ matrix.os }}
           displayName: ${{ matrix.displayName }}
@@ -733,6 +753,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -863,7 +884,7 @@ jobs:
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v7
