@@ -551,7 +551,8 @@ jobs:
         if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'ubuntu-22.04') }}
         run: |
           echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
+          # "/tools" is used later to distinguish JabGui from the other components
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
 
       # jablib is used by all components - thus, compile it first
       - name: jablib jar
@@ -657,6 +658,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -682,6 +684,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -708,6 +711,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: ""
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -733,6 +737,7 @@ jobs:
           suffix: ${{ matrix.suffix }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
           astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
           biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
@@ -863,7 +868,7 @@ jobs:
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ matrix.path }}/build/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
       - name: Upload artifacts
         if: ${{ github.event.inputs.upload-as-artifact || 'false' == 'true' }}
         uses: actions/upload-artifact@v7
