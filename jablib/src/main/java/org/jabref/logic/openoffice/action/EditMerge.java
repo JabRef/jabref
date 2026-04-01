@@ -141,6 +141,9 @@ public class EditMerge {
             return false;
         }
 
+        final String exceptionTitle = "MergeCitationGroups failed";
+        final String loggerMessage = "MergeCitationGroups: cursorBetween.end != currentGroupCursor.end";
+
         Objects.requireNonNull(state.currentGroupCursor);
         Objects.requireNonNull(state.cursorBetween);
         Objects.requireNonNull(state.prev);
@@ -187,8 +190,8 @@ public class EditMerge {
 
         // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
         if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
-            LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
-            throw new IllegalStateException("MergeCitationGroups failed");
+            LOGGER.warn(loggerMessage);
+            throw new IllegalStateException(exceptionTitle);
         }
 
         /*
@@ -219,8 +222,8 @@ public class EditMerge {
 
             // These two should move in sync:
             if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
-                LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end (during expand)");
-                throw new IllegalStateException("MergeCitationGroups failed");
+                LOGGER.warn(loggerMessage + " (during expand)");
+                throw new IllegalStateException(exceptionTitle);
             }
         }
 
