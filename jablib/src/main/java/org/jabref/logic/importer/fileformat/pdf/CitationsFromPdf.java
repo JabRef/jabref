@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.NotificationService;
@@ -26,6 +27,10 @@ public class CitationsFromPdf {
 
     /// As [NotificationService], one can pass `LOGGER::info`
     public static ParserResult extractCitationsUsingLLM(JabRefCliPreferences preferences, NotificationService notificationService, Path path) {
+        return extractCitationsUsingLLM((CliPreferences) preferences, notificationService, path);
+    }
+
+    public static ParserResult extractCitationsUsingLLM(CliPreferences preferences, NotificationService notificationService, Path path) {
         try (AiService aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
