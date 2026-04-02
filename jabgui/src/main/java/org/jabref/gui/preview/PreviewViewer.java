@@ -407,7 +407,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return previewHtml;
         }
         String annotationHtml = FileAnnotationHtmlRenderer.render(annotations);
-        return previewHtml + annotationHtml;
+        return previewHtml + "<div style='margin-top:10px'>" + annotationHtml + "</div>";
     }
 
 }
