@@ -94,6 +94,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final BookCoverFetcher bookCoverFetcher;
 
     private @Nullable FileAnnotationCache annotationCache;
+
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
@@ -216,17 +217,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         Number.serialExportNumber = 1;
         BibEntry currentEntry = entry;
 
-        //for generating html and replace the __PDFANNOTATIONS__ placeholder
         BackgroundTask.wrap(() -> {
                           String previewHtml = layout.generatePreview(currentEntry, databaseContext);
-                          if (annotationCache != null) {
-                              Map<Path, List<FileAnnotation>> annotations = annotationCache.getFromCache(currentEntry);
-                              String annotationHtml = FileAnnotationHtmlRenderer.render(annotations);
-                              previewHtml = previewHtml.replace("__PDFANNOTATIONS__", annotationHtml);
-                          } else {
-                              previewHtml = previewHtml.replace("__PDFANNOTATIONS__", "");
-                          }
-                          return previewHtml;
+                          annotationCache = new FileAnnotationCache(databaseContext, preferences.getFilePreferences());
+                          Map<Path, List<FileAnnotation>> annotations = annotationCache.getFromCache(currentEntry);
+                          String annotationHtml = FileAnnotationHtmlRenderer.render(annotations);
+                          return previewHtml + annotationHtml;
                       })
                       .onSuccess(this::setPreviewText)
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
@@ -410,8 +406,4 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
     }
 
-    ///to set annotation cache sued to resolve pdf annotations in the preview
-    public void setAnnotationCache(@Nullable FileAnnotationCache cache) {
-        this.annotationCache = cache;
-    }
 }
