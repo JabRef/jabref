@@ -369,20 +369,20 @@ public class OOBibBase {
                             + pathToStyleFile;
             return OOVoidResult.error(new OOError("StyleIsNotKnown", msg));
         }
-
-        if (!internalName.get().equals(styleName)) {
+        String actualName = internalName.get();
+        if (!actualName.equals(styleName)) {
             String msg =
                     switch (familyName) {
                         case UnoStyle.PARAGRAPH_STYLES ->
                                 Localization.lang("The %0 paragraph style '%1' is a display name for '%2'.",
                                         labelInJstyleFile,
                                         styleName,
-                                        internalName.get());
+                                        actualName);
                         case UnoStyle.CHARACTER_STYLES ->
                                 Localization.lang("The %0 character style '%1' is a display name for '%2'.",
                                         labelInJstyleFile,
                                         styleName,
-                                        internalName.get());
+                                        actualName);
                         default ->
                                 throw new IllegalArgumentException("Expected " + UnoStyle.CHARACTER_STYLES
                                         + " or " + UnoStyle.PARAGRAPH_STYLES
@@ -435,18 +435,17 @@ public class OOBibBase {
      *
      * ******************************************************/
     public Optional<List<CitationEntry>> guiActionGetCitationEntries() {
-        final Optional<List<CitationEntry>> FAIL = Optional.empty();
         final String errorTitle = Localization.lang("Problem collecting citations");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
         if (testDialog(errorTitle, odoc.asVoidResult())) {
-            return FAIL;
+            return Optional.empty();
         }
         XTextDocument doc = odoc.get();
 
         if (testDialog(errorTitle, checkIfOpenOfficeIsRecordingChanges(doc))) {
             LOGGER.warn(errorTitle);
-            return FAIL;
+            return Optional.empty();
         }
 
         try {
@@ -454,14 +453,14 @@ public class OOBibBase {
             return Optional.of(ManageCitations.getCitationEntries(doc));
         } catch (NoDocumentException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            return FAIL;
+            return Optional.empty();
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            return FAIL;
+            return Optional.empty();
         } catch (WrappedTargetException ex) {
             LOGGER.warn(errorTitle, ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            return FAIL;
+            return Optional.empty();
         }
     }
 
@@ -800,14 +799,13 @@ public class OOBibBase {
     ///
     /// @param returnPartialResult If there are some unresolved keys, shall we return an otherwise nonempty result, or Optional.empty()?
     public Optional<BibDatabase> exportCitedHelper(List<BibDatabase> databases, boolean returnPartialResult) {
-        final Optional<BibDatabase> FAIL = Optional.empty();
         final String errorTitle = Localization.lang("Unable to generate new library");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
         if (testDialog(errorTitle,
                 odoc.asVoidResult(),
                 databaseIsRequired(databases, OOError::noDataBaseIsOpenForExport))) {
-            return FAIL;
+            return Optional.empty();
         }
         XTextDocument doc = odoc.get();
 
@@ -829,7 +827,7 @@ public class OOBibBase {
                         Localization.lang("Your OpenOffice/LibreOffice document references"
                                 + " no citation keys"
                                 + " which could also be found in your current library."));
-                return FAIL;
+                return Optional.empty();
             }
 
             List<String> unresolvedKeys = result.unresolvedKeys;
@@ -845,7 +843,7 @@ public class OOBibBase {
                 if (returnPartialResult) {
                     return Optional.of(result.newDatabase);
                 } else {
-                    return FAIL;
+                    return Optional.empty();
                 }
             }
             return Optional.of(result.newDatabase);
@@ -858,7 +856,7 @@ public class OOBibBase {
             LOGGER.warn("Problem generating new database.", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
-        return FAIL;
+        return Optional.empty();
     }
 
     /// GUI action, refreshes citation markers and bibliography.

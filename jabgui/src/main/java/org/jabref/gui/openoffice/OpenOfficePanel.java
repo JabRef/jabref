@@ -602,7 +602,6 @@ public class OpenOfficePanel {
         // Found one, no need to look further for now
         boolean emptyKeys = entries.stream()
                                    .anyMatch(entry -> entry.getCitationKey().isEmpty());
-
         // If no empty keys, return true
         if (!emptyKeys) {
             return true;
