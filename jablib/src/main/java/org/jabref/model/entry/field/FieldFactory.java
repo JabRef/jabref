@@ -65,8 +65,9 @@ public class FieldFactory {
         }
 
         if (fieldName.contains(FIELD_NAME_PROPERTY_SEPARATOR)) {
+            // Unknown field can be parsed into "Field name" and "Properties" by FIELD_NAME_PROPERTY_SEPARATOR
             String[] fieldAndProperties = fieldName.split(Pattern.quote(FIELD_NAME_PROPERTY_SEPARATOR));
-            // A field can be parsed into "Field name" and "Properties" by FIELD_NAME_PROPERTY_SEPARATOR
+            // Only accept unknown fields
             if (fieldAndProperties.length == 2) {
                 String unknownFieldName = fieldAndProperties[0];
                 String[] fieldProperties = fieldAndProperties[1].split(FIELD_PROPERTY_SEPARATOR);
