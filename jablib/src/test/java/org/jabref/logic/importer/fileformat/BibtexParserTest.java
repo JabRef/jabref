@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -1359,8 +1360,7 @@ class BibtexParserTest {
                                                 .flatMap(orFields -> orFields.getFields().stream())
                                                 .filter(field -> field.getName().equalsIgnoreCase("name"))
                                                 .findFirst();
-        assertTrue(requiredName.isPresent());
-        assertTrue(requiredName.get().getProperties().contains(FieldProperty.PERSON_NAMES));
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.PERSON_NAMES)), requiredName.map(Field::getProperties));
 
         Optional<Field> googleScholar = entryType.getOptionalFields().stream()
                                                  .map(BibField::field)
@@ -1370,10 +1370,8 @@ class BibtexParserTest {
                                          .map(BibField::field)
                                          .filter(field -> field.getName().equalsIgnoreCase("orcid"))
                                          .findFirst();
-        assertTrue(googleScholar.isPresent());
-        assertTrue(orcid.isPresent());
-        assertTrue(googleScholar.get().getProperties().contains(FieldProperty.EXTERNAL));
-        assertTrue(orcid.get().getProperties().contains(FieldProperty.EXTERNAL));
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.EXTERNAL)), googleScholar.map(Field::getProperties));
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.EXTERNAL)), orcid.map(Field::getProperties));
     }
 
     @Test
