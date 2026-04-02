@@ -130,7 +130,8 @@ jobs:
 
   modernizer:
     name: Modernizer
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -570,7 +571,7 @@ jobs:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
