@@ -730,6 +730,17 @@ class SearchQuerySQLConversionTest {
                                     )
                                 )
                                 SELECT * FROM cte0 GROUP BY entryid"""
+                ),
+                Arguments.of(
+                        "year >= 2005",
+                        """
+                                WITH
+                                cte0 AS (
+                                    SELECT main_table.entryid
+                                    FROM bib_fields."tableName" AS main_table
+                                    WHERE (main_table.field_name = 'year') AND (main_table.field_value_literal >= ('2005'))
+                                )
+                                SELECT * FROM cte0 GROUP BY entryid"""
                 )
         );
     }
