@@ -148,10 +148,6 @@ public class OOBibBase {
         err.showErrorDialog(dialogService);
     }
 
-    void showDialog(String errorTitle, OOError err) {
-        err.setTitle(errorTitle).showErrorDialog(dialogService);
-    }
-
     OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
         String msg = results.stream()
                             .filter(OOVoidResult::isError)
@@ -170,10 +166,6 @@ public class OOBibBase {
 
     boolean testDialog(String errorTitle, OOVoidResult<OOError> res) {
         return res.ifError(e -> showDialog(e.setTitle(errorTitle))).isError();
-    }
-
-    boolean testDialog(String errorTitle, List<OOVoidResult<OOError>> results) {
-        return testDialog(errorTitle, collectResults(errorTitle, results));
     }
 
     @SafeVarargs
