@@ -325,7 +325,7 @@ public class OOFrontend {
     ///
     /// Note: Here we directly communicate to the document, not through the backend. This is because mapping ranges to footnote marks does not depend on how do we mark or structure those ranges.
     public List<RangeForOverlapCheck<CitationGroupId>>
-    footnoteMarkRanges(XTextDocument doc, List<RangeForOverlapCheck<CitationGroupId>> citationRanges) {
+    footnoteMarkRanges(List<RangeForOverlapCheck<CitationGroupId>> citationRanges) {
         // We partition by XText and use a single range from
         // each partition to get at the corresponding footnotemark range.
 
@@ -402,7 +402,7 @@ public class OOFrontend {
         // ranges.addAll(userRanges);
         ranges.addAll(bibliographyRanges(doc));
         ranges.addAll(citationRanges);
-        ranges.addAll(footnoteMarkRanges(doc, citationRanges));
+        ranges.addAll(footnoteMarkRanges(citationRanges));
 
         List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
                 RangeOverlapBetween.findFirst(doc,
@@ -432,7 +432,7 @@ public class OOFrontend {
         ranges.addAll(userRanges);
         ranges.addAll(bibliographyRanges(doc));
         ranges.addAll(citationRanges);
-        ranges.addAll(footnoteMarkRanges(doc, citationRanges));
+        ranges.addAll(footnoteMarkRanges(citationRanges));
 
         List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
                 RangeOverlapWithin.findOverlappingRanges(doc, ranges, requireSeparation, reportAtMost);
