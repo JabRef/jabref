@@ -6,6 +6,8 @@ import java.util.List;
 
 import javafx.collections.ModifiableObservableListBase;
 
+import static org.jabref.logic.util.JabRefBaseDirectoryLocator.getBaseDirectoryPath;
+
 public class FileHistory extends ModifiableObservableListBase<Path> {
 
     private static final int HISTORY_SIZE = 8;
@@ -51,6 +53,22 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
 
     public void removeItem(Path file) {
         this.remove(file);
+
+        Path baseDirectoryPath = getBaseDirectoryPath();
+        if (baseDirectoryPath == null) {
+            return;
+        }
+
+        if (file.isAbsolute()) {
+            try {
+                this.remove(baseDirectoryPath.relativize(file).normalize());
+            } catch (IllegalArgumentException e) {
+                return;
+            }
+            return;
+        }
+
+        this.remove(baseDirectoryPath.resolve(file).normalize());
     }
 
     public static FileHistory of(List<Path> list) {
