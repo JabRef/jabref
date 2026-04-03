@@ -324,6 +324,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Display an error dialog if file is locked or inaccessible
             LOGGER.error("Error Called while changing the name of the file");
             LOGGER.error("ERROR MESSAGE FOR RENAMING THE FILE: {}", e.getMessage());
+//            dialogService.showErrorDialogAndWait("Renaming Failed.");
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Rename failed"),
                     Localization.lang("JabRef cannot access the file because it is being used by another process."));

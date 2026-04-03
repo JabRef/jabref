@@ -17,6 +17,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,19 +200,20 @@ public class LinkedFileHandler {
         }
 
         final Path oldPath = oldFile.get();
-        final Integer parentLength = oldPath.getParent() == null ? 0 : oldPath.getParent().toString().length();
+        final Integer parentPathLength = oldPath.getParent() == null ? 0 : oldPath.getParent().toString().length();
 
-        LOGGER.debug("OLD PARENT: {}", oldPath.getParent());
+        LOGGER.debug("PARENT: {}", oldPath.getParent());
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
-//        LOGGER.debug("NEW EXTENSION: {}", newExtension);
-//        LOGGER.debug("OLD EXTENSION: {}", oldExtension);
 
         Path newPath;
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
-            if (OS.WINDOWS) {
-                LOGGER.debug("ENTERED OS.WINDOWS IF STATEMENT");
-                targetFileName = truncateFileNameOnWindows(targetFileName, parentLength, newExtension, oldExtension);
+            if (OS.WINDOWS && (parentPathLength + targetFileName.length()) >= MAX_PATH_LENGTH_WINDOWS) {
+                if (newExtension.isPresent()) {
+                    targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, newExtension.get(), null);
+                } else {
+                    targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, null, null);
+                }
             }
 
             LOGGER.debug("TARGET FILE NAME FROM RENAMETONAME FUNCTION: {}", targetFileName);
@@ -220,8 +222,8 @@ public class LinkedFileHandler {
             LOGGER.debug("NEW PATH WITH THE NEW FILENAME: {}", newPath);
         } else {
             assert oldExtension.isPresent() && newExtension.isEmpty();
-            if (OS.WINDOWS) {
-                targetFileName = truncateFileNameOnWindows(targetFileName, parentLength, newExtension, oldExtension);
+            if (OS.WINDOWS && (parentPathLength + targetFileName.length()) >= MAX_PATH_LENGTH_WINDOWS) {
+                targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, null, oldExtension.get());
             }
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
@@ -244,7 +246,9 @@ public class LinkedFileHandler {
             Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
         } else {
             Files.createDirectories(newPath.getParent());
+            LOGGER.debug("OVERWRITING FILENAME TO {}", newPath);
             Files.move(oldPath, newPath);
+            LOGGER.debug("OVERWRITING SUCCESSFUL");
         }
 
         // Update path
@@ -257,24 +261,19 @@ public class LinkedFileHandler {
         return true;
     }
 
-    private String truncateFileNameOnWindows(String targetFileName, Integer parentLength, Optional<String> newExtension, Optional<String> oldExtension) {
-        LOGGER.debug("ENTERED truncateFileNameOnWindows FUNCTION");
+    private String truncateFileNameOnWindows(String targetFileName, int parentLength, @Nullable String newExtension, @Nullable String oldExtension) {
         String baseName = FileUtil.getBaseName(targetFileName);
-        Integer extensionLength = 0;
-        Integer dot = 0;
+        LOGGER.debug("BASENAME: {}", baseName);
+        int extensionLength = 0;
+        int dot = 0;
         String fileName;
-//        String extension;
 
-        if (newExtension.isPresent()) {
-            LOGGER.debug("ENTERED NEW EXTENSION IF STATEMENT");
-            LOGGER.debug("BASENAME: {}", baseName);
-            String extension = newExtension.get();
-            extensionLength = newExtension.get().length();
+        if (newExtension != null) {
+            extensionLength = newExtension.length();
             dot = 1;
-            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1)) + "." + extension;
-//            LOGGER.debug("FILENAME: {}", fileName);
-        } else if (oldExtension.isPresent()) {
-            extensionLength = oldExtension.get().length();
+            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1)) + "." + newExtension;
+        } else if (oldExtension != null) {
+            extensionLength = oldExtension.length();
             dot = 1;
             fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1));
         } else {
