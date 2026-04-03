@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
@@ -22,6 +23,8 @@ import org.slf4j.LoggerFactory;
 public class LinkedFileHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileHandler.class);
+
+    private static final Integer MAX_PATH_LENGTH_WINDOWS = 259;
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
@@ -111,7 +114,10 @@ public class LinkedFileHandler {
     /// If exists: the path already exists and has the same content as the given sourcePath
     ///
     /// @param renamed The original/suggested filename was adapted to fit it
-    private record GetTargetPathResult(boolean exists, boolean renamed, Path path) {
+    private record GetTargetPathResult(
+            boolean exists,
+            boolean renamed,
+            Path path) {
     }
 
     private GetTargetPathResult getTargetPath(Path sourcePath, Path targetDirectory, boolean useSuggestedName) throws IOException {
@@ -193,14 +199,30 @@ public class LinkedFileHandler {
         }
 
         final Path oldPath = oldFile.get();
+        final Integer parentLength = oldPath.getParent() == null ? 0 : oldPath.getParent().toString().length();
+
+        LOGGER.debug("OLD PARENT: {}", oldPath.getParent());
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
         Optional<String> newExtension = FileUtil.getFileExtension(targetFileName);
+//        LOGGER.debug("NEW EXTENSION: {}", newExtension);
+//        LOGGER.debug("OLD EXTENSION: {}", oldExtension);
 
         Path newPath;
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
+            if (OS.WINDOWS) {
+                LOGGER.debug("ENTERED OS.WINDOWS IF STATEMENT");
+                targetFileName = truncateFileNameOnWindows(targetFileName, parentLength, newExtension, oldExtension);
+            }
+
+            LOGGER.debug("TARGET FILE NAME FROM RENAMETONAME FUNCTION: {}", targetFileName);
             newPath = oldPath.resolveSibling(targetFileName);
+
+            LOGGER.debug("NEW PATH WITH THE NEW FILENAME: {}", newPath);
         } else {
             assert oldExtension.isPresent() && newExtension.isEmpty();
+            if (OS.WINDOWS) {
+                targetFileName = truncateFileNameOnWindows(targetFileName, parentLength, newExtension, oldExtension);
+            }
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
         }
 
@@ -235,15 +257,45 @@ public class LinkedFileHandler {
         return true;
     }
 
+    private String truncateFileNameOnWindows(String targetFileName, Integer parentLength, Optional<String> newExtension, Optional<String> oldExtension) {
+        LOGGER.debug("ENTERED truncateFileNameOnWindows FUNCTION");
+        String baseName = FileUtil.getBaseName(targetFileName);
+        Integer extensionLength = 0;
+        Integer dot = 0;
+        String fileName;
+//        String extension;
+
+        if (newExtension.isPresent()) {
+            LOGGER.debug("ENTERED NEW EXTENSION IF STATEMENT");
+            LOGGER.debug("BASENAME: {}", baseName);
+            String extension = newExtension.get();
+            extensionLength = newExtension.get().length();
+            dot = 1;
+            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1)) + "." + extension;
+//            LOGGER.debug("FILENAME: {}", fileName);
+        } else if (oldExtension.isPresent()) {
+            extensionLength = oldExtension.get().length();
+            dot = 1;
+            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1));
+        } else {
+            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1));
+        }
+        LOGGER.debug("NEW FILE NAME: {}", fileName);
+
+        return fileName;
+    }
+
     /// Determines the suggested file name based on the pattern specified in the preferences and valid for the file system.
     /// Uses file extension from original file.
     ///
     /// @return the suggested filename, including extension
     public String getSuggestedFileName() {
+        LOGGER.debug("NORMAL getSuggestedFileName METHOD CALLED");
         String filename = linkedFile.getFileName().orElse("file");
+        LOGGER.debug("FILENAME: {}", filename);
         final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
                                               .orElse(FileUtil.getBaseName(filename));
-
+        LOGGER.debug("TARGET FILE NAME: {}", targetFileName);
         return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(ext -> targetFileName + "." + ext).orElse(targetFileName));
     }
 
@@ -275,7 +327,8 @@ public class LinkedFileHandler {
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase = stream.filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))
                                       .findFirst();
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             LOGGER.error("Could not get the list of files in target directory", e);
         }
         return matchedByDiffCase;

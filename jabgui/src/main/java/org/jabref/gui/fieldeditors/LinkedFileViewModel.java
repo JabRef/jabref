@@ -214,7 +214,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'", linkedFile.getLink()), e);
         }
     }
@@ -234,7 +235,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Cannot open folder as the file is an online link."));
             }
-        } catch (IOException ex) {
+        } catch (
+                IOException ex) {
             LOGGER.debug("Cannot open folder", ex);
         }
     }
@@ -270,12 +272,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private void performRenameWithConflictCheck(String targetFileName) {
         // Check if a file with the same name already exists
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
+        LOGGER.debug("file already exists: {}", existingFile.isPresent());
         boolean overwriteFile = false;
 
         if (existingFile.isPresent()) {
             // Get existing file path and its directory
             Path existingFilePath = existingFile.get();
             Path targetDirectory = existingFilePath.getParent();
+            LOGGER.debug("existing file path: {} || target Directory: {}", existingFilePath, targetDirectory);
 
             // Suggest a non-conflicting file name
             String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, targetFileName);
@@ -315,8 +319,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
         try {
             // Attempt the rename operation
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             // Display an error dialog if file is locked or inaccessible
+            LOGGER.error("Error Called while changing the name of the file");
+            LOGGER.error("ERROR MESSAGE FOR RENAMING THE FILE: {}", e.getMessage());
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Rename failed"),
                     Localization.lang("JabRef cannot access the file because it is being used by another process."));
@@ -341,7 +348,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Found the linked file, so move it
             try {
                 linkedFileHandler.moveToDefaultDirectory();
-            } catch (IOException exception) {
+            } catch (
+                    IOException exception) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Move file"),
                         Localization.lang("Could not move file '%0'.", file.get().toString()),
@@ -392,7 +400,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
                 return Files.isSameFile(fileA, fileB);
-            } catch (IOException e) {
+            } catch (
+                    IOException e) {
                 return false;
             }
         };
