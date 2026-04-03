@@ -76,7 +76,7 @@ public class AiChatComponent extends VBox {
     private final TaskExecutor taskExecutor;
     private final BibEntryTypesManager entryTypesManager;
     private final FieldPreferences fieldPreferences;
-    private StringProperty name;
+    private final  StringProperty name;
     private ObservableList<ChatMessage> chatHistory;
     private AiChatLogic aiChatLogic;
 
@@ -131,7 +131,7 @@ public class AiChatComponent extends VBox {
         this.bibDatabaseContext = newBibDatabaseContext;
         this.chatHistory = newChatHistory;
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, newChatHistory, entries, newBibDatabaseContext);
-        uiChatHistory.setItems(aiChatLogic.getChatHistory());
+
     }
 
     @FXML
