@@ -94,6 +94,43 @@ npx markdownlint-cli2 "*.md"
 
 ---
 
+## Requirements tracing (OpenFastTrace)
+
+JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) to trace requirements to implementation and tests.
+
+For a new feature or significant bug fix, **at minimum add the requirement** to the appropriate `docs/requirements/<area>.md` file. Full tracing (`Needs: impl` + implementation comments) is encouraged but can be skipped if the effort is disproportionate.
+
+**Defining a requirement** in `docs/requirements/<area>.md`:
+
+```markdown
+### Example
+`req~ai.example~1`
+
+Description of the requirement.
+```
+
+The identifier must follow the heading with no blank line between them. Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
+
+**Optionally — linking an implementation** to a requirement (full trace):
+
+```markdown
+Needs: impl
+```
+
+```java
+// [impl->req~ai.example~1]
+```
+
+**Checking coverage:**
+
+```bash
+./gradlew traceRequirements   # output: build/tracing.txt
+```
+
+See `docs/requirements/` for existing requirements and `docs/requirements/index.md` for full guidance.
+
+---
+
 ## Architecture decisions (MADR)
 
 When a significant design or implementation decision is made, create a new MADR in `docs/decisions/`:
