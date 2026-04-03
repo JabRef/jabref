@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -321,13 +322,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
         } catch (
                 IOException e) {
-            // Display an error dialog if file is locked or inaccessible
-            LOGGER.error("Error Called while changing the name of the file");
             LOGGER.error("ERROR MESSAGE FOR RENAMING THE FILE: {}", e.getMessage());
-//            dialogService.showErrorDialogAndWait("Renaming Failed.");
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Rename failed"),
-                    Localization.lang("JabRef cannot access the file because it is being used by another process."));
+            if (e instanceof FileSystemException fe) {
+                LOGGER.error(fe.getReason());
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Rename failed"),
+                        Localization.lang("JabRef could not rename the file. Please use a shorter filename or a shorter pattern or try changing the directory."));
+            } else {
+                // Display an error dialog if file is locked or inaccessible
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Rename failed"),
+                        Localization.lang("JabRef cannot access the file because it is being used by another process."));
+            }
         }
     }
 

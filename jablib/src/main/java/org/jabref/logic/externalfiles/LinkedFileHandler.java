@@ -200,7 +200,7 @@ public class LinkedFileHandler {
         }
 
         final Path oldPath = oldFile.get();
-        final Integer parentPathLength = oldPath.getParent() == null ? 0 : oldPath.getParent().toString().length();
+        final int parentPathLength = oldPath.getParent() == null ? 0 : oldPath.getParent().toString().length();
 
         LOGGER.debug("PARENT: {}", oldPath.getParent());
         Optional<String> oldExtension = FileUtil.getFileExtension(oldPath);
@@ -215,8 +215,6 @@ public class LinkedFileHandler {
                     targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, null, null);
                 }
             }
-
-            LOGGER.debug("TARGET FILE NAME FROM RENAMETONAME FUNCTION: {}", targetFileName);
             newPath = oldPath.resolveSibling(targetFileName);
 
             LOGGER.debug("NEW PATH WITH THE NEW FILENAME: {}", newPath);
@@ -261,6 +259,15 @@ public class LinkedFileHandler {
         return true;
     }
 
+    /// Helper function which truncates a file name for Windows if length (path + filename) exceeds the max windows
+    /// path limit.
+    ///
+    /// @param targetFileName proposed file name (may include an extension; only the base name is truncated)
+    /// @param parentLength   Length of the parent directory for the file being renamed
+    /// @param newExtension   extension from the target name (no leading "."), or null if the target has none
+    /// @param oldExtension   extension from the existing file when the target has no extension and the old extension is kept
+    ///
+    /// @return the shortened file name; includes {@code .extension} when {@code newExtension} is not {@code null}
     private String truncateFileNameOnWindows(String targetFileName, int parentLength, @Nullable String newExtension, @Nullable String oldExtension) {
         String baseName = FileUtil.getBaseName(targetFileName);
         LOGGER.debug("BASENAME: {}", baseName);
