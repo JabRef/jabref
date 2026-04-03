@@ -375,7 +375,14 @@ class JStyleGetCitationMarker {
             }
 
             StringBuilder pageInfoPart = new StringBuilder();
-            formatAuthorYearPageInfo(purpose, entry, pageInfoPart, pageInfoSeparator);
+            if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
+                Optional<OOText> pageInfo =
+                        PageInfo.normalizePageInfo(entry.getPageInfo());
+                if (pageInfo.isPresent()) {
+                    pageInfoPart.append(pageInfoSeparator);
+                    pageInfoPart.append(OOText.toString(pageInfo.get()));
+                }
+            }
 
             final boolean isUnresolved = entry.getLookupResult().isEmpty();
             if (isUnresolved) {
@@ -384,8 +391,41 @@ class JStyleGetCitationMarker {
                     stringBuilder.append(pageInfoPart);
                 }
             } else {
-                formatAuthorYearCitationEntry(style, purpose, maxAuthorsOverride, entry, andString, stringBuilder, yearSep, inParenthesis,
-                        startBrace, yearFieldNames, pageInfoPart, endingAGroup, endBrace);
+                CitationLookupResult db = entry.getLookupResult().get();
+
+                int maxAuthors = purpose == AuthorYearMarkerPurpose.NORMALIZED
+                                 ? style.getMaxAuthors()
+                                 : calculateNAuthorsToEmit(style, entry);
+
+                if (maxAuthorsOverride.isPresent()) {
+                    maxAuthors = maxAuthorsOverride.get();
+                }
+
+                AuthorList authorList = getAuthorList(style, db);
+                String authorString = formatAuthorList(style, authorList, maxAuthors, andString);
+                stringBuilder.append(authorString);
+                stringBuilder.append(yearSep);
+
+                if (!inParenthesis) {
+                    stringBuilder.append(startBrace); // parenthesis before year
+                }
+
+                String year = getCitationMarkerField(style, db, yearFieldNames);
+                if (year != null) {
+                    stringBuilder.append(year);
+                }
+
+                if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
+                    entry.getUniqueLetter().ifPresent(stringBuilder::append);
+                }
+
+                if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
+                    stringBuilder.append(pageInfoPart);
+                }
+
+                if (!inParenthesis && endingAGroup) {
+                    stringBuilder.append(endBrace);  // parenthesis after year
+                }
             }
         } // for j
 
@@ -394,60 +434,6 @@ class JStyleGetCitationMarker {
         }
         stringBuilder.append(style.getCitationGroupMarkupAfter());
         return OOText.fromString(stringBuilder.toString());
-    }
-
-    /// Helper method for getAuthorYearParenthesisMarker2(). Formats resolved citation entries.
-    private static void formatAuthorYearCitationEntry(JStyle style, AuthorYearMarkerPurpose purpose, Optional<Integer> maxAuthorsOverride,
-                                                      CitationMarkerEntry entry, String andString, StringBuilder stringBuilder, String yearSep,
-                                                      boolean inParenthesis, String startBrace, OrFields yearFieldNames, StringBuilder pageInfoPart,
-                                                      boolean endingAGroup, String endBrace) {
-        CitationLookupResult db = entry.getLookupResult().get();
-
-        int maxAuthors = purpose == AuthorYearMarkerPurpose.NORMALIZED
-                         ? style.getMaxAuthors()
-                         : calculateNAuthorsToEmit(style, entry);
-
-        if (maxAuthorsOverride.isPresent()) {
-            maxAuthors = maxAuthorsOverride.get();
-        }
-
-        AuthorList authorList = getAuthorList(style, db);
-        String authorString = formatAuthorList(style, authorList, maxAuthors, andString);
-        stringBuilder.append(authorString);
-        stringBuilder.append(yearSep);
-
-        if (!inParenthesis) {
-            stringBuilder.append(startBrace); // parenthesis before year
-        }
-
-        String year = getCitationMarkerField(style, db, yearFieldNames);
-        if (year != null) {
-            stringBuilder.append(year);
-        }
-
-        if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
-            entry.getUniqueLetter().ifPresent(stringBuilder::append);
-        }
-
-        if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
-            stringBuilder.append(pageInfoPart);
-        }
-
-        if (!inParenthesis && endingAGroup) {
-            stringBuilder.append(endBrace);  // parenthesis after year
-        }
-    }
-
-    /// Helper method for getAuthorYearParenthesisMarker2(). Normalizes page info.
-    private static void formatAuthorYearPageInfo(AuthorYearMarkerPurpose purpose, CitationMarkerEntry entry, StringBuilder pageInfoPart, String pageInfoSeparator) {
-        if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
-            Optional<OOText> pageInfo =
-                    PageInfo.normalizePageInfo(entry.getPageInfo());
-            if (pageInfo.isPresent()) {
-                pageInfoPart.append(pageInfoSeparator);
-                pageInfoPart.append(OOText.toString(pageInfo.get()));
-            }
-        }
     }
 
     /// Add / override methods for the purpose of creating a normalized citation marker.
