@@ -28,6 +28,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
+import org.jspecify.annotations.NonNull;
 
 /// This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
 /// It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
@@ -111,7 +112,8 @@ public class CSLCitationOOAdapter {
         if (isAlphanumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(entries, style,
+                    HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(citation);
@@ -132,7 +134,6 @@ public class CSLCitationOOAdapter {
             throws CreationException, com.sun.star.uno.Exception {
         setCitationStyleParameters(selectedStyle, CSLCitationType.IN_TEXT);
 
-        String style = selectedStyle.getSource();
         boolean isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();
 
@@ -140,32 +141,13 @@ public class CSLCitationOOAdapter {
         while (iterator.hasNext()) {
             BibEntry currentEntry = iterator.next();
 
-            String inTextCitation;
-
-            if (isAlphanumericStyle) {
-                inTextCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
-            } else {
-                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
-            }
-
-            String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
-            String finalText;
-
-            if (isNumericStyle) {
-                formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
-                String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, bibDatabaseContext);
-                finalText = prefix + formattedCitation;
-            } else if (isAlphanumericStyle) {
-                finalText = formattedCitation;
-            } else {
-                finalText = CSLFormatUtils.changeToInText(formattedCitation);
-            }
+            String formattedCitation = createInTextCitation(selectedStyle, isAlphanumericStyle, isNumericStyle, currentEntry, bibDatabaseContext);
 
             if (iterator.hasNext()) {
-                finalText += ",";
+                formattedCitation += ",";
             }
 
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
             insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle, CSLCitationType.IN_TEXT);
         }
     }
@@ -324,23 +306,7 @@ public class CSLCitationOOAdapter {
                     BibEntry currentEntry = iterator.next();
 
                     // We re-generate the citation in the new style and update it in the document
-                    String newCitation;
-
-                    if (isAlphaNumericStyle) {
-                        newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
-                    } else {
-                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
-                    }
-
-                    String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
-
-                    if (isNumericStyle) {
-                        formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
-                        String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, unifiedBibDatabaseContext);
-                        formattedCitation = prefix + formattedCitation;
-                    } else if (!isAlphaNumericStyle) {
-                        formattedCitation = CSLFormatUtils.changeToInText(formattedCitation);
-                    }
+                    String formattedCitation = createInTextCitation(style, isAlphaNumericStyle, isNumericStyle, currentEntry, unifiedBibDatabaseContext);
 
                     finalText.append(formattedCitation);
 
@@ -361,20 +327,47 @@ public class CSLCitationOOAdapter {
                                                      .toList();
 
                 // We re-generate the citation in the new style and update it in the document
-                String newCitation;
-
-                if (isAlphaNumericStyle) {
-                    newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
-                } else {
-                    newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
-                            HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
-                }
-
-                String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
+                String formattedCitation = createCitation(style, isAlphaNumericStyle, entries, unifiedBibDatabaseContext);
 
                 markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation, CSLCitationType.NORMAL);
             }
         }
+    }
+
+    /// Helper method for updateAllCitationsWithNewStyle and insertCitation.
+    private @NonNull String createCitation(CitationStyle style, boolean isAlphaNumericStyle, List<BibEntry> entries, BibDatabaseContext unifiedBibDatabaseContext) {
+        String citation;
+
+        if (isAlphaNumericStyle) {
+            citation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
+        } else {
+            citation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
+                    HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+        }
+
+        return CSLFormatUtils.transformHTML(citation);
+    }
+
+    ///  Helper method for updateAllCitationsWithNewStyle and insertInTextCitation.
+    private @NonNull String createInTextCitation(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
+        String citation;
+
+        if (isAlphaNumericStyle) {
+            citation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
+        } else {
+            citation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(),
+                    HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+        }
+
+        if (isNumericStyle) {
+            citation = updateSingleOrMultipleCitationNumbers(citation, List.of(currentEntry));
+            String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, bibDatabaseContext);
+            citation = prefix + citation;
+        } else if (!isAlphaNumericStyle) {
+            citation = CSLFormatUtils.changeToInText(citation);
+        }
+
+        return CSLFormatUtils.transformHTML(citation);
     }
 
     /// Checks if an entry has already been cited before in the document.
