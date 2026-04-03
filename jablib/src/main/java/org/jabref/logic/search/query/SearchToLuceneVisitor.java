@@ -88,17 +88,23 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     /// Currently, Lucene is used for files only. Metadata of the files is stored in the BibEntry.
     /// Thus, it does not make sense to search for "author" as field name as this is not stored in the Lucene index.
     private boolean isValidField(String field) {
+
+        // --- ADDED FOR #14249 ---
+        if ("date".equals(field) || "year".equals(field)) {
+            return true;
+        }
+        // ------------------------
         return "any".equals(field) || "anyfield".equals(field) || LinkedFilesConstants.PDF_FIELDS.contains(field);
     }
 
     private String buildFieldExpression(String field, String term, int operator, boolean isQuoted) {
-        // --- ADDED FOR SENG 371: DATE RANGE SUPPORT ---
+
+        // --- ADDED FOR #14249: DATE/RANGE SUPPORT ---
         if (operator == SearchParser.GEQUAL) return field + "[" + term + " TO *]";
         if (operator == SearchParser.LEQUAL) return field + "[* TO " + term + "]";
         if (operator == SearchParser.GT) return field + "{" + term + " TO *}";
         if (operator == SearchParser.LT) return field + "{* TO " + term + "}";
         // ----------------------------------------------
-
         boolean isRegexOp = isRegexOperator(operator);
         boolean isNegationOp = isNegationOperator(operator);
 

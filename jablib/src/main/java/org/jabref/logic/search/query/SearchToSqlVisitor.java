@@ -206,6 +206,18 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             setFlags(searchFlags, REGULAR_EXPRESSION, true, true);
         }
 
+        // --- ADDED FOR #14249 ---
+        else if (operator == SearchParser.GEQUAL) {
+            searchFlags.add(EXACT_MATCH); // We use EXACT_MATCH as a proxy for mathematical comparison
+        } else if (operator == SearchParser.LEQUAL) {
+            searchFlags.add(EXACT_MATCH);
+        } else if (operator == SearchParser.GT) {
+            searchFlags.add(EXACT_MATCH);
+        } else if (operator == SearchParser.LT) {
+            searchFlags.add(EXACT_MATCH);
+        }
+        // ------------------------
+
         // field = "" -> should find entries where the field is empty
         // field != "" -> should find entries where the field is not empty
         if (term.isEmpty()) {
@@ -215,6 +227,16 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                 searchFlags.add(NEGATION);
             }
         }
+
+        // --- ADDED FOR #14249 ---
+        if (operator == SearchParser.GEQUAL || operator == SearchParser.LEQUAL ||
+                operator == SearchParser.GT || operator == SearchParser.LT) {
+
+            String mathOp = getMathSqlOperator(operator);
+            // We bypass the standard builders to send a direct math comparison to SQL
+            return buildMathFieldQuery(field.toLowerCase(Locale.ROOT), mathOp, term);
+        }
+        // ------------------------
 
         return getFieldQueryNode(field.toLowerCase(Locale.ROOT), term, searchFlags);
     }
@@ -559,5 +581,37 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     /// - Escapes `\`, `_`, and `%` for SQL LIKE queries.
     private static String escapeTermForSql(String term) {
         return term.replaceAll("[\\\\_%]", "\\\\$0");
+    }
+
+
+    // --- ADDED FOR #14249 ---
+    private static String getMathSqlOperator(int operator) {
+        return switch (operator) {
+            case SearchParser.GEQUAL -> ">=";
+            case SearchParser.LEQUAL -> "<=";
+            case SearchParser.GT -> ">";
+            case SearchParser.LT -> "<";
+            default -> "=";
+        };
+    }
+
+    // --- ADDED FOR #14249 ---
+    private SqlQueryNode buildMathFieldQuery(String field, String operator, String term) {
+        String cte = """
+            cte%d AS (
+                SELECT %s.%s
+                FROM %s AS %s
+                WHERE (%s.%s = '%s') AND (%s.%s %s ?)
+            )
+            """.formatted(
+                cteCounter,
+                MAIN_TABLE, ENTRY_ID,
+                mainTableName, MAIN_TABLE,
+                MAIN_TABLE, FIELD_NAME, field,
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator);
+
+        SqlQueryNode node = new SqlQueryNode(cte, List.of(term));
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
     }
 }
