@@ -25,7 +25,8 @@ public class LinkedFileHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileHandler.class);
 
-    private static final Integer MAX_PATH_LENGTH_WINDOWS = 259;
+    private static final int MAX_PATH_LENGTH_WINDOWS = 259;
+    private static final int SEPERATOR_WINDOWS = 1;
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
@@ -278,13 +279,13 @@ public class LinkedFileHandler {
         if (newExtension != null) {
             extensionLength = newExtension.length();
             dot = 1;
-            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1)) + "." + newExtension;
+            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - SEPERATOR_WINDOWS)) + "." + newExtension;
         } else if (oldExtension != null) {
             extensionLength = oldExtension.length();
             dot = 1;
-            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1));
+            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - SEPERATOR_WINDOWS));
         } else {
-            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - 1));
+            fileName = baseName.substring(0, (MAX_PATH_LENGTH_WINDOWS - parentLength - extensionLength - dot - SEPERATOR_WINDOWS));
         }
         LOGGER.debug("NEW FILE NAME: {}", fileName);
 
