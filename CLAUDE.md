@@ -94,6 +94,18 @@ npx markdownlint-cli2 "*.md"
 
 ---
 
+## Architecture decisions (MADR)
+
+When a significant design or implementation decision is made, create a new MADR in `docs/decisions/`:
+
+1. Copy `docs/decisions/adr-template.md` to `docs/decisions/<NNNN>-<short-title>.md` (next free number).
+2. Fill in **Context and Problem Statement**, **Considered Options**, and **Decision Outcome**.
+3. Add an entry to `docs/decisions/index.md`.
+
+See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.md) for the rationale and [adr-template.md](docs/decisions/adr-template.md) for the full template.
+
+---
+
 ## Developer documentation
 
 - [devdocs.jabref.org](https://devdocs.jabref.org/) — full developer reference
