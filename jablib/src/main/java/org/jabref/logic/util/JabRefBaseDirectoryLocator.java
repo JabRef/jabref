@@ -3,6 +3,7 @@ package org.jabref.logic.util;
 import java.nio.file.Path;
 import java.util.Locale;
 
+// Locate and return base directory.
 public class JabRefBaseDirectoryLocator {
 
     public static Path getBaseDirectoryPath() {
