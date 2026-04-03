@@ -445,6 +445,7 @@ PR descriptions:
 ### Developer documentation
 
 When changing behaviour or adding features, update the relevant files under `docs/`.
+For complex flows or new architecture, consider adding a Mermaid sequence or class diagram to the relevant `docs/` file.
 
 - [devdocs.jabref.org](https://devdocs.jabref.org/) — full developer reference. Resides in `docs/`
 - `docs/getting-into-the-code/` — workspace setup, code style, IntelliJ config
