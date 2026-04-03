@@ -320,7 +320,34 @@ public class CSLCitationOOAdapter {
                 StringBuilder finalText = new StringBuilder();
                 Iterator<BibEntry> iterator = entries.iterator();
 
-                updateCitations(style, iterator, unifiedBibDatabaseContext, finalText);
+                while (iterator.hasNext()) {
+                    BibEntry currentEntry = iterator.next();
+
+                    // We re-generate the citation in the new style and update it in the document
+                    String newCitation;
+
+                    if (isAlphaNumericStyle) {
+                        newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
+                    } else {
+                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+                    }
+
+                    String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
+
+                    if (isNumericStyle) {
+                        formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
+                        String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, unifiedBibDatabaseContext);
+                        formattedCitation = prefix + formattedCitation;
+                    } else if (!isAlphaNumericStyle) {
+                        formattedCitation = CSLFormatUtils.changeToInText(formattedCitation);
+                    }
+
+                    finalText.append(formattedCitation);
+
+                    if (iterator.hasNext()) {
+                        finalText.append(",");
+                    }
+                }
 
                 markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString(), CSLCitationType.IN_TEXT);
             }
@@ -346,46 +373,6 @@ public class CSLCitationOOAdapter {
                 String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
 
                 markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation, CSLCitationType.NORMAL);
-            }
-        }
-    }
-
-    /// Helper method for updateAllCitationsWithNewStyle.
-    ///
-    /// @param style                     The current style we are using.
-    /// @param iterator                  Used to iterate through entries.
-    /// @param unifiedBibDatabaseContext Used to generate citations.
-    /// @param finalText                 Resulting text for updated citations.
-    private void updateCitations(CitationStyle style, Iterator<BibEntry> iterator, BibDatabaseContext unifiedBibDatabaseContext, StringBuilder finalText) {
-        boolean isAlphaNumericStyle = style.isAlphanumericStyle();
-        boolean isNumericStyle = style.isNumericStyle();
-
-        while (iterator.hasNext()) {
-            BibEntry currentEntry = iterator.next();
-
-            // We re-generate the citation in the new style and update it in the document
-            String newCitation;
-
-            if (isAlphaNumericStyle) {
-                newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
-            } else {
-                newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
-            }
-
-            String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
-
-            if (isNumericStyle) {
-                formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
-                String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, unifiedBibDatabaseContext);
-                formattedCitation = prefix + formattedCitation;
-            } else if (!isAlphaNumericStyle) {
-                formattedCitation = CSLFormatUtils.changeToInText(formattedCitation);
-            }
-
-            finalText.append(formattedCitation);
-
-            if (iterator.hasNext()) {
-                finalText.append(",");
             }
         }
     }
