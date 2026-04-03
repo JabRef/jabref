@@ -352,10 +352,10 @@ public class CSLCitationOOAdapter {
 
     /// Helper method for updateAllCitationsWithNewStyle.
     ///
-    /// @param style                      The current style we are using.
-    /// @param iterator                   Used to iterate through entries.
-    /// @param unifiedBibDatabaseContext  Used to generate citations.
-    /// @param finalText                  Resulting text for updated citations.
+    /// @param style                     The current style we are using.
+    /// @param iterator                  Used to iterate through entries.
+    /// @param unifiedBibDatabaseContext Used to generate citations.
+    /// @param finalText                 Resulting text for updated citations.
     private void updateCitations(CitationStyle style, Iterator<BibEntry> iterator, BibDatabaseContext unifiedBibDatabaseContext, StringBuilder finalText) {
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
         boolean isNumericStyle = style.isNumericStyle();
