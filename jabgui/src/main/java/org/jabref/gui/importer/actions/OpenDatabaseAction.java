@@ -49,6 +49,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.logic.util.JabRefBaseDirectoryLocator.getBaseDirectoryPath;
+
 /// The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
@@ -178,12 +180,33 @@ public class OpenDatabaseAction extends SimpleCommand {
         int initialCount = resolvedFiles.size();
         int removed = 0;
 
+        Path baseDirectoryPath = getBaseDirectoryPath();
+        FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
+
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = resolvedFiles.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
+
+            if (!file.isAbsolute() && baseDirectoryPath != null) {
+                try {
+                    file = baseDirectoryPath.relativize(file);
+                } catch (IllegalArgumentException e) {
+                    file = file.toAbsolutePath();
+                }
+            }
+
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
+                    if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath != null) {
+                        try {
+                            file = baseDirectoryPath.relativize(file);
+                        } catch (IllegalArgumentException e) {
+                            file = file.toAbsolutePath();
+                        }
+                    }
+
+                    fileHistory.newFile(file);
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -201,30 +224,18 @@ public class OpenDatabaseAction extends SimpleCommand {
         // locking until the file is loaded.
         if (!resolvedFiles.isEmpty()) {
             assert fileUpdateMonitor != null;
-            FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
             resolvedFiles.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
-                if (preferences.getInternalPreferences().isMemoryStickMode()) {
-                    try {
-                        /* --- Do not know how to find executable path ---- */
-                        Path jabRefExecutable = Path.of(
-                                Launcher.class
-                                        .getProtectionDomain()
-                                        .getCodeSource()
-                                        .getLocation()
-                                        .toURI()
-                        ).getParent();
-                        /* ------------------------------------------------ */
+                openTheFile(theFile);
 
-                        if (theFile.startsWith(jabRefExecutable)) {
-                            theFile = jabRefExecutable.relativize(theFile);
-                        }
-                    } catch (URISyntaxException e) {
-                        // Fall back to absolute path
+                if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath != null) {
+                    try {
+                        theFile = baseDirectoryPath.relativize(theFile);
+                    } catch (IllegalArgumentException e) {
+                        theFile = theFile.toAbsolutePath();
                     }
                 }
 
-                openTheFile(theFile);
                 fileHistory.newFile(theFile);
             });
         } else if (toRaise != null && tabContainer.getCurrentLibraryTab() == null) {

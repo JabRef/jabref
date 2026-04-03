@@ -14,6 +14,8 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
 
+import static org.jabref.logic.util.JabRefBaseDirectoryLocator.getBaseDirectoryPath;
+
 public class FileHistoryMenu extends Menu {
 
     protected final MenuItem clearRecentLibraries;
@@ -89,6 +91,11 @@ public class FileHistoryMenu extends Menu {
     }
 
     public void openFile(Path file) {
+        Path baseDirectoryPath = getBaseDirectoryPath();
+        if (!file.isAbsolute() && baseDirectoryPath != null) {
+            file = baseDirectoryPath.resolve(file).normalize();
+        }
+
         if (!Files.exists(file)) {
             this.dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
