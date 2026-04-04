@@ -209,7 +209,7 @@ public class LinkedFileHandler {
 
         Path newPath;
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
-            if (OS.WINDOWS && (parentPathLength + targetFileName.length() + SEPERATOR_WINDOWS) >= MAX_PATH_LENGTH_WINDOWS) {
+            if (OS.WINDOWS && (parentPathLength + targetFileName.length() + SEPERATOR_WINDOWS) > MAX_PATH_LENGTH_WINDOWS) {
                 if (newExtension.isPresent()) {
                     targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, newExtension.get(), null);
                 } else {
@@ -221,7 +221,7 @@ public class LinkedFileHandler {
             LOGGER.debug("NEW PATH WITH THE NEW FILENAME: {}", newPath);
         } else {
             assert oldExtension.isPresent() && newExtension.isEmpty();
-            if (OS.WINDOWS && (parentPathLength + targetFileName.length() + SEPERATOR_WINDOWS) >= MAX_PATH_LENGTH_WINDOWS) {
+            if (OS.WINDOWS && (parentPathLength + targetFileName.length() + SEPERATOR_WINDOWS) > MAX_PATH_LENGTH_WINDOWS) {
                 targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, null, oldExtension.get());
             }
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
