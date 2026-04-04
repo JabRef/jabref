@@ -139,7 +139,7 @@ public class MetaDataParser {
                     try {
                         metaData.setJournalAbbreviationCleanup(CleanupPreferences.CleanupStep.valueOf(values.getFirst()));
                     } catch (IllegalArgumentException e) {
-                        LOGGER.warn("Unrecognized Cleanup step: {}. Skipp.", values.getFirst(), e);
+                        LOGGER.warn("Unrecognized Cleanup step skipped: {}", values.getFirst(), e);
                     }
                 }
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
@@ -279,7 +279,7 @@ public class MetaDataParser {
                 try {
                     steps.add(CleanupPreferences.CleanupStep.valueOf(stringStep));
                 } catch (IllegalArgumentException e) {
-                    LOGGER.warn("Unrecognized Cleanup step: {}. Skipp.", stringStep, e);
+                    LOGGER.warn("Unrecognized Cleanup step skipped: {}", stringStep, e);
                 }
             }
             return steps;
