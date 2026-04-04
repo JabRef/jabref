@@ -33,8 +33,8 @@ public class SearchCitationsRelationsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchCitationsRelationsService.class);
 
-    private CitationFetcher citationFetcher;
-    private CitationCountFetcher citationCountFetcher;
+    private volatile CitationFetcher citationFetcher;
+    private volatile CitationCountFetcher citationCountFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences,
@@ -145,6 +145,14 @@ public class SearchCitationsRelationsService {
         }
         assert actualFieldValue.isPresent();
         return Integer.parseInt(actualFieldValue.get());
+    }
+
+    public boolean isReferencesUpdatable(BibEntry entry) {
+        return relationsRepository.isReferencesUpdatable(entry);
+    }
+
+    public boolean isCitationsUpdatable(BibEntry entry) {
+        return relationsRepository.isCitationsUpdatable(entry);
     }
 
     public void close() {

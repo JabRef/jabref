@@ -433,6 +433,34 @@ class FileUtilTest {
     }
 
     @Test
+    void isShortcutFileReturnsTrueForPathEndingInLnk() {
+        assertTrue(FileUtil.isShortcutFile(Path.of("test.lnk")));
+    }
+
+    @Test
+    void isShortcutFileReturnsTrueForPathEndingInLnkCaseInsensitive() {
+        assertTrue(FileUtil.isShortcutFile(Path.of("test.LNK")));
+    }
+
+    @Test
+    void isShortcutFileReturnsFalseForPathEndingInBib() {
+        assertFalse(FileUtil.isShortcutFile(Path.of("test.bib")));
+    }
+
+    @Test
+    void resolveIfShortcutReturnsOriginalPathWhenFileIsNotShortcut() {
+        Path path = Path.of("test.bib");
+        assertEquals(path, FileUtil.resolveIfShortcut(path));
+    }
+
+    @Test
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Shortcut resolution only supported on Windows")
+    void resolveIfShortcutReturnsOriginalPathOnNonWindowsOs() {
+        Path path = Path.of("test.lnk");
+        assertEquals(path, FileUtil.resolveIfShortcut(path));
+    }
+
+    @Test
     void findInPath() {
         Optional<Path> resultPath1 = FileUtil.findSingleFileRecursively("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());
