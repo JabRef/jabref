@@ -42,7 +42,7 @@ class BracketedPatternTest {
 
         romanentry = new BibEntry().withField(StandardField.AUTHOR, "O. Kitsune")
                                  .withField(StandardField.YEAR, "2017")
-                                 .withField(StandardField.PAGES, "XX--ivS");
+                                 .withField(StandardField.PAGES, "SXX--ivS");
 
         dbentry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("HipKro03")
@@ -436,9 +436,15 @@ class BracketedPatternTest {
     }
 
     @Test
-    void bibentryRomanExpansionTest() {
+    void bibentryRomanExpansionFirsPageTest() {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_iv", pattern.expand(romanentry));
+    }
+
+    @Test
+    void bibentryRomanExpansionLastPageTest() {
+        BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[lastpage]");
+        assertEquals("2017_Kitsune_XX", pattern.expand(romanentry));
     }
 
     @Test

@@ -1043,24 +1043,27 @@ public class BracketedPattern {
     /// @throws NullPointerException if pages is null
     public static String firstPage(String pages) {
         Objects.requireNonNull(pages);
+        return getPageNumberTokens(pages).stream()
+                                         .min(pageTokenComparator())
+                                         .orElse("");
+    }
 
-        Pattern pattern = Pattern.compile(PagesChecker.PAGE_NUMBER); // decimal or roman
-        Matcher matcher = pattern.matcher(pages);
-
-        List<String> numberTokens = new ArrayList<>();
+    private static List<String> getPageNumberTokens(String pages) {
+        Matcher matcher = Pattern.compile(PagesChecker.PAGE_NUMBER).matcher(pages);
+        List<String> tokens = new ArrayList<>();
         while (matcher.find()) {
-            numberTokens.add(matcher.group());
+            tokens.add(matcher.group());
         }
+        return tokens;
+    }
 
-        return numberTokens.stream()
-                     .min(Comparator.comparing(token -> {
-                         if (token.matches("\\d+")) {
-                             return new BigInteger(token);
-                         } else {
-                             return BigInteger.valueOf(romanToInteger(token));
-                         }
-                     }))
-                     .orElse("");
+    private static Comparator<String> pageTokenComparator() {
+        return Comparator.comparing(token -> {
+            if (token.matches("\\d+")) {
+                return new BigInteger(token);
+            }
+            return BigInteger.valueOf(romanToInteger(token));
+        });
     }
 
     private static int romanToInteger(String s) {
@@ -1096,16 +1099,14 @@ public class BracketedPattern {
 
     /// Split the pages field into separate numbers and return the highest
     ///
-    /// @param pages a pages string such as 42--111 or 7,41,73--97 or 43+
+    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97, 43+ or iv--xx
     /// @return the first page number or "" if no number is found in the string
     /// @throws NullPointerException if pages is null.
     public static String lastPage(String pages) {
-        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
-                                .filter(Predicate.not(String::isBlank))
-                                .map(BigInteger::new)
-                                .max(BigInteger::compareTo)
-                                .map(BigInteger::toString)
-                                .orElse("");
+        Objects.requireNonNull(pages);
+        return getPageNumberTokens(pages).stream()
+                                         .max(pageTokenComparator())
+                                         .orElse("");
     }
 
     /// Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
