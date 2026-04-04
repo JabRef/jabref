@@ -3,6 +3,7 @@ package org.jabref.logic.util.io;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.ModifiableObservableListBase;
 
@@ -54,21 +55,21 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     public void removeItem(Path file) {
         this.remove(file);
 
-        Path baseDirectoryPath = getBaseDirectoryPath();
-        if (baseDirectoryPath == null) {
+        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
+        if (baseDirectoryPath.isEmpty()) {
             return;
         }
 
         if (file.isAbsolute()) {
             try {
-                this.remove(baseDirectoryPath.relativize(file).normalize());
+                this.remove(baseDirectoryPath.get().relativize(file).normalize());
             } catch (IllegalArgumentException e) {
                 return;
             }
             return;
         }
 
-        this.remove(baseDirectoryPath.resolve(file).normalize());
+        this.remove(baseDirectoryPath.get().resolve(file).normalize());
     }
 
     public static FileHistory of(List<Path> list) {

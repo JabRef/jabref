@@ -178,23 +178,23 @@ public class OpenDatabaseAction extends SimpleCommand {
         int initialCount = resolvedFiles.size();
         int removed = 0;
 
-        Path baseDirectoryPath = getBaseDirectoryPath();
+        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
         FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
 
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = resolvedFiles.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
 
-            if (!file.isAbsolute() && baseDirectoryPath != null) {
-                file = baseDirectoryPath.resolve(file).normalize();
+            if (!file.isAbsolute() && baseDirectoryPath.isPresent()) {
+                file = baseDirectoryPath.get().resolve(file).normalize();
             }
 
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
-                    if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath != null) {
+                    if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath.isPresent()) {
                         try {
-                            file = baseDirectoryPath.relativize(file).normalize();
+                            file = baseDirectoryPath.get().relativize(file).normalize();
                         } catch (IllegalArgumentException e) {
                             file = file.normalize();
                         }
@@ -222,9 +222,9 @@ public class OpenDatabaseAction extends SimpleCommand {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
 
-                if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath != null) {
+                if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath.isPresent()) {
                     try {
-                        theFile = baseDirectoryPath.relativize(theFile).normalize();
+                        theFile = baseDirectoryPath.get().relativize(theFile).normalize();
                     } catch (IllegalArgumentException e) {
                         theFile = theFile.normalize();
                     }

@@ -2,6 +2,7 @@ package org.jabref.gui.frame;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.scene.control.Menu;
@@ -91,9 +92,9 @@ public class FileHistoryMenu extends Menu {
     }
 
     public void openFile(Path file) {
-        Path baseDirectoryPath = getBaseDirectoryPath();
-        if (!file.isAbsolute() && baseDirectoryPath != null) {
-            file = baseDirectoryPath.resolve(file).normalize();
+        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
+        if (!file.isAbsolute() && baseDirectoryPath.isPresent()) {
+            file = baseDirectoryPath.get().resolve(file).normalize();
         }
 
         if (!Files.exists(file)) {
