@@ -753,6 +753,18 @@ class SearchQuerySQLConversionTest {
                                     WHERE (main_table.field_name = 'year') AND (main_table.field_value_literal <= ('2010'))
                                 )
                                 SELECT * FROM cte0 GROUP BY entryid"""
+                ),
+
+                Arguments.of(
+                        "date > 2020-01-01",
+                        """
+                                WITH
+                                cte0 AS (
+                                    SELECT main_table.entryid
+                                    FROM bib_fields."tableName" AS main_table
+                                    WHERE (main_table.field_name = 'date') AND (main_table.field_value_literal > ('2020-01-01'))
+                                )
+                                SELECT * FROM cte0 GROUP BY entryid"""
                 )
         );
     }
@@ -925,18 +937,6 @@ class SearchQuerySQLConversionTest {
                                     FROM cte1
                                 )
                                 SELECT * FROM cte2 GROUP BY entryid"""
-                ),
-
-                Arguments.of(
-                        "date > 2020-01-01",
-                        """
-                                WITH
-                                cte0 AS (
-                                    SELECT main_table.entryid
-                                    FROM bib_fields."tableName" AS main_table
-                                    WHERE (main_table.field_name = 'date') AND (main_table.field_value_literal > ('2020-01-01'))
-                                )
-                                SELECT * FROM cte0 GROUP BY entryid"""
                 )
         );
     }
