@@ -461,6 +461,11 @@ jobs:
           files_ignore: |
             jablib/src/main/java/**/*-*.java
       - uses: ./.github/actions/setup-gradle
+
+        # --- ADD THIS STEP ---
+      - name: Generate ANTLR sources (Search.g4)
+        run: ./gradlew :jablib:generateGrammarSource
+        # ---------------------
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
