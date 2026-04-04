@@ -47,7 +47,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
                 new RelatedWorkReferenceResolver(),
                 new DuplicateCheck(entryTypesManager)
         );
-        this.matchedResults = List.copyOf(matchedResults);
+        this.matchedResults = matchedResults;
         matchedReferences.setAll(this.matchedResults);
     }
 
