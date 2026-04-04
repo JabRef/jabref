@@ -198,9 +198,9 @@ public class EditMerge {
 
     /// Helper method for checkAddToGroup. Tries to expand state.currentGroupCursor and state.cursorBetween by going right to reach rangeStart.
     ///
-    /// @param state          The CitationGroup to test.
-    /// @param currentRange   The XTextRange corresponding to group.
-    /// @param loggerMessage  The failure message for the LOGGER.
+    /// @param state         The CitationGroup to test.
+    /// @param currentRange  The XTextRange corresponding to group.
+    /// @param loggerMessage The failure message for the LOGGER.
     /// @return false if cannot expand, true if can.
     private static boolean checkCouldExpand(ScanState state, XTextRange currentRange, String loggerMessage) {
         XTextRange rangeStart = currentRange.getStart();
