@@ -15,13 +15,14 @@ public class PagesChecker implements ValueChecker {
     private static final String PAGE_NUMBER = "\\d+";
     private static final String PAGE = PAGE_AFFIX + PAGE_NUMBER + PAGE_AFFIX;
 
-    private static final String FOLLOWING_PAGES_INDICATOR = "\\+";
+    private static final String SEQUENS_AND_SEQUENTES = "(f{1,2}|sq{1,2})\\.?";
+    private static final String PAGE_CONTINUATION_MODIFIER = "(\\+|\\s*" + SEQUENS_AND_SEQUENTES + ")";
 
     private static final String BIBTEX_SEPARATOR = "(-{2}|\u2013)";      // separator, must contain exactly two dashes
     private static final String PAGE_RANGE_BIBTEX = "("
             + PAGE + BIBTEX_SEPARATOR + PAGE
             + "|"
-            + PAGE + FOLLOWING_PAGES_INDICATOR
+            + PAGE + PAGE_CONTINUATION_MODIFIER
             + ")";
 
     private static final String PAGES_EXP_BIBTEX =
@@ -35,7 +36,7 @@ public class PagesChecker implements ValueChecker {
     private static final String PAGE_RANGE_BIBLATEX = "("
             + PAGE + BIBLATEX_SEPARATOR + PAGE
             + "|"
-            + PAGE + FOLLOWING_PAGES_INDICATOR
+            + PAGE + PAGE_CONTINUATION_MODIFIER
             + ")";
 
     // See https://packages.oth-regensburg.de/ctan/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsubsection.3.15.3 for valid content
