@@ -1086,15 +1086,19 @@ public class BracketedPattern {
 
     /// Return the non-digit prefix of pages
     ///
-    /// @param pages a pages string such as L42--111 or L7,41,73--97 or L43+
+    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97, 43+ or iv--xx
     /// @return the non-digit prefix of pages (like "L" of L7) or "" if no non-digit prefix is found in the string
     /// @throws NullPointerException if pages is null.
     public static String pagePrefix(String pages) {
-        if (pages.matches("^\\D+.*$")) {
-            return (pages.split("\\d+"))[0];
-        } else {
-            return "";
+        Objects.requireNonNull(pages);
+
+        Matcher matcher = Pattern.compile(PagesChecker.PAGE_NUMBER).matcher(pages);
+
+        if (matcher.find()) {
+            return pages.substring(0, matcher.start());
         }
+
+        return "";
     }
 
     /// Split the pages field into separate numbers and return the highest
