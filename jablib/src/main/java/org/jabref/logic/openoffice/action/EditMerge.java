@@ -141,7 +141,6 @@ public class EditMerge {
             return false;
         }
 
-        final String exceptionTitle = "MergeCitationGroups failed";
         final String loggerMessage = "MergeCitationGroups: cursorBetween.end != currentGroupCursor.end";
 
         Objects.requireNonNull(state.currentGroupCursor);
@@ -191,10 +190,10 @@ public class EditMerge {
         // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
         if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
             LOGGER.warn(loggerMessage);
-            throw new IllegalStateException(exceptionTitle);
+            return false;
         }
 
-        return checkCouldExpand(state, currentRange, loggerMessage, exceptionTitle);
+        return checkCouldExpand(state, currentRange, loggerMessage);
     }
 
     /// Helper method for checkAddToGroup. Tries to expand state.currentGroupCursor and state.cursorBetween by going right to reach rangeStart.
@@ -202,9 +201,8 @@ public class EditMerge {
     /// @param state          The CitationGroup to test.
     /// @param currentRange   The XTextRange corresponding to group.
     /// @param loggerMessage  The failure message for the LOGGER.
-    /// @param exceptionTitle The custom exception message.
     /// @return false if cannot expand, true if can.
-    private static boolean checkCouldExpand(ScanState state, XTextRange currentRange, String loggerMessage, String exceptionTitle) {
+    private static boolean checkCouldExpand(ScanState state, XTextRange currentRange, String loggerMessage) {
         XTextRange rangeStart = currentRange.getStart();
         boolean couldExpand = true;
         XTextCursor thisCharCursor =
@@ -230,7 +228,7 @@ public class EditMerge {
             // These two should move in sync:
             if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
                 LOGGER.warn(loggerMessage + " (during expand)");
-                throw new IllegalStateException(exceptionTitle);
+                return false;
             }
         }
         return couldExpand;
@@ -264,7 +262,7 @@ public class EditMerge {
 
         if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
             LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
-            throw new IllegalStateException("MergeCitationGroups failed");
+            return;
         }
 
         /* Store data about last entry in currentGroup */
