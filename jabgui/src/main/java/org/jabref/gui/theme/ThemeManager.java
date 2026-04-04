@@ -220,13 +220,13 @@ public class ThemeManager {
         }
 
         if (theme.equals(this.theme)) {
-            LOGGER.info("Not updating theme because it hasn't changed");
+            LOGGER.debug("Not updating theme because it hasn't changed");
         } else {
             this.theme.getAdditionalStylesheet().ifPresent(this::removeStylesheetFromWatchList);
         }
 
         this.theme = theme;
-        LOGGER.info("Theme set to {} with base css {}", theme, baseStyleSheet);
+        LOGGER.debug("Theme set to {} with base css {}", theme, baseStyleSheet);
 
         boolean isDarkTheme = Theme.EMBEDDED_DARK_CSS.equals(theme.getName());
         if (this.isDarkMode != isDarkTheme) {
