@@ -437,18 +437,32 @@ jobs:
   jbang-pr:
     name: JBang (PR)
     runs-on: ubuntu-slim
-    # does not need publish, because the JBang scripts are modified
     if: github.ref != 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
-        script: [ .jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java ]
+        script:
+          - .jbang/JabKitLauncher.java
+          - .jbang/JabLsLauncher.java
+          - .jbang/JabSrvLauncher.java
+          - jablib-examples/jbang/doi_to_bibtex.java
+          - jablib-examples/jbang/ieee_pdf_references_to_bibtex.java
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
           submodules: 'false'
           show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'corretto'
+          check-latest: true
+
       - name: Detect changed jablib classes
         id: changed-jablib-files
         uses: tj-actions/changed-files@v47
@@ -460,52 +474,66 @@ jobs:
             jablib-examples/jbang/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
-      - uses: ./.github/actions/setup-gradle
 
-        # --- ADD THIS STEP ---
       - name: Generate ANTLR sources (Search.g4)
         run: ./gradlew :jablib:generateGrammarSource
-        # ---------------------
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'corretto'
-          check-latest: true
-      - name: Modify ${{ matrix.script }} to include changed classes
+
+      - name: Expose generated ANTLR sources to JBang
         shell: bash
-        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
         run: |
-          # We modify the JBang scripts directly to avoid issues with relative paths
+          GEN_DIR="jablib/build/generated-src/antlr/main"
+          if [ ! -d "$GEN_DIR" ]; then
+            echo "Expected generated ANTLR dir not found: $GEN_DIR"
+            find jablib -maxdepth 6 -type d | sort
+            exit 1
+          fi
+          rm -rf .generated-antlr
+          mkdir -p .generated-antlr
+          cp -R "$GEN_DIR"/. .generated-antlr/
+          echo "Generated ANTLR sources copied to .generated-antlr"
+
+      - name: Modify ${{ matrix.script }} to include changed classes (and generated ANTLR)
+        shell: bash
+        run: |
+          # Append changed sources (existing behavior)
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             case "$f" in
-              .jbang/*)
-                # skip scripts
-                continue
-                ;;
-              jablib-examples/*)
-                # skip scripts
-                continue
-                ;;
+              .jbang/*) continue ;;
+              jablib-examples/*) continue ;;
               jabkit/*)
-                # only JabKit needs its modified sources if jabkit was modified
                 if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
                   continue
                 fi
                 ;;
             esac
+
             if [[ "${{ matrix.script }}" == .jbang/* ]]; then
               echo "//SOURCES ../$f" >> "${{ matrix.script }}"
             else
               echo "//SOURCES ../../$f" >> "${{ matrix.script }}"
             fi
           done
+
+          # Append generated parser/lexer so SearchParser has GEQUAL/LEQUAL/GT/LT
+          if [[ "${{ matrix.script }}" == .jbang/* ]]; then
+            prefix="../.generated-antlr"
+          else
+            prefix="../../.generated-antlr"
+          fi
+
+          echo "//SOURCES ${prefix}/org/jabref/search/SearchLexer.java" >> "${{ matrix.script }}"
+          echo "//SOURCES ${prefix}/org/jabref/search/SearchParser.java" >> "${{ matrix.script }}"
+          echo "//SOURCES ${prefix}/org/jabref/search/SearchBaseVisitor.java" >> "${{ matrix.script }}"
+          echo "//SOURCES ${prefix}/org/jabref/search/SearchVisitor.java" >> "${{ matrix.script }}"
+
       - run: cat ${{ matrix.script }}
       - run: jbang build "${{ matrix.script }}"
         shell: bash
+
       - run: jbang "${{ matrix.script }}" --help
         if: ${{ contains(matrix.script, 'Launcher.java') }}
         shell: bash
+
 
   maven-examples:
     name: Maven examples
