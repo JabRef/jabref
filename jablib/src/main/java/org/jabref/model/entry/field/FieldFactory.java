@@ -75,12 +75,11 @@ public class FieldFactory {
                 if (fieldProperties.length == 0) {
                     return new UnknownField(unknownFieldName);
                 } else {
-                    FieldProperty firstProperty = FieldProperty.valueOf(fieldProperties[0]);
-                    FieldProperty[] restProperties = Arrays.stream(fieldProperties, 1, fieldProperties.length)
+                    List<FieldProperty> properties = Arrays.stream(fieldProperties)
                                                            .map(FieldProperty::valueOf)
-                                                           .toArray(FieldProperty[]::new);
+                                                           .toList();
 
-                    return new UnknownField(unknownFieldName, firstProperty, restProperties);
+                    return new UnknownField(unknownFieldName, properties);
                 }
             }
         }
