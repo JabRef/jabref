@@ -545,7 +545,7 @@ public class OOBibBase {
         }
 
         if (style instanceof JStyle jStyle) {
-            if(testDialog(errorTitle,
+            if (testDialog(errorTitle,
                     checkStylesExistInTheDocument(jStyle, doc),
                     checkIfOpenOfficeIsRecordingChanges(doc))) {
                 return;

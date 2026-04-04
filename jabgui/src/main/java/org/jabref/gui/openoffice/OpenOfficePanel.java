@@ -467,7 +467,7 @@ public class OpenOfficePanel {
             } catch (WrappedTargetException
                      | NoSuchElementException e) {
                 LOGGER.warn("Unable to connect to document", e);
-                OOError.fromMisc(e).setTitle("Unable to connect to document").showErrorDialog(dialogService);
+                OOError.fromMisc(e).showErrorDialog(dialogService);
                 return;
             }
 
