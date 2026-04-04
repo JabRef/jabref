@@ -95,6 +95,10 @@ public class FileHistoryMenu extends Menu {
         Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
         if (!file.isAbsolute() && baseDirectoryPath.isPresent()) {
             file = baseDirectoryPath.get().resolve(file).normalize();
+            if (!file.startsWith(baseDirectoryPath.get())) {
+                // reject or ignore unsafe path
+                return;
+            }
         }
 
         if (!Files.exists(file)) {
