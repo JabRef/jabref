@@ -1,21 +1,20 @@
 package org.jabref.logic.util;
 
 import java.nio.file.Path;
-import java.util.Locale;
+
+import org.jabref.logic.os.OS;
 
 // Locate and return base directory.
 public class JabRefBaseDirectoryLocator {
 
     public static Path getBaseDirectoryPath() {
         String appPath = System.getProperty("jpackage.app-path");
-        String os = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);
-
         if (appPath == null) {
             return null;
         }
 
         Path jabRefBaseDirectory = Path.of(appPath);
-        if (os.contains("mac")) {
+        if (OS.OS_X) {
             while (jabRefBaseDirectory != null && !jabRefBaseDirectory.getFileName().toString().endsWith(".app")) {
                 jabRefBaseDirectory = jabRefBaseDirectory.getParent();
             }
