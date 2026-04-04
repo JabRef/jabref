@@ -196,8 +196,8 @@ public class IndexManager {
                     new BackgroundTask<>() {
                         @Override
                         public Object call() {
-                            for (Field f : fieldsSnapshot) {
-                                bibFieldsIndexer.updateEntry(pendingEntry, f);
+                            for (Field snapshot : fieldsSnapshot) {
+                                bibFieldsIndexer.updateEntry(pendingEntry, snapshot);
                             }
                             return null;
                         }
