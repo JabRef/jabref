@@ -72,23 +72,6 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
         this.remove(baseDirectoryPath.get().resolve(file).normalize());
     }
 
-    public void updateItems(boolean memoryStickMode) {
-        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
-        if (baseDirectoryPath.isEmpty()) {
-            return;
-        }
-
-        for (int i = 0; i < size(); i++) {
-            Path file = this.get(i);
-
-            if (memoryStickMode && file.isAbsolute()) {
-                this.doSet(i, baseDirectoryPath.get().relativize(file));
-            } else if (!memoryStickMode && !file.isAbsolute()) {
-                this.doSet(i, baseDirectoryPath.get().resolve(file));
-            }
-        }
-    }
-
     public static FileHistory of(List<Path> list) {
         return new FileHistory(new ArrayList<>(list));
     }
