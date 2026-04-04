@@ -312,7 +312,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             }
         }
 
-        //NamedRangeReferenceMark.checkFillCursor(beta);
+        // NamedRangeReferenceMark.checkFillCursor(beta);
         return beta;
     }
 
