@@ -78,6 +78,8 @@ public class FieldViewModel {
         }
         if (multiline.getValue()) {
             field.getProperties().add(FieldProperty.MULTILINE_TEXT);
+        } else {
+            field.getProperties().remove(FieldProperty.MULTILINE_TEXT);
         }
         return field;
     }
