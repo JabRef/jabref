@@ -27,7 +27,11 @@ public class GitFileWriter {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
 
-                BibDatabaseWriter writer = new BibDatabaseWriter(bibWriter, saveConfiguration, cliPreferences, new BibEntryTypesManager(), journalAbbreviationRepository);
+                BibDatabaseWriter writer = new BibDatabaseWriter(bibWriter,
+                        saveConfiguration,
+                        cliPreferences,
+                        new BibEntryTypesManager(),
+                        journalAbbreviationRepository);
                 writer.writeDatabase(bibDatabaseContext);
 
                 if (fileWriter.hasEncodingProblems()) {
