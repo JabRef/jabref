@@ -287,9 +287,9 @@ public class StyleSelectDialogViewModel {
         }
     }
 
-    private boolean isDuplicate(CitationStyle style) {
+    private boolean isDuplicate(CitationStyle styleToAdd) {
         return CSLStyleLoader.getStyles().stream()
-                             .anyMatch(existingStyle -> hasSameStyleName(existingStyle, style));
+                             .anyMatch(existingStyle -> hasSameStyleName(existingStyle, styleToAdd));
     }
 
     private boolean hasSameStyleName(CitationStyle existingStyle, CitationStyle styleToAdd) {
