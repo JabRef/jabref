@@ -2,18 +2,10 @@ package org.jabref.logic.importer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.search.query.SearchQueryNode;
-
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
@@ -26,31 +18,11 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     /// @param pageNumber  requested site number indexed from 0
     /// @return Page with search results
     default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
-        // Interface does not allow private constants
-        final Logger LOGGER = LoggerFactory.getLogger(PagedSearchBasedFetcher.class);
-
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, List.of());
         }
 
-        SearchQuery searchQueryObject = new SearchQuery(searchQuery);
-        BaseQueryNode queryNode;
-
-        if (searchQueryObject.isValid()) {
-            SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
-            try {
-                queryNode = visitor.visitStart(searchQueryObject.getContext());
-            } catch (ParseCancellationException e) {
-                LOGGER.debug("Search query visitor failed for '{}', falling back to raw term search", searchQuery, e);
-                queryNode = new SearchQueryNode(Optional.empty(), searchQuery);
-            }
-        } else {
-            // Treat unparseable input as a raw unfielded term so fetchers pass it directly to their web API
-            LOGGER.debug("Search query '{}' is not valid ANTLR syntax, falling back to raw term search", searchQuery);
-            queryNode = new SearchQueryNode(Optional.empty(), searchQuery);
-        }
-
-        return this.performSearchPaged(queryNode, pageNumber);
+        return this.performSearchPaged(SearchBasedFetcher.getQueryNode(searchQuery), pageNumber);
     }
 
     /// @return default pageSize
