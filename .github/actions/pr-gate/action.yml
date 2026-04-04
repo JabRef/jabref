@@ -1,5 +1,5 @@
 name: PR gate (maintainer/CI/label)
-description: Checks whether actor is maintainer and whether CI is running or "status: changes-required" label is set.
+description: "Checks whether actor is maintainer and whether CI is running or \"status: changes-required\" label is set."
 
 inputs:
   github-token:
@@ -7,10 +7,10 @@ inputs:
     required: true
   ci-running-message:
     required: true
-    description: Message if CI is running
+    description: "Message if CI is running"
   changes-required-message:
     required: true
-    description: Message if label "status: changes-required" exists
+    description: "Message if label \"status: changes-required\" exists"
 
 outputs:
   skip-check:
@@ -20,7 +20,7 @@ outputs:
     description: "true if relevant checks are QUEUED/IN_PROGRESS"
     value: ${{ steps.eval.outputs.ci_running }}
   changes_required:
-    description: "true if label 'status: changes-required' exists"
+    description: "true if label \"status: changes-required\" exists"
     value: ${{ steps.eval.outputs.changes_required }}
   pr_number:
     value: ${{ steps.eval.outputs.pr_number }}

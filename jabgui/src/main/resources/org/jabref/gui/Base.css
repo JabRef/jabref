@@ -667,8 +667,10 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane.hide-tab-bar > .tab-header-area {
+    -fx-min-height: 0;
+    -fx-max-height: 0;
     -fx-pref-height: 0;
-    visibility: collapse;
+    -fx-padding: 0;
 }
 
 .numberColumn > .hits:any-selected {
@@ -1161,6 +1163,11 @@ TextFlow > .tooltip-text-monospaced {
 
 .global-search-bar:illegal-search {
     -fx-background-color: derive(-jr-light-red, 70%);
+}
+
+.mode-indicator {
+    -fx-font-size: 0.85em;
+    -fx-text-fill: -fx-mid-text-color;
 }
 
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
