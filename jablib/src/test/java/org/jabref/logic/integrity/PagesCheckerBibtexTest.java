@@ -47,7 +47,9 @@ public class PagesCheckerBibtexTest {
                 // affix and more following range
                 "S10A+",
                 // unicode separator
-                "1\u201310"
+                "1\u201310",
+                // roman numerals
+                "i", "ivxlcdm", "IVXLCDM", "iS", "i--vi", "VII--xii"
         );
     }
 

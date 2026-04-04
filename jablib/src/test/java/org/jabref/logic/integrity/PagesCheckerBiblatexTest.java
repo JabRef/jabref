@@ -51,9 +51,11 @@ public class PagesCheckerBiblatexTest {
                 // unicode separator
                 "1\u201310",
                 // other separators
-                "A10S/90",
+                "A10S/90", "1/10",
                 // sequens and sequents
-                "1f", "1ff", "1 f.", "1 ff.", "1sq", "1sqq", "1 sq.", "1 sqq."
+                "1f", "1ff", "1 f.", "1 ff.", "1sq", "1sqq", "1 sq.", "1 sqq.",
+                // roman numerals
+                "i", "ivxlcdm", "IVXLCDM", "iS", "i-vi", "VII-xii"
         );
     }
 

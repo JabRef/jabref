@@ -11,8 +11,11 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class PagesChecker implements ValueChecker {
 
+    private static final String ROMAN_NUMBER = "(?i)[ivxlcdm]+";
+    private static final String DECIMAL_NUMBER = "\\d+";
+    private static final String PAGE_NUMBER = "("+ ROMAN_NUMBER + "|" + DECIMAL_NUMBER +")";
+
     private static final String PAGE_AFFIX = "[A-Za-z]?";
-    private static final String PAGE_NUMBER = "\\d+";
     private static final String PAGE = PAGE_AFFIX + PAGE_NUMBER + PAGE_AFFIX;
 
     private static final String SEQUENS_AND_SEQUENTES = "(f{1,2}|sq{1,2})\\.?";
