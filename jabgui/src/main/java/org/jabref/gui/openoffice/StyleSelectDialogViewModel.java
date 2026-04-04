@@ -209,7 +209,7 @@ public class StyleSelectDialogViewModel {
             CitationStyle citationStyleToAdd = citationStyleToAddOptional.get();
 
             // Check if citation style is duplicate in the list
-            if (findDuplicate(citationStyleToAdd)) {
+            if (isDuplicate(citationStyleToAdd)) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Style already available"),
                         Localization.lang("The selected CSL style is already available in the list.")
@@ -287,7 +287,7 @@ public class StyleSelectDialogViewModel {
         }
     }
 
-    private boolean findDuplicate(CitationStyle style) {
+    private boolean isDuplicate(CitationStyle style) {
         return CSLStyleLoader.getStyles().stream()
                              .anyMatch(existingStyle -> hasSameStyleName(existingStyle, style));
     }
