@@ -1042,7 +1042,6 @@ public class BracketedPattern {
     /// @return the first page number or "" if no number is found in the string
     /// @throws NullPointerException if pages is null
     public static String firstPage(String pages) {
-        Objects.requireNonNull(pages);
         return getPageNumberTokens(pages).stream()
                                          .min(pageTokenComparator())
                                          .orElse("");
@@ -1095,8 +1094,6 @@ public class BracketedPattern {
     /// @return the non-digit prefix of pages (like "L" of L7) or "" if no non-digit prefix is found in the string
     /// @throws NullPointerException if pages is null.
     public static String pagePrefix(String pages) {
-        Objects.requireNonNull(pages);
-
         Matcher decimalMatcher = Pattern.compile(PagesChecker.DECIMAL_NUMBER).matcher(pages);
         Matcher romanMatcher = Pattern.compile(PagesChecker.ROMAN_NUMBER).matcher(pages);
 
@@ -1130,7 +1127,6 @@ public class BracketedPattern {
     /// @return the first page number or "" if no number is found in the string
     /// @throws NullPointerException if pages is null.
     public static String lastPage(String pages) {
-        Objects.requireNonNull(pages);
         List<String> tokens = getPageNumberTokens(pages);
 
         return tokens.stream()
