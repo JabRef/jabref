@@ -209,7 +209,7 @@ public class LinkedFileHandler {
 
         Path newPath;
         if (newExtension.isPresent() || (oldExtension.isEmpty() && newExtension.isEmpty())) {
-            if (OS.WINDOWS && (parentPathLength + targetFileName.length()) >= MAX_PATH_LENGTH_WINDOWS) {
+            if (OS.WINDOWS && (parentPathLength + targetFileName.length() + SEPERATOR_WINDOWS) >= MAX_PATH_LENGTH_WINDOWS) {
                 if (newExtension.isPresent()) {
                     targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, newExtension.get(), null);
                 } else {
@@ -221,7 +221,7 @@ public class LinkedFileHandler {
             LOGGER.debug("NEW PATH WITH THE NEW FILENAME: {}", newPath);
         } else {
             assert oldExtension.isPresent() && newExtension.isEmpty();
-            if (OS.WINDOWS && (parentPathLength + targetFileName.length()) >= MAX_PATH_LENGTH_WINDOWS) {
+            if (OS.WINDOWS && (parentPathLength + targetFileName.length() + SEPERATOR_WINDOWS) >= MAX_PATH_LENGTH_WINDOWS) {
                 targetFileName = truncateFileNameOnWindows(targetFileName, parentPathLength, null, oldExtension.get());
             }
             newPath = oldPath.resolveSibling(targetFileName + "." + oldExtension.get());
@@ -267,7 +267,6 @@ public class LinkedFileHandler {
     /// @param parentLength   Length of the parent directory for the file being renamed
     /// @param newExtension   extension from the target name (no leading "."), or null if the target has none
     /// @param oldExtension   extension from the existing file when the target has no extension and the old extension is kept
-    ///
     /// @return the shortened file name; includes {@code .extension} when {@code newExtension} is not {@code null}
     private String truncateFileNameOnWindows(String targetFileName, int parentLength, @Nullable String newExtension, @Nullable String oldExtension) {
         String baseName = FileUtil.getBaseName(targetFileName);
