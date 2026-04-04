@@ -221,17 +221,16 @@ public class OpenDatabaseAction extends SimpleCommand {
             resolvedFiles.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
-                Path file = theFile;
 
                 if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath.isPresent()) {
                     try {
-                        file = baseDirectoryPath.get().relativize(theFile).normalize();
+                        theFile = baseDirectoryPath.get().relativize(theFile).normalize();
                     } catch (IllegalArgumentException e) {
-                        file = theFile.normalize();
+                        theFile = theFile.normalize();
                     }
                 }
 
-                fileHistory.newFile(file);
+                fileHistory.newFile(theFile);
             });
         } else if (toRaise != null && tabContainer.getCurrentLibraryTab() == null) {
             // If no files are remaining to open, this could mean that a file was
