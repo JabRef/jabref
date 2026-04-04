@@ -88,12 +88,6 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     /// Currently, Lucene is used for files only. Metadata of the files is stored in the BibEntry.
     /// Thus, it does not make sense to search for "author" as field name as this is not stored in the Lucene index.
     private boolean isValidField(String field) {
-
-        // --- ADDED FOR #14249 ---
-        if ("date".equals(field) || "year".equals(field)) {
-            return true;
-        }
-        // ------------------------
         return "any".equals(field) || "anyfield".equals(field) || LinkedFilesConstants.PDF_FIELDS.contains(field);
     }
 
