@@ -14,6 +14,7 @@ import org.jabref.model.pdf.FileAnnotationType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileAnnotationHtmlRendererTest {
@@ -39,9 +40,7 @@ class FileAnnotationHtmlRendererTest {
     @Test
     void renderSingleHighlightAnnotation() {
         FileAnnotation annotation = createAnnotation("important text", 3, FileAnnotationType.HIGHLIGHT);
-        Map<Path, List<FileAnnotation>> annotations = Map.of(
-                Path.of("paper.pdf"), List.of(annotation)
-        );
+        Map<Path, List<FileAnnotation>> annotations = Map.of(Path.of("paper.pdf"), List.of(annotation));
 
         String result = FileAnnotationHtmlRenderer.render(annotations);
 
@@ -55,9 +54,7 @@ class FileAnnotationHtmlRendererTest {
     void renderMultipleAnnotationsSortedByPage() {
         FileAnnotation page5 = createAnnotation("later text", 5, FileAnnotationType.TEXT);
         FileAnnotation page2 = createAnnotation("earlier text", 2, FileAnnotationType.HIGHLIGHT);
-        Map<Path, List<FileAnnotation>> annotations = Map.of(
-                Path.of("paper.pdf"), List.of(page5, page2)
-        );
+        Map<Path, List<FileAnnotation>> annotations = Map.of(Path.of("paper.pdf"), List.of(page5, page2));
 
         String result = FileAnnotationHtmlRenderer.render(annotations);
 
@@ -70,27 +67,23 @@ class FileAnnotationHtmlRendererTest {
     void renderFiltersEmptyAnnotations() {
         FileAnnotation empty = createAnnotation("", 1, FileAnnotationType.HIGHLIGHT);
         FileAnnotation valid = createAnnotation("real content", 2, FileAnnotationType.TEXT);
-        Map<Path, List<FileAnnotation>> annotations = Map.of(
-                Path.of("paper.pdf"), List.of(empty, valid)
-        );
+        Map<Path, List<FileAnnotation>> annotations = Map.of(Path.of("paper.pdf"), List.of(empty, valid));
 
         String result = FileAnnotationHtmlRenderer.render(annotations);
 
         assertTrue(result.contains("real content"));
         // empty annotation should not produce a type label for page 1
-        assertTrue(!result.contains("p. 1"));
+        assertFalse(result.contains("p. 1"));
     }
 
     @Test
     void renderEscapesHtmlCharacters() {
         FileAnnotation annotation = createAnnotation("<script>alert('xss')</script>", 1, FileAnnotationType.TEXT);
-        Map<Path, List<FileAnnotation>> annotations = Map.of(
-                Path.of("paper.pdf"), List.of(annotation)
-        );
+        Map<Path, List<FileAnnotation>> annotations = Map.of(Path.of("paper.pdf"), List.of(annotation));
 
         String result = FileAnnotationHtmlRenderer.render(annotations);
 
-        assertTrue(!result.contains("<script>"));
+        assertFalse(result.contains("<script>"));
         assertTrue(result.contains("&lt;script&gt;"));
     }
 
@@ -113,11 +106,8 @@ class FileAnnotationHtmlRendererTest {
     @Test
     void renderLinkedAnnotationShowsNote() {
         FileAnnotation note = createAnnotation("my note", 3, FileAnnotationType.TEXT, Optional.empty());
-        FileAnnotation highlight = new FileAnnotation("Author", TIME, 3,
-                "highlighted text", FileAnnotationType.HIGHLIGHT, Optional.of(note));
-        Map<Path, List<FileAnnotation>> annotations = Map.of(
-                Path.of("paper.pdf"), List.of(highlight)
-        );
+        FileAnnotation highlight = new FileAnnotation("Author", TIME, 3, "highlighted text", FileAnnotationType.HIGHLIGHT, Optional.of(note));
+        Map<Path, List<FileAnnotation>> annotations = Map.of(Path.of("paper.pdf"), List.of(highlight));
 
         String result = FileAnnotationHtmlRenderer.render(annotations);
 

@@ -35,10 +35,7 @@ public class FileAnnotationHtmlRenderer {
             String fileName = fileEntry.getKey().getFileName().toString();
             html.append("<BR><i>").append(escapeHtml(fileName)).append("</i><BR>");
 
-            fileAnnotations.stream()
-                           .sorted(Comparator.comparingInt(FileAnnotation::getPage))
-                           .filter(annotation -> StringUtil.isNotBlank(annotation.getContent()))
-                           .forEach(annotation -> renderAnnotation(html, annotation));
+            fileAnnotations.stream().sorted(Comparator.comparingInt(FileAnnotation::getPage)).filter(annotation -> StringUtil.isNotBlank(annotation.getContent())).forEach(annotation -> renderAnnotation(html, annotation));
         }
 
         return html.toString();
@@ -49,9 +46,7 @@ public class FileAnnotationHtmlRenderer {
         int page = annotation.getPage();
         String content = annotation.getContent();
 
-        html.append("<b>")
-            .append(escapeHtml(type))
-            .append(" (p. ").append(page).append("):</b> ");
+        html.append("<b>").append(escapeHtml(type)).append(" (p. ").append(page).append("):</b> ");
 
         if (annotation.hasLinkedAnnotation()) {
             // highlights/underlines with a sticky note attached
@@ -71,9 +66,6 @@ public class FileAnnotationHtmlRenderer {
         if (text == null) {
             return "";
         }
-        return text.replace("&", "&amp;")
-                   .replace("<", "&lt;")
-                   .replace(">", "&gt;")
-                   .replace("\"", "&quot;");
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
     }
 }
