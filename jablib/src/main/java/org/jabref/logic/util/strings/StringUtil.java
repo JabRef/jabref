@@ -49,6 +49,8 @@ public class StringUtil {
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
     private static final String STRING_TABLE_DELIMITER = " : ";
+    // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
+    private static final Pattern SPLIT_TEXT_PATTERN = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
 
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
@@ -676,9 +678,7 @@ public class StringUtil {
 
     /// Returns a list of sentences contained in the given text.
     public static List<String> getStringAsSentences(String text) {
-        // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
-        Pattern splitTextPattern = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
-        return Arrays.asList(splitTextPattern.split(text));
+        return Arrays.asList(SPLIT_TEXT_PATTERN.split(text));
     }
 
     @AllowedToUseApacheCommonsLang3("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")

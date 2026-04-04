@@ -1165,6 +1165,11 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: derive(-jr-light-red, 70%);
 }
 
+.mode-indicator {
+    -fx-font-size: 0.85em;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button > .arrow {

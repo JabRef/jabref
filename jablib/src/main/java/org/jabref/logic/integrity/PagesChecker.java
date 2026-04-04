@@ -11,7 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class PagesChecker implements ValueChecker {
 
-    private static final String SINGLE_PAGE_PATTERN = "[A-Za-z]?\\d*";             // optional prefix and number
+    private static final String SINGLE_PAGE_PATTERN = "[A-Za-z]?\\d*[A-Za-z]?";    // optional prefix, numbers, and optional suffix
     private static final String BIBTEX_RANGE_SEPARATOR = "(\\+|-{2}|\u2013)";      // separator, must contain exactly two dashes
     private static final String BIBLATEX_RANGE_SEPARATOR = "(\\+|-{1,2}|\u2013)";  // separator
 
@@ -34,13 +34,16 @@ public class PagesChecker implements ValueChecker {
                     + ")?"
                     + "\\z";            // end String
 
+    private static final Predicate<String> IS_VALID_PAGE_NUMBER_BIBTEX = Pattern.compile(PAGES_EXP_BIBTEX).asPredicate();
+    private static final Predicate<String> IS_VALID_PAGE_NUMBER_BIBLATEX = Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
+
     private final Predicate<String> isValidPageNumber;
 
     public PagesChecker(BibDatabaseContext databaseContext) {
         if (databaseContext.isBiblatexMode()) {
-            isValidPageNumber = Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
+            isValidPageNumber = IS_VALID_PAGE_NUMBER_BIBLATEX;
         } else {
-            isValidPageNumber = Pattern.compile(PAGES_EXP_BIBTEX).asPredicate();
+            isValidPageNumber = IS_VALID_PAGE_NUMBER_BIBTEX;
         }
     }
 
