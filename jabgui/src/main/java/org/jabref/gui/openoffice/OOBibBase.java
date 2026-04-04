@@ -522,15 +522,34 @@ public class OOBibBase {
         final String errorTitle = "Could not insert citation";
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
-
+        if (testDialog(errorTitle,
+                odoc.asVoidResult(),
+                styleIsRequired(style),
+                selectedBibEntryIsRequired(entries, OOError::noEntriesSelectedForCitation))) {
+            return;
+        }
         XTextDocument doc = odoc.get();
 
         OOResult<OOFrontend, OOError> frontend = getFrontend(doc);
+        if (testDialog(errorTitle, frontend.asVoidResult())) {
+            return;
+        }
 
         OOResult<XTextCursor, OOError> cursor = getUserCursorForTextInsertion(doc, errorTitle);
-
-        if (!performPreInsertionChecks(entries, errorTitle, odoc, style, frontend, cursor, doc)) {
+        if (testDialog(errorTitle, cursor.asVoidResult())) {
             return;
+        }
+
+        if (testDialog(errorTitle, checkRangeOverlapsWithCursor(doc, frontend.get()))) {
+            return;
+        }
+
+        if (style instanceof JStyle jStyle) {
+            if(testDialog(errorTitle,
+                    checkStylesExistInTheDocument(jStyle, doc),
+                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                return;
+            }
         }
 
         /*
@@ -573,44 +592,6 @@ public class OOBibBase {
         } finally {
             UnoUndo.leaveUndoContext(doc);
         }
-    }
-
-    /// Helper method for guiActionInsertEntry. Handles pre-insertion checks
-    ///
-    /// @param entries    The entries to cite.
-    /// @param style      The bibliography style we are using.
-    /// @param errorTitle Message String of error
-    /// @param odoc       Open Office text document result
-    /// @param frontend   Open Office result of Open Office frontend
-    /// @param cursor     Open Office result of text cursor
-    /// @param doc        Text document
-    public boolean performPreInsertionChecks(List<BibEntry> entries, String errorTitle, OOResult<XTextDocument, OOError> odoc, OOStyle style,
-                                             OOResult<OOFrontend, OOError> frontend, OOResult<XTextCursor, OOError> cursor, XTextDocument doc) {
-        if (testDialog(errorTitle,
-                odoc.asVoidResult(),
-                styleIsRequired(style),
-                selectedBibEntryIsRequired(entries, OOError::noEntriesSelectedForCitation))) {
-            return false;
-        }
-
-        if (testDialog(errorTitle, frontend.asVoidResult())) {
-            return false;
-        }
-
-        if (testDialog(errorTitle, cursor.asVoidResult())) {
-            return false;
-        }
-
-        if (testDialog(errorTitle, checkRangeOverlapsWithCursor(doc, frontend.get()))) {
-            return false;
-        }
-
-        if (style instanceof JStyle jStyle) {
-            return !testDialog(errorTitle,
-                    checkStylesExistInTheDocument(jStyle, doc),
-                    checkIfOpenOfficeIsRecordingChanges(doc));
-        }
-        return true;
     }
 
     /// Helper method for guiActionInsertEntry. Handles CSL citation insertion
