@@ -59,7 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
-    public static final int ACTIVE_COLUMNS_MINIMUM = 2;
+    public static final int ACTIVE_COLUMNS_MINIMUM = 1;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiMergeEntriesView.class);
 

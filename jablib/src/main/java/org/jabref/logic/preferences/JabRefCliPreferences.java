@@ -1,6 +1,5 @@
 package org.jabref.logic.preferences;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
@@ -54,7 +54,6 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
@@ -64,6 +63,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
+import org.jabref.logic.importer.fetcher.WileyFetcher;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -368,6 +368,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String ENABLE_HTTP_SERVER = "enableHttpServer";
     private static final String ENABLE_LANGUAGE_SERVER = "enableLanguageServer";
     private static final String LANGUAGE_SERVER_PORT = "languageServerPort";
+    private static final String DIRECT_HTTP_IMPORT = "directHttpImport";
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
@@ -414,20 +415,24 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region Push to application preferences
     private static final String PUSH_TO_APPLICATION = "pushToApplication";
-    private static final String PUSH_EMACS_PATH = "emacsPath";
     private static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
-    private static final String PUSH_LYXPIPE = "lyxpipe";
-    private static final String PUSH_TEXSTUDIO_PATH = "TeXstudioPath";
-    private static final String PUSH_TEXWORKS_PATH = "TeXworksPath";
-    private static final String PUSH_WINEDT_PATH = "winEdtPath";
-    private static final String PUSH_TEXMAKER_PATH = "texmakerPath";
     private static final String PUSH_VIM_SERVER = "vimServer";
-    private static final String PUSH_VIM = "vim";
-    private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
-    private static final String PUSH_VSCODE_PATH = "VScodePath";
     private static final String PUSH_CITE_COMMAND = "citeCommand";
 
-    // Git
+    private static final Map<PushApplications, String> PUSH_APPLICATIONS_PATHS = Map.of(
+            PushApplications.EMACS, "emacsPath",
+            PushApplications.LYX, "lyxpipe",
+            PushApplications.TEXMAKER, "texmakerPath",
+            PushApplications.TEXSTUDIO, "TeXstudioPath",
+            PushApplications.TEXWORKS, "TeXworksPath",
+            PushApplications.VIM, "vim",
+            PushApplications.WIN_EDT, "winEdtPath",
+            PushApplications.SUBLIME_TEXT, "sublimeTextPath",
+            PushApplications.VSCODE, "VScodePath"
+    );
+    // endregion
+
+    // region Git
     private static final String GITHUB_PAT_KEY = "githubPersonalAccessToken";
     private static final String GITHUB_USERNAME_KEY = "githubUsername";
     private static final String GITHUB_REMOTE_URL_KEY = "githubRemoteUrl";
@@ -511,7 +516,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
         defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
 
-        // region: Grobid
+        // region Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_PREFERENCE, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
@@ -643,6 +648,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(HTTP_SERVER_PORT, 23119);
         defaults.put(ENABLE_LANGUAGE_SERVER, Boolean.FALSE);
         defaults.put(LANGUAGE_SERVER_PORT, 2087);
+        defaults.put(DIRECT_HTTP_IMPORT, Boolean.FALSE);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
@@ -692,7 +698,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(LAST_EDITED, "");
         // endregion
 
-        // region:AI
+        // region AI
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
         defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
@@ -719,8 +725,9 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
+        // endregion
 
-        // region:AI templates
+        // region AI templates
         defaults.put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
         defaults.put(AI_CHATTING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_USER_MESSAGE));
         defaults.put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE));
@@ -731,105 +738,16 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
         // endregion
 
-        // region PushToApplicationPreferences
-        defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
-        defaults.put(PUSH_TEXSTUDIO_PATH, OS.detectProgramPath("texstudio", "TeXstudio"));
-        defaults.put(PUSH_TEXWORKS_PATH, OS.detectProgramPath("texworks", "TeXworks"));
-        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.detectProgramPath("subl", "Sublime"));
-        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
-        defaults.put(PUSH_VIM, "vim");
-        defaults.put(PUSH_VIM_SERVER, "vim");
-        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-        defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("Code", "Microsoft VS Code"));
-        defaults.put(PUSH_CITE_COMMAND, "\\cite{key1,key2}");
-
-        if (OS.OS_X) {
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        } else if (OS.WINDOWS) {
-            defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
-        } else {
-            // Linux
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        }
-        // endregion
-
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
 
-        // region: Git preferences
+        // region Git preferences
         defaults.put(GITHUB_PAT_KEY, "");
         defaults.put(GITHUB_USERNAME_KEY, "");
         defaults.put(GITHUB_REMOTE_URL_KEY, "");
         defaults.put(GITHUB_REMEMBER_PAT_KEY, false);
         // endregion
     }
-
-    // region PushToApplicationPreferences
-    public PushToApplicationPreferences getPushToApplicationPreferences() {
-        if (pushToApplicationPreferences != null) {
-            return pushToApplicationPreferences;
-        }
-
-        Map<String, String> applicationCommands = new HashMap<>();
-        // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
-        // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
-        applicationCommands.put(PushApplications.EMACS.getDisplayName(), getEmptyIsDefault(PUSH_EMACS_PATH));
-        applicationCommands.put(PushApplications.LYX.getDisplayName(), getEmptyIsDefault(PUSH_LYXPIPE));
-        applicationCommands.put(PushApplications.TEXMAKER.getDisplayName(), getEmptyIsDefault(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushApplications.TEXSTUDIO.getDisplayName(), getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushApplications.TEXWORKS.getDisplayName(), getEmptyIsDefault(PUSH_TEXWORKS_PATH));
-        applicationCommands.put(PushApplications.VIM.getDisplayName(), getEmptyIsDefault(PUSH_VIM));
-        applicationCommands.put(PushApplications.WIN_EDT.getDisplayName(), getEmptyIsDefault(PUSH_WINEDT_PATH));
-        applicationCommands.put(PushApplications.SUBLIME_TEXT.getDisplayName(), getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
-        applicationCommands.put(PushApplications.VSCODE.getDisplayName(), getEmptyIsDefault(PUSH_VSCODE_PATH));
-
-        pushToApplicationPreferences = new PushToApplicationPreferences(
-                get(PUSH_TO_APPLICATION),
-                applicationCommands,
-                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
-                get(PUSH_VIM_SERVER),
-                CitationCommandString.from(get(PUSH_CITE_COMMAND)),
-                CitationCommandString.from((String) defaults.get(PUSH_CITE_COMMAND))
-        );
-
-        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
-        pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
-        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
-        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
-        EasyBind.listen(pushToApplicationPreferences.citeCommandProperty(),
-                (obs, oldValue, newValue) -> put(PUSH_CITE_COMMAND, newValue.toString()));
-
-        return pushToApplicationPreferences;
-    }
-
-    private void storePushToApplicationPath(Map<String, String> commandPair) {
-        commandPair.forEach((key, value) -> {
-            // is only for the preferences and therefore is okay to throw NoSuchElementException
-            switch (PushApplications.getApplicationByDisplayName(key).get()) {
-                case PushApplications.EMACS ->
-                        put(PUSH_EMACS_PATH, value);
-                case PushApplications.LYX ->
-                        put(PUSH_LYXPIPE, value);
-                case PushApplications.TEXMAKER ->
-                        put(PUSH_TEXMAKER_PATH, value);
-                case PushApplications.TEXSTUDIO ->
-                        put(PUSH_TEXSTUDIO_PATH, value);
-                case PushApplications.TEXWORKS ->
-                        put(PUSH_TEXWORKS_PATH, value);
-                case PushApplications.VIM ->
-                        put(PUSH_VIM, value);
-                case PushApplications.WIN_EDT ->
-                        put(PUSH_WINEDT_PATH, value);
-                case PushApplications.SUBLIME_TEXT ->
-                        put(PUSH_SUBLIME_TEXT_PATH, value);
-                case PushApplications.VSCODE ->
-                        put(PUSH_VSCODE_PATH, value);
-            }
-        });
-    }
-    // endregion
 
     /// @deprecated Never ever add a call to this method. There should be only one
     /// caller. All other usages should get the preferences passed (or injected). The
@@ -843,9 +761,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return JabRefCliPreferences.singleton;
     }
 
-    /// **********************************************************************************************************
-    /// Common serializer logic
-    /// ************************************************************************************************************
+    // region Common serializer logic
 
     @VisibleForTesting
     static String convertListToString(List<String> value) {
@@ -855,15 +771,16 @@ public class JabRefCliPreferences implements CliPreferences {
     @VisibleForTesting
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
-            return List.of();
+            // list needs to be mutable in observable preferences
+            // keep consistency with Splitter#splitToList
+            return new ArrayList<>();
         }
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
     }
+    // endregion
 
-    /// ************************************************************************************************************
-    /// Backingstore access logic
-    /// ************************************************************************************************************
+    // region Backingstore access logic
 
     /// Check whether a key is set (differently from null).
     ///
@@ -876,6 +793,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public String get(String key) {
         return PREFS_NODE.get(key, (String) defaults.get(key));
     }
+    // endregion
 
     public String getEmptyIsDefault(String key) {
         String defaultValue = (String) defaults.get(key);
@@ -980,21 +898,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private Path getPath(String key, Path defaultValue) {
         String rawPath = get(key);
         return StringUtil.isNotBlank(rawPath) ? Path.of(rawPath) : defaultValue;
-    }
-
-    /// Clear all preferences.
-    ///
-    /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
-    @Override
-    public void clear() throws BackingStoreException {
-        clearAllBibEntryTypes();
-        clearCitationKeyPatterns();
-        clearTruststoreFromCustomCertificates();
-        clearCustomFetcherKeys();
-        PREFS_NODE.clear();
-        new SharedDatabasePreferences().clear();
-
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
     }
 
     private void clearTruststoreFromCustomCertificates() {
@@ -1115,6 +1018,22 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
+    /// Clear all preferences.
+    ///
+    /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
+    @Override
+    public void clear() throws BackingStoreException {
+        clearAllBibEntryTypes();
+        clearCitationKeyPatterns();
+        clearTruststoreFromCustomCertificates();
+        clearCustomFetcherKeys();
+        PREFS_NODE.clear();
+        new SharedDatabasePreferences().clear();
+
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
+    }
+
     /// Imports Preferences from an XML file.
     ///
     /// @param path Path of file to import from
@@ -1127,7 +1046,8 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt xml fall back to current preferences
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
+        getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1141,18 +1061,8 @@ public class JabRefCliPreferences implements CliPreferences {
                     ex);
         }
     }
-    //*************************************************************************************************************
+
     // ToDo: Cleanup
-    //*************************************************************************************************************
-
-    @Override
-    public LayoutFormatterPreferences getLayoutFormatterPreferences() {
-        return new LayoutFormatterPreferences(
-                getNameFormatterPreferences(),
-                getDOIPreferences(),
-                getFilePreferences().mainFileDirectoryProperty());
-    }
-
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         if (journalAbbreviationPreferences != null) {
@@ -1171,10 +1081,66 @@ public class JabRefCliPreferences implements CliPreferences {
         return journalAbbreviationPreferences;
     }
 
-    //*************************************************************************************************************
-    // CustomEntryTypes
-    //*************************************************************************************************************
+    // region PushToApplicationPreferences
+    public PushToApplicationPreferences getPushToApplicationPreferences() {
+        if (pushToApplicationPreferences != null) {
+            return pushToApplicationPreferences;
+        }
 
+        pushToApplicationPreferences = getPushToApplicationPreferencesFromBackingStore(PushToApplicationPreferences.getDefault());
+
+        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (_, _, newValue) -> put(PUSH_TO_APPLICATION, newValue));
+        pushToApplicationPreferences.getCommandPaths().addListener((MapChangeListener<? super String, ? super String>) this::storePushToApplicationPath);
+        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (_, _, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
+        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (_, _, newValue) -> put(PUSH_VIM_SERVER, newValue));
+        EasyBind.listen(pushToApplicationPreferences.citeCommandProperty(),
+                (_, _, newValue) -> put(PUSH_CITE_COMMAND, newValue.toString()));
+
+        return pushToApplicationPreferences;
+    }
+
+    private PushToApplicationPreferences getPushToApplicationPreferencesFromBackingStore(PushToApplicationPreferences defaults) {
+        return new PushToApplicationPreferences(
+                get(PUSH_TO_APPLICATION, defaults.getActiveApplicationName()),
+                readPushToApplicationPath(defaults.getCommandPaths()),
+                get(PUSH_EMACS_ADDITIONAL_PARAMETERS, defaults.getEmacsArguments()),
+                get(PUSH_VIM_SERVER, defaults.getVimServer()),
+                CitationCommandString.from(get(PUSH_CITE_COMMAND, defaults.getCiteCommand().toString()))
+        );
+    }
+
+    private void storePushToApplicationPath(MapChangeListener.Change<? extends String, ? extends String> change) {
+        // is only for the preferences and therefore is okay to throw NoSuchElementException
+        PushApplications app = PushApplications.getApplicationByDisplayName(change.getKey()).get();
+        String key = PUSH_APPLICATIONS_PATHS.get(app);
+
+        if (key == null) {
+            return;
+        }
+
+        if (change.wasRemoved() || (change.wasAdded() && "".equals(change.getValueAdded()))) {
+            remove(key);
+        } else if (change.wasAdded()) {
+            put(key, change.getValueAdded());
+        }
+    }
+
+    /// An empty string is used as the default value to ensure that an installation of a tool leads to the new path
+    /// (instead of leaving the empty one). Reason: an empty string is returned by org.jabref.gui.desktop.os.Windows.
+    /// detectProgramPath if the program is not found. That path is stored in the preferences.
+    private Map<String, String> readPushToApplicationPath(Map<String, String> defaults) {
+        Map<String, String> commands = new HashMap<>();
+
+        PUSH_APPLICATIONS_PATHS.forEach((app, key) -> {
+            String value = get(key, defaults.getOrDefault(key, ""));
+            commands.put(app.getDisplayName(), value);
+        });
+
+        return commands;
+    }
+    // endregion
+
+    // region CustomEntryTypes
     @Override
     public BibEntryTypesManager getCustomEntryTypesRepository() {
         BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
@@ -1212,6 +1178,7 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
+    // endregion
 
     @Override
     public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
@@ -1242,9 +1209,7 @@ public class JabRefCliPreferences implements CliPreferences {
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
-    //*************************************************************************************************************
-    // Misc
-    //*************************************************************************************************************
+    // region Misc
 
     @Override
     public LibraryPreferences getLibraryPreferences() {
@@ -1327,10 +1292,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return timestampPreferences;
     }
+    // endregion
 
-    //*************************************************************************************************************
-    // Network preferences
-    //*************************************************************************************************************
+    // region Network preferences
 
     @Override
     public RemotePreferences getRemotePreferences() {
@@ -1344,7 +1308,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInt(HTTP_SERVER_PORT),
                 getBoolean(ENABLE_HTTP_SERVER),
                 getBoolean(ENABLE_LANGUAGE_SERVER),
-                getInt(LANGUAGE_SERVER_PORT));
+                getInt(LANGUAGE_SERVER_PORT),
+                getBoolean(DIRECT_HTTP_IMPORT));
 
         EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
@@ -1352,11 +1317,13 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_HTTP_SERVER, newValue));
         EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(LANGUAGE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_LANGUAGE_SERVER, newValue));
+        EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(DIRECT_HTTP_IMPORT, newValue));
 
         return remotePreferences;
     }
+    // endregion
 
-    // region: Proxy Preferences
+    // region Proxy Preferences
     @Override
     public ProxyPreferences getProxyPreferences() {
         if (proxyPreferences != null) {
@@ -1396,7 +1363,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
         );
     }
-    // endRegion: Proxy Preferences
+    // endregion
 
     private String getProxyPassword() {
         if (getBoolean(PROXY_PERSIST_PASSWORD)) {
@@ -1444,9 +1411,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return sslPreferences;
     }
 
-    //*************************************************************************************************************
-    // CitationKeyPatternPreferences
-    //*************************************************************************************************************
+    // region CitationKeyPatternPreferences
 
     private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
@@ -1464,6 +1429,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPattern;
     }
+    // endregion
 
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
@@ -1550,10 +1516,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return keySuffix;
     }
 
-    //*************************************************************************************************************
-    // BibEntryPreferences
-    //*************************************************************************************************************
-
+    // region BibEntryPreferences
     @Override
     public BibEntryPreferences getBibEntryPreferences() {
         if (bibEntryPreferences != null) {
@@ -1568,11 +1531,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return bibEntryPreferences;
     }
+    // endregion
 
-    //*************************************************************************************************************
     // InternalPreferences
-    //*************************************************************************************************************
-
     protected Path getDefaultPath() {
         return Path.of("/");
     }
@@ -1647,10 +1608,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return fieldPreferences;
     }
 
-    //*************************************************************************************************************
-    // Linked files preferences
-    //*************************************************************************************************************
-
+    // region Linked files preferences
     protected boolean moveToTrashSupported() {
         return false;
     }
@@ -1709,6 +1667,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return filePreferences;
     }
+    // endregion
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
@@ -1746,9 +1705,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return citationKeyDependency;
     }
 
-    //*************************************************************************************************************
-    // Import/Export preferences
-    //*************************************************************************************************************
+    // region Import/Export preferences
 
     @Override
     public ExportPreferences getExportPreferences() {
@@ -1816,13 +1773,14 @@ public class JabRefCliPreferences implements CliPreferences {
             putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
         }
     }
+    // endregion
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
         SaveOrder exportSaveOrder = getExportSaveOrder();
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE -> {
-                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
+                LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to default save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
             case SPECIFIED ->
@@ -2182,10 +2140,6 @@ public class JabRefCliPreferences implements CliPreferences {
         return protectedTermsPreferences;
     }
 
-    //*************************************************************************************************************
-    // Importer preferences
-    //*************************************************************************************************************
-
     @Override
     public ImporterPreferences getImporterPreferences() {
         if (importerPreferences != null) {
@@ -2313,6 +2267,7 @@ public class JabRefCliPreferences implements CliPreferences {
         keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
         keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(WileyFetcher.FETCHER_NAME, buildInfo.wileyTdmApiKey);
 
         return keys;
     }
@@ -2391,20 +2346,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return grobidPreferences;
     }
-
-    @Override
-    public ImportFormatPreferences getImportFormatPreferences() {
-        return new ImportFormatPreferences(
-                getBibEntryPreferences(),
-                getCitationKeyPatternPreferences(),
-                getFieldPreferences(),
-                getXmpPreferences(),
-                getDOIPreferences(),
-                getGrobidPreferences(),
-                getFilePreferences());
-    }
-
-    // endregion
 
     @Override
     public OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -2488,6 +2429,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return gitPreferences;
     }
+
+    // endregion
 
     private static void deleteGitHubPat() {
         try (final Keyring keyring = Keyring.create()) {
