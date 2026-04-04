@@ -202,7 +202,11 @@ public class JabKit implements Runnable {
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                         .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
-                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter, saveConfiguration, cliPreferences, entryTypesManager, journalAbbreviationRepository);
+                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter,
+                        saveConfiguration,
+                        cliPreferences,
+                        entryTypesManager,
+                        journalAbbreviationRepository);
                 bibDatabaseWriter.writeDatabase(bibDatabaseContext);
 
                 // Show just a warning message if encoding did not work for all characters:

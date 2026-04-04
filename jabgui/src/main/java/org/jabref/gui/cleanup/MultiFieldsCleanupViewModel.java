@@ -32,7 +32,7 @@ public class MultiFieldsCleanupViewModel {
 
     private final SetProperty<CleanupPreferences.CleanupStep> selectedJobs = new SimpleSetProperty<>(FXCollections.observableSet());
 
-    //  flag for synchronization between changes in set of steps and boolean properties
+    // flag for synchronization between changes in set of steps and boolean properties
     private boolean updating = false;
 
     public MultiFieldsCleanupViewModel() {

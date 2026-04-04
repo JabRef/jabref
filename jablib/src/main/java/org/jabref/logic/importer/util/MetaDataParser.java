@@ -19,6 +19,7 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -274,7 +275,7 @@ public class MetaDataParser {
             String multiFieldMetaString = StringUtil.unifyLineBreaks(multiFieldMetaList.getFirst(), "");
 
             EnumSet<CleanupPreferences.CleanupStep> steps = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
-            for (String stringStep : multiFieldMetaString.split(";")) {
+            for (String stringStep : multiFieldMetaString.split(MetaDataSerializer.SERIALIZED_MULTIFIELDCLEANUPACTIONS_SEPARATOR)) {
                 try {
                     steps.add(CleanupPreferences.CleanupStep.valueOf(stringStep));
                 } catch (IllegalArgumentException e) {

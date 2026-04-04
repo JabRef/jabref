@@ -405,7 +405,11 @@ public class StudyRepository {
                     .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
 
-            BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter, saveConfiguration, preferences, bibEntryTypesManager, journalAbbreviationRepository);
+            BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter,
+                    saveConfiguration,
+                    preferences,
+                    bibEntryTypesManager,
+                    journalAbbreviationRepository);
             bibDatabaseWriter.writeDatabase(context);
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));

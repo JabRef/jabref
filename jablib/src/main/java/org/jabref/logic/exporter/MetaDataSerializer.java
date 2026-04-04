@@ -25,6 +25,7 @@ import org.jabref.model.metadata.MetaData;
 
 /// Reading is done at {@link org.jabref.logic.importer.util.MetaDataParser}
 public class MetaDataSerializer {
+    public static final String SERIALIZED_MULTIFIELDCLEANUPACTIONS_SEPARATOR = ";";
 
     private MetaDataSerializer() {
     }
@@ -43,8 +44,8 @@ public class MetaDataSerializer {
         metaData.getSaveOrder().ifPresent(
                 saveOrderConfig -> stringyMetaData.put(MetaData.SAVE_ORDER_CONFIG, saveOrderConfig.getAsStringList()));
         metaData.getFieldFormatterCleanupActions().ifPresent(
-                fieldFormatterCleanupActions -> stringyMetaData.put(MetaData.FIELDFORMATTERCLEANUPACTIONS, getAsStringList(fieldFormatterCleanupActions, OS.NEWLINE)));
-        metaData.getMultiFieldCleanups().ifPresent(multiFieldCleanupActions -> stringyMetaData.put(MetaData.MULTIFIELDCLEANUPACTIONS, getAsStringList(multiFieldCleanupActions, OS.NEWLINE)));
+                fieldFormatterCleanupActions -> stringyMetaData.put(MetaData.FIELDFORMATTERCLEANUPACTIONS, getAsStringFieldFormatterCleanupActions(fieldFormatterCleanupActions, OS.NEWLINE)));
+        metaData.getMultiFieldCleanups().ifPresent(multiFieldCleanupActions -> stringyMetaData.put(MetaData.MULTIFIELDCLEANUPACTIONS, getAsStringMultiFieldCleanupActions(multiFieldCleanupActions, OS.NEWLINE)));
         metaData.getJournalAbbreviationCleanup().ifPresent(journalAbbreviationCleanup -> stringyMetaData.put(MetaData.JOURNALABBREVIATIONCLEANUP, List.of(journalAbbreviationCleanup.toString())));
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of("true"));
@@ -171,7 +172,7 @@ public class MetaDataSerializer {
                 "]";
     }
 
-    public static List<String> getAsStringList(FieldFormatterCleanupActions fieldFormatterCleanupActions, String delimiter) {
+    public static List<String> getAsStringFieldFormatterCleanupActions(FieldFormatterCleanupActions fieldFormatterCleanupActions, String delimiter) {
         List<String> stringRepresentation = new ArrayList<>();
 
         if (fieldFormatterCleanupActions.isEnabled()) {
@@ -186,12 +187,12 @@ public class MetaDataSerializer {
         return stringRepresentation;
     }
 
-    public static List<String> getAsStringList(Set<CleanupPreferences.CleanupStep> multiFieldCleanupActions, String delimiter) {
+    public static List<String> getAsStringMultiFieldCleanupActions(Set<CleanupPreferences.CleanupStep> multiFieldCleanupActions, String delimiter) {
         List<String> stringRepresentation = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
         for (CleanupPreferences.CleanupStep step : multiFieldCleanupActions) {
             stringBuilder.append(step);
-            stringBuilder.append(";");
+            stringBuilder.append(SERIALIZED_MULTIFIELDCLEANUPACTIONS_SEPARATOR);
             stringBuilder.append(delimiter);
         }
         stringRepresentation.add(stringBuilder.toString());
