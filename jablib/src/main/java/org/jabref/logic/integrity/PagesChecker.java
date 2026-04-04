@@ -21,7 +21,7 @@ public class PagesChecker implements ValueChecker {
     private static final String SEQUENS_AND_SEQUENTES = "(f{1,2}|sq{1,2})\\.?";
     private static final String PAGE_CONTINUATION_MODIFIER = "(\\+|\\s*" + SEQUENS_AND_SEQUENTES + ")";
 
-    private static final String BIBTEX_SEPARATOR = "(-{2}|\u2013)";      // separator, must contain exactly two dashes
+    private static final String BIBTEX_SEPARATOR = "(-{2}|\u2013)";
     private static final String PAGE_RANGE_BIBTEX = "("
             + PAGE + BIBTEX_SEPARATOR + PAGE
             + "|"
