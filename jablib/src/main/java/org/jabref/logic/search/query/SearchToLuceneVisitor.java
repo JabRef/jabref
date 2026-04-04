@@ -92,16 +92,16 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     }
 
     private String buildFieldExpression(String field, String term, int operator, boolean isQuoted) {
-
         // --- ADDED FOR #14249: DATE/RANGE SUPPORT ---
-        if (operator == SearchParser.GEQUAL)
+        if (operator == SearchParser.GEQUAL) {
             return field + "[" + term + " TO *]";
-        if (operator == SearchParser.LEQUAL)
+        }if (operator == SearchParser.LEQUAL) {
             return field + "[* TO " + term + "]";
-        if (operator == SearchParser.GT)
+        }if (operator == SearchParser.GT) {
             return field + "{" + term + " TO *}";
-        if (operator == SearchParser.LT)
+        }if (operator == SearchParser.LT) {
             return field + "{* TO " + term + "}";
+        }
         // ----------------------------------------------
         boolean isRegexOp = isRegexOperator(operator);
         boolean isNegationOp = isNegationOperator(operator);

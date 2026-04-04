@@ -190,10 +190,9 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             setFlags(searchFlags, REGULAR_EXPRESSION, false, true);
         } else if (operator == SearchParser.NCREEQUAL) {
             setFlags(searchFlags, REGULAR_EXPRESSION, true, true);
-        }
 
-        // --- ADDED FOR #14249 ---
-        else if (operator == SearchParser.GEQUAL) {
+            // --- ADDED FOR #14249 ---
+        }else if (operator == SearchParser.GEQUAL) {
             searchFlags.add(EXACT_MATCH); // We use EXACT_MATCH as a proxy for mathematical comparison
         } else if (operator == SearchParser.LEQUAL) {
             searchFlags.add(EXACT_MATCH);
@@ -203,7 +202,6 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             searchFlags.add(EXACT_MATCH);
         }
         // ------------------------
-
         // field = "" -> should find entries where the field is empty
         // field != "" -> should find entries where the field is not empty
         if (term.isEmpty()) {
@@ -213,10 +211,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                 searchFlags.add(NEGATION);
             }
         }
-
         // --- ADDED FOR #14249 ---
         if (operator == SearchParser.GEQUAL || operator == SearchParser.LEQUAL || operator == SearchParser.GT || operator == SearchParser.LT) {
-
             String mathOp = getMathSqlOperator(operator);
             // We bypass the standard builders to send a direct math comparison to SQL
             return buildMathFieldQuery(field.toLowerCase(Locale.ROOT), mathOp, term);
