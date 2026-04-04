@@ -43,7 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We improved the group filter to support full boolean search syntax. Space-separated terms now match groups containing any of the words (OR semantics). Explicit operators "AND", "OR", "NOT", and parentheses are also supported — e.g., `NOT learning` hides all learning groups, or `(deep OR neural) NOT vision` shows "Deep Learning" and "Neural Networks" but not "Computer Vision".. [#12721](https://github.com/JabRef/jabref/issues/12721)
+- We improved the group filter to support full boolean search syntax. [#12721](https://github.com/JabRef/jabref/issues/12721)
 - We fixed an issue where entries were being deselected after entering a BibTeX source and clicking elsewhere. [#15412](https://github.com/JabRef/jabref/issues/15412)
 - We fixed pages checker to allow suffix letters in the page range like "436S-439S". [#13701](https://github.com/JabRef/jabref/issues/13701)
 - We fixed an issue where the Web search table had extra space, to improve the layout. [#14556](https://github.com/JabRef/jabref/issues/14556)
