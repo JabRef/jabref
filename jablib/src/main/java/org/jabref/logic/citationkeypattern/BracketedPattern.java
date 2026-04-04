@@ -61,8 +61,8 @@ public class BracketedPattern {
     /// 1} name abbreviations will be displayed, and a + sign will be appended at the end.
     private static final int MAX_ALPHA_AUTHORS = 4;
 
-    /// Matches everything that is not a unicode decimal digit.
-    private static final Pattern NOT_DECIMAL_DIGIT = Pattern.compile("\\P{Nd}");
+    private static final Pattern DIGITS_PATTERN = Pattern.compile("\\d+");
+    private static final Pattern PAGE_NUMBER_PATTERN = Pattern.compile(PagesChecker.PAGE_NUMBER);
 
     /// Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
@@ -1049,7 +1049,7 @@ public class BracketedPattern {
     }
 
     private static List<String> getPageNumberTokens(String pages) {
-        Matcher matcher = Pattern.compile(PagesChecker.PAGE_NUMBER).matcher(pages);
+        Matcher matcher = PAGE_NUMBER_PATTERN.matcher(pages);
         List<String> tokens = new ArrayList<>();
         while (matcher.find()) {
             tokens.add(matcher.group());
@@ -1059,7 +1059,7 @@ public class BracketedPattern {
 
     private static Comparator<String> pageTokenComparator() {
         return Comparator.comparing(token -> {
-            if (token.matches("\\d+")) {
+            if (DIGITS_PATTERN.matcher(token).matches()) {
                 return new BigInteger(token);
             }
             return BigInteger.valueOf(romanToInteger(token));
