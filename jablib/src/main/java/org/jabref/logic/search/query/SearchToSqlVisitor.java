@@ -82,9 +82,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                     cte%d AS (
                     %s
                     )
-                    """.formatted(
-                    cteCounter,
-                    children.stream().map(node -> "    SELECT %s FROM %s".formatted(ENTRY_ID, node.cte())).collect(Collectors.joining("\n    INTERSECT\n")));
+                    """.formatted(cteCounter, children.stream().map(node -> "    SELECT %s FROM %s".formatted(ENTRY_ID, node.cte())).collect(Collectors.joining("\n    INTERSECT\n")));
 
             List<String> params = children.stream().flatMap(node -> node.params().stream()).toList();
             SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -110,13 +108,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                        FROM %s
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                ENTRY_ID,
-                subNode.cte());
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, ENTRY_ID, ENTRY_ID, subNode.cte());
 
         SqlQueryNode node = new SqlQueryNode(cte, subNode.params());
         nodes.add(node);
@@ -137,13 +129,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                     SELECT %s
                     FROM %s
                 )
-                """.formatted(
-                cteCounter,
-                ENTRY_ID,
-                left.cte(),
-                operator,
-                ENTRY_ID,
-                right.cte());
+                """.formatted(cteCounter, ENTRY_ID, left.cte(), operator, ENTRY_ID, right.cte());
 
         List<String> params = new ArrayList<>(left.params());
         params.addAll(right.params());
@@ -229,8 +215,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         }
 
         // --- ADDED FOR #14249 ---
-        if (operator == SearchParser.GEQUAL || operator == SearchParser.LEQUAL ||
-                operator == SearchParser.GT || operator == SearchParser.LT) {
+        if (operator == SearchParser.GEQUAL || operator == SearchParser.LEQUAL || operator == SearchParser.GT || operator == SearchParser.LT) {
 
             String mathOp = getMathSqlOperator(operator);
             // We bypass the standard builders to send a direct math comparison to SQL
@@ -265,23 +250,15 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             return buildEntryIdQuery(term);
         } else if ("any".equals(field)) {
             if (searchFlags.contains(EXACT_MATCH)) {
-                return searchFlags.contains(NEGATION)
-                       ? buildExactNegationAnyFieldQuery(sqlOperator, term)
-                       : buildExactAnyFieldQuery(sqlOperator, term);
+                return searchFlags.contains(NEGATION) ? buildExactNegationAnyFieldQuery(sqlOperator, term) : buildExactAnyFieldQuery(sqlOperator, term);
             } else {
-                return searchFlags.contains(NEGATION)
-                       ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
-                       : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
+                return searchFlags.contains(NEGATION) ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term) : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
             }
         } else {
             if (searchFlags.contains(EXACT_MATCH)) {
-                return searchFlags.contains(NEGATION)
-                       ? buildExactNegationFieldQuery(field, sqlOperator, term)
-                       : buildExactFieldQuery(field, sqlOperator, term);
+                return searchFlags.contains(NEGATION) ? buildExactNegationFieldQuery(field, sqlOperator, term) : buildExactFieldQuery(field, sqlOperator, term);
             } else {
-                return searchFlags.contains(NEGATION)
-                       ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
-                       : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
+                return searchFlags.contains(NEGATION) ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term) : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
             }
         }
     }
@@ -308,15 +285,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         (%s.%s != '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                MAIN_TABLE, FIELD_VALUE_LITERAL,
-                operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -337,18 +307,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         )
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                INNER_TABLE, ENTRY_ID,
-                mainTableName, INNER_TABLE,
-                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                INNER_TABLE, FIELD_VALUE_LITERAL,
-                operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, ENTRY_ID, INNER_TABLE, ENTRY_ID, mainTableName, INNER_TABLE, INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                INNER_TABLE, FIELD_VALUE_LITERAL, operator, INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -372,18 +332,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         )
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                splitValuesTableName, SPLIT_TABLE,
-                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
-                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
-                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, splitValuesTableName, SPLIT_TABLE, MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID, MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME, MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                MAIN_TABLE, FIELD_VALUE_LITERAL, operator, MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(4, term);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -411,21 +361,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         )
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                INNER_TABLE, ENTRY_ID,
-                mainTableName, INNER_TABLE,
-                splitValuesTableName, SPLIT_TABLE,
-                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
-                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
-                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
-                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, ENTRY_ID, INNER_TABLE, ENTRY_ID, mainTableName, INNER_TABLE, splitValuesTableName, SPLIT_TABLE, INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME, INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID, INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+                INNER_TABLE, FIELD_VALUE_LITERAL, operator, INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator, SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(4, term);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -442,13 +379,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         (%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?))
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, FIELD_NAME, field,
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, FIELD_NAME, field, MAIN_TABLE, FIELD_VALUE_LITERAL, operator, MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -469,18 +400,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         )
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                INNER_TABLE, ENTRY_ID,
-                mainTableName, INNER_TABLE,
-                INNER_TABLE, FIELD_NAME, field,
-                INNER_TABLE, FIELD_VALUE_LITERAL,
-                operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
-                operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, ENTRY_ID, INNER_TABLE, ENTRY_ID, mainTableName, INNER_TABLE, INNER_TABLE, FIELD_NAME, field, INNER_TABLE, FIELD_VALUE_LITERAL, operator, INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -501,19 +421,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         ((%s.%s = '%s') AND ((%s.%s %s ?) OR (%s.%s %s ?)))
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                splitValuesTableName, SPLIT_TABLE,
-                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
-                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
-                MAIN_TABLE, FIELD_NAME, field,
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
-                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                SPLIT_TABLE, FIELD_NAME, field,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, splitValuesTableName, SPLIT_TABLE, MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID, MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME, MAIN_TABLE, FIELD_NAME, field, MAIN_TABLE, FIELD_VALUE_LITERAL, operator, MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator, SPLIT_TABLE, FIELD_NAME, field, SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(4, term);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -538,22 +446,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                         )
                     )
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, ENTRY_ID,
-                INNER_TABLE, ENTRY_ID,
-                mainTableName, INNER_TABLE,
-                splitValuesTableName, SPLIT_TABLE,
-                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
-                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
-                INNER_TABLE, FIELD_NAME, field,
-                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
-                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
-                SPLIT_TABLE, FIELD_NAME, field,
-                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
-                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, ENTRY_ID, INNER_TABLE, ENTRY_ID, mainTableName, INNER_TABLE, splitValuesTableName, SPLIT_TABLE, INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID, INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME, INNER_TABLE, FIELD_NAME, field, INNER_TABLE, FIELD_VALUE_LITERAL, operator, INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator, SPLIT_TABLE, FIELD_NAME, field, SPLIT_TABLE, FIELD_VALUE_LITERAL, operator, SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
 
         List<String> params = Collections.nCopies(4, term);
         SqlQueryNode node = new SqlQueryNode(cte, params);
@@ -571,9 +464,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     }
 
     private static String getSqlOperator(EnumSet<SearchFlags> searchFlags) {
-        return searchFlags.contains(REGULAR_EXPRESSION)
-               ? (searchFlags.contains(CASE_SENSITIVE) ? "~" : "~*")
-               : (searchFlags.contains(CASE_SENSITIVE) ? "LIKE" : "ILIKE");
+        return searchFlags.contains(REGULAR_EXPRESSION) ? (searchFlags.contains(CASE_SENSITIVE) ? "~" : "~*") : (searchFlags.contains(CASE_SENSITIVE) ? "LIKE" : "ILIKE");
     }
 
     /// Escapes wildcard characters in the search term for SQL queries.
@@ -607,12 +498,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                     FROM %s AS %s
                     WHERE (%s.%s = '%s') AND (%s.%s %s ?)
                 )
-                """.formatted(
-                cteCounter,
-                MAIN_TABLE, ENTRY_ID,
-                mainTableName, MAIN_TABLE,
-                MAIN_TABLE, FIELD_NAME, field,
-                MAIN_TABLE, FIELD_VALUE_LITERAL, operator);
+                """.formatted(cteCounter, MAIN_TABLE, ENTRY_ID, mainTableName, MAIN_TABLE, MAIN_TABLE, FIELD_NAME, field, MAIN_TABLE, FIELD_VALUE_LITERAL, operator);
 
         SqlQueryNode node = new SqlQueryNode(cte, List.of(term));
         nodes.add(node);

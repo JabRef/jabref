@@ -32,9 +32,7 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
 
     @Override
     public BaseQueryNode visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
-        List<BaseQueryNode> children = ctx.expression().stream()
-                                          .map(this::visit)
-                                          .collect(Collectors.toList());
+        List<BaseQueryNode> children = ctx.expression().stream().map(this::visit).collect(Collectors.toList());
         if (children.size() == 1) {
             return children.getFirst();
         }
@@ -110,12 +108,7 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
 
         if (ctx.operator() != null) {
             int operator = ctx.operator().getStart().getType();
-            if (operator == SearchParser.NEQUAL
-                    || operator == SearchParser.NCEQUAL
-                    || operator == SearchParser.NEEQUAL
-                    || operator == SearchParser.NCEEQUAL
-                    || operator == SearchParser.NREQUAL
-                    || operator == SearchParser.NCREEQUAL) {
+            if (operator == SearchParser.NEQUAL || operator == SearchParser.NCEQUAL || operator == SearchParser.NEEQUAL || operator == SearchParser.NCEEQUAL || operator == SearchParser.NREQUAL || operator == SearchParser.NCREEQUAL) {
                 // All of these will be treated as !=
                 SearchQueryNode negatedNode = new SearchQueryNode(Optional.of(FieldFactory.parseField(field)), term);
                 return new NotNode(negatedNode);

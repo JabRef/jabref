@@ -121,9 +121,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     }
 
     private static String escapeForLucene(String term) {
-        return QueryParser.escape(term)
-                          .replace("\\*", "*")
-                          .replace("\\?", "?");
+        return QueryParser.escape(term).replace("\\*", "*").replace("\\?", "?");
     }
 
     private static boolean isNegationOperator(int operator) {
