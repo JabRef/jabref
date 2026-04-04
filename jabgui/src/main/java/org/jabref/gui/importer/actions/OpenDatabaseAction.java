@@ -188,11 +188,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             Path file = iterator.next();
 
             if (!file.isAbsolute() && baseDirectoryPath != null) {
-                try {
-                    file = baseDirectoryPath.relativize(file);
-                } catch (IllegalArgumentException e) {
-                    file = file.toAbsolutePath();
-                }
+                    file = baseDirectoryPath.resolve(file).normalize();
             }
 
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
@@ -200,9 +196,9 @@ public class OpenDatabaseAction extends SimpleCommand {
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
                     if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath != null) {
                         try {
-                            file = baseDirectoryPath.relativize(file);
+                            file = baseDirectoryPath.relativize(file).normalize();
                         } catch (IllegalArgumentException e) {
-                            file = file.toAbsolutePath();
+                            file = file.normalize();
                         }
                     }
 
@@ -230,9 +226,9 @@ public class OpenDatabaseAction extends SimpleCommand {
 
                 if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath != null) {
                     try {
-                        theFile = baseDirectoryPath.relativize(theFile);
+                        theFile = baseDirectoryPath.relativize(theFile).normalize();
                     } catch (IllegalArgumentException e) {
-                        theFile = theFile.toAbsolutePath();
+                        theFile = theFile.normalize();
                     }
                 }
 
