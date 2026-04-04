@@ -13,7 +13,7 @@ public class PagesChecker implements ValueChecker {
 
     private static final String ROMAN_NUMBER = "[ivxlcdmIVXLCDM]+";
     private static final String DECIMAL_NUMBER = "\\d+";
-    private static final String PAGE_NUMBER = "(" + ROMAN_NUMBER + "|" + DECIMAL_NUMBER + ")";
+    public static final String PAGE_NUMBER = "(" + ROMAN_NUMBER + "|" + DECIMAL_NUMBER + ")";
 
     private static final String PAGE_AFFIX = "[A-Za-z]?";
     private static final String PAGE = PAGE_AFFIX + PAGE_NUMBER + PAGE_AFFIX;

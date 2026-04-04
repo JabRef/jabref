@@ -4,9 +4,11 @@ import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
@@ -22,6 +24,7 @@ import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.casechanger.Word;
+import org.jabref.logic.integrity.PagesChecker;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
@@ -1035,19 +1038,47 @@ public class BracketedPattern {
 
     /// Split the pages field into separate numbers and return the lowest
     ///
-    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97 or 43+
+    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97, 43+ or iv--xx
     /// @return the first page number or "" if no number is found in the string
     /// @throws NullPointerException if pages is null
     public static String firstPage(String pages) {
-        // FIXME: incorrectly exracts the first page when pages are
-        // specified with ellipse, e.g. "213-6", which should stand
-        // for "213-216". S.G.
-        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
-                                .filter(Predicate.not(String::isBlank))
-                                .map(BigInteger::new)
-                                .min(BigInteger::compareTo)
-                                .map(BigInteger::toString)
-                                .orElse("");
+        Objects.requireNonNull(pages);
+
+        Pattern pattern = Pattern.compile(PagesChecker.PAGE_NUMBER); // decimal or roman
+        Matcher matcher = pattern.matcher(pages);
+
+        List<String> numberTokens = new ArrayList<>();
+        while (matcher.find()) {
+            numberTokens.add(matcher.group());
+        }
+
+        return numberTokens.stream()
+                     .min(Comparator.comparing(token -> {
+                         if (token.matches("\\d+")) {
+                             return new BigInteger(token);
+                         } else {
+                             return BigInteger.valueOf(romanToInteger(token));
+                         }
+                     }))
+                     .orElse("");
+    }
+
+    private static int romanToInteger(String s) {
+        Map<Character, Integer> va = Map.of(
+                'I', 1, 'V', 5, 'X', 10,
+                'L', 50, 'C', 100, 'D', 500, 'M', 1000
+        );
+        String roman = s.toUpperCase();
+        int res = 0;
+        for (int i = 0; i < roman.length(); i++) {
+            int v1 = va.get(roman.charAt(i));
+            if (i + 1 < roman.length()) {
+                int v2 = va.get(roman.charAt(i + 1));
+                if (v1 >= v2) res += v1;
+                else res -= v1;
+            } else res += v1;
+        }
+        return res;
     }
 
     /// Return the non-digit prefix of pages

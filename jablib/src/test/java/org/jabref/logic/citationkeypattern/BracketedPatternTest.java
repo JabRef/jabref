@@ -32,12 +32,17 @@ class BracketedPatternTest {
     private BibEntry bibentry;
     private BibDatabase database;
     private BibEntry dbentry;
+    private BibEntry romanentry;
 
     @BeforeEach
     void setUp() {
         bibentry = new BibEntry().withField(StandardField.AUTHOR, "O. Kitsune")
                                  .withField(StandardField.YEAR, "2017")
                                  .withField(StandardField.PAGES, "213--216");
+
+        romanentry = new BibEntry().withField(StandardField.AUTHOR, "O. Kitsune")
+                                 .withField(StandardField.YEAR, "2017")
+                                 .withField(StandardField.PAGES, "XX--ivS");
 
         dbentry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("HipKro03")
@@ -428,6 +433,12 @@ class BracketedPatternTest {
     void bibentryExpansionTest() {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry));
+    }
+
+    @Test
+    void bibentryRomanExpansionTest() {
+        BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
+        assertEquals("2017_Kitsune_iv", pattern.expand(romanentry));
     }
 
     @Test
