@@ -95,11 +95,14 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         // --- ADDED FOR #14249: DATE/RANGE SUPPORT ---
         if (operator == SearchParser.GEQUAL) {
             return field + "[" + term + " TO *]";
-        }if (operator == SearchParser.LEQUAL) {
+        }
+        if (operator == SearchParser.LEQUAL) {
             return field + "[* TO " + term + "]";
-        }if (operator == SearchParser.GT) {
+        }
+        if (operator == SearchParser.GT) {
             return field + "{" + term + " TO *}";
-        }if (operator == SearchParser.LT) {
+        }
+        if (operator == SearchParser.LT) {
             return field + "{* TO " + term + "}";
         }
         // ----------------------------------------------
