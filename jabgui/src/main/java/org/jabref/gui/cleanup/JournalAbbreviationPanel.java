@@ -38,15 +38,10 @@ public class JournalAbbreviationPanel extends VBox {
     @FXML
     private void initialize() {
         abbreviateDefault.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT));
-
         abbreviateDottles.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS));
-
         abbreviateShortestUnique.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE));
-
         abbreviateLTWA.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA));
-
         unabbreviate.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.UNABBREVIATE));
-
         noChanges.setUserData(EnumSet.noneOf(CleanupPreferences.CleanupStep.class));
 
         bindProperties();
