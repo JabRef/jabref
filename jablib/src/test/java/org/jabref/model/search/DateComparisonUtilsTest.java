@@ -1,9 +1,11 @@
 package org.jabref.model.search;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DateComparisonUtilsTest {
+class DateComparisonUtilsTest {
     @Test
     void testExactYearComparison() {
         // Is 2024 >= 2020? (true)
