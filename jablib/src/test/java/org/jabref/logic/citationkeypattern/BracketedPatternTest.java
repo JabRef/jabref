@@ -41,8 +41,8 @@ class BracketedPatternTest {
                                  .withField(StandardField.PAGES, "213--216");
 
         romanentry = new BibEntry().withField(StandardField.AUTHOR, "O. Kitsune")
-                                 .withField(StandardField.YEAR, "2017")
-                                 .withField(StandardField.PAGES, "SXX--ivS");
+                                   .withField(StandardField.YEAR, "2017")
+                                   .withField(StandardField.PAGES, "SXX--ivS");
 
         dbentry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("HipKro03")

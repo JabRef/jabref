@@ -1077,9 +1077,14 @@ public class BracketedPattern {
             int v1 = va.get(roman.charAt(i));
             if (i + 1 < roman.length()) {
                 int v2 = va.get(roman.charAt(i + 1));
-                if (v1 >= v2) res += v1;
-                else res -= v1;
-            } else res += v1;
+                if (v1 >= v2) {
+                    res += v1;
+                } else {
+                    res -= v1;
+                }
+            } else {
+                res += v1;
+            }
         }
         return res;
     }
