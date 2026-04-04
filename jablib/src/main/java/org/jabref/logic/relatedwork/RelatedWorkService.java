@@ -114,8 +114,8 @@ public class RelatedWorkService {
                              .filter(duplicateEntry -> !duplicateEntry.getId().equals(sourceEntry.getId()));
     }
 
-    /// Insert comment-{username} to target bib entry
-    /// If comment-{username} not exist, then create a new field; Otherwise append it and separate by an empty line.
+    /// Insert "comment-{username}" to target bib entry
+    /// If "comment-{username}" not exists, then create a new field; Otherwise append it and separate by an empty line.
     ///
     /// @param userSpecificCommentField comment-{username}
     /// @return FieldChange represents if the field is changed
