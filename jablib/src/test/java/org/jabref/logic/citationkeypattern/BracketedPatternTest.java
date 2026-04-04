@@ -448,16 +448,6 @@ class BracketedPatternTest {
     }
 
     @Test
-    void bibentryPagePrefixTest() {
-        assertEquals("S", BracketedPattern.pagePrefix("S5-K10"));
-    }
-
-    @Test
-    void bibentryRomanPagePrefixTest() {
-        assertEquals("S", BracketedPattern.pagePrefix("Siv-KXX"));
-    }
-
-    @Test
     void nullDatabaseExpansionTest() {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");

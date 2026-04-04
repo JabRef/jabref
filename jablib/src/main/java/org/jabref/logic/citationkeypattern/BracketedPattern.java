@@ -1092,12 +1092,30 @@ public class BracketedPattern {
     public static String pagePrefix(String pages) {
         Objects.requireNonNull(pages);
 
-        Matcher matcher = Pattern.compile(PagesChecker.PAGE_NUMBER).matcher(pages);
+        Matcher decimalMatcher = Pattern.compile(PagesChecker.DECIMAL_NUMBER).matcher(pages);
+        Matcher romanMatcher = Pattern.compile(PagesChecker.ROMAN_NUMBER).matcher(pages);
 
-        if (matcher.find()) {
-            return pages.substring(0, matcher.start());
+        boolean foundDecimal = decimalMatcher.find();
+        int decimalStart = foundDecimal ? decimalMatcher.start() : -1;
+
+        boolean foundRoman = romanMatcher.find();
+        int romanStart = foundRoman ? romanMatcher.start() : -1;
+
+        if (foundDecimal) {
+            if (!foundRoman || decimalStart <= romanStart) {
+                return pages.substring(0, decimalStart);
+            }
+
+            if (romanMatcher.end() == decimalStart) {
+                return pages.substring(0, decimalStart);
+            }
+
+            return pages.substring(0, romanStart);
         }
 
+        if (foundRoman) {
+            return pages.substring(0, romanStart);
+        }
         return "";
     }
 
@@ -1108,9 +1126,11 @@ public class BracketedPattern {
     /// @throws NullPointerException if pages is null.
     public static String lastPage(String pages) {
         Objects.requireNonNull(pages);
-        return getPageNumberTokens(pages).stream()
-                                         .max(pageTokenComparator())
-                                         .orElse("");
+        List<String> tokens = getPageNumberTokens(pages);
+
+        return tokens.stream()
+                     .max(pageTokenComparator().thenComparingInt(tokens::indexOf))
+                     .orElse("");
     }
 
     /// Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
