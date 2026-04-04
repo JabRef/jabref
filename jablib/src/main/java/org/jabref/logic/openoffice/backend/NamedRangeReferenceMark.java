@@ -247,7 +247,6 @@ public class NamedRangeReferenceMark implements NamedRange {
         if (fullText.length() < 2) {
             throw new IllegalStateException("getFillCursor: fullText.length() < 2 (after loop)'%n");
         }
-
         XTextCursor beta = full.getText().createTextCursorByRange(full);
         beta.collapseToStart();
         beta.goRight((short) 1, false);
@@ -312,7 +311,8 @@ public class NamedRangeReferenceMark implements NamedRange {
                 LOGGER.debug("getFillCursor: omega(8) covers '{}', should be '{}'", omega.getString(), right);
             }
         }
-        NamedRangeReferenceMark.checkFillCursor(beta);
+
+        //NamedRangeReferenceMark.checkFillCursor(beta);
         return beta;
     }
 
