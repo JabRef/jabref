@@ -19,12 +19,12 @@
             <ToggleGroup fx:id="journalAbbreviationsToggleGroup"/>
         </fx:define>
 
-        <RadioButton fx:id="abbreviateDefault" toggleGroup="$journalAbbreviationsToggleGroup"/>
-        <RadioButton fx:id="abbreviateDottles" toggleGroup="$journalAbbreviationsToggleGroup"/>
-        <RadioButton fx:id="abbreviateShortestUnique" toggleGroup="$journalAbbreviationsToggleGroup"/>
-        <RadioButton fx:id="abbreviateLTWA" toggleGroup="$journalAbbreviationsToggleGroup"/>
-        <RadioButton fx:id="unabbreviate" toggleGroup="$journalAbbreviationsToggleGroup"/>
-        <RadioButton fx:id="noChanges" toggleGroup="$journalAbbreviationsToggleGroup"/>
+        <RadioButton fx:id="abbreviateDefault" toggleGroup="$journalAbbreviationsToggleGroup" text="%Abbreviate (default)"/>
+        <RadioButton fx:id="abbreviateDottles" toggleGroup="$journalAbbreviationsToggleGroup" text="%Abbreviate (dotless)"/>
+        <RadioButton fx:id="abbreviateShortestUnique" toggleGroup="$journalAbbreviationsToggleGroup" text="%Abbreviate (shortest unique)"/>
+        <RadioButton fx:id="abbreviateLTWA" toggleGroup="$journalAbbreviationsToggleGroup" text="%Abbreviate (LTWA)"/>
+        <RadioButton fx:id="unabbreviate" toggleGroup="$journalAbbreviationsToggleGroup" text="%Unabbreviate"/>
+        <RadioButton fx:id="noChanges" toggleGroup="$journalAbbreviationsToggleGroup" text="%No changes"/>
     </VBox>
 
 </fx:root>

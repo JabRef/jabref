@@ -11,7 +11,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
 import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -38,22 +37,16 @@ public class JournalAbbreviationPanel extends VBox {
 
     @FXML
     private void initialize() {
-        abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
         abbreviateDefault.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT));
 
-        abbreviateDottles.setText(Localization.lang("Abbreviate (dotless)"));
         abbreviateDottles.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS));
 
-        abbreviateShortestUnique.setText(Localization.lang("Abbreviate (shortest unique)"));
         abbreviateShortestUnique.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE));
 
-        abbreviateLTWA.setText(Localization.lang("Abbreviate (LTWA)"));
         abbreviateLTWA.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA));
 
-        unabbreviate.setText(Localization.lang("Unabbreviate"));
         unabbreviate.setUserData(EnumSet.of(CleanupPreferences.CleanupStep.UNABBREVIATE));
 
-        noChanges.setText(Localization.lang("No changes"));
         noChanges.setUserData(EnumSet.noneOf(CleanupPreferences.CleanupStep.class));
 
         bindProperties();
