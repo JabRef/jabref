@@ -125,7 +125,7 @@ public class AiChatComponent extends VBox {
     }
 
     public void updateDatabase(BibDatabaseContext newBibDatabaseContext,
-                               ObservableList<ChatMessage> newChatHistory) {
+                   ObservableList<ChatMessage> newChatHistory) {
         this.bibDatabaseContext = newBibDatabaseContext;
         this.chatHistory = newChatHistory;
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, newChatHistory, entries, newBibDatabaseContext);
