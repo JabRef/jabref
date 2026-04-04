@@ -93,10 +93,10 @@ public class RelatedWorkDialogViewModel extends AbstractViewModel {
 
         try {
             List<RelatedWorkMatchResult> matchResults = relatedWorkService.matchRelatedWork(
-                    sourceEntry,
-                    text,
-                    linkedPDFFile,
                     databaseContext,
+                    sourceEntry,
+                    linkedPDFFile,
+                    text,
                     preferences.getFilePreferences()
             );
 

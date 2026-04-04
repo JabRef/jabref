@@ -33,10 +33,10 @@ class RelatedWorkServiceTest {
         RelatedWorkService service = createService();
 
         List<RelatedWorkMatchResult> matchResults = service.matchRelatedWork(
-                new BibEntry(StandardEntryType.Article),
-                "They are facing several challenges in this transformation described along the BAPO framework [80].",
-                linkedFile,
                 new BibDatabaseContext(),
+                new BibEntry(StandardEntryType.Article),
+                linkedFile,
+                "They are facing several challenges in this transformation described along the BAPO framework [80].",
                 createFilePreferences()
         );
 
@@ -65,10 +65,10 @@ class RelatedWorkServiceTest {
         databaseContext.getDatabase().insertEntry(existingLibraryEntry);
 
         List<RelatedWorkMatchResult> matchedResults = service.matchRelatedWork(
-                new BibEntry(StandardEntryType.Article),
-                "They are facing several challenges in this transformation described along the BAPO framework [80].",
-                linkedFile,
                 databaseContext,
+                new BibEntry(StandardEntryType.Article),
+                linkedFile,
+                "They are facing several challenges in this transformation described along the BAPO framework [80].",
                 createFilePreferences()
         );
 
@@ -83,10 +83,10 @@ class RelatedWorkServiceTest {
         RelatedWorkService service = createService();
 
         List<RelatedWorkMatchResult> matchResults = service.matchRelatedWork(
-                new BibEntry(StandardEntryType.Article),
-                "This text has no citation markers.",
-                linkedFile,
                 new BibDatabaseContext(),
+                new BibEntry(StandardEntryType.Article),
+                linkedFile,
+                "This text has no citation markers.",
                 createFilePreferences()
         );
 

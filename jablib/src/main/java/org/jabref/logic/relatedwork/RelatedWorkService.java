@@ -37,10 +37,10 @@ public class RelatedWorkService {
     ///
     /// @param sourceEntry selected bib entry in library
     /// @return List of matched result
-    public List<RelatedWorkMatchResult> matchRelatedWork(BibEntry sourceEntry,
-                                                         String relatedWorkText,
+    public List<RelatedWorkMatchResult> matchRelatedWork(BibDatabaseContext databaseContext,
+                                                         BibEntry sourceEntry,
                                                          LinkedFile linkedFile,
-                                                         BibDatabaseContext databaseContext,
+                                                         String relatedWorkText,
                                                          FilePreferences filePreferences) throws IOException {
         List<RelatedWorkSnippet> relatedWorkSnippets = relatedWorkTextParser.parseRelatedWork(relatedWorkText);
         if (relatedWorkSnippets.isEmpty()) {
