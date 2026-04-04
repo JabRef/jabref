@@ -1,6 +1,5 @@
 package org.jabref.logic.search;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -241,14 +241,25 @@ public class IndexManager {
         }
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
-            for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene")
-                        && !path.equals(currentIndexPath)) {
-                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
-                    Files.walk(path)
-                         .sorted(Comparator.reverseOrder())
-                         .map(Path::toFile)
-                         .forEach(File::delete);
+            for (Path directory : stream) {
+                if (Files.isDirectory(directory)
+                        && !directory.toString().endsWith("ssl")
+                        && directory.toString().contains("lucene")
+                        && !directory.equals(currentIndexPath)) {
+                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", directory);
+
+                    try (Stream<Path> indexPath = Files.walk(directory)) {
+                        indexPath.sorted(Comparator.reverseOrder())
+                                 .forEach(file -> {
+                                     try {
+                                         Files.deleteIfExists(file);
+                                     } catch (IOException e) {
+                                         LOGGER.error("Could not delete file {}", file, e);
+                                     }
+                                 });
+                    } catch (IOException e) {
+                        LOGGER.error("Could not read directory {}", directory, e);
+                    }
                 }
             }
         } catch (IOException e) {
