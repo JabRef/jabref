@@ -41,7 +41,15 @@ public class PagesCheckerBiblatexTest {
                 // bibTexAcceptsMorePageNumbersWithRangeOfNumbers
                 "7+,41--43,73",
                 // suffix
-                "436S-439S"
+                "436S-439S",
+                // prefix
+                "S436-S439",
+                // prefix and suffix
+                "S436S-S439S",
+                // affix and more following range
+                "S10A+",
+                // unicode separator
+                "1\u201310"
         );
     }
 
@@ -60,7 +68,9 @@ public class PagesCheckerBiblatexTest {
                 // bibTexDoesNotAcceptBrackets
                 "{1}-{2}",
                 // More than one suffix forbidden
-                "436SS-439S"
+                "436SS-439S",
+                // invalid ranges
+                "10-", "-10", "10--", "--10", "+10", "10+-10"
         );
     }
 
