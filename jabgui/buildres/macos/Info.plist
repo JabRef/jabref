@@ -31,6 +31,17 @@
   <string>DEPLOY_BUNDLE_CFBUNDLE_VERSION</string>
   <key>NSHumanReadableCopyright</key>
   <string>DEPLOY_BUNDLE_COPYRIGHT</string>DEPLOY_FILE_ASSOCIATIONS
+  <key>CFBundleURLTypes</key>
+  <array>
+   <dict>
+    <key>CFBundleURLName</key>
+    <string>JabRef Protocol</string>
+    <key>CFBundleURLSchemes</key>
+    <array>
+     <string>jabref</string>
+    </array>
+   </dict>
+  </array>
   <key>NSHighResolutionCapable</key>
   <string>true</string>
   <key>NSSupportsAutomaticGraphicsSwitching</key>

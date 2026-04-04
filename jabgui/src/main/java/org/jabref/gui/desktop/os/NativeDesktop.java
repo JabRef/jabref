@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -359,5 +360,14 @@ public abstract class NativeDesktop {
 
     public boolean moveToTrashSupported() {
         return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
+    }
+
+    /// Registers a handler for the {@code jabref://} URL scheme so that the app is focused when a link is opened.
+    /// On macOS, URI invocations are delivered as Apple Events; this method registers the handler there.
+    /// On Windows and Linux the URL arrives as a CLI argument and is handled by [ArgumentProcessor], so this is a no-op.
+    ///
+    /// @param whenJabRefUriOpened callback invoked when a jabref:// URI is received (e.g. focus the main window; run on FX thread if needed)
+    public void registerJabRefProtocolHandler(Consumer<URI> whenJabRefUriOpened) {
+        // Default: no-op. Overridden in OSX.
     }
 }

@@ -7,7 +7,7 @@ Icon=APPLICATION_ICON
 Terminal=false
 Type=Application
 Categories=DEPLOY_BUNDLE_CATEGORY
-DESKTOP_MIMES
+MimeType=text/x-bibtex;x-scheme-handler/jabref;
 
 GenericName=BibTeX Editor
 Keywords=bibtex;biblatex;latex;bibliography

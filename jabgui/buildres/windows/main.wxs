@@ -160,9 +160,25 @@
           <RegistryValue Type="string" Name="update_url" Value="https://edge.microsoft.com/extensionwebstorebase/v1/crx" />
         </RegistryKey>
       </Component>
+      <Component Id="RegistryJabRefProtocolHandler" Guid="a7d751c0-85f4-4d1c-abc0-06972d8a0379" Win64="yes">
+        <RegistryKey Root="HKMU" Key="SOFTWARE\Classes\jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Value="URL:JabRef Protocol"/>
+          <RegistryValue Type="string" Name="URL Protocol" Value=""/>
+        </RegistryKey>
+        <RegistryKey Root="HKMU" Key="SOFTWARE\Classes\jabref\DefaultIcon" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Value="[INSTALLDIR]JabRef.exe,0"/>
+        </RegistryKey>
+        <RegistryKey Root="HKMU" Key="SOFTWARE\Classes\jabref\shell\open" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Name="FriendlyAppName" Value="JabRef"/>
+        </RegistryKey>
+        <RegistryKey Root="HKMU" Key="SOFTWARE\Classes\jabref\shell\open\command" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Value="&quot;[INSTALLDIR]JabRef.exe&quot; &quot;%1&quot;"/>
+        </RegistryKey>
+      </Component>
     </DirectoryRef>
     <Feature Id="BrowserExtension" Level="1">
       <ComponentRef Id="RegistryJabRefBrowserEntries" />
+      <ComponentRef Id="RegistryJabRefProtocolHandler" />
     </Feature>
   </Product>
 </Wix>

@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added `jabref://` protocol handler registration so the browser extension can launch or foreground JabRef when the HTTP server is unreachable. [#15378](https://github.com/JabRef/jabref/pull/15378)
 - We added support for downloading full-text PDFs from Wiley journals via the Wiley TDM API. [#13404](https://github.com/JabRef/jabref/issues/13404)
 - We added `--key-patterns` option to CLI parameters to allows users to set a citation key's pattern for a specific entry type. [#14707](https://github.com/JabRef/jabref/issues/14707)
 - We added a CLI option `--field-formatters` to the `convert` and `generate-bib-from-aux` commands to apply field formatters during export. [#11520](https://github.com/JabRef/jabref/issues/11520)
