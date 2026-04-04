@@ -148,8 +148,9 @@ public class ThemeManager {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
         } else {
-            LOGGER.debug("Using default font size of {}pt", workspacePreferences.getDefaultFontSize());
-            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getDefaultFontSize() + "pt;");
+            int mainFontSize = WorkspacePreferences.getDefault().getMainFontSize();
+            LOGGER.debug("Using default font size of {}pt", mainFontSize);
+            scene.getRoot().setStyle("-fx-font-size: " + mainFontSize + "pt;");
         }
     }
 

@@ -157,7 +157,7 @@ public class UiTaskExecutor implements TaskExecutor {
         Task<V> javaTask = new Task<>() {
             {
                 this.updateMessage(task.messageProperty().get());
-                this.updateTitle(task.titleProperty().get());
+                this.updateTitle(java.util.Objects.toString(task.titleProperty().get(), ""));
                 BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.workDone(), progress.max()));
                 BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
                 BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);

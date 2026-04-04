@@ -115,6 +115,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
+
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     private final NavigationHistory navigationHistory = new NavigationHistory();
@@ -195,6 +197,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.taskExecutor = taskExecutor;
         this.aiService = aiService;
 
+        this.journalAbbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
         initializeComponentsAndListeners(isDummyContext);
 
         // set LibraryTab ID for drag'n'drop
@@ -274,6 +277,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         String mode = bibDatabaseContext.getMode().getFormattedName();
         String modeInfo = "\n%s".formatted(Localization.lang("%0 mode", mode));
         text.append(modeInfo);
+    }
+
+    /// Returns an index for a new untitled library to generate names like "untitled (1)", "untitled (2)", etc.
+    private int getUntitledLibraryNumber() {
+        // Relies on a fact that a fresh "untitled" library doesn't have a path and that new libraries are added at the end of the list.
+        // A trick, but works good enough.
+
+        List<LibraryTab> untitledTabs = tabContainer
+                .getLibraryTabs()
+                .stream()
+                .filter(tab -> tab.getBibDatabaseContext().getDatabasePath().isEmpty()
+                        && tab.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)
+                .toList();
+
+        return untitledTabs.indexOf(this);
     }
 
     private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
@@ -408,6 +426,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             Path databasePath = file.get();
             tabTitle.append(databasePath.getFileName().toString());
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
+            // Unicode codepoint deliberately chosen to avoid semantical confusion
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
             toolTipText.append(databasePath.toAbsolutePath());
 
@@ -428,7 +447,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append('*');
-                tabTitle.append(Localization.lang("untitled"));
+                int untitledNumber = getUntitledLibraryNumber();
+                if (untitledNumber > 0) {
+                    tabTitle.append(Localization.lang("untitled (%0)", Integer.toString(untitledNumber)));
+                } else {
+                    tabTitle.append(Localization.lang("untitled"));
+                }
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
@@ -475,6 +499,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService,
                 stateManager,
                 preferences.getKeyBindingRepository(),
+                journalAbbreviationRepository,
                 clipBoardManager,
                 entryTypesManager,
                 taskExecutor,
@@ -522,7 +547,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(
                     getDatabase(),
-                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                    journalAbbreviationRepository,
                     autoCompletePreferences);
         } else {
             // Create empty suggestion providers if auto-completion is deactivated
