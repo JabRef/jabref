@@ -17,6 +17,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class RelatedWorkService {
     private static final Pattern COMMENT_LINE_SEPARATOR_PATTERN = Pattern.compile("\\R\\R+");
 
