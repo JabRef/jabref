@@ -359,6 +359,8 @@ public class CSLCitationOOAdapter {
                     HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
         }
 
+        citation = CSLFormatUtils.transformHTML(citation);
+
         if (isNumericStyle) {
             citation = updateSingleOrMultipleCitationNumbers(citation, List.of(currentEntry));
             String prefix = CSLFormatUtils.generateAuthorPrefix(currentEntry, bibDatabaseContext);
@@ -367,7 +369,7 @@ public class CSLCitationOOAdapter {
             citation = CSLFormatUtils.changeToInText(citation);
         }
 
-        return CSLFormatUtils.transformHTML(citation);
+        return citation;
     }
 
     /// Checks if an entry has already been cited before in the document.
