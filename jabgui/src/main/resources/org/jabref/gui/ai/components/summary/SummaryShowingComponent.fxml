@@ -13,7 +13,7 @@
     <children>
         <BorderPane minHeight="30.0">
             <left>
-                <CheckBox fx:id="markdownCheckbox" mnemonicParsing="false" onAction="#onMarkdownToggle" text="Markdown" />
+                <CheckBox fx:id="markdownCheckbox" mnemonicParsing="false" onAction="#onMarkdownToggle" text="Markdown" selected="true" />
             </left>
             <center>
                 <Button mnemonicParsing="false" onAction="#onRegenerateButtonClick" text="%Regenerate" translateX="-40" />
