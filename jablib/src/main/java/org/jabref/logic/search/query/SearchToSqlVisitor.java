@@ -583,27 +583,31 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         return term.replaceAll("[\\\\_%]", "\\\\$0");
     }
 
-
     // --- ADDED FOR #14249 ---
     private static String getMathSqlOperator(int operator) {
         return switch (operator) {
-            case SearchParser.GEQUAL -> ">=";
-            case SearchParser.LEQUAL -> "<=";
-            case SearchParser.GT -> ">";
-            case SearchParser.LT -> "<";
-            default -> "=";
+            case SearchParser.GEQUAL ->
+                    ">=";
+            case SearchParser.LEQUAL ->
+                    "<=";
+            case SearchParser.GT ->
+                    ">";
+            case SearchParser.LT ->
+                    "<";
+            default ->
+                    "=";
         };
     }
 
     // --- ADDED FOR #14249 ---
     private SqlQueryNode buildMathFieldQuery(String field, String operator, String term) {
         String cte = """
-            cte%d AS (
-                SELECT %s.%s
-                FROM %s AS %s
-                WHERE (%s.%s = '%s') AND (%s.%s %s ?)
-            )
-            """.formatted(
+                cte%d AS (
+                    SELECT %s.%s
+                    FROM %s AS %s
+                    WHERE (%s.%s = '%s') AND (%s.%s %s ?)
+                )
+                """.formatted(
                 cteCounter,
                 MAIN_TABLE, ENTRY_ID,
                 mainTableName, MAIN_TABLE,
