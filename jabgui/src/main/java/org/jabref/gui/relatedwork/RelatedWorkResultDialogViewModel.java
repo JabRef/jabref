@@ -24,13 +24,13 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
 
-    private final BibEntry sourceEntry;
-    private final String userName;
     private final DialogService dialogService;
     private final UndoManager undoManager;
+    private final BibEntry sourceEntry;
     private final RelatedWorkService relatedWorkService;
     private final List<RelatedWorkMatchResult> matchedResults;
     private final ObservableList<RelatedWorkMatchResult> matchedReferences = FXCollections.observableArrayList();
+    private final String userName;
 
     public RelatedWorkResultDialogViewModel(BibEntry sourceEntry,
                                             List<RelatedWorkMatchResult> matchedResults,
