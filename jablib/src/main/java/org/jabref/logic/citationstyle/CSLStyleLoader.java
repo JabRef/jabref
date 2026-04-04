@@ -115,7 +115,7 @@ public record CSLStyleLoader(
     }
 
     /// Adds a new external CSL style.
-    public void addStyle(@NonNull CitationStyle citationStyle) {
+    public void addExternalStyle(@NonNull CitationStyle citationStyle) {
         EXTERNAL_STYLES.add(citationStyle);
         storeExternalStyles();
     }

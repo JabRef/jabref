@@ -218,7 +218,7 @@ public class StyleSelectDialogViewModel {
             }
 
             // Citation style is good to add
-            cslStyleLoader.addStyle(citationStyleToAdd);
+            cslStyleLoader.addExternalStyle(citationStyleToAdd);
 
             List<CitationStyle> allStyles = CSLStyleLoader.getStyles();
             List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
