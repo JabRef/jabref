@@ -34,13 +34,16 @@ public class PagesChecker implements ValueChecker {
                     + ")?"
                     + "\\z";            // end String
 
+    private static final Predicate<String> IS_VALID_PAGE_NUMBER_BIBTEX = Pattern.compile(PAGES_EXP_BIBTEX).asPredicate();
+    private static final Predicate<String> IS_VALID_PAGE_NUMBER_BIBLATEX = Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
+
     private final Predicate<String> isValidPageNumber;
 
     public PagesChecker(BibDatabaseContext databaseContext) {
         if (databaseContext.isBiblatexMode()) {
-            isValidPageNumber = Pattern.compile(PAGES_EXP_BIBLATEX).asPredicate();
+            isValidPageNumber = IS_VALID_PAGE_NUMBER_BIBLATEX;
         } else {
-            isValidPageNumber = Pattern.compile(PAGES_EXP_BIBTEX).asPredicate();
+            isValidPageNumber = IS_VALID_PAGE_NUMBER_BIBTEX;
         }
     }
 
