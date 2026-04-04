@@ -31,7 +31,7 @@ public class PagesChecker implements ValueChecker {
                     + PAGE_RANGE_BIBTEX
             + ")\\z";
 
-    private static final String BIBLATEX_SEPARATOR = "(-{1,2}|\u2013)";  // separator
+    private static final String BIBLATEX_SEPARATOR = "(-{1,2}|\u2013|/)";  // separator
     private static final String PAGE_RANGE_BIBLATEX = "("
             + PAGE + BIBLATEX_SEPARATOR + PAGE
             + "|"

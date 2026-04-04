@@ -49,7 +49,9 @@ public class PagesCheckerBiblatexTest {
                 // affix and more following range
                 "S10A+",
                 // unicode separator
-                "1\u201310"
+                "1\u201310",
+                // other separators
+                "A10S/90"
         );
     }
 
