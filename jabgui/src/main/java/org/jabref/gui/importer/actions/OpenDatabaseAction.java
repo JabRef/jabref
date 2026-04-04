@@ -1,7 +1,6 @@
 package org.jabref.gui.importer.actions;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -188,7 +186,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             Path file = iterator.next();
 
             if (!file.isAbsolute() && baseDirectoryPath != null) {
-                    file = baseDirectoryPath.resolve(file).normalize();
+                file = baseDirectoryPath.resolve(file).normalize();
             }
 
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
