@@ -126,6 +126,8 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.logic.util.JabRefBaseDirectoryLocator.getBaseDirectoryPath;
+
 /// The `JabRefPreferences` class provides the preferences and their defaults using
 /// the JDK `java.util.prefs` class.
 ///
@@ -1929,6 +1931,8 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void storeFileHistory(FileHistory history) {
+        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
+        history.updateItems(internalPreferences.isMemoryStickMode());
         putStringList(RECENT_DATABASES, history.stream()
                                                .map(Path::toString)
                                                .toList());
