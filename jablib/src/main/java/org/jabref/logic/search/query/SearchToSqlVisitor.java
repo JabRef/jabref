@@ -192,7 +192,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             setFlags(searchFlags, REGULAR_EXPRESSION, true, true);
 
             // --- ADDED FOR #14249 ---
-        }else if (operator == SearchParser.GEQUAL) {
+        } else if (operator == SearchParser.GEQUAL) {
             searchFlags.add(EXACT_MATCH); // We use EXACT_MATCH as a proxy for mathematical comparison
         } else if (operator == SearchParser.LEQUAL) {
             searchFlags.add(EXACT_MATCH);
