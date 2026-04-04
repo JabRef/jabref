@@ -98,18 +98,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private PreviewLayout layout;
     private String layoutText;
 
-    public PreviewViewer(DialogService dialogService,
-                         GuiPreferences preferences,
-                         ThemeManager themeManager,
-                         TaskExecutor taskExecutor) {
+    public PreviewViewer(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());
     }
 
-    public PreviewViewer(DialogService dialogService,
-                         GuiPreferences preferences,
-                         ThemeManager themeManager,
-                         TaskExecutor taskExecutor,
-                         StringProperty searchQueryProperty) {
+    public PreviewViewer(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor, StringProperty searchQueryProperty) {
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
@@ -125,6 +118,19 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setContent(previewView);
 
         configurePreviewView(themeManager);
+    }
+
+    private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
+        return """
+                <html>
+                    <head>
+                        <base href="%s">
+                    </head>
+                    <body id="previewBody">
+                        %s <div id="content"> %s </div>
+                    </body>
+                </html>
+                """.formatted(baseUrl, coverIfAny, text);
     }
 
     private void configurePreviewView(ThemeManager themeManager) {
@@ -204,10 +210,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void update() {
         if ((databaseContext == null) || (entry == null) || (layout == null)) {
-            LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
-                    databaseContext == null ? "null" : databaseContext,
-                    entry == null ? "null" : entry,
-                    layout == null ? "null" : layout);
+            LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}", databaseContext == null ? "null" : databaseContext, entry == null ? "null" : entry, layout == null ? "null" : layout);
             setPreviewText("");
             return;
         }
@@ -216,12 +219,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         BibEntry currentEntry = entry;
 
         BackgroundTask.wrap(() -> {
-                          String previewHtml = layout.generatePreview(currentEntry, databaseContext);
-                          return injectAnnotations(previewHtml, currentEntry, databaseContext);
-                      })
-                      .onSuccess(this::setPreviewText)
-                      .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
-                      .executeWith(taskExecutor);
+            String previewHtml = layout.generatePreview(currentEntry, databaseContext);
+            return injectAnnotations(previewHtml, currentEntry, databaseContext);
+        }).onSuccess(this::setPreviewText).onFailure(e -> setPreviewText(formatError(currentEntry, e))).executeWith(taskExecutor);
     }
 
     private String formatError(BibEntry entry, Throwable exception) {
@@ -233,9 +233,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     <p>%s</p>
                     <p><small>Check the event logs for details.</small></p>
                 </div>
-                """.formatted(
-                Localization.lang("Error while generating citation style"),
-                exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
+                """.formatted(Localization.lang("Error while generating citation style"), exception.getLocalizedMessage() != null ? exception.getLocalizedMessage() : "Unknown error");
     }
 
     private void setPreviewText(String text) {
@@ -266,19 +264,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         return Optional.empty();
     }
 
-    private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
-        return """
-                <html>
-                    <head>
-                        <base href="%s">
-                    </head>
-                    <body id="previewBody">
-                        %s <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(baseUrl, coverIfAny, text);
-    }
-
     private void highlightLayoutText() {
         if (layoutText == null) {
             return;
@@ -306,12 +291,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
 
         BackgroundTask.wrap(() -> {
-                          job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
-                          previewView.getEngine().print(job);
-                          job.endJob();
-                      })
-                      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e))
-                      .executeWith(taskExecutor);
+            job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
+            previewView.getEngine().print(job);
+            job.endJob();
+        }).onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e)).executeWith(taskExecutor);
     }
 
     public void copyPreviewHtmlToClipBoard() {
@@ -350,12 +333,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void exportToClipBoard(StateManager stateManager) {
-        ExportToClipboardAction exportToClipboardAction = new ExportToClipboardAction(
-                dialogService,
-                stateManager,
-                clipBoardManager,
-                taskExecutor,
-                preferences);
+        ExportToClipboardAction exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
         exportToClipboardAction.execute();
     }
 
@@ -371,10 +349,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 Platform.runLater(() -> {
-                    Object result = previewView.getEngine().executeScript(
-                            "var content = document.getElementById('content');" +
-                                    "content ? content.getBoundingClientRect().height : document.body.scrollHeight;"
-                    );
+                    Object result = previewView.getEngine().executeScript("var content = document.getElementById('content');" + "content ? content.getBoundingClientRect().height : document.body.scrollHeight;");
 
                     if (result instanceof java.lang.Number height) {
                         double actualH = height.doubleValue() + HEIGHT_BUFFER;
@@ -400,6 +375,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public String getSelectionHtmlContent() {
         return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
     }
+
     private String injectAnnotations(String previewHtml, BibEntry entry, BibDatabaseContext databaseContext) {
         FileAnnotationCache annotationCache = new FileAnnotationCache(databaseContext, preferences.getFilePreferences());
         Map<Path, List<FileAnnotation>> annotations = annotationCache.getFromCache(entry);
@@ -409,6 +385,5 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         String annotationHtml = FileAnnotationHtmlRenderer.render(annotations);
         return previewHtml + "<div style='margin-top:10px'>" + annotationHtml + "</div>";
     }
-
 }
 
