@@ -12,6 +12,7 @@ import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
@@ -25,6 +26,9 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     /// @param pageNumber  requested site number indexed from 0
     /// @return Page with search results
     default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
+        // Interface does not allow private constants
+        final Logger LOGGER = LoggerFactory.getLogger(PagedSearchBasedFetcher.class);
+
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, List.of());
         }
@@ -37,12 +41,12 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
             try {
                 queryNode = visitor.visitStart(searchQueryObject.getContext());
             } catch (ParseCancellationException e) {
-                LoggerFactory.getLogger(PagedSearchBasedFetcher.class).debug("Search query visitor failed for '{}', falling back to raw term search", searchQuery, e);
+                LOGGER.debug("Search query visitor failed for '{}', falling back to raw term search", searchQuery, e);
                 queryNode = new SearchQueryNode(Optional.empty(), searchQuery);
             }
         } else {
             // Treat unparseable input as a raw unfielded term so fetchers pass it directly to their web API
-            LoggerFactory.getLogger(PagedSearchBasedFetcher.class).debug("Search query '{}' is not valid ANTLR syntax, falling back to raw term search", searchQuery);
+            LOGGER.debug("Search query '{}' is not valid ANTLR syntax, falling back to raw term search", searchQuery);
             queryNode = new SearchQueryNode(Optional.empty(), searchQuery);
         }
 
