@@ -54,7 +54,8 @@ public class RelatedWorkService {
         return createMatchResults(sourceEntry, relatedWorkSnippets, parsedReferencesByMarker, databaseContext);
     }
 
-    /// Insert "{comment-username}" to bib entry
+    /// This method appends a “comment” to each matched bib entry unless the same “comment” already exists
+    /// Specifically, related work text is inserted into the `comment-{username}` field of the matched bib entries
     ///
     /// @return List of insertion result
     public List<RelatedWorkInsertionResult> insertMatchedRelatedWork(BibEntry sourceEntry,
