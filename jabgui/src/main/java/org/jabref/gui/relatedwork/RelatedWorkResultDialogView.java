@@ -83,7 +83,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
     private String getCitationKey(RelatedWorkMatchResult matchResult) {
         return matchResult.matchedLibraryBibEntry()
                           .flatMap(BibEntry::getCitationKey)
-                          .orElse("");
+                          .orElse("undefined");
     }
 
     private String getCommentPreview(RelatedWorkMatchResult matchResult) {
