@@ -44,7 +44,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
                                        List<RelatedWorkMatchResult> matchedResults,
                                        String userName) {
         this.sourceEntry = sourceEntry;
-        this.matchedResults = List.copyOf(matchedResults);
+        this.matchedResults = matchedResults;
         this.userName = userName;
 
         setTitle(Localization.lang("Insert related work text"));
