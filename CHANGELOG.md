@@ -83,6 +83,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved CSL support with JabRef LibreOffice converter extension. [#14387](https://github.com/JabRef/jabref/issues/14387)
 - We fixed an issue where a search group would not be updated in the ui after an entry change [#13378](https://github.com/JabRef/jabref/issues/13378)
 - We fixed exceptions occuring when generating citation keys or using certain cleanup operations on macOS [#15366](https://github.com/JabRef/jabref/issues/15366)
+- We fixed the merge dialog overwriting the citation key chosen by the user during duplicate import. [#8644](https://github.com/JabRef/jabref/issues/8644)
 
 ### Removed
 

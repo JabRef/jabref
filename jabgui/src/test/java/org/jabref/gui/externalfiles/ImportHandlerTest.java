@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -11,9 +12,15 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,6 +28,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -142,7 +150,7 @@ class ImportHandlerTest {
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_RIGHT
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.empty());
 
         // Act
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
@@ -173,7 +181,7 @@ class ImportHandlerTest {
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_BOTH
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.empty());
 
         // Act
         BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
@@ -207,7 +215,7 @@ class ImportHandlerTest {
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
         // Mock the behavior of getDuplicateDecision to return KEEP_MERGE
-        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.empty());
 
         // Act
         // create and return a default BibEntry or do other computations
@@ -217,5 +225,126 @@ class ImportHandlerTest {
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
+    }
+
+    @Test
+    void handleDuplicatesKeepBothWithCollidingKeysAppliesGeneratedKey() {
+        // Arrange
+        BibEntry duplicateEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("SameKey2023")
+                .withField(StandardField.AUTHOR, "Duplicate Author");
+
+        BibEntry originalEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("SameKey2023")
+                .withField(StandardField.AUTHOR, "Original Author");
+
+        BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
+        bibDatabase.insertEntry(duplicateEntry);
+
+        DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(
+                DuplicateResolverDialog.DuplicateResolverResult.KEEP_BOTH, null);
+        importHandler = Mockito.spy(new ImportHandler(
+                bibDatabaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                mock(UndoManager.class),
+                mock(StateManager.class),
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor()));
+
+        String generatedKey = "UniqueKey2023";
+        Mockito.doReturn(decisionResult).when(importHandler)
+               .getDuplicateDecision(originalEntry, duplicateEntry,
+                       DuplicateResolverDialog.DuplicateResolverResult.BREAK,
+                       Optional.of(generatedKey));
+
+        // Act
+        BibEntry result = importHandler.handleDuplicates(originalEntry, duplicateEntry,
+                DuplicateResolverDialog.DuplicateResolverResult.BREAK,
+                Optional.of(generatedKey)).get();
+
+        // Assert: the colliding key should be replaced by the generated one
+        assertEquals(generatedKey, result.getCitationKey().orElse(""),
+                "When keeping both entries with the same key, the imported entry should get the generated key");
+        assertEquals("SameKey2023", duplicateEntry.getCitationKey().orElse(""),
+                "The existing entry should keep its original key");
+    }
+
+    @Test
+    void importWithDuplicateCheckPreservesMergedCitationKey() {
+        // Arrange: set up key generation with pattern [auth][year]
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.shouldGenerateNewKeyOnImport()).thenReturn(true);
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+
+        GlobalCitationKeyPatterns patterns = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
+        when(citationKeyPatternPreferences.getKeyPatterns()).thenReturn(patterns);
+        when(citationKeyPatternPreferences.getUnwantedCharacters()).thenReturn("");
+        when(citationKeyPatternPreferences.getKeywordDelimiter()).thenReturn(',');
+        when(citationKeyPatternPreferences.getKeySuffix()).thenReturn(CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+
+        MetaData metaData = mock(MetaData.class);
+        when(metaData.getCiteKeyPatterns(any())).thenReturn(patterns);
+        when(bibDatabaseContext.getMetaData()).thenReturn(metaData);
+
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+
+        LibraryPreferences libraryPreferences = mock(LibraryPreferences.class);
+        when(libraryPreferences.isAddImportedEntriesEnabled()).thenReturn(false);
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+
+        when(preferences.getOwnerPreferences()).thenReturn(mock(OwnerPreferences.class));
+        when(preferences.getTimestampPreferences()).thenReturn(mock(TimestampPreferences.class));
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(filePreferences.shouldDownloadLinkedFiles()).thenReturn(false);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+
+        importHandler = Mockito.spy(new ImportHandler(
+                bibDatabaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                mock(UndoManager.class),
+                stateManager,
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor()));
+
+        // Existing entry in the database
+        BibEntry existingEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("ExistingKey")
+                .withField(StandardField.AUTHOR, "Smith")
+                .withField(StandardField.YEAR, "2022")
+                .withField(StandardField.TITLE, "Some Title");
+        BibDatabase bibDatabase = bibDatabaseContext.getDatabase();
+        bibDatabase.insertEntry(existingEntry);
+
+        // User-chosen merged entry with a custom citation key
+        String userChosenKey = "MyCustomKey";
+        BibEntry mergedEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey(userChosenKey)
+                .withField(StandardField.AUTHOR, "Smith")
+                .withField(StandardField.YEAR, "2022")
+                .withField(StandardField.TITLE, "Some Title");
+
+        // Entry to import
+        BibEntry importEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Smith")
+                .withField(StandardField.YEAR, "2022")
+                .withField(StandardField.TITLE, "Some Title");
+        // Mock findDuplicate to return the existing entry as a duplicate
+        Mockito.doReturn(Optional.of(existingEntry)).when(importHandler).findDuplicate(importEntry);
+
+        // Mock handleDuplicates(4 params) to simulate user choosing KEEP_MERGE with their custom key
+        Mockito.doReturn(Optional.of(mergedEntry)).when(importHandler).handleDuplicates(importEntry, existingEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK, Optional.of("Smith2022"));
+
+        // Act
+        importHandler.importEntriesWithDuplicateCheck(null, List.of(importEntry));
+
+        // Assert: the user's chosen citation key from the merge dialog must be preserved
+        assertEquals(userChosenKey, mergedEntry.getCitationKey().orElse(""),
+                "The citation key chosen by the user in the merge dialog should not be overwritten by key generation");
     }
 }

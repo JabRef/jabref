@@ -204,6 +204,15 @@ public class ThreeWayMergeView extends VBox {
         return viewModel.getRightEntry();
     }
 
+    public void setMergedFieldValue(Field field, String value) {
+        for (FieldRowView row : fieldRows) {
+            if (row.viewModel.getField().equals(field)) {
+                row.viewModel.setMergedFieldValue(value);
+                break;
+            }
+        }
+    }
+
     public void saveConfiguration() {
         toolbar.saveToolbarConfiguration();
     }

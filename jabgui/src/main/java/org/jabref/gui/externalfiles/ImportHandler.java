@@ -55,6 +55,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
@@ -240,8 +241,20 @@ public class ImportHandler {
     }
 
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
+        importCleanedEntries(transferInformation, entries, false);
+    }
+
+    /// Imports cleaned entries into the database.
+    ///
+    /// @param transferInformation optional transfer information for adjusting linked files
+    /// @param entries             the entries to import
+    /// @param skipKeyGeneration   if true, skip citation key generation (e.g., when the key was already generated before the merge dialog so the user could choose/edit it)
+
+    private void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries, boolean skipKeyGeneration) {
         targetBibDatabaseContext.getDatabase().insertEntries(entries);
-        generateKeys(entries);
+        if (!skipKeyGeneration) {
+            generateKeys(entries);
+        }
         setAutomaticFields(entries);
         addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
         addToImportEntriesGroup(entries);
@@ -279,17 +292,25 @@ public class ImportHandler {
                           LOGGER.error("Error in duplicate search", e);
                       })
                       .onSuccess(existingDuplicateInLibrary -> {
+                          // Generate citation key string WITHOUT modifying the entry,
+                          // so the "From import" column shows the original key
+                          Optional<String> generatedKey = generateKeyString(entryToInsert);
+
                           BibEntry finalEntry = entryToInsert;
                           if (existingDuplicateInLibrary.isPresent()) {
-                              Optional<BibEntry> duplicateHandledEntry = handleDuplicates(entryToInsert, existingDuplicateInLibrary.get(), decision);
+                              Optional<BibEntry> duplicateHandledEntry = handleDuplicates(entryToInsert, existingDuplicateInLibrary.get(), decision, generatedKey);
                               if (duplicateHandledEntry.isEmpty()) {
                                   tracker.markSkipped();
                                   return;
                               }
                               finalEntry = duplicateHandledEntry.get();
+                          } else {
+                              // No duplicate: apply the generated key directly
+                              generatedKey.ifPresent(key -> entryToInsert.setCitationKey(key));
                           }
 
-                          importCleanedEntries(transferInformation, List.of(finalEntry));
+                          // Skip key generation since it was already handled
+                          importCleanedEntries(transferInformation, List.of(finalEntry), true);
 
                           tracker.markImported(finalEntry);
                       }).executeWith(taskExecutor);
@@ -308,12 +329,28 @@ public class ImportHandler {
     }
 
     public Optional<BibEntry> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
-        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, decision);
+        return handleDuplicates(originalEntry, duplicateEntry, decision, Optional.empty());
+    }
+
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        return getDuplicateDecision(originalEntry, duplicateEntry, decision, Optional.empty());
+    }
+
+    public Optional<BibEntry> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision, Optional<String> generatedKey) {
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, decision, generatedKey);
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
                 targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                if (originalEntry.getCitationKey().isEmpty()) {
+                    generatedKey.ifPresent(key -> originalEntry.setCitationKey(key));
+                }
                 break;
             case KEEP_BOTH:
+                Optional<String> originalKey = originalEntry.getCitationKey();
+                Optional<String> duplicateKey = duplicateEntry.getCitationKey();
+                if (originalKey.isEmpty() || originalKey.equals(duplicateKey)) {
+                    generatedKey.ifPresent(key -> originalEntry.setCitationKey(key));
+                }
                 break;
             case KEEP_MERGE:
                 targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
@@ -327,8 +364,9 @@ public class ImportHandler {
         return Optional.of(originalEntry);
     }
 
-    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision, Optional<String> generatedKey) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, stateManager, dialogService, preferences);
+        generatedKey.ifPresent(key -> dialog.setMergedFieldValue(InternalField.KEY_FIELD, key));
         if (decision == BREAK) {
             decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
         }
@@ -389,6 +427,22 @@ public class ImportHandler {
                 targetBibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
+    }
+
+    /// Generates a citation key string for the given entry WITHOUT modifying it.
+    ///
+    /// @param entry the entry to generate a key for
+    /// @return the generated key, or empty if key generation is disabled
+    private Optional<String> generateKeyString(BibEntry entry) {
+        if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
+            return Optional.empty();
+        }
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
+                targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
+                                                                                     .getKeyPatterns()),
+                targetBibDatabaseContext.getDatabase(),
+                preferences.getCitationKeyPatternPreferences());
+        return Optional.of(keyGenerator.generateKey(entry));
     }
 
     public @NonNull List<@NonNull BibEntry> handleBibTeXData(@NonNull String entries) {

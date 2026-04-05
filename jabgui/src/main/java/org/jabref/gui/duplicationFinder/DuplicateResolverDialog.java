@@ -19,6 +19,7 @@ import org.jabref.gui.util.DialogWindowState;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
@@ -160,6 +161,10 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         borderPane.setRight(helpButton);
 
         getDialogPane().setContent(borderPane);
+    }
+
+    public void setMergedFieldValue(Field field, String value) {
+        threeWayMerge.setMergedFieldValue(field, value);
     }
 
     public BibEntry getMergedEntry() {
