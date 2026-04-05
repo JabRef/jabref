@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
@@ -12,15 +11,15 @@ import org.jabref.logic.util.strings.StringUtil;
 public class BooktitleContainsYearChecker implements ValueChecker {
 
     /// Matches a standalone 4-digit year (1000–2999) not adjacent to other digits.
-    private static final Predicate<String> CONTAINS_YEAR =
-            Pattern.compile("(?<![0-9])[12][0-9]{3}(?![0-9])").asPredicate();
+    private static final Pattern CONTAINS_YEAR =
+            Pattern.compile("(?<![0-9])[12][0-9]{3}(?![0-9])");
 
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }
-        if (CONTAINS_YEAR.test(value)) {
+        if (CONTAINS_YEAR.matcher(value).find()) {
             return Optional.of(Localization.lang("booktitle should not contain a year"));
         }
         return Optional.empty();

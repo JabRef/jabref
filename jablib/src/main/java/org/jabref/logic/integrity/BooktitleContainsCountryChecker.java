@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -15,13 +14,13 @@ import org.jabref.logic.util.strings.StringUtil;
 /// short abbreviations inside alphanumeric tokens (e.g. {@code USA2015}) are not mis-flagged.
 public class BooktitleContainsCountryChecker implements ValueChecker {
 
-    private static final Predicate<String> CONTAINS_COUNTRY;
+    private static final Pattern CONTAINS_COUNTRY;
 
     static {
         String alternation = Countries.COUNTRY_NAMES.stream()
                                                     .map(Pattern::quote)
                                                     .collect(Collectors.joining("|"));
-        CONTAINS_COUNTRY = Pattern.compile("(?i)(?<!\\p{Alnum})(" + alternation + ")(?!\\p{Alnum})").asPredicate();
+        CONTAINS_COUNTRY = Pattern.compile("(?i)(?<!\\p{Alnum})(" + alternation + ")(?!\\p{Alnum})");
     }
 
     @Override
@@ -29,7 +28,7 @@ public class BooktitleContainsCountryChecker implements ValueChecker {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }
-        if (CONTAINS_COUNTRY.test(value)) {
+        if (CONTAINS_COUNTRY.matcher(value).find()) {
             return Optional.of(Localization.lang("booktitle should not contain a location"));
         }
         return Optional.empty();

@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
@@ -13,15 +12,15 @@ import org.jabref.logic.util.strings.StringUtil;
 public class BooktitleContainsPagesChecker implements ValueChecker {
 
     /// Matches explicit page-number patterns such as "pp. 1–10", "p. 5", "pages 3-7".
-    private static final Predicate<String> CONTAINS_PAGES =
-            Pattern.compile("(?i)\\b(pp?\\.?|pages?)\\s*[0-9]+").asPredicate();
+    private static final Pattern CONTAINS_PAGES =
+            Pattern.compile("(?i)\\b(pp?\\.?|pages?)\\s*[0-9]+");
 
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }
-        if (CONTAINS_PAGES.test(value)) {
+        if (CONTAINS_PAGES.matcher(value).find()) {
             return Optional.of(Localization.lang("booktitle should not contain page numbers"));
         }
         return Optional.empty();
