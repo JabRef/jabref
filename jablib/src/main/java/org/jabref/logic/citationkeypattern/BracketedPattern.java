@@ -78,6 +78,11 @@ public class BracketedPattern {
 
     private static final RemoveEnclosingBracesFormatter ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
+    private static final Map<Character, Integer> ROMAN_DECIMAL_MAP = Map.of(
+            'I', 1, 'V', 5, 'X', 10, 'L', 50,
+            'C', 100, 'D', 500, 'M', 1000
+    );
+
     private enum Institution {
         SCHOOL,
         DEPARTMENT,
@@ -1066,23 +1071,20 @@ public class BracketedPattern {
     }
 
     private static int romanToInteger(String s) {
-        Map<Character, Integer> va = Map.of(
-                'I', 1, 'V', 5, 'X', 10,
-                'L', 50, 'C', 100, 'D', 500, 'M', 1000
-        );
         String roman = s.toUpperCase();
         int res = 0;
         for (int i = 0; i < roman.length(); i++) {
-            int v1 = va.get(roman.charAt(i));
+            int currentValue = ROMAN_DECIMAL_MAP.get(roman.charAt(i));
+
             if (i + 1 < roman.length()) {
-                int v2 = va.get(roman.charAt(i + 1));
-                if (v1 >= v2) {
-                    res += v1;
+                int nextValue = ROMAN_DECIMAL_MAP.get(roman.charAt(i + 1));
+                if (currentValue >= nextValue) {
+                    res += currentValue;
                 } else {
-                    res -= v1;
+                    res -= currentValue;
                 }
             } else {
-                res += v1;
+                res += currentValue;
             }
         }
         return res;
