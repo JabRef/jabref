@@ -66,6 +66,7 @@ public class RelatedWorkService {
         List<RelatedWorkInsertionResult> insertionResults = new ArrayList<>(matchResults.size());
 
         for (RelatedWorkMatchResult matchResult : matchResults) {
+            // In case a result does not match any library entry
             if (matchResult.matchedLibraryBibEntry().isEmpty()) {
                 LOGGER.debug("Could not find a matched bib entry for citation {}.", matchResult.citationKey());
                 continue;
