@@ -20,7 +20,8 @@ public class BooktitleContainsCountryChecker implements ValueChecker {
         String alternation = Countries.COUNTRY_NAMES.stream()
                                                     .map(Pattern::quote)
                                                     .collect(Collectors.joining("|"));
-        CONTAINS_COUNTRY = Pattern.compile("(?i)(?<!\\p{Alnum})(" + alternation + ")(?!\\p{Alnum})");
+        CONTAINS_COUNTRY = Pattern.compile(
+                "(?i)(?<!\\p{Alnum})(" + alternation + ")(?!\\p{Alnum})");
     }
 
     @Override

@@ -11,8 +11,7 @@ import org.jabref.logic.util.strings.StringUtil;
 public class BooktitleContainsYearChecker implements ValueChecker {
 
     /// Matches a standalone 4-digit year (1000–2999) not adjacent to other digits.
-    private static final Pattern CONTAINS_YEAR =
-            Pattern.compile("(?<![0-9])[12][0-9]{3}(?![0-9])");
+    private static final Pattern CONTAINS_YEAR = Pattern.compile("(?<![0-9])[12][0-9]{3}(?![0-9])");
 
     @Override
     public Optional<String> checkValue(String value) {

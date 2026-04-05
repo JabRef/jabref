@@ -12,8 +12,7 @@ import org.jabref.logic.util.strings.StringUtil;
 public class BooktitleContainsPagesChecker implements ValueChecker {
 
     /// Matches explicit page-number patterns such as "pp. 1–10", "p. 5", "pages 3-7".
-    private static final Pattern CONTAINS_PAGES =
-            Pattern.compile("(?i)\\b(pp?\\.?|pages?)\\s*[0-9]+");
+    private static final Pattern CONTAINS_PAGES = Pattern.compile("(?i)\\b(pp?\\.?|pages?)\\s*[0-9]+");
 
     @Override
     public Optional<String> checkValue(String value) {
