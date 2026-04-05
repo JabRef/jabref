@@ -15,6 +15,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -144,13 +145,14 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
                 .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent((style, internalStyle) -> {
-                    if (internalStyle) {
-                        return _ -> {
-                        };
+                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
+                    event.consume();
+
+                    if (internalStyle || (event.getButton() != MouseButton.PRIMARY)) {
+                        return;
                     }
 
-                    return _ -> viewModel.deleteCslStyle(style.getLayout().citationStyle());
+                    viewModel.deleteCslStyle(style.getLayout().citationStyle());
                 })
                 .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
                 .install(cslDeleteColumn);
