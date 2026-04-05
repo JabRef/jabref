@@ -74,11 +74,11 @@ public class RelatedWorkDialogView extends BaseDialog<Void> {
 
         this.entryField.textProperty().bind(viewModel.sourceEntryCitationKeyProperty());
         this.linkedFileField.textProperty().bind(viewModel.linkedPDFFileProperty());
-        this.userNameField.textProperty().bindBidirectional(viewModel.userNameProperty());
+        this.userNameField.textProperty().bind(viewModel.userNameProperty());
         this.relatedWorkTextArea.textProperty().bindBidirectional(viewModel.relatedWorkTextProperty());
     }
 
     private void openResultDialog(List<RelatedWorkMatchResult> matchedResults) {
-        dialogService.showCustomDialogAndWait(new RelatedWorkResultDialogView(sourceEntry, matchedResults, userNameField.getText()));
+        dialogService.showCustomDialogAndWait(new RelatedWorkResultDialogView(sourceEntry, matchedResults, viewModel.userNameProperty().get()));
     }
 }

@@ -1,6 +1,7 @@
 package org.jabref.gui.relatedwork;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.undo.UndoManager;
 
@@ -39,7 +40,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
                                             UndoManager undoManager,
                                             BibEntryTypesManager entryTypesManager) {
         this.sourceEntry = sourceEntry;
-        this.userName = userName.strip();
+        this.userName = userName.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
         this.dialogService = dialogService;
         this.undoManager = undoManager;
         this.relatedWorkService = new RelatedWorkService(

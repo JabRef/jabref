@@ -3,7 +3,6 @@ package org.jabref.logic.relatedwork;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -63,7 +62,7 @@ public class RelatedWorkService {
                                                                      String userName) {
         String sourceCitationKey = sourceEntry.getCitationKey().get();
 
-        UserSpecificCommentField userSpecificCommentField = new UserSpecificCommentField(normalizeOwner(userName));
+        UserSpecificCommentField userSpecificCommentField = new UserSpecificCommentField(userName);
         List<RelatedWorkInsertionResult> insertionResults = new ArrayList<>(matchResults.size());
 
         for (RelatedWorkMatchResult matchResult : matchResults) {
@@ -140,11 +139,5 @@ public class RelatedWorkService {
                 .orElse(formattedComment);
 
         return matchedLibraryEntry.setField(userSpecificCommentField, updatedComment);
-    }
-
-    /// John Doe -> john-doe
-    /// Test -> test
-    private String normalizeOwner(String userName) {
-        return userName.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
     }
 }

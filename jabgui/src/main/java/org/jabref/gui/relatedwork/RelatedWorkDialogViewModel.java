@@ -59,7 +59,7 @@ public class RelatedWorkDialogViewModel extends AbstractViewModel {
 
         this.sourceEntryCitationKey.set(sourceEntryCitationKey);
         this.linkedPDFFileName.set(linkedPDFFile.getFileName().orElse(linkedPDFFile.getLink()));
-        userName.set(preferences.getOwnerPreferences().getDefaultOwner());
+        this.userName.set(preferences.getOwnerPreferences().getDefaultOwner());
 
         parseDisabled = Bindings.createBooleanBinding(
                 () -> StringUtil.isBlank(userName.get()) || StringUtil.isBlank(relatedWorkText.getValue()),
