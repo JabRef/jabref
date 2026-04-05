@@ -1100,10 +1100,10 @@ public class BracketedPattern {
         Matcher romanMatcher = Pattern.compile(PagesChecker.ROMAN_NUMBER).matcher(pages);
 
         boolean foundDecimal = decimalMatcher.find();
-        int decimalStart = foundDecimal ? decimalMatcher.start() : -1;
+        int decimalStart = foundDecimal ? decimalMatcher.start() : -1; // -1 forces to choose the next roman if exists
 
         boolean foundRoman = romanMatcher.find();
-        int romanStart = foundRoman ? romanMatcher.start() : -1;
+        int romanStart = foundRoman ? romanMatcher.start() : -1; // -1 forces to choose the next decimal if exists
 
         if (foundDecimal) {
             if (!foundRoman || decimalStart <= romanStart) {
