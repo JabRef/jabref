@@ -137,24 +137,6 @@ class RelatedWorkServiceTest {
                 matchedLibraryEntry.getField(userSpecificCommentField).orElseThrow());
     }
 
-    @Test
-    void insertMatchedRelatedWorkReturnsSkippedResultWhenReferenceIsNotMatchedToLibraryEntry() {
-        RelatedWorkService service = createService();
-        BibEntry sourceEntry = new BibEntry(StandardEntryType.Article).withCitationKey("LunaOstos_2024");
-        RelatedWorkMatchResult matchResult = new RelatedWorkMatchResult(
-                "Colombia is a middle-income country with a population of approximately 50 million.",
-                "[1]",
-                Optional.of(new BibEntry(StandardEntryType.Misc).withCitationKey("Agency2021")),
-                Optional.empty()
-        );
-
-        List<RelatedWorkInsertionResult> insertionResults = service.insertMatchedRelatedWork(sourceEntry, List.of(matchResult), "koppor");
-
-        assertEquals(1, insertionResults.size());
-        assertEquals(RelatedWorkInsertionStatus.SKIPPED, insertionResults.getFirst().status());
-        assertTrue(insertionResults.getFirst().fieldChange().isEmpty());
-    }
-
     private FilePreferences createFilePreferences() {
         return new FilePreferences(
                 "",

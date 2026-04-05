@@ -6,7 +6,4 @@ public enum RelatedWorkInsertionStatus {
 
     /// `[citation-key]`: `xxxxx` already exists, not inserted
     UNCHANGED,
-
-    /// Cannot find a matched related work
-    SKIPPED,
 }

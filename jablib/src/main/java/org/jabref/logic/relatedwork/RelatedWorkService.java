@@ -18,9 +18,11 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
 
 @NullMarked
 public class RelatedWorkService {
+    private static Logger LOGGER;
     private static final Pattern COMMENT_LINE_SEPARATOR_PATTERN = Pattern.compile("\\R\\R+");
 
     private final RelatedWorkTextParser relatedWorkTextParser;
@@ -65,11 +67,7 @@ public class RelatedWorkService {
 
         for (RelatedWorkMatchResult matchResult : matchResults) {
             if (matchResult.matchedLibraryBibEntry().isEmpty()) {
-                insertionResults.add(new RelatedWorkInsertionResult(
-                        matchResult,
-                        RelatedWorkInsertionStatus.SKIPPED,
-                        Optional.empty()
-                ));
+                LOGGER.debug("Could not find a matched bib entry for citation {}.", matchResult.citationKey());
                 continue;
             }
 

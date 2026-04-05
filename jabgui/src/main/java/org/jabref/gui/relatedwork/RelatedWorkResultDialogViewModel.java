@@ -64,18 +64,14 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
 
         int insertedCount = 0;
         int unchangedCount = 0;
-        int skippedCount = 0;
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Insert related work comments"));
 
         for (RelatedWorkInsertionResult insertionResult : insertionResults) {
             RelatedWorkInsertionStatus insertionStatus = insertionResult.status();
-            switch (insertionStatus) {
-                case RelatedWorkInsertionStatus.INSERTED ->
-                        insertedCount++;
-                case RelatedWorkInsertionStatus.UNCHANGED ->
-                        unchangedCount++;
-                default ->
-                        skippedCount++;
+            if (insertionStatus == RelatedWorkInsertionStatus.INSERTED) {
+                insertedCount++;
+            } else {
+                unchangedCount++;
             }
 
             insertionResult.fieldChange().ifPresent(change -> compoundEdit.addEdit(new UndoableFieldChange(change)));
@@ -86,10 +82,9 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
         }
 
         dialogService.notify(Localization.lang(
-                "Processed related work comments. Inserted: %0, unchanged: %1, skipped: %2.",
+                "Processed related work comments. Inserted: %0, unchanged: %1.",
                 String.valueOf(insertedCount),
-                String.valueOf(unchangedCount),
-                String.valueOf(skippedCount)
+                String.valueOf(unchangedCount)
         ));
         return true;
     }

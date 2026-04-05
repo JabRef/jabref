@@ -12,7 +12,4 @@ public record RelatedWorkInsertionResult(
         RelatedWorkInsertionStatus status,
         Optional<FieldChange> fieldChange
 ) {
-    public boolean success() {
-        return status == RelatedWorkInsertionStatus.INSERTED || status == RelatedWorkInsertionStatus.UNCHANGED;
-    }
 }
