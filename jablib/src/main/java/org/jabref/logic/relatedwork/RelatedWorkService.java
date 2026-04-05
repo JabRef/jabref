@@ -54,7 +54,7 @@ public class RelatedWorkService {
         return createMatchResults(sourceEntry, relatedWorkSnippets, parsedReferencesByMarker, databaseContext);
     }
 
-    /// Insert {comment-username} to bib entry
+    /// Insert "{comment-username}" to bib entry
     ///
     /// @return List of insertion result
     public List<RelatedWorkInsertionResult> insertMatchedRelatedWork(BibEntry sourceEntry,
