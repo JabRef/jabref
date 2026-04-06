@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
@@ -154,11 +156,13 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
     /// Runs the cleanup on the entry and records the change.
     ///
+    /// @param mutationScheduler routes BibEntry field mutations to the correct thread
     /// @return true iff entry was modified
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
                               NamedCompoundEdit compoundEdit,
-                              List<JabRefException> failures) {
+                              List<JabRefException> failures,
+                              Consumer<Runnable> mutationScheduler) {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
@@ -167,7 +171,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 journalAbbreviationRepository
         );
 
-        List<FieldChange> changes = cleaner.cleanup(preset, entry);
+        List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
         for (FieldChange change : changes) {
             compoundEdit.addEdit(new UndoableFieldChange(change));
@@ -193,7 +197,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
 
         for (BibEntry entry : entries) {
-            if (doCleanup(cleanupPreferences, entry, compoundEdit, failures)) {
+            if (doCleanup(cleanupPreferences, entry, compoundEdit, failures, Runnable::run)) {
                 modifiedEntriesCount++;
             }
         }
@@ -228,7 +232,10 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 break;
             }
 
-            if (doCleanup(cleanupPreferences, entries.get(i), compoundEdit, failures)) {
+            // BibEntry uses ObservableMap which fires FX listeners on mutation.
+            // Heavy computation stays on this background thread; only field mutations are dispatched
+            // to the FX thread via UiTaskExecutor::runAndWaitInJavaFXThread (blocking).
+            if (doCleanup(cleanupPreferences, entries.get(i), compoundEdit, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
                 modifiedEntriesCount++;
             }
 
