@@ -280,16 +280,18 @@ public class GroupTreeView extends BorderPane {
                     super.updateItem(group, empty);
                     if (empty || group == null) {
                         setGraphic(null);
-                    } else {
+                    } else if (group.isRoot() || group.isEditable() && group.canAddGroupsIn()) {
                         if (group.isRoot()) {
                             button.setTooltip(new Tooltip(Localization.lang("New group")));
                         } else {
-                            button.setTooltip(new Tooltip(Localization.lang("New subgroup")));
+                            button.setTooltip(new Tooltip(Localization.lang("Add subgroup")));
                         }
                         setGraphic(pane);
                         button.setOnAction(event -> viewModel.addNewSubgroup(
                                 group,
                                 group.isRoot() ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP));
+                    } else {
+                        setGraphic(null);
                     }
                 }
             };
