@@ -63,9 +63,9 @@ public class GenericUrlBasedFetcher implements WebFetcher {
     private String scrapeTitle(String url) {
         try {
             Document document = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0")
-                    .timeout(10_000)
-                    .get();
+                                     .userAgent("Mozilla/5.0")
+                                     .timeout(10_000)
+                                     .get();
 
             return document.title();
         } catch (IOException e) {
