@@ -146,9 +146,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
                 .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent((style, internalStyle) -> event -> {
+                    if (internalStyle) {
+                        return;
+                    }
+
                     event.consume();
 
-                    if (internalStyle || (event.getButton() != MouseButton.PRIMARY)) {
+                    if (event.getButton() != MouseButton.PRIMARY) {
                         return;
                     }
 
