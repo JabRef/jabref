@@ -78,11 +78,10 @@ public class RelatedWorkService {
                     matchResult.matchedLibraryBibEntry().get(),
                     userSpecificCommentField
             );
-            insertionResults.add(new RelatedWorkInsertionResult(
-                    matchResult,
-                    fieldChange.isPresent() ? RelatedWorkInsertionStatus.INSERTED : RelatedWorkInsertionStatus.UNCHANGED,
-                    fieldChange
-            ));
+            fieldChange.ifPresentOrElse(
+                    change -> insertionResults.add(new RelatedWorkInsertionResult.Inserted(matchResult, change)),
+                    () -> insertionResults.add(new RelatedWorkInsertionResult.Unchanged(matchResult))
+            );
         }
 
         return insertionResults;

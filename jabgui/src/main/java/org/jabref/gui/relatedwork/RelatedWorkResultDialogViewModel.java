@@ -15,7 +15,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkInsertionResult;
-import org.jabref.logic.relatedwork.RelatedWorkInsertionStatus;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
 import org.jabref.logic.relatedwork.RelatedWorkReferenceResolver;
 import org.jabref.logic.relatedwork.RelatedWorkService;
@@ -68,14 +67,12 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Insert related work comments"));
 
         for (RelatedWorkInsertionResult insertionResult : insertionResults) {
-            RelatedWorkInsertionStatus insertionStatus = insertionResult.status();
-            if (insertionStatus == RelatedWorkInsertionStatus.INSERTED) {
+            if (insertionResult instanceof RelatedWorkInsertionResult.Inserted inserted) {
                 insertedCount++;
+                compoundEdit.addEdit(new UndoableFieldChange(inserted.fieldChange()));
             } else {
                 unchangedCount++;
             }
-
-            insertionResult.fieldChange().ifPresent(change -> compoundEdit.addEdit(new UndoableFieldChange(change)));
         }
 
         if (compoundEdit.hasEdits()) {
