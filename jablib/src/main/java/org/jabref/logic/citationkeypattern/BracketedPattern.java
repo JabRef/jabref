@@ -1072,22 +1072,22 @@ public class BracketedPattern {
 
     private static int romanToInteger(String s) {
         String roman = s.toUpperCase();
-        int res = 0;
+        int value = 0;
         for (int i = 0; i < roman.length(); i++) {
             int currentValue = ROMAN_DECIMAL_MAP.get(roman.charAt(i));
 
             if (i + 1 < roman.length()) {
                 int nextValue = ROMAN_DECIMAL_MAP.get(roman.charAt(i + 1));
                 if (currentValue >= nextValue) {
-                    res += currentValue;
+                    value += currentValue;
                 } else {
-                    res -= currentValue;
+                    value -= currentValue;
                 }
             } else {
-                res += currentValue;
+                value += currentValue;
             }
         }
-        return res;
+        return value;
     }
 
     /// Return the non-digit prefix of pages
