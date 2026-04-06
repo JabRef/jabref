@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -106,11 +107,14 @@ class RelatedWorkServiceTest {
         );
 
         List<RelatedWorkInsertionResult> insertionResults = service.insertMatchedRelatedWork(sourceEntry, List.of(matchResult), "koppor");
-        RelatedWorkInsertionResult InsertionResult = insertionResults.getFirst();
+        RelatedWorkInsertionResult.Inserted insertionResult = assertInstanceOf(RelatedWorkInsertionResult.Inserted.class, insertionResults.getFirst());
 
         assertEquals(1, insertionResults.size());
-        assertEquals(RelatedWorkInsertionStatus.INSERTED, InsertionResult.status());
-        assertFalse(InsertionResult.fieldChange().isEmpty());
+        assertEquals(matchResult, insertionResult.matchResult());
+        assertEquals(
+                matchedLibraryEntry,
+                insertionResult.fieldChange().getEntry()
+        );
         assertEquals("[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.",
                 matchedLibraryEntry.getField(new UserSpecificCommentField("koppor")).orElseThrow());
     }
@@ -132,7 +136,7 @@ class RelatedWorkServiceTest {
 
         List<RelatedWorkInsertionResult> insertionResults = service.insertMatchedRelatedWork(sourceEntry, List.of(matchResult), "koppor");
 
-        assertEquals(RelatedWorkInsertionStatus.INSERTED, insertionResults.getFirst().status());
+        assertInstanceOf(RelatedWorkInsertionResult.Inserted.class, insertionResults.getFirst());
         assertEquals("[test]: blahblah" + OS.NEWLINE + OS.NEWLINE + "[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.",
                 matchedLibraryEntry.getField(userSpecificCommentField).orElseThrow());
     }
