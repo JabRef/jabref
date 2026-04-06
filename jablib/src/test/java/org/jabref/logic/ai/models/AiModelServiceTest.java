@@ -56,7 +56,7 @@ class AiModelServiceTest {
         List<String> models = aiModelService.getStaticModels(AiProvider.GEMINI);
         assertNotNull(models);
         assertFalse(models.isEmpty());
-        assertTrue(models.contains("gemini-1.5-flash"));
+        assertTrue(models.contains("gemini-3-flash-preview"));
     }
 
     @Test

@@ -32,6 +32,9 @@ inputs:
     required: true
   suffix:
     required: true
+  subdir:
+    required: true
+
   gradleCommand:
     required: true
   secretsPresent:
@@ -115,7 +118,7 @@ runs:
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) && (inputs.archivePortable != 'NONE') }}
       shell: bash
       run: |
-        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
       # background: true
       # jabsrv-cli doesn't have any installer and no archivePortable; thus we do not upload
@@ -123,7 +126,7 @@ runs:
       shell: cmd
       # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
       run: |
-        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.* jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.* jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
 
     - name: ShadowJar ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
@@ -154,7 +157,7 @@ runs:
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
       shell: bash
       run: |
-        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/
+        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
 
     - name: jbundle ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
