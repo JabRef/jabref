@@ -113,19 +113,35 @@ jobs:
 
           echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
 
-          # Check if good first/second/.. issue
-          # If yes, copy label to GitHub PR for transparency
+
+          # Copy over labels from issue to PR if they match good first/second/third/forth issue or component:* labels
+
           LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+
+          # Check for good first/second/.. issue label
           LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
-          if [ -n "$LABEL" ]; then
-            echo "✅ Found label: $LABEL"
+
+          # Check for component:* labels (can be multiple)
+          COMPONENT_LABELS=$(echo "$LABELS" | grep -E '^component:' || true)
+
+          if [ -n "$LABEL" ] || [ -n "$COMPONENT_LABELS" ]; then
             SILENT=false
-            # Apply label
-            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+            if [ -n "$LABEL" ]; then
+              echo "✅ Found label: $LABEL"
+              gh pr edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+            fi
+            if [ -n "$COMPONENT_LABELS" ]; then
+              echo "✅ Found component labels:"
+              while IFS= read -r COMPONENT_LABEL; do
+                echo "   - $COMPONENT_LABEL"
+                gh pr edit "${{ github.event.pull_request.number }}" --add-label "$COMPONENT_LABEL"
+              done <<< "$COMPONENT_LABELS"
+            fi
           else
             echo "🚫 Silent fail if not possible to add assignee"
             SILENT=true
           fi
+
 
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
 

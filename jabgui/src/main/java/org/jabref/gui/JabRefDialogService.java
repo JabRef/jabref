@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
@@ -83,12 +84,15 @@ public class JabRefDialogService implements DialogService {
     private final NotificationGroup<Object, Notifications.UiNotification> uiNotifications = new NotificationGroup<>(Localization.lang("Preview"));
     private final NotificationGroup<Task<?>, Notifications.TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks"));
 
+    private final ObservableList<Notification<?>> persistentNotifications;
+
     private final Window mainWindow;
 
     public JabRefDialogService(Window mainWindow) {
         this.mainWindow = mainWindow;
 
         taskNotifications.setViewFactory(Notifications.TaskNotificationView::new);
+        persistentNotifications = EasyBind.concat(fileNotifications.getNotifications());
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
@@ -560,5 +564,9 @@ public class JabRefDialogService implements DialogService {
 
     public List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups() {
         return List.of(undefinedNotifications, fileNotifications, uiNotifications, taskNotifications);
+    }
+
+    public ObservableList<? extends Notification<?>> getPersistentNotifications() {
+        return persistentNotifications;
     }
 }
