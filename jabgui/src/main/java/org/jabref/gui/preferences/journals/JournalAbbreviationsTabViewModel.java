@@ -110,7 +110,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();
-        
+
         useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
     }
 
