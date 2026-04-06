@@ -1362,13 +1362,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(PROXY_PORT, defaults.getPort()),
                 getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
                 get(PROXY_USERNAME, defaults.getUsername()),
-                get(PROXY_PASSWORD, defaults.getPassword()),
+                getProxyPassword(defaults.getPassword()),
                 getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
         );
     }
     // endregion
 
-    private String getProxyPassword() {
+    private String getProxyPassword(String defaultPassword) {
         if (getBoolean(PROXY_PERSIST_PASSWORD)) {
             try (final Keyring keyring = Keyring.create()) {
                 return new Password(
@@ -1381,7 +1381,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("JabRef could not open the key store", ex);
             }
         }
-        return (String) defaults.get(PROXY_PASSWORD);
+        return defaultPassword;
     }
 
     private void setProxyPassword(String password) {
