@@ -32,6 +32,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
@@ -105,6 +106,7 @@ public class GroupTreeView extends BorderPane {
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> addSubgroupColumn;
     private CustomTextField searchField;
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
@@ -165,10 +167,17 @@ public class GroupTreeView extends BorderPane {
         expansionNodeColumn.setPrefWidth(20d);
         expansionNodeColumn.setResizable(false);
 
+        addSubgroupColumn = new TreeTableColumn<>();
+        addSubgroupColumn.getStyleClass().add("addSubgroupColumn");
+        addSubgroupColumn.setMinWidth(28d);
+        addSubgroupColumn.setMaxWidth(28d);
+        addSubgroupColumn.setPrefWidth(28d);
+        addSubgroupColumn.setResizable(false);
+
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
+        groupTree.getColumns().addAll(List.of(mainColumn, addSubgroupColumn, numberColumn, expansionNodeColumn));
         groupTree.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals(KeyBinding.GROUP_RENAME.getDefaultKeyBinding())) {
                 TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
@@ -179,7 +188,7 @@ public class GroupTreeView extends BorderPane {
         });
         this.setCenter(groupTree);
 
-        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
+        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(28d).subtract(15d));
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
@@ -257,6 +266,45 @@ public class GroupTreeView extends BorderPane {
                     event.consume();
                 })
                 .install(expansionNodeColumn);
+
+        // "Add subgroup" button shown on row hover
+        addSubgroupColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
+        addSubgroupColumn.setCellFactory(col -> {
+            Button button = IconTheme.JabRefIcons.ADD.asButton();
+            button.setVisible(false);
+            StackPane pane = new StackPane(button);
+
+            TreeTableCell<GroupNodeViewModel, GroupNodeViewModel> cell = new TreeTableCell<>() {
+                @Override
+                protected void updateItem(GroupNodeViewModel group, boolean empty) {
+                    super.updateItem(group, empty);
+                    if (empty || group == null) {
+                        setGraphic(null);
+                    } else {
+                        if (group.isRoot()) {
+                            button.setTooltip(new Tooltip(Localization.lang("New group")));
+                        } else {
+                            button.setTooltip(new Tooltip(Localization.lang("New subgroup")));
+                        }
+                        setGraphic(pane);
+                        button.setOnAction(event -> viewModel.addNewSubgroup(
+                                group,
+                                group.isRoot() ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP));
+                    }
+                }
+            };
+
+            cell.tableRowProperty().addListener((obs, oldRow, newRow) -> {
+                button.visibleProperty().unbind();
+                if (newRow != null) {
+                    button.visibleProperty().bind(newRow.hoverProperty());
+                } else {
+                    button.setVisible(false);
+                }
+            });
+
+            return cell;
+        });
 
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
@@ -640,7 +688,7 @@ public class GroupTreeView extends BorderPane {
         return contextMenu;
     }
 
-    private void addNewGroup() {
+    public void addNewGroup() {
         viewModel.addNewGroupToRoot();
     }
 
