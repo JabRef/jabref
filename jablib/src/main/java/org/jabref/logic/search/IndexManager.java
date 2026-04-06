@@ -85,7 +85,7 @@ public class IndexManager {
 
         this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection(), bibFieldsIndexer.getTable());
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
-        this.indexUpdateThrottler = taskExecutor.createThrottler(200);
+        this.indexUpdateThrottler = taskExecutor.createThrottler(700);
         updateOnStart();
     }
 
