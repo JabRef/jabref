@@ -35,7 +35,7 @@ public class GenericUrlBasedFetcher implements WebFetcher {
             throw new FetcherException("Invalid URL: " + normalizedUrl);
         }
 
-        BibEntry entry = new BibEntry(StandardEntryType.Online)
+        BibEntry entry = new BibEntry(StandardEntryType.MISC)
                 .withField(StandardField.URL, normalizedUrl)
                 .withField(
                         StandardField.URLDATE,
