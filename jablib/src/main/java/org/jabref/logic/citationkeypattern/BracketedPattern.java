@@ -4,9 +4,11 @@ import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
@@ -22,6 +24,7 @@ import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.casechanger.Word;
+import org.jabref.logic.integrity.PagesChecker;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
@@ -58,8 +61,8 @@ public class BracketedPattern {
     /// 1} name abbreviations will be displayed, and a + sign will be appended at the end.
     private static final int MAX_ALPHA_AUTHORS = 4;
 
-    /// Matches everything that is not a unicode decimal digit.
-    private static final Pattern NOT_DECIMAL_DIGIT = Pattern.compile("\\P{Nd}");
+    private static final Pattern DIGITS_PATTERN = Pattern.compile("\\d+");
+    private static final Pattern PAGE_NUMBER_PATTERN = Pattern.compile(PagesChecker.PAGE_NUMBER);
 
     /// Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
@@ -74,6 +77,11 @@ public class BracketedPattern {
     private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
 
     private static final RemoveEnclosingBracesFormatter ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
+
+    private static final Map<Character, Integer> ROMAN_DECIMAL_MAP = Map.of(
+            'I', 1, 'V', 5, 'X', 10, 'L', 50,
+            'C', 100, 'D', 500, 'M', 1000
+    );
 
     private enum Institution {
         SCHOOL,
@@ -1035,46 +1043,97 @@ public class BracketedPattern {
 
     /// Split the pages field into separate numbers and return the lowest
     ///
-    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97 or 43+
+    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97, 43+ or iv--xx
     /// @return the first page number or "" if no number is found in the string
     /// @throws NullPointerException if pages is null
     public static String firstPage(String pages) {
-        // FIXME: incorrectly exracts the first page when pages are
-        // specified with ellipse, e.g. "213-6", which should stand
-        // for "213-216". S.G.
-        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
-                                .filter(Predicate.not(String::isBlank))
-                                .map(BigInteger::new)
-                                .min(BigInteger::compareTo)
-                                .map(BigInteger::toString)
-                                .orElse("");
+        return getPageNumberTokens(pages).stream()
+                                         .min(pageTokenComparator())
+                                         .orElse("");
+    }
+
+    private static List<String> getPageNumberTokens(String pages) {
+        Matcher matcher = PAGE_NUMBER_PATTERN.matcher(pages);
+        List<String> tokens = new ArrayList<>();
+        while (matcher.find()) {
+            tokens.add(matcher.group());
+        }
+        return tokens;
+    }
+
+    private static Comparator<String> pageTokenComparator() {
+        return Comparator.comparing(token -> {
+            if (DIGITS_PATTERN.matcher(token).matches()) {
+                return new BigInteger(token);
+            }
+            return BigInteger.valueOf(romanToInteger(token));
+        });
+    }
+
+    private static int romanToInteger(String s) {
+        String roman = s.toUpperCase();
+        int value = 0;
+        for (int i = 0; i < roman.length(); i++) {
+            int currentValue = ROMAN_DECIMAL_MAP.get(roman.charAt(i));
+
+            if (i + 1 < roman.length()) {
+                int nextValue = ROMAN_DECIMAL_MAP.get(roman.charAt(i + 1));
+                if (currentValue >= nextValue) {
+                    value += currentValue;
+                } else {
+                    value -= currentValue;
+                }
+            } else {
+                value += currentValue;
+            }
+        }
+        return value;
     }
 
     /// Return the non-digit prefix of pages
     ///
-    /// @param pages a pages string such as L42--111 or L7,41,73--97 or L43+
+    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97, 43+ or iv--xx
     /// @return the non-digit prefix of pages (like "L" of L7) or "" if no non-digit prefix is found in the string
     /// @throws NullPointerException if pages is null.
     public static String pagePrefix(String pages) {
-        if (pages.matches("^\\D+.*$")) {
-            return (pages.split("\\d+"))[0];
-        } else {
-            return "";
+        Matcher decimalMatcher = Pattern.compile(PagesChecker.DECIMAL_NUMBER).matcher(pages);
+        Matcher romanMatcher = Pattern.compile(PagesChecker.ROMAN_NUMBER).matcher(pages);
+
+        boolean foundDecimal = decimalMatcher.find();
+        int decimalStart = foundDecimal ? decimalMatcher.start() : -1; // -1 forces to choose the next roman if exists
+
+        boolean foundRoman = romanMatcher.find();
+        int romanStart = foundRoman ? romanMatcher.start() : -1; // -1 forces to choose the next decimal if exists
+
+        if (foundDecimal) {
+            if (!foundRoman || decimalStart <= romanStart) {
+                return pages.substring(0, decimalStart);
+            }
+
+            if (romanMatcher.end() == decimalStart) {
+                return pages.substring(0, decimalStart);
+            }
+
+            return pages.substring(0, romanStart);
         }
+
+        if (foundRoman) {
+            return pages.substring(0, romanStart);
+        }
+        return "";
     }
 
     /// Split the pages field into separate numbers and return the highest
     ///
-    /// @param pages a pages string such as 42--111 or 7,41,73--97 or 43+
+    /// @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97, 43+ or iv--xx
     /// @return the first page number or "" if no number is found in the string
     /// @throws NullPointerException if pages is null.
     public static String lastPage(String pages) {
-        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
-                                .filter(Predicate.not(String::isBlank))
-                                .map(BigInteger::new)
-                                .max(BigInteger::compareTo)
-                                .map(BigInteger::toString)
-                                .orElse("");
+        List<String> tokens = getPageNumberTokens(pages);
+
+        return tokens.stream()
+                     .max(pageTokenComparator().thenComparingInt(tokens::indexOf))
+                     .orElse("");
     }
 
     /// Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and

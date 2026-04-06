@@ -50,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the column chooser context menu appearing when right-clicking the empty library table body. [#15384](https://github.com/JabRef/jabref/issues/15384)
 - We fixed web search rejecting queries with non-standard syntax. [#12637](https://github.com/JabRef/jabref/issues/12637)
 - We fixed an issue where multiline property of fields could not be removed properly. [#11897](https://github.com/JabRef/jabref/issues/11897)
+- We fixed pages checker to allow BibLaTeX-specific formats, including Roman numerals, forward slashes, and Latin continuity suffixes (f., ff., sq., sqq.). [#15457](https://github.com/JabRef/jabref/issues/15457)
 - We fixed an issue where entries were being deselected after entering a BibTeX source and clicking elsewhere. [#15412](https://github.com/JabRef/jabref/issues/15412)
 - We fixed pages checker to allow suffix letters in the page range like "436S-439S". [#13701](https://github.com/JabRef/jabref/issues/13701)
 - We fixed an issue where the Web search table had extra space, to improve the layout. [#14556](https://github.com/JabRef/jabref/issues/14556)
