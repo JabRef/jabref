@@ -29,13 +29,13 @@
                 </rowConstraints>
                 <children>
                     <Label text="%Source entry" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="entryField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="entryField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
                     <Label text="%PDF file" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <TextField fx:id="linkedFileField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <TextField fx:id="linkedFileField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
                     <Label text="%Comment owner" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <TextField fx:id="userNameField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <TextField fx:id="userNameField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
                     <Label text="%Related work text" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.valignment="TOP"/>
                     <TextArea fx:id="relatedWorkTextArea" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS"/>
