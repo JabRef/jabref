@@ -94,7 +94,7 @@ public record CSLStyleLoader(
                         styleCount--;
                     }
                 }
-                LOGGER.info("Loaded {} CSL styles", styleCount);
+                LOGGER.debug("Loaded {} CSL styles", styleCount);
             } else {
                 LOGGER.error("Citation style catalog is empty");
             }

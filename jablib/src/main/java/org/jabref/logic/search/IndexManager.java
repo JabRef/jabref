@@ -1,6 +1,5 @@
 package org.jabref.logic.search;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -8,9 +7,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -22,12 +24,14 @@ import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.BibFieldsSearcher;
 import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
@@ -51,6 +55,12 @@ public class IndexManager {
     private final LuceneIndexer linkedFilesIndexer;
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
+    private final DelayTaskThrottler indexUpdateThrottler;
+    private final ConcurrentHashMap<BibEntry, Set<Field>> pendingFieldsByEntry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BibEntry, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
+
+    private record FileDelta(String oldValue, String newValue) {
+    }
 
     public IndexManager(BibDatabaseContext databaseContext,
                         TaskExecutor executor,
@@ -75,6 +85,7 @@ public class IndexManager {
 
         this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection(), bibFieldsIndexer.getTable());
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
+        this.indexUpdateThrottler = taskExecutor.createThrottler(200);
         updateOnStart();
     }
 
@@ -157,24 +168,58 @@ public class IndexManager {
     }
 
     public void updateEntry(FieldChangedEvent event) {
-        new BackgroundTask<>() {
-            @Override
-            public Object call() {
-                bibFieldsIndexer.updateEntry(event.getBibEntry(), event.getField());
-                return null;
-            }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(event.getBibEntry()))))
-         .executeWith(taskExecutor);
+        BibEntry entry = event.getBibEntry();
+        Field field = event.getField();
 
-        if (shouldIndexLinkedFiles.get() && event.getField().equals(StandardField.FILE)) {
-            new BackgroundTask<>() {
-                @Override
-                public Object call() {
-                    linkedFilesIndexer.updateEntry(event.getBibEntry(), event.getOldValue(), event.getNewValue(), this);
-                    return null;
+        /// Accumulate which fields need updating for this entry
+        pendingFieldsByEntry.computeIfAbsent(entry, _ -> ConcurrentHashMap.newKeySet()).add(field);
+
+        /// FILE field updates rely on oldValue/newValue diffing in linkedFilesIndexer
+        /// Intermediate events dropped by the throttler would corrupt the baseline,
+        /// so we preserve the first oldValue seen and always update to the latest newValue
+        if (field.equals(StandardField.FILE)) {
+            pendingFileValuesByEntry.compute(entry, (_, existing) -> {
+                if (existing == null) {
+                    return new FileDelta(event.getOldValue(), event.getNewValue());
+                } else {
+                    return new FileDelta(existing.oldValue(), event.getNewValue());
                 }
-            }.executeWith(taskExecutor);
+            });
         }
+
+        indexUpdateThrottler.schedule(() -> {
+            /// Snapshot and clear pending state atomically
+            pendingFieldsByEntry.forEach((pendingEntry, fields) -> {
+                if (pendingFieldsByEntry.remove(pendingEntry, fields)) {
+                    Set<Field> fieldsSnapshot = Set.copyOf(fields);
+
+                    new BackgroundTask<>() {
+                        @Override
+                        public Object call() {
+                            for (Field snapshot : fieldsSnapshot) {
+                                bibFieldsIndexer.updateEntry(pendingEntry, snapshot);
+                            }
+                            return null;
+                        }
+                    }.onFinished(() -> this.databaseContext.getDatabase()
+                                                           .postEvent(new IndexAddedOrUpdatedEvent(List.of(pendingEntry))))
+                     .executeWith(taskExecutor);
+
+                    if (shouldIndexLinkedFiles.get() && fieldsSnapshot.contains(StandardField.FILE)) {
+                        FileDelta fileValues = pendingFileValuesByEntry.remove(pendingEntry);
+                        if (fileValues != null) {
+                            new BackgroundTask<>() {
+                                @Override
+                                public Object call() {
+                                    linkedFilesIndexer.updateEntry(pendingEntry, fileValues.oldValue(), fileValues.newValue(), this);
+                                    return null;
+                                }
+                            }.executeWith(taskExecutor);
+                        }
+                    }
+                }
+            });
+        });
     }
 
     public void rebuildFullTextIndex() {
@@ -241,14 +286,25 @@ public class IndexManager {
         }
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
-            for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene")
-                        && !path.equals(currentIndexPath)) {
-                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
-                    Files.walk(path)
-                         .sorted(Comparator.reverseOrder())
-                         .map(Path::toFile)
-                         .forEach(File::delete);
+            for (Path directory : stream) {
+                if (Files.isDirectory(directory)
+                        && !directory.toString().endsWith("ssl")
+                        && directory.toString().contains("lucene")
+                        && !directory.equals(currentIndexPath)) {
+                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", directory);
+
+                    try (Stream<Path> indexPath = Files.walk(directory)) {
+                        indexPath.sorted(Comparator.reverseOrder())
+                                 .forEach(file -> {
+                                     try {
+                                         Files.deleteIfExists(file);
+                                     } catch (IOException e) {
+                                         LOGGER.error("Could not delete file {}", file, e);
+                                     }
+                                 });
+                    } catch (IOException e) {
+                        LOGGER.error("Could not read directory {}", directory, e);
+                    }
                 }
             }
         } catch (IOException e) {

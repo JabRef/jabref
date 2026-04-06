@@ -583,7 +583,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getLanguage(),
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
                 getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
-                defaults.getDefaultFontSize(), // FixMe
                 new Theme(get(THEME, Theme.BASE_CSS)),
                 getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
                 getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),

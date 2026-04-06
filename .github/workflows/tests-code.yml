@@ -130,7 +130,8 @@ jobs:
 
   modernizer:
     name: Modernizer
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -154,7 +155,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v22
+        uses: DavidAnson/markdownlint-cli2-action@v23
         with:
           globs: |
             *.md
@@ -187,10 +188,10 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.14.1:bin check CHANGELOG.md | tee heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.16.1:bin check CHANGELOG.md | tee heylogs.txt || true
 
           # We have two acceptable errors
-          if ! grep -q "3 problems" heylogs.txt; then
+          if ! grep -q "1 problem" heylogs.txt; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt
@@ -570,7 +571,7 @@ jobs:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
