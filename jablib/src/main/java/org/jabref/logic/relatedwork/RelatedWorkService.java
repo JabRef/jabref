@@ -18,10 +18,11 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NullMarked
 public class RelatedWorkService {
-    private static Logger LOGGER;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RelatedWorkService.class);
     private static final Pattern COMMENT_LINE_SEPARATOR_PATTERN = Pattern.compile("\\R\\R+");
 
     private final RelatedWorkTextParser relatedWorkTextParser;
@@ -45,6 +46,7 @@ public class RelatedWorkService {
                                                          FilePreferences filePreferences) throws IOException {
         List<RelatedWorkSnippet> relatedWorkSnippets = relatedWorkTextParser.parseRelatedWork(relatedWorkText);
         if (relatedWorkSnippets.isEmpty()) {
+            LOGGER.debug("No citations were parsed from the related work text.");
             return List.of();
         }
 
@@ -129,6 +131,9 @@ public class RelatedWorkService {
         if (existingComment.stream()
                            .flatMap(comment -> COMMENT_LINE_SEPARATOR_PATTERN.splitAsStream(comment.strip()))
                            .anyMatch(formattedComment::equals)) {
+            LOGGER.debug("Insertion for citation {} is skipped, because comment already exists in {}.",
+                    sourceCitationKey,
+                    userSpecificCommentField);
             return Optional.empty();
         }
 
