@@ -690,7 +690,7 @@ public class GroupTreeView extends BorderPane {
         return contextMenu;
     }
 
-    public void addNewGroup() {
+    private void addNewGroup() {
         viewModel.addNewGroupToRoot();
     }
 
