@@ -8,6 +8,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -18,11 +19,12 @@ public class RelatedWorkAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public RelatedWorkAction(DialogService dialogService, StateManager stateManager) {
+    public RelatedWorkAction(DialogService dialogService, StateManager stateManager, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         executable.bind(ActionHelper.needsDatabase(stateManager)
-                                    .and(ActionHelper.needsEntriesSelected(1, stateManager)));
+                                    .and(ActionHelper.needsEntriesSelected(1, stateManager))
+                                    .and(ActionHelper.isPdfFilePresentForSelectedEntry(stateManager, preferences)));
     }
 
     @Override
@@ -35,8 +37,8 @@ public class RelatedWorkAction extends SimpleCommand {
 
         if (linkedPDFFile.isEmpty()) {
             dialogService.showWarningDialogAndWait(
-                    Localization.lang("Insert related work text"),
-                    Localization.lang("No PDF files available")
+                    Localization.lang("No PDF files available"),
+                    Localization.lang("Please attach PDF files")
             );
             return;
         }

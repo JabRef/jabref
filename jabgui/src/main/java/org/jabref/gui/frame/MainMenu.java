@@ -324,7 +324,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_ONLINE, new NewLibraryFromPdfActionOnline(frame, stateManager, dialogService, preferences, taskExecutor)),
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_OFFLINE, new NewLibraryFromPdfActionOffline(frame, stateManager, dialogService, preferences, taskExecutor)),
-                factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager, preferences)),
                 factory.createMenuItem(StandardActions.PSEUDONYMIZE_LIBRARY, new PseudonymizeAction(stateManager, dialogService, preferences)),
 
                 new SeparatorMenuItem(),
