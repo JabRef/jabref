@@ -2,6 +2,7 @@ package org.jabref.gui.relatedwork;
 
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -9,11 +10,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -76,6 +79,14 @@ public class RelatedWorkDialogView extends BaseDialog<Void> {
         this.linkedFileField.textProperty().bind(viewModel.linkedPDFFileProperty());
         this.userNameField.textProperty().bind(viewModel.userNameProperty());
         this.relatedWorkTextArea.textProperty().bindBidirectional(viewModel.relatedWorkTextProperty());
+
+        String clipboardText = ClipBoardManager.getContents().trim();
+        if (!StringUtil.isBlank(clipboardText)) {
+            relatedWorkTextArea.setText(clipboardText);
+            relatedWorkTextArea.selectAll();
+        }
+
+        Platform.runLater(relatedWorkTextArea::requestFocus);
     }
 
     private void openResultDialog(List<RelatedWorkMatchResult> matchedResults) {
