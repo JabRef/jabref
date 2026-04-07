@@ -1,8 +1,8 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -10,8 +10,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GenericUrlBasedFetcherTest {
 
@@ -25,32 +24,34 @@ class GenericUrlBasedFetcherTest {
     }
 
     @Test
-    void getNameReturnsURL() {
+    void getNameReturnsCorrectName() {
         assertEquals("Generic URL Fetcher", fetcher.getName());
     }
 
     @Test
-    void fetchEntryFromUrlWithValidUrlCreatesCorrectEntry() {
-        Optional<BibEntry> result = fetcher.fetchEntryFromUrl(TEST_URL);
+    void fetchEntryFromUrlWithValidUrlCreatesCorrectEntry() throws FetcherException {
+        List<BibEntry> results = fetcher.fetchEntryFromUrl(TEST_URL);
 
-        assertTrue(result.isPresent());
+        assertEquals(1, results.size());
 
-        BibEntry entry = result.get();
-        assertEquals(Optional.of(TEST_URL), entry.getField(StandardField.URL));
+        BibEntry entry = results.get(0);
+
+        assertEquals(TEST_URL, entry.getField(StandardField.URL).orElse(""));
         assertEquals(StandardEntryType.Misc, entry.getType());
     }
 
     @Test
-    void performSearchWithBlankUrlReturnsEmptyList() {
-        List<BibEntry> results = fetcher.performSearch("   ");
+    void fetchEntryFromUrlWithBlankUrlReturnsEmptyList() throws FetcherException {
+        List<BibEntry> results = fetcher.fetchEntryFromUrl("   ");
 
         assertTrue(results.isEmpty());
     }
 
     @Test
-    void performSearchTrimsUrl() {
-        List<BibEntry> results = fetcher.performSearch("  " + TEST_URL + "  ");
+    void fetchEntryFromUrlTrimsUrl() throws FetcherException {
+        List<BibEntry> results = fetcher.fetchEntryFromUrl("  " + TEST_URL + "  ");
 
-        assertEquals(Optional.of(TEST_URL), results.get(0).getField(StandardField.URL));
+        assertEquals(1, results.size());
+        assertEquals(TEST_URL, results.get(0).getField(StandardField.URL).orElse(""));
     }
 }
