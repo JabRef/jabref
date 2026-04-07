@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -58,6 +59,7 @@ public class IndexManager {
     private final DelayTaskThrottler indexUpdateThrottler;
     private final ConcurrentHashMap<BibEntry, Set<Field>> pendingFieldsByEntry = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<BibEntry, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private record FileDelta(String oldValue, String newValue) {
     }
@@ -168,6 +170,10 @@ public class IndexManager {
     }
 
     public void updateEntry(FieldChangedEvent event) {
+        if (closed.get()) {
+            return;
+        }
+
         BibEntry entry = event.getBibEntry();
         Field field = event.getField();
 
@@ -187,7 +193,17 @@ public class IndexManager {
             });
         }
 
+        if (closed.get()) {
+            pendingFieldsByEntry.remove(entry);
+            pendingFileValuesByEntry.remove(entry);
+            return;
+        }
+
         indexUpdateThrottler.schedule(() -> {
+            if (closed.get()) {
+                return;
+            }
+
             /// Snapshot and clear pending state atomically
             pendingFieldsByEntry.forEach((pendingEntry, fields) -> {
                 if (pendingFieldsByEntry.remove(pendingEntry, fields)) {
@@ -235,6 +251,10 @@ public class IndexManager {
     }
 
     public void close() {
+        if (!closed.compareAndSet(false, true)) {
+            return;
+        }
+        closeThrottler(false);
         bibFieldsIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
@@ -242,10 +262,32 @@ public class IndexManager {
     }
 
     public void closeAndWait() {
+        if (!closed.compareAndSet(false, true)) {
+            return;
+        }
+        closeThrottler(true);
         bibFieldsIndexer.closeAndWait();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.closeAndWait();
         databaseContext.getDatabase().postEvent(new IndexClosedEvent());
+    }
+
+    private void closeThrottler(boolean waitForShutdown) {
+        indexUpdateThrottler.cancel();
+        pendingFieldsByEntry.clear();
+        pendingFileValuesByEntry.clear();
+
+        if (waitForShutdown) {
+            indexUpdateThrottler.shutdown();
+        } else {
+            new BackgroundTask<>() {
+                @Override
+                public Object call() {
+                    indexUpdateThrottler.shutdown();
+                    return null;
+                }
+            }.executeWith(taskExecutor);
+        }
     }
 
     public SearchResults search(SearchQuery query) {
