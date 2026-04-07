@@ -17,7 +17,6 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -36,7 +35,6 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
-    @Inject private BibEntryTypesManager entryTypesManager;
 
     private RelatedWorkResultDialogViewModel viewModel;
 
@@ -65,8 +63,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
                 matchedResults,
                 userName,
                 dialogService,
-                undoManager,
-                entryTypesManager
+                undoManager
         );
 
         this.matchedReferenceTable.setItems(viewModel.matchedReferencesProperty());

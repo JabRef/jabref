@@ -15,8 +15,8 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
+import org.jabref.logic.relatedwork.RelatedWorkMatcher;
 import org.jabref.logic.relatedwork.RelatedWorkReferenceResolver;
-import org.jabref.logic.relatedwork.RelatedWorkService;
 import org.jabref.logic.relatedwork.RelatedWorkTextParser;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -31,7 +31,7 @@ public class RelatedWorkDialogViewModel extends AbstractViewModel {
     private final LinkedFile linkedPDFFile;
     private final DialogService dialogService;
     private final CliPreferences preferences;
-    private final RelatedWorkService relatedWorkService;
+    private final RelatedWorkMatcher relatedWorkMatcher;
 
     private final StringProperty sourceEntryCitationKey = new SimpleStringProperty("");
     private final StringProperty linkedPDFFileName = new SimpleStringProperty("");
@@ -51,7 +51,7 @@ public class RelatedWorkDialogViewModel extends AbstractViewModel {
         this.linkedPDFFile = linkedPDFFile;
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.relatedWorkService = new RelatedWorkService(
+        this.relatedWorkMatcher = new RelatedWorkMatcher(
                 new RelatedWorkTextParser(),
                 new RelatedWorkReferenceResolver(),
                 new DuplicateCheck(entryTypesManager)
@@ -92,7 +92,7 @@ public class RelatedWorkDialogViewModel extends AbstractViewModel {
         String text = relatedWorkText.get();
 
         try {
-            List<RelatedWorkMatchResult> matchResults = relatedWorkService.matchRelatedWork(
+            List<RelatedWorkMatchResult> matchResults = relatedWorkMatcher.matchRelatedWork(
                     databaseContext,
                     sourceEntry,
                     linkedPDFFile,

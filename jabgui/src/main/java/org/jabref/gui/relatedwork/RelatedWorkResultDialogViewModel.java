@@ -12,22 +12,18 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.relatedwork.RelatedWorkInserter;
 import org.jabref.logic.relatedwork.RelatedWorkInsertionResult;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
-import org.jabref.logic.relatedwork.RelatedWorkReferenceResolver;
-import org.jabref.logic.relatedwork.RelatedWorkService;
-import org.jabref.logic.relatedwork.RelatedWorkTextParser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
 
     private final DialogService dialogService;
     private final UndoManager undoManager;
     private final BibEntry sourceEntry;
-    private final RelatedWorkService relatedWorkService;
+    private final RelatedWorkInserter relatedWorkInserter;
     private final List<RelatedWorkMatchResult> matchedResults;
     private final ObservableList<RelatedWorkMatchResult> matchedReferences = FXCollections.observableArrayList();
     private final String userName;
@@ -36,17 +32,12 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
                                             List<RelatedWorkMatchResult> matchedResults,
                                             String userName,
                                             DialogService dialogService,
-                                            UndoManager undoManager,
-                                            BibEntryTypesManager entryTypesManager) {
+                                            UndoManager undoManager) {
         this.sourceEntry = sourceEntry;
         this.userName = userName.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
         this.dialogService = dialogService;
         this.undoManager = undoManager;
-        this.relatedWorkService = new RelatedWorkService(
-                new RelatedWorkTextParser(),
-                new RelatedWorkReferenceResolver(),
-                new DuplicateCheck(entryTypesManager)
-        );
+        this.relatedWorkInserter = new RelatedWorkInserter();
         this.matchedResults = matchedResults;
         matchedReferences.setAll(this.matchedResults);
     }
@@ -56,7 +47,7 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
     }
 
     public boolean insertComments() {
-        List<RelatedWorkInsertionResult> insertionResults = relatedWorkService.insertMatchedRelatedWork(
+        List<RelatedWorkInsertionResult> insertionResults = relatedWorkInserter.insertMatchedRelatedWork(
                 sourceEntry,
                 matchedResults,
                 userName

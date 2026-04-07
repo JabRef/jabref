@@ -9,31 +9,28 @@ import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.database.DuplicateCheck;
-import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RelatedWorkServiceTest {
+class RelatedWorkMatcherTest {
 
     @Test
     void matchRelatedWorkReturnsContextTextMappedToParsedReferences() throws IOException, URISyntaxException {
         LinkedFile linkedFile = createLinkedFile();
-        RelatedWorkService service = createService();
+        RelatedWorkMatcher matcher = createMatcher();
 
-        List<RelatedWorkMatchResult> matchResults = service.matchRelatedWork(
+        List<RelatedWorkMatchResult> matchResults = matcher.matchRelatedWork(
                 new BibDatabaseContext(),
                 new BibEntry(StandardEntryType.Article),
                 linkedFile,
@@ -55,17 +52,17 @@ class RelatedWorkServiceTest {
     void matchRelatedWorkReturnsExistingLibraryEntryWhenDuplicateIsFound() throws IOException, URISyntaxException {
         LinkedFile linkedFile = createLinkedFile();
         RelatedWorkReferenceResolver resolver = new RelatedWorkReferenceResolver();
-        RelatedWorkService service = new RelatedWorkService(
+        RelatedWorkMatcher matcher = new RelatedWorkMatcher(
                 new RelatedWorkTextParser(),
                 resolver,
                 new DuplicateCheck(new BibEntryTypesManager())
         );
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         Map<String, BibEntry> referencesByMarker = resolver.parseReferences(linkedFile, new BibDatabaseContext(), createFilePreferences());
-        BibEntry existingLibraryEntry = referencesByMarker.get("[80]");
+        BibEntry existingLibraryEntry = Optional.ofNullable(referencesByMarker.get("[80]")).orElseThrow();
         databaseContext.getDatabase().insertEntry(existingLibraryEntry);
 
-        List<RelatedWorkMatchResult> matchedResults = service.matchRelatedWork(
+        List<RelatedWorkMatchResult> matchedResults = matcher.matchRelatedWork(
                 databaseContext,
                 new BibEntry(StandardEntryType.Article),
                 linkedFile,
@@ -81,9 +78,9 @@ class RelatedWorkServiceTest {
     @Test
     void matchRelatedWorkReturnsEmptyWhenTextCannotBeParsed() throws IOException, URISyntaxException {
         LinkedFile linkedFile = createLinkedFile();
-        RelatedWorkService service = createService();
+        RelatedWorkMatcher matcher = createMatcher();
 
-        List<RelatedWorkMatchResult> matchResults = service.matchRelatedWork(
+        List<RelatedWorkMatchResult> matchResults = matcher.matchRelatedWork(
                 new BibDatabaseContext(),
                 new BibEntry(StandardEntryType.Article),
                 linkedFile,
@@ -95,50 +92,55 @@ class RelatedWorkServiceTest {
     }
 
     @Test
-    void insertMatchedRelatedWorkWritesUserSpecificCommentField() {
-        RelatedWorkService service = createService();
-        BibEntry sourceEntry = new BibEntry(StandardEntryType.Article).withCitationKey("LunaOstos_2024");
-        BibEntry matchedLibraryEntry = new BibEntry(StandardEntryType.Misc).withCitationKey("Agency2021");
-        RelatedWorkMatchResult matchResult = new RelatedWorkMatchResult(
-                "Colombia is a middle-income country with a population of approximately 50 million.",
-                "[1]",
-                Optional.of(new BibEntry(StandardEntryType.Misc)),
-                Optional.of(matchedLibraryEntry)
+    void matchRelatedWorkMatchesEquivalentPagesNotation() throws IOException {
+        BibEntry parsedReference = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("1")
+                .withField(StandardField.AUTHOR, "J. Smith and A. Brown")
+                .withField(StandardField.TITLE, "Sustainable agriculture methods for tropical regions")
+                .withField(StandardField.JOURNAL, "Journal of Agricultural Science")
+                .withField(StandardField.YEAR, "2021")
+                .withField(StandardField.VOLUME, "45")
+                .withField(StandardField.NUMBER, "3")
+                .withField(StandardField.PAGES, "123-145");
+        RelatedWorkReferenceResolver resolver = new RelatedWorkReferenceResolver() {
+            @Override
+            public Map<String, BibEntry> parseReferences(LinkedFile linkedFile,
+                                                         BibDatabaseContext databaseContext,
+                                                         FilePreferences filePreferences) {
+                return Map.of("[1]", parsedReference);
+            }
+        };
+        RelatedWorkMatcher matcher = new RelatedWorkMatcher(
+                new RelatedWorkTextParser(),
+                resolver,
+                new DuplicateCheck(new BibEntryTypesManager())
+        );
+        BibEntry existingLibraryEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Smith, John and Brown, Alice")
+                .withField(StandardField.TITLE, "Sustainable Agriculture Methods for Tropical Regions")
+                .withField(StandardField.JOURNAL, "Journal of Agricultural Science")
+                .withField(StandardField.YEAR, "2021")
+                .withField(StandardField.VOLUME, "45")
+                .withField(StandardField.NUMBER, "3")
+                .withField(StandardField.PAGES, "123--145");
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.getDatabase().insertEntry(existingLibraryEntry);
+
+        List<RelatedWorkMatchResult> matchResults = matcher.matchRelatedWork(
+                databaseContext,
+                new BibEntry(StandardEntryType.Article),
+                new LinkedFile("", "main.pdf", "PDF"),
+                "A short related work sentence [1].",
+                createFilePreferences()
         );
 
-        List<RelatedWorkInsertionResult> insertionResults = service.insertMatchedRelatedWork(sourceEntry, List.of(matchResult), "koppor");
-        RelatedWorkInsertionResult.Inserted insertionResult = assertInstanceOf(RelatedWorkInsertionResult.Inserted.class, insertionResults.getFirst());
+        RelatedWorkMatchResult matchResult = matchResults.getFirst();
 
-        assertEquals(1, insertionResults.size());
-        assertEquals(matchResult, insertionResult.matchResult());
-        assertEquals(
-                matchedLibraryEntry,
-                insertionResult.fieldChange().getEntry()
-        );
-        assertEquals("[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.",
-                matchedLibraryEntry.getField(new UserSpecificCommentField("koppor")).orElseThrow());
-    }
-
-    @Test
-    void insertMatchedRelatedWorkAppendsToExistingUserSpecificCommentField() {
-        RelatedWorkService service = createService();
-        BibEntry sourceEntry = new BibEntry(StandardEntryType.Article).withCitationKey("LunaOstos_2024");
-        UserSpecificCommentField userSpecificCommentField = new UserSpecificCommentField("koppor");
-        BibEntry matchedLibraryEntry = new BibEntry(StandardEntryType.Misc)
-                .withCitationKey("Agency2021")
-                .withField(userSpecificCommentField, "[test]: blahblah");
-        RelatedWorkMatchResult matchResult = new RelatedWorkMatchResult(
-                "Colombia is a middle-income country with a population of approximately 50 million.",
-                "[1]",
-                Optional.of(new BibEntry(StandardEntryType.Misc)),
-                Optional.of(matchedLibraryEntry)
-        );
-
-        List<RelatedWorkInsertionResult> insertionResults = service.insertMatchedRelatedWork(sourceEntry, List.of(matchResult), "koppor");
-
-        assertInstanceOf(RelatedWorkInsertionResult.Inserted.class, insertionResults.getFirst());
-        assertEquals("[test]: blahblah" + OS.NEWLINE + OS.NEWLINE + "[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.",
-                matchedLibraryEntry.getField(userSpecificCommentField).orElseThrow());
+        assertEquals(1, matchResults.size());
+        assertEquals("A short related work sentence.", matchResult.contextText());
+        assertEquals("[1]", matchResult.citationKey());
+        assertEquals("123-145", matchResult.parsedReference().orElseThrow().getField(StandardField.PAGES).orElseThrow());
+        assertSame(existingLibraryEntry, matchResult.matchedLibraryBibEntry().orElseThrow());
     }
 
     private FilePreferences createFilePreferences() {
@@ -166,8 +168,8 @@ class RelatedWorkServiceTest {
         );
     }
 
-    private RelatedWorkService createService() {
-        return new RelatedWorkService(
+    private RelatedWorkMatcher createMatcher() {
+        return new RelatedWorkMatcher(
                 new RelatedWorkTextParser(),
                 new RelatedWorkReferenceResolver(),
                 new DuplicateCheck(new BibEntryTypesManager())
@@ -175,7 +177,7 @@ class RelatedWorkServiceTest {
     }
 
     private LinkedFile createLinkedFile() throws URISyntaxException {
-        Path pdfPath = Path.of(RelatedWorkServiceTest.class
+        Path pdfPath = Path.of(RelatedWorkMatcherTest.class
                 .getResource("/org/jabref/logic/importer/fileformat/pdf/2024_SPLC_Becker.pdf")
                 .toURI());
         return new LinkedFile("", pdfPath, "PDF");
