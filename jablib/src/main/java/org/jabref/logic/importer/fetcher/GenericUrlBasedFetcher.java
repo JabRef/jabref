@@ -14,16 +14,17 @@ public class GenericUrlBasedFetcher {
     }
 
     public List<BibEntry> fetchEntryFromUrl(String url) throws FetcherException {
-
         if (url == null || url.trim().isEmpty()) {
             return List.of();
         }
 
         String trimmedUrl = url.trim();
+        if (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://")) {
+            trimmedUrl = "https://" + trimmedUrl;
+        }
 
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.URL, trimmedUrl);
-
         return List.of(entry);
     }
 }
