@@ -110,6 +110,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();
+
+        useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
     }
 
     /// Read all saved file paths and read their abbreviations.
@@ -315,7 +317,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess(success -> Injector.setModelOrService(
+                .onSuccess(_ -> Injector.setModelOrService(
                         JournalAbbreviationRepository.class,
                         JournalAbbreviationLoader.loadRepository(abbreviationsPreferences)))
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))

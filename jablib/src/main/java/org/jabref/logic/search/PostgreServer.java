@@ -28,7 +28,7 @@ public class PostgreServer implements AutoCloseable {
             embeddedPostgres = EmbeddedPostgres.builder()
                                                .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
                                                .start();
-            LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
+            LOGGER.debug("Postgres server started, connection port: {}", embeddedPostgres.getPort());
         } catch (IOException e) {
             LOGGER.error("Could not start Postgres server", e);
             this.embeddedPostgres = null;
