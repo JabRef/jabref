@@ -37,7 +37,7 @@ class GenericUrlBasedFetcherTest {
 
         BibEntry entry = result.get();
         assertEquals(Optional.of(TEST_URL), entry.getField(StandardField.URL));
-        assertEquals(StandardEntryType.Online, entry.getType());
+        assertEquals(StandardEntryType.Misc, entry.getType());
     }
 
     @Test
