@@ -8,6 +8,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 public class GenericUrlBasedFetcher {
+    
     public String getName() {
         return "Generic URL Fetcher";
     }
