@@ -87,7 +87,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a search group would not be updated in the ui after an entry change [#13378](https://github.com/JabRef/jabref/issues/13378)
 - We fixed exceptions occuring when generating citation keys or using certain cleanup operations on macOS [#15366](https://github.com/JabRef/jabref/issues/15366)
 - We fixed an issue that prevented files without a file extension from being shown in various file select dialogs [#11786](https://github.com/JabRef/jabref/issues/11786)
-- Fixed an issue where opening a child entry linked to a parent PDF via `crossref` did not navigate to the correct page. (https://github.com/JabRef/jabref/issues/8128)
+- Fixed an issue where opening a child entry linked to a parent PDF via `crossref` did not navigate to the correct page. [#8128](https://github.com/JabRef/jabref/issues/8128)
 
 ### Removed
 
