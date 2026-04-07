@@ -30,7 +30,6 @@ testModuleInfo {
 
     runtimeOnly("com.tngtech.archunit.junit5.engine")
 
-    requires("org.apache.pdfbox")
 }
 
 application {

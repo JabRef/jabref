@@ -132,8 +132,8 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
         return stateManager.getActiveDatabase()
                            .flatMap(databaseContext -> entry.getField(StandardField.CROSSREF)
-                                                           .filter(crossref -> !crossref.isBlank())
-                                                           .flatMap(databaseContext.getDatabase()::getEntryByCitationKey))
+                                                            .filter(crossref -> !crossref.isBlank())
+                                                            .flatMap(databaseContext.getDatabase()::getEntryByCitationKey))
                            .map(BibEntry::getFiles)
                            .stream()
                            .flatMap(List::stream)
