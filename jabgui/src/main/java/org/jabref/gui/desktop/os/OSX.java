@@ -27,6 +27,14 @@ public class OSX extends NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
+
+        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
+            String application = type.get().getOpenWithApplication();
+            openFileWithApplication(filePath, application, pageNumber);
+            return;
+        }
+
         if (isPdf(fileType) && pageNumber > 1) {
             String fileUrlWithPage = Path.of(filePath).toUri().toString() + "#page=" + pageNumber;
 
@@ -43,14 +51,6 @@ public class OSX extends NativeDesktop {
             }
 
             NativeDesktop.openBrowser(fileUrlWithPage, externalApplicationsPreferences);
-            return;
-        }
-
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
-
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            String application = type.get().getOpenWithApplication();
-            openFileWithApplication(filePath, application, pageNumber);
             return;
         }
 
