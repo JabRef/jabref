@@ -9,7 +9,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 public class GenericUrlBasedFetcher implements WebFetcher {
-    @Override
     public String getName() {
         return "Generic URL Fetcher";
     }
