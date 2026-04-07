@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.ai;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -213,14 +212,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     private void initializeApiKey() {
         apiKeyTextField.textProperty().bindBidirectional(viewModel.apiKeyProperty());
-
-        // Disable if GPT4ALL is selected
-        apiKeyTextField.disableProperty().bind(
-                Bindings.or(
-                        viewModel.disableBasicSettingsProperty(),
-                        aiProviderComboBox.valueProperty().isEqualTo(AiProvider.GPT4ALL)
-                )
-        );
+        apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         Button revealApiKeyButton = IconTheme.JabRefIcons.PASSWORD_REVEALED.asButton();
         revealApiKeyButton.disableProperty().bind(apiKeyTextField.disableProperty());
@@ -247,9 +239,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         this.aiProviderComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == AiProvider.HUGGING_FACE) {
                 chatModelComboBox.setPromptText(Localization.lang("TinyLlama/TinyLlama_v1.1 (or any other model name)"));
-            }
-            if (newValue == AiProvider.GPT4ALL) {
-                chatModelComboBox.setPromptText(Localization.lang("Phi-3.1-mini (or any other local model name from GPT4All)"));
             }
         });
     }

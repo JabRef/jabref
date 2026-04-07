@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.ai.AiProvider;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.ChatMessage;
@@ -47,7 +46,7 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
     /// and see {@link org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage}.
     private void rebuild() {
         String apiKey = aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider());
-        if (!aiPreferences.getEnableAi() || (apiKey.isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL)) {
+        if (!aiPreferences.getEnableAi()) {
             langchainChatModel = Optional.empty();
             return;
         }
@@ -57,9 +56,6 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
             case OPEN_AI,
                  HUGGING_FACE ->
                     langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
-
-            case GPT4ALL ->
-                    langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
 
             case MISTRAL_AI ->
                     langchainChatModel = Optional.of(MistralAiChatModel
@@ -111,7 +107,7 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
-            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty() && aiPreferences.getAiProvider() != AiProvider.GPT4ALL) {
+            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set an API key inside JabRef preferences (AI tab)."));
             } else {
                 rebuild();
