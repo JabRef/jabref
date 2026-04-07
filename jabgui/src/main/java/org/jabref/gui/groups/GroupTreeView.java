@@ -281,7 +281,11 @@ public class GroupTreeView extends BorderPane {
         addSubgroupColumn.setCellFactory(col -> {
             Button button = IconTheme.JabRefIcons.ADD.asButton();
             button.setVisible(false);
+            button.managedProperty().bind(button.visibleProperty());
             StackPane pane = new StackPane(button);
+            pane.setMinHeight(0);
+            pane.setPrefHeight(0);
+            pane.setMaxHeight(0);
 
             TreeTableCell<GroupNodeViewModel, GroupNodeViewModel> cell = new TreeTableCell<>() {
                 @Override
