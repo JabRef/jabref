@@ -2,74 +2,60 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.WebFetcher;
-import org.jabref.logic.util.URLUtil;
-import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
+import java.util.Optional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.jabref.logic.importer.WebFetcher;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 
 public class GenericUrlBasedFetcher implements WebFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericUrlBasedFetcher.class);
 
     @Override
     public String getName() {
         return "Generic URL Fetcher";
     }
 
-    public List<BibEntry> fetchEntryFromUrl(String url) throws FetcherException {
-        if (StringUtil.isBlank(url)) {
-            return List.of();
+    @Override
+    public List<BibEntry> performSearch(String url) {
+        if ((url == null) || url.isBlank()) {
+            return Collections.emptyList();
         }
 
-        String normalizedUrl = normalizeUrl(url);
-
-        if (!URLUtil.isValidHttpUrl(normalizedUrl)) {
-            throw new FetcherException("Invalid URL: " + normalizedUrl);
-        }
-
-        BibEntry entry = new BibEntry(StandardEntryType.MISC)
-                .withField(StandardField.URL, normalizedUrl)
-                .withField(
-                        StandardField.URLDATE,
-                        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                );
-
-        String title = scrapeTitle(normalizedUrl);
-        if (StringUtil.isNotBlank(title)) {
-            entry.setField(StandardField.TITLE, title);
-        }
-
-        return List.of(entry);
+        return fetchEntryFromUrl(url.trim())
+                .map(Collections::singletonList)
+                .orElse(Collections.emptyList());
     }
 
-    private String normalizeUrl(String url) {
-        String trimmed = url.trim();
-        String lower = trimmed.toLowerCase(Locale.ROOT);
-
-        if (!lower.startsWith("http://") && !lower.startsWith("https://")) {
-            return "https://" + trimmed;
+    public Optional<BibEntry> fetchEntryFromUrl(String urlString) {
+        if ((urlString == null) || urlString.isBlank()) {
+            return Optional.empty();
         }
-        return trimmed;
-    }
 
-    private String scrapeTitle(String url) {
+        BibEntry entry = new BibEntry(StandardEntryType.Online);
+        entry.setField(StandardField.URL, urlString);
+        entry.setField(StandardField.URLDATE, LocalDate.now().toString());
+
         try {
-            Document document = Jsoup.connect(url)
-                                     .userAgent("Mozilla/5.0")
-                                     .timeout(10_000)
-                                     .get();
+            Document document = Jsoup.connect(urlString).get();
+            String title = document.title();
 
-            return document.title();
+            if (!title.isBlank()) {
+                entry.setField(StandardField.TITLE, title);
+            }
         } catch (IOException e) {
-            return null;
+            LOGGER.debug("Could not fetch title from URL: {}", urlString, e);
         }
+
+        return Optional.of(entry);
     }
 }
