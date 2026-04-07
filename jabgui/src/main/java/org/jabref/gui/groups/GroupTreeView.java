@@ -91,6 +91,11 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
+    private static final double NUMBER_COL_WIDTH = 60d;
+    private static final double EXPANSION_COL_WIDTH = 20d;
+    private static final double ADD_SUBGROUP_COL_WIDTH = 28d;
+    private static final double SCROLLBAR_WIDTH = 15d;
+
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final AiService aiService;
@@ -156,28 +161,28 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(60d);
-        numberColumn.setMaxWidth(60d);
-        numberColumn.setPrefWidth(60d);
+        numberColumn.setMinWidth(NUMBER_COL_WIDTH);
+        numberColumn.setMaxWidth(NUMBER_COL_WIDTH);
+        numberColumn.setPrefWidth(NUMBER_COL_WIDTH);
         numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
-        expansionNodeColumn.setMaxWidth(20d);
-        expansionNodeColumn.setMinWidth(20d);
-        expansionNodeColumn.setPrefWidth(20d);
+        expansionNodeColumn.setMaxWidth(EXPANSION_COL_WIDTH);
+        expansionNodeColumn.setMinWidth(EXPANSION_COL_WIDTH);
+        expansionNodeColumn.setPrefWidth(EXPANSION_COL_WIDTH);
         expansionNodeColumn.setResizable(false);
 
         addSubgroupColumn = new TreeTableColumn<>();
         addSubgroupColumn.getStyleClass().add("addSubgroupColumn");
-        addSubgroupColumn.setMinWidth(28d);
-        addSubgroupColumn.setMaxWidth(28d);
-        addSubgroupColumn.setPrefWidth(28d);
+        addSubgroupColumn.setMinWidth(ADD_SUBGROUP_COL_WIDTH);
+        addSubgroupColumn.setMaxWidth(ADD_SUBGROUP_COL_WIDTH);
+        addSubgroupColumn.setPrefWidth(ADD_SUBGROUP_COL_WIDTH);
         addSubgroupColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        groupTree.getColumns().addAll(List.of(mainColumn, addSubgroupColumn, numberColumn, expansionNodeColumn));
+        groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, addSubgroupColumn, expansionNodeColumn));
         groupTree.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals(KeyBinding.GROUP_RENAME.getDefaultKeyBinding())) {
                 TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
@@ -188,7 +193,11 @@ public class GroupTreeView extends BorderPane {
         });
         this.setCenter(groupTree);
 
-        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(28d).subtract(15d));
+        mainColumn.prefWidthProperty().bind(groupTree.widthProperty()
+                                                     .subtract(NUMBER_COL_WIDTH)
+                                                     .subtract(EXPANSION_COL_WIDTH)
+                                                     .subtract(ADD_SUBGROUP_COL_WIDTH)
+                                                     .subtract(SCROLLBAR_WIDTH));
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
