@@ -51,14 +51,12 @@ class AiChatComponentTest {
         SimpleStringProperty mistralModelProp = new SimpleStringProperty("mistral-large");
         SimpleStringProperty geminiModelProp = new SimpleStringProperty("gemini-1.5-pro");
         SimpleStringProperty hfModelProp = new SimpleStringProperty("hf-model");
-        SimpleStringProperty gpt4AllModelProp = new SimpleStringProperty("gpt4all");
 
         when(prefs.aiProviderProperty()).thenReturn(providerProp);
         when(prefs.openAiChatModelProperty()).thenReturn(openAiModelProp);
         when(prefs.mistralAiChatModelProperty()).thenReturn(mistralModelProp);
         when(prefs.geminiChatModelProperty()).thenReturn(geminiModelProp);
         when(prefs.huggingFaceChatModelProperty()).thenReturn(hfModelProp);
-        when(prefs.gpt4AllChatModelProperty()).thenReturn(gpt4AllModelProp);
 
         when(prefs.getAiProvider()).thenAnswer(_ -> providerProp.get());
         when(prefs.getSelectedChatModel()).thenAnswer(_ -> {
@@ -71,8 +69,6 @@ class AiChatComponentTest {
                         geminiModelProp.get();
                 case HUGGING_FACE ->
                         hfModelProp.get();
-                case GPT4ALL ->
-                        gpt4AllModelProp.get();
             };
         });
 
@@ -142,7 +138,6 @@ class AiChatComponentTest {
         prefs.mistralAiChatModelProperty().set(newModel);
         prefs.geminiChatModelProperty().set(newModel);
         prefs.huggingFaceChatModelProperty().set(newModel);
-        prefs.gpt4AllChatModelProperty().set(newModel);
 
         Thread.sleep(50);
         String expected = "Current AI model: " + provider.getLabel() + " " + newModel

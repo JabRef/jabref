@@ -1,6 +1,7 @@
 package org.jabref.gui.collab;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -38,16 +39,22 @@ public class ChangeScanner {
         }
 
         try {
-            // Parse the modified file
-            // Important: apply all post-load actions
-            ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
-            BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
-
-            return DatabaseChangeList.compareAndGetChanges(database, databaseOnDisk, databaseChangeResolverFactory);
+            return getDatabaseChanges(database.getDatabasePath().get());
         } catch (IOException e) {
             LOGGER.warn("Error while parsing changed file.", e);
             return List.of();
         }
+    }
+
+    public List<DatabaseChange> getDatabaseChanges(Path fileToCompare) throws IOException {
+        ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
+        ParserResult result = OpenDatabase.loadDatabase(fileToCompare, importFormatPreferences, new DummyFileUpdateMonitor());
+
+        if (result.isInvalid() || result.isEmpty()) {
+            return List.of();
+        }
+
+        BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
+        return DatabaseChangeList.compareAndGetChanges(database, databaseOnDisk, databaseChangeResolverFactory);
     }
 }
