@@ -15,8 +15,7 @@ public class GenericUrlBasedFetcher implements WebFetcher {
     public String getName() {
         return "Generic URL Fetcher";
     }
-
-    @Override
+    
     public List<BibEntry> fetchEntryFromUrl(String url) throws FetcherException {
 
         if (url == null || url.trim().isEmpty()) {
