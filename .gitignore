@@ -1,4 +1,7 @@
 .zenflow/
+# AI tooling
+
+.claude/
 
 # no generated files in version control
 src/main/gen/
