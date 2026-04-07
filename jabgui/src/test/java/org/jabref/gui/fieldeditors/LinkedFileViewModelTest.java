@@ -17,6 +17,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
@@ -31,6 +32,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,10 +50,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -296,5 +302,56 @@ class LinkedFileViewModelTest {
         }
         // Assert fail if no PDF type was found
         fail();
+    }
+
+    @Test
+    void parseFirstPageNumberExtractsFirstNumber() {
+        assertEquals(Optional.of(73), LinkedFileViewModel.parseFirstPageNumber("73--96"));
+        assertEquals(Optional.of(5), LinkedFileViewModel.parseFirstPageNumber("S5-S8"));
+        assertEquals(Optional.empty(), LinkedFileViewModel.parseFirstPageNumber("no-pages"));
+    }
+
+    @Test
+    void openForPdfPassesParsedFirstPageNumber() {
+        linkedFile = new LinkedFile("desc", Path.of("paper.pdf"), "pdf");
+        entry.setField(StandardField.PAGES, "73--96");
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+
+        try (MockedStatic<NativeDesktop> nativeDesktop = mockStatic(NativeDesktop.class)) {
+            nativeDesktop.when(() -> NativeDesktop.openExternalFileAnyFormat(any(BibDatabaseContext.class), any(ExternalApplicationsPreferences.class), any(FilePreferences.class), anyString(), any(), anyInt()))
+                         .thenReturn(true);
+
+            viewModel.open();
+
+            nativeDesktop.verify(() -> NativeDesktop.openExternalFileAnyFormat(
+                    eq(databaseContext),
+                    eq(externalApplicationsPreferences),
+                    eq(filePreferences),
+                    eq(linkedFile.getLink()),
+                    any(),
+                    eq(73)));
+        }
+    }
+
+    @Test
+    void openForNonPdfPassesDefaultPageNumber() {
+        linkedFile = new LinkedFile("desc", Path.of("notes.txt"), "txt");
+        entry.setField(StandardField.PAGES, "73--96");
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+
+        try (MockedStatic<NativeDesktop> nativeDesktop = mockStatic(NativeDesktop.class)) {
+            nativeDesktop.when(() -> NativeDesktop.openExternalFileAnyFormat(any(BibDatabaseContext.class), any(ExternalApplicationsPreferences.class), any(FilePreferences.class), anyString(), any(), anyInt()))
+                         .thenReturn(true);
+
+            viewModel.open();
+
+            nativeDesktop.verify(() -> NativeDesktop.openExternalFileAnyFormat(
+                    eq(databaseContext),
+                    eq(externalApplicationsPreferences),
+                    eq(filePreferences),
+                    eq(linkedFile.getLink()),
+                    any(),
+                    eq(1)));
+        }
     }
 }
