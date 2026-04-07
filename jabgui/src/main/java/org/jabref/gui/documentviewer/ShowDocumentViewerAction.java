@@ -15,7 +15,7 @@ public class ShowDocumentViewerAction extends SimpleCommand {
     private DocumentViewerView documentViewerView;
 
     public ShowDocumentViewerAction(StateManager stateManager, CliPreferences preferences) {
-        this.executable.bind(needsEntriesSelected(stateManager).and(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences)));
+        this.executable.bind(needsEntriesSelected(stateManager).and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager)));
     }
 
     @Override

@@ -1,7 +1,11 @@
 package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -18,23 +22,102 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 @AllowedToUseAwt("Requires AWT to open a file")
 public class OSX extends NativeDesktop {
 
+    private static final Path ADOBE_READER_EXECUTABLE = Path.of("/Applications/Adobe Acrobat Reader.app/Contents/MacOS/AdobeReader");
+    private static final Path ADOBE_ACROBAT_EXECUTABLE = Path.of("/Applications/Adobe Acrobat DC/Adobe Acrobat.app/Contents/MacOS/Adobe Acrobat");
+
     @Override
-    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            openFileWithApplication(filePath, type.get().getOpenWithApplication());
-        } else {
-            String[] cmd = {"/usr/bin/open", filePath};
-            Runtime.getRuntime().exec(cmd);
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
+        if (isPdf(fileType) && pageNumber > 1) {
+            String fileUrlWithPage = Path.of(filePath).toUri().toString() + "#page=" + pageNumber;
+
+            String chromeBinary = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+            String edgeBinary = "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge";
+
+            if (Files.exists(Path.of(chromeBinary))) {
+                new ProcessBuilder(chromeBinary, fileUrlWithPage).start();
+                return;
+            }
+            if (Files.exists(Path.of(edgeBinary))) {
+                new ProcessBuilder(edgeBinary, fileUrlWithPage).start();
+                return;
+            }
+
+            NativeDesktop.openBrowser(fileUrlWithPage, externalApplicationsPreferences);
+            return;
         }
+
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
+
+        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
+            String application = type.get().getOpenWithApplication();
+            openFileWithApplication(filePath, application, pageNumber);
+            return;
+        }
+
+        String[] cmd = {"/usr/bin/open", filePath};
+        Runtime.getRuntime().exec(cmd);
     }
 
     @Override
-    public void openFileWithApplication(String filePath, String application) throws IOException {
-        // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-        String[] cmd = (application != null) && !application.isEmpty() ? new String[] {"/usr/bin/open", "-a",
-                application, filePath} : new String[] {"/usr/bin/open", filePath};
-        new ProcessBuilder(cmd).start();
+    public void openFileWithApplication(String filePath, String application, int pageNumber) throws IOException {
+        String executable = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
+
+        if (pageNumber > 1 && (executable.contains("adobereader") || executable.contains("acrobat"))) {
+            Path appBinary = resolveAdobeExecutable(application).orElse(null);
+            if (appBinary != null) {
+                new ProcessBuilder(appBinary.toString(), "/A", "page=" + pageNumber, filePath).start();
+                return;
+            }
+        }
+
+        List<String> command = new ArrayList<>();
+        command.add("/usr/bin/open");
+
+        if ((application != null) && !application.isEmpty()) {
+            command.add("-a");
+            command.add(application);
+        }
+
+        command.add(filePath);
+
+        if (pageNumber > 1) {
+            if (executable.contains("skim")) {
+                command.add("--args");
+                command.add("-g");
+                command.add(String.valueOf(pageNumber));
+            } else if (executable.contains("adobereader") || executable.contains("acrobat")) {
+                command.add("--args");
+                command.add("/A");
+                command.add("page=" + pageNumber);
+            }
+        }
+
+        new ProcessBuilder(command).start();
+    }
+
+    private static boolean isPdf(String fileType) {
+        return "pdf".equalsIgnoreCase(fileType);
+    }
+
+    private static Optional<Path> resolveAdobeExecutable(String application) {
+        if (application.endsWith(".app")) {
+            String appName = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
+            if (appName.contains("reader") && Files.isExecutable(ADOBE_READER_EXECUTABLE)) {
+                return Optional.of(ADOBE_READER_EXECUTABLE);
+            }
+            if (appName.contains("acrobat") && Files.isExecutable(ADOBE_ACROBAT_EXECUTABLE)) {
+                return Optional.of(ADOBE_ACROBAT_EXECUTABLE);
+            }
+        }
+
+        if (Files.isExecutable(ADOBE_READER_EXECUTABLE)) {
+            return Optional.of(ADOBE_READER_EXECUTABLE);
+        }
+        if (Files.isExecutable(ADOBE_ACROBAT_EXECUTABLE)) {
+            return Optional.of(ADOBE_ACROBAT_EXECUTABLE);
+        }
+
+        return Optional.empty();
     }
 
     @Override

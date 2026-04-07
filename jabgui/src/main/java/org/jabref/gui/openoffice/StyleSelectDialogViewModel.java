@@ -322,7 +322,7 @@ public class StyleSelectDialogViewModel {
         JStyle jStyle = selectedJStyle.getValue().getJStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", externalApplicationsPreferences);
         try {
-            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, jStyle.getPath(), type);
+            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, jStyle.getPath(), type, 1);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }

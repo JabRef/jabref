@@ -3,8 +3,11 @@ package org.jabref.gui.documentviewer;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -22,11 +25,13 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.PdfPageLabelResolver;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -34,11 +39,12 @@ import org.slf4j.LoggerFactory;
 
 public class DocumentViewerViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
+    private static final Pattern PAGE_NUMBER_PATTERN = Pattern.compile("\\d+");
 
     private final StateManager stateManager;
     private final CliPreferences preferences;
     private final ObjectProperty<Path> currentDocument = new SimpleObjectProperty<>();
-    private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
+    private final ListProperty<LinkedFile> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final IntegerProperty currentPage = new SimpleIntegerProperty();
     private final StringProperty highlightText = new SimpleStringProperty();
@@ -88,9 +94,12 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         if (entries.isEmpty()) {
             files.clear();
             currentDocument.set(null);
+            currentPage.set(0);
         } else {
+            currentPage.set(getPageToShow(entries.getFirst()));
+
             Set<LinkedFile> pdfFiles = entries.stream()
-                                              .map(BibEntry::getFiles)
+                                              .map(this::getPdfFilesToDisplay)
                                               .flatMap(List::stream)
                                               .filter(this::isPdfFile)
                                               .collect(Collectors.toSet());
@@ -102,6 +111,47 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             } else {
                 files.setValue(FXCollections.observableArrayList(pdfFiles));
             }
+        }
+    }
+
+    private int getPageToShow(BibEntry entry) {
+        return entry.getField(StandardField.PAGES)
+                    .flatMap(DocumentViewerViewModel::parseFirstPageNumber)
+                    .filter(pageNumber -> pageNumber > 0)
+                    .map(pageNumber -> pageNumber - 1)
+                    .orElse(0);
+    }
+
+    private List<LinkedFile> getPdfFilesToDisplay(BibEntry entry) {
+        List<LinkedFile> directPdfFiles = entry.getFiles().stream()
+                                               .filter(this::isPdfFile)
+                                               .toList();
+        if (!directPdfFiles.isEmpty()) {
+            return directPdfFiles;
+        }
+
+        return stateManager.getActiveDatabase()
+                           .flatMap(databaseContext -> entry.getField(StandardField.CROSSREF)
+                                                           .filter(crossref -> !crossref.isBlank())
+                                                           .flatMap(databaseContext.getDatabase()::getEntryByCitationKey))
+                           .map(BibEntry::getFiles)
+                           .stream()
+                           .flatMap(List::stream)
+                           .filter(this::isPdfFile)
+                           .toList();
+    }
+
+    private static Optional<Integer> parseFirstPageNumber(String pages) {
+        Matcher matcher = PAGE_NUMBER_PATTERN.matcher(pages);
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(Integer.parseInt(matcher.group()));
+        } catch (NumberFormatException exception) {
+            LOGGER.debug("Could not parse first page number from '{}'", pages, exception);
+            return Optional.empty();
         }
     }
 
@@ -126,10 +176,14 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public void switchToFile(LinkedFile file) {
         if (file != null) {
+            setCurrentPageFromSelectedEntry();
             stateManager.getActiveDatabase()
                         .flatMap(database -> file.findIn(database, preferences.getFilePreferences()))
                         .ifPresentOrElse(
-                                this::setCurrentDocument,
+                                resolvedPath -> {
+                                    setCurrentPageFromSelectedEntry(resolvedPath);
+                                    setCurrentDocument(resolvedPath);
+                                },
                                 () -> {
                                     currentDocument.set(null);
                                     LOGGER.warn("Could not find or access file: {}", file.getLink());
@@ -138,6 +192,22 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         } else {
             currentDocument.set(null);
         }
+    }
+
+    private void setCurrentPageFromSelectedEntry() {
+        stateManager.getSelectedEntries().stream().findFirst().ifPresent(entry -> {
+            int pageToShow = getPageToShow(entry);
+            currentPage.set(pageToShow);
+        });
+    }
+
+    private void setCurrentPageFromSelectedEntry(Path pdfPath) {
+        stateManager.getSelectedEntries().stream().findFirst().ifPresent(entry -> {
+            int logicalPageNumber = getPageToShow(entry) + 1;
+            int physicalPageNumber = PdfPageLabelResolver.resolvePhysicalPageNumber(pdfPath, logicalPageNumber);
+            int pageIndexToShow = Math.max(0, physicalPageNumber - 1);
+            currentPage.set(pageIndexToShow);
+        });
     }
 
     public void showPage(int pageNumber) {

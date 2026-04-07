@@ -21,12 +21,12 @@ import org.slf4j.LoggerFactory;
 public class DefaultDesktop extends NativeDesktop {
 
     @Override
-    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
         Desktop.getDesktop().open(Path.of(filePath).toFile());
     }
 
     @Override
-    public void openFileWithApplication(String filePath, String application) throws IOException {
+    public void openFileWithApplication(String filePath, String application, int pageNumber) throws IOException {
         Desktop.getDesktop().open(Path.of(filePath).toFile());
     }
 

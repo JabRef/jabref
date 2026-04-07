@@ -18,6 +18,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.PdfPageLabelResolver;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
@@ -122,14 +123,14 @@ public abstract class NativeDesktop {
                     openBrowser(link, preferences.getExternalApplicationsPreferences());
             case PS -> {
                 try {
-                    get().openFile(link, PS.getName(), preferences.getExternalApplicationsPreferences());
+                    get().openFile(link, PS.getName(), preferences.getExternalApplicationsPreferences(), 1);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
             }
             case PDF -> {
                 try {
-                    get().openFile(link, PDF.getName(), preferences.getExternalApplicationsPreferences());
+                    get().openFile(link, PDF.getName(), preferences.getExternalApplicationsPreferences(), 1);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
@@ -167,12 +168,14 @@ public abstract class NativeDesktop {
     ///
     /// @param databaseContext The database this file belongs to.
     /// @param link            The filename.
+    /// @param pageNumber
     /// @return false if the link couldn't be resolved, true otherwise.
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
                                                     ExternalApplicationsPreferences externalApplicationsPreferences,
                                                     FilePreferences filePreferences,
                                                     String link,
-                                                    final Optional<ExternalFileType> type) throws IOException {
+                                                    final Optional<ExternalFileType> type,
+                                                    int pageNumber) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openBrowser(link, externalApplicationsPreferences);
             return true;
@@ -183,26 +186,40 @@ public abstract class NativeDesktop {
         }
 
         String filePath = file.get().toString();
-        openExternalFilePlatformIndependent(type, filePath, externalApplicationsPreferences);
+        int pageNumberToOpen = resolvePageNumberForOpen(type, file.get(), pageNumber);
+        openExternalFilePlatformIndependent(type, filePath, externalApplicationsPreferences, pageNumberToOpen);
         return true;
+    }
+
+    private static int resolvePageNumberForOpen(Optional<ExternalFileType> fileType, Path resolvedFilePath, int logicalPageNumber) {
+        if (logicalPageNumber <= 1) {
+            return 1;
+        }
+
+        boolean isPdf = fileType.map(type -> "pdf".equalsIgnoreCase(type.getExtension()))
+                                .orElseGet(() -> resolvedFilePath.toString().toLowerCase(Locale.ROOT).endsWith(".pdf"));
+        if (!isPdf) {
+            return logicalPageNumber;
+        }
+
+        return PdfPageLabelResolver.resolvePhysicalPageNumber(resolvedFilePath, logicalPageNumber);
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType,
                                                             String filePath,
-                                                            ExternalApplicationsPreferences externalApplicationsPreferences)
+                                                            ExternalApplicationsPreferences externalApplicationsPreferences,
+                                                            int pageNumber)
             throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
             if (application.isEmpty()) {
-                get().openFile(filePath, fileType.get().getExtension(), externalApplicationsPreferences);
+                get().openFile(filePath, fileType.get().getExtension(), externalApplicationsPreferences, pageNumber);
             } else {
-                get().openFileWithApplication(filePath, application);
+                get().openFileWithApplication(filePath, application, pageNumber);
             }
         } else {
-            // File type is not given and therefore no application specified
-            // Let the OS handle the opening of the file
-            get().openFile(filePath, "", externalApplicationsPreferences);
+            get().openFile(filePath, "", externalApplicationsPreferences, pageNumber);
         }
     }
 
@@ -281,7 +298,7 @@ public abstract class NativeDesktop {
     /// @param url the URL to open
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
-        openExternalFilePlatformIndependent(fileType, url, externalApplicationsPreferences);
+        openExternalFilePlatformIndependent(fileType, url, externalApplicationsPreferences, 1);
     }
 
     public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
@@ -317,13 +334,13 @@ public abstract class NativeDesktop {
         return new DefaultDesktop();
     }
 
-    public abstract void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException;
+    public abstract void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException;
 
     /// Opens a file on an Operating System, using the given application.
     ///
     /// @param filePath    The filename.
     /// @param application Link to the app that opens the file.
-    public abstract void openFileWithApplication(String filePath, String application) throws IOException;
+    public abstract void openFileWithApplication(String filePath, String application, int pageNumber) throws IOException;
 
     public abstract void openFolderAndSelectFile(Path file) throws IOException;
 

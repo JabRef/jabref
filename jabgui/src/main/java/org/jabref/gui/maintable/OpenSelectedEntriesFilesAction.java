@@ -10,6 +10,10 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 public class OpenSelectedEntriesFilesAction extends SimpleCommand {
 
@@ -38,7 +42,7 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             List<LinkedFileViewModel> linkedFileViewModelList = stateManager
                     .getSelectedEntries().stream()
-                    .flatMap(entry -> entry.getFiles().stream()
+                    .flatMap(entry -> getLinkedFilesToOpen(entry, databaseContext).stream()
                                            .map(linkedFile -> new LinkedFileViewModel(
                                                    linkedFile,
                                                    entry,
@@ -61,5 +65,17 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
 
             linkedFileViewModelList.forEach(LinkedFileViewModel::open);
         });
+    }
+
+    static List<LinkedFile> getLinkedFilesToOpen(BibEntry entry, BibDatabaseContext databaseContext) {
+        if (!entry.getFiles().isEmpty()) {
+            return entry.getFiles();
+        }
+
+        return entry.getField(StandardField.CROSSREF)
+                    .filter(crossref -> !crossref.isBlank())
+                    .flatMap(databaseContext.getDatabase()::getEntryByCitationKey)
+                    .map(BibEntry::getFiles)
+                    .orElse(List.of());
     }
 }

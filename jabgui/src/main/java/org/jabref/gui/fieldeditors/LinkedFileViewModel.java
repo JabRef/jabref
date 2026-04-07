@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -48,6 +50,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.OptionalUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -60,6 +63,7 @@ import org.slf4j.LoggerFactory;
 public class LinkedFileViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
+    private static final Pattern PAGE_NUMBER_PATTERN = Pattern.compile("\\d+");
 
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;
@@ -210,12 +214,45 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void open() {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
-            boolean successful = NativeDesktop.openExternalFileAnyFormat(databaseContext, preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), linkedFile.getLink(), type);
+            int pageNumber = isPdf(type) ? getFirstPageNumberFromEntry().orElse(1) : 1;
+            boolean successful = NativeDesktop.openExternalFileAnyFormat(
+                    databaseContext,
+                    preferences.getExternalApplicationsPreferences(),
+                    preferences.getFilePreferences(),
+                    linkedFile.getLink(),
+                    type,
+                    pageNumber
+            );
+
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'", linkedFile.getLink()), e);
+        }
+    }
+
+    private static boolean isPdf(Optional<ExternalFileType> type) {
+        return type.map(externalFileType -> "pdf".equalsIgnoreCase(externalFileType.getExtension())).orElse(false);
+    }
+
+    private Optional<Integer> getFirstPageNumberFromEntry() {
+        return entry.getField(StandardField.PAGES)
+                    .flatMap(LinkedFileViewModel::parseFirstPageNumber)
+                    .filter(pageNumber -> pageNumber > 0);
+    }
+
+    static Optional<Integer> parseFirstPageNumber(String pages) {
+        Matcher matcher = PAGE_NUMBER_PATTERN.matcher(pages);
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(Integer.parseInt(matcher.group()));
+        } catch (NumberFormatException exception) {
+            LOGGER.debug("Could not parse first page number from '{}'", pages, exception);
+            return Optional.empty();
         }
     }
 

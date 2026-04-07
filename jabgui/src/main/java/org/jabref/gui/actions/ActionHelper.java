@@ -18,6 +18,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -119,6 +120,14 @@ public class ActionHelper {
     /// @return a boolean binding
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
-                entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
+                entries -> entries.anyMatch(entry -> {
+                    if (!entry.getFiles().isEmpty()) {
+                        return true;
+                    }
+
+                    return entry.getField(StandardField.CROSSREF)
+                                .filter(crossref -> !crossref.isBlank())
+                                .isPresent();
+                })));
     }
 }
