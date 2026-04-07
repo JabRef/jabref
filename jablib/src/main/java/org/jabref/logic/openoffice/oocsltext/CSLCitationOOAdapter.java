@@ -112,8 +112,7 @@ public class CSLCitationOOAdapter {
         if (isAlphanumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style,
-                    HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(citation);

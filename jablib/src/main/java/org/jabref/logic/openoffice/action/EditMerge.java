@@ -203,6 +203,10 @@ public class EditMerge {
     /// @param loggerMessage The failure message for the LOGGER.
     /// @return false if cannot expand, true if can.
     private static boolean checkCouldExpand(ScanState state, XTextRange currentRange, String loggerMessage) {
+        /*
+         * Try to expand state.currentGroupCursor and state.cursorBetween by going right to reach
+         * rangeStart.
+         */
         XTextRange rangeStart = currentRange.getStart();
         boolean couldExpand = true;
         XTextCursor thisCharCursor =

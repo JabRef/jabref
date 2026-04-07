@@ -361,6 +361,7 @@ public class OOBibBase {
                             + pathToStyleFile;
             return OOVoidResult.error(new OOError("StyleIsNotKnown", msg));
         }
+
         if (!internalName.get().equals(styleName)) {
             String msg =
                     switch (familyName) {
@@ -570,10 +571,26 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
-                insertCSLCitation(entries, doc, citationType, citationStyle, bibDatabaseContext, bibEntryTypesManager, cursor, syncOptions);
+                insertCSLCitation(entries,
+                        doc,
+                        citationType,
+                        citationStyle,
+                        bibDatabaseContext,
+                        bibEntryTypesManager,
+                        cursor,
+                        syncOptions);
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
-                insertJStyleCitation(entries, doc, citationType, jStyle, frontend, cursor, bibDatabaseContext, syncOptions, pageInfo, fcursor);
+                insertJStyleCitation(entries,
+                        doc,
+                        citationType,
+                        jStyle,
+                        frontend,
+                        cursor,
+                        bibDatabaseContext,
+                        syncOptions,
+                        pageInfo,
+                        fcursor);
             }
         } catch (NoDocumentException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
@@ -603,9 +620,16 @@ public class OOBibBase {
     /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
     /// @param citationStyle      Indicates style, name and path of citation
     /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
-    public void insertCSLCitation(List<BibEntry> entries, XTextDocument doc, CitationType citationType, CitationStyle citationStyle,
-                                  BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager, OOResult<XTextCursor, OOError> cursor,
-                                  Optional<Update.SyncOptions> syncOptions) throws CreationException, com.sun.star.uno.Exception {
+    public void insertCSLCitation(List<BibEntry> entries,
+                                  XTextDocument doc,
+                                  CitationType citationType,
+                                  CitationStyle citationStyle,
+                                  BibDatabaseContext bibDatabaseContext,
+                                  BibEntryTypesManager bibEntryTypesManager,
+                                  OOResult<XTextCursor,
+                                          OOError> cursor,
+                                  Optional<Update.SyncOptions> syncOptions)
+            throws CreationException, com.sun.star.uno.Exception {
         try {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
@@ -642,10 +666,25 @@ public class OOBibBase {
     /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
     /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
     /// @param pageInfo           A single page-info for these entries. Attributed to the last entry.
-    public void insertJStyleCitation(List<BibEntry> entries, XTextDocument doc, CitationType citationType, JStyle jStyle, OOResult<OOFrontend, OOError> frontend,
-                                     OOResult<XTextCursor, OOError> cursor, BibDatabaseContext bibDatabaseContext, Optional<Update.SyncOptions> syncOptions,
-                                     String pageInfo, OOResult<FunctionalTextViewCursor, OOError> fcursor)
-            throws PropertyVetoException, WrappedTargetException, IllegalTypeException, NotRemoveableException, CreationException, NoDocumentException {
+    public void insertJStyleCitation(List<BibEntry> entries,
+                                     XTextDocument doc,
+                                     CitationType citationType,
+                                     JStyle jStyle,
+                                     OOResult<OOFrontend,
+                                             OOError> frontend,
+                                     OOResult<XTextCursor,
+                                             OOError> cursor,
+                                     BibDatabaseContext bibDatabaseContext,
+                                     Optional<Update.SyncOptions> syncOptions,
+                                     String pageInfo,
+                                     OOResult<FunctionalTextViewCursor,
+                                             OOError> fcursor)
+            throws PropertyVetoException,
+            WrappedTargetException,
+            IllegalTypeException,
+            NotRemoveableException,
+            CreationException,
+            NoDocumentException {
         EditInsert.insertCitationGroup(doc,
                 frontend.get(),
                 cursor.get(),
@@ -666,12 +705,20 @@ public class OOBibBase {
 
         if (style instanceof JStyle jStyle) {
             OOResult<XTextDocument, OOError> odoc = getXTextDocument();
-
+            if (testDialog(errorTitle,
+                    odoc.asVoidResult(),
+                    styleIsRequired(jStyle),
+                    databaseIsRequired(databases, OOError::noDataBaseIsOpen))) {
+                return;
+            }
             XTextDocument doc = odoc.get();
 
             OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
 
-            if (!performPreMergeSeparateChecks(databases, errorTitle, odoc, jStyle, fcursor, doc)) {
+            if (testDialog(errorTitle,
+                    fcursor.asVoidResult(),
+                    checkStylesExistInTheDocument(jStyle, doc),
+                    checkIfOpenOfficeIsRecordingChanges(doc))) {
                 return;
             }
 
@@ -712,12 +759,21 @@ public class OOBibBase {
 
         if (style instanceof JStyle jStyle) {
             OOResult<XTextDocument, OOError> odoc = getXTextDocument();
+            if (testDialog(errorTitle,
+                    odoc.asVoidResult(),
+                    styleIsRequired(jStyle),
+                    databaseIsRequired(databases, OOError::noDataBaseIsOpen))) {
+                return;
+            }
 
             XTextDocument doc = odoc.get();
 
             OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
 
-            if (!performPreMergeSeparateChecks(databases, errorTitle, odoc, jStyle, fcursor, doc)) {
+            if (testDialog(errorTitle,
+                    fcursor.asVoidResult(),
+                    checkStylesExistInTheDocument(jStyle, doc),
+                    checkIfOpenOfficeIsRecordingChanges(doc))) {
                 return;
             }
 
@@ -748,32 +804,6 @@ public class OOBibBase {
                 fcursor.get().restore(doc);
             }
         }
-    }
-
-    /// Helper method for guiActionSeparateCitations and guiActionMergeCitations. Handles checks
-    ///
-    /// @param databases  Requires at least one
-    /// @param jStyle     JStyle object
-    /// @param errorTitle Message String of error
-    /// @param odoc       Open Office text document result
-    /// @param fcursor    Open Office result of functional text view cursor
-    /// @param doc        Text document
-    public boolean performPreMergeSeparateChecks(List<BibDatabase> databases, String errorTitle, OOResult<XTextDocument, OOError> odoc, JStyle jStyle,
-                                                 OOResult<FunctionalTextViewCursor, OOError> fcursor, XTextDocument doc) {
-        if (testDialog(errorTitle,
-                odoc.asVoidResult(),
-                styleIsRequired(jStyle),
-                databaseIsRequired(databases, OOError::noDataBaseIsOpen))) {
-            return false;
-        }
-
-        if (testDialog(errorTitle,
-                fcursor.asVoidResult(),
-                checkStylesExistInTheDocument(jStyle, doc),
-                checkIfOpenOfficeIsRecordingChanges(doc))) {
-            return false;
-        }
-        return true;
     }
 
     /// GUI action for "Export cited"
