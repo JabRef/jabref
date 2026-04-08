@@ -605,7 +605,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, "Text body");
         defaults.put(OO_EXTERNAL_CSL_STYLES, "");
         defaults.put(OO_ADD_SPACE_AFTER, Boolean.TRUE);
-        defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
@@ -1373,32 +1372,33 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private ProxyPreferences getProxyPreferencesFromBackingStore(ProxyPreferences defaults) {
+        boolean persistPassword = getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword());
+
         return new ProxyPreferences(
                 getBoolean(PROXY_USE, defaults.shouldUseProxy()),
                 get(PROXY_HOSTNAME, defaults.getHostname()),
                 get(PROXY_PORT, defaults.getPort()),
                 getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
                 get(PROXY_USERNAME, defaults.getUsername()),
-                getProxyPassword(defaults.getPassword()),
-                getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
+                persistPassword ? getProxyPassword().orElse(defaults.getPassword()) : defaults.getPassword(),
+                persistPassword
         );
     }
     // endregion
 
-    private String getProxyPassword(String defaultPassword) {
-        if (getBoolean(PROXY_PERSIST_PASSWORD)) {
-            try (final Keyring keyring = Keyring.create()) {
-                return new Password(
-                        keyring.getPassword("org.jabref", "proxy"),
-                        getInternalPreferences().getUserAndHost())
-                        .decrypt();
-            } catch (PasswordAccessException ex) {
-                LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
-            } catch (Exception ex) {
-                LOGGER.warn("JabRef could not open the key store", ex);
-            }
+    private Optional<String> getProxyPassword() {
+        try (final Keyring keyring = Keyring.create()) {
+            return Optional.of(new Password(
+                    keyring.getPassword("org.jabref", "proxy"),
+                    getInternalPreferences().getUserAndHost())
+                    .decrypt());
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
+        } catch (Exception ex) {
+            LOGGER.warn("JabRef could not open the key store", ex);
         }
-        return defaultPassword;
+
+        return Optional.empty();
     }
 
     private void setProxyPassword(String password) {
