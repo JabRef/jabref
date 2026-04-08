@@ -20,13 +20,11 @@ public class AiDefaultPreferences {
         // "mixtral" is not a typo.
         OPEN_MIXTRAL_8X7B(AiProvider.MISTRAL_AI, "open-mixtral-8x7b", 32000),
         OPEN_MIXTRAL_8X22B(AiProvider.MISTRAL_AI, "open-mixtral-8x22b", 64000),
-        GEMINI_1_5_FLASH(AiProvider.GEMINI, "gemini-1.5-flash", 1048576),
-        GEMINI_1_5_PRO(AiProvider.GEMINI, "gemini-1.5-pro", 2097152),
-        GEMINI_1_0_PRO(AiProvider.GEMINI, "gemini-1.0-pro", 32000),
+        GEMINI_3_0_FLASH(AiProvider.GEMINI, "gemini-3-flash-preview", 1048576),
+        GEMINI_3_1_PRO(AiProvider.GEMINI, "gemini-3.1-pro-preview", 1048576),
         // Dummy variant for Hugging Face models.
         // Blank entry used for cases where the model name is not specified.
-        BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0),
-        BLANK_GPT4ALL(AiProvider.GPT4ALL, "", 0);
+        BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0);
 
         private final AiProvider aiProvider;
         private final String name;
@@ -66,9 +64,8 @@ public class AiDefaultPreferences {
     public static final Map<AiProvider, PredefinedChatModel> CHAT_MODELS = Map.of(
             AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
-            AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
-            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE,
-            AiProvider.GPT4ALL, PredefinedChatModel.BLANK_GPT4ALL
+            AiProvider.GEMINI, PredefinedChatModel.GEMINI_3_0_FLASH,
+            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
     public static final boolean CUSTOMIZE_SETTINGS = false;
