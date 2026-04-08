@@ -312,7 +312,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
-    // TODO: USed by both importer preferences and workspace preferences
     protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
 
     // Helper string
@@ -333,7 +332,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROXY_USE = "useProxy";
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
     private static final String PROXY_USERNAME = "proxyUsername";
-    private static final String PROXY_PASSWORD = "proxyPassword";
+    // PROXY_PASSWORD = "proxyPassword" handled by KeyRing
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
     // endregion
 
@@ -343,10 +342,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
 
     // SSL
-    private static final String TRUSTSTORE_PATH = "truststorePath";
-
-    // User
-    private static final String USER_ID = "userId";
+    private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
 
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -539,7 +535,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
 
         // SSL
-        defaults.put(TRUSTSTORE_PATH, Directories
+        defaults.put(SSL_TRUSTSTORE_PATH, Directories
                 .getSslDirectory()
                 .resolve("truststore.jks").toString());
 
@@ -875,7 +871,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearTruststoreFromCustomCertificates() {
-        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
+        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(SSL_TRUSTSTORE_PATH).toString()));
         trustStoreManager.clearCustomCertificates();
     }
 
@@ -1383,7 +1379,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
         );
     }
-    // endregion
 
     private String getProxyPassword(String defaultPassword) {
         if (getBoolean(PROXY_PERSIST_PASSWORD)) {
@@ -1417,7 +1412,9 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
     }
+    // endregion
 
+    // region SSLPreferences
     @Override
     public SSLPreferences getSSLPreferences() {
         if (sslPreferences != null) {
@@ -1425,14 +1422,14 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         sslPreferences = new SSLPreferences(
-                get(TRUSTSTORE_PATH)
+                get(SSL_TRUSTSTORE_PATH)
         );
 
         return sslPreferences;
     }
+    // endregion
 
     // region CitationKeyPatternPreferences
-
     private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
@@ -1449,7 +1446,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPattern;
     }
-    // endregion
 
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
@@ -1535,6 +1531,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
         return keySuffix;
     }
+    // endregion
 
     // region BibEntryPreferences
     @Override
