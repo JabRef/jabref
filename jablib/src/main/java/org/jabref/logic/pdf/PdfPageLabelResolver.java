@@ -1,4 +1,4 @@
-package org.jabref.gui.util;
+package org.jabref.logic.pdf;
 
 import java.io.IOException;
 import java.nio.file.Path;

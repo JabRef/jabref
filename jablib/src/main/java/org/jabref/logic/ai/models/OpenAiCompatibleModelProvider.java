@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAiCompatibleModelProvider.class);
+    private static final int MODEL_FETCH_TIMEOUT_MILLIS = 10_000;
 
     @Override
     public List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
@@ -38,6 +39,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
             HttpResponse<JsonNode> response = Unirest.get(modelsEndpoint)
                                                      .header("Authorization", "Bearer " + apiKey)
                                                      .header("accept", "application/json")
+                                                     .requestTimeout(MODEL_FETCH_TIMEOUT_MILLIS)
                                                      .asJson();
 
             if (response.getStatus() == 200) {

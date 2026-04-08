@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -43,6 +41,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.PdfPageNumberParser;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
@@ -63,7 +62,6 @@ import org.slf4j.LoggerFactory;
 public class LinkedFileViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
-    private static final Pattern PAGE_NUMBER_PATTERN = Pattern.compile("\\d+");
 
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;
@@ -238,22 +236,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     private Optional<Integer> getFirstPageNumberFromEntry() {
         return entry.getField(StandardField.PAGES)
-                    .flatMap(LinkedFileViewModel::parseFirstPageNumber)
+                    .flatMap(PdfPageNumberParser::parseFirstPageNumber)
                     .filter(pageNumber -> pageNumber > 0);
-    }
-
-    static Optional<Integer> parseFirstPageNumber(String pages) {
-        Matcher matcher = PAGE_NUMBER_PATTERN.matcher(pages);
-        if (!matcher.find()) {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(Integer.parseInt(matcher.group()));
-        } catch (NumberFormatException exception) {
-            LOGGER.debug("Could not parse first page number from '{}'", pages, exception);
-            return Optional.empty();
-        }
     }
 
     public void openFolder() {

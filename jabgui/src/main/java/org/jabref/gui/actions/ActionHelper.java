@@ -125,9 +125,13 @@ public class ActionHelper {
                         return true;
                     }
 
-                    return entry.getField(StandardField.CROSSREF)
-                                .filter(crossref -> !crossref.isBlank())
-                                .isPresent();
+                    return stateManager.getActiveDatabase()
+                                       .flatMap(databaseContext -> entry.getField(StandardField.CROSSREF)
+                                                                        .filter(crossref -> !crossref.isBlank())
+                                                                        .flatMap(databaseContext.getDatabase()::getEntryByCitationKey))
+                                       .map(BibEntry::getFiles)
+                                       .filter(parentFiles -> !parentFiles.isEmpty())
+                                       .isPresent();
                 })));
     }
 }

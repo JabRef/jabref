@@ -76,6 +76,7 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
                     .filter(crossref -> !crossref.isBlank())
                     .flatMap(databaseContext.getDatabase()::getEntryByCitationKey)
                     .map(BibEntry::getFiles)
+                    .filter(parentFiles -> !parentFiles.isEmpty())
                     .orElse(List.of());
     }
 }

@@ -3,10 +3,7 @@ package org.jabref.gui.documentviewer;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -25,8 +22,9 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.util.PdfPageLabelResolver;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.PdfPageLabelResolver;
+import org.jabref.logic.pdf.PdfPageNumberParser;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
@@ -39,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 public class DocumentViewerViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
-    private static final Pattern PAGE_NUMBER_PATTERN = Pattern.compile("\\d+");
 
     private final StateManager stateManager;
     private final CliPreferences preferences;
@@ -116,7 +113,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     private int getPageToShow(BibEntry entry) {
         return entry.getField(StandardField.PAGES)
-                    .flatMap(DocumentViewerViewModel::parseFirstPageNumber)
+                    .flatMap(PdfPageNumberParser::parseFirstPageNumber)
                     .filter(pageNumber -> pageNumber > 0)
                     .map(pageNumber -> pageNumber - 1)
                     .orElse(0);
@@ -139,20 +136,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
                            .flatMap(List::stream)
                            .filter(this::isPdfFile)
                            .toList();
-    }
-
-    private static Optional<Integer> parseFirstPageNumber(String pages) {
-        Matcher matcher = PAGE_NUMBER_PATTERN.matcher(pages);
-        if (!matcher.find()) {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(Integer.parseInt(matcher.group()));
-        } catch (NumberFormatException exception) {
-            LOGGER.debug("Could not parse first page number from '{}'", pages, exception);
-            return Optional.empty();
-        }
     }
 
     private void setCurrentDocument(Path path) {
@@ -204,6 +187,11 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private void setCurrentPageFromSelectedEntry(Path pdfPath) {
         stateManager.getSelectedEntries().stream().findFirst().ifPresent(entry -> {
             int logicalPageNumber = getPageToShow(entry) + 1;
+            if (logicalPageNumber <= 1) {
+                currentPage.set(0);
+                return;
+            }
+
             int physicalPageNumber = PdfPageLabelResolver.resolvePhysicalPageNumber(pdfPath, logicalPageNumber);
             int pageIndexToShow = Math.max(0, physicalPageNumber - 1);
             currentPage.set(pageIndexToShow);

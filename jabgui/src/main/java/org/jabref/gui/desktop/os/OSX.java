@@ -63,9 +63,9 @@ public class OSX extends NativeDesktop {
         String executable = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
 
         if (pageNumber > 1 && (executable.contains("adobereader") || executable.contains("acrobat"))) {
-            Path appBinary = resolveAdobeExecutable(application).orElse(null);
-            if (appBinary != null) {
-                new ProcessBuilder(appBinary.toString(), "/A", "page=" + pageNumber, filePath).start();
+            Optional<Path> appBinary = resolveAdobeExecutable(application);
+            if (appBinary.isPresent()) {
+                new ProcessBuilder(appBinary.get().toString(), "/A", "page=" + pageNumber, filePath).start();
                 return;
             }
         }
