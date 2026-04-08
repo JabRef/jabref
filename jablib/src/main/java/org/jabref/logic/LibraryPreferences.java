@@ -34,7 +34,7 @@ public class LibraryPreferences {
                 BibDatabaseMode.BIBTEX,
                 false,               // alwaysReformatOnSave
                 false,               // autoSave
-                false,                // addImportedEntries
+                false,               // addImportedEntries
                 "Imported entries"); // addImportedEntriesGroupName
     }
 
