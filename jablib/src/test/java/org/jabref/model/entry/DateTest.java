@@ -132,4 +132,9 @@ class DateTest {
                 Date.parse(" 2025-05-02 ")
         );
     }
+
+    @Test
+    void normalizedDateRangeKeepsBothDates() {
+        assertEquals("2020/2021", Date.parse("2020/2021").orElseThrow().getNormalized());
+    }
 }

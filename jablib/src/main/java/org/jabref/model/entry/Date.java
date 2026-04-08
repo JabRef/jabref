@@ -340,7 +340,11 @@ public class Date {
     }
 
     public String getNormalized() {
-        return NORMALIZED_DATE_FORMATTER.format(date);
+        String normalizedStartDate = NORMALIZED_DATE_FORMATTER.format(date);
+        if (endDate != null) {
+            return normalizedStartDate + "/" + NORMALIZED_DATE_FORMATTER.format(endDate);
+        }
+        return normalizedStartDate;
     }
 
     public Optional<Integer> getYear() {

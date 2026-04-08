@@ -134,4 +134,9 @@ class NormalizeDateFormatterTest {
     void formatExample() {
         assertEquals("2003-11-29", formatter.format(formatter.getExampleInput()));
     }
+
+    @Test
+    void formatDateRange() {
+        assertEquals("2020/2021", formatter.format("2020/2021"));
+    }
 }
