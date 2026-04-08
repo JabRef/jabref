@@ -58,4 +58,18 @@ class OpenSelectedEntriesFilesActionTest {
 
         assertTrue(files.isEmpty());
     }
+
+    @Test
+    void getLinkedFilesToOpenReturnsEmptyWhenResolvedParentHasNoFiles() {
+        BibDatabase database = new BibDatabase();
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+
+        BibEntry parentEntry = new BibEntry().withCitationKey("parent");
+        BibEntry childEntry = new BibEntry().withField(StandardField.CROSSREF, "parent");
+        database.insertEntries(List.of(parentEntry, childEntry));
+
+        List<LinkedFile> files = OpenSelectedEntriesFilesAction.getLinkedFilesToOpen(childEntry, databaseContext);
+
+        assertTrue(files.isEmpty());
+    }
 }

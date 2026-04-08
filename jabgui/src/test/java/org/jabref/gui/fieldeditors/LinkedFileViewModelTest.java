@@ -25,6 +25,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.pdf.PdfPageNumberParser;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
@@ -306,9 +307,9 @@ class LinkedFileViewModelTest {
 
     @Test
     void parseFirstPageNumberExtractsFirstNumber() {
-        assertEquals(Optional.of(73), LinkedFileViewModel.parseFirstPageNumber("73--96"));
-        assertEquals(Optional.of(5), LinkedFileViewModel.parseFirstPageNumber("S5-S8"));
-        assertEquals(Optional.empty(), LinkedFileViewModel.parseFirstPageNumber("no-pages"));
+        assertEquals(Optional.of(73), PdfPageNumberParser.parseFirstPageNumber("73--96"));
+        assertEquals(Optional.of(5), PdfPageNumberParser.parseFirstPageNumber("S5-S8"));
+        assertEquals(Optional.empty(), PdfPageNumberParser.parseFirstPageNumber("no-pages"));
     }
 
     @Test

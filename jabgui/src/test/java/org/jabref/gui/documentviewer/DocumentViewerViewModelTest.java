@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.pdf.PdfPageLabelResolver;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,11 +24,13 @@ import org.apache.pdfbox.pdmodel.common.PDPageLabelRange;
 import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -138,6 +141,36 @@ class DocumentViewerViewModelTest {
         viewModel.switchToFile(parentFile);
 
         assertEquals(4, viewModel.currentPageProperty().get());
+    }
+
+    @Test
+    void switchToFileSkipsPdfPageLabelResolutionForFirstLogicalPage() {
+        Path pdfPath = tempDir.resolve("proceedings.pdf");
+
+        LinkedFile parentFile = spy(new LinkedFile("", pdfPath, "pdf"));
+        BibEntry childEntry = new BibEntry()
+                .withField(StandardField.PAGES, "1--10")
+                .withFiles(List.of(parentFile));
+
+        BibDatabase database = new BibDatabase(List.of(childEntry));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+
+        ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList(childEntry);
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+
+        CliPreferences preferences = mock(CliPreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        doReturn(Optional.of(pdfPath)).when(parentFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
+
+        try (MockedStatic<PdfPageLabelResolver> pdfPageLabelResolver = mockStatic(PdfPageLabelResolver.class)) {
+            DocumentViewerViewModel viewModel = new DocumentViewerViewModel(stateManager, preferences, mock(DialogService.class));
+            viewModel.switchToFile(parentFile);
+
+            pdfPageLabelResolver.verifyNoInteractions();
+            assertEquals(0, viewModel.currentPageProperty().get());
+        }
     }
 
     private static void createPdfWithFrontMatterAndDecimalLabels(Path pdfFile) throws Exception {
