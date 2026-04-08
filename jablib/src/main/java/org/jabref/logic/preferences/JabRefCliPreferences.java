@@ -523,9 +523,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
         // endregion
 
-        defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
-        defaults.put(BASE_DOI_URI, "https://doi.org");
-
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
         } else {
@@ -1025,6 +1022,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
         getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
         getLibraryPreferences().setAll(LibraryPreferences.getDefault());
+        getDOIPreferences().setAll(DOIPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1044,6 +1042,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
         getJournalAbbreviationPreferences().setAll(getJournalAbbreviationPreferencesFromBackingStore(getJournalAbbreviationPreferences()));
         getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
+        getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1238,22 +1237,28 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // region Misc
+    // region DOIPreferences
     @Override
     public DOIPreferences getDOIPreferences() {
         if (doiPreferences != null) {
             return doiPreferences;
         }
 
-        doiPreferences = new DOIPreferences(
-                getBoolean(USE_CUSTOM_DOI_URI),
-                get(BASE_DOI_URI));
+        doiPreferences = getDoiPreferencesFromBackingStore(DOIPreferences.getDefault());
 
-        EasyBind.listen(doiPreferences.useCustomProperty(), (_, _, newValue) -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
-        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (_, _, newValue) -> put(BASE_DOI_URI, newValue));
+        EasyBind.listen(doiPreferences.useCustomProperty(), (_, _, newValue) -> putBoolean(DOI_USE_CUSTOM_URI, newValue));
+        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (_, _, newValue) -> put(DOI_BASE_URI, newValue));
 
         return doiPreferences;
     }
+
+    private @NonNull DOIPreferences getDoiPreferencesFromBackingStore(DOIPreferences defaults) {
+        return new DOIPreferences(
+                getBoolean(DOI_USE_CUSTOM_URI, defaults.shouldUseCustom()),
+                get(DOI_BASE_URI, defaults.getDefaultBaseURI())
+        );
+    }
+    // endregion
 
     @Override
     public OwnerPreferences getOwnerPreferences() {

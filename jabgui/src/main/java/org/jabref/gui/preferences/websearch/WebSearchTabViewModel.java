@@ -153,7 +153,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
         citationsRelationStoreTTL.setValue(importerPreferences.getCitationsRelationsStoreTTL());
 
-        useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
+        useCustomDOIProperty.setValue(doiPreferences.shouldUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
 
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
