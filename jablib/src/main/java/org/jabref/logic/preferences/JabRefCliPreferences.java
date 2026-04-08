@@ -327,7 +327,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String RECENT_DATABASES = "recentDatabases";
     // endregion
 
-    // Proxy
+    // region ProxyPreferences
     private static final String PROXY_PORT = "proxyPort";
     private static final String PROXY_HOSTNAME = "proxyHostname";
     private static final String PROXY_USE = "useProxy";
@@ -335,6 +335,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROXY_USERNAME = "proxyUsername";
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
+    // endregion
 
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
@@ -368,7 +369,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final int EXPORTER_FILENAME_INDEX = 1;
     private static final int EXPORTER_EXTENSION_INDEX = 2;
 
-    // Remote
+    // region RemotePreferences
     private static final String SERVER_REMOTE_ENABLE = "useRemoteServer";
     private static final String SERVER_REMOTE_PORT = "remoteServerPort";
     private static final String SERVER_HTTP_ENABLE = "enableHttpServer";
@@ -376,7 +377,9 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String SERVER_LANGUAGE_ENABLE = "enableLanguageServer";
     private static final String SERVER_LANGUAGE_PORT = "languageServerPort";
     private static final String SERVER_DIRECT_HTTP_IMPORT = "directHttpImport";
+    // endregion
 
+    // region AiPreferences
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
     private static final String AI_AUTO_GENERATE_SUMMARIES = "aiAutoGenerateSummaries";
@@ -410,6 +413,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE = "aiSummarizationCombineUserMessageTemplate";
     private static final String AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE = "aiCitationParsingSystemMessageTemplate";
     private static final String AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE = "aiCitationParsingUserMessageTemplate";
+    // endregion
 
     private static final String LAST_USED_DIRECTORY = "lastUsedDirectory";
 
