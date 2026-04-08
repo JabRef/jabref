@@ -189,7 +189,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         FieldViewModel fieldViewModel = new FieldViewModel(newField,
                 FieldViewModel.Mandatory.REQUIRED,
                 FieldPriority.IMPORTANT,
-                false);
+                isMultiline.test(newField));
         fieldViewModel.getProperties().addAll(selectedProperties);
 
         this.selectedEntryType.getValue().addField(fieldViewModel);
