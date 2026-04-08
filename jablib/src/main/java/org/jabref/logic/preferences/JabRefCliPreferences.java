@@ -184,9 +184,11 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String DOI_USE_CUSTOM_URI = "useCustomDOIURI";
     // endregion
 
-    public static final String USE_OWNER = "useOwner";
-    public static final String DEFAULT_OWNER = "defaultOwner";
-    public static final String OVERWRITE_OWNER = "overwriteOwner";
+    // region OwnerPreferences
+    public static final String OWNER_ENABLE = "useOwner";
+    public static final String OWNER_DEFAULT = "defaultOwner";
+    public static final String OWNER_OVERWRITE = "overwriteOwner";
+    // endregion
 
     // Required for migration from pre-v5.3 only
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
@@ -573,7 +575,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
-        defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
@@ -607,8 +608,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
         defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
 
-        defaults.put(USE_OWNER, Boolean.FALSE);
-        defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
         defaults.put(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, Boolean.FALSE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
@@ -1023,6 +1022,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
         getLibraryPreferences().setAll(LibraryPreferences.getDefault());
         getDOIPreferences().setAll(DOIPreferences.getDefault());
+        getOwnerPreferences().setAll(OwnerPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1043,6 +1043,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getJournalAbbreviationPreferences().setAll(getJournalAbbreviationPreferencesFromBackingStore(getJournalAbbreviationPreferences()));
         getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
         getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
+        getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1260,30 +1261,37 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region OwnerPreferences
     @Override
     public OwnerPreferences getOwnerPreferences() {
         if (ownerPreferences != null) {
             return ownerPreferences;
         }
 
-        ownerPreferences = new OwnerPreferences(
-                getBoolean(USE_OWNER),
-                get(DEFAULT_OWNER),
-                getBoolean(OVERWRITE_OWNER));
+        ownerPreferences = getOwnerPreferencesFromBackingStore(OwnerPreferences.getDefault());
 
-        EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -> putBoolean(USE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_ENABLE, newValue));
         EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (_, _, newValue) -> {
-            put(DEFAULT_OWNER, newValue);
+            put(OWNER_DEFAULT, newValue);
             // trigger re-determination of userAndHost and the dependent preferences
             userAndHost = null;
 
             // this propagates down to filePreferences
             getInternalPreferences().getUserAndHostProperty().setValue(newValue);
         });
-        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_OVERWRITE, newValue));
 
         return ownerPreferences;
     }
+
+    private @NonNull OwnerPreferences getOwnerPreferencesFromBackingStore(OwnerPreferences defaults) {
+        return new OwnerPreferences(
+                getBoolean(OWNER_ENABLE, defaults.shouldUseOwner()),
+                get(OWNER_DEFAULT, defaults.getDefaultOwner()),
+                getBoolean(OWNER_OVERWRITE, defaults.shouldOverwriteOwner())
+        );
+    }
+    // endregion
 
     @Override
     public TimestampPreferences getTimestampPreferences() {
@@ -1587,7 +1595,7 @@ public class JabRefCliPreferences implements CliPreferences {
         if (userAndHost != null) {
             return userAndHost;
         }
-        userAndHost = new UserHostInfo(get(DEFAULT_OWNER), OS.getHostName());
+        userAndHost = new UserHostInfo(get(OWNER_DEFAULT), OS.getHostName());
         return userAndHost;
     }
 
