@@ -282,12 +282,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
-            if (remotePreferences.isDifferentRemoteServerPort(newPort)) {
-                remotePreferences.setRemoteServerPort(newPort);
-            }
-        });
-
         CLIMessageHandler messageHandler = new CLIMessageHandler(uiMessageHandler, preferences);
         // stop in all cases, because the port might have changed
         remoteListenerServerManager.stop();
