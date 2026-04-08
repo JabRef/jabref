@@ -33,9 +33,9 @@ public class LibraryPreferences {
     private LibraryPreferences() {
         this(
                 BibDatabaseMode.BIBTEX,
-                false,                                     // alwaysReformatOnSave
-                false,                                     // autoSave
-                false,                                     // addImportedEntries
+                false,                                // alwaysReformatOnSave
+                false,                                // autoSave
+                false,                                // addImportedEntries
                 Localization.lang("Imported entries") // addImportedEntriesGroupName
         );
     }
