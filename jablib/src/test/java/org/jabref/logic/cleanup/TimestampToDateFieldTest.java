@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TimeStampToDateFieldTest {
+class TimestampToDateFieldTest {
 
     private static final Field CUSTOM_TIME_STAMP_FIELD = new UnknownField("dateOfCreation");
 
@@ -40,7 +40,7 @@ class TimeStampToDateFieldTest {
     @ParameterizedTest
     @MethodSource("standardFieldToCreationDate")
     void withStandardFieldToCreationDate(BibEntry expected, BibEntry input) {
-        TimeStampToDateField migrator = new TimeStampToDateField(StandardField.TIMESTAMP, StandardField.CREATIONDATE);
+        TimestampToDateField migrator = new TimestampToDateField(StandardField.TIMESTAMP, StandardField.CREATIONDATE);
         migrator.cleanup(input);
         assertEquals(expected, input);
     }
@@ -66,7 +66,7 @@ class TimeStampToDateFieldTest {
     @ParameterizedTest
     @MethodSource("customFieldToCreationDate")
     void withCustomFieldToCreationDate(BibEntry expected, BibEntry input) {
-        TimeStampToDateField migrator = new TimeStampToDateField(CUSTOM_TIME_STAMP_FIELD, StandardField.CREATIONDATE);
+        TimestampToDateField migrator = new TimestampToDateField(CUSTOM_TIME_STAMP_FIELD, StandardField.CREATIONDATE);
         migrator.cleanup(input);
         assertEquals(expected, input);
     }
@@ -150,7 +150,7 @@ class TimeStampToDateFieldTest {
     @ParameterizedTest
     @MethodSource("entriesMigratedToCreationDateFromDifferentFormats")
     void withDifferentFormats(BibEntry expected, BibEntry input) {
-        TimeStampToDateField migrator = new TimeStampToDateField(StandardField.TIMESTAMP, StandardField.CREATIONDATE);
+        TimestampToDateField migrator = new TimestampToDateField(StandardField.TIMESTAMP, StandardField.CREATIONDATE);
         ParserResult parserResult = new ParserResult(List.of(input));
         migrator.cleanup(input);
         assertEquals(expected, input);

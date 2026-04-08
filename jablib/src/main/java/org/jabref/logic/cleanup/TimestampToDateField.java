@@ -17,12 +17,12 @@ import org.jabref.model.entry.field.Field;
 ///
 /// If the legacy pre-5.3 updateTimestamp setting is enabled, the timestamp field for each entry are migrated to the
 /// date-modified field. Otherwise, it is migrated to the date-added field.
-public class TimeStampToDateField implements CleanupJob {
+public class TimestampToDateField implements CleanupJob {
 
     private final Field sourceField;
     private final Field targetField;
 
-    public TimeStampToDateField(Field source, Field target) {
+    public TimestampToDateField(Field source, Field target) {
         sourceField = source;
         targetField = target;
     }
@@ -59,14 +59,14 @@ public class TimeStampToDateField implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         // Query entries for their timestamp field entries
-        if (entry.getField(targetField).isPresent()) {
-            Optional<String> formattedTimeStamp = formatTimeStamp(entry.getField(targetField).get());
+        if (entry.getField(sourceField).isPresent()) {
+            Optional<String> formattedTimeStamp = formatTimeStamp(entry.getField(sourceField).get());
             if (formattedTimeStamp.isEmpty()) {
                 // In case the timestamp could not be parsed, do nothing to not lose data
                 return List.of();
             }
-            // Setting the EventSource is necessary to circumvent the update of the modification date during timestamp migration
-            entry.clearField(targetField, EntriesEventSource.CLEANUP_TIMESTAMP);
+            // Setting the EventSource is necessary to circumvent the update of the target field during timestamp migration
+            entry.clearField(sourceField, EntriesEventSource.CLEANUP_TIMESTAMP);
             List<FieldChange> changeList = new ArrayList<>();
             FieldChange changeTo;
             // Add removal of timestamp field

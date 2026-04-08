@@ -37,7 +37,7 @@ public class LibraryPreferences {
                 false,                                     // autoSave
                 false,                                     // addImportedEntries
                 Localization.lang("Imported entries") // addImportedEntriesGroupName
-        ); 
+        );
     }
 
     public static LibraryPreferences getDefault() {

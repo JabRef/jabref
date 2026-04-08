@@ -100,9 +100,9 @@ public class CleanupWorker {
             case CONVERT_TO_BIBTEX ->
                     new ConvertToBibtexCleanup();
             case CONVERT_TIMESTAMP_TO_CREATIONDATE ->
-                    new TimeStampToDateField(timestampPreferences.getTimestampField(), StandardField.CREATIONDATE);
+                    new TimestampToDateField(timestampPreferences.getTimestampField(), StandardField.CREATIONDATE);
             case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
-                    new TimeStampToDateField(timestampPreferences.getTimestampField(), StandardField.MODIFICATIONDATE);
+                    new TimestampToDateField(timestampPreferences.getTimestampField(), StandardField.MODIFICATIONDATE);
             case MOVE_PDF ->
                     new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->
