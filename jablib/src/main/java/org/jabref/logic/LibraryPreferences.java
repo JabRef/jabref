@@ -29,6 +29,28 @@ public class LibraryPreferences {
         this.addImportedEntriesGroupName = new SimpleStringProperty(addImportedEntriesGroupName);
     }
 
+    private LibraryPreferences() {
+        this(
+                BibDatabaseMode.BIBTEX,
+                false,               // alwaysReformatOnSave
+                false,               // autoSave
+                false,                // addImportedEntries
+                "Imported entries"); // addImportedEntriesGroupName
+    }
+
+    public static LibraryPreferences getDefault() {
+        return new LibraryPreferences();
+    }
+
+    public LibraryPreferences setAll(LibraryPreferences preferences) {
+        setDefaultBibDatabaseMode(preferences.getDefaultBibDatabaseMode());
+        setAlwaysReformatOnSave(preferences.shouldAlwaysReformatOnSave());
+        setAutoSave(preferences.shouldAutoSave());
+        setAddImportedEntries(preferences.shouldAddImportedEntries());
+        setAddImportedEntriesGroupName(preferences.getAddImportedEntriesGroupName());
+        return this;
+    }
+
     public BibDatabaseMode getDefaultBibDatabaseMode() {
         return defaultBibDatabaseMode.get();
     }
@@ -65,7 +87,7 @@ public class LibraryPreferences {
         this.autoSave.set(shouldAutoSave);
     }
 
-    public boolean isAddImportedEntriesEnabled() {
+    public boolean shouldAddImportedEntries() {
         return addImportedEntries.get();
     }
 
