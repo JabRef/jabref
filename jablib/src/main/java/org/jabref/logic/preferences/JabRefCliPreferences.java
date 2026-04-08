@@ -605,6 +605,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, "Text body");
         defaults.put(OO_EXTERNAL_CSL_STYLES, "");
         defaults.put(OO_ADD_SPACE_AFTER, Boolean.TRUE);
+        defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
@@ -645,8 +646,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(LANGUAGE_SERVER_PORT, 2087);
         defaults.put(DIRECT_HTTP_IMPORT, Boolean.FALSE);
 
-        defaults.put(EXTERNAL_JOURNAL_LISTS, "");
-        defaults.put(USE_AMS_FJOURNAL, true);
         defaults.put(LAST_USED_EXPORT, "");
 
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
@@ -1023,9 +1022,10 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
+        getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
-        getFieldPreferences().setAll(FieldPreferences.getDefault());
+        getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1040,10 +1040,10 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt xml fall back to current preferences
-        getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(ProxyPreferences.getDefault()));
-        getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(FieldPreferences.getDefault()));
+        getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
         getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
+        getJournalAbbreviationPreferences().setAll(getJournalAbbreviationPreferencesFromBackingStore(getJournalAbbreviationPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1058,16 +1058,14 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    // ToDo: Cleanup
+    // region JournalAbbreviationPreferences
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         if (journalAbbreviationPreferences != null) {
             return journalAbbreviationPreferences;
         }
 
-        journalAbbreviationPreferences = new JournalAbbreviationPreferences(
-                getStringList(EXTERNAL_JOURNAL_LISTS),
-                getBoolean(USE_AMS_FJOURNAL));
+        journalAbbreviationPreferences = getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences.getDefault());
 
         journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
@@ -1076,6 +1074,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return journalAbbreviationPreferences;
     }
+
+    private JournalAbbreviationPreferences getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences defaults) {
+        return new JournalAbbreviationPreferences(
+                convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaults.getExternalJournalLists()))),
+                getBoolean(USE_AMS_FJOURNAL, defaults.useFJournalFieldProperty().get()));
+    }
+    // endregion
 
     // region PushToApplicationPreferences
     public PushToApplicationPreferences getPushToApplicationPreferences() {
@@ -1174,7 +1179,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
-    // endregion
 
     @Override
     public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
@@ -1204,9 +1208,9 @@ public class JabRefCliPreferences implements CliPreferences {
                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
+    // endregion
 
     // region Misc
-
     @Override
     public LibraryPreferences getLibraryPreferences() {
         if (libraryPreferences != null) {
@@ -1355,13 +1359,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(PROXY_PORT, defaults.getPort()),
                 getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
                 get(PROXY_USERNAME, defaults.getUsername()),
-                get(PROXY_PASSWORD, defaults.getPassword()),
+                getProxyPassword(defaults.getPassword()),
                 getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
         );
     }
     // endregion
 
-    private String getProxyPassword() {
+    private String getProxyPassword(String defaultPassword) {
         if (getBoolean(PROXY_PERSIST_PASSWORD)) {
             try (final Keyring keyring = Keyring.create()) {
                 return new Password(
@@ -1374,7 +1378,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("JabRef could not open the key store", ex);
             }
         }
-        return (String) defaults.get(PROXY_PASSWORD);
+        return defaultPassword;
     }
 
     private void setProxyPassword(String password) {
