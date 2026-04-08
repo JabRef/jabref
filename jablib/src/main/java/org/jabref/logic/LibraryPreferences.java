@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 
 public class LibraryPreferences {
@@ -32,10 +33,11 @@ public class LibraryPreferences {
     private LibraryPreferences() {
         this(
                 BibDatabaseMode.BIBTEX,
-                false,               // alwaysReformatOnSave
-                false,               // autoSave
-                false,               // addImportedEntries
-                "Imported entries"); // addImportedEntriesGroupName
+                false,                                     // alwaysReformatOnSave
+                false,                                     // autoSave
+                false,                                     // addImportedEntries
+                Localization.lang("Imported entries") // addImportedEntriesGroupName
+        ); 
     }
 
     public static LibraryPreferences getDefault() {
