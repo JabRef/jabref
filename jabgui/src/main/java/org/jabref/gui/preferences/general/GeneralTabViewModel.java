@@ -231,7 +231,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         remoteServerProperty.setValue(remotePreferences.shouldEnableRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getRemoteServerPort()));
 
-        enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());
+        enableHttpServerProperty.setValue(remotePreferences.shouldEnableHttpServer());
         httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpServerPort()));
 
         enableLanguageServerProperty.setValue(remotePreferences.shouldEnableLanguageServer());
@@ -314,11 +314,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         // stop in all cases, because the port might have changed
         httpServerManager.stop();
         if (enableHttpServerProperty.getValue()) {
-            remotePreferences.shouldEnableHttpServer(true);
+            remotePreferences.setEnableHttpServer(true);
             URI uri = remotePreferences.getHttpServerUri();
             httpServerManager.start(preferences, stateManager, uiMessageHandler, uri);
         } else {
-            remotePreferences.shouldEnableHttpServer(false);
+            remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();
         }
 

@@ -65,7 +65,7 @@ public class RemotePreferences {
     public void setAll(RemotePreferences preferences) {
         enableRemoteServer.setValue(preferences.shouldEnableRemoteServer());
         remoteServerPort.setValue(preferences.getRemoteServerPort());
-        enableHttpServer.setValue(preferences.enableHttpServer());
+        enableHttpServer.setValue(preferences.shouldEnableHttpServer());
         httpServerPort.setValue(preferences.getHttpServerPort());
         enableLanguageServer.setValue(preferences.shouldEnableLanguageServer());
         languageServerPort.setValue(preferences.getLanguageServerPort());
@@ -100,7 +100,7 @@ public class RemotePreferences {
         return getRemoteServerPort() != otherPort;
     }
 
-    public boolean enableHttpServer() {
+    public boolean shouldEnableHttpServer() {
         return enableHttpServer.getValue();
     }
 
@@ -108,7 +108,7 @@ public class RemotePreferences {
         return enableHttpServer;
     }
 
-    public void shouldEnableHttpServer(boolean enableHttpServer) {
+    public void setEnableHttpServer(boolean enableHttpServer) {
         this.enableHttpServer.setValue(enableHttpServer);
     }
 

@@ -463,7 +463,7 @@ public class JabRefGUI extends Application {
                     remotePreferences.getRemoteServerPort());
         }
 
-        if (remotePreferences.enableHttpServer()) {
+        if (remotePreferences.shouldEnableHttpServer()) {
             httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.shouldEnableLanguageServer()) {

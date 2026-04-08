@@ -1336,7 +1336,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private @NonNull RemotePreferences getRemotePreferencesFromBackingStore(RemotePreferences defaults) {
         return new RemotePreferences(
                 getBoolean(SERVER_REMOTE_ENABLE, defaults.shouldEnableRemoteServer()), getInt(SERVER_REMOTE_PORT, defaults.getRemoteServerPort()),
-                getBoolean(SERVER_HTTP_ENABLE, defaults.enableHttpServer()), getInt(SERVER_HTTP_PORT, defaults.getHttpServerPort()),
+                getBoolean(SERVER_HTTP_ENABLE, defaults.shouldEnableHttpServer()), getInt(SERVER_HTTP_PORT, defaults.getHttpServerPort()),
                 getBoolean(SERVER_LANGUAGE_ENABLE, defaults.shouldEnableLanguageServer()),
                 getInt(SERVER_LANGUAGE_PORT, defaults.getLanguageServerPort()),
                 getBoolean(SERVER_DIRECT_HTTP_IMPORT, defaults.directHttpImport()));
