@@ -56,8 +56,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
     @Override
     public boolean supports(AiProvider aiProvider) {
         return aiProvider == AiProvider.OPEN_AI
-                || aiProvider == AiProvider.MISTRAL_AI
-                || aiProvider == AiProvider.GPT4ALL;
+                || aiProvider == AiProvider.MISTRAL_AI;
     }
 
     /// Builds the URL for the models endpoint from the given API base URL.

@@ -70,6 +70,17 @@
         <property name="fileExtensions" value="groovy,java" />
     </module>
 
+    <!-- Detect Pattern.compile() with a string literal argument outside a static final field declaration.
+         Use a private static final Pattern field instead to avoid recompiling on every invocation.
+         Dynamic patterns (where the argument is a variable or concatenation) are intentionally excluded.
+         Limitation: patterns where the word "static" appears inside the string literal itself would not be flagged. -->
+    <module name="RegexpSingleline">
+        <property name="id" value="PatternCompileToStaticField"/>
+        <property name="message" value="Pattern.compile() with a string literal argument should be a private static final Pattern field to avoid recompiling on every call." />
+        <property name="format" value="^(?!\s*[/*])(?!.*\bstatic\b).*Pattern\.compile\s*\(\s*&quot;(?:[^&quot;\\]|\\.)*&quot;\s*[,)]" />
+        <property name="fileExtensions" value="java" />
+    </module>
+
     <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
 
     <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->

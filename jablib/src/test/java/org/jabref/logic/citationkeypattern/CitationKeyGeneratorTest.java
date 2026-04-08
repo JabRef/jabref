@@ -618,12 +618,14 @@ class CitationKeyGeneratorTest {
         return Stream.of(
                 // Tests with prefix L
                 Arguments.of("L7--27", "L"),
-                Arguments.of("L--27", "L--"),
-                Arguments.of("L", "L"),
+                Arguments.of("L--27", ""),
+                Arguments.of("L", ""),
                 Arguments.of("L42--111", "L"),
                 Arguments.of("L7,L41,L73--97", "L"),
                 Arguments.of("L41,L7,L73--97", "L"),
                 Arguments.of("L43+", "L"),
+                Arguments.of("S5-K10", "S"),
+                Arguments.of("Siv-KXX", "S"),
 
                 // Tests with no prefix
                 Arguments.of("7--27", ""),
@@ -658,7 +660,8 @@ class CitationKeyGeneratorTest {
                 Arguments.of("7,41,97--73", "97"),
                 Arguments.of("43+", "43"),
                 Arguments.of("00--0", "0"),
-                Arguments.of("1--1", "1")
+                Arguments.of("1--1", "1"),
+                Arguments.of("ivS--SXXY", "XX")
         );
     }
 
