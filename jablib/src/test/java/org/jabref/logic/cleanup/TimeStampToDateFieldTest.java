@@ -62,7 +62,7 @@ class TimeStampToDateFieldTest {
         );
     }
 
-    /// Tests migration to creationdate if the users uses the default ISO yyyy-mm-dd format and a custom timestamp field
+    /// Tests migration to creationdate if the users use the default ISO yyyy-mm-dd format and a custom timestamp field
     @ParameterizedTest
     @MethodSource("customFieldToCreationDate")
     void withCustomFieldToCreationDate(BibEntry expected, BibEntry input) {

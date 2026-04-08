@@ -369,13 +369,13 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final int EXPORTER_EXTENSION_INDEX = 2;
 
     // Remote
-    private static final String USE_REMOTE_SERVER = "useRemoteServer";
-    private static final String REMOTE_SERVER_PORT = "remoteServerPort";
-    private static final String HTTP_SERVER_PORT = "httpServerPort";
-    private static final String ENABLE_HTTP_SERVER = "enableHttpServer";
-    private static final String ENABLE_LANGUAGE_SERVER = "enableLanguageServer";
-    private static final String LANGUAGE_SERVER_PORT = "languageServerPort";
-    private static final String DIRECT_HTTP_IMPORT = "directHttpImport";
+    private static final String SERVER_REMOTE_ENABLE = "useRemoteServer";
+    private static final String SERVER_REMOTE_PORT = "remoteServerPort";
+    private static final String SERVER_HTTP_ENABLE = "enableHttpServer";
+    private static final String SERVER_HTTP_PORT = "httpServerPort";
+    private static final String SERVER_LANGUAGE_ENABLE = "enableLanguageServer";
+    private static final String SERVER_LANGUAGE_PORT = "languageServerPort";
+    private static final String SERVER_DIRECT_HTTP_IMPORT = "directHttpImport";
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
@@ -626,14 +626,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
-
-        defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
-        defaults.put(REMOTE_SERVER_PORT, 6050);
-        defaults.put(ENABLE_HTTP_SERVER, Boolean.FALSE);
-        defaults.put(HTTP_SERVER_PORT, 23119);
-        defaults.put(ENABLE_LANGUAGE_SERVER, Boolean.FALSE);
-        defaults.put(LANGUAGE_SERVER_PORT, 2087);
-        defaults.put(DIRECT_HTTP_IMPORT, Boolean.FALSE);
 
         defaults.put(LAST_USED_EXPORT, "");
 
@@ -1018,6 +1010,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
         getTimestampPreferences().setAll(TimestampPreferences.getDefault());
+        getRemotePreferences().setAll(RemotePreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1028,10 +1021,10 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path path) throws JabRefException {
         importPreferencesToBackingStore(path);
 
-        // TODO: We need to load all CLI-preferences from the backing store
+        // TODO: We need to load all CLI preferences from the backing store
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
-        // in case of incomplete or corrupt xml fall back to current preferences
+        // in case of incomplete or corrupt XML fall back to current preferences
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
         getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
@@ -1040,6 +1033,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
         getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
+        getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1317,31 +1311,33 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // region Network preferences
+    // region RemotePreferences
     @Override
     public RemotePreferences getRemotePreferences() {
         if (remotePreferences != null) {
             return remotePreferences;
         }
 
-        remotePreferences = new RemotePreferences(
-                getInt(REMOTE_SERVER_PORT),
-                getBoolean(USE_REMOTE_SERVER),
-                getInt(HTTP_SERVER_PORT),
-                getBoolean(ENABLE_HTTP_SERVER),
-                getBoolean(ENABLE_LANGUAGE_SERVER),
-                getInt(LANGUAGE_SERVER_PORT),
-                getBoolean(DIRECT_HTTP_IMPORT));
+        remotePreferences = getRemotePreferencesFromBackingStore(RemotePreferences.getDefault());
 
-        EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
-        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
-        EasyBind.listen(remotePreferences.httpPortProperty(), (_, _, newValue) -> putInt(HTTP_SERVER_PORT, newValue));
-        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_HTTP_SERVER, newValue));
-        EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(LANGUAGE_SERVER_PORT, newValue));
-        EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_LANGUAGE_SERVER, newValue));
-        EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(DIRECT_HTTP_IMPORT, newValue));
+        EasyBind.listen(remotePreferences.remoteServerPortProperty(), (_, _, newValue) -> putInt(SERVER_REMOTE_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableRemoteServerProperty(), (_, _, newValue) -> putBoolean(SERVER_REMOTE_ENABLE, newValue));
+        EasyBind.listen(remotePreferences.httpServerPortProperty(), (_, _, newValue) -> putInt(SERVER_HTTP_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(SERVER_HTTP_ENABLE, newValue));
+        EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(SERVER_LANGUAGE_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(SERVER_LANGUAGE_ENABLE, newValue));
+        EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(SERVER_DIRECT_HTTP_IMPORT, newValue));
 
         return remotePreferences;
+    }
+
+    private @NonNull RemotePreferences getRemotePreferencesFromBackingStore(RemotePreferences defaults) {
+        return new RemotePreferences(
+                getBoolean(SERVER_REMOTE_ENABLE, defaults.shouldEnableRemoteServer()), getInt(SERVER_REMOTE_PORT, defaults.getRemoteServerPort()),
+                getBoolean(SERVER_HTTP_ENABLE, defaults.enableHttpServer()), getInt(SERVER_HTTP_PORT, defaults.getHttpServerPort()),
+                getBoolean(SERVER_LANGUAGE_ENABLE, defaults.shouldEnableLanguageServer()),
+                getInt(SERVER_LANGUAGE_PORT, defaults.getLanguageServerPort()),
+                getBoolean(SERVER_DIRECT_HTTP_IMPORT, defaults.directHttpImport()));
     }
     // endregion
 
@@ -1827,7 +1823,7 @@ public class JabRefCliPreferences implements CliPreferences {
         for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
             List<String> formatData = convertStringToList(toImport);
             TemplateExporter format = new TemplateExporter(
-                    formatData.getFirst(),
+                    formatData.get(EXPORTER_NAME_INDEX),
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
