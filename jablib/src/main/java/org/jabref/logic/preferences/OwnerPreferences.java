@@ -22,9 +22,9 @@ public class OwnerPreferences {
 
     private OwnerPreferences() {
         this(
-                false,
-                DEFAULT_OWNER,
-                false
+                false,         // useOwner
+                DEFAULT_OWNER, // defaultOwner
+                false          // overwriteOwner
         );
     }
 
