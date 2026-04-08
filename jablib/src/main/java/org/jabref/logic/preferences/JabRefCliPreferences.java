@@ -190,13 +190,14 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OWNER_OVERWRITE = "overwriteOwner";
     // endregion
 
-    // Required for migration from pre-v5.3 only
-    public static final String UPDATE_TIMESTAMP = "updateTimestamp";
-    public static final String TIME_STAMP_FIELD = "timeStampField";
-    public static final String TIME_STAMP_FORMAT = "timeStampFormat";
-
-    public static final String ADD_CREATION_DATE = "addCreationDate";
-    public static final String ADD_MODIFICATION_DATE = "addModificationDate";
+    // region TimestampPreferences
+    public static final String TIMESTAMP_ADD_CREATION_DATE = "addCreationDate";
+    public static final String TIMESTAMP_ADD_MODIFICATION_DATE = "addModificationDate";
+    // legacy pre-5.3 fields for library cleanups
+    public static final String TIMESTAMP_DEPRECATED_UPDATE = "updateTimestamp";
+    public static final String TIMESTAMP_DEPRECATED_FIELD = "timeStampField";
+    public static final String TIMESTAMP_DEPRECATED_FORMAT = "timeStampFormat";
+    // endregion
 
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_FOR_FIELDS = "resolveStringsForFields";
@@ -623,13 +624,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-        defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
-        defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
-
-        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
-        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
-        // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
-        defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
@@ -1023,6 +1017,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLibraryPreferences().setAll(LibraryPreferences.getDefault());
         getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
+        getTimestampPreferences().setAll(TimestampPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1044,6 +1039,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
         getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
+        getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1293,28 +1289,35 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region TimestampPreferences
     @Override
     public TimestampPreferences getTimestampPreferences() {
         if (timestampPreferences != null) {
             return timestampPreferences;
         }
 
-        timestampPreferences = new TimestampPreferences(
-                getBoolean(ADD_CREATION_DATE),
-                getBoolean(ADD_MODIFICATION_DATE),
-                getBoolean(UPDATE_TIMESTAMP),
-                FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                get(TIME_STAMP_FORMAT));
+        timestampPreferences = getTimestampPreferencesFromBackingStore(TimestampPreferences.getDefault());
 
-        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (_, _, newValue) -> putBoolean(ADD_CREATION_DATE, newValue));
-        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (_, _, newValue) -> putBoolean(ADD_MODIFICATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (_, _, newValue) -> putBoolean(TIMESTAMP_ADD_CREATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (_, _, newValue) -> putBoolean(TIMESTAMP_ADD_MODIFICATION_DATE, newValue));
 
         return timestampPreferences;
+    }
+
+    private @NonNull TimestampPreferences getTimestampPreferencesFromBackingStore(TimestampPreferences defaults) {
+        return new TimestampPreferences(
+                getBoolean(TIMESTAMP_ADD_CREATION_DATE, defaults.shouldAddCreationDate()),
+                getBoolean(TIMESTAMP_ADD_MODIFICATION_DATE, defaults.shouldAddModificationDate()),
+
+                // legacy pre-5.3 fields for library cleanups
+                getBoolean(TIMESTAMP_DEPRECATED_UPDATE, defaults.shouldUpdateTimestamp()),
+                FieldFactory.parseField(get(TIMESTAMP_DEPRECATED_FIELD, defaults.getTimestampField().getName())),
+                get(TIMESTAMP_DEPRECATED_FORMAT, defaults.getTimestampFormat())
+        );
     }
     // endregion
 
     // region Network preferences
-
     @Override
     public RemotePreferences getRemotePreferences() {
         if (remotePreferences != null) {
