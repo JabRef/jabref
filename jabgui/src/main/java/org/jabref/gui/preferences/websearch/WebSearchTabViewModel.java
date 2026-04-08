@@ -148,12 +148,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldKeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
-        addImportedEntries.setValue(libraryPreferences.isAddImportedEntriesEnabled());
+        addImportedEntries.setValue(libraryPreferences.shouldAddImportedEntries());
         addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
         citationsRelationStoreTTL.setValue(importerPreferences.getCitationsRelationsStoreTTL());
 
-        useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
+        useCustomDOIProperty.setValue(doiPreferences.shouldUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
 
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());

@@ -69,7 +69,7 @@ public class OpenUrlAction extends SimpleCommand {
 
             if (link.isPresent()) {
                 try {
-                    if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
+                    if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().shouldUseCustom()) {
                         NativeDesktop.openCustomDoi(link.get(), preferences, dialogService);
                     } else {
                         NativeDesktop.openExternalViewer(databaseContext, preferences, link.get(), field, dialogService, entry);
