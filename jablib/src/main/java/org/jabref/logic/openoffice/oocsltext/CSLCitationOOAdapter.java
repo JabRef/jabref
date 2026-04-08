@@ -333,7 +333,7 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    /// Helper method for updateAllCitationsWithNewStyle and insertCitation.
+    /// Helper method for creating citations for `updateAllCitationsWithNewStyle` and `insertCitation`.
     private @NonNull String createCitation(CitationStyle style, boolean isAlphaNumericStyle, List<BibEntry> entries, BibDatabaseContext unifiedBibDatabaseContext) {
         String citation;
 
