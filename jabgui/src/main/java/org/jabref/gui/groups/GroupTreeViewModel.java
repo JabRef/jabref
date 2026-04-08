@@ -31,6 +31,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -109,7 +110,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
+        filterPredicate.bind(EasyBind.map(filterText, text ->
+                group -> GroupNameFilterVisitor.matches(group.getDisplayName(), text)
+        ));
     }
 
     private void refresh() {

@@ -19,6 +19,7 @@ import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.MergeLibraryAction;
 import org.jabref.gui.consistency.ConsistencyCheckAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
@@ -178,6 +179,8 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
 
                 new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.MERGE_LIBRARY, new MergeLibraryAction(dialogService, stateManager, preferences, taskExecutor, undoManager, frame)),
 
                 factory.createSubMenu(StandardActions.IMPORT,
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),
