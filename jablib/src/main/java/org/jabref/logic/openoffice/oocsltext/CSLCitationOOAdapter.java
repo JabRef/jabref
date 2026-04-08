@@ -340,8 +340,7 @@ public class CSLCitationOOAdapter {
         if (isAlphaNumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
-                    HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
         }
 
         return CSLFormatUtils.transformHTML(citation);
@@ -354,8 +353,7 @@ public class CSLCitationOOAdapter {
         if (isAlphaNumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(),
-                    HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
         }
 
         citation = CSLFormatUtils.transformHTML(citation);
