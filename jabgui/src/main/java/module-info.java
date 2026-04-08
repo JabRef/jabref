@@ -180,7 +180,6 @@ open module org.jabref {
     // requires kotlin.stdlib;
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
-    requires org.apache.pdfbox;
     requires org.libreoffice.uno;
     // endregion
 }

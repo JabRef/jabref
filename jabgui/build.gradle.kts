@@ -14,6 +14,7 @@ version = providers.gradleProperty("projVersion")
     .get()
 
 testModuleInfo {
+    requires("org.apache.pdfbox")
     requires("org.jabref.testsupport")
 
     requires("com.github.javaparser.core")
