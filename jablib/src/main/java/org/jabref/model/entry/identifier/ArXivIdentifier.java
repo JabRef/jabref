@@ -20,6 +20,8 @@ public class ArXivIdentifier extends EprintIdentifier {
 
     private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|html|pdf)/|arxiv|arXiv";
     private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}\\.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
+    private static final Pattern OLD_IDENTIFIER_PATTERN = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?");
+
     private final String identifier;
     private final String classification;
     private final String version;
@@ -45,8 +47,7 @@ public class ArXivIdentifier extends EprintIdentifier {
             return getArXivIdentifier(identifierMatcher);
         }
 
-        Pattern oldIdentifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?");
-        Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);
+        Matcher oldIdentifierMatcher = OLD_IDENTIFIER_PATTERN.matcher(identifier);
         if (oldIdentifierMatcher.matches()) {
             return getArXivIdentifier(oldIdentifierMatcher);
         }

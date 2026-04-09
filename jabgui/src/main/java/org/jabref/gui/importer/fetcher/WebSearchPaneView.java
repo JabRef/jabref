@@ -5,6 +5,7 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -52,6 +53,7 @@ public class WebSearchPaneView extends VBox {
         getChildren().addAll(
                 fetcherContainer,
                 createQueryField(),
+                createModeIndicatorLabel(),
                 createSearchButton()
         );
         this.disableProperty().bind(searchDisabledProperty());
@@ -100,6 +102,17 @@ public class WebSearchPaneView extends VBox {
         enableEnterToTriggerSearch(query);
         ClipBoardManager.addX11Support(query);
         return query;
+    }
+
+    /// Creates a label that indicates how the current query will be interpreted
+    private Label createModeIndicatorLabel() {
+        Label modeIndicator = new Label();
+        modeIndicator.textProperty().bind(viewModel.searchModeIndicatorProperty());
+        modeIndicator.managedProperty().bind(modeIndicator.visibleProperty());
+        modeIndicator.visibleProperty().bind(modeIndicator.textProperty().isNotEmpty());
+        modeIndicator.getStyleClass().add("mode-indicator");
+        modeIndicator.setMaxWidth(Double.MAX_VALUE);
+        return modeIndicator;
     }
 
     /// Create button that triggers search
