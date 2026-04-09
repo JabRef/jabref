@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
@@ -130,8 +132,7 @@ class GenerateCitationKeys implements Runnable {
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
                 getKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
-                pattern != null ? pattern : existingPreferences.getDefaultPattern(),
-                keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
+                new SimpleObjectProperty<>(keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter())
         );
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }
