@@ -60,9 +60,9 @@ public class CitationKeyPatternPreferences {
                 false,                                    // shouldGenerateCiteKeysBeforeSaving
                 KeySuffix.SECOND_WITH_A,
                 "",                                       // keyPatternRegex
-                "[auth][year]",                           // keyPatternReplacement
+                "",                                       // keyPatternReplacement
                 "-`ʹ:!;?^$",                              // unwantedCharacters
-                GlobalCitationKeyPatterns.fromPattern(""),
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 new SimpleObjectProperty<>(',') // keywordDelimiter
         );
     }
