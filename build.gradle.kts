@@ -3,7 +3,7 @@ plugins {
     id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.openrewrite.rewrite") version "7.30.0"
     id("org.itsallcode.openfasttrace") version "3.1.1"
-    id("org.cyclonedx.bom") version "3.2.3"
+    id("org.cyclonedx.bom") version "3.2.4"
 }
 
 // OpenRewrite should rewrite all sources
