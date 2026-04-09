@@ -347,6 +347,7 @@ public class CSLCitationOOAdapter {
     }
 
     ///  Helper method for creating in-text citations for `updateAllCitationsWithNewStyle` and `insertInTextCitation`.
+
     private @NonNull String createInTextCitation(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
         String citation;
 
