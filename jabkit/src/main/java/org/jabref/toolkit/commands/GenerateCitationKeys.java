@@ -143,7 +143,9 @@ class GenerateCitationKeys implements Runnable {
     /// @param keyPatternsPreferences patterns from preferences
     /// @return keyPatterns from preferences or overridden by user-supplied patterns
     private GlobalCitationKeyPatterns getKeyPatterns(@Nullable Map<String, String> keyPatternsOption, GlobalCitationKeyPatterns keyPatternsPreferences) {
-        GlobalCitationKeyPatterns patternsCopy = new GlobalCitationKeyPatterns(keyPatternsPreferences.getDefaultValue());
+        GlobalCitationKeyPatterns patternsCopy = pattern != null
+                                                 ? GlobalCitationKeyPatterns.fromPattern(pattern)
+                                                 : new GlobalCitationKeyPatterns(keyPatternsPreferences.getDefaultValue());
         if (keyPatternsOption == null) {
             return patternsCopy;
         }
