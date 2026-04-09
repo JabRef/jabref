@@ -140,13 +140,14 @@ public class CSLCitationOOAdapter {
         while (iterator.hasNext()) {
             BibEntry currentEntry = iterator.next();
 
-            String formattedCitation = createInTextCitation(selectedStyle, isAlphanumericStyle, isNumericStyle, currentEntry, bibDatabaseContext);
+            String citation = createInTextCitationText(selectedStyle, isAlphanumericStyle, isNumericStyle, currentEntry, bibDatabaseContext);
+            String finalText = citation;
 
             if (iterator.hasNext()) {
-                formattedCitation += ",";
+                finalText += ",";
             }
 
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
             insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle, CSLCitationType.IN_TEXT);
         }
     }
@@ -305,9 +306,9 @@ public class CSLCitationOOAdapter {
                     BibEntry currentEntry = iterator.next();
 
                     // We re-generate the citation in the new style and update it in the document
-                    String formattedCitation = createInTextCitation(style, isAlphaNumericStyle, isNumericStyle, currentEntry, unifiedBibDatabaseContext);
+                    String citation = createInTextCitationText(style, isAlphaNumericStyle, isNumericStyle, currentEntry, unifiedBibDatabaseContext);
 
-                    finalText.append(formattedCitation);
+                    finalText.append(citation);
 
                     if (iterator.hasNext()) {
                         finalText.append(",");
@@ -326,15 +327,15 @@ public class CSLCitationOOAdapter {
                                                      .toList();
 
                 // We re-generate the citation in the new style and update it in the document
-                String formattedCitation = createCitation(style, isAlphaNumericStyle, entries, unifiedBibDatabaseContext);
+                String citation = createCitationText(style, isAlphaNumericStyle, entries, unifiedBibDatabaseContext);
 
-                markManager.updateMarkAndTextWithNewStyle(mark, formattedCitation, CSLCitationType.NORMAL);
+                markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.NORMAL);
             }
         }
     }
 
     /// Helper method for creating citations for `updateAllCitationsWithNewStyle` and `insertCitation`.
-    private @NonNull String createCitation(CitationStyle style, boolean isAlphaNumericStyle, List<BibEntry> entries, BibDatabaseContext unifiedBibDatabaseContext) {
+    private @NonNull String createCitationText(CitationStyle style, boolean isAlphaNumericStyle, List<BibEntry> entries, BibDatabaseContext unifiedBibDatabaseContext) {
         String citation;
 
         if (isAlphaNumericStyle) {
@@ -347,8 +348,7 @@ public class CSLCitationOOAdapter {
     }
 
     ///  Helper method for creating in-text citations for `updateAllCitationsWithNewStyle` and `insertInTextCitation`.
-
-    private @NonNull String createInTextCitation(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
+    private @NonNull String createInTextCitationText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
         String citation;
 
         if (isAlphaNumericStyle) {
