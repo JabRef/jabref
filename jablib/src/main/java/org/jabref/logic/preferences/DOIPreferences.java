@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class DOIPreferences {
-    private BooleanProperty useCustom;
+    private final BooleanProperty useCustom;
     private final StringProperty defaultBaseURI;
 
     public DOIPreferences(boolean useCustom, String defaultBaseURI) {
@@ -14,7 +14,23 @@ public class DOIPreferences {
         this.defaultBaseURI = new SimpleStringProperty(defaultBaseURI);
     }
 
-    public boolean isUseCustom() {
+    private DOIPreferences() {
+        this(
+                false,            // useCustom
+                "https://doi.org" // defaultBaseURI
+        );
+    }
+
+    public static DOIPreferences getDefault() {
+        return new DOIPreferences();
+    }
+
+    public void setAll(DOIPreferences preferences) {
+        this.useCustom.set(preferences.shouldUseCustom());
+        this.defaultBaseURI.set(preferences.getDefaultBaseURI());
+    }
+
+    public boolean shouldUseCustom() {
         return useCustom.get();
     }
 
