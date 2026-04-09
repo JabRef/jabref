@@ -271,6 +271,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             for (CSLStyleSelectViewModel model : cslStylesTable.getItems()) {
                 if (model.getLayout().equals(viewModel.selectedCslLayoutProperty().get())) {
                     cslStylesTable.getSelectionModel().select(model);
+                    cslStylesTable.scrollTo(model);
                     break;
                 }
             }

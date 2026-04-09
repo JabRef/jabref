@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -22,6 +23,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -91,5 +94,25 @@ class CustomEntryTypesTabViewModelTest {
 
         TreeSet<BibEntryType> expected = new TreeSet<>(List.of(modified));
         assertEquals(expected, entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    void resetMultilinePropertyOfStandardFieldsToDefault() {
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.resetMultilineFieldsToDefault();
+
+        StandardField fieldTitle = StandardField.TITLE;
+        assertFalse(fieldTitle.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        fieldTitle.getProperties().add(FieldProperty.MULTILINE_TEXT);
+        assertTrue(fieldTitle.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        model.resetMultilineFieldsToDefault();
+        assertFalse(fieldTitle.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+
+        StandardField fieldAbstract = StandardField.ABSTRACT;
+        assertTrue(fieldAbstract.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        fieldAbstract.getProperties().remove(FieldProperty.MULTILINE_TEXT);
+        assertFalse(fieldAbstract.getProperties().contains(FieldProperty.MULTILINE_TEXT));
+        model.resetMultilineFieldsToDefault();
+        assertTrue(fieldAbstract.getProperties().contains(FieldProperty.MULTILINE_TEXT));
     }
 }
