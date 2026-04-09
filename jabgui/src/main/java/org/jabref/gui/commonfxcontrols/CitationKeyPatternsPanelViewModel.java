@@ -67,7 +67,7 @@ public class CitationKeyPatternsPanelViewModel {
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternsPanelItemModel item) {
-        item.setPattern(CitationKeyPatternPreferences.getDefault().getKeyPatterns().getDefaultValue().stringRepresentation());
+        item.setPattern("");
     }
 
     public void resetAll() {
