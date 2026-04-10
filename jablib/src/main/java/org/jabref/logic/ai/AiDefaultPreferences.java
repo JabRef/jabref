@@ -24,8 +24,7 @@ public class AiDefaultPreferences {
         GEMINI_3_1_PRO(AiProvider.GEMINI, "gemini-3.1-pro-preview", 1048576),
         // Dummy variant for Hugging Face models.
         // Blank entry used for cases where the model name is not specified.
-        BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0),
-        BLANK_GPT4ALL(AiProvider.GPT4ALL, "", 0);
+        BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0);
 
         private final AiProvider aiProvider;
         private final String name;
@@ -66,8 +65,7 @@ public class AiDefaultPreferences {
             AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
             AiProvider.GEMINI, PredefinedChatModel.GEMINI_3_0_FLASH,
-            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE,
-            AiProvider.GPT4ALL, PredefinedChatModel.BLANK_GPT4ALL
+            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
     public static final boolean CUSTOMIZE_SETTINGS = false;

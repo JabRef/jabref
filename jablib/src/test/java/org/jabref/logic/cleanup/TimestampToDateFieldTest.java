@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -13,23 +12,12 @@ import org.jabref.model.entry.field.UnknownField;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TimeStampToCreationDateTest {
+class TimestampToDateFieldTest {
 
     private static final Field CUSTOM_TIME_STAMP_FIELD = new UnknownField("dateOfCreation");
-
-    private final TimestampPreferences timestampPreferences = Mockito.mock(TimestampPreferences.class);
-
-    public void makeMockReturnCustomField() {
-        Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> CUSTOM_TIME_STAMP_FIELD);
-    }
-
-    public void makeMockReturnStandardField() {
-        Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
-    }
 
     public static Stream<Arguments> standardFieldToCreationDate() {
         return Stream.of(
@@ -52,8 +40,7 @@ class TimeStampToCreationDateTest {
     @ParameterizedTest
     @MethodSource("standardFieldToCreationDate")
     void withStandardFieldToCreationDate(BibEntry expected, BibEntry input) {
-        makeMockReturnStandardField();
-        TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
+        TimestampToDateField migrator = new TimestampToDateField(StandardField.TIMESTAMP, StandardField.CREATIONDATE);
         migrator.cleanup(input);
         assertEquals(expected, input);
     }
@@ -75,12 +62,11 @@ class TimeStampToCreationDateTest {
         );
     }
 
-    /// Tests migration to creationdate if the users uses the default ISO yyyy-mm-dd format and a custom timestamp field
+    /// Tests migration to creationdate if the users use the default ISO yyyy-mm-dd format and a custom timestamp field
     @ParameterizedTest
     @MethodSource("customFieldToCreationDate")
     void withCustomFieldToCreationDate(BibEntry expected, BibEntry input) {
-        makeMockReturnCustomField();
-        TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
+        TimestampToDateField migrator = new TimestampToDateField(CUSTOM_TIME_STAMP_FIELD, StandardField.CREATIONDATE);
         migrator.cleanup(input);
         assertEquals(expected, input);
     }
@@ -164,8 +150,7 @@ class TimeStampToCreationDateTest {
     @ParameterizedTest
     @MethodSource("entriesMigratedToCreationDateFromDifferentFormats")
     void withDifferentFormats(BibEntry expected, BibEntry input) {
-        makeMockReturnStandardField();
-        TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
+        TimestampToDateField migrator = new TimestampToDateField(StandardField.TIMESTAMP, StandardField.CREATIONDATE);
         ParserResult parserResult = new ParserResult(List.of(input));
         migrator.cleanup(input);
         assertEquals(expected, input);
