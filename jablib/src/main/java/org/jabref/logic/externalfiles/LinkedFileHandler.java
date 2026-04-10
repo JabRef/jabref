@@ -333,8 +333,7 @@ public class LinkedFileHandler {
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase = stream.filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))
                                       .findFirst();
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Could not get the list of files in target directory", e);
         }
         return matchedByDiffCase;
