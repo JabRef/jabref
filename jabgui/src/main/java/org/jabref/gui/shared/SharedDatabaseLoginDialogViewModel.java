@@ -34,6 +34,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
@@ -213,7 +214,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             dialogService,
                             preferences,
                             Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                            stateManager
+                            stateManager,
+                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class)
                     ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
