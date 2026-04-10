@@ -73,28 +73,28 @@ public class PdfMergeDialog {
         ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
 
         BackgroundTask.wrap(() -> {
-            List<BibEntry> parsedEntries = new ArrayList<>();
-            Optional.ofNullable(xmpSupplier.get()).ifPresent(parsedEntries::add);
-            Optional.ofNullable(contentSupplier.get()).ifPresent(parsedEntries::add);
+                          List<BibEntry> parsedEntries = new ArrayList<>();
+                          Optional.ofNullable(xmpSupplier.get()).ifPresent(parsedEntries::add);
+                          Optional.ofNullable(contentSupplier.get()).ifPresent(parsedEntries::add);
 
-            Map<Field, String> identifiers = extractor.extract(parsedEntries);
+                          Map<Field, String> identifiers = extractor.extract(parsedEntries);
 
-            Map<Field, BibEntry> fetched = new LinkedHashMap<>();
-            for (Field field : PdfIdentifierExtractor.SUPPORTED_FIELDS) {
-                String value = identifiers.get(field);
-                if (value != null) {
-                    BibEntry entry = fetchEntryFromWeb(field, value, importFormatPreferences);
-                    if (entry != null) {
-                        fetched.put(field, entry);
-                    }
-                }
-            }
-            return fetched;
-        })
+                          Map<Field, BibEntry> fetched = new LinkedHashMap<>();
+                          for (Field field : PdfIdentifierExtractor.SUPPORTED_FIELDS) {
+                              String value = identifiers.get(field);
+                              if (value != null) {
+                                  BibEntry entry = fetchEntryFromWeb(field, value, importFormatPreferences);
+                                  if (entry != null) {
+                                      fetched.put(field, entry);
+                                  }
+                              }
+                          }
+                          return fetched;
+                      })
                       .onSuccess(fetched -> fetched.forEach((field, entry) -> dialog.addSource(
-                                                                                               Localization.lang("From %0", FieldTextMapper.getDisplayName(field)),
-                                                                                               entry)))
-                      .onFailure(e -> LOGGER.warn("Identifier-based fetch failed", e)) 
+                              Localization.lang("From %0", FieldTextMapper.getDisplayName(field)),
+                              entry)))
+                      .onFailure(e -> LOGGER.warn("Identifier-based fetch failed", e))
                       .executeWith(taskExecutor);
     }
 
@@ -123,7 +123,7 @@ public class PdfMergeDialog {
                                   return fetcher.performSearchById(identifier);
                               } catch (FetcherException e) {
                                   LOGGER.warn("Failed to fetch entry by {} {}", field, identifier, e);
-                              } catch (RuntimeException e) { 
+                              } catch (RuntimeException e) {
                                   LOGGER.warn("Unexpected error during fetch by {} {}", field, identifier, e);
                               }
                               return Optional.empty();
