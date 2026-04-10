@@ -15,10 +15,10 @@ public final class Countries {
 
     /// Set of country names (in English, lower-case) derived from the JDK locale data.
     public static final Set<String> COUNTRY_NAMES = Arrays.stream(Locale.getISOCountries())
-            .map(code -> new Locale.Builder().setRegion(code).build().getDisplayCountry(Locale.ENGLISH))
-            .filter(name -> !name.isEmpty())
-            .map(name -> name.toLowerCase(Locale.ENGLISH))
-            .collect(Collectors.toUnmodifiableSet());
+                                                          .map(code -> new Locale.Builder().setRegion(code).build().getDisplayCountry(Locale.ENGLISH))
+                                                          .filter(name -> !name.isEmpty())
+                                                          .map(name -> name.toLowerCase(Locale.ENGLISH))
+                                                          .collect(Collectors.toUnmodifiableSet());
 
     private Countries() {
         // utility class
