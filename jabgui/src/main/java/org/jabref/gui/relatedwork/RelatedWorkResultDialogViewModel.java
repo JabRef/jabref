@@ -60,11 +60,13 @@ public class RelatedWorkResultDialogViewModel extends AbstractViewModel {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Insert related work comments"));
 
         for (RelatedWorkInsertionResult insertionResult : insertionResults) {
-            if (insertionResult instanceof RelatedWorkInsertionResult.Inserted inserted) {
-                insertedCount++;
-                compoundEdit.addEdit(new UndoableFieldChange(inserted.fieldChange()));
-            } else {
-                unchangedCount++;
+            switch (insertionResult) {
+                case RelatedWorkInsertionResult.Inserted inserted -> {
+                    insertedCount++;
+                    compoundEdit.addEdit(new UndoableFieldChange(inserted.fieldChange()));
+                }
+                case RelatedWorkInsertionResult.Unchanged unchanged ->
+                        unchangedCount++;
             }
         }
 
