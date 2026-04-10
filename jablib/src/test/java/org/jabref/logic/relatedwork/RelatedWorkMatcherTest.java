@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class RelatedWorkMatcherTest {
 
@@ -144,28 +145,7 @@ class RelatedWorkMatcherTest {
     }
 
     private FilePreferences createFilePreferences() {
-        return new FilePreferences(
-                "",
-                "",
-                false,
-                false,
-                FilePreferences.DEFAULT_FILENAME_PATTERNS[0],
-                "",
-                false,
-                false,
-                Path.of(""),
-                false,
-                Path.of(""),
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                Path.of(""),
-                false,
-                false
-        );
+        return mock(FilePreferences.class);
     }
 
     private RelatedWorkMatcher createMatcher() {
