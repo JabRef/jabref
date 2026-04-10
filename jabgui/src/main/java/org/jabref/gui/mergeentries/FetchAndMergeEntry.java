@@ -81,16 +81,16 @@ public class FetchAndMergeEntry {
                                                       .ifPresentOrElse(idBasedFetcher -> BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(value))
                                                                                                        .onSuccess(fetchedEntry -> {
                                                                                                            ImportCleanup cleanup = ImportCleanup.targeting(
-                                                                                                                                                           bibDatabaseContext.getMode(),
-                                                                                                                                                           preferences.getFieldPreferences());
+                                                                                                                   bibDatabaseContext.getMode(),
+                                                                                                                   preferences.getFieldPreferences());
 
                                                                                                            if (fetchedEntry.isPresent()) {
                                                                                                                cleanup.doPostCleanup(fetchedEntry.get());
                                                                                                                showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
                                                                                                            } else {
                                                                                                                dialogService.notify(Localization.lang(
-                                                                                                                                                      "Cannot get info based on given %0: %1",
-                                                                                                                                                      FieldTextMapper.getDisplayName(field), value));
+                                                                                                                       "Cannot get info based on given %0: %1",
+                                                                                                                       FieldTextMapper.getDisplayName(field), value));
                                                                                                            }
                                                                                                        })
                                                                                                        .onFailure(exception -> {
@@ -102,16 +102,16 @@ public class FetchAndMergeEntry {
                                                                                                                dialogService.notify(Localization.lang("Server not available"));
                                                                                                            } else {
                                                                                                                dialogService.notify(Localization.lang(
-                                                                                                                                                      "Error while fetching from %0",
-                                                                                                                                                      idBasedFetcher.getName()));
+                                                                                                                       "Error while fetching from %0",
+                                                                                                                       idBasedFetcher.getName()));
                                                                                                            }
                                                                                                        })
                                                                                                        .executeWith(taskExecutor),
-                                                                       () -> LOGGER.warn("No fetcher available for '{}'",
-                                                                                         FieldTextMapper.getDisplayName(field))),
-                                  () -> dialogService.notify(Localization.lang(
-                                                                               "No %0 found",
-                                                                               FieldTextMapper.getDisplayName(field))));
+                                                              () -> LOGGER.warn("No fetcher available for '{}'",
+                                                                      FieldTextMapper.getDisplayName(field))),
+                         () -> dialogService.notify(Localization.lang(
+                                 "No %0 found",
+                                 FieldTextMapper.getDisplayName(field))));
         }
     }
 
@@ -150,7 +150,7 @@ public class FetchAndMergeEntry {
                 if (originalString.isEmpty() || !originalString.equals(mergedString)) {
                     originalEntry.setField(field, mergedString.get()); // mergedString always present
                     compoundEdit.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
-                                                                 mergedString.get()));
+                            mergedString.get()));
                     edited = true;
                 }
             }

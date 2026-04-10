@@ -63,31 +63,24 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     public static final int ACTIVE_COLUMNS_MINIMUM = 1;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiMergeEntriesView.class);
-
+    private final ToggleGroup headerToggleGroup = new ToggleGroup();
+    private final HashMap<Field, FieldRow> fieldRows = new HashMap<>();
+    private final MultiMergeEntriesViewModel viewModel;
+    private final TaskExecutor taskExecutor;
+    private final GuiPreferences preferences;
     // LEFT
     @FXML private ScrollPane leftScrollPane;
     @FXML private VBox fieldHeader;
-
     // CENTER
     @FXML private ScrollPane topScrollPane;
     @FXML private HBox supplierHeader;
     @FXML private ScrollPane centerScrollPane;
     @FXML private GridPane optionsGrid;
-
     // RIGHT
     @FXML private ScrollPane rightScrollPane;
     @FXML private VBox fieldEditor;
-
     @FXML private Label failedSuppliers;
     @FXML private ComboBox<DiffMode> diffMode;
-
-    private final ToggleGroup headerToggleGroup = new ToggleGroup();
-    private final HashMap<Field, FieldRow> fieldRows = new HashMap<>();
-
-    private final MultiMergeEntriesViewModel viewModel;
-    private final TaskExecutor taskExecutor;
-
-    private final GuiPreferences preferences;
 
     public MultiMergeEntriesView(GuiPreferences preferences,
                                  TaskExecutor taskExecutor) {
@@ -117,8 +110,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         viewModel.mergedEntryProperty().get().getFieldsObservable().addListener((MapChangeListener<Field, String>) change -> {
             if (change.wasAdded() && !fieldRows.containsKey(change.getKey())) {
                 FieldRow fieldRow = new FieldRow(
-                                                 change.getKey(),
-                                                 viewModel.mergedEntryProperty().get().getFields().size() - 1);
+                        change.getKey(),
+                        viewModel.mergedEntryProperty().get().getFields().size() - 1);
                 fieldRows.put(change.getKey(), fieldRow);
             }
         });
@@ -132,8 +125,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
         viewModel.failedSuppliersProperty().addListener((_, _, _) -> {
             failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
-                                                                                                                 "Could not extract Metadata from: %0",
-                                                                                                                 String.join(", ", viewModel.failedSuppliersProperty())));
+                    "Could not extract Metadata from: %0",
+                    String.join(", ", viewModel.failedSuppliersProperty())));
             int activeColumns = viewModel.entriesProperty().get().size() - viewModel.failedSuppliersProperty().get().size();
             if (activeColumns < ACTIVE_COLUMNS_MINIMUM) {
                 // [impl->req~ux.auto-close.merge-entries~1]
@@ -145,12 +138,12 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
     private void fillDiffModes() {
         diffMode.setItems(FXCollections.observableList(List.of(
-                                                               DiffMode.PLAIN,
-                                                               DiffMode.WORD,
-                                                               DiffMode.CHARACTER)));
+                DiffMode.PLAIN,
+                DiffMode.WORD,
+                DiffMode.CHARACTER)));
         new ViewModelListCellFactory<DiffMode>()
-                                                .withText(DiffMode::getDisplayText)
-                                                .install(diffMode);
+                .withText(DiffMode::getDisplayText)
+                .install(diffMode);
         diffMode.setValue(preferences.getMergeDialogPreferences().getMergeDiffMode());
         EasyBind.subscribe(this.diffMode.valueProperty(), mode -> preferences.getMergeDialogPreferences().setMergeDiffMode(mode));
     }
@@ -256,6 +249,14 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         return FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
     }
 
+    public void addSource(String title, BibEntry entry) {
+        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, entry));
+    }
+
+    public void addSource(String title, Supplier<BibEntry> supplier) {
+        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, supplier, taskExecutor));
+    }
+
     private class Cell extends HBox {
 
         private final String content;
@@ -313,7 +314,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                     String fromDoiTitle = Localization.lang("From DOI");
                     boolean doiSourceAlreadyPresent = viewModel.entriesProperty().stream()
                                                                .anyMatch(source -> fromDoiTitle.equals(source.titleProperty().get())
-                                                                   || Localization.lang("From DOI").equals(source.titleProperty().get()));
+                                                                       || Localization.lang("From DOI").equals(source.titleProperty().get()));
 
                     if (!doiSourceAlreadyPresent) {
                         Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
@@ -344,14 +345,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         public String getContent() {
             return content;
         }
-    }
-
-    public void addSource(String title, BibEntry entry) {
-        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, entry));
-    }
-
-    public void addSource(String title, Supplier<BibEntry> supplier) {
-        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, supplier, taskExecutor));
     }
 
     private class FieldRow {
@@ -398,18 +391,18 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
             fieldBinding = viewModel.mergedEntryProperty().get().getFieldBinding(field).asOrdinary();
             BindingsHelper.bindBidirectional(
-                                             fieldEditorCell.textProperty(),
-                                             fieldBinding,
-                                             text -> {
-                                                 if (text != null) {
-                                                     fieldEditorCell.setText(text);
-                                                 }
-                                             },
-                                             binding -> {
-                                                 if (binding != null) {
-                                                     viewModel.mergedEntryProperty().get().setField(field, binding);
-                                                 }
-                                             });
+                    fieldEditorCell.textProperty(),
+                    fieldBinding,
+                    text -> {
+                        if (text != null) {
+                            fieldEditorCell.setText(text);
+                        }
+                    },
+                    binding -> {
+                        if (binding != null) {
+                            viewModel.mergedEntryProperty().get().setField(field, binding);
+                        }
+                    });
 
             fieldEditorCell.setMaxHeight(Double.MAX_VALUE);
             VBox.setVgrow(fieldEditorCell, Priority.ALWAYS);

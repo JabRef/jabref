@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
 public class PdfIdentifierExtractor {
 
     public static final List<Field> SUPPORTED_FIELDS = List.of(
-                                                               StandardField.EPRINT,
-                                                               StandardField.DOI,
-                                                               StandardField.ISBN,
-                                                               StandardField.ISSN);
+            StandardField.EPRINT,
+            StandardField.DOI,
+            StandardField.ISBN,
+            StandardField.ISSN);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfIdentifierExtractor.class);
 
@@ -34,34 +34,6 @@ public class PdfIdentifierExtractor {
 
     public PdfIdentifierExtractor(XmpPreferences xmpPreferences) {
         this.xmpPreferences = xmpPreferences;
-    }
-
-    /// Parses the given PDF and returns a map of identifier field to value for every supported identifier found in the file. The first non-empty value found per field wins (XMP metadata takes priority over content).
-    public Map<Field, String> extract(Path filePath) {
-        return extractIdentifiers(parsePdfForEntries(filePath));
-    }
-
-    /// Extracts identifier field values from a list of already-parsed entries. Use this overload when the entries have already been obtained by other importers to avoid re-parsing the PDF.
-    public Map<Field, String> extract(List<BibEntry> entries) {
-        return extractIdentifiers(entries);
-    }
-
-    private List<BibEntry> parsePdfForEntries(Path filePath) {
-        List<BibEntry> entries = new ArrayList<>();
-        List<Importer> importers = List.of(
-                                           new PdfXmpImporter(xmpPreferences),
-                                           new PdfContentImporter());
-        for (Importer importer : importers) {
-            try {
-                ParserResult result = importer.importDatabase(filePath);
-                if (!result.isInvalid() && !result.isEmpty() && result.getDatabase().hasEntries()) {
-                    entries.add(result.getDatabase().getEntries().getFirst());
-                }
-            } catch (IOException e) {
-                LOGGER.warn("Could not parse PDF for identifier lookup", e);
-            }
-        }
-        return entries;
     }
 
     static Map<Field, String> extractIdentifiers(List<BibEntry> entries) {
@@ -79,5 +51,33 @@ public class PdfIdentifierExtractor {
         }
 
         return identifiers;
+    }
+
+    /// Parses the given PDF and returns a map of identifier field to value for every supported identifier found in the file. The first non-empty value found per field wins (XMP metadata takes priority over content).
+    public Map<Field, String> extract(Path filePath) {
+        return extractIdentifiers(parsePdfForEntries(filePath));
+    }
+
+    /// Extracts identifier field values from a list of already-parsed entries. Use this overload when the entries have already been obtained by other importers to avoid re-parsing the PDF.
+    public Map<Field, String> extract(List<BibEntry> entries) {
+        return extractIdentifiers(entries);
+    }
+
+    private List<BibEntry> parsePdfForEntries(Path filePath) {
+        List<BibEntry> entries = new ArrayList<>();
+        List<Importer> importers = List.of(
+                new PdfXmpImporter(xmpPreferences),
+                new PdfContentImporter());
+        for (Importer importer : importers) {
+            try {
+                ParserResult result = importer.importDatabase(filePath);
+                if (!result.isInvalid() && !result.isEmpty() && result.getDatabase().hasEntries()) {
+                    entries.add(result.getDatabase().getEntries().getFirst());
+                }
+            } catch (IOException e) {
+                LOGGER.warn("Could not parse PDF for identifier lookup", e);
+            }
+        }
+        return entries;
     }
 }
