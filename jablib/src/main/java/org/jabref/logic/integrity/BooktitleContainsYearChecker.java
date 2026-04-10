@@ -6,11 +6,8 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
-/// Checks whether a booktitle contains an embedded 4-digit year (1000–2999).
-/// Years belong in the dedicated {@code year} field, not in {@code booktitle}.
 public class BooktitleContainsYearChecker implements ValueChecker {
 
-    /// Matches a standalone 4-digit year (1000–2999) not adjacent to other digits.
     private static final Pattern CONTAINS_YEAR = Pattern.compile("(?<![0-9])[12][0-9]{3}(?![0-9])");
 
     @Override
