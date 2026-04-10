@@ -15,9 +15,7 @@ class BooktitleCheckerTest {
     private final BooktitleContainsCountryChecker countryChecker = new BooktitleContainsCountryChecker();
     private final BooktitleContainsPagesChecker pagesChecker = new BooktitleContainsPagesChecker();
 
-    // ------------------------------------------------------------------
-    // "ends with conference on" checks
-    // ------------------------------------------------------------------
+    //region "ends with conference on" checks
 
     @Test
     void booktitleAcceptsIfItDoesNotEndWithConferenceOn() {
@@ -35,9 +33,9 @@ class BooktitleCheckerTest {
         assertEquals(Optional.empty(), checker.checkValue(" "));
     }
 
-    // ------------------------------------------------------------------
-    // Year detection
-    // ------------------------------------------------------------------
+    // endregion
+
+    //region Year detection
 
     @Test
     void booktitleFlagsYearInMiddle() {
@@ -61,9 +59,9 @@ class BooktitleCheckerTest {
         assertEquals(Optional.empty(), yearChecker.checkValue(" "));
     }
 
-    // ------------------------------------------------------------------
-    // Location (country) detection
-    // ------------------------------------------------------------------
+    // endregion
+
+    //region Location (country) detection
 
     @Test
     void booktitleFlagsCountryName() {
@@ -93,9 +91,9 @@ class BooktitleCheckerTest {
         assertEquals(Optional.empty(), countryChecker.checkValue(" "));
     }
 
-    // ------------------------------------------------------------------
-    // Page-number detection
-    // ------------------------------------------------------------------
+    // endregion
+
+    //region Page-number detection
 
     @Test
     void booktitleFlagsPagesPattern() {
@@ -119,9 +117,9 @@ class BooktitleCheckerTest {
         assertEquals(Optional.empty(), pagesChecker.checkValue(" "));
     }
 
-    // ------------------------------------------------------------------
-    // Multiple issues in one booktitle — all reported independently
-    // ------------------------------------------------------------------
+    // endregion
+
+    //region Multiple issues in one booktitle
 
     @Test
     void booktitleWithYearAndCountryFlagsBoth() {
@@ -131,4 +129,6 @@ class BooktitleCheckerTest {
         assertEquals(Optional.of("booktitle should not contain a location"),
                 countryChecker.checkValue("2015 IEEE Conference, Singapore"));
     }
+
+    // endregion
 }

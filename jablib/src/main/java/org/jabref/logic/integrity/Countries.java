@@ -1,59 +1,24 @@
 package org.jabref.logic.integrity;
 
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-/// A hard-coded set of country names used by the integrity checker to detect
-/// location information (countries) embedded in booktitle fields.
+/// Provides the set of country names used by the integrity checker to detect
+/// location information embedded in booktitle fields.
 ///
-/// The list covers all UN-recognized sovereign states and several widely used
-/// territories. It can be regenerated from WikiData or a similar authoritative
-/// source when updates are required.
+/// Country names are derived from {@link Locale#getISOCountries()} and
+/// {@link Locale#getDisplayCountry(Locale)} so that no hard-coded list needs
+/// to be maintained.
 public final class Countries {
 
-    /// Set of country names (in English). All entries are stored in lower-case
-    /// so that comparisons can be made case-insensitively.
-    public static final Set<String> COUNTRY_NAMES = Set.of(
-            "afghanistan", "albania", "algeria", "andorra", "angola",
-            "antigua and barbuda", "argentina", "armenia", "australia", "austria",
-            "azerbaijan", "bahamas", "bahrain", "bangladesh", "barbados",
-            "belarus", "belgium", "belize", "benin", "bhutan",
-            "bolivia", "bosnia and herzegovina", "botswana", "brazil", "brunei",
-            "bulgaria", "burkina faso", "burundi", "cabo verde", "cambodia",
-            "cameroon", "canada", "central african republic", "chad", "chile",
-            "china", "colombia", "comoros", "congo", "costa rica",
-            "croatia", "cuba", "cyprus", "czech republic", "czechia",
-            "denmark", "djibouti", "dominica", "dominican republic", "ecuador",
-            "egypt", "el salvador", "equatorial guinea", "eritrea", "estonia",
-            "eswatini", "ethiopia", "fiji", "finland", "france",
-            "gabon", "gambia", "georgia", "germany", "ghana",
-            "greece", "grenada", "guatemala", "guinea", "guinea-bissau",
-            "guyana", "haiti", "honduras", "hungary", "iceland",
-            "india", "indonesia", "iran", "iraq", "ireland",
-            "israel", "italy", "jamaica", "japan", "jordan",
-            "kazakhstan", "kenya", "kiribati", "kuwait", "kyrgyzstan",
-            "laos", "latvia", "lebanon", "lesotho", "liberia",
-            "libya", "liechtenstein", "lithuania", "luxembourg", "madagascar",
-            "malawi", "malaysia", "maldives", "mali", "malta",
-            "marshall islands", "mauritania", "mauritius", "mexico", "micronesia",
-            "moldova", "monaco", "mongolia", "montenegro", "morocco",
-            "mozambique", "myanmar", "namibia", "nauru", "nepal",
-            "netherlands", "new zealand", "nicaragua", "niger", "nigeria",
-            "north korea", "north macedonia", "norway", "oman", "pakistan",
-            "palau", "palestine", "panama", "papua new guinea", "paraguay",
-            "peru", "philippines", "poland", "portugal", "qatar",
-            "romania", "russia", "rwanda", "saint kitts and nevis", "saint lucia",
-            "saint vincent and the grenadines", "samoa", "san marino", "sao tome and principe", "saudi arabia",
-            "senegal", "serbia", "seychelles", "sierra leone", "singapore",
-            "slovakia", "slovenia", "solomon islands", "somalia", "south africa",
-            "south korea", "south sudan", "spain", "sri lanka", "sudan",
-            "suriname", "sweden", "switzerland", "syria", "taiwan",
-            "tajikistan", "tanzania", "thailand", "timor-leste", "togo",
-            "tonga", "trinidad and tobago", "tunisia", "turkey", "turkmenistan",
-            "tuvalu", "uganda", "ukraine", "united arab emirates", "united kingdom",
-            "united states", "usa", "uk", "uae", "uruguay",
-            "uzbekistan", "vanuatu", "venezuela", "vietnam", "yemen",
-            "zambia", "zimbabwe"
-    );
+    /// Set of country names (in English, lower-case) derived from the JDK locale data.
+    public static final Set<String> COUNTRY_NAMES = Arrays.stream(Locale.getISOCountries())
+            .map(code -> new Locale.Builder().setRegion(code).build().getDisplayCountry(Locale.ENGLISH))
+            .filter(name -> !name.isEmpty())
+            .map(name -> name.toLowerCase(Locale.ENGLISH))
+            .collect(Collectors.toUnmodifiableSet());
 
     private Countries() {
         // utility class
