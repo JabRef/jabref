@@ -285,7 +285,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         } else {
             if (!horizontalSplit.getItems().contains(sidePane)) {
                 horizontalSplit.getItems().addFirst(sidePane);
-                Platform.runLater(this::updateHorizontalDividerPosition);
+                updateHorizontalDividerPosition();
             }
         }
     }
@@ -406,6 +406,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private void initBindings() {
         BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
+
+        mainStage.showingProperty().addListener((obs, wasShowing, isShowing) -> {
+            if (isShowing) {
+                updateHorizontalDividerPosition();
+            }
+        });
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
