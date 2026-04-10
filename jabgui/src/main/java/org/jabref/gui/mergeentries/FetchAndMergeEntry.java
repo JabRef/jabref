@@ -74,35 +74,44 @@ public class FetchAndMergeEntry {
 
     public void fetchAndMerge(BibEntry entry, List<Field> fields) {
         for (Field field : fields) {
-            Optional<String> fieldContent = entry.getField(field);
-            if (fieldContent.isPresent()) {
-                WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences())
-                           .ifPresentOrElse(idBasedFetcher ->
-                                           BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(fieldContent.get()))
-                                                         .onSuccess(fetchedEntry -> {
-                                                             ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                                                             if (fetchedEntry.isPresent()) {
-                                                                 cleanup.doPostCleanup(fetchedEntry.get());
-                                                                 showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
-                                                             } else {
-                                                                 dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", FieldTextMapper.getDisplayName(field), fieldContent.get()));
-                                                             }
-                                                         })
-                                                         .onFailure(exception -> {
-                                                             LOGGER.error("Error while fetching bibliographic information", exception);
-                                                             if (exception instanceof FetcherClientException) {
-                                                                 dialogService.notify(Localization.lang("No data was found for the identifier"));
-                                                             } else if (exception instanceof FetcherServerException) {
-                                                                 dialogService.notify(Localization.lang("Server not available"));
-                                                             } else {
-                                                                 dialogService.notify(Localization.lang("Error while fetching from %0", idBasedFetcher.getName()));
-                                                             }
-                                                         })
-                                                         .executeWith(taskExecutor),
-                                   () -> LOGGER.warn("No fetcher available for '{}'", FieldTextMapper.getDisplayName(field)));
-            } else {
-                dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field)));
-            }
+            entry.getField(field)
+                 .map(String::trim)
+                 .filter(value -> !value.isEmpty())
+                 .ifPresentOrElse(value -> WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences())
+                                                      .ifPresentOrElse(idBasedFetcher -> BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(value))
+                                                                                                       .onSuccess(fetchedEntry -> {
+                                                                                                           ImportCleanup cleanup = ImportCleanup.targeting(
+                                                                                                                                                           bibDatabaseContext.getMode(),
+                                                                                                                                                           preferences.getFieldPreferences());
+
+                                                                                                           if (fetchedEntry.isPresent()) {
+                                                                                                               cleanup.doPostCleanup(fetchedEntry.get());
+                                                                                                               showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
+                                                                                                           } else {
+                                                                                                               dialogService.notify(Localization.lang(
+                                                                                                                                                      "Cannot get info based on given %0: %1",
+                                                                                                                                                      FieldTextMapper.getDisplayName(field), value));
+                                                                                                           }
+                                                                                                       })
+                                                                                                       .onFailure(exception -> {
+                                                                                                           LOGGER.error("Error while fetching bibliographic information", exception);
+
+                                                                                                           if (exception instanceof FetcherClientException) {
+                                                                                                               dialogService.notify(Localization.lang("No data was found for the identifier"));
+                                                                                                           } else if (exception instanceof FetcherServerException) {
+                                                                                                               dialogService.notify(Localization.lang("Server not available"));
+                                                                                                           } else {
+                                                                                                               dialogService.notify(Localization.lang(
+                                                                                                                                                      "Error while fetching from %0",
+                                                                                                                                                      idBasedFetcher.getName()));
+                                                                                                           }
+                                                                                                       })
+                                                                                                       .executeWith(taskExecutor),
+                                                                       () -> LOGGER.warn("No fetcher available for '{}'",
+                                                                                         FieldTextMapper.getDisplayName(field))),
+                                  () -> dialogService.notify(Localization.lang(
+                                                                               "No %0 found",
+                                                                               FieldTextMapper.getDisplayName(field))));
         }
     }
 
@@ -141,7 +150,7 @@ public class FetchAndMergeEntry {
                 if (originalString.isEmpty() || !originalString.equals(mergedString)) {
                     originalEntry.setField(field, mergedString.get()); // mergedString always present
                     compoundEdit.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
-                            mergedString.get()));
+                                                                 mergedString.get()));
                     edited = true;
                 }
             }

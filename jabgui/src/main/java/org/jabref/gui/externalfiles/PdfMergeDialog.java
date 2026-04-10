@@ -37,17 +37,6 @@ public class PdfMergeDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeDialog.class);
 
-    /// Constructs a merge dialog for a PDF file. This dialog calls various {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s, collects the results, and lets the user choose between them.
-    ///
-    /// {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s try to extract a {@link BibEntry} out of a PDF file,
-    /// but it does not perform this 100% perfectly, it is only a set of heuristics that in some cases might work, in others not.
-    /// Thus, JabRef provides this merge dialog that collects the results of all {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s
-    /// and gives user a choice between field values.
-    ///
-    /// @param entry        the entry to merge with
-    /// @param filePath     the path to the PDF file. This PDF is used as the source for the {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s.
-    /// @param preferences  the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
-    /// @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
         dialog.addSource(Localization.lang("Entry"), entry);
@@ -74,8 +63,6 @@ public class PdfMergeDialog {
             dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
         }
 
-        // Memoize XMP and Content suppliers so that the identifier extraction task below
-        // can reuse the already-parsed results rather than opening the PDDocument a second time.
         Supplier<BibEntry> xmpSupplier = memoize(wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
         Supplier<BibEntry> contentSupplier = memoize(wrapImporterToSupplier(new PdfContentImporter(), filePath));
 
@@ -92,8 +79,6 @@ public class PdfMergeDialog {
 
             Map<Field, String> identifiers = extractor.extract(parsedEntries);
 
-            // Fetch entries and collect only successful results; skipping empty results avoids
-            // registering failed supplier entries in MultiMergeEntriesViewModel.
             Map<Field, BibEntry> fetched = new LinkedHashMap<>();
             for (Field field : PdfIdentifierExtractor.SUPPORTED_FIELDS) {
                 String value = identifiers.get(field);
@@ -106,15 +91,13 @@ public class PdfMergeDialog {
             }
             return fetched;
         })
-        .onSuccess(fetched -> fetched.forEach((field, entry) ->
-                dialog.addSource(
-                        Localization.lang("From %0", FieldTextMapper.getDisplayName(field)),
-                        entry)))
-        .executeWith(taskExecutor);
+                      .onSuccess(fetched -> fetched.forEach((field, entry) -> dialog.addSource(
+                                                                                               Localization.lang("From %0", FieldTextMapper.getDisplayName(field)),
+                                                                                               entry)))
+                      .onFailure(e -> LOGGER.warn("Identifier-based fetch failed", e)) 
+                      .executeWith(taskExecutor);
     }
 
-    /// Returns a supplier that computes {@code delegate} at most once, caching the result
-    /// (including {@code null}) for all subsequent callers.
     private static Supplier<BibEntry> memoize(Supplier<BibEntry> delegate) {
         AtomicReference<Optional<BibEntry>> cache = new AtomicReference<>();
         return () -> {
@@ -140,8 +123,10 @@ public class PdfMergeDialog {
                                   return fetcher.performSearchById(identifier);
                               } catch (FetcherException e) {
                                   LOGGER.warn("Failed to fetch entry by {} {}", field, identifier, e);
-                                  return Optional.empty();
+                              } catch (RuntimeException e) { 
+                                  LOGGER.warn("Unexpected error during fetch by {} {}", field, identifier, e);
                               }
+                              return Optional.empty();
                           })
                           .orElse(null);
     }
