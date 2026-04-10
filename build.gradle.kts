@@ -3,14 +3,14 @@ plugins {
     id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.openrewrite.rewrite") version "7.30.0"
     id("org.itsallcode.openfasttrace") version "3.1.1"
-    id("org.cyclonedx.bom") version "3.2.3"
+    id("org.cyclonedx.bom") version "3.2.4"
 }
 
 // OpenRewrite should rewrite all sources
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
 dependencies {
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.27.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.28.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
