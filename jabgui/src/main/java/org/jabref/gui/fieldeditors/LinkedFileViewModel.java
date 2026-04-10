@@ -215,8 +215,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'", linkedFile.getLink()), e);
         }
     }
@@ -236,8 +235,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Cannot open folder as the file is an online link."));
             }
-        } catch (
-                IOException ex) {
+        } catch (IOException ex) {
             LOGGER.debug("Cannot open folder", ex);
         }
     }
@@ -320,8 +318,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         try {
             // Attempt the rename operation
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("ERROR MESSAGE FOR RENAMING THE FILE: {}", e.getMessage());
             if (e instanceof FileSystemException fe) {
                 LOGGER.error(fe.getReason());
@@ -355,8 +352,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Found the linked file, so move it
             try {
                 linkedFileHandler.moveToDefaultDirectory();
-            } catch (
-                    IOException exception) {
+            } catch (IOException exception) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Move file"),
                         Localization.lang("Could not move file '%0'.", file.get().toString()),
@@ -407,8 +403,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
                 return Files.isSameFile(fileA, fileB);
-            } catch (
-                    IOException e) {
+            } catch (IOException e) {
                 return false;
             }
         };

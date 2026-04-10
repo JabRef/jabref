@@ -113,8 +113,7 @@ public class FileUtil {
         Path path;
         try {
             path = Path.of(fileName.trim());
-        } catch (
-                InvalidPathException e) {
+        } catch (InvalidPathException e) {
             return fileName;
         }
         String realFileName = path.getFileName().toString();
@@ -141,8 +140,7 @@ public class FileUtil {
         URI uri;
         try {
             uri = new URI(link);
-        } catch (
-                URISyntaxException e) {
+        } catch (URISyntaxException e) {
             LOGGER.warn("Was not a valid URL {}", link, e);
             return Optional.empty();
         }
@@ -150,8 +148,7 @@ public class FileUtil {
         Path path;
         try {
             path = Path.of(pathFragment);
-        } catch (
-                InvalidPathException e) {
+        } catch (InvalidPathException e) {
             // Try to keep something of the invalid path fragment
             return Optional.of(FileNameCleaner.cleanFileName(pathFragment));
         }
@@ -283,8 +280,7 @@ public class FileUtil {
             // This should also preserve Hard Links
             Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);
             return true;
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
             return false;
         }
@@ -327,8 +323,7 @@ public class FileUtil {
         if (Files.exists(path)) {
             try {
                 return Optional.of(path.toRealPath());
-            } catch (
-                    IOException e) {
+            } catch (IOException e) {
                 LOGGER.warn("Could not resolve real path for {}", path, e);
                 return Optional.empty();
             }
@@ -433,9 +428,7 @@ public class FileUtil {
                     .filter(Files::isRegularFile)
                     .filter(f -> f.getFileName().toString().equals(filename))
                     .findFirst();
-        } catch (
-                UncheckedIOException |
-                IOException ex) {
+        } catch (UncheckedIOException | IOException ex) {
             LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory, ex);
         }
         return Optional.empty();
@@ -562,9 +555,7 @@ public class FileUtil {
                     return resolvedPath;
                 }
             }
-        } catch (
-                IOException |
-                ShellLinkException e) {
+        } catch (IOException | ShellLinkException e) {
             LOGGER.warn("Could not resolve shortcut file", e);
         }
 
@@ -604,8 +595,7 @@ public class FileUtil {
         //         but a perfectly legal one in the path at this position
         try {
             fileName = Path.of(fileName).getFileName().toString();
-        } catch (
-                InvalidPathException _) {
+        } catch (InvalidPathException _) {
             // in case the internal method cannot parse the path, it is surely illegal
             return true;
         }
