@@ -15,7 +15,7 @@ class BooktitleCheckerTest {
     private final BooktitleContainsCountryChecker countryChecker = new BooktitleContainsCountryChecker();
     private final BooktitleContainsPagesChecker pagesChecker = new BooktitleContainsPagesChecker();
 
-    //region "ends with conference on" checks
+    // region "ends with conference on" checks
 
     @Test
     void booktitleAcceptsIfItDoesNotEndWithConferenceOn() {
@@ -35,7 +35,7 @@ class BooktitleCheckerTest {
 
     // endregion
 
-    //region Year detection
+    // region Year detection
 
     @Test
     void booktitleFlagsYearInMiddle() {
@@ -61,7 +61,7 @@ class BooktitleCheckerTest {
 
     // endregion
 
-    //region Location (country) detection
+    // region Location (country) detection
 
     @Test
     void booktitleFlagsCountryName() {
@@ -93,7 +93,7 @@ class BooktitleCheckerTest {
 
     // endregion
 
-    //region Page-number detection
+    // region Page-number detection
 
     @Test
     void booktitleFlagsPagesPattern() {
@@ -119,7 +119,7 @@ class BooktitleCheckerTest {
 
     // endregion
 
-    //region Multiple issues in one booktitle
+    // region Multiple issues in one booktitle
 
     @Test
     void booktitleWithYearAndCountryFlagsBoth() {
