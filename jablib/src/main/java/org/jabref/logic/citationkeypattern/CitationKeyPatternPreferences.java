@@ -16,6 +16,9 @@ public class CitationKeyPatternPreferences {
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
     }
 
+    public static final GlobalCitationKeyPatterns DEFAULT_CITATION_KEY_PATTERN = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+    public static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_DELIMITER = new SimpleObjectProperty<>(',');
+
     private final BooleanProperty shouldTransliterateFieldsForCitationKey;
     private final BooleanProperty shouldAvoidOverwriteCiteKey;
     private final BooleanProperty shouldWarnBeforeOverwriteCiteKey;
@@ -25,8 +28,7 @@ public class CitationKeyPatternPreferences {
     private final StringProperty keyPatternReplacement;
     private final StringProperty unwantedCharacters;
     private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns;
-
-    private ReadOnlyObjectProperty<Character> keywordDelimiter;
+    private final SimpleObjectProperty<Character> keywordDelimiter;
 
     /// @param keywordDelimiter should always be BibEntryProperties#keyWordDelimiterProperty
     public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
@@ -49,22 +51,26 @@ public class CitationKeyPatternPreferences {
         this.keyPatternReplacement = new SimpleStringProperty(keyPatternReplacement);
         this.unwantedCharacters = new SimpleStringProperty(unwantedCharacters);
         this.keyPatterns = new SimpleObjectProperty<>(keyPatterns);
-        this.keywordDelimiter = keywordDelimiter;
+
+        this.keywordDelimiter = new SimpleObjectProperty<>();
+        this.keywordDelimiter.bind(keywordDelimiter);
     }
 
     private CitationKeyPatternPreferences() {
         this(
-                false,                                    // shouldTransliterateFieldsForCitationKey
-                false,                                    // shouldAvoidOverwriteCiteKey
-                true,                                     // shouldWarnBeforeOverwriteCiteKey
-                false,                                    // shouldGenerateCiteKeysBeforeSaving
+                false,                        // shouldTransliterateFieldsForCitationKey
+                false,                        // shouldAvoidOverwriteCiteKey
+                true,                         // shouldWarnBeforeOverwriteCiteKey
+                false,                        // shouldGenerateCiteKeysBeforeSaving
                 KeySuffix.SECOND_WITH_A,
-                "",                                       // keyPatternRegex
-                "",                                       // keyPatternReplacement
-                "-`ʹ:!;?^$",                              // unwantedCharacters
-                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
-                new SimpleObjectProperty<>(',') // keywordDelimiter
+                "",                           // keyPatternRegex
+                "",                           // keyPatternReplacement
+                "-`ʹ:!;?^$",                  // unwantedCharacters
+                DEFAULT_CITATION_KEY_PATTERN,
+                new SimpleObjectProperty<>()  // keywordDelimiter
         );
+
+        this.keywordDelimiter.bind(DEFAULT_KEYWORD_DELIMITER);
     }
 
     public static CitationKeyPatternPreferences getDefault() {
@@ -196,8 +202,17 @@ public class CitationKeyPatternPreferences {
         return keywordDelimiter.get();
     }
 
-    public CitationKeyPatternPreferences withKeywordDelimiter(ReadOnlyObjectProperty<Character> keywordDelimiter) {
-        this.keywordDelimiter = keywordDelimiter;
+    public CitationKeyPatternPreferences withKeywordDelimiter(ReadOnlyObjectProperty<Character> newDelimiter) {
+        if (this.keywordDelimiter.isBound()) {
+            this.keywordDelimiter.unbind();
+        }
+
+        if (newDelimiter == null) {
+            this.keywordDelimiter.bind(DEFAULT_KEYWORD_DELIMITER);
+        } else {
+            this.keywordDelimiter.bind(newDelimiter);
+        }
+
         return this;
     }
 }
