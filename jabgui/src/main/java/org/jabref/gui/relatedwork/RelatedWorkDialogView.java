@@ -80,6 +80,7 @@ public class RelatedWorkDialogView extends BaseDialog<Void> {
         this.userNameField.textProperty().bind(viewModel.userNameProperty());
         this.relatedWorkTextArea.textProperty().bindBidirectional(viewModel.relatedWorkTextProperty());
 
+        // [impl->req~textinput.clipboard.autofocus~1]
         String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
             relatedWorkTextArea.setText(clipboardText);
