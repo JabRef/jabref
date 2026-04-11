@@ -214,8 +214,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
             int pageNumber = isPdf(type) ? getFirstPageNumberFromEntry().orElse(1) : 1;
-            System.out.println("【DEBUG】当前传入的 entry title 是: " + entry.getField(StandardField.TITLE).orElse("无标题")
-                    + "，解析出来的最终跳转页码是: " + pageNumber);
             boolean successful = NativeDesktop.openExternalFileAnyFormat(
                     databaseContext,
                     preferences.getExternalApplicationsPreferences(),

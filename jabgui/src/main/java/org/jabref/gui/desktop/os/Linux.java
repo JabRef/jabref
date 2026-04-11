@@ -21,7 +21,9 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.StreamGobbler;
+import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +59,14 @@ public class Linux extends NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
-        String viewer;
+        String viewer = type.map(ExternalFileType::getOpenWithApplication)
+                            .filter(app -> !app.isEmpty())
+                            .orElse("");
 
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            viewer = type.get().getOpenWithApplication();
+        if (!viewer.isEmpty()) {
             List<String> command = new ArrayList<>();
             command.add(viewer);
-            addPdfPageArguments(command, viewer, fileType, pageNumber);
+            addPdfPageArguments(command, viewer, filePath, pageNumber);
             command.add(filePath);
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -74,7 +77,7 @@ public class Linux extends NativeDesktop {
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } else {
-            if ("pdf".equalsIgnoreCase(fileType) && pageNumber > 1) {
+            if (isPdfType(fileType) && pageNumber > 1) {
                 Optional<List<String>> command = getPdfViewerCommandWithPage(filePath, pageNumber);
                 if (command.isPresent()) {
                     Process process = new ProcessBuilder(command.get()).start();
@@ -96,7 +99,7 @@ public class Linux extends NativeDesktop {
         if ((application != null) && !application.isEmpty()) {
             openWith = application.split(" ");
             List<String> command = new ArrayList<>(List.of(openWith));
-            addPdfPageArguments(command, openWith[0], "pdf", pageNumber);
+            addPdfPageArguments(command, openWith[0], filePath, pageNumber);
             command.add(filePath);
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -112,8 +115,8 @@ public class Linux extends NativeDesktop {
         }
     }
 
-    private static void addPdfPageArguments(List<String> command, String application, String fileType, int pageNumber) {
-        if (pageNumber <= 1 || !"pdf".equalsIgnoreCase(fileType)) {
+    private static void addPdfPageArguments(List<String> command, String application, String filePath, int pageNumber) {
+        if (pageNumber <= 1 || !isPdfPath(filePath)) {
             return;
         }
 
@@ -130,22 +133,26 @@ public class Linux extends NativeDesktop {
     }
 
     private static Optional<List<String>> getPdfViewerCommandWithPage(String filePath, int pageNumber) {
-        Optional<Path> evince = findExecutableOnPath("evince");
-        if (evince.isPresent()) {
-            return Optional.of(List.of(evince.get().toString(), "--page-label=" + pageNumber, filePath));
+        return findExecutableOnPath("evince")
+                .map(executable -> List.of(executable.toString(), "--page-label=" + pageNumber, filePath))
+                .or(() -> findExecutableOnPath("okular")
+                        .map(executable -> List.of(executable.toString(), "-p", String.valueOf(pageNumber), filePath)))
+                .or(() -> findExecutableOnPath("zathura")
+                        .map(executable -> List.of(executable.toString(), "-P", String.valueOf(pageNumber), filePath)));
+    }
+
+    private static boolean isPdfType(String fileType) {
+        if (fileType == null || fileType.isBlank()) {
+            return false;
         }
 
-        Optional<Path> okular = findExecutableOnPath("okular");
-        if (okular.isPresent()) {
-            return Optional.of(List.of(okular.get().toString(), "-p", String.valueOf(pageNumber), filePath));
-        }
+        return StandardFileType.PDF.getExtensions().stream().anyMatch(fileType::equalsIgnoreCase);
+    }
 
-        Optional<Path> zathura = findExecutableOnPath("zathura");
-        if (zathura.isPresent()) {
-            return Optional.of(List.of(zathura.get().toString(), "-P", String.valueOf(pageNumber), filePath));
-        }
-
-        return Optional.empty();
+    private static boolean isPdfPath(String filePath) {
+        return FileUtil.getFileExtension(filePath)
+                       .map(extension -> StandardFileType.PDF.getExtensions().stream().anyMatch(extension::equalsIgnoreCase))
+                       .orElse(false);
     }
 
     private static Optional<Path> findExecutableOnPath(String command) {

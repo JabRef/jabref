@@ -13,6 +13,8 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
@@ -30,11 +32,14 @@ public class Windows extends NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
+        String application = type.map(ExternalFileType::getOpenWithApplication)
+                                 .filter(app -> !app.isEmpty())
+                                 .orElse("");
 
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            openFileWithApplication(filePath, type.get().getOpenWithApplication(), pageNumber);
+        if (!application.isEmpty()) {
+            openFileWithApplication(filePath, application, pageNumber);
         } else {
-            if ("pdf".equalsIgnoreCase(fileType) && pageNumber > 1) {
+            if (isPdfType(fileType) && pageNumber > 1) {
                 Optional<Path> sumatraPdfExecutable = findSumatraPdfExecutable();
                 if (sumatraPdfExecutable.isPresent()) {
                     new ProcessBuilder(
@@ -85,7 +90,7 @@ public class Windows extends NativeDesktop {
         command.add(Path.of(application).toString());
 
         String executable = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
-        if (pageNumber > 1) {
+        if (pageNumber > 1 && isPdfPath(filePath)) {
             if (executable.contains("sumatrapdf")) {
                 command.add("-page");
                 command.add(String.valueOf(pageNumber));
@@ -130,5 +135,19 @@ public class Windows extends NativeDesktop {
         }
 
         return Optional.empty();
+    }
+
+    private static boolean isPdfType(String fileType) {
+        if (fileType == null || fileType.isBlank()) {
+            return false;
+        }
+
+        return StandardFileType.PDF.getExtensions().stream().anyMatch(fileType::equalsIgnoreCase);
+    }
+
+    private static boolean isPdfPath(String filePath) {
+        return FileUtil.getFileExtension(filePath)
+                       .map(extension -> StandardFileType.PDF.getExtensions().stream().anyMatch(extension::equalsIgnoreCase))
+                       .orElse(false);
     }
 }
