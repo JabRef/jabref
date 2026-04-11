@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -54,8 +56,7 @@ class AutoRenameFileOnEntryChangeTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
 
         when(guiPreferences.getCitationKeyPatternPreferences()).thenReturn(patternPreferences);
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);

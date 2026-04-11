@@ -217,8 +217,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
-    public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
-    public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
+
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
@@ -239,8 +238,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String GROBID_PREFERENCE = "grobidPreference";
     public static final String GROBID_URL = "grobidURL";
 
-    public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
-    public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
 
@@ -248,15 +245,20 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String COPY_LINKED_FILES_ON_TRANSFER = "copyLinkedFilesOnTransfer";
     public static final String MOVE_LINKED_FILES_ON_TRANSFER = "moveLinkedFilesOnTransfer";
 
-    public static final String TRANSLITERATE_FIELDS_FOR_CITATION_KEY = "transliterateFields";
-    public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
-    public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
+    // region CitationKeyPreferences
+    public static final String CITATION_KEY_TRANSLITERATE_FIELDS = "transliterateFields";
+    public static final String CITATION_KEY_AVOID_OVERWRITING = "avoidOverwritingKey";
+    public static final String CITATION_KEY_WARN_BEFORE_OVERWRITE = "warnBeforeOverwritingKey";
+    public static final String CITATION_KEY_GENERATE_BEFORE_SAVING = "generateKeysBeforeSaving";
+    public static final String CITATION_KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
+    public static final String CITATION_KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
+    public static final String CITATION_KEY_PATTERN_REGEX = "KeyPatternRegex";
+    public static final String CITATION_KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
+    public static final String CITATION_KEY_UNWANTED_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
+    public static final String CITATION_KEY_DEFAULT_PATTERN = "defaultBibtexKeyPattern";
+    // endregion
+
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
-
-    public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
-    public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
-    public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
@@ -300,6 +302,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
+
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
@@ -312,7 +315,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
-    // TODO: USed by both importer preferences and workspace preferences
     protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
 
     // Helper string
@@ -333,7 +335,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROXY_USE = "useProxy";
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
     private static final String PROXY_USERNAME = "proxyUsername";
-    private static final String PROXY_PASSWORD = "proxyPassword";
+    // PROXY_PASSWORD = "proxyPassword" handled by KeyRing
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
     // endregion
 
@@ -343,10 +345,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
 
     // SSL
-    private static final String TRUSTSTORE_PATH = "truststorePath";
-
-    // User
-    private static final String USER_ID = "userId";
+    private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
 
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -535,11 +534,8 @@ public class JabRefCliPreferences implements CliPreferences {
             defaults.put(FONT_FAMILY, "SansSerif");
         }
 
-        defaults.put(KEY_PATTERN_REGEX, "");
-        defaults.put(KEY_PATTERN_REPLACEMENT, "");
-
         // SSL
-        defaults.put(TRUSTSTORE_PATH, Directories
+        defaults.put(SSL_TRUSTSTORE_PATH, Directories
                 .getSslDirectory()
                 .resolve("truststore.jks").toString());
 
@@ -610,9 +606,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
         defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
 
-        defaults.put(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, Boolean.FALSE);
-        defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
-        defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
 
         defaults.put(ADJUST_FILE_LINKS_ON_TRANSFER, Boolean.TRUE);
@@ -622,21 +615,13 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(KEEP_DOWNLOAD_URL, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
-        defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
-        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-
-        defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
         defaults.put(LAST_USED_EXPORT, "");
 
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
-        // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
-        // Currently, JabRef does not escape them
-        defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
-        defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
@@ -874,7 +859,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearTruststoreFromCustomCertificates() {
-        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
+        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(SSL_TRUSTSTORE_PATH).toString()));
         trustStoreManager.clearCustomCertificates();
     }
 
@@ -1012,6 +997,9 @@ public class JabRefCliPreferences implements CliPreferences {
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
         getTimestampPreferences().setAll(TimestampPreferences.getDefault());
         getRemotePreferences().setAll(RemotePreferences.getDefault());
+        getCitationKeyPatternPreferences().setAll(
+                CitationKeyPatternPreferences.getDefault()
+                                             .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
     }
 
     /// Imports Preferences from an XML file.
@@ -1035,6 +1023,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
         getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
+        getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1384,7 +1373,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 persistPassword
         );
     }
-    // endregion
 
     private Optional<String> getProxyPassword() {
         try (final Keyring keyring = Keyring.create()) {
@@ -1417,7 +1405,9 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
     }
+    // endregion
 
+    // region SSLPreferences
     @Override
     public SSLPreferences getSSLPreferences() {
         if (sslPreferences != null) {
@@ -1425,16 +1415,80 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         sslPreferences = new SSLPreferences(
-                get(TRUSTSTORE_PATH)
+                get(SSL_TRUSTSTORE_PATH)
         );
 
         return sslPreferences;
     }
+    // endregion
 
     // region CitationKeyPatternPreferences
+    @Override
+    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+        if (citationKeyPatternPreferences != null) {
+            return citationKeyPatternPreferences;
+        }
 
-    private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
-        GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
+        citationKeyPatternPreferences = getCitationKeyPatternPreferencesFromBackingStore(CitationKeyPatternPreferences.getDefault());
+
+        EasyBind.listen(citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKeyProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_TRANSLITERATE_FIELDS, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_AVOID_OVERWRITING, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_WARN_BEFORE_OVERWRITE, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_GENERATE_BEFORE_SAVING, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (_, _, newValue) -> {
+            putBoolean(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
+            putBoolean(CITATION_KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
+        });
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
+                (_, _, newValue) -> put(CITATION_KEY_PATTERN_REGEX, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
+                (_, _, newValue) -> put(CITATION_KEY_PATTERN_REPLACEMENT, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
+                (_, _, newValue) -> put(CITATION_KEY_UNWANTED_CHARACTERS, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternsProperty(),
+                (_, _, newValue) -> storeGlobalCitationKeyPattern(newValue));
+
+        return citationKeyPatternPreferences;
+    }
+
+    private @NonNull CitationKeyPatternPreferences getCitationKeyPatternPreferencesFromBackingStore(CitationKeyPatternPreferences defaults) {
+        return new CitationKeyPatternPreferences(
+                getBoolean(CITATION_KEY_TRANSLITERATE_FIELDS, defaults.shouldTransliterateFieldsForCitationKey()),
+                getBoolean(CITATION_KEY_AVOID_OVERWRITING, defaults.shouldAvoidOverwriteCiteKey()),
+                getBoolean(CITATION_KEY_WARN_BEFORE_OVERWRITE, defaults.shouldWarnBeforeOverwriteCiteKey()),
+                getBoolean(CITATION_KEY_GENERATE_BEFORE_SAVING, defaults.shouldGenerateCiteKeysBeforeSaving()),
+                getKeySuffix(defaults),
+                get(CITATION_KEY_PATTERN_REGEX, defaults.getKeyPatternRegex()),
+                get(CITATION_KEY_PATTERN_REPLACEMENT, defaults.getKeyPatternReplacement()),
+                get(CITATION_KEY_UNWANTED_CHARACTERS, defaults.getUnwantedCharacters()),
+                getGlobalCitationKeyPattern(defaults),
+                getBibEntryPreferences().keywordSeparatorProperty());
+    }
+
+    private CitationKeyPatternPreferences.KeySuffix getKeySuffix(CitationKeyPatternPreferences defaults) {
+        if (!hasKey(CITATION_KEY_GEN_ALWAYS_ADD_LETTER) && !hasKey(CITATION_KEY_GEN_FIRST_LETTER_A)) {
+            return defaults.getKeySuffix();
+        }
+
+        boolean alwaysAddLetter = getBoolean(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, false);
+        boolean firstLetterA = getBoolean(CITATION_KEY_GEN_FIRST_LETTER_A, false);
+
+        if (alwaysAddLetter && !firstLetterA) {
+            return CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+        } else if (!alwaysAddLetter && firstLetterA) {
+            return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+        } else {
+            return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+        }
+    }
+
+    private @NonNull GlobalCitationKeyPatterns getGlobalCitationKeyPattern(CitationKeyPatternPreferences defaults) {
+        GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(
+                get(CITATION_KEY_DEFAULT_PATTERN, defaults.getKeyPatterns().getDefaultValue().stringRepresentation()));
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
@@ -1449,18 +1503,17 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPattern;
     }
-    // endregion
 
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
         if ((pattern.getDefaultValue() == null)
                 || pattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
-            put(DEFAULT_CITATION_KEY_PATTERN, "");
+            put(CITATION_KEY_DEFAULT_PATTERN, "");
         } else {
-            put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().stringRepresentation());
+            put(CITATION_KEY_DEFAULT_PATTERN, pattern.getDefaultValue().stringRepresentation());
         }
 
-        // Store overridden definitions to Preferences.
+        // Store overridden definitions in Preferences.
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
@@ -1479,62 +1532,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private void clearCitationKeyPatterns() throws BackingStoreException {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
-        getCitationKeyPatternPreferences().setKeyPatterns(getGlobalCitationKeyPattern());
     }
-
-    @Override
-    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
-        if (citationKeyPatternPreferences != null) {
-            return citationKeyPatternPreferences;
-        }
-
-        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
-                getBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY),
-                getBoolean(AVOID_OVERWRITING_KEY),
-                getBoolean(WARN_BEFORE_OVERWRITING_KEY),
-                getBoolean(GENERATE_KEYS_BEFORE_SAVING),
-                getKeySuffix(),
-                get(KEY_PATTERN_REGEX),
-                get(KEY_PATTERN_REPLACEMENT),
-                get(UNWANTED_CITATION_KEY_CHARACTERS),
-                getGlobalCitationKeyPattern(),
-                (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
-                getBibEntryPreferences().keywordSeparatorProperty());
-
-        EasyBind.listen(citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKeyProperty(),
-                (_, _, newValue) -> putBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
-                (_, _, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
-                (_, _, newValue) -> putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
-                (_, _, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (_, _, newValue) -> {
-            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
-            putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
-        });
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
-                (_, _, newValue) -> put(KEY_PATTERN_REGEX, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
-                (_, _, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
-                (_, _, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternsProperty(),
-                (_, _, newValue) -> storeGlobalCitationKeyPattern(newValue));
-
-        return citationKeyPatternPreferences;
-    }
-
-    private CitationKeyPatternPreferences.KeySuffix getKeySuffix() {
-        CitationKeyPatternPreferences.KeySuffix keySuffix =
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
-        if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
-        } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
-        }
-        return keySuffix;
-    }
+    // endregion
 
     // region BibEntryPreferences
     @Override
