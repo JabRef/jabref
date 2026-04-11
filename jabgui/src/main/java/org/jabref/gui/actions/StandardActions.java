@@ -43,6 +43,7 @@ public enum StandardActions implements Action {
     OPEN_EXTERNAL_FILE(Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     EXTRACT_FILE_REFERENCES_ONLINE(Localization.lang("Extract references from file (online)"), IconTheme.JabRefIcons.FILE_STAR),
     EXTRACT_FILE_REFERENCES_OFFLINE(Localization.lang("Extract references from file (offline)"), IconTheme.JabRefIcons.FILE_STAR),
+    EXTRACT_RELATED_WORK_COMMENTS(Localization.lang("Extract related work comments"), IconTheme.JabRefIcons.COMMENT),
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     SEARCH(Localization.lang("Search...")),
     SEARCH_GOOGLE_SCHOLAR(Localization.lang("Search Google Scholar")),
