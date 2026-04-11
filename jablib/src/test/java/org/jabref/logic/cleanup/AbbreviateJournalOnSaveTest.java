@@ -35,22 +35,16 @@ class AbbreviateJournalOnSaveTest {
                 .withField(StandardField.JOURNAL, "Annals of Mathematics and Pure and Applied Sciences");
         AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(database, repository, AbbreviationType.LTWA, false);
 
-        cleanup.cleanup(entry);
-
-        assertEquals("Ann. Math. Pure Appl. Sci.", entry.getField(StandardField.JOURNAL).orElse(""));
-    }
-
-    @Test
-    void ltwaProducesFieldChangeOnAbbreviation() {
-        BibEntry entry = new BibEntry()
-                .withField(StandardField.JOURNAL, "Annals of Mathematics and Pure and Applied Sciences");
-        AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(database, repository, AbbreviationType.LTWA, false);
-
         List<FieldChange> changes = cleanup.cleanup(entry);
 
-        assertEquals(1, changes.size());
-        assertEquals(StandardField.JOURNAL, changes.getFirst().getField());
-        assertEquals("Annals of Mathematics and Pure and Applied Sciences", changes.getFirst().getOldValue());
+        List<FieldChange> expected = List.of(
+                new FieldChange(entry, StandardField.JOURNAL, "Annals of Mathematics and Pure and Applied Sciences", "Ann. Math. Pure Appl. Sci.")
+        );
+        assertEquals(expected, changes);
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "Ann. Math. Pure Appl. Sci.");
+        assertEquals(expectedEntry, entry);
     }
 }
 
