@@ -4,6 +4,9 @@ import java.util.List;
 
 public record MeshHeading(
         String descriptorName,
-        List<String> qualifierNames
+        boolean descriptorMajor,
+        List<QualifierName> qualifierNames
 ) {
+    public record QualifierName(String name, boolean major) {
+    }
 }
