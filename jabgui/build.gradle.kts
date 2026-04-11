@@ -14,6 +14,8 @@ version = providers.gradleProperty("projVersion")
     .get()
 
 testModuleInfo {
+    requires("jdk.httpserver")
+
     requires("org.apache.pdfbox")
     requires("org.jabref.testsupport")
 

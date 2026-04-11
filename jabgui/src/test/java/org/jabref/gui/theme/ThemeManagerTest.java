@@ -40,6 +40,7 @@ class ThemeManagerTest {
             .code-area .text {
                 -fx-font-family: monospace;
             }""";
+    private static final String RELOADED_TEST_CSS_DATA = "data:text/css;charset=utf-8;base64,LyogQW5kIG5vdyBmb3Igc29tZXRoaW5nIHNsaWdodGx5IGRpZmZlcmVudCAqLwouY29kZS1hcmVhIC50ZXh0IHsKICAgIC1meC1mb250LWZhbWlseTogc2VyaWY7Cn0=";
 
     private Path tempFolder;
 
@@ -228,18 +229,23 @@ class ThemeManagerTest {
                 /* And now for something slightly different */
                 .code-area .text {
                     -fx-font-family: serif;
-                }""", StandardOpenOption.CREATE);
+                }""", StandardOpenOption.TRUNCATE_EXISTING);
 
-        // Wait for the stylesheet to be reloaded
-        Thread.sleep(500);
+        Optional<String> testCssLocation2 = Optional.empty();
+        for (int i = 0; i < 50; i++) {
+            testCssLocation2 = themeManager.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
+            if (testCssLocation2.isPresent() && RELOADED_TEST_CSS_DATA.equals(testCssLocation2.get())) {
+                break;
+            }
+            Thread.sleep(100);
+        }
 
         fileUpdateMonitor.shutdown();
         thread.join();
 
-        Optional<String> testCssLocation2 = themeManager.getActiveTheme().getAdditionalStylesheet().map(StyleSheet::getWebEngineStylesheet);
         assertTrue(testCssLocation2.isPresent(), "expected custom theme location to be available");
         assertEquals(
-                "data:text/css;charset=utf-8;base64,LyogQW5kIG5vdyBmb3Igc29tZXRoaW5nIHNsaWdodGx5IGRpZmZlcmVudCAqLwouY29kZS1hcmVhIC50ZXh0IHsKICAgIC1meC1mb250LWZhbWlseTogc2VyaWY7Cn0=",
+                RELOADED_TEST_CSS_DATA,
                 testCssLocation2.get(),
                 "stylesheet embedded in data: url should have reloaded");
     }

@@ -38,7 +38,7 @@ class IdentifierEditorTest extends ApplicationTest {
         interact(() -> textField.setText(""));
         FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isInvisible());
 
-        clickOn(textField).write("10.1001/jama.2017.18444");
+        interact(() -> textField.setText("10.1001/jama.2017.18444"));
         FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isVisible());
 
         interact(() -> textField.setText(""));

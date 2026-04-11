@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -25,6 +27,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -48,6 +53,8 @@ class DownloadLinkedFileActionTest {
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
+    private HttpServer httpServer;
+    private String pdfUrl;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws IOException {
@@ -70,11 +77,47 @@ class DownloadLinkedFileActionTest {
             cookieManager = (CookieManager) CookieHandler.getDefault();
         }
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+
+        startLocalHttpServer();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (httpServer != null) {
+            httpServer.stop(0);
+        }
+    }
+
+    private void startLocalHttpServer() throws IOException {
+        httpServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        byte[] pdfContent = """
+                %PDF-1.4
+                1 0 obj
+                << /Type /Catalog >>
+                endobj
+                trailer
+                << /Root 1 0 R >>
+                %%EOF
+                """.getBytes(StandardCharsets.US_ASCII);
+        httpServer.createContext("/paper.pdf", exchange -> sendResponse(exchange, "application/pdf", pdfContent));
+        httpServer.start();
+        int port = httpServer.getAddress().getPort();
+        pdfUrl = "http://127.0.0.1:" + port + "/paper.pdf";
+    }
+
+    private void sendResponse(HttpExchange exchange, String contentType, byte[] body) throws IOException {
+        exchange.getResponseHeaders().set("Content-Type", contentType);
+        exchange.sendResponseHeaders(200, body.length);
+        try (var outputStream = exchange.getResponseBody()) {
+            outputStream.write(body);
+        } finally {
+            exchange.close();
+        }
     }
 
     @Test
     void replacesLinkedFiles(@TempDir Path tempFolder) throws MalformedURLException {
-        String url = "http://arxiv.org/pdf/1207.0408v1";
+        String url = pdfUrl;
 
         LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
@@ -99,7 +142,7 @@ class DownloadLinkedFileActionTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void doesntReplaceSourceURL(boolean keepHtml) throws IOException {
-        String url = "http://arxiv.org/pdf/1207.0408v1";
+        String url = pdfUrl;
 
         LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));

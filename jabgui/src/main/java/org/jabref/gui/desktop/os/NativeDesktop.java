@@ -175,7 +175,6 @@ public abstract class NativeDesktop {
                                                     String link,
                                                     final Optional<ExternalFileType> type,
                                                     int pageNumber) throws IOException {
-        System.out.println("【DEBUG】NativeDesktop 接收到的要求跳转的页码是: " + pageNumber + "，文件链接是: " + link);
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openBrowser(link, externalApplicationsPreferences);
             return true;

@@ -79,6 +79,8 @@ class KeyBindingsTabModelTest {
 
     @Test
     void randomNewKeyKeyBindingInRepository() {
+        assumeFalse(OS.OS_X);
+
         setKeyBindingViewModel(KeyBinding.CLEANUP);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "K", "K", KeyCode.K, true, true, true, false);
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent));

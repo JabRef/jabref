@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -35,13 +37,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import org.testfx.framework.junit5.ApplicationExtension;
@@ -76,6 +79,9 @@ class LinkedFileViewModelTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private CookieManager cookieManager;
+    private HttpServer httpServer;
+    private String htmlUrl;
+    private String pdfUrl;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws IOException {
@@ -102,11 +108,49 @@ class LinkedFileViewModelTest {
             cookieManager = (CookieManager) CookieHandler.getDefault();
         }
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+
+        startLocalHttpServer();
     }
 
     @AfterEach
     void tearDown() {
+        if (httpServer != null) {
+            httpServer.stop(0);
+        }
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_NONE);
+    }
+
+    private void startLocalHttpServer() throws IOException {
+        httpServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+
+        byte[] htmlContent = "<html><body>test html</body></html>".getBytes(StandardCharsets.UTF_8);
+        httpServer.createContext("/index.html", exchange -> sendResponse(exchange, "text/html; charset=UTF-8", htmlContent));
+
+        byte[] pdfContent = """
+                %PDF-1.4
+                1 0 obj
+                << /Type /Catalog >>
+                endobj
+                trailer
+                << /Root 1 0 R >>
+                %%EOF
+                """.getBytes(StandardCharsets.US_ASCII);
+        httpServer.createContext("/paper.pdf", exchange -> sendResponse(exchange, "application/pdf", pdfContent));
+
+        httpServer.start();
+        int port = httpServer.getAddress().getPort();
+        htmlUrl = "http://127.0.0.1:" + port + "/index.html";
+        pdfUrl = "http://127.0.0.1:" + port + "/paper.pdf";
+    }
+
+    private void sendResponse(HttpExchange exchange, String contentType, byte[] body) throws IOException {
+        exchange.getResponseHeaders().set("Content-Type", contentType);
+        exchange.sendResponseHeaders(200, body.length);
+        try (var outputStream = exchange.getResponseBody()) {
+            outputStream.write(body);
+        } finally {
+            exchange.close();
+        }
     }
 
     @Test
@@ -193,17 +237,14 @@ class LinkedFileViewModelTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "true, Download 'https://www.google.com/' was a HTML file. Keeping URL.",
-            "false, Download 'https://www.google.com/' was a HTML file. Removed."
-    })
-    void downloadHtmlFileCausesWarningDisplay(Boolean keepHtmlLink, String warningText) throws MalformedURLException {
+    @ValueSource(booleans = {true, false})
+    void downloadHtmlFileCausesWarningDisplay(boolean keepHtmlLink) throws MalformedURLException {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
 
-        URL url = URLUtil.create("https://www.google.com/");
+        URL url = URLUtil.create(htmlUrl);
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(url, fileType);
 
@@ -211,6 +252,9 @@ class LinkedFileViewModelTest {
 
         viewModel.download(keepHtmlLink);
 
+        String warningText = keepHtmlLink
+                ? "Download '%s' was a HTML file. Keeping URL.".formatted(htmlUrl)
+                : "Download '%s' was a HTML file. Removed.".formatted(htmlUrl);
         verify(dialogService, atLeastOnce()).notify(warningText);
     }
 
@@ -280,7 +324,7 @@ class LinkedFileViewModelTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {
-        linkedFile = new LinkedFile(URLUtil.create("http://arxiv.org/pdf/1207.0408v1"), "pdf");
+        linkedFile = new LinkedFile(URLUtil.create(pdfUrl), "pdf");
         // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
