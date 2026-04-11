@@ -167,7 +167,7 @@ public abstract class NativeDesktop {
     ///
     /// @param databaseContext The database this file belongs to.
     /// @param link            The filename.
-    /// @param pageNumber
+    /// @param pageNumber      1-based logical page number requested by the caller; for PDF files this is resolved to a physical page index before opening.
     /// @return false if the link couldn't be resolved, true otherwise.
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
                                                     ExternalApplicationsPreferences externalApplicationsPreferences,

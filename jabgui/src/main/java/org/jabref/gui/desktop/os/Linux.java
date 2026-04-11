@@ -78,9 +78,11 @@ public class Linux extends NativeDesktop {
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } else {
             if (isPdfType(fileType) && pageNumber > 1) {
-                Optional<List<String>> command = getPdfViewerCommandWithPage(filePath, pageNumber);
-                if (command.isPresent()) {
-                    Process process = new ProcessBuilder(command.get()).start();
+                List<String> command = new ArrayList<>();
+                getPdfViewerCommandWithPage(filePath, pageNumber).ifPresent(command::addAll);
+
+                if (!command.isEmpty()) {
+                    Process process = new ProcessBuilder(command).start();
                     StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
                     StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
                     HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
@@ -122,7 +124,7 @@ public class Linux extends NativeDesktop {
 
         String executable = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
         if (executable.contains("evince")) {
-            command.add("--page-label=" + pageNumber);
+            command.add("--page-index=" + pageNumber);
         } else if (executable.contains("okular")) {
             command.add("-p");
             command.add(String.valueOf(pageNumber));
@@ -134,7 +136,7 @@ public class Linux extends NativeDesktop {
 
     private static Optional<List<String>> getPdfViewerCommandWithPage(String filePath, int pageNumber) {
         return findExecutableOnPath("evince")
-                .map(executable -> List.of(executable.toString(), "--page-label=" + pageNumber, filePath))
+                .map(executable -> List.of(executable.toString(), "--page-index=" + pageNumber, filePath))
                 .or(() -> findExecutableOnPath("okular")
                         .map(executable -> List.of(executable.toString(), "-p", String.valueOf(pageNumber), filePath)))
                 .or(() -> findExecutableOnPath("zathura")
