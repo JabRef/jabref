@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -24,7 +25,7 @@ class OpenSelectedEntriesFilesActionTest {
                 .withField(StandardField.CROSSREF, "parent")
                 .withFiles(List.of(childFile));
 
-        List<LinkedFile> files = OpenSelectedEntriesFilesAction.getLinkedFilesToOpen(childEntry, databaseContext);
+        List<LinkedFile> files = ActionHelper.getLinkedFilesToOpen(childEntry, databaseContext);
 
         assertEquals(1, files.size());
         assertEquals("child.pdf", files.getFirst().getLink());
@@ -43,7 +44,7 @@ class OpenSelectedEntriesFilesActionTest {
 
         database.insertEntries(List.of(parentEntry, childEntry));
 
-        List<LinkedFile> files = OpenSelectedEntriesFilesAction.getLinkedFilesToOpen(childEntry, databaseContext);
+        List<LinkedFile> files = ActionHelper.getLinkedFilesToOpen(childEntry, databaseContext);
 
         assertEquals(1, files.size());
         assertEquals("proceedings.pdf", files.getFirst().getLink());
@@ -54,7 +55,7 @@ class OpenSelectedEntriesFilesActionTest {
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
         BibEntry childEntry = new BibEntry().withField(StandardField.CROSSREF, "missing-parent");
 
-        List<LinkedFile> files = OpenSelectedEntriesFilesAction.getLinkedFilesToOpen(childEntry, databaseContext);
+        List<LinkedFile> files = ActionHelper.getLinkedFilesToOpen(childEntry, databaseContext);
 
         assertTrue(files.isEmpty());
     }
@@ -68,7 +69,7 @@ class OpenSelectedEntriesFilesActionTest {
         BibEntry childEntry = new BibEntry().withField(StandardField.CROSSREF, "parent");
         database.insertEntries(List.of(parentEntry, childEntry));
 
-        List<LinkedFile> files = OpenSelectedEntriesFilesAction.getLinkedFilesToOpen(childEntry, databaseContext);
+        List<LinkedFile> files = ActionHelper.getLinkedFilesToOpen(childEntry, databaseContext);
 
         assertTrue(files.isEmpty());
     }

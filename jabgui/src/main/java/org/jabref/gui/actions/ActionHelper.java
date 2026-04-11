@@ -120,18 +120,21 @@ public class ActionHelper {
     /// @return a boolean binding
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
-                entries -> entries.anyMatch(entry -> {
-                    if (!entry.getFiles().isEmpty()) {
-                        return true;
-                    }
+                entries -> stateManager.getActiveDatabase()
+                                      .map(databaseContext -> entries.anyMatch(entry -> !getLinkedFilesToOpen(entry, databaseContext).isEmpty()))
+                                      .orElseGet(() -> entries.anyMatch(entry -> !entry.getFiles().isEmpty()))));
+    }
 
-                    return stateManager.getActiveDatabase()
-                                       .flatMap(databaseContext -> entry.getField(StandardField.CROSSREF)
-                                                                        .filter(crossref -> !crossref.isBlank())
-                                                                        .flatMap(databaseContext.getDatabase()::getEntryByCitationKey))
-                                       .map(BibEntry::getFiles)
-                                       .filter(parentFiles -> !parentFiles.isEmpty())
-                                       .isPresent();
-                })));
+    public static List<LinkedFile> getLinkedFilesToOpen(BibEntry entry, BibDatabaseContext databaseContext) {
+        if (!entry.getFiles().isEmpty()) {
+            return entry.getFiles();
+        }
+
+        return entry.getField(StandardField.CROSSREF)
+                    .filter(crossref -> !crossref.isBlank())
+                    .flatMap(databaseContext.getDatabase()::getEntryByCitationKey)
+                    .map(BibEntry::getFiles)
+                    .filter(parentFiles -> !parentFiles.isEmpty())
+                    .orElse(List.of());
     }
 }

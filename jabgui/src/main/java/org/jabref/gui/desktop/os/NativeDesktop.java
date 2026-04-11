@@ -24,6 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.pdf.PdfPageLabelResolver;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -81,13 +82,11 @@ public abstract class NativeDesktop {
             }
             link = file.get().toAbsolutePath().toString();
 
-            // Use the correct viewer even if pdf and ps are mixed up:
-            String[] split = file.get().getFileName().toString().split("\\.");
-            if (split.length >= 2) {
-                if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
-                    field = PDF;
-                } else if ("ps".equalsIgnoreCase(split[split.length - 1])
-                        || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
+            if (FileUtil.isPDFFile(file.get())) {
+                field = PDF;
+            } else {
+                String extension = FileUtil.getFileExtension(file.get()).orElse("");
+                if (StandardFileType.PS.getExtensions().stream().anyMatch(extension::equalsIgnoreCase)) {
                     field = PS;
                 }
             }
@@ -176,6 +175,7 @@ public abstract class NativeDesktop {
                                                     String link,
                                                     final Optional<ExternalFileType> type,
                                                     int pageNumber) throws IOException {
+        System.out.println("【DEBUG】NativeDesktop 接收到的要求跳转的页码是: " + pageNumber + "，文件链接是: " + link);
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openBrowser(link, externalApplicationsPreferences);
             return true;
@@ -196,9 +196,7 @@ public abstract class NativeDesktop {
             return 1;
         }
 
-        boolean isPdf = fileType.map(type -> "pdf".equalsIgnoreCase(type.getExtension()))
-                                .orElseGet(() -> resolvedFilePath.toString().toLowerCase(Locale.ROOT).endsWith(".pdf"));
-        if (!isPdf) {
+        if (!FileUtil.isPDFFile(resolvedFilePath)) {
             return logicalPageNumber;
         }
 
@@ -219,6 +217,7 @@ public abstract class NativeDesktop {
                 get().openFileWithApplication(filePath, application, pageNumber);
             }
         } else {
+            String extension = FileUtil.getFileExtension(filePath).orElse("");
             get().openFile(filePath, "", externalApplicationsPreferences, pageNumber);
         }
     }

@@ -1,6 +1,5 @@
 package org.jabref.gui.documentviewer;
 
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.PdfPageLabelResolver;
 import org.jabref.logic.pdf.PdfPageNumberParser;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -145,16 +145,22 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     private boolean isPdfFile(LinkedFile file) {
-        if (file == null || file.getLink() == null || file.getLink().trim().isEmpty()) {
+        if (file == null) {
             return false;
         }
 
-        try {
-            Path filePath = Path.of(file.getLink());
-            return FileUtil.isPDFFile(filePath);
-        } catch (InvalidPathException | SecurityException e) {
+        String link = file.getLink();
+        if (link == null || link.trim().isEmpty()) {
             return false;
         }
+
+        if (StandardFileType.PDF.getName().equalsIgnoreCase(file.getFileType())) {
+            return true;
+        }
+
+        return FileUtil.getFileExtension(link)
+                       .map(extension -> StandardFileType.PDF.getExtensions().stream().anyMatch(extension::equalsIgnoreCase))
+                       .orElse(false);
     }
 
     public void switchToFile(LinkedFile file) {

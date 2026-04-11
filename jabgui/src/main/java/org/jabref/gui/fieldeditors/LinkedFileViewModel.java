@@ -42,6 +42,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.PdfPageNumberParser;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
@@ -100,13 +101,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
                         return true;
                     } else {
                         Optional<Path> path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
-                        return path.isPresent() && Files.exists(path.get());
+                        return path.map(Files::exists).orElse(false);
                     }
                 },
                 ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
-        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && "pdf".equalsIgnoreCase(linkedFile.getFileType()));
+        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && isPdf(linkedFile.getFileType()));
     }
 
     public static LinkedFileViewModel fromLinkedFile(
@@ -213,6 +214,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
             int pageNumber = isPdf(type) ? getFirstPageNumberFromEntry().orElse(1) : 1;
+            System.out.println("【DEBUG】当前传入的 entry title 是: " + entry.getField(StandardField.TITLE).orElse("无标题")
+                    + "，解析出来的最终跳转页码是: " + pageNumber);
             boolean successful = NativeDesktop.openExternalFileAnyFormat(
                     databaseContext,
                     preferences.getExternalApplicationsPreferences(),
@@ -231,7 +234,16 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private static boolean isPdf(Optional<ExternalFileType> type) {
-        return type.map(externalFileType -> "pdf".equalsIgnoreCase(externalFileType.getExtension())).orElse(false);
+        return type.map(ExternalFileType::getExtension).map(LinkedFileViewModel::isPdf).orElse(false);
+    }
+
+    private static boolean isPdf(String extensionOrTypeName) {
+        if (StringUtil.isBlank(extensionOrTypeName)) {
+            return false;
+        }
+
+        return StandardFileType.PDF.getName().equalsIgnoreCase(extensionOrTypeName)
+                || StandardFileType.PDF.getExtensions().stream().anyMatch(extensionOrTypeName::equalsIgnoreCase);
     }
 
     private Optional<Integer> getFirstPageNumberFromEntry() {
