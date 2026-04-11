@@ -881,18 +881,31 @@ public class OOBibBase {
         final String errorTitle = Localization.lang("Unable to synchronize bibliography");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
-        XTextDocument doc = odoc.get();
-        OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
-        OOResult<OOFrontend, OOError> frontend = getFrontend(doc);
-
-        if (!performPreUpdateChecks(errorTitle, odoc, style, getFrontend(doc), fcursor, doc)) {
+        if (testDialog(errorTitle,
+                odoc.asVoidResult(),
+                styleIsRequired(style))) {
             return;
         }
 
+        XTextDocument doc = odoc.get();
+
+        OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
+
         if (style instanceof JStyle jStyle) {
             try {
+                if (testDialog(errorTitle,
+                        fcursor.asVoidResult(),
+                        checkStylesExistInTheDocument(jStyle, doc),
+                        checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    return;
+                }
 
-                updateJStyleBibliography(databases, jStyle, doc, frontend.get(), fcursor, errorTitle);
+                OOFrontend frontend = new OOFrontend(doc);
+                if (testDialog(errorTitle, checkRangeOverlaps(doc, frontend))) {
+                    return;
+                }
+
+                updateJStyleBibliography(databases, jStyle, doc, frontend, fcursor, errorTitle);
             } catch (NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } catch (DisposedException ex) {
@@ -908,6 +921,11 @@ public class OOBibBase {
                 return;
             }
             try {
+                if (testDialog(errorTitle,
+                        fcursor.asVoidResult(),
+                        checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    return;
+                }
 
                 updateCSLBibliography(databases, citationStyle, doc, fcursor);
             } catch (CreationException | com.sun.star.lang.IllegalArgumentException ex) {
@@ -915,40 +933,6 @@ public class OOBibBase {
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }
-    }
-
-    /// Helper method for guiActionUpdateDocument. Handles pre-update checks
-    ///
-    /// @param style      The bibliography style we are using.
-    /// @param errorTitle Message String of error
-    /// @param odoc       Open Office text document result
-    /// @param frontend   Open Office result of Open Office frontend
-    /// @param fcursor    Open Office result of functional text view cursor
-    /// @param doc        Text document
-    public boolean performPreUpdateChecks(String errorTitle, OOResult<XTextDocument, OOError> odoc, OOStyle style,
-                                          OOResult<OOFrontend, OOError> frontend, OOResult<FunctionalTextViewCursor, OOError> fcursor, XTextDocument doc) {
-        if (testDialog(errorTitle,
-                odoc.asVoidResult(),
-                styleIsRequired(style))) {
-            return false;
-        }
-
-        if (testDialog(errorTitle,
-                fcursor.asVoidResult(),
-                checkIfOpenOfficeIsRecordingChanges(doc))) {
-            return false;
-        }
-
-        if (testDialog(errorTitle, checkRangeOverlaps(doc, frontend.get()))) {
-            return false;
-        }
-
-        if (style instanceof JStyle jStyle) {
-            return !testDialog(errorTitle,
-                    checkStylesExistInTheDocument(jStyle, doc),
-                    checkIfOpenOfficeIsRecordingChanges(doc));
-        }
-        return true;
     }
 
     /// Helper method for guiActionUpdateDocument, refreshes a JStyle bibliography.
