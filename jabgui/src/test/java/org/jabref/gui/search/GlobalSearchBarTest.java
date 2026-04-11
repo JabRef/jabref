@@ -73,8 +73,8 @@ public class GlobalSearchBarTest {
                 SearchType.NORMAL_SEARCH
         );
 
-            focusTargetField = new TextField();
-            hBox = new HBox(searchBar, focusTargetField);
+        focusTargetField = new TextField();
+        hBox = new HBox(searchBar, focusTargetField);
 
         Scene scene = new Scene(hBox, 400, 400);
         stage.setScene(scene);

@@ -253,8 +253,8 @@ class LinkedFileViewModelTest {
         viewModel.download(keepHtmlLink);
 
         String warningText = keepHtmlLink
-                ? "Download '%s' was a HTML file. Keeping URL.".formatted(htmlUrl)
-                : "Download '%s' was a HTML file. Removed.".formatted(htmlUrl);
+                             ? "Download '%s' was a HTML file. Keeping URL.".formatted(htmlUrl)
+                             : "Download '%s' was a HTML file. Removed.".formatted(htmlUrl);
         verify(dialogService, atLeastOnce()).notify(warningText);
     }
 

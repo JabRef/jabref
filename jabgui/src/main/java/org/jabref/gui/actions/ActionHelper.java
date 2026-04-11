@@ -143,8 +143,8 @@ public class ActionHelper {
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> stateManager.getActiveDatabase()
-                                      .map(databaseContext -> entries.anyMatch(entry -> !getLinkedFilesToOpen(entry, databaseContext).isEmpty()))
-                                      .orElseGet(() -> entries.anyMatch(entry -> !entry.getFiles().isEmpty()))));
+                                       .map(databaseContext -> entries.anyMatch(entry -> !getLinkedFilesToOpen(entry, databaseContext).isEmpty()))
+                                       .orElseGet(() -> entries.anyMatch(entry -> !entry.getFiles().isEmpty()))));
     }
 
     public static List<LinkedFile> getLinkedFilesToOpen(BibEntry entry, BibDatabaseContext databaseContext) {
