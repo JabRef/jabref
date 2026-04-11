@@ -190,13 +190,17 @@ public class MedlinePlainImporter extends Importer {
                          "IR",
                          "FIR" ->
                             fieldConversionMap.merge(new UnknownField("investigator"), value, (a, b) -> a + ", " + b);
-                    case "MH",
-                         "OT" -> {
-                        if (!fieldConversionMap.containsKey(StandardField.KEYWORDS)) {
-                            fieldConversionMap.put(StandardField.KEYWORDS, value);
-                        } else {
-                            fieldConversionMap.compute(StandardField.KEYWORDS, (k, kw) -> kw + importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " " + value);
-                        }
+                    case "MH" -> {
+                        List<String> meshKeywords = parseMeshTerm(value);
+                        Character separator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
+                        String meshString = String.join(separator + " ", meshKeywords);
+                        fieldConversionMap.merge(StandardField.KEYWORDS, meshString,
+                                (existing, newVal) -> existing + separator + " " + newVal);
+                    }
+                    case "OT" -> {
+                        Character separator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
+                        fieldConversionMap.merge(StandardField.KEYWORDS, value,
+                                (existing, newVal) -> existing + separator + " " + newVal);
                     }
                     case "CON",
                          "CIN",
@@ -394,6 +398,40 @@ public class MedlinePlainImporter extends Importer {
         } else if ("MHDA".equals(lab) && isCreateDateFormat(val)) {
             hm.put(new UnknownField("mesh-date"), val);
         }
+    }
+
+    /// Parses a MeSH term from MEDLINE plain format into individual heading/qualifier keywords.
+    /// For example, {@code *Kidney Diseases/diagnosis/epidemiology} becomes
+    /// {@code ["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]}.
+    /// A heading without qualifiers for example, {@code *Humans}) becomes {@code ["Humans*"]}.
+    private List<String> parseMeshTerm(String meshTerm) {
+        String term = meshTerm.trim();
+
+        boolean descriptorMajor = term.startsWith("*");
+        if (descriptorMajor) {
+            term = term.substring(1);
+        }
+
+        String[] parts = term.split("/");
+        String descriptor = parts[0];
+        if (descriptorMajor) {
+            descriptor += "*";
+        }
+
+        if (parts.length == 1) {
+            return List.of(descriptor);
+        }
+
+        List<String> keywords = new ArrayList<>();
+        for (int i = 1; i < parts.length; i++) {
+            String qualifier = parts[i];
+            boolean qualifierMajor = qualifier.startsWith("*");
+            if (qualifierMajor) {
+                qualifier = qualifier.substring(1) + "*";
+            }
+            keywords.add(descriptor + "/" + qualifier);
+        }
+        return keywords;
     }
 
     private boolean isCreateDateFormat(String value) {
