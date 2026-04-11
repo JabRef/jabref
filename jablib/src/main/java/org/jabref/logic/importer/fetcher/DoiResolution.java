@@ -53,7 +53,7 @@ public class DoiResolution implements FulltextFetcher {
         URL base;
 
         String doiLink;
-        if (doiPreferences.isUseCustom()) {
+        if (doiPreferences.shouldUseCustom()) {
             base = URLUtil.create(doiPreferences.getDefaultBaseURI());
             doiLink = doi.get()
                          .getExternalURIWithCustomBase(base.toString())
