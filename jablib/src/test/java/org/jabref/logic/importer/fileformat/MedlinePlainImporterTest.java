@@ -124,10 +124,10 @@ class MedlinePlainImporterTest {
                 OT  - some other term""")) {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
-            BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setField(StandardField.PMID, "12345678");
-            expectedEntry.setField(StandardField.KEYWORDS,
-                    "Kidney Diseases*/diagnosis, Kidney Diseases*/epidemiology, Female, some other term");
+            BibEntry expectedEntry = new BibEntry()
+                    .withField(StandardField.PMID, "12345678")
+                    .withField(StandardField.KEYWORDS,
+                            "Kidney Diseases*/diagnosis, Kidney Diseases*/epidemiology, Female, some other term");
 
             assertEquals(List.of(expectedEntry), actualEntries);
         }
