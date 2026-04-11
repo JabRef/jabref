@@ -36,7 +36,6 @@ public class OSX extends NativeDesktop {
         List<String> command = new ArrayList<>();
         command.add("/usr/bin/open");
 
-
         String appNameLower = application.toLowerCase(Locale.ROOT);
 
         if (pageNumber > 1 && (appNameLower.contains("chrome") || appNameLower.contains("edge") ||
