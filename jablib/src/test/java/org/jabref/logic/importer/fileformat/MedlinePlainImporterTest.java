@@ -116,6 +116,24 @@ class MedlinePlainImporterTest {
     }
 
     @Test
+    void meshTermsAreParsedIntoIndividualKeywords() throws IOException {
+        try (BufferedReader reader = readerForString("""
+                PMID-12345678
+                MH  - *Kidney Diseases/diagnosis/epidemiology
+                MH  - Female
+                OT  - some other term""")) {
+            List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
+
+            BibEntry expectedEntry = new BibEntry();
+            expectedEntry.setField(StandardField.PMID, "12345678");
+            expectedEntry.setField(StandardField.KEYWORDS,
+                    "Kidney Diseases*/diagnosis, Kidney Diseases*/epidemiology, Female, some other term");
+
+            assertEquals(List.of(expectedEntry), actualEntries);
+        }
+    }
+
+    @Test
     void emptyFileImport() throws IOException {
         List<BibEntry> emptyEntries = importer.importDatabase(readerForString("")).getDatabase().getEntries();
         assertEquals(List.of(), emptyEntries);
