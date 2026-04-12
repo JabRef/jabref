@@ -211,7 +211,7 @@
     -fx-fill: #151924 !important;
 }
 
-/* Cite as you write styles begin here */
+/* region CiteAsYouWrite */
 
 /* this is the search filed used to enter the citation name */
 .search-dialog {
@@ -247,3 +247,5 @@
     -fx-border-width: 0;
     -fx-background-color: transparent;
 }
+
+/* endregion */
