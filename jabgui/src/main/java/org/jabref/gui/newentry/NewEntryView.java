@@ -370,6 +370,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeInterpretCitations() {
+        // [impl->req~textinput.clipboard.autofocus~1]
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
@@ -443,6 +444,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
 
+        // [impl->req~textinput.clipboard.autofocus~1]
         if (interpretText != null) {
             Platform.runLater(() -> interpretText.requestFocus());
         }

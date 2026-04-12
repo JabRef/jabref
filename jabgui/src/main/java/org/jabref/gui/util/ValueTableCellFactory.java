@@ -127,14 +127,15 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     }
                     if (toTooltip != null) {
                         String tooltipText = toTooltip.apply(rowItem, item);
+                        Tooltip cellTooltip = null;
                         if (StringUtil.isNotBlank(tooltipText)) {
                             Screen currentScreen = Screen.getPrimary();
                             double maxWidth = currentScreen.getBounds().getWidth();
-                            Tooltip tooltip = new Tooltip(tooltipText);
-                            tooltip.setMaxWidth(maxWidth * 2 / 3);
-                            tooltip.setWrapText(true);
-                            setTooltip(tooltip);
+                            cellTooltip = new Tooltip(tooltipText);
+                            cellTooltip.setMaxWidth(maxWidth * 2 / 3);
+                            cellTooltip.setWrapText(true);
                         }
+                        setTooltip(cellTooltip);
                     }
 
                     if (contextMenuFactory != null) {
