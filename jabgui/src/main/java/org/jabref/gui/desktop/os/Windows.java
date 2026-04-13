@@ -19,7 +19,6 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
 import com.sun.jna.platform.win32.Win32Exception;
-
 import org.slf4j.LoggerFactory;
 
 /// This class contains Windows specific implementations for file directories and file/application open handling methods.
