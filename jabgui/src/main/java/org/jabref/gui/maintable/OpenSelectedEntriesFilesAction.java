@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiles.LinkedFilesResolver;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -38,7 +39,7 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             List<LinkedFileViewModel> linkedFileViewModelList = stateManager
                     .getSelectedEntries().stream()
-                    .flatMap(entry -> ActionHelper.getLinkedFilesToOpen(entry, databaseContext).stream()
+                    .flatMap(entry -> LinkedFilesResolver.getLinkedFilesToOpen(entry, databaseContext).stream()
                                                   .map(linkedFile -> new LinkedFileViewModel(
                                                           linkedFile,
                                                           entry,

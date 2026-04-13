@@ -10,6 +10,7 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.LinkedFilesResolver;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -18,7 +19,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -143,20 +143,7 @@ public class ActionHelper {
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> stateManager.getActiveDatabase()
-                                       .map(databaseContext -> entries.anyMatch(entry -> !getLinkedFilesToOpen(entry, databaseContext).isEmpty()))
+                                       .map(databaseContext -> entries.anyMatch(entry -> !LinkedFilesResolver.getLinkedFilesToOpen(entry, databaseContext).isEmpty()))
                                        .orElseGet(() -> entries.anyMatch(entry -> !entry.getFiles().isEmpty()))));
-    }
-
-    public static List<LinkedFile> getLinkedFilesToOpen(BibEntry entry, BibDatabaseContext databaseContext) {
-        if (!entry.getFiles().isEmpty()) {
-            return entry.getFiles();
-        }
-
-        return entry.getField(StandardField.CROSSREF)
-                    .filter(crossref -> !crossref.isBlank())
-                    .flatMap(databaseContext.getDatabase()::getEntryByCitationKey)
-                    .map(BibEntry::getFiles)
-                    .filter(parentFiles -> !parentFiles.isEmpty())
-                    .orElse(List.of());
     }
 }

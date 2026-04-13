@@ -9,6 +9,8 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.verify;
 
 class OSXTest {
 
+    @EnabledOnOs(OS.MAC)
     @Test
     void openFileForPdfWithPageUsesBrowserHashJump() throws IOException {
         ExternalFileType pdfType = new CustomExternalFileType("PDF", "pdf", "application/pdf", "", "", IconTheme.JabRefIcons.FILE);

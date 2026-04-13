@@ -64,12 +64,12 @@ public class Linux extends NativeDesktop {
                             .orElse("");
 
         if (!viewer.isEmpty()) {
-            List<String> command = new ArrayList<>();
-            command.add(viewer);
-            addPdfPageArguments(command, viewer, filePath, pageNumber);
-            command.add(filePath);
+            List<String> commands = new ArrayList<>();
+            commands.add(viewer);
+            addPdfPageArguments(commands, viewer, filePath, pageNumber);
+            commands.add(filePath);
 
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
@@ -100,11 +100,11 @@ public class Linux extends NativeDesktop {
         String[] openWith;
         if ((application != null) && !application.isEmpty()) {
             openWith = application.split(" ");
-            List<String> command = new ArrayList<>(List.of(openWith));
-            addPdfPageArguments(command, openWith[0], filePath, pageNumber);
-            command.add(filePath);
+            List<String> commands = new ArrayList<>(List.of(openWith));
+            addPdfPageArguments(commands, openWith[0], filePath, pageNumber);
+            commands.add(filePath);
 
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(commands);
             Process process = processBuilder.start();
 
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
@@ -117,20 +117,20 @@ public class Linux extends NativeDesktop {
         }
     }
 
-    private static void addPdfPageArguments(List<String> command, String application, String filePath, int pageNumber) {
+    private static void addPdfPageArguments(List<String> commands, String application, String filePath, int pageNumber) {
         if (pageNumber <= 1 || !isPdfPath(filePath)) {
             return;
         }
 
         String executable = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
         if (executable.contains("evince")) {
-            command.add("--page-index=" + pageNumber);
+            commands.add("--page-index=" + pageNumber);
         } else if (executable.contains("okular")) {
-            command.add("-p");
-            command.add(String.valueOf(pageNumber));
+            commands.add("-p");
+            commands.add(String.valueOf(pageNumber));
         } else if (executable.contains("zathura")) {
-            command.add("-P");
-            command.add(String.valueOf(pageNumber));
+            commands.add("-P");
+            commands.add(String.valueOf(pageNumber));
         }
     }
 
