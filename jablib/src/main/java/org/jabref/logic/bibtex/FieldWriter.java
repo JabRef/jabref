@@ -1,8 +1,8 @@
 package org.jabref.logic.bibtex;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.StringJoiner;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -24,6 +24,9 @@ public class FieldWriter {
     private final boolean neverFailOnHashes;
     private final FieldPreferences preferences;
 
+    private record BracePosition(int index, int line, int column) {
+    }
+
     public FieldWriter(FieldPreferences preferences) {
         this(true, preferences);
     }
@@ -37,12 +40,16 @@ public class FieldWriter {
         return new FieldWriter(true, prefs);
     }
 
-    private static void checkBraces(String text) throws InvalidFieldValueException {
-        Deque<String> queue = new ArrayDeque<>();
+    /// Checks text for balanced braces and returns a list of unbalanced
+    ///
+    /// @return list of balancing errors
+    public static List<String> checkBalancedBraces(String text) {
+        Stack<FieldWriter.BracePosition> openBraces = new Stack<>();
+        List<String> errors = new ArrayList<>();
+
         int line = 0;
         int lastLineIndex = 0;
 
-        // First we collect all occurrences:
         for (int i = 0; i < text.length(); i++) {
             char item = text.charAt(i);
             if (item == '\n') {
@@ -53,31 +60,64 @@ public class FieldWriter {
 
             if (!isEscaped(text, i)) {
                 if (item == '{') {
-                    queue.add("Line %d, column %d (index %d): in '%s'".formatted(
-                            line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i)));
+                    openBraces.push(new FieldWriter.BracePosition(i, line, i - lastLineIndex + 1));
                 } else if (item == '}') {
-                    if (queue.pollLast() == null) {
-                        String errorMessage = "Unescaped '}' without matching opening bracket found at line %d, column %d (index %d): in '%s'".formatted(
-                                line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i));
-                        LOGGER.error(errorMessage);
-                        throw new InvalidFieldValueException(errorMessage);
+                    if (openBraces.pop() == null) {
+                        errors.add("Unbalanced '}' at line %d, column %d (index %d): in '%s'".formatted(
+                                line + 1,
+                                i - lastLineIndex + 1,
+                                i,
+                                getContextSnippet(text, i)));
+                    }
+                }
+            }
+
+            while (!openBraces.isEmpty()) {
+                FieldWriter.BracePosition lastOpenBrace = openBraces.pop();
+                errors.add("Unbalanced '{' at line %d, column %d (index %d): in '%s'".formatted(
+                        lastOpenBrace.index(),
+                        lastOpenBrace.column(),
+                        lastOpenBrace.index(),
+                        getContextSnippet(text, lastOpenBrace.index())));
+            }
+        }
+
+        return errors;
+    }
+
+    /// Escapes the last unbalanced curly brace in the given text.
+    ///
+    /// @param text the text to sanitize
+    /// @return sanitized text
+    public static String sanitizeUnbalancedBraces(String text) {
+        Stack<Integer> openBraces = new Stack<>();
+        StringBuilder sanitized = new StringBuilder(text);
+
+        // Fix unbalanced closing braces
+        for (int i = 0; i < sanitized.length(); i++) {
+            char item = sanitized.charAt(i);
+
+            if (!isEscaped(sanitized.toString(), i)) {
+                if (item == '{') {
+                    openBraces.push(i);
+                } else if (item == '}') {
+                    if (openBraces.pop() == null) {
+                        sanitized.insert(i, '\\');
+                        i++;
                     }
                 }
             }
         }
 
-        if (!queue.isEmpty()) {
-            StringJoiner joiner = new StringJoiner("\n");
-            for (String error : queue) {
-                joiner.add(error);
-            }
-            String errorMessage = "The following unescaped '{' do not have matching closing bracket:\n%s".formatted(joiner);
-            LOGGER.error(errorMessage);
-            throw new InvalidFieldValueException(errorMessage);
+        // Fix remaining open braces
+        while (!openBraces.isEmpty()) {
+            sanitized.insert((int) openBraces.pop(), '\\');
         }
+
+        return sanitized.toString();
     }
 
-    private static String getErrorContextSnippet(String text, int index) {
+    private static String getContextSnippet(String text, int index) {
         int neighbourSize = 5;
         return text.substring(Math.max(0, index - neighbourSize), index)
                 + "*" + text.charAt(index) + "*"
@@ -103,6 +143,7 @@ public class FieldWriter {
     }
 
     /// Formats the content of a field.
+    /// FixMe: Remove deprecated InvalideFieldValueException, make proper error handling
     ///
     /// @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
     /// @param content the content of the field
@@ -111,6 +152,13 @@ public class FieldWriter {
     public String write(Field field, String content) throws InvalidFieldValueException {
         if (content == null) {
             return FIELD_START + "" + FIELD_END;
+        }
+
+        List<String> unbalancedBraceErrors = checkBalancedBraces(content);
+        if (!unbalancedBraceErrors.isEmpty()) {
+            LOGGER.error("Unbalanced braces in field value: {}", content);
+            unbalancedBraceErrors.forEach(LOGGER::error);
+            throw new InvalidFieldValueException("Unbalanced braces in field value: " + content);
         }
 
         if (!shouldResolveStrings(field) || field.equals(InternalField.BIBTEX_STRING)) {
@@ -124,8 +172,6 @@ public class FieldWriter {
     ///
     /// For instance, `#jan# - #feb#` gets  `jan #{ - } # feb` (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
     private String formatAndResolveStrings(String content) throws InvalidFieldValueException {
-        checkBraces(content);
-
         content = content.replace("##", "");
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -208,8 +254,7 @@ public class FieldWriter {
         return false;
     }
 
-    private String formatWithoutResolvingStrings(String content) throws InvalidFieldValueException {
-        checkBraces(content);
+    private String formatWithoutResolvingStrings(String content) {
         return FIELD_START + content + FIELD_END;
     }
 
