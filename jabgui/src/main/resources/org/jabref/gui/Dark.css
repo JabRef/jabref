@@ -210,3 +210,42 @@
     /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
     -fx-fill: #151924 !important;
 }
+
+/* region CiteAsYouWrite */
+
+/* this is the search filed used to enter the citation name */
+.search-dialog {
+    -fx-background-color: -jr-background-alt;
+}
+
+/* each cells' background color and text color */
+.search-dialog .list-cell:hover,
+.search-dialog .list-cell:selected {
+    -fx-background-color: derive(-fx-control-inner-background, 10%);
+    -fx-text-fill: -fx-light-text-color;
+}
+
+/* each cells' text and label styles here */
+.search-dialog .list-cell .text,
+.search-dialog .list-cell .label,
+.search-dialog .search-result-label,
+.search-dialog .search-result-description {
+    -fx-text-fill: -fx-light-text-color;
+    -fx-fill: -fx-light-text-color;
+}
+
+/* This is the chip style that contains the selected citation name and cross button */
+.search-dialog .chip-style {
+    -fx-border-radius: 15px;
+    -fx-border-color: -jr-separator;
+    -fx-border-width: 1px;
+}
+
+/* This is the chip style button present in the chip style. it is the cross */
+.search-dialog .chip-style .button {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+
+/* endregion */
