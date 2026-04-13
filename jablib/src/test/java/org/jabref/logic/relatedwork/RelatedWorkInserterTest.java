@@ -3,7 +3,7 @@ package org.jabref.logic.relatedwork;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.os.OS;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -58,7 +58,7 @@ class RelatedWorkInserterTest {
         List<RelatedWorkInsertionResult> insertionResults = inserter.insertMatchedRelatedWork(sourceEntry, List.of(matchResult), "koppor");
 
         assertInstanceOf(RelatedWorkInsertionResult.Inserted.class, insertionResults.getFirst());
-        assertEquals("[test]: blahblah" + OS.NEWLINE + OS.NEWLINE + "[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.",
+        assertEquals(StringUtil.unifyLineBreaks("[test]: blahblah".stripTrailing(), "\n") + "\n\n" + "[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.",
                 matchedLibraryEntry.getField(userSpecificCommentField).orElseThrow());
     }
 }
