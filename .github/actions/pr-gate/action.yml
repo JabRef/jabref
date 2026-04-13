@@ -30,8 +30,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v6
-
     - name: Maintainer permission + PR link
       id: perm
       shell: bash
