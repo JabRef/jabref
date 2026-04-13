@@ -41,6 +41,7 @@ public class Windows extends NativeDesktop {
             String fileUrlWithPage = Path.of(filePath).toUri().toString() + "#page=" + pageNumber;
             NativeDesktop.openBrowser(fileUrlWithPage, externalApplicationsPreferences);
         } else {
+            // quote String so explorer handles URL query strings correctly
             String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();
         }

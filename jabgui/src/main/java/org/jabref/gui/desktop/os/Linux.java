@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.BrowserUtils;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -64,31 +65,17 @@ public class Linux extends NativeDesktop {
                             .orElse("");
 
         if (!viewer.isEmpty()) {
-            List<String> commands = new ArrayList<>();
-            commands.add(viewer);
-            addPdfPageArguments(commands, viewer, filePath, pageNumber);
-            commands.add(filePath);
-
-            ProcessBuilder processBuilder = new ProcessBuilder(commands);
-            Process process = processBuilder.start();
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
-
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
+            openFileWithApplication(filePath, viewer, pageNumber);
         } else {
             if (isPdfType(fileType) && pageNumber > 1) {
-                List<String> command = new ArrayList<>();
-                getPdfViewerCommandWithPage(filePath, pageNumber).ifPresent(command::addAll);
-
-                if (!command.isEmpty()) {
-                    Process process = new ProcessBuilder(command).start();
-                    StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
-                    StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
-                    HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-                    HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
-                    return;
-                }
+                getPdfViewerCommandWithPage(filePath, pageNumber).ifPresentOrElse(commands -> {
+                    try {
+                        startProcess(commands);
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(Linux.class).warn("Could not open PDF with page jump using fallback viewers", e);
+                    }
+                }, () -> nativeOpenFile(filePath));
+                return;
             }
             nativeOpenFile(filePath);
         }
@@ -97,41 +84,52 @@ public class Linux extends NativeDesktop {
     @Override
     public void openFileWithApplication(String filePath, String application, int pageNumber) throws IOException {
         // Use the given app if specified, and the universal "xdg-open" otherwise:
-        String[] openWith;
-        if ((application != null) && !application.isEmpty()) {
-            openWith = application.split(" ");
-            List<String> commands = new ArrayList<>(List.of(openWith));
-            addPdfPageArguments(commands, openWith[0], filePath, pageNumber);
-            commands.add(filePath);
-
-            ProcessBuilder processBuilder = new ProcessBuilder(commands);
-            Process process = processBuilder.start();
-
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
-
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
-        } else {
+        if (application == null || application.isEmpty()) {
             nativeOpenFile(filePath);
-        }
-    }
-
-    private static void addPdfPageArguments(List<String> commands, String application, String filePath, int pageNumber) {
-        if (pageNumber <= 1 || !isPdfPath(filePath)) {
             return;
         }
 
-        String executable = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
-        if (executable.contains("evince")) {
+        List<String> commands = new ArrayList<>();
+        String[] appArgs = application.split(" ");
+        String executablePath = appArgs[0];
+        String appNameLower = Path.of(executablePath).getFileName().toString().toLowerCase(Locale.ROOT);
+
+        if (pageNumber > 1 && isPdfPath(filePath)) {
+            if (BrowserUtils.isBrowserSupportingPageJump(appNameLower)) {
+                String fileUrlWithPage = Path.of(filePath).toUri().toString() + "#page=" + pageNumber;
+                commands.add(executablePath);
+                commands.add(fileUrlWithPage);
+                startProcess(commands);
+                return;
+            }
+            commands.addAll(List.of(appArgs));
+            if (addNativePdfArguments(commands, appNameLower, pageNumber)) {
+                commands.add(filePath);
+                startProcess(commands);
+                return;
+            }
+        }
+        commands.clear();
+        commands.addAll(List.of(appArgs));
+        commands.add(filePath);
+        startProcess(commands);
+    }
+
+    private static boolean addNativePdfArguments(List<String> commands, String appNameLower, int pageNumber) {
+        if (appNameLower.contains("evince")) {
             commands.add("--page-index=" + pageNumber);
-        } else if (executable.contains("okular")) {
+            return true;
+        } else if (appNameLower.contains("okular")) {
             commands.add("-p");
             commands.add(String.valueOf(pageNumber));
-        } else if (executable.contains("zathura")) {
+            return true;
+        } else if (appNameLower.contains("zathura")) {
             commands.add("-P");
             commands.add(String.valueOf(pageNumber));
+            return true;
         }
+
+        return false;
     }
 
     private static Optional<List<String>> getPdfViewerCommandWithPage(String filePath, int pageNumber) {
@@ -171,6 +169,16 @@ public class Linux extends NativeDesktop {
         }
 
         return Optional.empty();
+    }
+
+    private static void startProcess(List<String> commands) throws IOException {
+        Process process = new ProcessBuilder(commands).start();
+
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
+
+        HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+        HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override

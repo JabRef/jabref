@@ -1,5 +1,6 @@
 package org.jabref.gui.documentviewer;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
