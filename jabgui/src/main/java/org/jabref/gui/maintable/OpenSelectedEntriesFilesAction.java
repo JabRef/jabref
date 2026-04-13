@@ -40,13 +40,13 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
             List<LinkedFileViewModel> linkedFileViewModelList = stateManager
                     .getSelectedEntries().stream()
                     .flatMap(entry -> LinkedFilesResolver.getLinkedFilesToOpen(entry, databaseContext).stream()
-                                                  .map(linkedFile -> new LinkedFileViewModel(
-                                                          linkedFile,
-                                                          entry,
-                                                          databaseContext,
-                                                          taskExecutor,
-                                                          dialogService,
-                                                          preferences)))
+                                                         .map(linkedFile -> new LinkedFileViewModel(
+                                                                 linkedFile,
+                                                                 entry,
+                                                                 databaseContext,
+                                                                 taskExecutor,
+                                                                 dialogService,
+                                                                 preferences)))
                     .toList();
             if (linkedFileViewModelList.size() > FILES_LIMIT) {
                 boolean continueOpening = dialogService.showConfirmationDialogAndWait(

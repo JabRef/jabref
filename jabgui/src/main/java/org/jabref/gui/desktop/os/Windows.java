@@ -1,7 +1,6 @@
 package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +13,11 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.util.io.FileUtil;
 
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
+import org.jabref.gui.desktop.BrowserUtils;
 import com.sun.jna.platform.win32.Win32Exception;
 import org.slf4j.LoggerFactory;
 
@@ -33,26 +32,15 @@ public class Windows extends NativeDesktop {
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
         String application = type.map(ExternalFileType::getOpenWithApplication)
-                                 .filter(app -> !app.isEmpty())
-                                 .orElse("");
+                                .filter(app -> !app.isEmpty())
+                                .orElse("");
 
         if (!application.isEmpty()) {
             openFileWithApplication(filePath, application, pageNumber);
+        } else if (pageNumber > 1 && StandardFileType.PDF.getExtensions().stream().anyMatch(extension -> extension.equalsIgnoreCase(fileType))) {
+            String fileUrlWithPage = Path.of(filePath).toUri().toString() + "#page=" + pageNumber;
+            NativeDesktop.openBrowser(fileUrlWithPage, externalApplicationsPreferences);
         } else {
-            if (isPdfType(fileType) && pageNumber > 1) {
-                Optional<Path> sumatraPdfExecutable = findSumatraPdfExecutable();
-                if (sumatraPdfExecutable.isPresent()) {
-                    new ProcessBuilder(
-                            sumatraPdfExecutable.get().toString(),
-                            "-page",
-                            String.valueOf(pageNumber),
-                            Path.of(filePath).toString())
-                            .start();
-                    return;
-                }
-            }
-
-            // quote String so explorer handles URL query strings correctly
             String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();
         }
@@ -86,22 +74,30 @@ public class Windows extends NativeDesktop {
 
     @Override
     public void openFileWithApplication(String filePath, String application, int pageNumber) throws IOException {
-        List<String> command = new ArrayList<>();
-        command.add(Path.of(application).toString());
+        List<String> commands = new ArrayList<>();
+        commands.add(application);
 
-        String executable = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
-        if (pageNumber > 1 && isPdfPath(filePath)) {
-            if (executable.contains("sumatrapdf")) {
-                command.add("-page");
-                command.add(String.valueOf(pageNumber));
-            } else if (executable.contains("acrord32") || executable.contains("acrobat")) {
-                command.add("/A");
-                command.add("page=" + pageNumber);
+        String appNameLower = Path.of(application).getFileName().toString().toLowerCase(Locale.ROOT);
+
+        if (pageNumber > 1) {
+            if (BrowserUtils.isBrowserSupportingPageJump(appNameLower)) {
+                String fileUrlWithPage = Path.of(filePath).toUri().toString() + "#page=" + pageNumber;
+                commands.add(fileUrlWithPage);
+            } else if (appNameLower.contains("sumatrapdf")) {
+                commands.add("-page");
+                commands.add(String.valueOf(pageNumber));
+                commands.add(filePath);
+            } else if (appNameLower.contains("acrord32") || appNameLower.contains("acrobat")) {
+                commands.add("/A");
+                commands.add("page=" + pageNumber);
+                commands.add(filePath);
+            } else {
+                commands.add(filePath);
             }
+        } else {
+            commands.add(filePath);
         }
-
-        command.add(Path.of(filePath).toString());
-        new ProcessBuilder(command).start();
+        new ProcessBuilder(commands).start();
     }
 
     @Override
@@ -114,40 +110,5 @@ public class Windows extends NativeDesktop {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
         process.directory(Path.of(absolutePath).toFile());
         process.start();
-    }
-
-    private static Optional<Path> findSumatraPdfExecutable() {
-        String programFiles = System.getenv("ProgramFiles");
-        String programFilesX86 = System.getenv("ProgramFiles(x86)");
-
-        if (programFiles != null) {
-            Path candidate = Path.of(programFiles, "SumatraPDF", "SumatraPDF.exe");
-            if (Files.isExecutable(candidate)) {
-                return Optional.of(candidate);
-            }
-        }
-
-        if (programFilesX86 != null) {
-            Path candidate = Path.of(programFilesX86, "SumatraPDF", "SumatraPDF.exe");
-            if (Files.isExecutable(candidate)) {
-                return Optional.of(candidate);
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    private static boolean isPdfType(String fileType) {
-        if (fileType == null || fileType.isBlank()) {
-            return false;
-        }
-
-        return StandardFileType.PDF.getExtensions().stream().anyMatch(fileType::equalsIgnoreCase);
-    }
-
-    private static boolean isPdfPath(String filePath) {
-        return FileUtil.getFileExtension(filePath)
-                       .map(extension -> StandardFileType.PDF.getExtensions().stream().anyMatch(extension::equalsIgnoreCase))
-                       .orElse(false);
     }
 }

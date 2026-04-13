@@ -9,13 +9,22 @@ import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.BrowserUtils;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.util.StandardFileType;
 
+/// This class contains macOS specific implementations for file directories and file/application open handling methods.
+///
+/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+/// The configuration of tinylog will become immutable as soon as the first log entry is issued.
+/// https://tinylog.org/v2/configuration
 @AllowedToUseAwt("Requires AWT to open a file")
 public class OSX extends NativeDesktop {
+
+    private static final String CHROME_EXECUTABLE_PATH = "/Contents/MacOS/Google Chrome";
+    private static final String EDGE_EXECUTABLE_PATH = "/Contents/MacOS/Microsoft Edge";
 
     @Override
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
@@ -33,34 +42,19 @@ public class OSX extends NativeDesktop {
 
     @Override
     public void openFileWithApplication(String filePath, String application, int pageNumber) throws IOException {
-        List<String> command = new ArrayList<>();
-        command.add("/usr/bin/open");
+        List<String> commands = new ArrayList<>();
+        commands.add("/usr/bin/open");
 
-        String appNameLower = application.toLowerCase(Locale.ROOT);
+        String appNameLower = application == null ? "" : application.toLowerCase(Locale.ROOT);
 
-        if (pageNumber > 1 && (appNameLower.contains("chrome") || appNameLower.contains("edge") ||
-                appNameLower.contains("safari") || appNameLower.contains("firefox") || appNameLower.contains("brave"))) {
+        if (pageNumber > 1 && BrowserUtils.isBrowserSupportingPageJump(appNameLower)) {
             String fileUrlWithPage = Path.of(filePath).toUri().toString() + "#page=" + pageNumber;
-            String executable = application;
-            if (application.endsWith(".app")) {
-                if (appNameLower.contains("chrome")) {
-                    executable += "/Contents/MacOS/Google Chrome";
-                } else if (appNameLower.contains("edge")) {
-                    executable += "/Contents/MacOS/Microsoft Edge";
-                }
-            }
-
-            new ProcessBuilder(executable, fileUrlWithPage).start();
+            String browserExecutable = getBrowserExecutableWithOptions(application, appNameLower);
+            new ProcessBuilder(browserExecutable, fileUrlWithPage).start();
             return;
         }
 
-        if (application != null && !application.isEmpty()) {
-            command.add("-a");
-            command.add(application);
-        }
-        command.add(filePath);
-
-        if (pageNumber > 1 && appNameLower.contains("skim")) {
+        if (pageNumber > 1 && BrowserUtils.isSkim(appNameLower)) {
             String appleScript = String.format(
                     "tell application \"Skim\"\n" +
                             "  activate\n" +
@@ -73,11 +67,25 @@ public class OSX extends NativeDesktop {
         }
 
         if (application != null && !application.isEmpty()) {
-            command.add("-a");
-            command.add(application);
+            commands.add("-a");
+            commands.add(application);
         }
-        command.add(filePath);
-        new ProcessBuilder(command).start();
+        commands.add(filePath);
+        new ProcessBuilder(commands).start();
+    }
+
+    private static String getBrowserExecutableWithOptions(String application, String appNameLower) {
+        if ((application != null) && application.endsWith(".app")) {
+            if (BrowserUtils.isChrome(appNameLower)) {
+                return application + CHROME_EXECUTABLE_PATH;
+            }
+
+            if (BrowserUtils.isEdge(appNameLower)) {
+                return application + EDGE_EXECUTABLE_PATH;
+            }
+        }
+
+        return application;
     }
 
     @Override
