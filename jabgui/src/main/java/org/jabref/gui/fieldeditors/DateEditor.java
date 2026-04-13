@@ -18,6 +18,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -52,12 +53,12 @@ public class DateEditor extends HBox implements FieldEditorFX {
         this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers, undoManager);
         textField.setId(field.getName());
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
-        viewModel.textProperty().addListener((observable, oldValue, newValue) -> {
+        viewModel.textProperty().addListener((observable, oldValue, newValue) -> UiTaskExecutor.runInJavaFXThread(() -> {
             if (!textField.isFocused()) {
                 lastAcceptedText = normalizeText(newValue);
                 syncPickerWithText(lastAcceptedText);
             }
-        });
+        }));
         datePicker.temporalAccessorValueProperty().addListener((observable, oldValue, newValue) -> {
             if (!synchronizingPicker && (newValue != null)) {
                 acceptCommittedText(formatDate(newValue));
@@ -101,7 +102,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
 
         Optional<TemporalAccessor> pickerCompatibleDate = getLosslessPickerDate(currentText);
         if (pickerCompatibleDate.isPresent()) {
-            datePicker.setTemporalAccessorValue(pickerCompatibleDate.get());
+            pickerCompatibleDate.ifPresent(datePicker::setTemporalAccessorValue);
             return;
         }
 
@@ -112,7 +113,6 @@ public class DateEditor extends HBox implements FieldEditorFX {
         }
 
         syncPickerWithValue(null);
-        acceptCommittedText("");
     }
 
     private Optional<TemporalAccessor> getLosslessPickerDate(String text) {

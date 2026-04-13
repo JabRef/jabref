@@ -253,11 +253,10 @@ public class CffExporter extends Exporter {
         }
         Date parsedDate = parsedDateOpt.get();
         if (parsedDate.getYear().isPresent() && parsedDate.getMonth().isPresent() && parsedDate.getDay().isPresent()) {
-            data.put("date-released", parsedDate.getNormalized());
+            data.put("date-released", new Date(parsedDate.toTemporalAccessor()).getNormalized());
             return;
         }
         parsedDate.getMonth().ifPresent(month -> data.put("month", month.getNumber()));
         parsedDate.getYear().ifPresent(year -> data.put("year", year));
     }
 }
-
