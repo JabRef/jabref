@@ -49,21 +49,15 @@ public class ChatHistoryService implements AutoCloseable {
 
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final ChatHistoryStorage implementation;
-
-    // Note about `Optional<BibDatabaseContext>`: it was necessary in previous version, but currently we never save an `Optional.empty()`.
-    // However, we decided to left it here: to reduce migrations and to make possible to chat with a {@link BibEntry} without {@link BibDatabaseContext}
-    // ({@link BibDatabaseContext} is required only for load/store of the chat).
-    private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) {
-    }
-
     // We use a {@link TreeMap} here to store {@link BibEntry} chat histories by their id.
     // When you compare {@link BibEntry} instances, they are compared by value, not by reference.
     // And when you store {@link BibEntry} instances in a {@link HashMap}, an old hash may be stored when the {@link BibEntry} is changed.
     // See also ADR-38.
     private final TreeMap<BibEntry, ChatHistoryManagementRecord> bibEntriesChatHistory = new TreeMap<>(Comparator.comparing(BibEntry::getId));
-
     // We use {@link TreeMap} for group chat history for the same reason as for {@link BibEntry}ies.
-    private final TreeMap<GroupTreeNode, ChatHistoryManagementRecord> groupsChatHistory = new TreeMap<>(Comparator.comparing(GroupTreeNode::getName));
+    private final TreeMap<GroupTreeNode, ChatHistoryManagementRecord> groupsChatHistory =
+            new TreeMap<>(Comparator.comparing((GroupTreeNode node) -> node.getGroup().getName())
+                                    .thenComparingInt(System::identityHashCode));
 
     public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, ChatHistoryStorage implementation) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
@@ -227,6 +221,12 @@ public class ChatHistoryService implements AutoCloseable {
                 e -> new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;
         implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldCitationKey, List.of());
         implementation.storeMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), newCitationKey, chatMessages);
+    }
+
+    // Note about `Optional<BibDatabaseContext>`: it was necessary in previous version, but currently we never save an `Optional.empty()`.
+    // However, we decided to left it here: to reduce migrations and to make possible to chat with a {@link BibEntry} without {@link BibDatabaseContext}
+    // ({@link BibDatabaseContext} is required only for load/store of the chat).
+    private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) {
     }
 
     private class CitationKeyChangeListener {
