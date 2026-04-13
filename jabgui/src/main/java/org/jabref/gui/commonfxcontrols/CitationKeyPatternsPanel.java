@@ -17,16 +17,20 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanelItemModel> {
 
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> entryTypeColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, String> patternColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> actionsColumn;
+
+    @Inject private CliPreferences preferences;
 
     private CitationKeyPatternsPanelViewModel viewModel;
 
@@ -49,7 +53,7 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
 
     @FXML
     private void initialize() {
-        viewModel = new CitationKeyPatternsPanelViewModel();
+        viewModel = new CitationKeyPatternsPanelViewModel(preferences.getCitationKeyPatternPreferences());
 
         this.setEditable(true);
 
@@ -59,7 +63,7 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
         new ValueTableCellFactory<CitationKeyPatternsPanelItemModel, EntryType>()
                 .withText(EntryType::getDisplayName)
                 .install(entryTypeColumn);
-        this.setOnSort(_ ->
+        this.setOnSort(event ->
                 viewModel.patternListProperty().sort(CitationKeyPatternsPanelViewModel.defaultOnTopComparator));
 
         patternColumn.setSortable(true);
@@ -75,14 +79,14 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
         new ValueTableCellFactory<CitationKeyPatternsPanelItemModel, EntryType>()
-                .withGraphic(_ -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
+                .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
                 .withTooltip(entryType ->
                         Localization.lang("Reset %s to default value").formatted(entryType.getDisplayName()))
-                .withOnMouseClickedEvent(_ -> _ ->
+                .withOnMouseClickedEvent(item -> evt ->
                         viewModel.setItemToDefaultPattern(this.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
-        this.setRowFactory(_ -> new HighlightTableRow());
+        this.setRowFactory(item -> new HighlightTableRow());
         this.setOnKeyTyped(this::jumpToSearchKey);
         this.itemsProperty().bindBidirectional(viewModel.patternListProperty());
     }

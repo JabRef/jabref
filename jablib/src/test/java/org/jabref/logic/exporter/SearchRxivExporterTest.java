@@ -57,6 +57,8 @@ class SearchRxivExporterTest {
         assertTrue(root.has("record_info"));
         assertTrue(root.has("date"));
         assertFalse(root.has("title"));
+        assertTrue(root.has("database"));
+        assertEquals(0, root.get("database").size());
     }
 
     @Test

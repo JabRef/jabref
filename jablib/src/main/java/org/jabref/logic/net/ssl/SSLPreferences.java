@@ -10,6 +10,10 @@ public class SSLPreferences {
         this.truststorePath = new SimpleStringProperty(truststorePath);
     }
 
+    public StringProperty truststorePathProperty() {
+        return truststorePath;
+    }
+
     public String getTruststorePath() {
         return truststorePath.getValue();
     }

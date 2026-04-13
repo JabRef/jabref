@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jabref.model.study.Study;
@@ -56,6 +57,7 @@ public class SearchRxivExporter {
         // Placeholder fields — to be filled by the user on SearchRxiv
         data.put("record_info", Map.of());
         data.put("date", Map.of());
+        data.put("database", List.of());
         return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(data);
     }
 

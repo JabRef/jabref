@@ -1,7 +1,5 @@
 package org.jabref.logic.citationkeypattern;
 
-import javafx.beans.property.SimpleObjectProperty;
-
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 
 public class CitationKeyGeneratorTestUtils {
@@ -17,7 +15,8 @@ public class CitationKeyGeneratorTestUtils {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
-                new SimpleObjectProperty<>(',')
+                "",
+                ','
         );
     }
 }

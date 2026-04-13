@@ -17,8 +17,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
-import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
@@ -331,7 +329,7 @@ public class ManageStudyDefinitionViewModel {
         return catalogsValidationMessage;
     }
 
-    public void shareOnSearchRxiv(Path initialDirectory, ExternalApplicationsPreferences externalPreferences) {
+    public void shareOnSearchRxiv(Path initialDirectory) {
         Study study = buildStudy();
         if (study.getDatabases().isEmpty()) {
             dialogService.notify(Localization.lang("Please select at least one catalog."));
@@ -345,10 +343,6 @@ public class ManageStudyDefinitionViewModel {
         dialogService.showDirectorySelectionDialog(config).ifPresent(exportDirectory -> {
             try {
                 new SearchRxivExporter().export(study, exportDirectory);
-                NativeDesktop.openBrowserShowPopup(
-                        SearchRxivExporter.SEARCHRXIV_URL,
-                        dialogService,
-                        externalPreferences);
                 dialogService.notify(Localization.lang("Exported search queries for SearchRxiv."));
             } catch (IOException e) {
                 LOGGER.error("Could not export search queries for SearchRxiv", e);

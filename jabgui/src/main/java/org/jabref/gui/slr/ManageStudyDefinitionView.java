@@ -310,9 +310,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML
     private void shareOnSearchRxiv() {
-        viewModel.shareOnSearchRxiv(
-                pathToStudyDataDirectory,
-                preferences.getExternalApplicationsPreferences());
+        viewModel.shareOnSearchRxiv(pathToStudyDataDirectory);
     }
 
     private void setupCellFactories(TableColumn<String, String> contentColumn,

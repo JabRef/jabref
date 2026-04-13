@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
-import javafx.beans.property.SimpleObjectProperty;
-
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
@@ -132,7 +130,8 @@ class GenerateCitationKeys implements Runnable {
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
                 getKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
-                new SimpleObjectProperty<>(keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter())
+                pattern != null ? pattern : existingPreferences.getDefaultPattern(),
+                keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter()
         );
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }
@@ -143,9 +142,7 @@ class GenerateCitationKeys implements Runnable {
     /// @param keyPatternsPreferences patterns from preferences
     /// @return keyPatterns from preferences or overridden by user-supplied patterns
     private GlobalCitationKeyPatterns getKeyPatterns(@Nullable Map<String, String> keyPatternsOption, GlobalCitationKeyPatterns keyPatternsPreferences) {
-        GlobalCitationKeyPatterns patternsCopy = pattern != null
-                                                 ? GlobalCitationKeyPatterns.fromPattern(pattern)
-                                                 : new GlobalCitationKeyPatterns(keyPatternsPreferences.getDefaultValue());
+        GlobalCitationKeyPatterns patternsCopy = new GlobalCitationKeyPatterns(keyPatternsPreferences.getDefaultValue());
         if (keyPatternsOption == null) {
             return patternsCopy;
         }

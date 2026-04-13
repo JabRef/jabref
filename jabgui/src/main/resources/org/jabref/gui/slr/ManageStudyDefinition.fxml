@@ -274,7 +274,7 @@
                                         onAction="#shareOnSearchRxiv"
                                         text="%Export search queries (search-query format)">
                                     <tooltip>
-                                        <Tooltip text="%Export search queries as search-query JSON files and open SearchRxiv"/>
+                                        <Tooltip text="%Export search queries as search-query JSON files"/>
                                     </tooltip>
                                 </Button>
                                 <Label fx:id="directoryWarning"
