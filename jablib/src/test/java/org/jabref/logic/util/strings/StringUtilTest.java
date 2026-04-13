@@ -388,31 +388,6 @@ class StringUtilTest {
         assertEquals("Modele", StringUtil.replaceSpecialCharacters("Modèle"));
     }
 
-    static Stream<Arguments> testRepeatSpacesData() {
-        return Stream.of(
-                Arguments.of("", -1),
-                Arguments.of("", 0),
-                Arguments.of(" ", 1),
-                Arguments.of("       ", 7)
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("testRepeatSpacesData")
-    void repeatSpaces(String result, int count) {
-        assertEquals(result, StringUtil.repeatSpaces(count));
-    }
-
-    @ParameterizedTest
-    @CsvSource(textBlock = """
-            '',      0, a
-            a,       1, a
-            aaaaaaa, 7, a
-            """)
-    void repeat(String expected, int count, char character) {
-        assertEquals(expected, StringUtil.repeat(count, character));
-    }
-
     @Test
     void boldHTML() {
         assertEquals("<b>AA</b>", StringUtil.boldHTML("AA"));

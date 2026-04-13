@@ -372,8 +372,8 @@ public class BibDatabaseWriter {
             bibWriter.writeLine(userComments);
         }
 
-        bibWriter.write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
-                .repeatSpaces(maxKeyLength - bibtexString.getName().length()) + " = ");
+        bibWriter.write(STRING_PREFIX + "{" + bibtexString.getName()
+                + " ".repeat(maxKeyLength - bibtexString.getName().length()) + " = ");
         if (bibtexString.getContent().isEmpty()) {
             bibWriter.write("{}");
         } else {
