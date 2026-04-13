@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.BrowserUtils;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -17,8 +18,8 @@ import org.jabref.logic.util.StandardFileType;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
-import org.jabref.gui.desktop.BrowserUtils;
 import com.sun.jna.platform.win32.Win32Exception;
+
 import org.slf4j.LoggerFactory;
 
 /// This class contains Windows specific implementations for file directories and file/application open handling methods.
@@ -32,8 +33,8 @@ public class Windows extends NativeDesktop {
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
         String application = type.map(ExternalFileType::getOpenWithApplication)
-                                .filter(app -> !app.isEmpty())
-                                .orElse("");
+                                 .filter(app -> !app.isEmpty())
+                                 .orElse("");
 
         if (!application.isEmpty()) {
             openFileWithApplication(filePath, application, pageNumber);
