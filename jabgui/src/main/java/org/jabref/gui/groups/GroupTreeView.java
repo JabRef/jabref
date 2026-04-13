@@ -43,8 +43,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -199,15 +197,6 @@ public class GroupTreeView extends BorderPane {
                                                      .subtract(ADD_SUBGROUP_COL_WIDTH)
                                                      .subtract(SCROLLBAR_WIDTH));
 
-        Button addNewGroup = new Button(Localization.lang("Add group"));
-        addNewGroup.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(addNewGroup, Priority.ALWAYS);
-        addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
-        addNewGroup.setOnAction(event -> addNewGroup());
-
-        HBox groupBar = new HBox(addNewGroup);
-        groupBar.setId("groupBar");
-        this.setBottom(groupBar);
     }
 
     private void initialize() {
@@ -701,10 +690,6 @@ public class GroupTreeView extends BorderPane {
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
         contextMenu.getStyleClass().add("context-menu");
         return contextMenu;
-    }
-
-    private void addNewGroup() {
-        viewModel.addNewGroupToRoot();
     }
 
     private String getFormattedNumber(int hits) {

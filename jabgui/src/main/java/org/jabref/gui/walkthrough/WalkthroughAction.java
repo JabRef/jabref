@@ -320,7 +320,7 @@ public class WalkthroughAction extends SimpleCommand {
                 new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
         );
         String groupName = Localization.lang("Research");
-        String addGroup = Localization.lang("Add group");
+        String allEntries = Localization.lang("All entries");
         String addSelectedEntries = Localization.lang("Add selected entries to this group");
 
         return Walkthrough
@@ -339,13 +339,15 @@ public class WalkthroughAction extends SimpleCommand {
                         .continueButton(Localization.lang("Continue"))
                         .position(PanelPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
-                // Step 3: Click "Add group" button
+                // Step 3: Hover over "All entries" and click the "+" button
                 .addStep(WalkthroughStep
-                        .tooltip(Localization.lang("Click on \"%0\" button", addGroup))
-                        .content(new TextBlock(Localization.lang("Let's create your first group. Click the \"%0\" button at the bottom of the groups panel to open the group creation dialog.", addGroup)))
-                        .resolver(NodeResolver.selectorWithText(".button", addGroup::equals))
+                        .tooltip(Localization.lang("Hover over \"%0\" and click the \"+\" button", allEntries))
+                        .content(new TextBlock(Localization.lang("Let's create your first group. Hover over the \"%0\" group in the groups panel and click the \"+\" button that appears to open the group creation dialog.", allEntries)))
+                        .resolver(NodeResolver.selectorWithText(
+                                ".tree-table-row-cell",
+                                text -> allEntries.equals(text) || (text != null && text.contains(allEntries))))
                         .trigger(Trigger.create().withWindowChangeListener().onClick())
-                        .position(TooltipPosition.TOP)
+                        .position(TooltipPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
                 // Step 4: Fill group creation dialog
                 .addStep(WalkthroughStep

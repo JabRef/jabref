@@ -2377,10 +2377,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 2em;
 }
 
-#groupBar .glyph-icon {
-    -fx-font-size: 2em;
-}
-
 /* ImportEntriesDialog */
 
 #importEntriesDialog .addEntryButton {
