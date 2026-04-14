@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a related work text extractor, which finds and inserts the related work text into bib entries from references in the texts. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We added a hover button on group rows to quickly add a new group or subgroup. [#12289](https://github.com/JabRef/jabref/issues/12289)
 - We added a shorthand for protecting terms in the fields: user can now select a text and type a opening curling brace to quickly wrap the selection in braces. [#15442](https://github.com/JabRef/jabref/pull/15442)
 - We added fallback search for `[DATE]` patterns in the file finder, so that if an exact date match is not found, progressively less specific dates (year-month, then year) are tried. [#8152](https://github.com/JabRef/jabref/issues/8152)
@@ -91,6 +92,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved CSL support with JabRef LibreOffice converter extension. [#14387](https://github.com/JabRef/jabref/issues/14387)
 - We fixed an issue where a search group would not be updated in the ui after an entry change [#13378](https://github.com/JabRef/jabref/issues/13378)
 - We fixed exceptions occuring when generating citation keys or using certain cleanup operations on macOS [#15366](https://github.com/JabRef/jabref/issues/15366)
+- We fixed an issue where the invisible delete button area was shown for internal CSL styles in the OpenOffice/LibreOffice style selection dialog. External CSL styles remain deletable. [#15397](https://github.com/JabRef/jabref/issues/15397)
 - We fixed an issue that prevented files without a file extension from being shown in various file select dialogs [#11786](https://github.com/JabRef/jabref/issues/11786)
 
 ### Removed

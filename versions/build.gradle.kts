@@ -25,7 +25,7 @@ dependencies {
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.1.1"))
+    api(platform("tools.jackson:jackson-bom:3.1.2"))
 }
 
 dependencies.constraints {
@@ -65,7 +65,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    api("com.uber.nullaway:nullaway:0.13.1")
+    api("com.uber.nullaway:nullaway:0.13.2")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.21.0")

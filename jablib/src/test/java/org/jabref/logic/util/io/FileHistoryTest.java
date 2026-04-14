@@ -68,6 +68,20 @@ class FileHistoryTest {
         history.newFile(Path.of("cc"));
         assertEquals(Path.of("bb"), history.get(1));
     }
+
+    @Test
+    void oldestEntryIsDroppedWhenSizeExceedsLimit() {
+        for (int i = 1; i <= 8; i++) {
+            history.newFile(Path.of("file" + i));
+        }
+        assertEquals(8, history.size());
+
+        history.newFile(Path.of("file9"));
+
+        assertEquals(8, history.size());
+        assertEquals(Path.of("file9"), history.get(0));
+        assertFalse(history.contains(Path.of("file1")));
+    }
 }
 
 
