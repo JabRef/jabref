@@ -113,7 +113,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.82")
+    api("org.bouncycastle:bcprov-jdk18on:1.84")
     api("org.controlsfx:controlsfx:11.2.3")
     api("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
