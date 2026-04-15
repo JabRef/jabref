@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We removed a little snap that used to happen with the side panel when one opened JabRef after changing the side panel's default position [#15394](https://github.com/JabRef/jabref/issues/15394)
 - We added a shorthand for protecting terms in the fields: user can now select a text and type a opening curling brace to quickly wrap the selection in braces. [#15442](https://github.com/JabRef/jabref/pull/15442)
 - We added fallback search for `[DATE]` patterns in the file finder, so that if an exact date match is not found, progressively less specific dates (year-month, then year) are tried. [#8152](https://github.com/JabRef/jabref/issues/8152)
 - We added support for downloading full-text PDFs from Wiley journals via the Wiley TDM API. [#13404](https://github.com/JabRef/jabref/issues/13404)
