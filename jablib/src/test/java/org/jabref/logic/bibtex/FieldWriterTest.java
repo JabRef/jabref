@@ -139,7 +139,6 @@ class FieldWriterTest {
             "{",
             "}",
             "{{",
-            "{}",
             "\\{}"})
     void checkUnbalancedBraces(String input) {
         assertNotEquals(List.of(), FieldWriter.checkBalancedBraces(input));
@@ -147,6 +146,7 @@ class FieldWriterTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
+            "\\{\\}",
             "Incorporating evolutionary {Measures into Conservation Prioritization}",
             "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}",
             "{Measures into Conservation Prioritization}"})
