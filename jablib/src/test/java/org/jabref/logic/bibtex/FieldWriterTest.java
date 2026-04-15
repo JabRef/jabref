@@ -128,7 +128,7 @@ class FieldWriterTest {
             "'Incorporating evolutionary {Measures into Conservation Prioritization}', 'Incorporating evolutionary {Measures into Conservation Prioritization}'",
             "'Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}', 'Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}'",
     })
-    void unbalancedBraces(String input, String expected) {
+    void unbalancedBraces(String expected, String input) {
         assertEquals("{" + expected + "}", writer.write(StandardField.COMMENT, input));
     }
 
