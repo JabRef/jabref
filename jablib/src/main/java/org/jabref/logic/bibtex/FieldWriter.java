@@ -186,7 +186,7 @@ public class FieldWriter {
             }
 
             if (pos2 == -1) {
-                pos1 = content.length(); // just write out the rest of the text, and throw no exception
+                pos1 = content.length();
                 LOGGER.warn("The character {} is not allowed in BibTeX strings unless escaped as in '\\\\{}'. "
                                 + "In JabRef, use pairs of # characters to indicate a string. "
                                 + "Field value: {}",
