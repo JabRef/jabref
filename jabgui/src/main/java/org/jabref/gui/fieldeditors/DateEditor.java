@@ -37,7 +37,6 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
 
-    private String lastAcceptedText = "";
     private boolean synchronizingPicker;
 
     public DateEditor(Field field,
@@ -55,8 +54,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
         viewModel.textProperty().addListener((observable, oldValue, newValue) -> UiTaskExecutor.runInJavaFXThread(() -> {
             if (!textField.isFocused()) {
-                lastAcceptedText = normalizeText(newValue);
-                syncPickerWithText(lastAcceptedText);
+                syncPickerWithText(normalizeText(newValue));
             }
         }));
         datePicker.temporalAccessorValueProperty().addListener((observable, oldValue, newValue) -> {
@@ -82,8 +80,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
-        lastAcceptedText = normalizeText(viewModel.textProperty().get());
-        syncPickerWithText(lastAcceptedText);
+        syncPickerWithText(normalizeText(viewModel.textProperty().get()));
     }
 
     @Override
@@ -135,7 +132,6 @@ public class DateEditor extends HBox implements FieldEditorFX {
 
     private void acceptCommittedText(String text) {
         String normalizedText = normalizeText(text);
-        lastAcceptedText = normalizedText;
         if (!Objects.equals(textField.getText(), normalizedText)) {
             textField.setText(normalizedText);
         }
