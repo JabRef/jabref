@@ -1,7 +1,6 @@
 package org.jabref.gui.help;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
@@ -58,6 +57,8 @@ class AboutDialogViewTest extends ApplicationTest {
 
         aboutDialogView = new AboutDialogView();
 
+        aboutDialogView = new AboutDialogView();
+
         DialogPane pane = aboutDialogView.getDialogPane();
 
         // 1. Load the CSS into the DialogPane
@@ -76,12 +77,7 @@ class AboutDialogViewTest extends ApplicationTest {
     @Test
     void copyVersionButton() {
         verifyThat("Copy Version", isVisible());
-        ButtonType copyButtonType = aboutDialogView.getDialogPane().getButtonTypes().stream()
-                                                   .filter(type -> type.getButtonData() == ButtonBar.ButtonData.LEFT)
-                                                   .findFirst()
-                                                   .orElseThrow();
-        Button copyButton = (Button) aboutDialogView.getDialogPane().lookupButton(copyButtonType);
-        interact(copyButton::fire);
+        clickOn("Copy Version");
         verify(clipBoardManager).setContent(anyString());
     }
 

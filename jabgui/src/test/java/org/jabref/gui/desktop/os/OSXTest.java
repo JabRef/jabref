@@ -3,6 +3,9 @@ package org.jabref.gui.desktop.os;
 import java.io.IOException;
 import java.util.Set;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+
 import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -20,9 +23,11 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class OSXTest {
 
@@ -30,15 +35,9 @@ class OSXTest {
     @Test
     void openFileForPdfWithPageUsesBrowserHashJump() throws IOException {
         ExternalFileType pdfType = new CustomExternalFileType("PDF", "pdf", "application/pdf", "", "", IconTheme.JabRefIcons.FILE);
-        ExternalApplicationsPreferences preferences = new ExternalApplicationsPreferences(
-                "References",
-                false,
-                Set.of(pdfType),
-                false,
-                "",
-                false,
-                "",
-                "");
+        ExternalApplicationsPreferences preferences = mock(ExternalApplicationsPreferences.class);
+        ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(Set.of(pdfType));
+        when(preferences.getExternalFileTypes()).thenReturn(externalFileTypes);
 
         String filePath = "/tmp/test.pdf";
         String expectedUrl = "file:///tmp/test.pdf#page=73";
@@ -56,15 +55,9 @@ class OSXTest {
     @Test
     void openFileForPdfWithSkimConfiguredUsesConfiguredApplication() throws IOException {
         ExternalFileType pdfType = new CustomExternalFileType("PDF", "pdf", "application/pdf", "Skim", "", IconTheme.JabRefIcons.FILE);
-        ExternalApplicationsPreferences preferences = new ExternalApplicationsPreferences(
-                "References",
-                false,
-                Set.of(pdfType),
-                false,
-                "",
-                false,
-                "",
-                "");
+        ExternalApplicationsPreferences preferences = mock(ExternalApplicationsPreferences.class);
+        ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(Set.of(pdfType));
+        when(preferences.getExternalFileTypes()).thenReturn(externalFileTypes);
 
         OSX osx = spy(new OSX());
         doNothing().when(osx).openFileWithApplication(anyString(), anyString(), anyInt());
