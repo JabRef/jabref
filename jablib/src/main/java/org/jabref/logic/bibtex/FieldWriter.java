@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -53,7 +54,7 @@ public class FieldWriter {
                     openBraces.push(new FieldWriter.BracePosition(i, line, i - lastLineIndex + 1));
                 } else if (item == '}') {
                     if (openBraces.isEmpty()) {
-                        errors.add("Unbalanced '}' at line %d, column %d (index %d): in '%s'".formatted(
+                        errors.add(Localization.lang("Unbalanced '}' at line %0, column %1 (index %2): in '%3'.",
                                 line + 1,
                                 i - lastLineIndex + 1,
                                 i,
@@ -67,7 +68,7 @@ public class FieldWriter {
 
         while (!openBraces.isEmpty()) {
             FieldWriter.BracePosition lastOpenBrace = openBraces.pop();
-            errors.add("Unbalanced '{' at line %d, column %d (index %d): in '%s'".formatted(
+            errors.add(Localization.lang("Unbalanced '{' at line %0, column %1 (index %2): in '%3'.",
                     lastOpenBrace.index(),
                     lastOpenBrace.column(),
                     lastOpenBrace.index(),
