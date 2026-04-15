@@ -124,7 +124,7 @@ public class FieldWriter {
     /// @param text  the input string to check for escaped characters
     /// @param index the index of the character in the text to check for escaping
     /// @return true if the character at the specified index is escaped, false otherwise
-    private static boolean isEscaped(String text, int index) {
+    public static boolean isEscaped(String text, int index) {
         int indexCounter = 0;
         for (int i = index - 1; i >= 0; i--) {
             if (text.charAt(i) == '\\') {

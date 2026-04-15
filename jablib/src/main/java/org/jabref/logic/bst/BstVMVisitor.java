@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -80,24 +79,21 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
                 Field field = FieldFactory.parseField(mEntry.getKey());
                 String fieldValue = e.entry.getResolvedFieldOrAlias(field, bstVMContext.bibDatabase())
                                            .map(content -> {
-                                               try {
-                                                   String result = fieldWriter.write(field, content);
-                                                   if (result.startsWith("{")) {
-                                                       // Strip enclosing {} from the output
-                                                       return result.substring(1, result.length() - 1);
-                                                   }
-                                                   if (field == StandardField.MONTH) {
-                                                       // We don't have the internal BibTeX strings at hand.
-                                                       // Thus, we look up the full month name in the generic table.
-                                                       return Month.parse(result)
-                                                                   .map(Month::getFullName)
-                                                                   .orElse(result);
-                                                   }
-                                                   return result;
-                                               } catch (InvalidFieldValueException invalidFieldValueException) {
-                                                   // in case there is something wrong with the content, just return the content itself
-                                                   return content;
+                                               String result = fieldWriter.write(field, content);
+                                               if (result.startsWith("{")
+                                                       && result.endsWith("}")
+                                                       && !FieldWriter.isEscaped(result, result.length() - 1)) {
+                                                   // Strip enclosing {} from the output
+                                                   return result.substring(1, result.length() - 1);
                                                }
+                                               if (field == StandardField.MONTH) {
+                                                   // We don't have the internal BibTeX strings at hand.
+                                                   // Thus, we look up the full month name in the generic table.
+                                                   return Month.parse(result)
+                                                               .map(Month::getFullName)
+                                                               .orElse(result);
+                                               }
+                                               return result;
                                            })
                                            .orElse(null);
                 mEntry.setValue(fieldValue);
