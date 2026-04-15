@@ -279,6 +279,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         text.append(modeInfo);
     }
 
+    /// Returns an index for a new untitled library to generate names like "untitled (1)", "untitled (2)", etc.
+    private int getUntitledLibraryNumber() {
+        // Relies on a fact that a fresh "untitled" library doesn't have a path and that new libraries are added at the end of the list.
+        // A trick, but works good enough.
+
+        List<LibraryTab> untitledTabs = tabContainer
+                .getLibraryTabs()
+                .stream()
+                .filter(tab -> tab.getBibDatabaseContext().getDatabasePath().isEmpty()
+                        && tab.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)
+                .toList();
+
+        return untitledTabs.indexOf(this);
+    }
+
     private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());
         text.append(" [");
@@ -432,7 +447,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append('*');
-                tabTitle.append(Localization.lang("untitled"));
+                int untitledNumber = getUntitledLibraryNumber();
+                if (untitledNumber > 0) {
+                    tabTitle.append(Localization.lang("untitled (%0)", Integer.toString(untitledNumber)));
+                } else {
+                    tabTitle.append(Localization.lang("untitled"));
+                }
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);

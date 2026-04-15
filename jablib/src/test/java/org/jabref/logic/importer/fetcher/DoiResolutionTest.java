@@ -26,7 +26,7 @@ class DoiResolutionTest {
     @BeforeEach
     void setup() {
         DOIPreferences doiPreferences = mock(DOIPreferences.class);
-        when(doiPreferences.isUseCustom()).thenReturn(false);
+        when(doiPreferences.shouldUseCustom()).thenReturn(false);
         finder = new DoiResolution(doiPreferences);
         entry = new BibEntry();
     }

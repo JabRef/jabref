@@ -12,6 +12,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -99,9 +100,9 @@ public class CleanupWorker {
             case CONVERT_TO_BIBTEX ->
                     new ConvertToBibtexCleanup();
             case CONVERT_TIMESTAMP_TO_CREATIONDATE ->
-                    new TimeStampToCreationDate(timestampPreferences);
+                    new TimestampToDateField(timestampPreferences.getTimestampField(), StandardField.CREATIONDATE);
             case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
-                    new TimeStampToModificationDate(timestampPreferences);
+                    new TimestampToDateField(timestampPreferences.getTimestampField(), StandardField.MODIFICATIONDATE);
             case MOVE_PDF ->
                     new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->

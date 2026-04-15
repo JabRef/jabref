@@ -123,6 +123,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,9 +145,14 @@ import org.slf4j.LoggerFactory;
 public class JabRefCliPreferences implements CliPreferences {
     public static final String LANGUAGE = "language";
 
-    public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
+    // region LibraryPreferences
+    public static final String LIBRARY_BIBLATEX_DEFAULT_MODE = "biblatexMode";
+    public static final String LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
+    public static final String LIBRARY_AUTO_SAVE = "localAutoSave";
+    public static final String LIBRARY_ADD_IMPORTED_ENTRIES = "addImportedEntries";
+    public static final String LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME = "addImportedEntriesGroupName";
+    // endregion
 
-    public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
 
@@ -173,23 +179,25 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
 
-    public static final String ADD_IMPORTED_ENTRIES = "addImportedEntries";
-    public static final String ADD_IMPORTED_ENTRIES_GROUP_NAME = "addImportedEntriesGroupName";
+    // region DOIPreferences
+    public static final String DOI_BASE_URI = "baseDOIURI";
+    public static final String DOI_USE_CUSTOM_URI = "useCustomDOIURI";
+    // endregion
 
-    public static final String BASE_DOI_URI = "baseDOIURI";
-    public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
+    // region OwnerPreferences
+    public static final String OWNER_ENABLE = "useOwner";
+    public static final String OWNER_DEFAULT = "defaultOwner";
+    public static final String OWNER_OVERWRITE = "overwriteOwner";
+    // endregion
 
-    public static final String USE_OWNER = "useOwner";
-    public static final String DEFAULT_OWNER = "defaultOwner";
-    public static final String OVERWRITE_OWNER = "overwriteOwner";
-
-    // Required for migration from pre-v5.3 only
-    public static final String UPDATE_TIMESTAMP = "updateTimestamp";
-    public static final String TIME_STAMP_FIELD = "timeStampField";
-    public static final String TIME_STAMP_FORMAT = "timeStampFormat";
-
-    public static final String ADD_CREATION_DATE = "addCreationDate";
-    public static final String ADD_MODIFICATION_DATE = "addModificationDate";
+    // region TimestampPreferences
+    public static final String TIMESTAMP_ADD_CREATION_DATE = "addCreationDate";
+    public static final String TIMESTAMP_ADD_MODIFICATION_DATE = "addModificationDate";
+    // legacy pre-5.3 fields for library cleanups
+    public static final String TIMESTAMP_DEPRECATED_UPDATE = "updateTimestamp";
+    public static final String TIMESTAMP_DEPRECATED_FIELD = "timeStampField";
+    public static final String TIMESTAMP_DEPRECATED_FORMAT = "timeStampFormat";
+    // endregion
 
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_FOR_FIELDS = "resolveStringsForFields";
@@ -209,8 +217,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
-    public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
-    public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
+
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
@@ -231,8 +238,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String GROBID_PREFERENCE = "grobidPreference";
     public static final String GROBID_URL = "grobidURL";
 
-    public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
-    public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
 
@@ -240,16 +245,20 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String COPY_LINKED_FILES_ON_TRANSFER = "copyLinkedFilesOnTransfer";
     public static final String MOVE_LINKED_FILES_ON_TRANSFER = "moveLinkedFilesOnTransfer";
 
-    public static final String TRANSLITERATE_FIELDS_FOR_CITATION_KEY = "transliterateFields";
-    public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
-    public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
+    // region CitationKeyPreferences
+    public static final String CITATION_KEY_TRANSLITERATE_FIELDS = "transliterateFields";
+    public static final String CITATION_KEY_AVOID_OVERWRITING = "avoidOverwritingKey";
+    public static final String CITATION_KEY_WARN_BEFORE_OVERWRITE = "warnBeforeOverwritingKey";
+    public static final String CITATION_KEY_GENERATE_BEFORE_SAVING = "generateKeysBeforeSaving";
+    public static final String CITATION_KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
+    public static final String CITATION_KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
+    public static final String CITATION_KEY_PATTERN_REGEX = "KeyPatternRegex";
+    public static final String CITATION_KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
+    public static final String CITATION_KEY_UNWANTED_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
+    public static final String CITATION_KEY_DEFAULT_PATTERN = "defaultBibtexKeyPattern";
+    // endregion
+
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
-
-    public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
-    public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
-    public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-
-    public static final String LOCAL_AUTO_SAVE = "localAutoSave";
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
@@ -293,6 +302,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
+
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
@@ -305,7 +315,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
-    // TODO: USed by both importer preferences and workspace preferences
     protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
 
     // Helper string
@@ -320,14 +329,15 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String RECENT_DATABASES = "recentDatabases";
     // endregion
 
-    // Proxy
+    // region ProxyPreferences
     private static final String PROXY_PORT = "proxyPort";
     private static final String PROXY_HOSTNAME = "proxyHostname";
     private static final String PROXY_USE = "useProxy";
     private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
     private static final String PROXY_USERNAME = "proxyUsername";
-    private static final String PROXY_PASSWORD = "proxyPassword";
+    // PROXY_PASSWORD = "proxyPassword" handled by KeyRing
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
+    // endregion
 
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
@@ -335,10 +345,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
 
     // SSL
-    private static final String TRUSTSTORE_PATH = "truststorePath";
-
-    // User
-    private static final String USER_ID = "userId";
+    private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
 
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -361,15 +368,17 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final int EXPORTER_FILENAME_INDEX = 1;
     private static final int EXPORTER_EXTENSION_INDEX = 2;
 
-    // Remote
-    private static final String USE_REMOTE_SERVER = "useRemoteServer";
-    private static final String REMOTE_SERVER_PORT = "remoteServerPort";
-    private static final String HTTP_SERVER_PORT = "httpServerPort";
-    private static final String ENABLE_HTTP_SERVER = "enableHttpServer";
-    private static final String ENABLE_LANGUAGE_SERVER = "enableLanguageServer";
-    private static final String LANGUAGE_SERVER_PORT = "languageServerPort";
-    private static final String DIRECT_HTTP_IMPORT = "directHttpImport";
+    // region RemotePreferences
+    private static final String SERVER_REMOTE_ENABLE = "useRemoteServer";
+    private static final String SERVER_REMOTE_PORT = "remoteServerPort";
+    private static final String SERVER_HTTP_ENABLE = "enableHttpServer";
+    private static final String SERVER_HTTP_PORT = "httpServerPort";
+    private static final String SERVER_LANGUAGE_ENABLE = "enableLanguageServer";
+    private static final String SERVER_LANGUAGE_PORT = "languageServerPort";
+    private static final String SERVER_DIRECT_HTTP_IMPORT = "directHttpImport";
+    // endregion
 
+    // region AiPreferences
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
     private static final String AI_AUTO_GENERATE_SUMMARIES = "aiAutoGenerateSummaries";
@@ -381,14 +390,12 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
     private static final String AI_GEMINI_CHAT_MODEL = "aiGeminiChatModel";
     private static final String AI_HUGGING_FACE_CHAT_MODEL = "aiHuggingFaceChatModel";
-    private static final String AI_GPT_4_ALL_MODEL = "aiGpt4AllChatModel";
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
     private static final String AI_OPEN_AI_API_BASE_URL = "aiOpenAiApiBaseUrl";
     private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
     private static final String AI_GEMINI_API_BASE_URL = "aiGeminiApiBaseUrl";
     private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
-    private static final String AI_GPT_4_ALL_API_BASE_URL = "aiGpt4AllApiBaseUrl";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
     private static final String AI_TEMPERATURE = "aiTemperature";
     private static final String AI_CONTEXT_WINDOW_SIZE = "aiMessageWindowSize";
@@ -405,6 +412,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE = "aiSummarizationCombineUserMessageTemplate";
     private static final String AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE = "aiCitationParsingSystemMessageTemplate";
     private static final String AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE = "aiCitationParsingUserMessageTemplate";
+    // endregion
 
     private static final String LAST_USED_DIRECTORY = "lastUsedDirectory";
 
@@ -513,19 +521,11 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);
 
-        defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
-        defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
-
         // region Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_PREFERENCE, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
         // endregion
-
-        defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
-
-        defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
-        defaults.put(BASE_DOI_URI, "https://doi.org");
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -534,18 +534,13 @@ public class JabRefCliPreferences implements CliPreferences {
             defaults.put(FONT_FAMILY, "SansSerif");
         }
 
-        defaults.put(KEY_PATTERN_REGEX, "");
-        defaults.put(KEY_PATTERN_REPLACEMENT, "");
-
         // SSL
-        defaults.put(TRUSTSTORE_PATH, Directories
+        defaults.put(SSL_TRUSTSTORE_PATH, Directories
                 .getSslDirectory()
                 .resolve("truststore.jks").toString());
 
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
-
-        defaults.put(REFORMAT_FILE_ON_SAVE_AND_EXPORT, Boolean.FALSE);
 
         // export order
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.TRUE);
@@ -579,7 +574,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
-        defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
@@ -612,11 +606,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
         defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
 
-        defaults.put(USE_OWNER, Boolean.FALSE);
-        defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
-        defaults.put(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, Boolean.FALSE);
-        defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
-        defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
 
         defaults.put(ADJUST_FILE_LINKS_ON_TRANSFER, Boolean.TRUE);
@@ -626,42 +615,13 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(KEEP_DOWNLOAD_URL, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
-        defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
-        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
-        defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon");
-        defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);
-        defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-        defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
-        defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
-        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
-        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
-        // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
-        defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
-
-        defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
-
-        defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
-        defaults.put(REMOTE_SERVER_PORT, 6050);
-        defaults.put(ENABLE_HTTP_SERVER, Boolean.FALSE);
-        defaults.put(HTTP_SERVER_PORT, 23119);
-        defaults.put(ENABLE_LANGUAGE_SERVER, Boolean.FALSE);
-        defaults.put(LANGUAGE_SERVER_PORT, 2087);
-        defaults.put(DIRECT_HTTP_IMPORT, Boolean.FALSE);
-
-        defaults.put(EXTERNAL_JOURNAL_LISTS, "");
-        defaults.put(USE_AMS_FJOURNAL, true);
         defaults.put(LAST_USED_EXPORT, "");
 
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
-        defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
-        // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
-        // Currently, JabRef does not escape them
-        defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
-        defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
@@ -710,14 +670,12 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());
         defaults.put(AI_GEMINI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI).getName());
         defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.HUGGING_FACE).getName());
-        defaults.put(AI_GPT_4_ALL_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GPT4ALL).getName());
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
         defaults.put(AI_OPEN_AI_API_BASE_URL, AiProvider.OPEN_AI.getApiUrl());
         defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiProvider.MISTRAL_AI.getApiUrl());
         defaults.put(AI_GEMINI_API_BASE_URL, AiProvider.GEMINI.getApiUrl());
         defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiProvider.HUGGING_FACE.getApiUrl());
-        defaults.put(AI_GPT_4_ALL_API_BASE_URL, AiProvider.GPT4ALL.getApiUrl());
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
         defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.getContextWindowSize(AiDefaultPreferences.PROVIDER, AiDefaultPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER).getName()));
@@ -901,7 +859,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearTruststoreFromCustomCertificates() {
-        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));
+        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(SSL_TRUSTSTORE_PATH).toString()));
         trustStoreManager.clearCustomCertificates();
     }
 
@@ -1030,8 +988,18 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
+        getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
+        getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
+        getLibraryPreferences().setAll(LibraryPreferences.getDefault());
+        getDOIPreferences().setAll(DOIPreferences.getDefault());
+        getOwnerPreferences().setAll(OwnerPreferences.getDefault());
+        getTimestampPreferences().setAll(TimestampPreferences.getDefault());
+        getRemotePreferences().setAll(RemotePreferences.getDefault());
+        getCitationKeyPatternPreferences().setAll(
+                CitationKeyPatternPreferences.getDefault()
+                                             .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
     }
 
     /// Imports Preferences from an XML file.
@@ -1042,12 +1010,20 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path path) throws JabRefException {
         importPreferencesToBackingStore(path);
 
-        // TODO: We need to load all CLI-preferences from the backing store
+        // TODO: We need to load all CLI preferences from the backing store
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
-        // in case of incomplete or corrupt xml fall back to current preferences
+        // in case of incomplete or corrupt XML fall back to current preferences
+        getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
         getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
+        getJournalAbbreviationPreferences().setAll(getJournalAbbreviationPreferencesFromBackingStore(getJournalAbbreviationPreferences()));
+        getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
+        getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
+        getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
+        getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
+        getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
+        getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1062,16 +1038,14 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    // ToDo: Cleanup
+    // region JournalAbbreviationPreferences
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         if (journalAbbreviationPreferences != null) {
             return journalAbbreviationPreferences;
         }
 
-        journalAbbreviationPreferences = new JournalAbbreviationPreferences(
-                getStringList(EXTERNAL_JOURNAL_LISTS),
-                getBoolean(USE_AMS_FJOURNAL));
+        journalAbbreviationPreferences = getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences.getDefault());
 
         journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
@@ -1080,6 +1054,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return journalAbbreviationPreferences;
     }
+
+    private JournalAbbreviationPreferences getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences defaults) {
+        return new JournalAbbreviationPreferences(
+                convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaults.getExternalJournalLists()))),
+                getBoolean(USE_AMS_FJOURNAL, defaults.useFJournalFieldProperty().get()));
+    }
+    // endregion
 
     // region PushToApplicationPreferences
     public PushToApplicationPreferences getPushToApplicationPreferences() {
@@ -1178,7 +1159,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
-    // endregion
 
     @Override
     public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
@@ -1208,118 +1188,146 @@ public class JabRefCliPreferences implements CliPreferences {
                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
+    // endregion
 
-    // region Misc
-
+    // region LibraryPreferences
     @Override
     public LibraryPreferences getLibraryPreferences() {
         if (libraryPreferences != null) {
             return libraryPreferences;
         }
 
-        libraryPreferences = new LibraryPreferences(
-                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
-                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                getBoolean(LOCAL_AUTO_SAVE),
-                getBoolean(ADD_IMPORTED_ENTRIES),
-                get(ADD_IMPORTED_ENTRIES_GROUP_NAME));
+        libraryPreferences = getLibraryPreferencesFromBackingStore(LibraryPreferences.getDefault());
 
-        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (_, _, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));
-        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (_, _, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
-        EasyBind.listen(libraryPreferences.autoSaveProperty(), (_, _, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
-        EasyBind.listen(libraryPreferences.addImportedEntriesProperty(), (_, _, newValue) -> putBoolean(ADD_IMPORTED_ENTRIES, newValue));
-        EasyBind.listen(libraryPreferences.addImportedEntriesGroupNameProperty(), (_, _, newValue) -> put(ADD_IMPORTED_ENTRIES_GROUP_NAME, newValue));
+        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (_, _, newValue) -> putBoolean(LIBRARY_BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));
+        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (_, _, newValue) -> putBoolean(LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(libraryPreferences.autoSaveProperty(), (_, _, newValue) -> putBoolean(LIBRARY_AUTO_SAVE, newValue));
+        EasyBind.listen(libraryPreferences.addImportedEntriesProperty(), (_, _, newValue) -> putBoolean(LIBRARY_ADD_IMPORTED_ENTRIES, newValue));
+        EasyBind.listen(libraryPreferences.addImportedEntriesGroupNameProperty(), (_, _, newValue) -> put(LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, newValue));
 
         return libraryPreferences;
     }
 
+    private @NonNull LibraryPreferences getLibraryPreferencesFromBackingStore(LibraryPreferences defaults) {
+        return new LibraryPreferences(
+                getBoolean(LIBRARY_BIBLATEX_DEFAULT_MODE, defaults.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
+                getBoolean(LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, defaults.shouldAlwaysReformatOnSave()),
+                getBoolean(LIBRARY_AUTO_SAVE, defaults.shouldAutoSave()),
+                getBoolean(LIBRARY_ADD_IMPORTED_ENTRIES, defaults.shouldAddImportedEntries()),
+                get(LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, defaults.getAddImportedEntriesGroupName()));
+    }
+    // endregion
+
+    // region DOIPreferences
     @Override
     public DOIPreferences getDOIPreferences() {
         if (doiPreferences != null) {
             return doiPreferences;
         }
 
-        doiPreferences = new DOIPreferences(
-                getBoolean(USE_CUSTOM_DOI_URI),
-                get(BASE_DOI_URI));
+        doiPreferences = getDoiPreferencesFromBackingStore(DOIPreferences.getDefault());
 
-        EasyBind.listen(doiPreferences.useCustomProperty(), (_, _, newValue) -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
-        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (_, _, newValue) -> put(BASE_DOI_URI, newValue));
+        EasyBind.listen(doiPreferences.useCustomProperty(), (_, _, newValue) -> putBoolean(DOI_USE_CUSTOM_URI, newValue));
+        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (_, _, newValue) -> put(DOI_BASE_URI, newValue));
 
         return doiPreferences;
     }
 
+    private @NonNull DOIPreferences getDoiPreferencesFromBackingStore(DOIPreferences defaults) {
+        return new DOIPreferences(
+                getBoolean(DOI_USE_CUSTOM_URI, defaults.shouldUseCustom()),
+                get(DOI_BASE_URI, defaults.getDefaultBaseURI())
+        );
+    }
+    // endregion
+
+    // region OwnerPreferences
     @Override
     public OwnerPreferences getOwnerPreferences() {
         if (ownerPreferences != null) {
             return ownerPreferences;
         }
 
-        ownerPreferences = new OwnerPreferences(
-                getBoolean(USE_OWNER),
-                get(DEFAULT_OWNER),
-                getBoolean(OVERWRITE_OWNER));
+        ownerPreferences = getOwnerPreferencesFromBackingStore(OwnerPreferences.getDefault());
 
-        EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -> putBoolean(USE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_ENABLE, newValue));
         EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (_, _, newValue) -> {
-            put(DEFAULT_OWNER, newValue);
+            put(OWNER_DEFAULT, newValue);
             // trigger re-determination of userAndHost and the dependent preferences
             userAndHost = null;
 
             // this propagates down to filePreferences
             getInternalPreferences().getUserAndHostProperty().setValue(newValue);
         });
-        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_OVERWRITE, newValue));
 
         return ownerPreferences;
     }
 
+    private @NonNull OwnerPreferences getOwnerPreferencesFromBackingStore(OwnerPreferences defaults) {
+        return new OwnerPreferences(
+                getBoolean(OWNER_ENABLE, defaults.shouldUseOwner()),
+                get(OWNER_DEFAULT, defaults.getDefaultOwner()),
+                getBoolean(OWNER_OVERWRITE, defaults.shouldOverwriteOwner())
+        );
+    }
+    // endregion
+
+    // region TimestampPreferences
     @Override
     public TimestampPreferences getTimestampPreferences() {
         if (timestampPreferences != null) {
             return timestampPreferences;
         }
 
-        timestampPreferences = new TimestampPreferences(
-                getBoolean(ADD_CREATION_DATE),
-                getBoolean(ADD_MODIFICATION_DATE),
-                getBoolean(UPDATE_TIMESTAMP),
-                FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                get(TIME_STAMP_FORMAT));
+        timestampPreferences = getTimestampPreferencesFromBackingStore(TimestampPreferences.getDefault());
 
-        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (_, _, newValue) -> putBoolean(ADD_CREATION_DATE, newValue));
-        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (_, _, newValue) -> putBoolean(ADD_MODIFICATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (_, _, newValue) -> putBoolean(TIMESTAMP_ADD_CREATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (_, _, newValue) -> putBoolean(TIMESTAMP_ADD_MODIFICATION_DATE, newValue));
 
         return timestampPreferences;
     }
+
+    private @NonNull TimestampPreferences getTimestampPreferencesFromBackingStore(TimestampPreferences defaults) {
+        return new TimestampPreferences(
+                getBoolean(TIMESTAMP_ADD_CREATION_DATE, defaults.shouldAddCreationDate()),
+                getBoolean(TIMESTAMP_ADD_MODIFICATION_DATE, defaults.shouldAddModificationDate()),
+
+                // legacy pre-5.3 fields for library cleanups
+                getBoolean(TIMESTAMP_DEPRECATED_UPDATE, defaults.shouldUpdateTimestamp()),
+                FieldFactory.parseField(get(TIMESTAMP_DEPRECATED_FIELD, defaults.getTimestampField().getName())),
+                get(TIMESTAMP_DEPRECATED_FORMAT, defaults.getTimestampFormat())
+        );
+    }
     // endregion
 
-    // region Network preferences
-
+    // region RemotePreferences
     @Override
     public RemotePreferences getRemotePreferences() {
         if (remotePreferences != null) {
             return remotePreferences;
         }
 
-        remotePreferences = new RemotePreferences(
-                getInt(REMOTE_SERVER_PORT),
-                getBoolean(USE_REMOTE_SERVER),
-                getInt(HTTP_SERVER_PORT),
-                getBoolean(ENABLE_HTTP_SERVER),
-                getBoolean(ENABLE_LANGUAGE_SERVER),
-                getInt(LANGUAGE_SERVER_PORT),
-                getBoolean(DIRECT_HTTP_IMPORT));
+        remotePreferences = getRemotePreferencesFromBackingStore(RemotePreferences.getDefault());
 
-        EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
-        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
-        EasyBind.listen(remotePreferences.httpPortProperty(), (_, _, newValue) -> putInt(HTTP_SERVER_PORT, newValue));
-        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_HTTP_SERVER, newValue));
-        EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(LANGUAGE_SERVER_PORT, newValue));
-        EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_LANGUAGE_SERVER, newValue));
-        EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(DIRECT_HTTP_IMPORT, newValue));
+        EasyBind.listen(remotePreferences.remoteServerPortProperty(), (_, _, newValue) -> putInt(SERVER_REMOTE_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableRemoteServerProperty(), (_, _, newValue) -> putBoolean(SERVER_REMOTE_ENABLE, newValue));
+        EasyBind.listen(remotePreferences.httpServerPortProperty(), (_, _, newValue) -> putInt(SERVER_HTTP_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(SERVER_HTTP_ENABLE, newValue));
+        EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(SERVER_LANGUAGE_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(SERVER_LANGUAGE_ENABLE, newValue));
+        EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(SERVER_DIRECT_HTTP_IMPORT, newValue));
 
         return remotePreferences;
+    }
+
+    private @NonNull RemotePreferences getRemotePreferencesFromBackingStore(RemotePreferences defaults) {
+        return new RemotePreferences(
+                getBoolean(SERVER_REMOTE_ENABLE, defaults.shouldEnableRemoteServer()), getInt(SERVER_REMOTE_PORT, defaults.getRemoteServerPort()),
+                getBoolean(SERVER_HTTP_ENABLE, defaults.shouldEnableHttpServer()), getInt(SERVER_HTTP_PORT, defaults.getHttpServerPort()),
+                getBoolean(SERVER_LANGUAGE_ENABLE, defaults.shouldEnableLanguageServer()),
+                getInt(SERVER_LANGUAGE_PORT, defaults.getLanguageServerPort()),
+                getBoolean(SERVER_DIRECT_HTTP_IMPORT, defaults.directHttpImport()));
     }
     // endregion
 
@@ -1353,32 +1361,32 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private ProxyPreferences getProxyPreferencesFromBackingStore(ProxyPreferences defaults) {
+        boolean persistPassword = getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword());
+
         return new ProxyPreferences(
                 getBoolean(PROXY_USE, defaults.shouldUseProxy()),
                 get(PROXY_HOSTNAME, defaults.getHostname()),
                 get(PROXY_PORT, defaults.getPort()),
                 getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
                 get(PROXY_USERNAME, defaults.getUsername()),
-                get(PROXY_PASSWORD, defaults.getPassword()),
-                getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword())
+                persistPassword ? getProxyPassword().orElse(defaults.getPassword()) : defaults.getPassword(),
+                persistPassword
         );
     }
-    // endregion
 
-    private String getProxyPassword() {
-        if (getBoolean(PROXY_PERSIST_PASSWORD)) {
-            try (final Keyring keyring = Keyring.create()) {
-                return new Password(
-                        keyring.getPassword("org.jabref", "proxy"),
-                        getInternalPreferences().getUserAndHost())
-                        .decrypt();
-            } catch (PasswordAccessException ex) {
-                LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
-            } catch (Exception ex) {
-                LOGGER.warn("JabRef could not open the key store", ex);
-            }
+    private Optional<String> getProxyPassword() {
+        try (final Keyring keyring = Keyring.create()) {
+            return Optional.of(new Password(
+                    keyring.getPassword("org.jabref", "proxy"),
+                    getInternalPreferences().getUserAndHost())
+                    .decrypt());
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
+        } catch (Exception ex) {
+            LOGGER.warn("JabRef could not open the key store", ex);
         }
-        return (String) defaults.get(PROXY_PASSWORD);
+
+        return Optional.empty();
     }
 
     private void setProxyPassword(String password) {
@@ -1397,7 +1405,9 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
     }
+    // endregion
 
+    // region SSLPreferences
     @Override
     public SSLPreferences getSSLPreferences() {
         if (sslPreferences != null) {
@@ -1405,16 +1415,80 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         sslPreferences = new SSLPreferences(
-                get(TRUSTSTORE_PATH)
+                get(SSL_TRUSTSTORE_PATH)
         );
 
         return sslPreferences;
     }
+    // endregion
 
     // region CitationKeyPatternPreferences
+    @Override
+    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+        if (citationKeyPatternPreferences != null) {
+            return citationKeyPatternPreferences;
+        }
 
-    private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
-        GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
+        citationKeyPatternPreferences = getCitationKeyPatternPreferencesFromBackingStore(CitationKeyPatternPreferences.getDefault());
+
+        EasyBind.listen(citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKeyProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_TRANSLITERATE_FIELDS, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_AVOID_OVERWRITING, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_WARN_BEFORE_OVERWRITE, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
+                (_, _, newValue) -> putBoolean(CITATION_KEY_GENERATE_BEFORE_SAVING, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (_, _, newValue) -> {
+            putBoolean(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
+            putBoolean(CITATION_KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
+        });
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
+                (_, _, newValue) -> put(CITATION_KEY_PATTERN_REGEX, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
+                (_, _, newValue) -> put(CITATION_KEY_PATTERN_REPLACEMENT, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
+                (_, _, newValue) -> put(CITATION_KEY_UNWANTED_CHARACTERS, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternsProperty(),
+                (_, _, newValue) -> storeGlobalCitationKeyPattern(newValue));
+
+        return citationKeyPatternPreferences;
+    }
+
+    private @NonNull CitationKeyPatternPreferences getCitationKeyPatternPreferencesFromBackingStore(CitationKeyPatternPreferences defaults) {
+        return new CitationKeyPatternPreferences(
+                getBoolean(CITATION_KEY_TRANSLITERATE_FIELDS, defaults.shouldTransliterateFieldsForCitationKey()),
+                getBoolean(CITATION_KEY_AVOID_OVERWRITING, defaults.shouldAvoidOverwriteCiteKey()),
+                getBoolean(CITATION_KEY_WARN_BEFORE_OVERWRITE, defaults.shouldWarnBeforeOverwriteCiteKey()),
+                getBoolean(CITATION_KEY_GENERATE_BEFORE_SAVING, defaults.shouldGenerateCiteKeysBeforeSaving()),
+                getKeySuffix(defaults),
+                get(CITATION_KEY_PATTERN_REGEX, defaults.getKeyPatternRegex()),
+                get(CITATION_KEY_PATTERN_REPLACEMENT, defaults.getKeyPatternReplacement()),
+                get(CITATION_KEY_UNWANTED_CHARACTERS, defaults.getUnwantedCharacters()),
+                getGlobalCitationKeyPattern(defaults),
+                getBibEntryPreferences().keywordSeparatorProperty());
+    }
+
+    private CitationKeyPatternPreferences.KeySuffix getKeySuffix(CitationKeyPatternPreferences defaults) {
+        if (!hasKey(CITATION_KEY_GEN_ALWAYS_ADD_LETTER) && !hasKey(CITATION_KEY_GEN_FIRST_LETTER_A)) {
+            return defaults.getKeySuffix();
+        }
+
+        boolean alwaysAddLetter = getBoolean(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, false);
+        boolean firstLetterA = getBoolean(CITATION_KEY_GEN_FIRST_LETTER_A, false);
+
+        if (alwaysAddLetter && !firstLetterA) {
+            return CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+        } else if (!alwaysAddLetter && firstLetterA) {
+            return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+        } else {
+            return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+        }
+    }
+
+    private @NonNull GlobalCitationKeyPatterns getGlobalCitationKeyPattern(CitationKeyPatternPreferences defaults) {
+        GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(
+                get(CITATION_KEY_DEFAULT_PATTERN, defaults.getKeyPatterns().getDefaultValue().stringRepresentation()));
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
@@ -1429,18 +1503,17 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPattern;
     }
-    // endregion
 
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
         if ((pattern.getDefaultValue() == null)
                 || pattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
-            put(DEFAULT_CITATION_KEY_PATTERN, "");
+            put(CITATION_KEY_DEFAULT_PATTERN, "");
         } else {
-            put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().stringRepresentation());
+            put(CITATION_KEY_DEFAULT_PATTERN, pattern.getDefaultValue().stringRepresentation());
         }
 
-        // Store overridden definitions to Preferences.
+        // Store overridden definitions in Preferences.
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
@@ -1459,62 +1532,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private void clearCitationKeyPatterns() throws BackingStoreException {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
-        getCitationKeyPatternPreferences().setKeyPatterns(getGlobalCitationKeyPattern());
     }
-
-    @Override
-    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
-        if (citationKeyPatternPreferences != null) {
-            return citationKeyPatternPreferences;
-        }
-
-        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
-                getBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY),
-                getBoolean(AVOID_OVERWRITING_KEY),
-                getBoolean(WARN_BEFORE_OVERWRITING_KEY),
-                getBoolean(GENERATE_KEYS_BEFORE_SAVING),
-                getKeySuffix(),
-                get(KEY_PATTERN_REGEX),
-                get(KEY_PATTERN_REPLACEMENT),
-                get(UNWANTED_CITATION_KEY_CHARACTERS),
-                getGlobalCitationKeyPattern(),
-                (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
-                getBibEntryPreferences().keywordSeparatorProperty());
-
-        EasyBind.listen(citationKeyPatternPreferences.shouldTransliterateFieldsForCitationKeyProperty(),
-                (_, _, newValue) -> putBoolean(TRANSLITERATE_FIELDS_FOR_CITATION_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
-                (_, _, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
-                (_, _, newValue) -> putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
-                (_, _, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (_, _, newValue) -> {
-            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
-            putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
-        });
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
-                (_, _, newValue) -> put(KEY_PATTERN_REGEX, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
-                (_, _, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
-                (_, _, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternsProperty(),
-                (_, _, newValue) -> storeGlobalCitationKeyPattern(newValue));
-
-        return citationKeyPatternPreferences;
-    }
-
-    private CitationKeyPatternPreferences.KeySuffix getKeySuffix() {
-        CitationKeyPatternPreferences.KeySuffix keySuffix =
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
-        if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
-        } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
-            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
-        }
-        return keySuffix;
-    }
+    // endregion
 
     // region BibEntryPreferences
     @Override
@@ -1576,7 +1595,7 @@ public class JabRefCliPreferences implements CliPreferences {
         if (userAndHost != null) {
             return userAndHost;
         }
-        userAndHost = new UserHostInfo(get(DEFAULT_OWNER), OS.getHostName());
+        userAndHost = new UserHostInfo(get(OWNER_DEFAULT), OS.getHostName());
         return userAndHost;
     }
 
@@ -1590,14 +1609,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return fieldPreferences;
         }
 
-        fieldPreferences = new FieldPreferences(
-                !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !
-                getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
-                                                         .map(FieldFactory::parseField)
-                                                         .collect(Collectors.toList()),
-                getStringList(NON_WRAPPABLE_FIELDS).stream()
-                                                   .map(FieldFactory::parseField)
-                                                   .collect(Collectors.toList()));
+        fieldPreferences = getFieldPreferencesFromBackingStore(FieldPreferences.getDefault());
 
         EasyBind.listen(fieldPreferences.resolveStringsProperty(), (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
         fieldPreferences.getResolvableFields().addListener((InvalidationListener) _ ->
@@ -1606,6 +1618,16 @@ public class JabRefCliPreferences implements CliPreferences {
                 put(NON_WRAPPABLE_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields())));
 
         return fieldPreferences;
+    }
+
+    private FieldPreferences getFieldPreferencesFromBackingStore(FieldPreferences defaults) {
+        return new FieldPreferences(
+                !getBoolean(DO_NOT_RESOLVE_STRINGS, !defaults.shouldResolveStrings()),
+                List.copyOf(FieldFactory.parseFieldList(get(RESOLVE_STRINGS_FOR_FIELDS,
+                        FieldFactory.serializeFieldsList(defaults.getResolvableFields())))),
+                List.copyOf(FieldFactory.parseFieldList(get(NON_WRAPPABLE_FIELDS,
+                        FieldFactory.serializeFieldsList(defaults.getNonWrappableFields()))))
+        );
     }
 
     // region Linked files preferences
@@ -1802,7 +1824,7 @@ public class JabRefCliPreferences implements CliPreferences {
         for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
             List<String> formatData = convertStringToList(toImport);
             TemplateExporter format = new TemplateExporter(
-                    formatData.getFirst(),
+                    formatData.get(EXPORTER_NAME_INDEX),
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
@@ -1953,18 +1975,16 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(AI_AUTO_GENERATE_SUMMARIES),
                 getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS),
                 getInt(AI_FOLLOW_UP_QUESTIONS_COUNT),
-                AiProvider.valueOf(get(AI_PROVIDER)),
+                AiProvider.fromString(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
                 get(AI_GEMINI_CHAT_MODEL),
                 get(AI_HUGGING_FACE_CHAT_MODEL),
-                get(AI_GPT_4_ALL_MODEL),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_OPEN_AI_API_BASE_URL),
                 get(AI_MISTRAL_AI_API_BASE_URL),
                 get(AI_GEMINI_API_BASE_URL),
                 get(AI_HUGGING_FACE_API_BASE_URL),
-                get(AI_GPT_4_ALL_API_BASE_URL),
                 EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 getDouble(AI_TEMPERATURE),
                 getInt(AI_CONTEXT_WINDOW_SIZE),
@@ -1996,7 +2016,6 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (_, _, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.geminiChatModelProperty(), (_, _, newValue) -> put(AI_GEMINI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (_, _, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
-        EasyBind.listen(aiPreferences.gpt4AllChatModelProperty(), (_, _, newValue) -> put(AI_GPT_4_ALL_MODEL, newValue));
 
         EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (_, _, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
@@ -2004,7 +2023,6 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.mistralAiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_MISTRAL_AI_API_BASE_URL, newValue));
         EasyBind.listen(aiPreferences.geminiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_GEMINI_API_BASE_URL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (_, _, newValue) -> put(AI_HUGGING_FACE_API_BASE_URL, newValue));
-        EasyBind.listen(aiPreferences.gpt4AllApiBaseUrlProperty(), (_, _, newValue) -> put(AI_GPT_4_ALL_API_BASE_URL, newValue));
 
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (_, _, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.temperatureProperty(), (_, _, newValue) -> putDouble(AI_TEMPERATURE, newValue.doubleValue()));
