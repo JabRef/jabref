@@ -1,8 +1,9 @@
 package org.jabref.logic.bibtex;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -35,7 +36,7 @@ public class FieldWriter {
     ///
     /// @return list of balancing errors
     public static List<String> checkBalancedBraces(String text) {
-        Stack<FieldWriter.BracePosition> openBraces = new Stack<>();
+        Deque<FieldWriter.BracePosition> openBraces = new ArrayDeque<>();
         List<String> errors = new ArrayList<>();
 
         int line = 0;
@@ -83,7 +84,7 @@ public class FieldWriter {
     /// @param text the text to sanitize
     /// @return sanitized text
     public static String sanitizeUnbalancedBraces(String text) {
-        Stack<Integer> openBraces = new Stack<>();
+        Deque<Integer> openBraces = new ArrayDeque<>();
         StringBuilder sanitized = new StringBuilder(text);
 
         // Fix unbalanced closing braces
