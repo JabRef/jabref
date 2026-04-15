@@ -178,7 +178,21 @@
 }
 
 .notification-bar > .pane {
+    -fx-background-color: -jr-gray-3;
+}
+
+.notification-bar > .pane > .title,
+.notification-bar > .pane > .label,
+.notification-bar > .pane > .button-bar > .container > .action {
+    -fx-text-fill: -fx-light-text-color;
+}
+
+.notification-pane .notification-bar > .pane .close-button > .graphic {
     -fx-background-color: -fx-light-text-color;
+}
+
+.notification-bar > .pane > .label > .ikonli-font-icon {
+    -fx-icon-color: -fx-light-text-color;
 }
 
 .rating > .container > .button {
