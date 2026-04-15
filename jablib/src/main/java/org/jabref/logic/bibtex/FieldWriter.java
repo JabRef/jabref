@@ -52,12 +52,14 @@ public class FieldWriter {
                 if (item == '{') {
                     openBraces.push(new FieldWriter.BracePosition(i, line, i - lastLineIndex + 1));
                 } else if (item == '}') {
-                    if (openBraces.pop() == null) {
+                    if (openBraces.isEmpty()) {
                         errors.add("Unbalanced '}' at line %d, column %d (index %d): in '%s'".formatted(
                                 line + 1,
                                 i - lastLineIndex + 1,
                                 i,
                                 getContextSnippet(text, i)));
+                    } else {
+                        openBraces.pop();
                     }
                 }
             }
@@ -91,9 +93,11 @@ public class FieldWriter {
                 if (item == '{') {
                     openBraces.push(i);
                 } else if (item == '}') {
-                    if (openBraces.pop() == null) {
+                    if (openBraces.isEmpty()) {
                         sanitized.insert(i, '\\');
                         i++;
+                    } else {
+                        openBraces.pop();
                     }
                 }
             }
