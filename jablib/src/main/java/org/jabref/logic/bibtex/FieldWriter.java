@@ -146,13 +146,8 @@ public class FieldWriter {
             return FIELD_START + "" + FIELD_END;
         }
 
-        String sanitized = content;
-        List<String> unbalancedBraceErrors = checkBalancedBraces(content);
-        if (!unbalancedBraceErrors.isEmpty()) {
-            LOGGER.error("Unbalanced braces in field value: {}", content);
-            unbalancedBraceErrors.forEach(LOGGER::error);
-            sanitized = sanitizeUnbalancedBraces(content);
-        }
+        // Always sanitize the braces
+        String sanitized = sanitizeUnbalancedBraces(content);
 
         if (!shouldResolveStrings(field) || field.equals(InternalField.BIBTEX_STRING)) {
             return formatWithoutResolvingStrings(sanitized);
