@@ -345,7 +345,8 @@ public class SourceTab extends EntryEditorTab {
                 // Test if the field is legally set.
                 List<String> errors = FieldWriter.checkBalancedBraces(newValue);
                 if (!errors.isEmpty()) {
-                    validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
+                    validationMessage.setValue(ValidationMessage.error(
+                            Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors))));
                     return;
                 }
 
