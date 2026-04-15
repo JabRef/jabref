@@ -14,8 +14,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class FieldWriterTest {
 
@@ -128,8 +130,28 @@ class FieldWriterTest {
             "'Incorporating evolutionary {Measures into Conservation Prioritization}', 'Incorporating evolutionary {Measures into Conservation Prioritization}'",
             "'Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}', 'Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}'",
     })
-    void unbalancedBraces(String expected, String input) {
+    void unbalancedBracesSanitized(String expected, String input) {
         assertEquals("{" + expected + "}", writer.write(StandardField.COMMENT, input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{",
+            "}",
+            "{{",
+            "{}",
+            "\\{}"})
+    void checkUnbalancedBraces(String input) {
+        assertNotEquals(List.of(), FieldWriter.checkBalancedBraces(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Incorporating evolutionary {Measures into Conservation Prioritization}",
+            "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}",
+            "{Measures into Conservation Prioritization}"})
+    void checkBalancedBraces(String input) {
+        assertEquals(List.of(), FieldWriter.checkBalancedBraces(input));
     }
 
     @Test
