@@ -43,6 +43,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
@@ -267,23 +268,27 @@ public class SaveDatabaseAction {
                         preferences.getCitationKeyPatternPreferences(),
                         entryTypesManager);
 
-                if (selectedOnly) {
-                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
-                } else {
-                    databaseWriter.writeDatabase(bibDatabaseContext);
-                }
-
+                List<BibEntry> entriesToAbbreviate = selectedOnly
+                                                     ? libraryTab.getSelectedEntries()
+                                                     : bibDatabaseContext.getDatabase().getEntries();
                 List<FieldChange> abbreviationChanges = bibDatabaseContext.getMetaData()
                                                                           .getLibraryAbbreviationType()
                                                                           .map(abbreviationType -> {
                                                                               boolean useFJournal = preferences.getJournalAbbreviationPreferences().shouldUseFJournalField();
                                                                               AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(
                                                                                       bibDatabaseContext.getDatabase(), journalAbbreviationRepository, abbreviationType, useFJournal);
-                                                                              return bibDatabaseContext.getDatabase().getEntries().stream()
-                                                                                                       .flatMap(entry -> cleanup.cleanup(entry).stream())
-                                                                                                       .toList();
+                                                                              return entriesToAbbreviate.stream()
+                                                                                                        .flatMap(entry -> cleanup.cleanup(entry).stream())
+                                                                                                        .toList();
                                                                           })
                                                                           .orElse(List.of());
+
+                if (selectedOnly) {
+                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                } else {
+                    databaseWriter.writeDatabase(bibDatabaseContext);
+                }
+
                 libraryTab.registerUndoableChanges(
                         Stream.concat(databaseWriter.getSaveActionsFieldChanges().stream(), abbreviationChanges.stream()).toList());
 
