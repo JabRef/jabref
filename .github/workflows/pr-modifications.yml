@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - if: github.head_ref == 'main'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
