@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
@@ -377,13 +376,9 @@ public class BibDatabaseWriter {
         if (bibtexString.getContent().isEmpty()) {
             bibWriter.write("{}");
         } else {
-            try {
-                String formatted = new FieldWriter(fieldPreferences)
-                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
-                bibWriter.write(formatted);
-            } catch (InvalidFieldValueException ex) {
-                throw new IOException(ex);
-            }
+            String formatted = new FieldWriter(fieldPreferences)
+                    .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
+            bibWriter.write(formatted);
         }
 
         bibWriter.writeLine("}");
