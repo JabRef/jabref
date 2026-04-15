@@ -195,7 +195,7 @@ public class BibEntryWriter {
     @ADR(49)
     static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();
-        return fieldName + " ".repeat(indent - fieldName.length()) + " = ";
+        return fieldName + " ".repeat(Math.max(0, indent - fieldName.length())) + " = ";
     }
 
     public Map<Field, Range> getFieldPositions() {

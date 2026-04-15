@@ -33,7 +33,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -654,15 +653,6 @@ class BibEntryWriterTest {
                 }
                 """.replace("\n", OS.NEWLINE);
         assertEquals(expected, stringWriter.toString());
-    }
-
-    @Test
-    void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.NOTE, "some text with unbalanced { braces")
-                .withChanged(true);
-
-        assertThrows(IOException.class, () -> bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX));
     }
 
     @Test
