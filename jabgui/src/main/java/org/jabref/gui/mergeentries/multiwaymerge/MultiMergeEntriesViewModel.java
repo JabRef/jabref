@@ -21,6 +21,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
@@ -49,6 +50,11 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
     public void updateFields(BibEntry entry) {
         if (entry == null) {
             return;
+        }
+        if (mergedEntry.get().getType() == StandardEntryType.Misc
+                && entry.getType() != null
+                && entry.getType() != StandardEntryType.Misc) {
+            mergedEntry.get().setType(entry.getType());
         }
         for (Map.Entry<Field, String> fieldEntry : entry.getFieldMap().entrySet()) {
             Field field = fieldEntry.getKey();
