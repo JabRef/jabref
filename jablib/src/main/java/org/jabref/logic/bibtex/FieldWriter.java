@@ -84,30 +84,41 @@ public class FieldWriter {
     /// @param text the text to sanitize
     /// @return sanitized text
     public static String sanitizeUnbalancedBraces(String text) {
-        Deque<Integer> openBraces = new ArrayDeque<>();
-        StringBuilder sanitized = new StringBuilder(text);
+        int length = text.length();
+        Deque<Integer> lastOpenBrace = new ArrayDeque<>(length);
+        boolean[] toEscape = new boolean[length];
 
-        // Fix unbalanced closing braces
-        for (int i = 0; i < sanitized.length(); i++) {
-            char item = sanitized.charAt(i);
-
-            if (!isEscaped(sanitized.toString(), i)) {
-                if (item == '{') {
-                    openBraces.push(i);
-                } else if (item == '}') {
-                    if (openBraces.isEmpty()) {
-                        sanitized.insert(i, '\\');
-                        i++;
+        // Find all braces
+        for (int i = 0; i < length; i++) {
+            char currentChat = text.charAt(i);
+            if (!isEscaped(text, i)) {
+                if (currentChat == '{') {
+                    // Remember the last open brace
+                    lastOpenBrace.push(i);
+                } else if (currentChat == '}') {
+                    if (!lastOpenBrace.isEmpty()) {
+                        // Match with the last open brace
+                        lastOpenBrace.pop();
                     } else {
-                        openBraces.pop();
+                        // No related opening brace
+                        toEscape[i] = true;
                     }
                 }
             }
         }
 
-        // Fix remaining open braces
-        while (!openBraces.isEmpty()) {
-            sanitized.insert((int) openBraces.pop(), '\\');
+        // Remaining open braces
+        while (!lastOpenBrace.isEmpty()) {
+            toEscape[lastOpenBrace.pop()] = true;
+        }
+
+        // Create the result with escaped unbalanced braces
+        StringBuilder sanitized = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            if (toEscape[i]) {
+                sanitized.append('\\');
+            }
+            sanitized.append(text.charAt(i));
         }
 
         return sanitized.toString();
