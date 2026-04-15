@@ -21,23 +21,13 @@ public class FieldWriter {
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
 
-    private final boolean neverFailOnHashes;
     private final FieldPreferences preferences;
 
     private record BracePosition(int index, int line, int column) {
     }
 
     public FieldWriter(FieldPreferences preferences) {
-        this(true, preferences);
-    }
-
-    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
-        this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
-    }
-
-    public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
-        return new FieldWriter(true, prefs);
     }
 
     /// Checks text for balanced braces and returns a list of unbalanced
@@ -143,35 +133,34 @@ public class FieldWriter {
     }
 
     /// Formats the content of a field.
-    /// FixMe: Remove deprecated InvalideFieldValueException, make proper error handling
     ///
     /// @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
     /// @param content the content of the field
     /// @return a formatted string suitable for output
-    /// @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
-    public String write(Field field, String content) throws InvalidFieldValueException {
+    public String write(Field field, String content) {
         if (content == null) {
             return FIELD_START + "" + FIELD_END;
         }
 
+        String sanitized = content;
         List<String> unbalancedBraceErrors = checkBalancedBraces(content);
         if (!unbalancedBraceErrors.isEmpty()) {
             LOGGER.error("Unbalanced braces in field value: {}", content);
             unbalancedBraceErrors.forEach(LOGGER::error);
-            throw new InvalidFieldValueException("Unbalanced braces in field value: " + content);
+            sanitized = sanitizeUnbalancedBraces(content);
         }
 
         if (!shouldResolveStrings(field) || field.equals(InternalField.BIBTEX_STRING)) {
-            return formatWithoutResolvingStrings(content);
+            return formatWithoutResolvingStrings(sanitized);
         }
 
-        return formatAndResolveStrings(content);
+        return formatAndResolveStrings(sanitized);
     }
 
     /// This method handles # in the field content to get valid bibtex strings
     ///
     /// For instance, `#jan# - #feb#` gets  `jan #{ - } # feb` (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
-    private String formatAndResolveStrings(String content) throws InvalidFieldValueException {
+    private String formatAndResolveStrings(String content) {
         content = content.replace("##", "");
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -193,20 +182,13 @@ public class FieldWriter {
             }
 
             if (pos2 == -1) {
-                if (neverFailOnHashes) {
-                    pos1 = content.length(); // just write out the rest of the text, and throw no exception
-                } else {
-                    LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\\\{}'. "
-                                    + "In JabRef, use pairs of # characters to indicate a string. "
-                                    + "Note that the entry causing the problem has been selected. Field value: {}",
-                            BIBTEX_STRING_START_END_SYMBOL,
-                            BIBTEX_STRING_START_END_SYMBOL,
-                            content);
-                    throw new InvalidFieldValueException(
-                            "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
-                                    + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                    + "Note that the entry causing the problem has been selected. Field value: " + content);
-                }
+                pos1 = content.length(); // just write out the rest of the text, and throw no exception
+                LOGGER.warn("The character {} is not allowed in BibTeX strings unless escaped as in '\\\\{}'. "
+                                + "In JabRef, use pairs of # characters to indicate a string. "
+                                + "Field value: {}",
+                        BIBTEX_STRING_START_END_SYMBOL,
+                        BIBTEX_STRING_START_END_SYMBOL,
+                        content);
             }
 
             if (pos1 > pivot) {

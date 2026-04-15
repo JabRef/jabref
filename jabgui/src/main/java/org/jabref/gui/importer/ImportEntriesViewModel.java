@@ -169,7 +169,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public String getSourceString(BibEntry entry) {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
+        FieldWriter fieldWriter = new FieldWriter(preferences.getFieldPreferences());
         try {
             // Force reformatting so the displayed BibTeX is consistently formatted
             new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode(), true);

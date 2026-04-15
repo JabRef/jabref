@@ -680,7 +680,7 @@ public class BibEntry {
             FieldPreferences fieldPreferences) {
         try (StringWriter writer = new StringWriter()) {
             BibWriter bibWriter = new BibWriter(writer, "\n");
-            FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+            FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
             BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
             bibEntryWriter.write(entry, bibWriter, type, true);
             return writer.toString();
