@@ -63,15 +63,15 @@ public class FieldWriter {
                     }
                 }
             }
+        }
 
-            while (!openBraces.isEmpty()) {
-                FieldWriter.BracePosition lastOpenBrace = openBraces.pop();
-                errors.add("Unbalanced '{' at line %d, column %d (index %d): in '%s'".formatted(
-                        lastOpenBrace.index(),
-                        lastOpenBrace.column(),
-                        lastOpenBrace.index(),
-                        getContextSnippet(text, lastOpenBrace.index())));
-            }
+        while (!openBraces.isEmpty()) {
+            FieldWriter.BracePosition lastOpenBrace = openBraces.pop();
+            errors.add("Unbalanced '{' at line %d, column %d (index %d): in '%s'".formatted(
+                    lastOpenBrace.index(),
+                    lastOpenBrace.column(),
+                    lastOpenBrace.index(),
+                    getContextSnippet(text, lastOpenBrace.index())));
         }
 
         return errors;
