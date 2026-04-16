@@ -74,7 +74,7 @@ public class RelatedWorkInserter {
 
         String updatedComment = existingComment
                 .filter(comment -> !comment.isBlank())
-                .map(comment -> StringUtil.unifyLineBreaks(comment.stripTrailing(), "\n") + "\n\n" + formattedComment)
+                .map(comment -> StringUtil.unifyLineBreaks(comment.stripTrailing(), OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE + formattedComment)
                 .orElse(formattedComment);
 
         return matchedLibraryEntry.setField(userSpecificCommentField, updatedComment);
