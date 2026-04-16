@@ -42,6 +42,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.logic.importer.util.UrlIdentifierParser;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
@@ -339,7 +340,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         CompletableFuture<Optional<BibEntry>> arXivBibEntryPromise = arXiv.asyncPerformSearchById(identifier);
         if (this.doiFetcher != null) {
-            inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, ArXivIdentifier.parse(identifier));
+            inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, UrlIdentifierParser.parseArXiv(identifier));
         }
         return arXivBibEntryPromise.join();
     }
