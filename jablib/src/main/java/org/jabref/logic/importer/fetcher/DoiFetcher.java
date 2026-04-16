@@ -142,7 +142,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             throw new FetcherException("Invalid URL", e);
         }
         if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
-            return new Medra().performSearchById(identifier);
+            return new Medra().performSearchById(doi.asString());
         }
 
         URLDownload download = getUrlDownload(doiURL);

@@ -1,0 +1,18 @@
+--- a/jablib/src/main/java/org/jabref/logic/importer/fetcher/ArXivFetcher.java
++++ b/jablib/src/main/java/org/jabref/logic/importer/fetcher/ArXivFetcher.java
+@@ -339,8 +339,13 @@ public class ArXivFetcher implements IdBasedFetcher {
+     @Override
+     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+-        CompletableFuture<Optional<BibEntry>> arXivBibEntryPromise = arXiv.asyncPerformSearchById(identifier);
++        Optional<ArXivIdentifier> arXivId = UrlIdentifierParser.parseArXiv(identifier);
++        if (arXivId.isEmpty()) {
++            throw new FetcherException("Invalid arXiv identifier");
++        }
++        String extractedId = arXivId.get().getNormalizedIdentifier();
++        CompletableFuture<Optional<BibEntry>> arXivBibEntryPromise = arXiv.asyncPerformSearchById(extractedId);
+         if (this.doiFetcher != null) {
+-            inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, UrlIdentifierParser.parseArXiv(identifier));
++            inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, arXivId);
+         }
+         return arXivBibEntryPromise.join();
+     }
