@@ -31,6 +31,7 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.logic.importer.util.UrlIdentifierParser;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
@@ -88,7 +89,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private void doAPILimiting(String identifier) {
         // Without a generic API Rate Limiter implemented on the project, use Guava's RateLimiter for avoiding
         // API throttling when multiple threads are working, specially during DOI Content Negotiations
-        Optional<DOI> doi = DOI.parse(identifier);
+        Optional<DOI> doi = UrlIdentifierParser.parseDOI(identifier);
 
         try {
             Optional<String> agency;
@@ -121,7 +122,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        DOI doi = DOI.parse(identifier)
+        DOI doi = UrlIdentifierParser.parseDOI(identifier)
                      .orElseThrow(() -> new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier)));
 
         URL doiURL;
