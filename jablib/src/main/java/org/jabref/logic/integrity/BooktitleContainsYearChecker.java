@@ -8,7 +8,7 @@ import org.jabref.logic.util.strings.StringUtil;
 
 public class BooktitleContainsYearChecker implements ValueChecker {
 
-    private static final Pattern CONTAINS_YEAR = Pattern.compile("(?<![0-9])[12][0-9]{3}(?![0-9])");
+    private static final Pattern CONTAINS_YEAR = Pattern.compile("(?<!\\p{Alnum})[12][0-9]{3}(?!\\p{Alnum})");
 
     @Override
     public Optional<String> checkValue(String value) {

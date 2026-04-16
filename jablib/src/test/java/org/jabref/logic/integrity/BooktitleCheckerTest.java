@@ -55,6 +55,12 @@ class BooktitleCheckerTest {
     }
 
     @Test
+    void booktitleYearNotFlaggedInsideAlphanumericToken() {
+        // "ICML2015" should NOT be flagged — the digits are part of a larger token
+        assertEquals(Optional.empty(), yearChecker.checkValue("Proceedings ICML2015"));
+    }
+
+    @Test
     void booktitleYearCheckerIsBlank() {
         assertEquals(Optional.empty(), yearChecker.checkValue(" "));
     }
