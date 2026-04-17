@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added SearchRxiv integration to the SLR feature. [#12618](https://github.com/JabRef/jabref/issues/12618)
 - Added context menu entry "Sort tabs alphabetically" to the library tabs. [#15425](https://github.com/JabRef/jabref/pull/15425)
 - We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
+- We added integrity checks that warn when the `booktitle` field contains a year, a country/location, or page numbers that should live in dedicated fields. [#12271](https://github.com/JabRef/jabref/issues/12271)
 
 ### Changed
 
