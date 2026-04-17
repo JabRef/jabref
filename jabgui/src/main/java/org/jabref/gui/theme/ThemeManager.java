@@ -29,8 +29,6 @@ import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.pixelduke.window.ThemeWindowManager;
-import com.pixelduke.window.ThemeWindowManagerFactory;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,22 +57,17 @@ public class ThemeManager {
 
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final ThemeWindowManager themeWindowManager;
     private final StyleSheet baseStyleSheet;
     private Theme theme;
-    private boolean isDarkMode;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
     public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
                         @NonNull FileUpdateMonitor fileUpdateMonitor) {
         this.workspacePreferences = workspacePreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        // Always returns something even if the native library is not available - see https://github.com/dukke/FXThemes/issues/15
-        this.themeWindowManager = ThemeWindowManagerFactory.create();
 
-        this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
+        this.baseStyleSheet = Theme.getBaseStyleSheet();
         this.theme = workspacePreferences.getTheme();
-        this.isDarkMode = Theme.EMBEDDED_DARK_CSS.equals(this.theme.getName());
 
         initializeWindowThemeUpdater();
 
@@ -116,8 +109,7 @@ public class ThemeManager {
              .map(URL::toExternalForm)
              .ifPresent(toAdd::add);
 
-        scene.getStylesheets().clear();
-        scene.getStylesheets().addAll(toAdd);
+        scene.getStylesheets().setAll(toAdd);
     }
 
     /// Registers a runnable on JavaFX thread to install the base and additional css files as stylesheets in the given scene.
@@ -173,7 +165,7 @@ public class ThemeManager {
                         updateFontStyle(scene);
                     }
                     if (window instanceof Stage stage) {
-                        stage.showingProperty().addListener(_ -> applyDarkModeToWindow(stage));
+                        stage.showingProperty().addListener(_ -> applyModeToWindow(stage));
                     }
                 }
             }
@@ -182,41 +174,52 @@ public class ThemeManager {
 
         // Apply styles to all windows that *already exist*
         applyCssAndFontToAllWindows();
-        applyDarkModeToAllWindows();
+        applyModeToAllWindows();
         LOGGER.debug("Window theme monitoring initialized");
     }
 
-    private void applyDarkModeToWindow(Stage stage) {
-        if (stage == null || !stage.isShowing()) {
+    private void applyModeToWindow(Stage stage) {
+        Theme.Type type = theme.getType();
+        if (type == Theme.Type.CUSTOM) {
             return;
         }
-        try {
-            themeWindowManager.setDarkModeForWindowFrame(stage, isDarkMode);
-            LOGGER.debug("Applied {} mode to window: {}", isDarkMode ? "dark" : "light", stage);
-        } catch (NoClassDefFoundError | UnsatisfiedLinkError e) {
-            // We need to handle these exceptions because the native library may not be available on all platforms (e.g., x86).
-            // See https://github.com/dukke/FXThemes/issues/13 for details.
-            LOGGER.debug("Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)", e);
+
+        if (stage == null) {
+            return;
+        }
+
+        Scene scene = stage.getScene();
+        if (scene == null) {
+            return;
+        }
+
+        if (Objects.equals(type, Theme.light().getType())) {
+            scene.getPreferences().setColorScheme(ColorScheme.LIGHT);
+        } else if (Objects.equals(type, Theme.dark().getType())) {
+            scene.getPreferences().setColorScheme(ColorScheme.DARK);
+        } else {
+            scene.getPreferences().setColorScheme(null);
         }
     }
 
-    private void applyDarkModeToAllWindows() {
+    private void applyModeToAllWindows() {
+        if (theme.getType() == Theme.Type.CUSTOM) {
+            return;
+        }
+
         Window.getWindows().stream()
               .filter(Window::isShowing)
               .filter(window -> window instanceof Stage)
               .map(window -> (Stage) window)
-              .forEach(this::applyDarkModeToWindow);
+              .forEach(this::applyModeToWindow);
     }
 
     private void updateThemeSettings() {
         Theme theme = workspacePreferences.getTheme();
 
-        if (workspacePreferences.themeSyncOsProperty().getValue()) {
-            if (Platform.getPreferences().getColorScheme() == ColorScheme.DARK) {
-                theme = Theme.dark();
-            } else {
-                theme = Theme.light();
-            }
+        // In this case we let JavaFX decide and don't do any changes.
+        if (workspacePreferences.shouldThemeSyncOs()) {
+            theme = Theme.system();
         }
 
         if (theme.equals(this.theme)) {
@@ -228,11 +231,7 @@ public class ThemeManager {
         this.theme = theme;
         LOGGER.debug("Theme set to {} with base css {}", theme, baseStyleSheet);
 
-        boolean isDarkTheme = Theme.EMBEDDED_DARK_CSS.equals(theme.getName());
-        if (this.isDarkMode != isDarkTheme) {
-            this.isDarkMode = isDarkTheme;
-            applyDarkModeToAllWindows();
-        }
+        applyModeToAllWindows();
 
         this.theme.getAdditionalStylesheet().ifPresent(
                 styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));

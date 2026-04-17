@@ -1,83 +1,450 @@
-.root {
-    /* Note that counting for odd/even starts at 0, thus the first displayed row is even */
-    -jr-row-odd-background: -fx-control-inner-background-alt;
-    -jr-row-even-background: -fx-control-inner-background;
-    /*
-    On light theme, the text is hard to see when it's on top of the accent color. This is an alternative lighter accent color
-    for better text visibility.
-    */
-    -jr-accent-alt: derive(-jr-accent, 15%);
+/*
+* This is the default JabRef theme.
+* It will automatically use the OS color scheme, of not overridden inside JavaFX.
+*/
+
+@media (prefers-color-scheme: light) {
+    * {
+        /* Note that counting for odd/even starts at 0, thus the first displayed row is even */
+        -jr-row-odd-background: -fx-control-inner-background-alt;
+        -jr-row-even-background: -fx-control-inner-background;
+        /*
+        On light theme, the text is hard to see when it's on top of the accent color. This is an alternative lighter accent color
+        for better text visibility.
+        */
+        -jr-accent: #a3b7e6;
+        -jr-accent-alt: derive(-jr-accent, 15%);
+
+        /*
+        The theme color and some derived colors from it are used for icons, tab-headers, marking of selected inputs and
+        hover colors for the main menu. It generally defines the look of JabRef. The highlighting colors below should
+        work nicely with this base color
+        */
+
+        /* original JabRef dark blue color */
+        -jr-theme: #50618F;
+
+        -jr-transparent-accent: rgba(163, 183, 230, 0.16);
+        -jr-checked: -jr-theme;
+        -jr-selected: -jr-accent;
+
+        -jr-hover: #0002;
+        -jr-hover-text: -fx-focused-text-base-color;
+
+        /* The base gray. Most gray-tones in the application are derived from this color. */
+        -jr-base: #ebebeb;
+
+        /* Highlights */
+        -jr-blue: #0abde3;
+        -jr-light-blue: #48dbfb;
+        -jr-purple: #7559C2;
+        -jr-light-purple: #ff9ff3;
+        -jr-green: #10ac84;
+        -jr-light-green: #1dd1a1;
+        -jr-red: #ee5253;
+        -jr-light-red: #ff6b6b;
+        -jr-yellow: #feca57;
+        -jr-orange: #ff9f43;
+
+        /* Background specs */
+        -jr-background-alt: -fx-background;
+        -jr-text-area-background: derive(-jr-base, 80%);
+        -jr-search-background: -jr-text-area-background;
+        -jr-toolbar: derive(-jr-base, 46.4%);
+
+        -jr-menu-background: derive(-jr-base, 46.4%);
+        -jr-menu-background-active: -jr-hover;
+        -jr-menu-foreground: -fx-dark-text-color;
+        -jr-menu-item-foreground: -fx-dark-text-color;
+        -jr-menu-forground-active: -fx-dark-text-color;
+
+        -jr-head-fg: -fx-text-inner-color;
+
+        /* All icons/text on toolbars */
+        -jr-theme-text: -jr-theme;
+
+        -jr-icon-background: transparent;
+        -jr-icon-background-active: #0001;
+        -jr-icon-background-armed: #0002;
+
+
+        /* Color for the small group view indicator for the number of hits */
+        -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
+        -jr-group-hits-fg: ladder(
+                -jr-group-hits-bg,
+                -fx-light-text-color 45%,
+                -fx-dark-text-color 46%,
+                -fx-dark-text-color 59%,
+                -fx-mid-text-color 60%
+        );
+
+        /* Specific color for general tooltips */
+        -jr-tooltip-bg: -jr-accent;
+        -jr-tooltip-fg: -jr-black;
+
+        /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
+        -jr-sidepane-background: -jr-gray-1;
+        -jr-sidepane-header-background: -jr-gray-1;
+        -jr-sidepane-header-color: -jr-theme-text;
+
+        /* Specs for the scrollbars */
+        -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
+        -jr-scrollbar-track: derive(-fx-control-inner-background, -10%);
+
+        -jr-separator: derive(-fx-color, -5%);
+
+        -jr-search-text: -fx-text-base-color;
+
+        /* For drag and drop actions */
+        -jr-drag-target: -jr-purple;
+        -jr-drag-target-hover: derive(-jr-purple, 80%);
+
+        -js-summary-text-color: #000000;
+        -js-summary-text-color-selected: #000000;
+
+        -jr-inner-bg: derive(-fx-base, 95%);
+        -jr-inner-bg-alt: derive(-fx-control-inner-background, -6%);
+        -jr-mid-text-color: -jr-gray-3;
+        -jr-light-text-color: -jr-white;
+        -jr-outer-border: derive(-fx-color, -5%);
+
+        -jr-match-1-odd: -jr-row-odd-background;
+        -jr-match-1-even: -jr-row-even-background;
+        -jr-match-1-text-color: -fx-mid-text-color;
+
+        -jr-match-2-odd: derive(-jr-theme, 100%);
+        -jr-match-2-even: derive(-jr-match-2-odd, 10%);
+        -jr-match-2-text-color: -fx-mid-text-color;
+
+        -jr-match-3-odd: derive(-jr-theme, 50%);
+        -jr-match-3-even: derive(-jr-match-3-odd, 10%);
+        -jr-match-3-text-color: derive(-jr-accent, 30%);
+
+        -jr-match-4-odd: -jr-theme;
+        -jr-match-4-even: derive(-jr-match-4-odd, 10%);
+        -jr-match-4-text-color: -jr-accent;
+    }
 
     /*
-    The theme color and some derived colors from it are used for icons, tab-headers, marking of selected inputs and
-    hover colors for the main menu. It generally defines the look of JabRef. The highlighting colors below should
-    work nicely with this base color
+    * TODO:
+    * Those should be removed eventually and just declared once outside of the media queries
+    * with the matching variables, as the rest of the CSS (below).
+    * Example:
+    * -- from: -rtfx-background-color: rgba(29, 209, 161, 0.5);
+    * -- to: -jr-xxx-color; (and outside this @media block)
     */
 
-    /* original JabRef dark blue color */
-    -jr-theme: #50618F;
+    .unchanged {
+        -rtfx-background-color: #0000;
+    }
 
-    -jr-accent: #a3b7e6;
-    -jr-transparent-accent: rgba(163, 183, 230, 0.16);
-    -jr-checked: -jr-theme;
+    .text-unchanged {
 
-    -jr-selected: -jr-accent;
+    }
 
-    -jr-hover: #0002;
-    -jr-hover-text: -fx-focused-text-base-color;
+    .addition {
+        -rtfx-background-color: rgba(29, 209, 161, 0.5);
+    }
 
-    /* The base gray. Most gray-tones in the application are derived from this color. */
-    -jr-base: #ebebeb;
+    .deletion {
+        -rtfx-background-color: rgba(255, 107, 107, 0.55);
+    }
 
-    -jr-white: #ffffff;
-    -jr-gray-0: #f2f2f2;
-    -jr-gray-1: #dddddd;
-    -jr-gray-2: #808080;
-    -jr-gray-3: #404040;
-    -jr-black: #000;
+    .custom-color-dialog {
 
-    /* Some blueish greys - currently not used */
-    -jr-blue-gray-1: #c8d6e5;
-    -jr-blue-gray-1-darker: derive(-jr-blue-gray-1, -5%);
-    -jr-blue-gray-2: #8395a7;
-    -jr-blue-gray-2-darker: derive(-jr-blue-gray-2, -5%);
-    -jr-blue-gray-3: #576574;
-    -jr-blue-gray-3-darker: derive(-jr-blue-gray-3, -5%);
-    -jr-blue-gray-4: #222f3e;
-    -jr-blue-gray-4-darker: derive(-jr-blue-gray-4, -5%);
+    }
 
-    /* Highlights */
-    -jr-blue: #0abde3;
-    -jr-light-blue: #48dbfb;
-    -jr-purple: #7559C2;
-    -jr-light-purple: #ff9ff3;
-    -jr-green: #10ac84;
-    -jr-light-green: #1dd1a1;
-    -jr-red: #ee5253;
-    -jr-light-red: #ff6b6b;
-    -jr-yellow: #feca57;
-    -jr-orange: #ff9f43;
+    .merge-field-value .action-icon {
+        -fx-blend-mode: multiply;
+        -fx-opacity: 69%;
+    }
 
-    /* Background specs */
-    -jr-background-alt: -fx-background;
-    -jr-text-area-background: derive(-jr-base, 80%);
-    -jr-search-background: -jr-text-area-background;
-    -jr-toolbar: derive(-jr-base, 46.4%);
-    -jr-menu-background: derive(-jr-base, 46.4%);
-    -jr-menu-background-active: -jr-hover;
+    .merge-header-cell {
+        -fx-border-color: -jr-gray-1;
+        -fx-background-color: -jr-row-even-background;
+    }
 
-    -jr-menu-foreground: -fx-dark-text-color;
-    -jr-menu-item-foreground: -fx-dark-text-color;
-    -jr-menu-forground-active: -fx-dark-text-color;
+    .merge-header {
+        -fx-background-color: -jr-row-even-background;
+    }
 
-    -jr-head-fg: -fx-text-inner-color;
+    .table-view .groupColumnBackground {
+        -fx-stroke: -jr-gray-2;
+    }
 
-    /* All icons/text on toolbars */
-    -jr-theme-text: -jr-theme;
+    .radio-button > .radio {
+        -fx-background-color: rgba(0, 0, 0, 0.54), -fx-control-inner-background;
+    }
 
-    -jr-icon-background: transparent;
-    -jr-icon-background-active: #0001;
-    -jr-icon-background-armed: #0002;
+    #groupTree .numberColumn > .hits:any-selected {
+        -fx-background-color: derive(-jr-green, 70%);
+    }
+
+    #groupTree .numberColumn > .hits:all-selected {
+        -fx-background-color: -jr-green;
+    }
+
+    .global-search-bar .toggle-button .glyph-icon {
+        -fx-icon-color: derive(-jr-search-text, 80%);
+    }
+
+    .rating > .container > .button {
+        -fx-icon-color: derive(-fx-text-base-color, 85%);
+    }
+
+    .rating > .container > .button.strong {
+        -fx-icon-color: -fx-text-base-color;
+    }
+
+    .file-row-text {
+        -fx-fill: -jr-search-text;
+    }
+
+    .walkthrough-spotlight {
+        /* -jr-blue-gray-4 with 75% Alpha */
+        -fx-fill: rgba(34, 47, 62, 0.75);
+    }
+
+    .walkthrough-darken {
+        /* -jr-blue-gray-4 with 75% Alpha */
+        -fx-fill: rgba(34, 47, 62, 0.75);
+    }
+
+    .walkthrough-ping {
+        /* -jr-accent with 75% Alpha */
+        -fx-fill: rgba(163, 183, 230, 0.75);
+    }
+
+    .walkthrough-tooltip .border {
+        /* The arrow of the PopOver. Need to override the default `.popover > .border` (https://github.com/controlsfx/controlsfx/blob/194b10bb948389bf18c463006adcec7c92ca6403/controlsfx/src/main/resources/org/controlsfx/control/popover.css#L8) */
+        /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+        -fx-fill: #f3f3f3 !important;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    * {
+        -jr-row-odd-background: #272b38;
+        -jr-row-even-background: #212330;
+
+        -jr-accent: #255652;
+        -jr-accent-alt: -jr-accent;
+
+        -jr-theme: #2c9490;
+
+        -jr-transparent-accent: rgba(163, 183, 230, 0.16);
+        -jr-checked: -jr-theme;
+        -jr-selected: -jr-accent;
+
+        -jr-hover: #fff1;
+        -jr-hover-text: -fx-focused-text-base-color;
+
+        -jr-base: #141824;
+
+        -jr-blue: #2c2cb7;
+        -jr-light-blue: #3a3ad9;
+        -jr-purple: #b72486;
+        -jr-light-purple: #d927a8;
+        -jr-green: #1cb631;
+        -jr-light-green: #28d93c;
+        -jr-red: #b71c1f;
+        -jr-light-red: #db1d2b;
+        -jr-yellow: #b5b021;
+        -jr-orange: #b77620;
+
+        -jr-background-alt: #151924;
+        -jr-text-area-background: derive(-jr-base, 80%);
+        -jr-sidepane-background: #212330;
+        -jr-search-background: #2c2e3b;
+
+        -jr-menu-background: #141824;
+        -jr-menu-background-active: -jr-hover;
+        -jr-menu-foreground: -fx-light-text-color;
+        -jr-menu-item-foreground: -fx-light-text-color;
+        -jr-menu-forground-active: derive(-fx-light-text-color, 50%);
+
+        -jr-toolbar: -jr-menu-background;
+
+        -jr-head-fg: -fx-text-inner-color;
+
+        /* All icons/text on toolbars */
+        -jr-theme-text: -jr-theme;
+
+        -jr-icon-background: transparent;
+        -jr-icon-background-active: -jr-hover;
+        -jr-icon-background-armed: #fff2;
+
+        -jr-group-hits-bg: -jr-background-alt;
+        -jr-group-hits-fg: -fx-light-text-color;
+
+        /* Specific color for general tooltips */
+        -jr-tooltip-bg: -jr-accent;
+        -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
+
+        -jr-sidepane-background: #212330;
+        -jr-sidepane-header-background: -jr-background-alt;
+        -jr-sidepane-header-color: -jr-theme-text;
+
+        /* Specs for the scrollbars */
+        -jr-scrollbar-thumb: -fx-light-text-color;
+        -jr-scrollbar-track: derive(-fx-control-inner-background, -90%);
+
+        -jr-separator: #333744;
+
+        -jr-search-text: -fx-text-base-color;
+
+        /* For drag and drop actions */
+        -jr-drag-target: -jr-accent;
+        -jr-drag-target-hover: -jr-accent;
+
+        -js-summary-text-color: derive(-fx-light-text-color, 70%);
+        -js-summary-text-color-selected: derive(-fx-dark-text-color, 70%);
+
+        -jr-inner-bg: #272b38;
+        -jr-inner-bg-alt: -fx-control-inner-background;
+        -jr-mid-text-color: #7d8591;
+        -jr-light-text-color: #e5e7ea;
+        -jr-outer-border: #424758;
+
+        -jr-match-1-odd: -jr-row-odd-background;
+        -jr-match-1-even: -jr-row-even-background;
+        -jr-match-1-text-color: -fx-mid-text-color;
+
+        -jr-match-2-odd: derive(-jr-theme, 100%);
+        -jr-match-2-even: derive(-jr-match-2-odd, 10%);
+        -jr-match-2-text-color: -fx-mid-text-color;
+
+        -jr-match-3-odd: derive(-jr-theme, 50%);
+        -jr-match-3-even: derive(-jr-match-3-odd, 10%);
+        -jr-match-3-text-color: derive(-jr-accent, 30%);
+
+        -jr-match-4-odd: -jr-theme;
+        -jr-match-4-even: derive(-jr-match-4-odd, 10%);
+        -jr-match-4-text-color: -jr-accent;
+    }
+
+    /*
+    * TODO:
+    * Those should be removed eventually and just declared once outside of the media queries
+    * with the matching variables, as the rest of the CSS (below).
+    * Example:
+    * -- from: -rtfx-background-color: rgba(29, 209, 161, 0.5);
+    * -- to: -jr-xxx-color; (and outside this @media block)
+    */
+
+    .unchanged {
+
+    }
+
+    .text-unchanged {
+        -fx-fill: -fx-light-text-color;
+    }
+
+    .addition {
+        -fx-text-background-color: black;
+        -rtfx-background-color: #FDAF56;
+    }
+
+    .deletion {
+        -fx-text-background-color: black;
+        -rtfx-background-color: #FFEECC;
+    }
+
+    .custom-color-dialog {
+        -fx-background-color: -fx-control-inner-background;
+    }
+
+    .table-row-cell:odd {
+        -fx-background-color: #272b38;
+    }
+
+    .table-row-cell:even {
+        -fx-background-color: #212330;
+    }
+
+    .merge-field-value .action-icon {
+        -fx-blend-mode: none;
+        -fx-opacity: 90%;
+    }
+
+    .merge-header-cell {
+        -fx-border-color: -fx-outer-border;
+        -fx-background-color: -jr-row-odd-background;
+    }
+
+    .merge-header {
+        -fx-background-color: -jr-row-odd-background;
+    }
+
+    .table-view .groupColumnBackground {
+        -fx-stroke: -jr-gray-3;
+    }
+
+    .code-area {
+        -fx-background-color: -jr-background-alt;
+        -fx-text-fill: -fx-mid-text-color;
+    }
+
+    .code-area .lineno {
+        -fx-background-color: -jr-background-alt;
+        -fx-text-fill: -fx-mid-text-color;
+    }
+
+    .radio-button > .radio {
+        -fx-background-color: -fx-light-text-color, -fx-control-inner-background;
+    }
+
+    #groupTree .numberColumn > .hits:any-selected {
+        -fx-background-color: derive(-jr-gray-3, 25%);
+    }
+
+    #groupTree .numberColumn > .hits:all-selected {
+        -fx-background-color: -jr-gray-3;
+    }
+
+    #preferencesContainer .tab-pane > .tab-header-area > .tab-header-background {
+        -fx-background-color: -jr-background;
+    }
+
+    .global-search-bar .toggle-button .glyph-icon {
+        -fx-icon-color: derive(-jr-search-background, 50%);
+    }
+
+    .rating > .container > .button {
+        -fx-icon-color: derive(-fx-light-text-color, -50%);
+    }
+
+    .rating > .container > .button.strong {
+        -fx-icon-color: -fx-light-text-color;
+    }
+
+    .file-row-text {
+        -fx-text-fill: -fx-light-text-color;
+    }
+
+    .walkthrough-spotlight {
+        -fx-fill: rgba(0, 0, 0, 0.65);
+    }
+
+    .walkthrough-darken {
+        -fx-fill: rgba(0, 0, 0, 0.65);
+    }
+
+    .walkthrough-ping {
+        /* -jr-accent with 75% Alpha */
+        -fx-fill: rgba(37, 86, 82, 0.75);
+    }
+
+    .walkthrough-tooltip .border {
+        /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+        -fx-fill: #151924 !important;
+    }
+}
+
+/* JabRef variables and colors */
+* {
+    /* Consistent size for headers of tab-pane and side-panels*/
+    -jr-header-height: 3em;
 
     /* Colors for messages and errors */
     -jr-info: -jr-light-green;
@@ -85,40 +452,16 @@
     -jr-error: -jr-light-red;
     -jr-success: -jr-green;
 
-    /* Color for the small group view indicator for the number of hits */
-    -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
-    -jr-group-hits-fg: ladder(
-            -jr-group-hits-bg,
-            -fx-light-text-color 45%,
-            -fx-dark-text-color 46%,
-            -fx-dark-text-color 59%,
-            -fx-mid-text-color 60%
-    );
+    -jr-white: #ffffff;
+    -jr-gray-0: #f2f2f2;
+    -jr-gray-1: #dddddd;
+    -jr-gray-2: #808080;
+    -jr-gray-3: #404040;
+    -jr-black: #000;
+}
 
-    /* Specific color for general tooltips */
-    -jr-tooltip-bg: -jr-accent;
-    -jr-tooltip-fg: -jr-black;
-
-    /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
-    -jr-sidepane-background: -jr-gray-1;
-    -jr-sidepane-header-background: -jr-gray-1;
-    -jr-sidepane-header-color: -jr-theme-text;
-
-    /* Specs for the scrollbars */
-    -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
-    -jr-scrollbar-track: derive(-fx-control-inner-background, -10%);
-
-    -jr-separator: derive(-fx-color, -5%);
-
-    -jr-search-text: -fx-text-base-color;
-
-    /* For drag and drop actions */
-    -jr-drag-target: -jr-purple;
-    -jr-drag-target-hover: derive(-jr-purple, 80%);
-
-    -js-summary-text-color: #000000;
-    -js-summary-text-color-selected: #000000;
-
+/* JavaFX CSS overwrites with our JabRef colors. */
+.root {
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
      above colors. Goal should be to make as few as possible direct color-changes to elements and only do this for
@@ -137,9 +480,10 @@
      * -fx-text-fill value for text painted on top of backgrounds colored
      * with -fx-control-inner-background.
      */
-    -fx-control-inner-background: derive(-fx-base, 95%);
+
+    -fx-control-inner-background: -jr-inner-bg;
     /* Version of -fx-control-inner-background for alternative rows */
-    -fx-control-inner-background-alt: derive(-fx-control-inner-background, -6%);
+    -fx-control-inner-background-alt: -jr-inner-bg-alt;
 
     /* One of these colors will be chosen based upon a ladder calculation
      * that uses the brightness of a background color.  Instead of using these
@@ -152,8 +496,8 @@
      * -fx-selection-bar-text for text on top of -fx-selection-bar
      */
     -fx-dark-text-color: -jr-black;
-    -fx-mid-text-color: -jr-gray-3;
-    -fx-light-text-color: -jr-white;
+    -fx-mid-text-color: -jr-mid-text-color;
+    -fx-light-text-color: -jr-light-text-color;
 
     /* We overwrite accents -> make old stick out  */
     -fx-accent: red;
@@ -207,7 +551,7 @@
      * a control. It is typically the same size as the control (i.e., insets
      * are 0).
      */
-    -fx-outer-border: derive(-fx-color, -5%);
+    -fx-outer-border: -jr-outer-border;
 
     /* A gradient that goes from a bit lighter than -fx-color on the top to
      * a little darker at the bottom.  Typically is the third color in the
@@ -257,56 +601,12 @@
     /** Focus line for keyboard focus traversal on cell based controls */
     -fx-cell-focus-inner-border: derive(-fx-selection-bar, 30%);
 
+    -fx-focused-text-base-color: -fx-light-text-color;
     -fx-focused-mark-color: -fx-focused-text-base-color;
-
-    /* Consistent size for headers of tab-pane and side-panels*/
-    -jr-header-height: 3em;
-
-    /* AI chat style */
-    -jr-ai-message-user: derive(-jr-accent, 50%);
-    -jr-ai-message-user-border: -jr-theme;
-    -jr-ai-message-ai: derive(-jr-accent, 80%);
-    -jr-ai-message-ai-border: -jr-theme;
-    -jr-ai-message-error: -jr-error;
-    -jr-ai-message-error-border: derive(-jr-error, -40%);
-
-    /* region: maintable base colors **/
-
-    -jr-match-1-odd: -jr-row-odd-background;
-    -jr-match-1-even: -jr-row-even-background;
-    -jr-match-1-text-color: -fx-mid-text-color;
-
-    -jr-match-2-odd: derive(-jr-theme, 100%);
-    -jr-match-2-even: derive(-jr-match-2-odd, 10%);
-    -jr-match-2-text-color: -fx-mid-text-color;
-
-    -jr-match-3-odd: derive(-jr-theme, 50%);
-    -jr-match-3-even: derive(-jr-match-3-odd, 10%);
-    -jr-match-3-text-color: derive(-jr-accent, 30%);
-
-    -jr-match-4-odd: -jr-theme;
-    -jr-match-4-even: derive(-jr-match-4-odd, 10%);
-    -jr-match-4-text-color: -jr-accent;
-
-    -jr-maintable-focused-hover-text: -jr-white;
-
-    /* endregion */
-}
-
-.unchanged {
-    -rtfx-background-color: #0000;
 }
 
 .updated {
     -rtfx-background-color: rgba(41, 166, 236, 0.66);
-}
-
-.addition {
-    -rtfx-background-color: rgba(29, 209, 161, 0.5);
-}
-
-.deletion {
-    -rtfx-background-color: rgba(255, 107, 107, 0.55);
 }
 
 #frame {
@@ -385,13 +685,15 @@ TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 
-
-.radio-button > .radio,
 .check-box > .box {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-text-fill: -fx-text-base-color;
+    -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.54); */
+    -fx-border-width: 0.125em;
+    -fx-border-radius: 0.062em;
+    -fx-padding: 0.1em 0.1em 0.2em 0.2em;
 }
 
 .button,
@@ -407,10 +709,8 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .button {
-    -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
     -fx-border-width: 0.062em;
-    -fx-border-radius: 0.25em;
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
@@ -518,13 +818,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: -fx-text-background-color;
 }
 
-.check-box > .box {
-    -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.54); */
-    -fx-border-width: 0.125em;
-    -fx-border-radius: 0.062em;
-    -fx-padding: 0.1em 0.1em 0.2em 0.2em;
-}
-
 .check-box:selected > .box {
     -fx-background-insets: 0.125em;
     -fx-border-color: -jr-checked;
@@ -546,6 +839,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
     -fx-background-color: rgba(0, 0, 0, 0.54), -fx-control-inner-background;
     -fx-background-insets: 0, 0.125em;
+    -fx-text-fill: -fx-text-base-color;
 }
 
 .radio-button:selected > .radio {
@@ -694,8 +988,9 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .table-row-cell:hover,
+.tree-table-row-cell:hover,
 .table-row-cell:hover:even,
-.tree-table-row-cell:hover {
+.tree-table-row-cell:hover:even {
     -fx-background-color: -jr-hover;
     -fx-fill: -jr-hover-text;
     -fx-text-fill: -jr-hover-text;
@@ -713,8 +1008,6 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .merge-field-value .action-icon {
-    -fx-blend-mode: multiply;
-    -fx-opacity: 69%;
     -fx-icon-size: 14;
     -fx-icon-color: -fx-text-background-color;
 }
@@ -725,8 +1018,6 @@ TextFlow > .tooltip-text-monospaced {
 
 .merge-header-cell {
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: -jr-gray-1;
-    -fx-background-color: -jr-row-even-background;
 }
 
 .merge-header {
@@ -742,10 +1033,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-font-size: 11px;
     -fx-text-fill: #555;
     -fx-padding: 4 0 0 5;
-}
-
-.table-view .groupColumnBackground {
-    -fx-stroke: -jr-gray-2;
 }
 
 .scroll-pane:focused,
@@ -794,10 +1081,6 @@ TextFlow > .tooltip-text-monospaced {
 
 .duplicate-entry {
     -fx-background-color: -jr-light-green;
-}
-
-.file-row-text {
-    -fx-fill: -jr-search-text;
 }
 
 .file-row-text:opacity {
@@ -1148,10 +1431,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-icon-background-active;
 }
 
-.global-search-bar .toggle-button .glyph-icon {
-    -fx-icon-color: derive(-jr-search-text, 80%);
-}
-
 .global-search-bar .toggle-button:selected .glyph-icon {
     -fx-icon-color: -jr-search-text;
 }
@@ -1237,6 +1516,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0 0 -2 0;
 }
 
+.table-row-cell:dragOver-center,
 .table-row-cell:dragOver-center > .table-cell {
     -fx-background-color: -jr-drag-target-hover;
 }
@@ -1269,42 +1549,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .sidePaneComponent {
     -fx-background-color: -jr-sidepane-background;
-}
-
-.notification-bar > .pane {
-    -fx-background-color: -jr-gray-3;
-    -fx-background-radius: 0.25em;
-}
-
-.notification-bar > .pane > .title,
-.notification-bar > .pane > .label,
-.notification-bar > .pane > .button-bar > .container > .action {
-    -fx-text-fill: -jr-base;
-    -fx-padding: 1ex 1ex 1ex 1ex;
-}
-
-.notification-bar > .pane {
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 9, 0, 0, 2);
-    -fx-padding: 0.375em 0.438em 0.375em 2.0em;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-}
-
-.notification-bar > .pane > .button-bar > .container {
-    -fx-padding: 0.0em 1.5em 0.0em 0.0em;
-}
-
-.notification-bar > .pane > .label {
-    -fx-graphic-text-gap: 0.5em;
-}
-
-.notification-pane .notification-bar > .pane .close-button > .graphic {
-    -fx-background-color: -jr-base;
-}
-
-.notification-bar > .pane > .label > .ikonli-font-icon {
-    -fx-icon-size: 1.0em;
-    -fx-icon-color: -jr-base;
 }
 
 .progress-bar > .bar {
@@ -1521,14 +1765,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.5em 0.0em 0.0em 0.0em;
 }
 
-.rating > .container > .button {
-    -fx-icon-color: derive(-fx-text-base-color, 85%);
-}
-
-.rating > .container > .button.strong {
-    -fx-icon-color: -fx-text-base-color;
-}
-
 .table-column .rotated > .label {
     -fx-content-display: graphic-only;
 }
@@ -1608,10 +1844,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -fx-focused-text-base-color;
 }
 .main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell {
-    -fx-text-fill: -jr-maintable-focused-hover-text;
+    -fx-text-fill: -jr-white;
 }
 .main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-maintable-focused-hover-text;
+    -fx-icon-color: -jr-white;
 }
 .main-table .table-row-cell:matching-search-and-groups:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
@@ -1644,10 +1880,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -fx-focused-text-base-color;
 }
 .main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell {
-    -fx-text-fill: -jr-maintable-focused-hover-text;
+    -fx-text-fill: -jr-white;
 }
 .main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-maintable-focused-hover-text;
+    -fx-icon-color: -jr-white;
 }
 .main-table .table-row-cell:matching-search-not-groups:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
@@ -1681,10 +1917,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -fx-focused-text-base-color;
 }
 .main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell {
-    -fx-text-fill: -jr-maintable-focused-hover-text;
+    -fx-text-fill: -jr-white;
 }
 .main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-maintable-focused-hover-text;
+    -fx-icon-color: -jr-white;
 }
 .main-table .table-row-cell:matching-groups-not-search:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
@@ -1718,10 +1954,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -fx-focused-text-base-color;
 }
 .main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell {
-    -fx-text-fill: -jr-maintable-focused-hover-text;
+    -fx-text-fill: -jr-whitet;
 }
 .main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-maintable-focused-hover-text;
+    -fx-icon-color: -jr-white;
 }
 .main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell {
     -fx-text-fill: -jr-hover-text;
@@ -2270,14 +2506,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .numberColumn > .hits .text {
     -fx-fill: -jr-group-hits-fg;
-}
-
-#groupTree .numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-green, 70%);
-}
-
-#groupTree .numberColumn > .hits:all-selected {
-    -fx-background-color: -jr-green;
 }
 
 #groupTree .expansionNodeColumn {
@@ -2831,7 +3059,6 @@ journalInfo .grid-cell-b {
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0.125em, 0.0, 0, 0.0625em);
-    -fx-border-color: -jr-wf-border-color;
 }
 
 .wireframe-menubar {
@@ -2982,30 +3209,9 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
 }
 
-.walkthrough-spotlight {
-    /* -jr-blue-gray-4 with 75% Alpha */
-    -fx-fill: rgba(34, 47, 62, 0.75);
-}
-
-.walkthrough-ping {
-    /* -jr-accent with 75% Alpha */
-    -fx-fill: rgba(163, 183, 230, 0.75);
-}
-
-.walkthrough-darken {
-    /* -jr-blue-gray-4 with 75% Alpha */
-    -fx-fill: rgba(34, 47, 62, 0.75);
-}
-
 /* Tooltip Content */
 .walkthrough-tooltip-content-container {
     -fx-background-color: -jr-background-alt;
-}
-
-.walkthrough-tooltip .border {
-    /* The arrow of the PopOver. Need to override the default `.popover > .border` (https://github.com/controlsfx/controlsfx/blob/194b10bb948389bf18c463006adcec7c92ca6403/controlsfx/src/main/resources/org/controlsfx/control/popover.css#L8) */
-    /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
-    -fx-fill: #f3f3f3 !important;
 }
 
 .walkthrough-tooltip-content-container {
@@ -3280,4 +3486,32 @@ journalInfo .grid-cell-b {
 
 .automatic-field-editor .button-bar .button:default {
     -fx-min-width: 12em;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .title-label {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper > .ikonli-font-icon {
+    -fx-icon-color: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .description-label {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view .default-icon {
+    -fx-icon-color: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+    -fx-icon-color: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+    -fx-icon-color: -fx-dark-text-color;
 }
