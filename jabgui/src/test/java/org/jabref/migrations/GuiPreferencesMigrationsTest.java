@@ -18,6 +18,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -100,7 +101,7 @@ class GuiPreferencesMigrationsTest {
                 \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
                 \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
 
-        when(preferences.get(JabRefGuiPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
 
         PreferencesMigrations.upgradePreviewStyle(preferences);
 
@@ -118,11 +119,21 @@ class GuiPreferencesMigrationsTest {
                 \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
                 </font>__NEWLINE__""";
 
-        when(preferences.get(JabRefGuiPreferences.PREVIEW_STYLE)).thenReturn(unchangedPreviewStyle);
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(unchangedPreviewStyle);
 
         PreferencesMigrations.upgradePreviewStyle(preferences);
 
         verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, unchangedPreviewStyle);
+    }
+
+    @Test
+    void previewStyleNameChanged() {
+        String oldCycle = "Customized preview style;ieee.csl";
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_CYCLE), anyString())).thenReturn(oldCycle);
+
+        PreferencesMigrations.upgradeBuiltinPreviewName(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_CYCLE, "PREVIEW;ieee.csl");
     }
 
     @Test

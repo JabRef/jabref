@@ -9,6 +9,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
@@ -322,6 +323,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(InfoCenterPane.class, powerpane.getInfoCenterPane());
         powerpane.setContent(JabRefGUI.mainFrame);
         powerpane.getInfoCenterPane().setInfoCenterViewPos(InfoCenterViewPos.BOTTOM_RIGHT);
+        powerpane.getInfoCenterPane().autoHideProperty().bind(Bindings.isEmpty(dialogService.getPersistentNotifications()));
 
         Scene scene = new Scene(powerpane);
 
@@ -455,16 +457,16 @@ public class JabRefGUI extends Application {
     public void startBackgroundTasks() {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
         CLIMessageHandler cliMessageHandler = new CLIMessageHandler(mainFrame, preferences);
-        if (remotePreferences.useRemoteServer()) {
+        if (remotePreferences.shouldEnableRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     cliMessageHandler,
-                    remotePreferences.getPort());
+                    remotePreferences.getRemoteServerPort());
         }
 
-        if (remotePreferences.enableHttpServer()) {
+        if (remotePreferences.shouldEnableHttpServer()) {
             httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
         }
-        if (remotePreferences.enableLanguageServer()) {
+        if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
     }

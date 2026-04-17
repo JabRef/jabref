@@ -22,7 +22,6 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
@@ -31,12 +30,13 @@ import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
+import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -49,9 +49,7 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class RightClickMenu {
 
-    public static ContextMenu create(BibEntryTableViewModel entry,
-                                     KeyBindingRepository keyBindingRepository,
-                                     LibraryTab libraryTab,
+    public static ContextMenu create(LibraryTab libraryTab,
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      GuiPreferences preferences,
@@ -97,6 +95,7 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor)),
                 extractFileReferencesOnline,
                 extractFileReferencesOffline,
+                factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager, preferences)),
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
 

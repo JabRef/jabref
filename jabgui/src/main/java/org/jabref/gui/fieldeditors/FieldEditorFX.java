@@ -46,6 +46,16 @@ public interface FieldEditorFX {
             }
         });
 
+        // When '{' is typed with an active selection, wrap the selected text in '{…}' instead of replacing it.
+        // This is equivalent to the "Protect terms" option in the context menu.
+        textInputControl.addEventFilter(KeyEvent.KEY_TYPED, e -> {
+            if ("{".equals(e.getCharacter()) && textInputControl.getSelection().getLength() > 0) {
+                String selectedText = textInputControl.getSelectedText();
+                textInputControl.replaceSelection("{" + selectedText + "}");
+                e.consume();
+            }
+        });
+
         // We need some more sophisticated handling to avoid cursor jumping
         // https://github.com/JabRef/jabref/issues/5904
 

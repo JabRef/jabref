@@ -3,6 +3,7 @@ package org.jabref.gui.welcome.quicksettings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -21,6 +22,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class ThemeDialog extends FXDialog {
+    @FXML private CheckBox themeSyncOs;
     @FXML private RadioButton lightRadio;
     @FXML private RadioButton darkRadio;
     @FXML private RadioButton customRadio;
@@ -74,17 +76,27 @@ public class ThemeDialog extends FXDialog {
             if (newValue != null) {
                 ThemeTypes selectedType = (ThemeTypes) newValue.getUserData();
                 viewModel.setSelectedTheme(selectedType);
-                updateCustomThemeVisibility(selectedType == ThemeTypes.CUSTOM);
+                updateThemeVisibility();
             }
         });
 
+        themeSyncOs.selectedProperty().addListener(_ -> {
+            viewModel.setThemeSyncOs(themeSyncOs.isSelected());
+            updateThemeVisibility();
+        });
+        themeSyncOs.setSelected(viewModel.shouldThemeSyncOs());
+
         selectInitialTheme();
-        updateCustomThemeVisibility(viewModel.getSelectedTheme() == ThemeTypes.CUSTOM);
+        updateThemeVisibility();
 
         helpButton.setHelpUrl(URLs.CUSTOM_THEME_DOC);
     }
 
     private void selectInitialTheme() {
+        if (viewModel.shouldThemeSyncOs() || viewModel.getSelectedTheme() == null) {
+            return;
+        }
+
         switch (viewModel.getSelectedTheme()) {
             case LIGHT ->
                     lightRadio.setSelected(true);
@@ -95,7 +107,13 @@ public class ThemeDialog extends FXDialog {
         }
     }
 
-    private void updateCustomThemeVisibility(boolean visible) {
+    private void updateThemeVisibility() {
+        if (viewModel.shouldThemeSyncOs()) {
+            customRadio.getToggleGroup().selectToggle(null);
+        }
+
+        boolean visible = viewModel.getSelectedTheme() == ThemeTypes.CUSTOM;
+
         customThemeContainer.setVisible(visible);
         customThemeContainer.setManaged(visible);
         if (customThemeContainer.getScene() != null) {

@@ -15,6 +15,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -27,13 +28,13 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.preview.CitationStylePreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
@@ -143,14 +144,21 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
-                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(item -> evt -> {
-                    CSLStyleSelectViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
-                    if (selectedStyle != null) {
-                        viewModel.deleteCslStyle(selectedStyle.getLayout().citationStyle());
+                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
+                    if (internalStyle) {
+                        return;
                     }
+
+                    event.consume();
+
+                    if (event.getButton() != MouseButton.PRIMARY) {
+                        return;
+                    }
+
+                    viewModel.deleteCslStyle(style.getLayout().citationStyle());
                 })
-                .withTooltip(item -> Localization.lang("Remove style"))
+                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
                 .install(cslDeleteColumn);
 
         new ViewModelTableRowFactory<CSLStyleSelectViewModel>()
@@ -198,11 +206,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         new ValueTableCellFactory<JStyleSelectViewModel, Boolean>()
                 .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
-                .withTooltip(item -> Localization.lang("Remove style"))
+                .withOnMouseClickedEvent(_ -> _ -> viewModel.deleteJStyle())
+                .withTooltip(_ -> Localization.lang("Remove style"))
                 .install(jStyleDeleteColumn);
 
-        edit.setOnAction(e -> viewModel.editJStyle());
+        edit.setOnAction(_ -> viewModel.editJStyle());
 
         new ViewModelTableRowFactory<JStyleSelectViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
@@ -213,7 +221,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                         this.close();
                     }
                 })
-                .withContextMenu(item -> createContextMenu())
+                .withContextMenu(_ -> createContextMenu())
                 .install(jStylesTable);
 
         jStylesTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
@@ -271,6 +279,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             for (CSLStyleSelectViewModel model : cslStylesTable.getItems()) {
                 if (model.getLayout().equals(viewModel.selectedCslLayoutProperty().get())) {
                     cslStylesTable.getSelectionModel().select(model);
+                    cslStylesTable.scrollTo(model);
                     break;
                 }
             }
