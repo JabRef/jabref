@@ -37,8 +37,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
-
 public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
@@ -65,6 +63,7 @@ public class StyleSelectDialogViewModel {
                                       CSLStyleLoader cslStyleLoader,
                                       JStyleLoader jStyleLoader,
                                       GuiPreferences preferences,
+                                      JournalAbbreviationRepository journalAbbreviationRepository,
                                       TaskExecutor taskExecutor,
                                       BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
@@ -74,7 +73,7 @@ public class StyleSelectDialogViewModel {
 
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.filePreferences = preferences.getFilePreferences();
-        this.openOfficePreferences = preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+        this.openOfficePreferences = preferences.getOpenOfficePreferences(journalAbbreviationRepository);
 
         this.bibEntryTypesManager = bibEntryTypesManager;
 

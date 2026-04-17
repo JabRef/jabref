@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.clearcontent.ClearContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView;
@@ -21,18 +22,17 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
 
     private final UndoManager undoManager;
 
-    public AutomaticFieldEditorViewModel(BibDatabase database, UndoManager undoManager, StateManager stateManager) {
+    public AutomaticFieldEditorViewModel(BibDatabase database,
+                                         UndoManager undoManager,
+                                         DialogService dialogService,
+                                         StateManager stateManager) {
         this.undoManager = undoManager;
         fieldEditorTabs.addAll(
-                new EditFieldContentTabView(database, stateManager),
-                new CopyOrMoveFieldContentTabView(database, stateManager),
-                new ClearContentTabView(stateManager),
-                new RenameFieldTabView(database, stateManager)
+                new EditFieldContentTabView(database, dialogEdits, dialogService, stateManager),
+                new CopyOrMoveFieldContentTabView(database, dialogEdits, dialogService, stateManager),
+                new ClearContentTabView(database, dialogEdits, dialogService, stateManager),
+                new RenameFieldTabView(database, dialogEdits, dialogService, stateManager)
         );
-    }
-
-    public NamedCompoundEdit getDialogEdits() {
-        return dialogEdits;
     }
 
     public ObservableList<AutomaticFieldEditorTab> getFieldEditorTabs() {

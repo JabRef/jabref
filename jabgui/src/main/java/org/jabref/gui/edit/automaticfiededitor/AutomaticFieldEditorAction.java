@@ -24,6 +24,6 @@ public class AutomaticFieldEditorAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        dialogService.showCustomDialogAndWait(new AutomaticFieldEditorDialog(stateManager, undoManager));
+        dialogService.showCustomDialogAndWait(new AutomaticFieldEditorDialog(stateManager, dialogService, undoManager));
     }
 }

@@ -65,6 +65,11 @@ public class QuickSettings extends VBox {
         httpServerToggle.setMaxWidth(Double.MAX_VALUE);
         httpServerToggle.setPadding(new Insets(5));
 
+        ToggleSwitch coverImagesDownloadToggle = new ToggleSwitch(Localization.lang("Enable cover images download"));
+        coverImagesDownloadToggle.selectedProperty().bindBidirectional(preferences.getPreviewPreferences().shouldDownloadCoversProperty());
+        coverImagesDownloadToggle.setMaxWidth(Double.MAX_VALUE);
+        coverImagesDownloadToggle.setPadding(new Insets(5));
+
         Button mainFileDirButton = createButton(
                 Localization.lang("Set main file directory"),
                 IconTheme.JabRefIcons.FOLDER,
@@ -97,6 +102,7 @@ public class QuickSettings extends VBox {
 
         VBox newContent = new VBox(
                 httpServerToggle,
+                coverImagesDownloadToggle,
                 mainFileDirButton,
                 themeButton,
                 largeLibraryButton,

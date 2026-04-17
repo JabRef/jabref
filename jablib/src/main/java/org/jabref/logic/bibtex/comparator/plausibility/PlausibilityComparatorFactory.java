@@ -23,6 +23,9 @@ public enum PlausibilityComparatorFactory {
         if (field.getProperties().contains(FieldProperty.MONTH)) {
             return Optional.of(new MonthPlausibilityComparator());
         }
+        if (field.getProperties().contains(FieldProperty.DATE)) {
+            return Optional.of(new DateFieldPlausibilityComparator());
+        }
         if (InternalField.TYPE_HEADER == field) {
             return Optional.of(new EntryTypePlausibilityComparator());
         }

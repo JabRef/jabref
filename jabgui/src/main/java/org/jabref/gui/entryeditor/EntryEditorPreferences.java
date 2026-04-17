@@ -20,6 +20,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -59,6 +60,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty autoLinkFiles;
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
     private final ObjectProperty<CitationFetcherType> citationFetcherType;
+    private final ObjectProperty<CitationCountFetcherType> citationCountFetcherType;
     private final BooleanProperty shouldShowSciteTab;
     private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
@@ -78,6 +80,7 @@ public class EntryEditorPreferences {
                 true,                                 // Automatically search and show unlinked files in the entry editor
                 JournalPopupEnabled.DISABLED,         // Fetch journal information online to show
                 CitationFetcherType.SEMANTIC_SCHOLAR, // Citation Fetcher Type
+                CitationCountFetcherType.SEMANTIC_SCHOLAR, // Citation Count Fetcher Type
                 true,                                 // Show tab 'Citation information'
                 true,                                 // Show user comments field
                 0.5                                   // Preview Width Divider Position
@@ -97,6 +100,7 @@ public class EntryEditorPreferences {
                                   boolean autolinkFilesEnabled,
                                   JournalPopupEnabled journalPopupEnabled,
                                   CitationFetcherType citationFetcherType,
+                                  CitationCountFetcherType citationCountFetcherType,
                                   boolean showSciteTab,
                                   boolean showUserCommentsFields,
                                   double previewWidthDividerPosition) {
@@ -114,6 +118,7 @@ public class EntryEditorPreferences {
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
         this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
+        this.citationCountFetcherType = new SimpleObjectProperty<>(citationCountFetcherType);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
@@ -167,6 +172,7 @@ public class EntryEditorPreferences {
         this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
         this.enablementStatus.set(preferences.shouldEnableJournalPopup());
         this.citationFetcherType.set(preferences.getCitationFetcherType());
+        this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
         this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
         this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
         this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
@@ -326,6 +332,18 @@ public class EntryEditorPreferences {
 
     public ObjectProperty<CitationFetcherType> citationFetcherTypeProperty() {
         return citationFetcherType;
+    }
+
+    public CitationCountFetcherType getCitationCountFetcherType() {
+        return citationCountFetcherType.get();
+    }
+
+    public void setCitationCountFetcherType(CitationCountFetcherType citationCountFetcherType) {
+        this.citationCountFetcherType.set(citationCountFetcherType);
+    }
+
+    public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
+        return citationCountFetcherType;
     }
 
     public boolean shouldShowSciteTab() {

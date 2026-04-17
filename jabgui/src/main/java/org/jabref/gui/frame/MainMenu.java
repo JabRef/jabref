@@ -184,8 +184,8 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
 
                 new SeparatorMenuItem(),

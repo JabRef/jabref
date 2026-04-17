@@ -489,6 +489,8 @@ extraJavaModuleInfo {
         opens("javafx.scene.control.cell")
         opens("javafx.scene.control.skin")
         exports("com.sun.javafx.scene.control")
+        // required for ActionFactory#enableTooltips
+        opens("com.sun.javafx.scene.control")
     }
 
     module("org.hamcrest:hamcrest", "org.hamcrest")

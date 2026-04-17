@@ -181,7 +181,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.sidePane = new SidePane(
                 this,
                 this.preferences,
-                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                journalAbbreviationRepository,
                 taskExecutor,
                 dialogService,
                 aiService,
@@ -245,7 +245,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 taskExecutor,
                 dialogService,
-                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                journalAbbreviationRepository,
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
