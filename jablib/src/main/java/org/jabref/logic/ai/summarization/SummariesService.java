@@ -152,7 +152,7 @@ public class SummariesService {
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             LOGGER.info("No database path is present. Could not clear stored summary for regeneration");
-        } else if (bibEntry.getCitationKey().isEmpty() || CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {
+        } else if (bibEntry.getCitationKey().isEmpty() || !CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {
             LOGGER.info("No valid citation key is present. Could not clear stored summary for regeneration");
         } else {
             summariesStorage.clear(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());

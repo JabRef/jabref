@@ -16,7 +16,7 @@
 // from jabsrv
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
-//DEPS com.google.guava:guava:33.5.0-jre
+//DEPS com.google.guava:guava:33.6.0-jre
 //DEPS com.konghq:unirest-modules-gson:4.8.1
 //DEPS de.undercouch:citeproc-java:3.5.0
 //DEPS info.picocli:picocli:4.7.7
@@ -26,7 +26,7 @@
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS org.apache.commons:commons-lang3:3.20.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.4
-//DEPS org.bouncycastle:bcprov-jdk18on:1.83
+//DEPS org.bouncycastle:bcprov-jdk18on:1.84
 //DEPS org.postgresql:postgresql:42.7.10
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
@@ -42,9 +42,9 @@
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.2
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.1.1
-//DEPS tools.jackson.core:jackson-databind:3.1.1
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.1
+//DEPS tools.jackson.core:jackson-core:3.1.2
+//DEPS tools.jackson.core:jackson-databind:3.1.2
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.2
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
