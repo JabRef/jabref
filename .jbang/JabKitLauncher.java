@@ -9,6 +9,7 @@
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
+// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
 //DEPS io.github.adr:e-adr:2.0.0
 
 // requirements needed by jabkit projecxt need to be listed; requirements by jablib are loaded transitively
