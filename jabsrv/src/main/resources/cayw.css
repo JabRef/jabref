@@ -68,7 +68,6 @@
     -fx-background-color: transparent;
 }
 
-/* Selected item has that thin border color as in table controls. */
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
     -fx-background: -fx-selection-bar;
 }

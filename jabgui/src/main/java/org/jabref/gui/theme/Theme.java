@@ -20,7 +20,7 @@ public class Theme {
 
     public static final String SYSTEM = "";
 
-    private static final String BASE_CSS = "Base.css";
+    private static final String JABREF_THEME_CSS = "jabref-theme.css";
 
     private static final String LIGHT = "light";
     private static final String DARK = "dark";
@@ -118,7 +118,7 @@ public class Theme {
                 '}';
     }
 
-    public static StyleSheet getBaseStyleSheet() {
-        return StyleSheet.create(BASE_CSS).orElseThrow();
+    public static StyleSheet getJabRefTheme() {
+        return StyleSheet.create(JABREF_THEME_CSS).orElseThrow();
     }
 }

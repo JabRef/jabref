@@ -91,6 +91,14 @@ public class UiTaskExecutor implements TaskExecutor {
         Platform.runLater(runnable);
     }
 
+    public static void runNowOrInJavaFXThread(Runnable runnable) {
+        if (Platform.isFxApplicationThread()) {
+            runnable.run();
+            return;
+        }
+        Platform.runLater(runnable);
+    }
+
     /// This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
     /// The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
     ///
