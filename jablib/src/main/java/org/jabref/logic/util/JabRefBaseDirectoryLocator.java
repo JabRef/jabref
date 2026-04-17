@@ -1,17 +1,18 @@
 package org.jabref.logic.util;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.jabref.logic.os.OS;
 
-// Locate and return base directory.
 public class JabRefBaseDirectoryLocator {
 
-    public static Optional<Path> getBaseDirectoryPath() {
+    public static Path getBaseDirectoryPath() {
         String appPath = System.getProperty("jpackage.app-path");
+
+        Path cwdPath = Path.of("").toAbsolutePath().normalize();
         if (appPath == null) {
-            return Optional.empty();
+            // fallback: current working directory
+            return cwdPath;
         }
 
         Path jabRefBaseDirectory = Path.of(appPath);
@@ -24,9 +25,11 @@ public class JabRefBaseDirectoryLocator {
         }
 
         if (jabRefBaseDirectory == null) {
-            return Optional.empty();
+            return cwdPath;
         }
 
-        return Optional.ofNullable(jabRefBaseDirectory.getParent());
+        Path parent = jabRefBaseDirectory.getParent();
+
+        return parent != null ? parent : cwdPath;
     }
 }

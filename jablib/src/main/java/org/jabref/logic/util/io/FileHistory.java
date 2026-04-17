@@ -55,21 +55,18 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     public void removeItem(Path file) {
         this.remove(file);
 
-        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
-        if (baseDirectoryPath.isEmpty()) {
-            return;
-        }
+        Path baseDirectoryPath = getBaseDirectoryPath();
 
         if (file.isAbsolute()) {
             try {
-                this.remove(baseDirectoryPath.get().relativize(file).normalize());
+                this.remove(baseDirectoryPath.relativize(file).normalize());
             } catch (IllegalArgumentException e) {
                 return;
             }
             return;
         }
 
-        this.remove(baseDirectoryPath.get().resolve(file).normalize());
+        this.remove(baseDirectoryPath.resolve(file).normalize());
     }
 
     public static FileHistory of(List<Path> list) {

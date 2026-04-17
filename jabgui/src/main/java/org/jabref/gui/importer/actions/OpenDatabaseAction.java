@@ -178,23 +178,23 @@ public class OpenDatabaseAction extends SimpleCommand {
         int initialCount = resolvedFiles.size();
         int removed = 0;
 
-        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
+        Path baseDirectoryPath = getBaseDirectoryPath();
         FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
 
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = resolvedFiles.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
 
-            if (!file.isAbsolute() && baseDirectoryPath.isPresent()) {
-                file = baseDirectoryPath.get().resolve(file).normalize();
+            if (!file.isAbsolute()) {
+                file = baseDirectoryPath.resolve(file).normalize();
             }
 
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
-                    if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath.isPresent()) {
+                    if (preferences.getInternalPreferences().isMemoryStickMode()) {
                         try {
-                            file = baseDirectoryPath.get().relativize(file).normalize();
+                            file = baseDirectoryPath.relativize(file).normalize();
                         } catch (IllegalArgumentException e) {
                             file = file.normalize();
                         }
@@ -223,9 +223,9 @@ public class OpenDatabaseAction extends SimpleCommand {
                 openTheFile(theFile);
                 Path file = theFile;
 
-                if (preferences.getInternalPreferences().isMemoryStickMode() && baseDirectoryPath.isPresent()) {
+                if (preferences.getInternalPreferences().isMemoryStickMode()) {
                     try {
-                        file = baseDirectoryPath.get().relativize(theFile).normalize();
+                        file = baseDirectoryPath.relativize(file).normalize();
                     } catch (IllegalArgumentException e) {
                         file = theFile.normalize();
                     }

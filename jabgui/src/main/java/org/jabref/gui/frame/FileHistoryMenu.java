@@ -2,7 +2,6 @@ package org.jabref.gui.frame;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.scene.control.Menu;
@@ -92,18 +91,21 @@ public class FileHistoryMenu extends Menu {
     }
 
     public void openFile(Path file) {
-        Optional<Path> baseDirectoryPath = getBaseDirectoryPath();
-        if (!file.isAbsolute() && baseDirectoryPath.isPresent()) {
-            file = baseDirectoryPath.get().resolve(file).normalize();
+        Path resolvedFile = file;
+
+        if (!file.isAbsolute()) {
+            Path baseDir = getBaseDirectoryPath();
+            resolvedFile = baseDir.resolve(file).normalize();
         }
 
-        if (!Files.exists(file)) {
+        if (!Files.exists(resolvedFile)) {
             this.dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
-                    Localization.lang("File not found") + ": " + file);
+                    Localization.lang("File not found") + ": " + resolvedFile);
             return;
         }
-        openDatabaseAction.openFile(file);
+
+        openDatabaseAction.openFile(resolvedFile);
     }
 
     public void clearLibrariesHistory() {
