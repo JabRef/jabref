@@ -1165,6 +1165,11 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: derive(-jr-light-red, 70%);
 }
 
+.mode-indicator {
+    -fx-font-size: 0.85em;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button > .arrow {
@@ -2279,6 +2284,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-alignment: top-right;
 }
 
+#groupTree .addSubgroupColumn {
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
 #groupTree .tree-table-row-cell:dragOver-bottom {
     -fx-border-color: -jr-drag-target;
     -fx-border-width: 0 0 2 0;
@@ -2306,6 +2316,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.20em 0.2em 0.20em 0em;
 }
 
+#groupTree .tree-table-row-cell:sub > .addSubgroupColumn {
+    -fx-padding: 0;
+}
+
 #groupTree .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
     -fx-border-color: -jr-separator;
@@ -2321,6 +2335,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .tree-table-row-cell:root > .expansionNodeColumn {
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
+}
+
+#groupTree .tree-table-row-cell:root > .addSubgroupColumn {
+    -fx-padding: 0;
 }
 
 #groupTree .tree-table-row-cell:empty {

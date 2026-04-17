@@ -31,6 +31,9 @@ public class FieldCheckers {
             fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleContainsYearChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleContainsCountryChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleContainsPagesChecker());
         fieldCheckers.put(StandardField.TITLE, new BracketChecker());
         fieldCheckers.put(StandardField.TITLE, new TitleChecker(databaseContext));
         fieldCheckers.put(StandardField.DOI, new DoiValidityChecker());
