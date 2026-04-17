@@ -42,7 +42,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const {owner, repo} = context.repo;
