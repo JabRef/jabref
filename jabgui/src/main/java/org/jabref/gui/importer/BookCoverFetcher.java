@@ -185,7 +185,7 @@ public class BookCoverFetcher {
         }
     }
 
-    private String getImageUrl(ISBN isbn) {
+    private static String getImageUrl(ISBN isbn) {
         if (isbn.isIsbn13()) {
             String url = URL_FETCHER_URL + isbn.asString();
             try {
