@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,9 +22,11 @@ import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.OptionalUtil;
 
@@ -40,6 +44,7 @@ public class WebSearchPaneViewModel {
     private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
+    private final ReadOnlyStringWrapper searchModeIndicator = new ReadOnlyStringWrapper("");
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
@@ -73,19 +78,31 @@ public class WebSearchPaneViewModel {
                 queryText -> {
                     if (StringUtil.isBlank(queryText)) {
                         // in case user did not enter something, it is treated as valid (to avoid UI WTFs)
+                        searchModeIndicator.set("");
+                        return null;
+                    }
+
+                    if (DOI.parse(queryText).isPresent()) {
+                        searchModeIndicator.set(Localization.lang("Routing to DOI fetcher"));
                         return null;
                     }
 
                     if (CompositeIdFetcher.containsValidId(queryText)) {
                         // in case the query contains any ID, it is treated as valid
+                        searchModeIndicator.set("");
                         return null;
                     }
 
                     try {
                         // The result is ignored because we just check for validity
                         SearchQuery.getStartContext(queryText);
+                        searchModeIndicator.set(Localization.lang("Advanced search syntax"));
                         return null;
                     } catch (ParseCancellationException e) {
+                        // Query will still be sent as a raw search term to the fetcher
+                        // but we show a warning so the user knows advanced syntax was not recognized.
+                        searchModeIndicator.set(Localization.lang("Query sent as raw search term"));
+
                         // RecognitionException can point out the exact error
                         if (e.getCause() instanceof RecognitionException recEx) {
                             Token offendingToken = recEx.getOffendingToken();
@@ -94,11 +111,11 @@ public class WebSearchPaneViewModel {
                             int line = offendingToken.getLine();
                             int charPositionInLine = offendingToken.getCharPositionInLine() + 1;
 
-                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
+                            return ValidationMessage.warning(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
                         }
 
                         // Fallback for other failing reasons
-                        return ValidationMessage.error(Localization.lang("Invalid query"));
+                        return ValidationMessage.warning(Localization.lang("Invalid query"));
                     }
                 });
     }
@@ -150,8 +167,16 @@ public class WebSearchPaneViewModel {
         Callable<ParserResult> parserResultCallable;
 
         String fetcherName = activeFetcher.getName();
+        SearchBasedFetcher effectiveFetcher = activeFetcher;
 
-        if (CompositeIdFetcher.containsValidId(query)) {
+        if (DOI.parse(query).isPresent()) {
+            // DOI detected — route to DoiFetcher regardless of selected fetcher
+            DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
+            parserResultCallable = () -> new ParserResult(OptionalUtil.toList(doiFetcher.performSearchById(query)));
+            fetcherName = DoiFetcher.NAME;
+            // DoiFetcher is not a SearchBasedFetcher, so effectiveFetcher stays null for this branch
+            effectiveFetcher = null;
+        } else if (CompositeIdFetcher.containsValidId(query)) {
             CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
             fetcherName = Localization.lang("Identifier-based Web Search");
@@ -164,12 +189,21 @@ public class WebSearchPaneViewModel {
                                                           .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
-        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task, activeFetcher, query);
+        ImportEntriesDialog dialog;
+        if (effectiveFetcher != null) {
+            dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task, effectiveFetcher, query);
+        } else {
+            dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
+        }
         dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
 
     public ValidationStatus queryValidationStatus() {
         return searchQueryValidator.getValidationStatus();
+    }
+
+    public ReadOnlyStringProperty searchModeIndicatorProperty() {
+        return searchModeIndicator.getReadOnlyProperty();
     }
 }

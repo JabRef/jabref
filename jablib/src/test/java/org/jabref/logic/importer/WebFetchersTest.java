@@ -42,7 +42,8 @@ class WebFetchersTest {
 
     private static final Set<String> IGNORED_INACCESSIBLE_FETCHERS = Set.of(
             "org.jabref.logic.importer.fetcher.ArXivFetcher$ArXiv",
-            "org.jabref.logic.importer.FulltextFetchersTest$FulltextFetcherWithTrustLevel");
+            "org.jabref.logic.importer.FulltextFetchersTest$FulltextFetcherWithTrustLevel",
+            "org.jabref.logic.importer.SearchBasedFetcherTest$StubSearchBasedFetcher");
 
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;

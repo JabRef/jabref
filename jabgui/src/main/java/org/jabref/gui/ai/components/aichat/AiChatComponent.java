@@ -169,8 +169,7 @@ public class AiChatComponent extends VBox {
                 aiPreferences.openAiChatModelProperty(),
                 aiPreferences.mistralAiChatModelProperty(),
                 aiPreferences.geminiChatModelProperty(),
-                aiPreferences.huggingFaceChatModelProperty(),
-                aiPreferences.gpt4AllChatModelProperty()
+                aiPreferences.huggingFaceChatModelProperty()
         };
     }
 

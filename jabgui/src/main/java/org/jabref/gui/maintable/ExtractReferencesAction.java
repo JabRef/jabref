@@ -39,6 +39,8 @@ import org.jspecify.annotations.Nullable;
 ///
 /// The mode is selected by the preferences whether to use Grobid or not.
 public class ExtractReferencesAction extends SimpleCommand {
+    private static final Pattern COMMENT_NUMBER_PATTERN = Pattern.compile("^\\[(\\d+)\\]");
+
     private final int FILES_LIMIT = 10;
 
     private final DialogService dialogService;
@@ -182,8 +184,7 @@ public class ExtractReferencesAction extends SimpleCommand {
                 String newCitationKey;
                 // Could happen if no author and no year is present
                 // We use the number of the comment field (because there is no other way to get the number reliable)
-                Pattern pattern = Pattern.compile("^\\[(\\d+)\\]");
-                Matcher matcher = pattern.matcher(importedEntry.getField(StandardField.COMMENT).orElse(""));
+                Matcher matcher = COMMENT_NUMBER_PATTERN.matcher(importedEntry.getField(StandardField.COMMENT).orElse(""));
                 if (matcher.hasMatch()) {
                     newCitationKey = sourceCitationKey + "-" + matcher.group(1);
                 } else {
