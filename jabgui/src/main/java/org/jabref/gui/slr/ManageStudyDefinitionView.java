@@ -25,6 +25,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
@@ -182,13 +183,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         initQueriesTab();
         initCatalogsTab();
         initValidationBindings();
-
         shareOnSearchRxivButton.disableProperty().bind(
                 Bindings.or(
                         Bindings.isEmpty(viewModel.getQueries()),
-                        Bindings.createBooleanBinding(
-                                () -> viewModel.getCatalogs().stream().noneMatch(StudyCatalogItem::isEnabled),
-                                viewModel.getCatalogs())
+                        ActionHelper.noCatalogEnabled(viewModel.getCatalogs())
                 ));
     }
 
