@@ -12,11 +12,11 @@ import org.jspecify.annotations.NonNull;
 
 public class MonthChecker implements ValueChecker {
 
-    private static final Predicate<String> ONLY_AN_INTEGER = Pattern.compile("[1-9]|10|11|12")
-                                                                    .asPredicate();
+    private static final Predicate<String> ONLY_AN_INTEGER = Pattern.compile("^([1-9]|10|11|12)$")
+                                                                    .asMatchPredicate();
     private static final Predicate<String> MONTH_NORMALIZED = Pattern
-            .compile("#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#")
-            .asPredicate();
+            .compile("^(#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#)$")
+            .asMatchPredicate();
 
     private final BibDatabaseContext bibDatabaseContextMonth;
 
