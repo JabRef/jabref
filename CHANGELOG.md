@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
 - We added a related work text extractor, which finds and inserts the related work text into bib entries from references in the texts. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We added a hover button on group rows to quickly add a new group or subgroup. [#12289](https://github.com/JabRef/jabref/issues/12289)
 - We added a shorthand for protecting terms in the fields: user can now select a text and type a opening curling brace to quickly wrap the selection in braces. [#15442](https://github.com/JabRef/jabref/pull/15442)
@@ -28,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We now support refreshing existing CSL citations with respect to their in-text nature in the LibreOffice integration. [#15369](https://github.com/JabRef/jabref/pull/15369)
 - Added context menu entry "Sort tabs alphabetically" to the library tabs. [#15425](https://github.com/JabRef/jabref/pull/15425)
 - We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
+- We added integrity checks that warn when the `booktitle` field contains a year, a country/location, or page numbers that should live in dedicated fields. [#12271](https://github.com/JabRef/jabref/issues/12271)
 
 ### Changed
 
