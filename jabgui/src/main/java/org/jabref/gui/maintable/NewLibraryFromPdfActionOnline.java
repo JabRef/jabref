@@ -15,7 +15,12 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class NewLibraryFromPdfActionOnline extends NewLibraryFromPdfAction {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfActionOnline.class);
 
     public NewLibraryFromPdfActionOnline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, CliPreferences preferences, TaskExecutor taskExecutor, AiService aiService) {
         super(libraryTabContainer, stateManager, dialogService, preferences, taskExecutor, aiService);
@@ -24,12 +29,19 @@ public class NewLibraryFromPdfActionOnline extends NewLibraryFromPdfAction {
     @Override
     protected Callable<ParserResult> getParserResultCallable(Path path) {
         return () -> {
-            List<BibEntry> entries = new GrobidService(this.preferences.getGrobidPreferences()).processReferences(path, preferences.getImportFormatPreferences());
+            List<BibEntry> entries;
+            try {
+                entries = new GrobidService(this.preferences.getGrobidPreferences())
+                        .processReferences(path, preferences.getImportFormatPreferences());
+            } catch (Exception e) {
+                LOGGER.warn("Grobid failed, falling back to LLM", e);
+                entries = List.of();
+            }
             if (entries.isEmpty()) {
-                entries = CitationsFromPdf.extractCitationsUsingLLM(this.aiService, this.preferences.getImportFormatPreferences(), path).getDatabase().getEntries();
+                entries = CitationsFromPdf.extractCitationsUsingLLM(
+                        this.aiService, this.preferences.getImportFormatPreferences(), path).getDatabase().getEntries();
             }
             return new ParserResult(entries);
         };
     }
 }
-
