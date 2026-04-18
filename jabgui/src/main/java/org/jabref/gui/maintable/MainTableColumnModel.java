@@ -231,7 +231,7 @@ public class MainTableColumnModel {
     /// @param rawColumnName the name of the column, e.g. "field:author", or "author"
     /// @return A new `MainTableColumnModel`
     public static MainTableColumnModel parse(String rawColumnName) {
-        if (rawColumnName == null || rawColumnName.isBlank()) {
+        if (rawColumnName.isBlank()) {
             return new MainTableColumnModel(Type.NORMALFIELD, "");
         }
 
