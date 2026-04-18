@@ -8,6 +8,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -29,6 +30,7 @@ public abstract class NewLibraryFromPdfAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction.class);
 
     protected final CliPreferences preferences;
+    protected final AiService aiService;
 
     private final LibraryTabContainer libraryTabContainer;
     private final StateManager stateManager;
@@ -40,12 +42,14 @@ public abstract class NewLibraryFromPdfAction extends SimpleCommand {
             StateManager stateManager,
             DialogService dialogService,
             CliPreferences preferences,
-            TaskExecutor taskExecutor) {
+            TaskExecutor taskExecutor,
+            AiService aiService) {
         this.libraryTabContainer = libraryTabContainer;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.aiService = aiService;
     }
 
     @Override
