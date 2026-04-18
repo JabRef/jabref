@@ -40,6 +40,7 @@ import static org.jabref.logic.openoffice.backend.NamedRangeReferenceMark.safeIn
 /// Class for generation, insertion and management of all reference marks in the document.
 public class CSLReferenceMarkManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLReferenceMarkManager.class);
+    private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
 
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
@@ -230,8 +231,7 @@ public class CSLReferenceMarkManager {
     }
 
     private String getUpdatedCitationTextWithNewNumbers(String currentText, List<Integer> newNumbers) {
-        Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
-        Matcher matcher = pattern.matcher(currentText);
+        Matcher matcher = CITATION_NUMBER_PATTERN.matcher(currentText);
         StringBuilder result = new StringBuilder();
         int lastEnd = 0;
         int numberIndex = 0;

@@ -33,6 +33,8 @@ import static org.mockito.Mockito.when;
 @ResourceLock("Localization.lang")
 public class ImporterTest {
 
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
+
     @ParameterizedTest
     @MethodSource("instancesToTest")
     void getFormatterNameDoesNotReturnNull(Importer format) {
@@ -54,8 +56,7 @@ public class ImporterTest {
     @ParameterizedTest
     @MethodSource("instancesToTest")
     void getIdDoesNotContainWhitespace(Importer format) {
-        Pattern whitespacePattern = Pattern.compile("\\s");
-        assertFalse(whitespacePattern.matcher(format.getId()).find());
+        assertFalse(WHITESPACE_PATTERN.matcher(format.getId()).find());
     }
 
     @ParameterizedTest

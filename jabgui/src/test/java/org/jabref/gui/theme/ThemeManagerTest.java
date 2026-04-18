@@ -169,7 +169,7 @@ class ThemeManagerTest {
 
         ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
 
-        themeManager.installCss(scene);
+        themeManager.installCssOnScene(scene);
 
         assertEquals(2, scene.getStylesheets().size());
         assertTrue(scene.getStylesheets().contains(testCss.toUri().toURL().toExternalForm()));
@@ -188,7 +188,7 @@ class ThemeManagerTest {
 
         Platform.runLater(() -> {
             WebEngine webEngine = new WebEngine();
-            themeManager.installCss(webEngine);
+            themeManager.installCssOnWebEngine(webEngine);
 
             webEngineStyleSheetLocation.complete(webEngine.getUserStyleSheetLocation());
         });
@@ -222,7 +222,7 @@ class ThemeManagerTest {
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
         when(scene.getRoot()).thenReturn(mock(Parent.class));
 
-        themeManager.installCss(scene);
+        themeManager.installCssOnScene(scene);
 
         Files.writeString(testCss, """
                 /* And now for something slightly different */

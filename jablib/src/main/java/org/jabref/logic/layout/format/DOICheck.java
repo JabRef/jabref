@@ -29,7 +29,7 @@ public class DOICheck implements LayoutFormatter {
             result = result.substring(1);
         }
 
-        if (doiPreferences.isUseCustom()) {
+        if (doiPreferences.shouldUseCustom()) {
             URI base = URLUtil.createUri(doiPreferences.getDefaultBaseURI());
             return DOI.parse(result).flatMap(doi -> doi.getExternalURIFromBase(base))
                       .map(URI::toASCIIString)
