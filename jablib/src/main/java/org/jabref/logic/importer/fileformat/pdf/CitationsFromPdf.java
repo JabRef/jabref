@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.nio.file.Path;
 
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
 import org.jabref.logic.preferences.CliPreferences;
@@ -40,5 +41,10 @@ public class CitationsFromPdf {
             LlmPlainCitationParser importer = new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
             return importer.importDatabase(path);
         }
+    }
+
+    public static ParserResult extractCitationsUsingLLM(AiService aiService, ImportFormatPreferences importFormatPreferences, Path path) {
+        LlmPlainCitationParser importer = new LlmPlainCitationParser(aiService.getTemplatesService(), importFormatPreferences, aiService.getChatLanguageModel());
+        return importer.importDatabase(path);
     }
 }
