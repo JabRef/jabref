@@ -7,10 +7,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 
 import org.jabref.http.server.cayw.CitationProperties;
@@ -65,8 +63,6 @@ public class CitationPropertiesPopup extends Popup {
 
         VBox content = new VBox(8, titleLabel, authorLabel, grid);
         content.setPadding(new Insets(10));
-        content.setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 4; -fx-background-radius: 4;");
-        content.setEffect(new DropShadow(10, Color.gray(0, 0.3)));
 
         getContent().add(content);
         setAutoHide(true);
