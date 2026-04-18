@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for heuristic keywords delimiter detection: special delimiters such as ";" will be replaced with "," in the importing process. [#12974](https://github.com/JabRef/jabref/issues/12974)
 - We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
 - We added a related work text extractor, which finds and inserts the related work text into bib entries from references in the texts. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We added a hover button on group rows to quickly add a new group or subgroup. [#12289](https://github.com/JabRef/jabref/issues/12289)

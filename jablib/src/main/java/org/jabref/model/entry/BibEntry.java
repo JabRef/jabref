@@ -827,6 +827,13 @@ public class BibEntry {
         keywords.forEach(keyword -> addKeyword(keyword, delimiter));
     }
 
+    /// Add a keywordList to entry
+    ///
+    /// @param keywordList A list of keywords to add
+    public void addKeywords(@NonNull KeywordList keywordList, Character delimiter) {
+        keywordList.forEach(keyword -> addKeyword(keyword, delimiter));
+    }
+
     public KeywordList getKeywords(Character delimiter) {
         return getFieldAsKeywords(StandardField.KEYWORDS, delimiter);
     }
