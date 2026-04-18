@@ -189,7 +189,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Creates the "Imported entries" group if enabled and missing.
     /// Selection is disabled to prevent focus theft when switching tabs.
     private void addGroupImportEntries(GroupNodeViewModel parent) {
-        if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
+        if (!preferences.getLibraryPreferences().shouldAddImportedEntries()) {
             return;
         }
 
