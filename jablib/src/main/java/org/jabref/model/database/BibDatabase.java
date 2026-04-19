@@ -568,7 +568,7 @@ public class BibDatabase {
             }
 
             // Add to the new key's set
-            if(!newValue.isEmpty()){
+            if(!newValue.isEmpty()) {
                 // if check so that empty strings are not added in map as empty is not valid crossref
                 citationIndex.computeIfAbsent(newValue, k -> ConcurrentHashMap.newKeySet()).add(entry);
             }
