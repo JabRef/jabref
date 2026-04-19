@@ -621,11 +621,11 @@ public class PreferencesMigrations {
 
     /// upgrade the old theme css names of the theme to the new theme properties
     static void upgradeTheme(JabRefGuiPreferences preferences) {
-        if ("Dark.css".equals(preferences.get("fxTheme"))) {
+        if ("Dark.css".equals(preferences.get("fxTheme", ""))) {
             preferences.getWorkspacePreferences().setTheme(Theme.dark());
         }
         // no value means light theme when sync with os theme switch is not on
-        if ("".equals(preferences.get("fxTheme")) && !preferences.getBoolean("themeSyncOs")) {
+        if ("".equals(preferences.get("fxTheme", "")) && !preferences.getBoolean("themeSyncOs", false)) {
             preferences.getWorkspacePreferences().setTheme(Theme.light());
         }
     }
