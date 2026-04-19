@@ -3,7 +3,6 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,6 +47,7 @@ import org.jabref.model.groups.AbstractGroup;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,14 +138,12 @@ public class MainTableColumnFactory {
         return returnColumn;
     }
 
+    @Nullable
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
-        columnPreferences.getColumns().stream()
-                         .map(this::createColumn)
-                         .filter(Objects::nonNull)
-                         .forEach(columns::add);
+        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
 
