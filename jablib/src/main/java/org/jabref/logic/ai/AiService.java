@@ -137,6 +137,7 @@ public class AiService implements AutoCloseable {
     public void close() {
         shutdownSignal.set(true);
 
+        chatHistoryService.close();
         cachedThreadPool.shutdownNow();
         jabRefChatLanguageModel.close();
         jabRefEmbeddingModel.close();

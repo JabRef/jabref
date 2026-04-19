@@ -125,7 +125,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void configurePreviewView(ThemeManager themeManager) {
         previewView.setContextMenuEnabled(false);
         previewView.getEngine().setJavaScriptEnabled(true);
-        themeManager.installCss(previewView.getEngine());
+        themeManager.installCssOnWebEngine(previewView.getEngine());
 
         previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
