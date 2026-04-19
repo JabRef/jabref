@@ -57,7 +57,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
                 syncPickerWithText(normalizeText(newValue));
             }
         }));
-        datePicker.temporalAccessorValueProperty().addListener((observable, oldValue, newValue) -> {
+        datePicker.temporalAccessorValueProperty().addListener((_, _, newValue) -> {
             if (!synchronizingPicker && (newValue != null)) {
                 acceptCommittedText(formatDate(newValue));
             }
