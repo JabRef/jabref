@@ -486,4 +486,22 @@ class BibDatabaseTest {
         assertEquals(1, database.indexOf(entryD));
         assertEquals(-1, database.indexOf(entryA));
     }
+
+    @Test
+    void crossrefChangeUpdatesCitationIndex() {
+        BibDatabase database = new BibDatabase();
+        BibEntry parent = new BibEntry(StandardEntryType.Proceedings)
+                .withCitationKey("TestParent");
+        BibEntry child = new BibEntry(StandardEntryType.InProceedings);
+
+        database.insertEntry(parent);
+        database.insertEntry(child);
+
+        // Setting the crossref field after insertion should trigger the FieldChangedEvent
+        // and safely update the citation index without crashing.
+        child.setField(StandardField.CROSSREF, "TestParent");
+
+        // Verify that the database successfully linked the child to the parent
+        assertEquals(Optional.of(parent), database.getReferencedEntry(child));
+    }
 }
