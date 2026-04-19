@@ -52,7 +52,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
         this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers, undoManager);
         textField.setId(field.getName());
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
-        viewModel.textProperty().addListener((observable, oldValue, newValue) -> UiTaskExecutor.runInJavaFXThread(() -> {
+        viewModel.textProperty().addListener((_, _, newValue) -> UiTaskExecutor.runInJavaFXThread(() -> {
             if (!textField.isFocused()) {
                 syncPickerWithText(normalizeText(newValue));
             }
