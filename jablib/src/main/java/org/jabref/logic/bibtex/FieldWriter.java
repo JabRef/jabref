@@ -1,9 +1,11 @@
 package org.jabref.logic.bibtex;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
-import java.util.StringJoiner;
+import java.util.List;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -21,28 +23,25 @@ public class FieldWriter {
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
 
-    private final boolean neverFailOnHashes;
     private final FieldPreferences preferences;
 
-    public FieldWriter(FieldPreferences preferences) {
-        this(true, preferences);
+    private record BracePosition(int index, int line, int column) {
     }
 
-    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
-        this.neverFailOnHashes = neverFailOnHashes;
+    public FieldWriter(FieldPreferences preferences) {
         this.preferences = preferences;
     }
 
-    public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
-        return new FieldWriter(true, prefs);
-    }
+    /// Checks text for balanced braces and returns a list of unbalanced
+    ///
+    /// @return list of balancing errors
+    public static List<String> checkBalancedBraces(String text) {
+        Deque<FieldWriter.BracePosition> openBraces = new ArrayDeque<>();
+        List<String> errors = new ArrayList<>();
 
-    private static void checkBraces(String text) throws InvalidFieldValueException {
-        Deque<String> queue = new ArrayDeque<>();
         int line = 0;
         int lastLineIndex = 0;
 
-        // First we collect all occurrences:
         for (int i = 0; i < text.length(); i++) {
             char item = text.charAt(i);
             if (item == '\n') {
@@ -53,31 +52,79 @@ public class FieldWriter {
 
             if (!isEscaped(text, i)) {
                 if (item == '{') {
-                    queue.add("Line %d, column %d (index %d): in '%s'".formatted(
-                            line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i)));
+                    openBraces.push(new FieldWriter.BracePosition(i, line, i - lastLineIndex + 1));
                 } else if (item == '}') {
-                    if (queue.pollLast() == null) {
-                        String errorMessage = "Unescaped '}' without matching opening bracket found at line %d, column %d (index %d): in '%s'".formatted(
-                                line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i));
-                        LOGGER.error(errorMessage);
-                        throw new InvalidFieldValueException(errorMessage);
+                    if (openBraces.isEmpty()) {
+                        errors.add(Localization.lang("Unbalanced '}' at line %0, column %1 (index %2): in '%3'.",
+                                line + 1,
+                                i - lastLineIndex + 1,
+                                i,
+                                getContextSnippet(text, i)));
+                    } else {
+                        openBraces.pop();
                     }
                 }
             }
         }
 
-        if (!queue.isEmpty()) {
-            StringJoiner joiner = new StringJoiner("\n");
-            for (String error : queue) {
-                joiner.add(error);
-            }
-            String errorMessage = "The following unescaped '{' do not have matching closing bracket:\n%s".formatted(joiner);
-            LOGGER.error(errorMessage);
-            throw new InvalidFieldValueException(errorMessage);
+        while (!openBraces.isEmpty()) {
+            FieldWriter.BracePosition lastOpenBrace = openBraces.pop();
+            errors.add(Localization.lang("Unbalanced '{' at line %0, column %1 (index %2): in '%3'.",
+                    lastOpenBrace.line() + 1,
+                    lastOpenBrace.column(),
+                    lastOpenBrace.index(),
+                    getContextSnippet(text, lastOpenBrace.index())));
         }
+
+        return errors;
     }
 
-    private static String getErrorContextSnippet(String text, int index) {
+    /// Escapes the last unbalanced curly brace in the given text.
+    ///
+    /// @param text the text to sanitize
+    /// @return sanitized text
+    public static String sanitizeUnbalancedBraces(String text) {
+        int length = text.length();
+        Deque<Integer> lastOpenBrace = new ArrayDeque<>(length);
+        boolean[] toEscape = new boolean[length];
+
+        // Match braces, mark orphan '}'
+        for (int i = 0; i < length; i++) {
+            char currentChar = text.charAt(i);
+            if (!isEscaped(text, i)) {
+                if (currentChar == '{') {
+                    // Remember the last open brace
+                    lastOpenBrace.push(i);
+                } else if (currentChar == '}') {
+                    if (!lastOpenBrace.isEmpty()) {
+                        // Match with the last open brace
+                        lastOpenBrace.pop();
+                    } else {
+                        // No related opening brace
+                        toEscape[i] = true;
+                    }
+                }
+            }
+        }
+
+        // Remaining open braces
+        while (!lastOpenBrace.isEmpty()) {
+            toEscape[lastOpenBrace.pop()] = true;
+        }
+
+        // Create the result with escaped unbalanced braces
+        StringBuilder sanitized = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            if (toEscape[i]) {
+                sanitized.append('\\');
+            }
+            sanitized.append(text.charAt(i));
+        }
+
+        return sanitized.toString();
+    }
+
+    private static String getContextSnippet(String text, int index) {
         int neighbourSize = 5;
         return text.substring(Math.max(0, index - neighbourSize), index)
                 + "*" + text.charAt(index) + "*"
@@ -90,7 +137,7 @@ public class FieldWriter {
     /// @param text  the input string to check for escaped characters
     /// @param index the index of the character in the text to check for escaping
     /// @return true if the character at the specified index is escaped, false otherwise
-    private static boolean isEscaped(String text, int index) {
+    public static boolean isEscaped(String text, int index) {
         int indexCounter = 0;
         for (int i = index - 1; i >= 0; i--) {
             if (text.charAt(i) == '\\') {
@@ -107,25 +154,25 @@ public class FieldWriter {
     /// @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
     /// @param content the content of the field
     /// @return a formatted string suitable for output
-    /// @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
-    public String write(Field field, String content) throws InvalidFieldValueException {
+    public String write(Field field, String content) {
         if (content == null) {
             return FIELD_START + "" + FIELD_END;
         }
 
+        // Always sanitize the braces
+        String sanitized = sanitizeUnbalancedBraces(content);
+
         if (!shouldResolveStrings(field) || field.equals(InternalField.BIBTEX_STRING)) {
-            return formatWithoutResolvingStrings(content);
+            return formatWithoutResolvingStrings(sanitized);
         }
 
-        return formatAndResolveStrings(content);
+        return formatAndResolveStrings(sanitized);
     }
 
     /// This method handles # in the field content to get valid bibtex strings
     ///
     /// For instance, `#jan# - #feb#` gets  `jan #{ - } # feb` (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
-    private String formatAndResolveStrings(String content) throws InvalidFieldValueException {
-        checkBraces(content);
-
+    private String formatAndResolveStrings(String content) {
         content = content.replace("##", "");
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -147,20 +194,13 @@ public class FieldWriter {
             }
 
             if (pos2 == -1) {
-                if (neverFailOnHashes) {
-                    pos1 = content.length(); // just write out the rest of the text, and throw no exception
-                } else {
-                    LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\\\{}'. "
-                                    + "In JabRef, use pairs of # characters to indicate a string. "
-                                    + "Note that the entry causing the problem has been selected. Field value: {}",
-                            BIBTEX_STRING_START_END_SYMBOL,
-                            BIBTEX_STRING_START_END_SYMBOL,
-                            content);
-                    throw new InvalidFieldValueException(
-                            "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
-                                    + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                    + "Note that the entry causing the problem has been selected. Field value: " + content);
-                }
+                pos1 = content.length();
+                LOGGER.warn("The character {} is not allowed in BibTeX strings unless escaped as in '\\\\{}'. "
+                                + "In JabRef, use pairs of # characters to indicate a string. "
+                                + "Field value: {}",
+                        BIBTEX_STRING_START_END_SYMBOL,
+                        BIBTEX_STRING_START_END_SYMBOL,
+                        content);
             }
 
             if (pos1 > pivot) {
@@ -208,8 +248,7 @@ public class FieldWriter {
         return false;
     }
 
-    private String formatWithoutResolvingStrings(String content) throws InvalidFieldValueException {
-        checkBraces(content);
+    private String formatWithoutResolvingStrings(String content) {
         return FIELD_START + content + FIELD_END;
     }
 

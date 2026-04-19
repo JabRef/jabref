@@ -630,7 +630,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
         new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
     }
