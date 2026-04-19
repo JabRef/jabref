@@ -8,7 +8,7 @@
 @media (prefers-color-scheme: light) {
     * {
         -jr-theme: #50618F;
-        -jr-accent: #a3b7e6;
+        -jr-accent: #A3B7E6;
         -jr-accent-alt: derive(-jr-accent, 15%);
 
         -jr-row-odd-background: -fx-control-inner-background-alt;
@@ -18,23 +18,17 @@
         -jr-selected: -jr-accent;
 
         -jr-hover: #0002;
-        -jr-hover-text: -fx-focused-text-base-color;
 
         -jr-base: #ebebeb;
 
         -jr-background-alt: -fx-background;
         -jr-search-background: derive(-jr-base, 80%);
-        -jr-toolbar: derive(-jr-base, 46.4%);
 
-        -jr-menu-background: derive(-jr-base, 46.4%);
-        -jr-menu-background-active: -jr-hover;
-        -jr-menu-foreground: -fx-dark-text-color;
-        -jr-menu-item-foreground: -fx-dark-text-color;
+        -jr-menu-background: derive(-jr-base, 46%);
         -jr-menu-forground-active: -fx-dark-text-color;
 
-        -jr-head-fg: -fx-text-inner-color;
-
-        -jr-theme-text: -jr-theme;
+        -jr-text-foreground: -fx-dark-text-color;
+        -jr-toolbar: derive(-jr-base, 46%);
 
         -jr-icon-background: transparent;
         -jr-icon-background-active: #0001;
@@ -52,22 +46,18 @@
         -jr-tooltip-bg: -jr-accent;
         -jr-tooltip-fg: #000;
 
-        -jr-sidepane-background: #dddddd;
-        -jr-sidepane-header-background: #dddddd;
-        -jr-sidepane-header-color: -jr-theme-text;
+        -jr-sidepane-background: #DDDDDD;
+        -jr-sidepane-header-background: #DDDDDD;
 
         -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
         -jr-scrollbar-track: derive(-fx-control-inner-background, -10%);
 
         -jr-separator: derive(-fx-color, -5%);
 
-        -jr-search-text: -fx-text-base-color;
-
         -jr-drag-target: -jr-purple;
         -jr-drag-target-hover: derive(-jr-purple, 80%);
 
         -jr-inner-bg: derive(-fx-base, 95%);
-        -jr-inner-bg-alt: derive(-fx-control-inner-background, -6%);
         -jr-mid-text-color: #404040;
         -jr-light-text-color: #ffffff;
         -jr-outer-border: derive(-fx-color, -5%);
@@ -78,28 +68,13 @@
         -jr-red: #ee5253;
         -jr-light-red: #ff6b6b;
         -jr-orange: #ff9f43;
-
-        -jr-match-1-odd: -jr-row-odd-background;
-        -jr-match-1-even: -jr-row-even-background;
-        -jr-match-1-text-color: -fx-mid-text-color;
-
-        -jr-match-2-odd: derive(-jr-theme, 100%);
-        -jr-match-2-even: derive(-jr-match-2-odd, 10%);
-        -jr-match-2-text-color: -fx-mid-text-color;
-
-        -jr-match-3-odd: derive(-jr-theme, 50%);
-        -jr-match-3-even: derive(-jr-match-3-odd, 10%);
-        -jr-match-3-text-color: derive(-jr-accent, 30%);
-
-        -jr-match-4-odd: -jr-theme;
-        -jr-match-4-even: derive(-jr-match-4-odd, 10%);
-        -jr-match-4-text-color: -jr-accent;
     }
 }
 
 @media (prefers-color-scheme: dark) {
     * {
-        -jr-theme: #2c9490;
+        -jr-theme: #2C9490;
+
         -jr-accent: #255652;
         -jr-accent-alt: derive(-jr-accent, 15%);
 
@@ -110,25 +85,18 @@
         -jr-selected: -jr-accent;
 
         -jr-hover: #fff1;
-        -jr-hover-text: -fx-focused-text-base-color;
 
         -jr-base: #141824;
 
         -jr-background-alt: #151924;
         -jr-sidepane-background: #212330;
-        -jr-search-background: #2c2e3b;
+        -jr-search-background: #2C2E3B;
 
         -jr-menu-background: #141824;
-        -jr-menu-background-active: -jr-hover;
-        -jr-menu-foreground: -fx-light-text-color;
-        -jr-menu-item-foreground: -fx-light-text-color;
         -jr-menu-forground-active: derive(-fx-light-text-color, 50%);
 
+        -jr-text-foreground: -fx-light-text-color;
         -jr-toolbar: -jr-menu-background;
-
-        -jr-head-fg: -fx-text-inner-color;
-
-        -jr-theme-text: -jr-theme;
 
         -jr-icon-background: transparent;
         -jr-icon-background-active: -jr-hover;
@@ -141,20 +109,16 @@
         -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
 
         -jr-sidepane-header-background: -jr-background-alt;
-        -jr-sidepane-header-color: -jr-theme-text;
 
         -jr-scrollbar-thumb: -fx-light-text-color;
         -jr-scrollbar-track: derive(-fx-control-inner-background, -90%);
 
         -jr-separator: #333744;
 
-        -jr-search-text: -fx-text-base-color;
-
         -jr-drag-target: -jr-accent;
         -jr-drag-target-hover: -jr-accent;
 
         -jr-inner-bg: #272b38;
-        -jr-inner-bg-alt: -fx-control-inner-background;
         -jr-mid-text-color: #7d8591;
         -jr-light-text-color: #e5e7ea;
         -jr-outer-border: #424758;
@@ -165,22 +129,6 @@
         -jr-red: #b71c1f;
         -jr-light-red: #db1d2b;
         -jr-orange: #b77620;
-
-        -jr-match-1-odd: -jr-row-odd-background;
-        -jr-match-1-even: -jr-row-even-background;
-        -jr-match-1-text-color: -fx-mid-text-color;
-
-        -jr-match-2-odd: derive(-jr-theme, 100%);
-        -jr-match-2-even: derive(-jr-match-2-odd, 10%);
-        -jr-match-2-text-color: -fx-mid-text-color;
-
-        -jr-match-3-odd: derive(-jr-theme, 50%);
-        -jr-match-3-even: derive(-jr-match-3-odd, 10%);
-        -jr-match-3-text-color: derive(-jr-accent, 30%);
-
-        -jr-match-4-odd: -jr-theme;
-        -jr-match-4-even: derive(-jr-match-4-odd, 10%);
-        -jr-match-4-text-color: -jr-accent;
     }
 }
 
@@ -191,7 +139,7 @@
     -fx-background: derive(-fx-base, 26%);
 
     -fx-control-inner-background: -jr-inner-bg;
-    -fx-control-inner-background-alt: -jr-inner-bg-alt;
+    -fx-control-inner-background-alt: derive(-fx-control-inner-background, -5%);
 
     -fx-dark-text-color: #000;
     -fx-mid-text-color: -jr-mid-text-color;
@@ -260,8 +208,7 @@
 .list-view:focused,
 .tree-view:focused,
 .table-view:focused,
-.tree-table-view:focused,
-.html-editor:contains-focus {
+.tree-table-view:focused {
     -fx-background-color: -fx-control-inner-background;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
@@ -496,8 +443,8 @@ TextFlow > .tooltip-text-monospaced {
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background-color: -jr-menu-background-active;
-    -fx-background: -jr-menu-background-active;
+    -fx-background-color: -jr-hover;
+    -fx-background: -jr-hover;
 }
 
 .menu-bar > .container > .menu-button:hover > .label,
@@ -511,13 +458,13 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .menu-item > .label {
-    -fx-text-fill: -jr-menu-item-foreground;
+    -fx-text-fill: -jr-text-foreground;
 }
 
 .menu-item:focused {
-    -fx-text-fill: -jr-menu-background-active;
-    -fx-background: -jr-menu-background-active;
-    -fx-background-color: -jr-menu-background-active;
+    -fx-text-fill: -jr-hover;
+    -fx-background: -jr-hover;
+    -fx-background-color: -jr-hover;
 }
 
 .menu-item:focused > .label {
@@ -560,7 +507,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-border-color: -fx-outer-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
-    -fx-pref-height: -jr-header-height;
+    -fx-pref-height: 3em;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
@@ -569,8 +516,8 @@ TextFlow > .tooltip-text-monospaced {
 
 .tab-pane > .tab-header-area > .headers-region > .control-buttons-tab {
     -fx-border-color: -jr-theme;
-    -fx-fill: -jr-theme-text;
-    -fx-text-fill: -jr-theme-text;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
@@ -580,12 +527,12 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
-    -fx-fill: -jr-theme-text;
-    -fx-text-fill: -jr-theme-text;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button {
-    -fx-background-color: -jr-theme-text;
+    -fx-background-color: -jr-theme;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
@@ -621,8 +568,8 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-fill: -jr-theme-text;
-    -fx-text-fill: -jr-theme-text;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
 }
 
 .tab-pane > .tab-header-area {
@@ -858,6 +805,9 @@ TextFlow > .tooltip-text-monospaced {
 .tree-table-view {
     -fx-background-insets: 0;
     -fx-padding: 0;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+    -fx-table-cell-border-color: transparent;
 }
 
 .table-view:focused,
@@ -865,13 +815,21 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-insets: 0;
 }
 
-.table-row-cell:hover,
-.tree-table-row-cell:hover,
-.table-row-cell:hover:even,
-.tree-table-row-cell:hover:even {
+.table-cell,
+.tree-table-cell {
+    -fx-cell-size: 4.0em;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-fill: -fx-text-background-color;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover,
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover {
     -fx-background-color: -jr-hover;
-    -fx-fill: -jr-hover-text;
-    -fx-text-fill: -jr-hover-text;
+    -fx-fill: -fx-focused-text-base-color;
+    -fx-text-fill: -fx-focused-text-base-color;
 }
 
 .tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
@@ -879,8 +837,8 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: white;
 }
 
-.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
-.tree-table-view > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:filled:selected,
+.tree-table-view > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:filled:selected {
     -fx-border-color: transparent;
     -fx-background-insets: 0;
 }
@@ -890,8 +848,8 @@ TextFlow > .tooltip-text-monospaced {
 .tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
 .table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
 .tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
-.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
-.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:filled:selected {
     -fx-background: -jr-selected;
     -fx-background-color: -jr-selected;
     -fx-table-cell-border-color: transparent;
@@ -904,19 +862,10 @@ TextFlow > .tooltip-text-monospaced {
 .tree-cell:filled:selected,
 .table-row-cell:filled:selected,
 .tree-table-row-cell:filled:selected,
-.table-row-cell:filled > .table-cell:selected,
-.tree-table-row-cell:filled > .tree-table-cell:selected {
+.table-row-cell:filled > .table-cell:filled:selected,
+.tree-table-row-cell:filled > .tree-table-cell:filled:selected {
     -fx-background: -jr-selected;
     -fx-background-color: -jr-selected;
-    -fx-table-cell-border-color: transparent;
-}
-
-
-.table-view,
-.tree-table-view {
-    -fx-border-width: 0;
-    -fx-padding: 0;
-    -fx-border-insets: 0;
     -fx-table-cell-border-color: transparent;
 }
 
@@ -943,15 +892,7 @@ TextFlow > .tooltip-text-monospaced {
 .column-header > .label {
     -fx-padding: 0 1em 0 1em;
     -fx-alignment: center-left;
-    -fx-text-fill: -jr-head-fg;
-}
-
-.table-cell,
-.tree-table-cell {
-    -fx-cell-size: 4.0em;
-    -fx-padding: 0.5em 1em 0.5em 1em;
-    -fx-fill: -fx-text-background-color;
-    -fx-text-fill: -fx-text-background-color;
+    -fx-text-fill: -fx-text-inner-color;
 }
 
 /* JavaFX WebView */
