@@ -558,23 +558,22 @@ public class BibDatabase {
             String newValue = event.getNewValue() == null ? "" : event.getNewValue();
 
             // Remove from the old key's set
-            if (oldValue != null) {
-                Set<BibEntry> referenceEntries = citationIndex.get(oldValue);
-                if (referenceEntries != null) {
-                    referenceEntries.remove(entry);
-                    if (referenceEntries.isEmpty()) {
-                        citationIndex.remove(oldValue);
-                    }
+
+            Set<BibEntry> referenceEntries = citationIndex.get(oldValue);
+            if (referenceEntries != null) {
+                referenceEntries.remove(entry);
+                if (referenceEntries.isEmpty()) {
+                    citationIndex.remove(oldValue);
                 }
             }
 
             // Add to the new key's set
-            if (newValue != null) {
+            if(!newValue.isEmpty()){
+                // if check so that empty strings are not added in map as empty is not valid crossref
                 citationIndex.computeIfAbsent(newValue, k -> ConcurrentHashMap.newKeySet()).add(entry);
             }
-        }
 
-        // After changes, post the event just like before
+        }
         eventBus.post(event);
     }
 
