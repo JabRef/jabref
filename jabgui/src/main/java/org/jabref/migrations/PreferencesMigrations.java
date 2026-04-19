@@ -312,7 +312,7 @@ public class PreferencesMigrations {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(
-                prefs.get(JabRefCliPreferences.DEFAULT_CITATION_KEY_PATTERN));
+                prefs.get(JabRefCliPreferences.CITATION_KEY_DEFAULT_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }

@@ -147,6 +147,14 @@ public class SearchCitationsRelationsService {
         return Integer.parseInt(actualFieldValue.get());
     }
 
+    public boolean isReferencesUpdatable(BibEntry entry) {
+        return relationsRepository.isReferencesUpdatable(entry);
+    }
+
+    public boolean isCitationsUpdatable(BibEntry entry) {
+        return relationsRepository.isCitationsUpdatable(entry);
+    }
+
     public void close() {
         relationsRepository.close();
     }

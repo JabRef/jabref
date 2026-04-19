@@ -328,7 +328,7 @@ public class JabRefGUI extends Application {
         Scene scene = new Scene(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssImmediately(scene);
+        themeManager.installCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -457,16 +457,16 @@ public class JabRefGUI extends Application {
     public void startBackgroundTasks() {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
         CLIMessageHandler cliMessageHandler = new CLIMessageHandler(mainFrame, preferences);
-        if (remotePreferences.useRemoteServer()) {
+        if (remotePreferences.shouldEnableRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     cliMessageHandler,
-                    remotePreferences.getPort());
+                    remotePreferences.getRemoteServerPort());
         }
 
-        if (remotePreferences.enableHttpServer()) {
+        if (remotePreferences.shouldEnableHttpServer()) {
             httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
         }
-        if (remotePreferences.enableLanguageServer()) {
+        if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
     }

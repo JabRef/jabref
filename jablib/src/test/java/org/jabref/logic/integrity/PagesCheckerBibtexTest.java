@@ -37,7 +37,19 @@ public class PagesCheckerBibtexTest {
                 // bibTexAcceptsNoSimpleRangeOfNumbers
                 "43+",
                 // bibTexAcceptsMorePageNumbersWithRangeOfNumbers
-                "7+,41--43,73"
+                "7+,41--43,73",
+                // suffix
+                "436S--439S",
+                // prefix
+                "S436--S439",
+                // prefix and suffix
+                "S436S--S439S",
+                // affix and more following range
+                "S10A+",
+                // unicode separator
+                "1\u201310",
+                // roman numerals
+                "i", "ivxlcdm", "IVXLCDM", "iS", "i--vi", "VII--xii"
         );
     }
 
@@ -56,7 +68,11 @@ public class PagesCheckerBibtexTest {
                 // bibTexDoesNotAcceptMorePageNumbersWithoutComma
                 "1 2",
                 // bibTexDoesNotAcceptBrackets
-                "{1}-{2}"
+                "{1}-{2}",
+                // single dash forbidden
+                "436S-439S",
+                // invalid ranges
+                "10-", "-10", "10--", "--10", "+10", "10+-10"
         );
     }
 

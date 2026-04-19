@@ -44,7 +44,7 @@ public class SummaryShowingComponent extends VBox {
     @FXML
     private void initialize() {
         initializeWebView();
-        updateContent(false); // Start in plain text mode
+        updateContent(true); // Start in Markdown mode
         updateInfoText();
     }
 
