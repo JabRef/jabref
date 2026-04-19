@@ -535,7 +535,7 @@ public class BibDatabase {
     /// Unregisters an listener object.
     ///
     /// @param listener listener (subscriber) to remove
-    public void unregisterListener(Object listener) {
+    public void unregisterListener(Object listener)  {
         try {
             this.eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
@@ -545,7 +545,43 @@ public class BibDatabase {
     }
 
     @Subscribe
-    private void relayEntryChangeEvent(FieldChangedEvent event) {
+    private void relayEntryChangeEvent(FieldChangedEvent event)
+    {
+        Field field = event.getField();
+
+        // Check if the field changed was a single entry or multiple entry link
+        boolean isLinkedField = field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) ||
+                field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK);
+
+
+        if (isLinkedField)
+        {
+            BibEntry entry = event.getBibEntry();
+            String oldValue = event.getOldValue() == null ? "" : event.getOldValue();
+            String newValue = event.getNewValue() == null ? "" : event.getNewValue();
+
+            //Remove from the old key's set
+            if (oldValue != null)
+            {
+                Set<BibEntry> referenceEntries = citationIndex.get(oldValue);
+                if (referenceEntries != null)
+                {
+                    referenceEntries.remove(entry);
+                    if (referenceEntries.isEmpty())
+                    {
+                        citationIndex.remove(oldValue);
+                    }
+                }
+            }
+
+            // Add to the new key's set
+            if (newValue != null)
+            {
+                citationIndex.computeIfAbsent(newValue, k -> ConcurrentHashMap.newKeySet()).add(entry);
+            }
+        }
+
+        // After changes, post the event just like before
         eventBus.post(event);
     }
 
