@@ -63,7 +63,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
             }
         });
         textField.setOnAction(event -> commitTextFieldValue());
-        textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+        textField.focusedProperty().addListener((_, _, newValue) -> {
             if (!newValue) {
                 commitTextFieldValue();
             }
