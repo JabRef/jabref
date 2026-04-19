@@ -80,7 +80,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
-        syncPickerWithText(normalizeText(viewModel.textProperty().get()));
+        syncPickerWithText(viewModel.textProperty().getValueSafe());
     }
 
     @Override
