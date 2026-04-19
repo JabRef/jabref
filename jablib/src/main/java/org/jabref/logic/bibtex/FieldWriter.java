@@ -88,7 +88,7 @@ public class FieldWriter {
         Deque<Integer> lastOpenBrace = new ArrayDeque<>(length);
         boolean[] toEscape = new boolean[length];
 
-        // Find all braces
+        // Match braces, mark orphan '}'
         for (int i = 0; i < length; i++) {
             char currentChat = text.charAt(i);
             if (!isEscaped(text, i)) {
