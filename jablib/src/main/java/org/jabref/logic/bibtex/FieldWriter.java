@@ -70,7 +70,7 @@ public class FieldWriter {
         while (!openBraces.isEmpty()) {
             FieldWriter.BracePosition lastOpenBrace = openBraces.pop();
             errors.add(Localization.lang("Unbalanced '{' at line %0, column %1 (index %2): in '%3'.",
-                    lastOpenBrace.index(),
+                    lastOpenBrace.line() + 1,
                     lastOpenBrace.column(),
                     lastOpenBrace.index(),
                     getContextSnippet(text, lastOpenBrace.index())));
@@ -90,12 +90,12 @@ public class FieldWriter {
 
         // Match braces, mark orphan '}'
         for (int i = 0; i < length; i++) {
-            char currentChat = text.charAt(i);
+            char currentChar = text.charAt(i);
             if (!isEscaped(text, i)) {
-                if (currentChat == '{') {
+                if (currentChar == '{') {
                     // Remember the last open brace
                     lastOpenBrace.push(i);
-                } else if (currentChat == '}') {
+                } else if (currentChar == '}') {
                     if (!lastOpenBrace.isEmpty()) {
                         // Match with the last open brace
                         lastOpenBrace.pop();
