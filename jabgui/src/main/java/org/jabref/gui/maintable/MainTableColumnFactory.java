@@ -85,6 +85,7 @@ public class MainTableColumnFactory {
         this.tooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
+    @Nullable
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
@@ -138,7 +139,6 @@ public class MainTableColumnFactory {
         return returnColumn;
     }
 
-    @Nullable
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
