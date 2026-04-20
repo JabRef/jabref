@@ -24,7 +24,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for dragging entries from the "Citation relations" tab to other libraries. [#15135](https://github.com/JabRef/jabref/issues/15135)
 - We added a fetcher selection dropdown to the citation count field in the General tab, allowing users to choose between Semantic Scholar, OpenAlex, OpenCitations, and scite.ai as the source. The selected fetcher is now persisted across restarts and can also be configured in the Entry Editor preferences. [#15134](https://github.com/JabRef/jabref/issues/15134)
 - We added support for citation properties in the CAYW endpoint. [#13821](https://github.com/JabRef/jabref/issues/13821)
-- We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request.
 - We added an export format for [`academicpages`](https://academicpages.github.io/) format. [#12727](https://github.com/JabRef/jabref/issues/12727)
 - We added "All" option to the citation fetcher combo box, which queries all providers (CrossRef, OpenAlex, OpenCitations, SemanticScholar) and merges the results into a single deduplicated list.
 - We added a quick setting toggle to enable cover images download. [#15322](https://github.com/JabRef/jabref/pull/15322)
@@ -32,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Added context menu entry "Sort tabs alphabetically" to the library tabs. [#15425](https://github.com/JabRef/jabref/pull/15425)
 - We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
 - We added integrity checks that warn when the `booktitle` field contains a year, a country/location, or page numbers that should live in dedicated fields. [#12271](https://github.com/JabRef/jabref/issues/12271)
+- We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
 
 ### Changed
 
