@@ -273,7 +273,7 @@ class GuiPreferencesMigrationsTest {
     @Test
     void upgradeThemeMigratesOldDarkCssToDarkTheme() {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
-        when(preferences.get("fxTheme")).thenReturn("Dark.css");
+        when(preferences.get("fxTheme", "")).thenReturn("Dark.css");
         when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
 
         PreferencesMigrations.upgradeTheme(preferences);
@@ -284,8 +284,8 @@ class GuiPreferencesMigrationsTest {
     @Test
     void upgradeThemeMigratesEmptyThemeToLightWhenThemeSyncOsIsDisabled() {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
-        when(preferences.get("fxTheme")).thenReturn("");
-        when(preferences.getBoolean("themeSyncOs")).thenReturn(false);
+        when(preferences.get("fxTheme", "")).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", false)).thenReturn(false);
         when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
 
         PreferencesMigrations.upgradeTheme(preferences);
