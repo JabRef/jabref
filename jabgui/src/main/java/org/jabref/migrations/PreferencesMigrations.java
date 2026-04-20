@@ -620,6 +620,7 @@ public class PreferencesMigrations {
     }
 
     /// upgrade the old theme css names of the theme to the new theme properties
+    /// Theme names were changed in [#15573](https://github.com/JabRef/jabref/pull/15573)
     static void upgradeTheme(JabRefGuiPreferences preferences) {
         if ("Dark.css".equals(preferences.get("fxTheme", ""))) {
             preferences.getWorkspacePreferences().setTheme(Theme.dark());
