@@ -1,5 +1,7 @@
 package org.jabref.http.server;
 
+import java.util.EnumSet;
+
 import org.jabref.http.server.resources.LibrariesResource;
 
 import jakarta.ws.rs.client.Entity;
@@ -76,6 +78,28 @@ class LibrariesQueryResourceTest extends ServerTest {
                     }
                   ]
                 }""".formatted(TestBibFile.GENERAL_SERVER_TEST.id);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void doiMatchInChocolateBib() {
+        // [utest->req~jabsrv.query.doi~1]
+        setAvailableLibraries(EnumSet.of(TestBibFile.CHOCOLATE_BIB));
+        String body = """
+                {"dois": ["10.1161/circulationaha.108.827022"]}""";
+        String result = target("/libraries/query")
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(body), String.class);
+        String expected = """
+                {
+                  "matches": [
+                    {
+                      "doi": "10.1161/circulationaha.108.827022",
+                      "libraryId": "%s",
+                      "entryId": "Corti_2009"
+                    }
+                  ]
+                }""".formatted(TestBibFile.CHOCOLATE_BIB.id);
         assertEquals(expected, result);
     }
 
