@@ -164,26 +164,27 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Gets invoked if the user changes the active database.
     /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
-        if (newDatabase.isPresent()) {
-            GroupNodeViewModel newRoot = newDatabase
-                    .map(BibDatabaseContext::getMetaData)
-                    .flatMap(MetaData::getGroups)
-                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
-                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
-
-            rootGroup.setValue(newRoot);
-            if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
-                stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
-            }
-            selectedGroups.setAll(
-                    stateManager.getSelectedGroups(newDatabase.get()).stream()
-                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
-                                .collect(Collectors.toList()));
-        } else {
-            rootGroup.setValue(null);
-        }
         currentDatabase = newDatabase;
-        newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
+        if (newDatabase.isEmpty()) {
+            rootGroup.setValue(null);
+            return;
+        }
+
+        GroupNodeViewModel newRoot = newDatabase
+                .map(BibDatabaseContext::getMetaData)
+                .flatMap(MetaData::getGroups)
+                .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
+                .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
+
+        rootGroup.setValue(newRoot);
+        if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
+            stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
+        }
+        selectedGroups.setAll(
+                stateManager.getSelectedGroups(newDatabase.get()).stream()
+                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
+                            .collect(Collectors.toList()));
+        addGroupImportEntries(rootGroup.get());
     }
 
     /// Creates the "Imported entries" group if enabled and missing.
