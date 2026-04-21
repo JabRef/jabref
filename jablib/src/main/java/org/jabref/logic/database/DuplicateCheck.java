@@ -3,6 +3,7 @@ package org.jabref.logic.database;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -23,6 +25,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
@@ -34,9 +37,20 @@ import org.slf4j.LoggerFactory;
 
 /// This class contains utility method for duplicate checking of entries.
 public class DuplicateCheck {
+    public static final double COMPARE_ENTRIES_THRESHOLD = 0.8; // The threshold that determines if entries are likely to be of the same publication
     private static final double DUPLICATE_THRESHOLD = 0.75; // The overall threshold to signal a duplicate pair
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateCheck.class);
+
+    private static final Map<Field, Double> COMPARE_ENTRIES_FIELD_WEIGHTS = Map.of(
+            StandardField.AUTHOR, 2.5,
+            StandardField.EDITOR, 2.5,
+            StandardField.TITLE, 3.0,
+            StandardField.JOURNAL, 2.0,
+            StandardField.NOTE, 0.1,
+            StandardField.COMMENT, 0.1
+    );
+
     /*
      * Integer values for indicating result of duplicate check (for entries):
      */
@@ -339,5 +353,87 @@ public class DuplicateCheck {
                                                 final BibEntry entry,
                                                 final BibDatabaseMode bibDatabaseMode) {
         return database.getEntries().stream().filter(other -> isDuplicate(entry, other, bibDatabaseMode)).findFirst();
+    }
+
+    /// Computes a weighted similarity score between two entries for reference checking purposes.
+    ///
+    /// Only fields present in one are scored. Internal fields and identifier fields
+    /// such as DOI and EPRINT are excluded since they are used for lookup not comparison.
+    ///
+    /// If one contains a field that two does not similarity for that field is 0.0
+    /// and its weight still counts toward the denominator. This conservatively lowers
+    /// the score rather than silently ignoring the discrepancy.
+    ///
+    /// Person name fields are compared author by author at matching positions.
+    /// The word "others" (e.g, author name1 , author name2, and others) is stripped before comparison
+    /// to handle abbreviated author lists.
+    /// Only authors listed in one are compared against two at the same position
+    /// so abbreviated local lists match complete fetched lists without penalty
+    /// while invented authors are still penalized.
+    ///
+    /// @param one the local entry to check (drives which fields are scored)
+    /// @param two the authoritative entry fetched from an online source
+    /// @return weighted similarity score in [0.0, 1.0]
+    public static double compareEntries(BibEntry one, BibEntry two) {
+        StringSimilarity stringSimilarity = new StringSimilarity();
+
+        List<Field> localFields = one.getFields().stream()
+                                     .filter(field -> !(field instanceof InternalField))
+                                     .filter(field -> !field.getProperties().contains(FieldProperty.IDENTIFIER))
+                                     .toList();
+
+        if (localFields.isEmpty()) {
+            return 0.0;
+        }
+
+        double totalWeight = 0.0;
+        double weightedSimilaritySum = 0.0;
+
+        for (Field field : localFields) {
+            String firstValue = one.getFieldLatexFree(field).orElse("");
+            String secondValue = two.getFieldLatexFree(field).orElse("");
+
+            double similarity;
+            if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                List<Author> localAuthors = AuthorList.parse(firstValue).getAuthors().stream()
+                                                      .filter(a -> !a.getFamilyGiven(false).equalsIgnoreCase("others"))
+                                                      .toList();
+                List<Author> authoritativeAuthors = AuthorList.parse(secondValue).getAuthors();
+
+                if (localAuthors.isEmpty()) {
+                    similarity = 0.0;
+                } else {
+                    int count = Math.min(localAuthors.size(), authoritativeAuthors.size());
+                    double authorSimilaritySum = 0.0;
+                    for (int i = 0; i < count; i++) {
+                        Author localAuthor = localAuthors.get(i);
+                        Author authAuthor = authoritativeAuthors.get(i);
+
+                        String localFamily = localAuthor.getFamilyName().orElse("").toLowerCase(Locale.ROOT);
+                        String authFamily = authAuthor.getFamilyName().orElse("").toLowerCase(Locale.ROOT);
+                        double familySimilarity = stringSimilarity.similarity(localFamily, authFamily);
+
+                        String localGiven = localAuthor.getGivenName().orElse("").toLowerCase(Locale.ROOT);
+                        String authGiven = authAuthor.getGivenName().orElse("").toLowerCase(Locale.ROOT);
+                        double givenSimilarity = (localGiven.isEmpty() || authGiven.isEmpty())
+                                                 ? 1.0
+                                                 : stringSimilarity.similarity(localGiven, authGiven);
+
+                        authorSimilaritySum += (familySimilarity + givenSimilarity) / 2.0;
+                    }
+                    similarity = authorSimilaritySum / localAuthors.size();
+                }
+            } else {
+                similarity = stringSimilarity.similarity(
+                        firstValue.toLowerCase(Locale.ROOT),
+                        secondValue.toLowerCase(Locale.ROOT));
+            }
+
+            double weight = COMPARE_ENTRIES_FIELD_WEIGHTS.getOrDefault(field, 1.0);
+            weightedSimilaritySum += similarity * weight;
+            totalWeight += weight;
+        }
+
+        return totalWeight > 0 ? weightedSimilaritySum / totalWeight : 0.0;
     }
 }

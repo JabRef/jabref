@@ -7,6 +7,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -626,5 +627,62 @@ public class DuplicateCheckTest {
                 .withField(StandardField.ISBN, "978-1-4684-8585-1");
 
         assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void entriesShareNoNonInternalFields() {
+        BibEntry one = new BibEntry().withField(StandardField.TITLE, "Some Title");
+        BibEntry two = new BibEntry().withField(StandardField.AUTHOR, "Some Author");
+
+        double score = DuplicateCheck.compareEntries(one, two);
+
+        assertEquals(0.0, score);
+    }
+
+    @Test
+    void sameEntryIsComparedWithItself() {
+        BibEntry entry = getSimpleArticle();
+
+        double score = DuplicateCheck.compareEntries(entry, entry);
+
+        assertEquals(1.0, score);
+    }
+
+    @Test
+    void ignoresCitationKeyWhenDeterminingScore() {
+        BibEntry one = new BibEntry()
+                .withField(InternalField.KEY_FIELD, "citationKey1")
+                .withField(StandardField.TITLE, "Identical Title");
+        BibEntry two = new BibEntry()
+                .withField(InternalField.KEY_FIELD, "citationKey2")
+                .withField(StandardField.TITLE, "Identical Title");
+
+        double score = DuplicateCheck.compareEntries(one, two);
+
+        assertEquals(1.0, score);
+    }
+
+    @Test
+    void entriesWithIdenticalTitles() {
+        BibEntry one = new BibEntry().withField(StandardField.TITLE, "Reinforcement learning: An introduction");
+        BibEntry two = new BibEntry().withField(StandardField.TITLE, "Reinforcement learning: An introduction");
+
+        double score = DuplicateCheck.compareEntries(one, two);
+
+        assertTrue(score >= DuplicateCheck.COMPARE_ENTRIES_THRESHOLD);
+    }
+
+    @Test
+    void entriesWithCompletelyDifferentFields() {
+        BibEntry one = new BibEntry()
+                .withField(StandardField.TITLE, "Performance on a Signal")
+                .withField(StandardField.AUTHOR, "Richard Atkinson");
+        BibEntry two = new BibEntry()
+                .withField(StandardField.TITLE, "Rest in Treatment")
+                .withField(StandardField.AUTHOR, "Elizabeth Ballard");
+
+        double score = DuplicateCheck.compareEntries(one, two);
+
+        assertTrue(score < DuplicateCheck.COMPARE_ENTRIES_THRESHOLD);
     }
 }
