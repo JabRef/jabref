@@ -64,7 +64,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.2")
-    api("com.uber.nullaway:nullaway:0.13.3")
+    api("com.uber.nullaway:nullaway:0.13.4")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.21.0")
