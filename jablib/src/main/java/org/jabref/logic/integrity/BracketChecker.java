@@ -4,11 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class BracketChecker implements ValueChecker {
 
     @Override
     public Optional<String> checkValue(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
         List<String> errors = FieldWriter.checkBalancedBraces(value);
         if (!errors.isEmpty()) {
             return Optional.of(String.join("\n", errors));
