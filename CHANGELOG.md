@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
 - We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
 - We added a related work text extractor, which finds and inserts the related work text into bib entries from references in the texts. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We added a hover button on group rows to quickly add a new group or subgroup. [#12289](https://github.com/JabRef/jabref/issues/12289)
@@ -52,6 +53,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue with the `Normalize date` save action truncating date ranges. [#8902](https://github.com/JabRef/jabref/issues/8902)
 - We fixed an issue where removed CSL files were not immediately cleared from the UI upon style removal. [#15438](https://github.com/JabRef/jabref/issues/15438)
 - We improved the group filter to support full boolean search syntax. [#12721](https://github.com/JabRef/jabref/issues/12721)
 - We fixed the column chooser context menu appearing when right-clicking the empty library table body. [#15384](https://github.com/JabRef/jabref/issues/15384)
