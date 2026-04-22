@@ -3,13 +3,9 @@ package org.jabref.logic.importer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
-import org.jabref.model.search.query.SearchQuery;
-
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
@@ -25,13 +21,8 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, List.of());
         }
-        SearchQuery searchQueryObject = new SearchQuery(searchQuery);
-        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
-        try {
-            return this.performSearchPaged(visitor.visitStart(searchQueryObject.getContext()), pageNumber);
-        } catch (ParseCancellationException e) {
-            throw new FetcherException("A syntax error occurred during parsing of the query");
-        }
+
+        return this.performSearchPaged(SearchBasedFetcher.getQueryNode(searchQuery), pageNumber);
     }
 
     /// @return default pageSize

@@ -48,6 +48,7 @@ public final class CSLFormatUtils {
     private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
+    private static final Pattern BIBLIOGRAPHY_NUMBER_PATTERN = Pattern.compile("([\\[(])?(\\d+)([])])?(\\.)?\\s*");
 
     private CSLFormatUtils() {
         // prevent instantiation
@@ -168,8 +169,7 @@ public final class CSLFormatUtils {
     /// @param currentNumber the correct number to update the citation with.
     /// @return the bibliographic citation with resolved number.
     public static String updateSingleBibliographyNumber(String citation, int currentNumber) {
-        Pattern pattern = Pattern.compile("([\\[(])?(\\d+)([])])?(\\.)?\\s*");
-        Matcher matcher = pattern.matcher(citation);
+        Matcher matcher = BIBLIOGRAPHY_NUMBER_PATTERN.matcher(citation);
         StringBuilder sb = new StringBuilder();
         boolean numberReplaced = false;
 

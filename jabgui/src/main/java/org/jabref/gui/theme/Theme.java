@@ -5,59 +5,68 @@ import java.util.Optional;
 
 import org.jspecify.annotations.NonNull;
 
-/// Represents one of three types of a css based Theme for JabRef:
+/// Represents one of four types of a CSS-based Theme for JabRef:
 ///
-/// The Default type of theme is the light theme (which is in fact the absence of any theme), the dark theme is currently
-/// the only embedded theme and the custom themes, that can be created by loading a proper css file.
+/// - System - Tightly coupled to the <code>shouldThemeSyncOs</code> setting,
+/// meaning we do not want to override the theme at all
+/// - Light - Ignore whatever the OS is set to and make JabRef use the light theme
+/// - Dark - Ignore whatever the OS is set to and make JabRef use the dark theme
+/// - Custom - CSS provided by the user
 public class Theme {
 
     public enum Type {
-        DEFAULT, EMBEDDED, CUSTOM
+        SYSTEM, LIGHT, DARK, CUSTOM
     }
 
-    public static final String BASE_CSS = "Base.css";
-    public static final String EMBEDDED_DARK_CSS = "Dark.css";
+    public static final String SYSTEM = "";
+
+    private static final String JABREF_THEME_CSS = "jabref-theme.css";
+
+    private static final String LIGHT = "light";
+    private static final String DARK = "dark";
 
     private final Type type;
     private final String name;
     private final Optional<StyleSheet> additionalStylesheet;
 
     public Theme(@NonNull String name) {
-        if (name.isEmpty() || BASE_CSS.equalsIgnoreCase(name)) {
+        if (SYSTEM.equalsIgnoreCase(name)) {
             this.additionalStylesheet = Optional.empty();
-            this.type = Type.DEFAULT;
-            this.name = "";
-        } else if (EMBEDDED_DARK_CSS.equalsIgnoreCase(name)) {
-            this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_CSS);
-            if (this.additionalStylesheet.isPresent()) {
-                this.type = Type.EMBEDDED;
-                this.name = EMBEDDED_DARK_CSS;
-            } else {
-                this.type = Type.DEFAULT;
-                this.name = "";
-            }
+            this.type = Type.SYSTEM;
+            this.name = name;
+        } else if (LIGHT.equalsIgnoreCase(name)) {
+            this.additionalStylesheet = Optional.empty();
+            this.type = Type.LIGHT;
+            this.name = name;
+        } else if (DARK.equalsIgnoreCase(name)) {
+            this.additionalStylesheet = Optional.empty();
+            this.type = Type.DARK;
+            this.name = name;
         } else {
             this.additionalStylesheet = StyleSheet.create(name);
             if (this.additionalStylesheet.isPresent()) {
                 this.type = Type.CUSTOM;
-                this.name = name;
             } else {
-                this.type = Type.DEFAULT;
-                this.name = "";
+                this.type = Type.SYSTEM;
             }
+            this.name = name;
         }
     }
 
     public static Theme light() {
-        return new Theme("");
+        return new Theme(LIGHT);
     }
 
     public static Theme dark() {
-        return new Theme(EMBEDDED_DARK_CSS);
+        return new Theme(DARK);
     }
 
     public static Theme custom(String name) {
         return new Theme(name);
+    }
+
+    public static Theme system() {
+        return new Theme(SYSTEM);
     }
 
     /// @return the Theme type. Guaranteed to be non-null.
@@ -107,5 +116,9 @@ public class Theme {
                 "type=" + type +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public static StyleSheet getJabRefTheme() {
+        return StyleSheet.create(JABREF_THEME_CSS).orElseThrow();
     }
 }

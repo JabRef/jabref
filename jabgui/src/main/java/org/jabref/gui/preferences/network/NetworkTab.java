@@ -25,9 +25,9 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.controlsfx.control.textfield.CustomPasswordField;
 
 import static javafx.beans.binding.Bindings.not;
 
@@ -44,7 +44,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private Label proxyUsernameLabel;
     @FXML private TextField proxyUsername;
     @FXML private Label proxyPasswordLabel;
-    @FXML private CustomPasswordField proxyPassword;
+    @FXML private EnhancedPasswordField proxyPassword;
     @FXML private CheckBox proxyPersistPassword;
     @FXML private SplitPane persistentTooltipWrapper; // The disabled persistPassword control does not show tooltips
     @FXML private Button checkConnectionButton;
@@ -54,7 +54,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     // endregion
 
     @FXML private TextField gitUsername;
-    @FXML private CustomPasswordField gitPat;
+    @FXML private EnhancedPasswordField gitPat;
     @FXML private CheckBox gitPersistPat;
     @FXML private SplitPane persistGitPatTooltipWrapper;
     private String gitPatText = "";
@@ -118,9 +118,9 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         });
 
         proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
-        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);
-        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
-        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
+        proxyPassword.setOnMouseClicked(event -> {
+            proxyPassword.setShowPassword(!proxyPassword.isShowPassword());
+        });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
@@ -142,9 +142,9 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         });
 
         gitPat.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
-        gitPat.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::gitPatReveal);
-        gitPat.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::gitPatMask);
-        gitPat.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::gitPatMask);
+        gitPat.setOnMouseClicked(event -> {
+            gitPat.setShowPassword(!gitPat.isShowPassword());
+        });
 
         certSerialNumber.setCellValueFactory(data -> data.getValue().serialNumberProperty());
         certIssuer.setCellValueFactory(data -> data.getValue().issuerProperty());
@@ -186,23 +186,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
             proxyPassword.setPromptText("");
             proxyPasswordText = "";
             proxyPasswordCaretPosition = 0;
-        }
-    }
-
-    private void gitPatReveal(MouseEvent event) {
-        gitPatText = gitPat.getText();
-        gitPatCaretPosition = gitPat.getCaretPosition();
-        gitPat.clear();
-        gitPat.setPromptText(gitPatText);
-    }
-
-    private void gitPatMask(MouseEvent event) {
-        if (!"".equals(gitPatText)) {
-            gitPat.setText(gitPatText);
-            gitPat.positionCaret(gitPatCaretPosition);
-            gitPat.setPromptText("");
-            gitPatText = "";
-            gitPatCaretPosition = 0;
         }
     }
 
