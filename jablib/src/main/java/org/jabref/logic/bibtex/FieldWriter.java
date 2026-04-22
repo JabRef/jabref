@@ -191,16 +191,16 @@ public class FieldWriter {
                 pos2 = -1;
             } else {
                 pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
-            }
 
-            if (pos2 == -1) {
-                pos1 = content.length();
-                LOGGER.warn("The character {} is not allowed in BibTeX strings unless escaped as in '\\\\{}'. "
-                                + "In JabRef, use pairs of # characters to indicate a string. "
-                                + "Field value: {}",
-                        BIBTEX_STRING_START_END_SYMBOL,
-                        BIBTEX_STRING_START_END_SYMBOL,
-                        content);
+                if (pos2 == -1) {
+                    pos1 = content.length();
+                    LOGGER.warn("The character {} is not allowed in BibTeX strings unless escaped as in '\\\\{}'. "
+                                    + "In JabRef, use pairs of # characters to indicate a string. "
+                                    + "Field value: {}",
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            content);
+                }
             }
 
             if (pos1 > pivot) {

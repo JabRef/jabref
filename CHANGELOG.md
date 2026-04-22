@@ -50,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We refined the "Select files to import" page in "Search for unlinked local files" dialog to give the users the choice of linking the file to a related entry or import it to a new entry. [#13689](https://github.com/JabRef/jabref/issues/13689)
 - The "Make/Sync bibliography" button in OO/LO panel now refreshes citations before generating bibliographies. [#14387](https://github.com/JabRef/jabref/issues/14387)
 - Improved responsiveness and user interface of refresh button in Citation Relations tab. [#12247](https://github.com/JabRef/jabref/issues/12247)
+- JabRef keeps the field `review` in BibTeX files. [#15609](https://github.com/JabRef/jabref/pull/15609)
 
 ### Fixed
 

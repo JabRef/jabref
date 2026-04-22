@@ -12,7 +12,7 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafx = "26"
+val javafx = "26.0.1"
 
 val lucene = "10.4.0"
 
@@ -64,7 +64,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.2")
-    api("com.uber.nullaway:nullaway:0.13.3")
+    api("com.uber.nullaway:nullaway:0.13.4")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.21.0")
@@ -123,7 +123,7 @@ dependencies.constraints {
     api("org.glassfish.jaxb:jaxb-runtime:4.0.7")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
-    api("org.hisp.dhis:json-tree:1.8.1")
+    api("org.hisp.dhis:json-tree:1.9.0")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jabref:mslinks:1.1.1")
