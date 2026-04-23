@@ -71,15 +71,13 @@ class HayagrivaYamlExporterTest {
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
-                "---",
                 "test:",
                 "  type: article",
                 "  title: \"Test Title\"",
                 "  author:",
                 "    - Author, Test",
                 "  date: 2020-10-14",
-                "  url: http://example.com",
-                "---");
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -98,7 +96,6 @@ class HayagrivaYamlExporterTest {
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
-                "---",
                 "test:",
                 "  type: article",
                 "  title: \"Test Title\"",
@@ -106,8 +103,7 @@ class HayagrivaYamlExporterTest {
                 "    - Author, Test",
                 "    - One, Other",
                 "  date: 2020-10-14",
-                "  url: http://example.com",
-                "---");
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -126,15 +122,13 @@ class HayagrivaYamlExporterTest {
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
-                "---",
                 "test:",
                 "  type: Misc",
                 "  title: \"Test Title\"",
                 "  author:",
                 "    - Author, Test",
                 "  date: 2020-10-14",
-                "  url: http://example.com",
-                "---");
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -153,15 +147,13 @@ class HayagrivaYamlExporterTest {
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
-                "---",
                 "test:",
                 "  type: article",
                 "  title: \"細雪\"",
                 "  author:",
                 "    - 潤一郎, 谷崎",
                 "  date: 2020-10-14",
-                "  url: http://example.com",
-                "---");
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
@@ -180,15 +172,13 @@ class HayagrivaYamlExporterTest {
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
-                "---",
                 "test:",
                 "  type: article",
                 "  title: \"細雪\"",
                 "  author:",
                 "    - 潤一郎, 谷崎",
                 "  date: 2020-10-14",
-                "  url: http://example.com",
-                "---");
+                "  url: http://example.com");
         assertEquals(expected, Files.readAllLines(file));
     }
 
@@ -207,7 +197,6 @@ class HayagrivaYamlExporterTest {
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
-                "---",
                 "test:",
                 "  type: article",
                 "  title: \"Test Title\"",
@@ -217,8 +206,7 @@ class HayagrivaYamlExporterTest {
                 "  parent:",
                 "    type: periodical",
                 "    title: Test Publisher",
-                "  url: http://example.com",
-                "---");
+                "  url: http://example.com");
 
         assertEquals(expected, Files.readAllLines(file));
     }
