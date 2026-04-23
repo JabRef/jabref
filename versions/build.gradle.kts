@@ -126,7 +126,7 @@ dependencies.constraints {
     api("org.hisp.dhis:json-tree:1.9.0")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
-    api("org.jabref:mslinks:1.1.1")
+    api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.20")
     api("org.jooq:jool:0.9.15")
