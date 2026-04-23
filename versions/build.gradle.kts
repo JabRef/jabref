@@ -128,7 +128,7 @@ dependencies.constraints {
     api("org.jabref:easybind:2.3.0")
     api("org.jabref:mslinks:1.1.1")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.20")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
