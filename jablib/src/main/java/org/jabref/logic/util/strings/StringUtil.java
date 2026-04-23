@@ -569,29 +569,6 @@ public class StringUtil {
         return result;
     }
 
-    /// Return a String with n spaces
-    ///
-    /// @param n Number of spaces
-    /// @return String with n spaces
-    public static String repeatSpaces(int n) {
-        return repeat(Math.max(0, n), ' ');
-    }
-
-    /// Return a String with n copies of the char c
-    ///
-    /// @param n Number of copies
-    /// @param c char to copy
-    /// @return String with n copies of c
-    public static String repeat(int n, char c) {
-        StringBuilder resultSB = new StringBuilder(n);
-
-        for (int i = 0; i < n; i++) {
-            resultSB.append(c);
-        }
-
-        return resultSB.toString();
-    }
-
     public static boolean isNullOrEmpty(@Nullable String toTest) {
         return (toTest == null) || toTest.isEmpty();
     }
@@ -747,7 +724,7 @@ public class StringUtil {
             sb.append(WRAPPED_LINE_PREFIX);
             sb.append(pair.getKey());
 
-            sb.append(StringUtil.repeatSpaces(padding));
+            sb.append(" ".repeat(padding));
 
             sb.append(STRING_TABLE_DELIMITER);
             sb.append(pair.getValue());

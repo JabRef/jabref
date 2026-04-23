@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.gui.theme.Theme;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
@@ -266,5 +268,28 @@ class GuiPreferencesMigrationsTest {
 
         PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
         verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);
+    }
+
+    @Test
+    void upgradeThemeMigratesOldDarkCssToDarkTheme() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", "")).thenReturn("Dark.css");
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences).setTheme(Theme.dark());
+    }
+
+    @Test
+    void upgradeThemeMigratesEmptyThemeToLightWhenThemeSyncOsIsDisabled() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", "")).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", false)).thenReturn(false);
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences).setTheme(Theme.light());
     }
 }

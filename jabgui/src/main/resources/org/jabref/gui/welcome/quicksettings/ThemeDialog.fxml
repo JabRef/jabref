@@ -13,6 +13,7 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.jabref.gui.util.component.HelpButton?>
 <?import org.jabref.gui.welcome.components.ThemeWireFrame?>
+<?import javafx.scene.control.CheckBox?>
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.ThemeDialog">
     <content>
@@ -23,9 +24,11 @@
                 <HelpButton fx:id="helpButton"/>
             </HBox>
 
+            <CheckBox fx:id="themeSyncOs" text="%Use System Preference"/>
+
             <HBox>
                 <VBox styleClass="theme-option" onMouseClicked="#selectLight">
-                    <RadioButton fx:id="lightRadio" text="Light Theme">
+                    <RadioButton fx:id="lightRadio" text="%Light Theme" disable="${themeSyncOs.selected}">
                         <toggleGroup>
                             <ToggleGroup fx:id="themeGroup"/>
                         </toggleGroup>
@@ -34,13 +37,13 @@
                 </VBox>
 
                 <VBox styleClass="theme-option" onMouseClicked="#selectDark">
-                    <RadioButton fx:id="darkRadio" text="Dark Theme"
+                    <RadioButton fx:id="darkRadio" text="%Dark Theme" disable="${themeSyncOs.selected}"
                                  toggleGroup="$themeGroup"/>
                     <ThemeWireFrame fx:id="darkWireframe"/>
                 </VBox>
 
                 <VBox styleClass="theme-option" onMouseClicked="#selectCustom">
-                    <RadioButton fx:id="customRadio" text="Custom Theme"
+                    <RadioButton fx:id="customRadio" text="%Custom Theme" disable="${themeSyncOs.selected}"
                                  toggleGroup="$themeGroup"/>
                     <ThemeWireFrame fx:id="customWireframe"/>
                 </VBox>
@@ -50,8 +53,8 @@
                 <HBox spacing="4.0">
                     <TextField fx:id="customPathField"
                                promptText="%Custom theme file path"
-                               HBox.hgrow="ALWAYS"/>
-                    <Button styleClass="icon-button" onAction="#browseThemeFile">
+                               HBox.hgrow="ALWAYS" disable="${themeSyncOs.selected}"/>
+                    <Button styleClass="icon-button" onAction="#browseThemeFile" disable="${themeSyncOs.selected}">
                         <graphic>
                             <JabRefIconView glyph="OPEN"/>
                         </graphic>

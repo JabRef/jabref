@@ -15,6 +15,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -143,14 +144,21 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
-                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(_ -> _ -> {
-                    CSLStyleSelectViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
-                    if (selectedStyle != null) {
-                        viewModel.deleteCslStyle(selectedStyle.getLayout().citationStyle());
+                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
+                    if (internalStyle) {
+                        return;
                     }
+
+                    event.consume();
+
+                    if (event.getButton() != MouseButton.PRIMARY) {
+                        return;
+                    }
+
+                    viewModel.deleteCslStyle(style.getLayout().citationStyle());
                 })
-                .withTooltip(_ -> Localization.lang("Remove style"))
+                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
                 .install(cslDeleteColumn);
 
         new ViewModelTableRowFactory<CSLStyleSelectViewModel>()
