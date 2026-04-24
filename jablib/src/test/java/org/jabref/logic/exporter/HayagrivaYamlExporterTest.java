@@ -210,4 +210,43 @@ class HayagrivaYamlExporterTest {
 
         assertEquals(expected, Files.readAllLines(file));
     }
+
+    @Test
+    final void exportsMultipleEntriesAsSingleYamlDocument(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+        BibEntry first = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("first")
+                .withField(StandardField.AUTHOR, "Test Author")
+                .withField(StandardField.TITLE, "First Title")
+                .withField(StandardField.URL, "http://example.com/1")
+                .withField(StandardField.DATE, "2020-10-14");
+
+        BibEntry second = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("second")
+                .withField(StandardField.AUTHOR, "Other One")
+                .withField(StandardField.TITLE, "Second Title")
+                .withField(StandardField.URL, "http://example.com/2")
+                .withField(StandardField.DATE, "2021-05-03");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(first, second));
+
+        List<String> expected = List.of(
+                "first:",
+                "  type: article",
+                "  title: \"First Title\"",
+                "  author:",
+                "    - Author, Test",
+                "  date: 2020-10-14",
+                "  url: http://example.com/1",
+                "second:",
+                "  type: article",
+                "  title: \"Second Title\"",
+                "  author:",
+                "    - One, Other",
+                "  date: 2021-05-03",
+                "  url: http://example.com/2");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
 }
