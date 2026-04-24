@@ -62,7 +62,7 @@ class AboutDialogViewTest extends ApplicationTest {
         DialogPane pane = aboutDialogView.getDialogPane();
 
         // 1. Load the CSS into the DialogPane
-        pane.getStylesheets().add(AboutDialogView.class.getResource("/org/jabref/gui/Base.css").toExternalForm());
+        pane.getStylesheets().add(AboutDialogView.class.getResource("/org/jabref/gui/jabref-theme.css").toExternalForm());
         // 2. Force the 10pt font style
         pane.setStyle("-fx-font-size: 10pt;");
         // 3. Show the dialog (this triggers BaseDialog's DIALOG_SHOWING listener)
