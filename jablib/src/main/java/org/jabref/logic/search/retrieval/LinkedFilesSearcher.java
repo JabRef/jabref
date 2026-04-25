@@ -86,7 +86,7 @@ public final class LinkedFilesSearcher {
         try {
             return Optional.of(parser.parse(query));
         } catch (ParseException e) {
-            LOGGER.error("Error during query parsing", e);
+            LOGGER.error("Error during query parsing with query {}", searchQuery, e);
             return Optional.empty();
         }
     }

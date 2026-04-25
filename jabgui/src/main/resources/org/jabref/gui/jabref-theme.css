@@ -17,11 +17,29 @@
     -jr-error: -jr-light-red;
     -jr-success: -jr-green;
 
+    /* Generic colors */
     -jr-white: #ffffff;
     -jr-gray-1: #dddddd;
     -jr-gray-2: #808080;
     -jr-gray-3: #404040;
     -jr-black: #000;
+
+    /* Main Table Matching */
+    -jr-match-1-odd: -jr-row-odd-background;
+    -jr-match-1-even: -jr-row-even-background;
+    -jr-match-1-text-color: -jr-text-foreground;
+
+    -jr-match-2-odd: derive(-jr-row-odd-background, -40%);
+    -jr-match-2-even: derive(-jr-row-even-background, -40%);
+    -jr-match-2-text-color: derive(-jr-text-foreground, -40%);
+
+    -jr-match-3-odd: derive(-jr-row-odd-background, -50%);
+    -jr-match-3-even: derive(-jr-row-even-background, -50%);
+    -jr-match-3-text-color: derive(-jr-text-foreground, -50%);
+
+    -jr-match-4-odd: derive(-jr-row-odd-background, -60%);
+    -jr-match-4-even: derive(-jr-row-even-background, -60%);
+    -jr-match-4-text-color: derive(-jr-text-foreground, -60%);
 
     /* Used only in Code inside setStyle(..) */
     -jr-ai-message-user: derive(-jr-accent, 50%);
@@ -67,7 +85,7 @@
 }
 
 .global-search-bar .toggle-button .glyph-icon {
-    -fx-icon-color: derive(-jr-search-text, 80%);
+    -fx-icon-color: derive(-fx-text-base-color, 80%);
 }
 
 .rating > .container > .button {
@@ -79,7 +97,7 @@
 }
 
 .file-row-text {
-    -fx-fill: -jr-search-text;
+    -fx-fill: -fx-text-base-color;
 }
 
 .walkthrough-spotlight {
@@ -213,7 +231,7 @@
 }
 
 .file-row-text:opacity {
-    -fx-fill: derive(-jr-search-text, 70%);
+    -fx-fill: derive(-fx-text-base-color, 70%);
 }
 
 .sidePaneComponentHeader {
@@ -223,17 +241,17 @@
 }
 
 .sidePaneComponentHeader > .label {
-    -fx-text-fill: -jr-sidepane-header-color;
+    -fx-text-fill: -jr-theme;
     -fx-font-weight: bold;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
 .sidePaneComponentHeader .glyph-icon,
 .sidePaneComponentHeader .ikonli-font-icon {
-    -fx-fill: -jr-sidepane-header-color;
-    -fx-text-fill: -jr-sidepane-header-color;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
     -fx-font-size: 1.0em;
-    -fx-icon-color: -jr-theme-text;
+    -fx-icon-color: -jr-theme;
 }
 
 .progress-indicatorToolbar {
@@ -250,12 +268,12 @@
 }
 
 .mainMenu > .container > .menu-button > .label {
-    -fx-text-fill: -jr-menu-foreground;
+    -fx-text-fill: -jr-text-foreground;
 }
 
 .menu-item .glyph-icon {
-    -fx-fill: -jr-menu-item-foreground;
-    -fx-text-fill: -jr-menu-item-foreground;
+    -fx-fill: -jr-text-foreground;
+    -fx-text-fill: -jr-text-foreground;
 }
 
 .menu-item:focused .glyph-icon {
@@ -281,9 +299,9 @@
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
     -fx-font-size: 1.7em!important;
-    -fx-fill: -jr-theme-text;
-    -fx-text-fill: -jr-theme-text;
-    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-icon-color: -jr-theme;
 }
 
 .mainToolbar .progress-indicator {
@@ -296,13 +314,13 @@
     -fx-border-width: 1;
     -fx-border-color: -jr-separator;
     -fx-border-radius: 2;
-    -fx-fill: -jr-search-text;
+    -fx-fill: -fx-text-base-color;
 }
 
 .search-field .button .glyph-icon {
-    -fx-fill: -jr-search-text;
-    -fx-text-fill: -jr-search-text;
-    -fx-icon-color: -jr-search-text;
+    -fx-fill: -fx-text-base-color;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-icon-color: -fx-text-base-color;
 }
 
 /*
@@ -310,7 +328,7 @@
  * Currently, hits "Web search" and "Groups" only (not the searchbar on the top).
 */
 .search-field-icon {
-    -fx-icon-color: -jr-search-text;
+    -fx-icon-color: -fx-text-base-color;
     -fx-font-size: 1.7em;
 }
 
@@ -325,7 +343,7 @@
 }
 
 .global-search-bar .toggle-button:selected .glyph-icon {
-    -fx-icon-color: -jr-search-text;
+    -fx-icon-color: -fx-text-base-color;
 }
 
 /* search text */
@@ -345,17 +363,17 @@
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button > .arrow {
-    -fx-background-color: -jr-theme-text;
+    -fx-background-color: -jr-theme;
 }
 
 .mainToolbar .tool-bar-overflow-button:hover > .arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-jr-theme-text, -30%);
+    -fx-background-color: -fx-mark-highlight-color, derive(-jr-theme, -30%);
 }
 
 .column-header .glyph-icon {
     -fx-alignment: baseline-center;
-    -fx-text-fill: -jr-head-fg;
-    -fx-fill: -jr-head-fg;
+    -fx-text-fill: -fx-text-inner-color;
+    -fx-fill: -fx-text-inner-color;
 }
 
 .table-cell .glyph-icon,
@@ -387,7 +405,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* Improve the context menu of the main toolbar, when icons don't fit and you have to press the little arrow to see them */
 .mainToolbar .context-menu .glyph-icon {
-    -fx-fill: -jr-theme-text;
+    -fx-fill: -jr-theme;
 }
 
 .mainToolbar .context-menu .glyph-icon:hover {
@@ -653,152 +671,147 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: -2 0 0 0;
 }
 
-/** even and odd are swapped around somehow. Below "odd" matches lines 2, 4, ... **/
+/* matching-search-and-groups */
 
-.main-table .table-row-cell:matching-search-and-groups {
+.main-table .table-row-cell:matching-search-and-groups:even {
     -fx-background-color: -jr-match-1-even;
-}
-.main-table .table-row-cell:matching-search-and-groups > .table-cell {
-    -fx-text-fill: -jr-match-1-text-color;
-}
-.main-table .table-row-cell:matching-search-and-groups:focused > .table-cell {
-    -fx-text-fill: -fx-focused-text-base-color;
-}
-.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell {
-    -fx-text-fill: -jr-white;
-}
-.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-white;
-}
-.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell {
-    -fx-text-fill: -jr-hover-text;
-}
-.main-table .table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-match-1-text-color;
-}
-.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-hover-text;
 }
 .main-table .table-row-cell:matching-search-and-groups:odd {
     -fx-background-color: -jr-match-1-odd;
 }
-.main-table .table-row-cell:matching-search-and-groups:selected,
-.main-table .table-row-cell:matching-search-and-groups:focused,
-.main-table .table-row-cell:matching-search-and-groups:focused:hover {
+
+.main-table .table-row-cell:matching-search-and-groups:selected {
     -fx-background-color: -jr-selected;
 }
+
+.main-table .table-row-cell:matching-search-and-groups:selected:hover,
 .main-table .table-row-cell:matching-search-and-groups:hover {
-    -fx-background-color: -jr-hover;
+    -fx-background-color: -jr-hover
 }
 
-.main-table .table-row-cell:matching-search-not-groups {
+.main-table .table-row-cell:matching-search-and-groups > .table-cell,
+.main-table .table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-1-text-color;
+}
+
+.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell,
+.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell,
+.main-table .table-row-cell:matching-search-and-groups:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-1-text-color, 10%);
+}
+
+.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-1-text-color, 10%);
+}
+
+/* matching-search-not-groups */
+
+.main-table .table-row-cell:matching-search-not-groups:even {
     -fx-background-color: -jr-match-2-even;
 }
-.main-table .table-row-cell:matching-search-not-groups > .table-cell {
-    -fx-text-fill: -jr-match-2-text-color;
-}
-.main-table .table-row-cell:matching-search-not-groups:focused > .table-cell {
-    -fx-text-fill: -fx-focused-text-base-color;
-}
-.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell {
-    -fx-text-fill: -jr-white;
-}
-.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-white;
-}
-.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell {
-    -fx-text-fill: -jr-hover-text;
-}
-.main-table .table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-match-2-text-color;
-}
-.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-hover-text;
-}
+
 .main-table .table-row-cell:matching-search-not-groups:odd {
     -fx-background-color: -jr-match-2-odd;
 }
-.main-table .table-row-cell:matching-search-not-groups:selected,
-.main-table .table-row-cell:matching-search-not-groups:focused,
-.main-table .table-row-cell:matching-search-not-groups:focused:hover,
-.main-table .table-row-cell:matching-search-not-groups:hover {
+
+.main-table .table-row-cell:matching-search-not-groups:selected {
     -fx-background-color: -jr-selected;
 }
+
+.main-table .table-row-cell:matching-search-not-groups:selected:hover,
 .main-table .table-row-cell:matching-search-not-groups:hover {
     -fx-background-color: -jr-hover;
 }
 
-.main-table .table-row-cell:matching-groups-not-search {
+.main-table .table-row-cell:matching-search-not-groups > .table-cell,
+.main-table .table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-2-text-color;
+}
+
+.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell,
+.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell,
+.main-table .table-row-cell:matching-search-not-groups:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-2-text-color, 10%);
+}
+
+.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-not-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-2-text-color, 10%);
+}
+
+/* matching-groups-not-search */
+
+.main-table .table-row-cell:matching-groups-not-search:even {
     -fx-background-color: -jr-match-3-even;
 }
-.main-table .table-row-cell:matching-groups-not-search > .table-cell {
-    -fx-text-fill: -jr-match-3-text-color;
-}
-.main-table .table-row-cell:matching-groups-not-search:focused > .table-cell {
-    -fx-text-fill: -fx-focused-text-base-color;
-}
-.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell {
-    -fx-text-fill: -jr-white;
-}
-.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-white;
-}
-.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell {
-    -fx-text-fill: -jr-hover-text;
-}
-.main-table .table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-match-3-text-color;
-}
-.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-hover-text;
-}
+
 .main-table .table-row-cell:matching-groups-not-search:odd {
     -fx-background-color: -jr-match-3-odd;
 }
-.main-table .table-row-cell:matching-groups-not-search:selected,
-.main-table .table-row-cell:matching-groups-not-search:focused,
-.main-table .table-row-cell:matching-groups-not-search:focused:hover,
-.main-table .table-row-cell:matching-groups-not-search:hover {
+
+.main-table .table-row-cell:matching-groups-not-search:selected {
     -fx-background-color: -jr-selected;
 }
+
+.main-table .table-row-cell:matching-groups-not-search:selected:hover,
 .main-table .table-row-cell:matching-groups-not-search:hover {
     -fx-background-color: -jr-hover;
 }
 
-.main-table .table-row-cell:not-matching-search-and-groups {
+.main-table .table-row-cell:matching-groups-not-search > .table-cell,
+.main-table .table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-3-text-color;
+}
+
+.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell,
+.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell,
+.main-table .table-row-cell:matching-groups-not-search:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-3-text-color, 10%);
+}
+
+.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-groups-not-search:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-3-text-color, 10%);
+}
+
+/* not-matching-search-and-groups */
+
+.main-table .table-row-cell:not-matching-search-and-groups:even {
     -fx-background-color: -jr-match-4-even;
 }
-.main-table .table-row-cell:not-matching-search-and-groups > .table-cell {
-    -fx-text-fill: -jr-match-4-text-color;
-}
-.main-table .table-row-cell:not-matching-search-and-groups:focused > .table-cell {
-    -fx-text-fill: -fx-focused-text-base-color;
-}
-.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell {
-    -fx-text-fill: -jr-white;
-}
-.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-white;
-}
-.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell {
-    -fx-text-fill: -jr-hover-text;
-}
-.main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-match-4-text-color;
-}
-.main-table.table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
-    -fx-icon-color: -jr-hover-text;
-}
+
 .main-table .table-row-cell:not-matching-search-and-groups:odd {
     -fx-background-color: -jr-match-4-odd;
 }
-.main-table .table-row-cell:not-matching-search-and-groups:selected,
-.main-table .table-row-cell:not-matching-search-and-groups:focused,
-.main-table .table-row-cell:not-matching-search-and-groups:focused:hover {
+
+.main-table .table-row-cell:not-matching-search-and-groups:selected {
     -fx-background-color: -jr-selected;
 }
+
+.main-table .table-row-cell:not-matching-search-and-groups:selected:hover,
 .main-table .table-row-cell:not-matching-search-and-groups:hover {
     -fx-background-color: -jr-hover;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups > .table-cell,
+.main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-4-text-color;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell,
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-4-text-color, 10%);
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-4-text-color, 10%);
 }
 
 .rating > .container {
@@ -821,7 +834,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .welcome-label {
     -fx-font-size: 2.75em;
-    -fx-text-fill: -jr-theme-text;
+    -fx-text-fill: -jr-theme;
     -fx-font-family: "Arial";
 }
 
@@ -834,7 +847,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
-    -fx-text-fill: -jr-head-fg;
+    -fx-text-fill: -fx-text-inner-color;
 }
 
 .welcome-no-recent-label {
@@ -1085,7 +1098,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
-    -fx-text-fill: -jr-theme-text;
+    -fx-text-fill: -jr-theme;
 }
 
 #entryEditor #typeLabel:hover {
@@ -1125,8 +1138,8 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor .tool-bar .glyph-icon {
     -glyph-size: 1.0em;
     -fx-font-size: 2em;
-    -fx-fill: -jr-theme-text;
-    -fx-text-fill: -jr-theme-text;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
 }
 
 #entryEditor .warning-icon {
@@ -1256,8 +1269,7 @@ We want to have a look that matches our icons in the tool-bar */
 #errorConsole .info-section .glyph-icon,
 #errorConsole .exception .glyph-icon,
 #errorConsole .output .glyph-icon,
-#errorConsole .log .glyph-icon
-{
+#errorConsole .log .glyph-icon {
     -fx-font-size: 1.5em;
 }
 
@@ -1759,7 +1771,7 @@ journalInfo .grid-cell-b {
 .three-way-merge .field-name .glyph-icon,
 .three-way-merge .field-name .ikonli-font-icon {
     -fx-icon-size: 17;
-    -fx-icon-color: -jr-theme-text;
+    -fx-icon-color: -jr-theme;
 }
 
 /* Miscellaneous */
@@ -1838,8 +1850,8 @@ journalInfo .grid-cell-b {
 
 .quick-settings-button .glyph-icon,
 .quick-settings-button .ikonli-font-icon {
-    -fx-icon-color: -jr-theme-text;
-    -fx-fill: -jr-theme-text;
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
     -fx-font-size: 1.1em;
 }
 
@@ -2015,8 +2027,8 @@ journalInfo .grid-cell-b {
 
 .detected-application .glyph-icon,
 .detected-application .ikonli-font-icon {
-    -fx-icon-color: -jr-theme-text;
-    -fx-fill: -jr-theme-text;
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
 }
 
 /* Quick Settings: Online Fetchers */
