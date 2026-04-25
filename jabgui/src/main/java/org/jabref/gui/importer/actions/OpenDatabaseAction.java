@@ -166,8 +166,15 @@ public class OpenDatabaseAction extends SimpleCommand {
     public void openFiles(List<Path> filesToOpen) {
         // Resolve any shortcuts to their targets and filter to only .bib files.
         // The resulting list must remain modifiable for downstream processing (iterator.remove() calls below).
+        Path baseDirectoryPath = getBaseDirectoryPath();
         List<Path> resolvedFiles = filesToOpen.stream()
                                               .map(FileUtil::resolveIfShortcut)
+                                              .map(path -> {
+                                                  if (!path.isAbsolute()) {
+                                                      return baseDirectoryPath.resolve(path).normalize();
+                                                  }
+                                                  return path.normalize();
+                                              })
                                               .filter(FileUtil::isBibFile)
                                               .collect(Collectors.toList());
 
@@ -175,17 +182,11 @@ public class OpenDatabaseAction extends SimpleCommand {
         int initialCount = resolvedFiles.size();
         int removed = 0;
 
-        Path baseDirectoryPath = getBaseDirectoryPath();
         FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
 
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = resolvedFiles.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
-
-            if (!file.isAbsolute()) {
-                file = baseDirectoryPath.resolve(file).normalize();
-            }
-
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
