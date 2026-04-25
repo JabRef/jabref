@@ -16,6 +16,8 @@ import org.tinylog.Logger;
 
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
+// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
+//DEPS io.github.adr:e-adr:2.0.0
 // JabRef relies on PR https://github.com/unicode-org/icu/pull/2127; for experiments the release version is OK.
 //DEPS com.ibm.icu:icu4j:78.1
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
