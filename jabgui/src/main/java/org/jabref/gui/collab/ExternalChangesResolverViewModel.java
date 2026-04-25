@@ -28,14 +28,18 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     private final BooleanBinding canAskUserToResolveChange;
 
     public ExternalChangesResolverViewModel(@NonNull List<DatabaseChange> externalChanges) {
-        assert !externalChanges.isEmpty();
-
         this.visibleChanges.addAll(externalChanges);
         this.changes.addAll(externalChanges);
 
-        areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
-        areAllChangesAccepted = Bindings.createBooleanBinding(() -> changes.stream().allMatch(DatabaseChange::isAccepted));
-        areAllChangesDenied = Bindings.createBooleanBinding(() -> changes.stream().noneMatch(DatabaseChange::isAccepted));
+        if (externalChanges.isEmpty()) {
+            areAllChangesResolved = Bindings.createBooleanBinding(() -> false);
+            areAllChangesAccepted = Bindings.createBooleanBinding(() -> false);
+            areAllChangesDenied = Bindings.createBooleanBinding(() -> false);
+        } else {
+            areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
+            areAllChangesAccepted = Bindings.createBooleanBinding(() -> changes.stream().allMatch(DatabaseChange::isAccepted));
+            areAllChangesDenied = Bindings.createBooleanBinding(() -> changes.stream().noneMatch(DatabaseChange::isAccepted));
+        }
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
     }
 

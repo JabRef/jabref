@@ -38,10 +38,7 @@ public class CitationKeyPatternsPanelViewModel {
     private final ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
-    private final CitationKeyPatternPreferences keyPatternPreferences;
-
-    public CitationKeyPatternsPanelViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
-        this.keyPatternPreferences = keyPatternPreferences;
+    public CitationKeyPatternsPanelViewModel() {
     }
 
     public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
@@ -70,12 +67,12 @@ public class CitationKeyPatternsPanelViewModel {
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternsPanelItemModel item) {
-        item.setPattern(keyPatternPreferences.getDefaultPattern());
+        item.setPattern("");
     }
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern(keyPatternPreferences.getDefaultPattern());
+        defaultItemProperty.getValue().setPattern(CitationKeyPatternPreferences.getDefault().getKeyPatterns().getDefaultValue().stringRepresentation());
     }
 
     public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {

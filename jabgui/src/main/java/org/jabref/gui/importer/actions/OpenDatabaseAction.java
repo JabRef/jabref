@@ -55,9 +55,6 @@ public class OpenDatabaseAction extends SimpleCommand {
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
-            // Migrations:
-            // Warning for migrating the Review into the Comment field
-            new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
             // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)

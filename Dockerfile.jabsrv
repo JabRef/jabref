@@ -1,7 +1,7 @@
-FROM maven:3.9.12-amazoncorretto-25-debian AS build
+FROM maven:3.9.14-amazoncorretto-25-debian AS build
 
 # Is not debian-based
-# FROM amazoncorretto:25-jdk AS build
+# FROM amazoncorretto:26-jdk AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
@@ -32,6 +32,15 @@ COPY jabls-cli/build.gradle.kts jabls-cli/
 COPY jabsrv/build.gradle.kts jabsrv/
 COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
 COPY test-support test-support
+COPY ./jabgui/src/main/java/module-info.java ./jabgui/src/main/java/module-info.java
+COPY ./jabkit/src/main/java/module-info.java ./jabkit/src/main/java/module-info.java
+COPY ./jablib/src/main/java/module-info.java ./jablib/src/main/java/module-info.java
+COPY ./jabls/src/main/java/module-info.java ./jabls/src/main/java/module-info.java
+COPY ./jabls-cli/src/main/java/module-info.java ./jabls-cli/src/main/java/module-info.java
+COPY ./jabsrv/src/main/java/module-info.java ./jabsrv/src/main/java/module-info.java
+COPY ./jabsrv-cli/src/main/java/module-info.java ./jabsrv-cli/src/main/java/module-info.java
+COPY ./test-support/src/main/java/module-info.java ./test-support/src/main/java/module-info.java
+
 COPY versions versions
 
 # Cache gradle and build-logic
@@ -39,9 +48,11 @@ RUN ./gradlew --no-daemon :build-logic:jar
 
 COPY . .
 
-RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage && \
-    mkdir /dist && \
-    mv jabsrv-cli/build/packages/*/* /dist
+RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabsrv-cli:jpackage
+
+RUN mkdir /dist
+
+RUN mv jabsrv-cli/build/packages/*/* /dist
 
 
 # jpackage needs glibc; alpine does not work

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.os.OS;
@@ -53,6 +54,7 @@ public class DuplicateCheck {
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     private static final Map<Field, Double> FIELD_WEIGHTS = new HashMap<>();
+    private static final Pattern PAGE_SEPARATOR_PATTERN = Pattern.compile("[\\p{Pd} ]+");
 
     private static final Set<StandardEntryType> STANDARD_ENTRY_TYPES = Set.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection);
 
@@ -202,8 +204,8 @@ public class DuplicateCheck {
     /// We do a replace to harmonize these to a simple "-"
     /// After this, a simple test for equality should be enough
     private static int comparePagesField(final String stringOne, final String stringTwo) {
-        final String processedStringOne = stringOne.replaceAll("[- ]+", "-");
-        final String processedStringTwo = stringTwo.replaceAll("[- ]+", "-");
+        final String processedStringOne = PAGE_SEPARATOR_PATTERN.matcher(stringOne).replaceAll("-");
+        final String processedStringTwo = PAGE_SEPARATOR_PATTERN.matcher(stringTwo).replaceAll("-");
         if (processedStringOne.equals(processedStringTwo)) {
             return EQUAL;
         }

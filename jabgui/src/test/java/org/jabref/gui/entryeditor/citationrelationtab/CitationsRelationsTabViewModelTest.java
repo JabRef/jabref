@@ -84,7 +84,7 @@ class CitationsRelationsTabViewModelTest {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(bibDatabaseContext));
 
         LibraryPreferences libraryPreferences = mock(LibraryPreferences.class);
-        when(libraryPreferences.isAddImportedEntriesEnabled()).thenReturn(false);
+        when(libraryPreferences.shouldAddImportedEntries()).thenReturn(false);
         when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
 
         viewModel = new CitationsRelationsTabViewModel(

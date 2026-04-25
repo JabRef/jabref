@@ -94,7 +94,7 @@ public record CSLStyleLoader(
                         styleCount--;
                     }
                 }
-                LOGGER.info("Loaded {} CSL styles", styleCount);
+                LOGGER.debug("Loaded {} CSL styles", styleCount);
             } else {
                 LOGGER.error("Citation style catalog is empty");
             }
@@ -114,20 +114,10 @@ public record CSLStyleLoader(
         }
     }
 
-    /// Adds a new external CSL style if it's valid.
-    ///
-    /// @return Optional containing the added CitationStyle if valid, empty otherwise
-    public Optional<CitationStyle> addStyleIfValid(@NonNull String stylePath) {
-        Optional<CitationStyle> newStyleOptional = CSLStyleUtils.createCitationStyleFromFile(stylePath);
-        if (newStyleOptional.isPresent()) {
-            CitationStyle newStyle = newStyleOptional.get();
-
-            EXTERNAL_STYLES.add(newStyle);
-            storeExternalStyles();
-            return newStyleOptional;
-        }
-
-        return Optional.empty();
+    /// Adds a new external CSL style.
+    public void addExternalStyle(@NonNull CitationStyle citationStyle) {
+        EXTERNAL_STYLES.add(citationStyle);
+        storeExternalStyles();
     }
 
     /// Stores the current list of external styles to preferences.

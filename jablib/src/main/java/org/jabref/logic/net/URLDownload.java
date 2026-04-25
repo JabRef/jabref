@@ -134,7 +134,7 @@ public class URLDownload {
             do {
                 // @formatter:on
                 retries++;
-                HttpResponse<String> response = Unirest.head(urlToCheck).asString();
+                HttpResponse<String> response = Unirest.head(urlToCheck).headers(parameters).asString();
                 // Check if we have redirects, e.g. arxiv will give otherwise content type HTML for the original url
                 // We need to do it "manually", because ".followRedirects(true)" only works for GET not for HEAD
                 locationHeader = response.getHeaders().getFirst("location");
@@ -143,7 +143,7 @@ public class URLDownload {
                 }
                 // while loop, because there could be multiple redirects
             } while (!StringUtil.isNullOrEmpty(locationHeader) && retries <= MAX_RETRIES);
-            contentType = Unirest.head(urlToCheck).asString().getHeaders().getFirst("Content-Type");
+            contentType = Unirest.head(urlToCheck).headers(parameters).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
                 return Optional.of(contentType);
             }
@@ -153,7 +153,7 @@ public class URLDownload {
 
         // Use GET request as alternative if no HEAD request is available
         try {
-            contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
+            contentType = Unirest.get(source.toString()).headers(parameters).asString().getHeaders().get("Content-Type").getFirst();
             if (!StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);
             }
