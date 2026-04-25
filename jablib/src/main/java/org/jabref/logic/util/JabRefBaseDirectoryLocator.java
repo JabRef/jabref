@@ -18,8 +18,18 @@ public class JabRefBaseDirectoryLocator {
         Path jabRefBaseDirectory = Path.of(appPath);
 
         if (OS.OS_X) {
-            while (jabRefBaseDirectory != null
-                    && !jabRefBaseDirectory.getFileName().toString().endsWith(".app")) {
+            while (jabRefBaseDirectory != null) {
+                Path fileName = jabRefBaseDirectory.getFileName();
+
+                if (fileName == null) {
+                    jabRefBaseDirectory = null;
+                    break;
+                }
+
+                if (fileName.toString().endsWith(".app")) {
+                    break;
+                }
+
                 jabRefBaseDirectory = jabRefBaseDirectory.getParent();
             }
         }
