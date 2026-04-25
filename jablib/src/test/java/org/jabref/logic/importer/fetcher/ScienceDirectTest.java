@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
@@ -13,10 +14,18 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
+import kong.unirest.core.GetRequest;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.Unirest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +40,7 @@ class ScienceDirectTest {
     void setUp() {
         Optional<String> apiKey = Optional.of(new BuildInfo().scopusApiKey);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(ScienceDirect.FETCHER_NAME)).thenReturn(apiKey);
+        when(importerPreferences.getApiKey(Scopus.FETCHER_NAME)).thenReturn(apiKey);
         finder = new ScienceDirect(importerPreferences);
         entry = new BibEntry();
     }
@@ -76,5 +85,33 @@ class ScienceDirectTest {
         entry.setField(StandardField.DOI, "10.1016/j.aasri.2014.0559.002");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findsPdfDirectlyWhenSciDirPdfPresent() throws IOException {
+        String jsonBody = """
+                {"full-text-retrieval-response":{"coredata":{"link":[{"@href":"https://api.elsevier.com/content/article/pii/S0963869523002050","@rel":"self","@_fa":"true"},{"@href":"https://www.sciencedirect.com/science/article/pii/S0963869523002050","@rel":"scidir","@_fa":"true"},{"@href":"https://www.sciencedirect.com/science/article/pii/S0963869523002050/pdfft?isDTMRedir=true","@rel":"scidir-pdf","@_fa":"true"}]}}}""";
+
+        entry = new BibEntry()
+                .withField(StandardField.DOI, "10.1016/j.ndteint.2023.102990");
+
+        GetRequest getRequest = mock(GetRequest.class, Answers.RETURNS_DEEP_STUBS);
+        HttpResponse<JsonNode> httpResponse = mock(HttpResponse.class);
+        when(httpResponse.getBody()).thenReturn(new JsonNode(jsonBody));
+        when(getRequest.header(anyString(), anyString())
+                       .queryString(anyString(), anyString())
+                       .asJson()).thenReturn(httpResponse);
+
+        try (MockedStatic<Unirest> unirestMock = Mockito.mockStatic(Unirest.class)) {
+            unirestMock.when(() -> Unirest.get(anyString())).thenReturn(getRequest);
+
+            Optional<URL> result = finder.findFullText(entry);
+
+            assertEquals(
+                    Optional.of(URLUtil.create("https://www.sciencedirect.com/science/article/pii/S0963869523002050/pdfft?isDTMRedir=true")),
+                    result
+            );
+        }
     }
 }

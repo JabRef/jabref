@@ -12,6 +12,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -172,5 +174,77 @@ class RegExpBasedFileFinderTest {
 
         // then
         assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+                exact date finds exact file,        2021-07-07,            2021-07-07.pdf;2021-07.pdf, 2021-07-07.pdf, **/.*[DATE].*\\\\.[extension]
+                full date falls back to month,      2021-07-07,            2021-07.pdf,               2021-07.pdf,    **/.*[DATE].*\\\\.[extension]
+                full date falls back to year,       2021-07-07,            2021.pdf,                  2021.pdf,       **/.*[DATE].*\\\\.[extension]
+                year+month date falls back to year, 2021-07,               2021.pdf,                  2021.pdf,       **/.*[DATE].*\\\\.[extension]
+                date range uses start date,         2021-01-01/2021-12-31, 2021-01-01.pdf,            2021-01-01.pdf, **/.*[DATE].*\\\\.[extension]
+                lowercase marker triggers fallback, 2021-07-07,            2021-07-07.pdf,            2021-07-07.pdf, **/.*[date].*\\\\.[extension]
+                no matching file returns empty,     2021-07-07,            ,                          ,               **/.*[DATE].*\\\\.[extension]
+            """)
+    void dateFallbackBehavior(String description, String dateValue, String filesToCreate, String expectedFile, String pattern) throws IOException {
+        // given
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article).withField(StandardField.DATE, dateValue);
+
+        if (filesToCreate != null && !filesToCreate.isBlank()) {
+            for (String filename : filesToCreate.split(";")) {
+                Files.createFile(directory.resolve(filename.strip()));
+            }
+        }
+
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder(pattern, ',');
+
+        // when
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+
+        // then
+        if (expectedFile == null || expectedFile.isBlank()) {
+            assertEquals(List.of(), result);
+        } else {
+            assertEquals(List.of(directory.resolve(expectedFile)), result);
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+                numeric month format,               07,    ,   2021-07.pdf
+                numeric month+day format,           07,    07, 2021-07-07.pdf
+                bibtex month string,                #jul#, ,   2021-07.pdf
+                bibtex month string+day format,     #jul#, 07, 2021-07-07.pdf
+            """)
+    void dateFallbackFromYearMonthFieldsWhenNoDateField(String description, String monthValue, String dayValue, String expectedFile) throws IOException {
+        // given - entry has year+month(+day) fields (no date field)
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article).withField(StandardField.YEAR, "2021").withField(StandardField.MONTH, monthValue);
+        if (dayValue != null && !dayValue.isBlank()) {
+            localEntry = localEntry.withField(StandardField.DAY, dayValue);
+        }
+        Files.createFile(directory.resolve(expectedFile));
+
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/.*[DATE].*\\\\.[extension]", ',');
+
+        // when
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+
+        // then
+        assertEquals(List.of(directory.resolve(expectedFile)), result);
+    }
+
+    @Test
+    void nonDatePatternUnaffectedByFallbackLogic() throws IOException {
+        // given - pattern uses [YEAR] not [DATE]; fallback logic should not trigger
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article).withField(StandardField.YEAR, "2021");
+        Files.createFile(directory.resolve("2021.pdf"));
+
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/.*[YEAR].*\\\\.[extension]", ',');
+
+        // when
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, List.of(directory), PDF_EXTENSION);
+
+        // then - existing behavior unchanged
+        assertEquals(List.of(directory.resolve("2021.pdf")), result);
     }
 }

@@ -62,7 +62,7 @@ jobs:
         id: pr_data
         env:
           PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const {owner, repo} = context.repo;

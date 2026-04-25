@@ -16,6 +16,7 @@ Fetchers are the implementation of the [search using online services](https://do
 | [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database#sao-nasa-astrophysics-data-system) | [ADS UI](https://ui.adsabs.harvard.edu/user/settings/token)                                                    | `AstrophysicsDataSystemAPIKey` | 5000 calls/day                                                                        |
 | [SemanticScholar](https://www.semanticscholar.org/)                                                                                               | <https://www.semanticscholar.org/product/api#api-key-form>                                                     | `SemanticScholarApiKey`        |                                                                                       |
 | [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database#springer)                                            | [Springer Nature API portal](https://dev.springernature.com). Use the "Meta API" API key.                      | `SpringerNatureAPIKey`         | 5000 calls/day                                                                        |
+| [Wiley (TDM)](https://onlinelibrary.wiley.com/library-info/resources/text-and-datamining)                                                         | [Wiley TDM portal](https://onlinelibrary.wiley.com/library-info/resources/text-and-datamining)                 | `WileyTdmApiKey`               | 3 articles/second **AND** 60 requests/10min                                           |
 | [Zentralblatt Math](https://www.zbmath.org)                                                                                                       | (none)                                                                                                         | (none)                         | Depending on the current network                                                      |
 
 "Depending on the current network" means that it depends on whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
@@ -53,6 +54,7 @@ All fetchers are contained in the package `org.jabref.logic.importer.fetcher`. H
 * Springer: Publisher
 * ACS: Publisher
 * IEEE: Publisher
+* Wiley: Publisher
 * Google Scholar: META\_SEARCH, because it is a search engine
 * Arxiv: PREPRINT, because preprints are published there
 * OpenAccessDOI: META\_SEARCH
@@ -63,6 +65,19 @@ Reasoning:
 * We assume the DOI resolution surely points to the correct paper and that publisher fetches may have errors: For instance, a title of a paper may lead to different publications of it. One the conference version, the other the journal version. --> the PDF could be chosen randomly
 
 Code was first introduced at [PR#3882](https://github.com/JabRef/jabref/pull/3882).
+
+### Authenticated Downloads
+
+Some publishers require authentication headers on the actual PDF download request (not just for metadata or search). Fetchers that need this can override the `getDownloadHeaders()` default method on `FulltextFetcher`:
+
+```java
+@Override
+public Map<String, String> getDownloadHeaders() {
+    return Map.of("Wiley-TDM-Client-Token", apiKey);
+}
+```
+
+These headers are propagated through the download code execution flow automatically: they are included in the `FetcherResult` returned by `FulltextFetchers.findFullTextPDF()` and applied to all HTTP requests during PDF validation and download.
 
 ## Background on embedding the keys in JabRef
 

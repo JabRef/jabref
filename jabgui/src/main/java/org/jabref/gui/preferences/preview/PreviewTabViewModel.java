@@ -62,6 +62,9 @@ import org.slf4j.LoggerFactory;
 public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
+    private static final Pattern XML_TAG_PATTERN = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
+            + "|(?<COMMENT><!--[^<>]+-->)");
+    private static final Pattern XML_ATTRIBUTES_PATTERN = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
 
     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);
@@ -330,10 +333,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     /// @param text to parse and highlight
     /// @return highlighted span for codeArea
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
-        final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
-                + "|(?<COMMENT><!--[^<>]+-->)");
-        final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
-
         final int GROUP_OPEN_BRACKET = 2;
         final int GROUP_ELEMENT_NAME = 3;
         final int GROUP_ATTRIBUTES_SECTION = 4;
@@ -342,7 +341,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         final int GROUP_EQUAL_SYMBOL = 2;
         final int GROUP_ATTRIBUTE_VALUE = 3;
 
-        Matcher matcher = XML_TAG.matcher(text);
+        Matcher matcher = XML_TAG_PATTERN.matcher(text);
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
@@ -359,7 +358,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     if (!attributesText.isEmpty()) {
                         lastKeywordEnd = 0;
 
-                        Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);
+                        Matcher attributesMatcher = XML_ATTRIBUTES_PATTERN.matcher(attributesText);
                         while (attributesMatcher.find()) {
                             spansBuilder.add(List.of(), attributesMatcher.start() - lastKeywordEnd);
                             spansBuilder.add(Set.of("attribute"), attributesMatcher.end(GROUP_ATTRIBUTE_NAME) - attributesMatcher.start(GROUP_ATTRIBUTE_NAME));

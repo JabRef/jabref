@@ -65,7 +65,10 @@ public class DelayTaskThrottler {
 
     /// Cancel scheduled Runnable gracefully
     public void cancel() {
-        scheduledTask.cancel(false);
+        if (scheduledTask != null) {
+            scheduledTask.cancel(false);
+            scheduledTask = null;
+        }
     }
 
     /// Shuts everything down. Upon termination, this method returns.

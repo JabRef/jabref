@@ -46,6 +46,7 @@ public final class BuildInfo {
     public final String semanticScholarApiKey;
     public final String springerNatureAPIKey;
     public final String unpaywallEmail;
+    public final String wileyTdmApiKey;
 
     public BuildInfo() {
         this("/build.properties");
@@ -77,6 +78,7 @@ public final class BuildInfo {
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
         unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
+        wileyTdmApiKey = BuildInfo.getValue(properties, "wileyTdmApiKey", "");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {

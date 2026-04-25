@@ -7,21 +7,24 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class represents a change in any field value. The relevant
 /// information is the BibEntry, the field name, the old and the
 /// new value. Old/new values can be null.
+@NullMarked
 public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableFieldChange.class);
 
     private final BibEntry entry;
     private final Field field;
-    private final String oldValue;
-    private final String newValue;
+    @Nullable private final String oldValue;
+    @Nullable private final String newValue;
 
-    public UndoableFieldChange(BibEntry entry, Field field, String oldValue, String newValue) {
+    public UndoableFieldChange(BibEntry entry, Field field, @Nullable String oldValue, @Nullable String newValue) {
         this.entry = entry;
         this.field = field;
         this.oldValue = oldValue;

@@ -27,7 +27,7 @@ class DOICheckTest {
 
     @Test
     void formatDOIWithCustomBase() {
-        when(doiPreferences.isUseCustom()).thenReturn(true);
+        when(doiPreferences.shouldUseCustom()).thenReturn(true);
         when(doiPreferences.getDefaultBaseURI()).thenReturn("http://example.org");
         assertEquals("http://example.org/10.1000/ISBN1-900512-44-0", layoutFormatter.format("10.1000/ISBN1-900512-44-0"));
     }
