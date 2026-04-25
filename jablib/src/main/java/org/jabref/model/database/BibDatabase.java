@@ -405,7 +405,7 @@ public class BibDatabase {
     /// Take the given BibEntry and resolve any string references.
     ///
     /// @param entry   A BibEntry in which all strings of the form #xxx# will be resolved against the hash map of string references stored in the database.
-    /// @param inPlace If inPlace is true then the given BibEntry will be modified, if false then a copy is made using close made before  resolving the strings.
+        /// @param inPlace If inPlace is true then the given BibEntry will be modified, if false then a copy is made using close made before  resolving the strings.
     /// @return a BibEntry with all string references resolved. It is
     /// dependent on the value of inPlace whether a copy is made or the
     /// given BibtexEntries is modified.
@@ -544,8 +544,7 @@ public class BibDatabase {
         }
     }
 
-    @Subscribe
-    private void relayEntryChangeEvent(FieldChangedEvent event) {
+    private void updateCitationIndexForFieldChange(FieldChangedEvent event) {
         Field field = event.getField();
         // check if field changed was single entry or multiple entry link
         boolean isLinkedField = field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) ||
@@ -584,6 +583,11 @@ public class BibDatabase {
                 }
             }
         }
+    }
+
+    @Subscribe
+    private void relayEntryChangeEvent(FieldChangedEvent event) {
+        updateCitationIndexForFieldChange(event);
         eventBus.post(event);
     }
 

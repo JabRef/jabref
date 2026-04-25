@@ -497,12 +497,12 @@ class BibDatabaseTest {
         database.insertEntry(parent);
         database.insertEntry(child);
 
-        // Setting the crossref field after insertion should trigger the FieldChangedEvent
-        // and safely update the citation index without crashing.
+        // setting the crossref field after insertion triggers the FieldChangedEvent
         child.setField(StandardField.CROSSREF, "TestParent");
 
-        // Verify that the database successfully linked the child to the parent
-        assertEquals(Optional.of(parent), database.getReferencedEntry(child));
+        // verify the child was actually added to the citationIndex
+        Set<BibEntry> indexedChildren = database.getEntriesForCitationKey("TestParent");
+        assertTrue(indexedChildren.contains(child), "The citationIndex should contain the child entry under the parent's key");
     }
 
     @Test
@@ -518,13 +518,16 @@ class BibDatabaseTest {
         // setting crossref in child
         child.setField(StandardField.CROSSREF, "ParentA");
 
+        // ensure it is in the first parent set
+        assertTrue(database.getEntriesForCitationKey("ParentA").contains(child), "Child should be indexed under ParentA");
+
         // first rename of parent
         parent.setCitationKey("ParentB");
-        assertEquals(Optional.of("ParentB"), child.getField(StandardField.CROSSREF));
+        assertTrue(database.getEntriesForCitationKey("ParentB").contains(child), "Child should have moved to the ParentB index set");
 
         // second rename of parent
         parent.setCitationKey("ParentC");
-        assertEquals(Optional.of("ParentC"), child.getField(StandardField.CROSSREF));
+        assertTrue(database.getEntriesForCitationKey("ParentC").contains(child), "Child should have moved to the ParentC index set");
     }
 
     @Test
