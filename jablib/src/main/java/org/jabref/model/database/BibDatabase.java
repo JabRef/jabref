@@ -545,46 +545,46 @@ public class BibDatabase {
     }
 
     @Subscribe
-        private void relayEntryChangeEvent(FieldChangedEvent event) {
-            Field field = event.getField();
-            // check if field changed was single entry or multiple entry link
-            boolean isLinkedField = field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) ||
-                    field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK);
+    private void relayEntryChangeEvent(FieldChangedEvent event) {
+        Field field = event.getField();
+        // check if field changed was single entry or multiple entry link
+        boolean isLinkedField = field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) ||
+                field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK);
 
-            if (isLinkedField) {
-                BibEntry entry = event.getBibEntry();
-                String oldValue = event.getOldValue();
-                String newValue = event.getNewValue();
+        if (isLinkedField) {
+            BibEntry entry = event.getBibEntry();
+            String oldValue = event.getOldValue();
+            String newValue = event.getNewValue();
 
-                // split the old multiple key string into individual keys and remove the entry from all old keys
-                if (oldValue != null && !oldValue.trim().isEmpty()) {
-                    for (String rawKey : oldValue.split(",")) {
-                        String oldKey = rawKey.trim();
-                        if (!oldKey.isEmpty()) {
-                            Set<BibEntry> referenceEntries = citationIndex.get(oldKey);
-                            if (referenceEntries != null) {
-                                // remove entry using unique id to prevent duplicate child entries
-                                // due to changed hashcodes when field in child is changed
-                                referenceEntries.removeIf(e -> e.getId().equals(entry.getId()));
-                                if (referenceEntries.isEmpty()) {
-                                    citationIndex.remove(oldKey);
-                                }
+            // split the old multiple key string into individual keys and remove the entry from all old keys
+            if (oldValue != null && !oldValue.trim().isEmpty()) {
+                for (String rawKey : oldValue.split(",")) {
+                    String oldKey = rawKey.trim();
+                    if (!oldKey.isEmpty()) {
+                        Set<BibEntry> referenceEntries = citationIndex.get(oldKey);
+                        if (referenceEntries != null) {
+                            // remove entry using unique id to prevent duplicate child entries
+                            // due to changed hashcodes when field in child is changed
+                            referenceEntries.removeIf(e -> e.getId().equals(entry.getId()));
+                            if (referenceEntries.isEmpty()) {
+                                citationIndex.remove(oldKey);
                             }
                         }
                     }
                 }
+            }
 
-                // split the new multiple key string into individual keys and add the entry to all new keys
-                if (newValue != null && !newValue.trim().isEmpty()) {
-                    for (String rawKey : newValue.split(",")) {
-                        String newKey = rawKey.trim();
-                        if (!newKey.isEmpty()) {
-                            citationIndex.computeIfAbsent(newKey, k -> ConcurrentHashMap.newKeySet()).add(entry);
-                        }
+            // split the new multiple key string into individual keys and add the entry to all new keys
+            if (newValue != null && !newValue.trim().isEmpty()) {
+                for (String rawKey : newValue.split(",")) {
+                    String newKey = rawKey.trim();
+                    if (!newKey.isEmpty()) {
+                        citationIndex.computeIfAbsent(newKey, k -> ConcurrentHashMap.newKeySet()).add(entry);
                     }
                 }
             }
-            eventBus.post(event);
+        }
+        eventBus.post(event);
     }
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
