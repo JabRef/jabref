@@ -328,7 +328,7 @@ public class JabRefGUI extends Application {
         Scene scene = new Scene(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssImmediately(scene);
+        themeManager.installCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

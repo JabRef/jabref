@@ -6,6 +6,8 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.jspecify.annotations.Nullable;
+
 /// Makes sure the key is legal
 public class ValidCitationKeyChecker implements ValueChecker {
     private final String unwantedCharacters;
@@ -15,7 +17,7 @@ public class ValidCitationKeyChecker implements ValueChecker {
     }
 
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isNullOrEmpty(value)) {
             return Optional.of(Localization.lang("empty citation key"));
         }

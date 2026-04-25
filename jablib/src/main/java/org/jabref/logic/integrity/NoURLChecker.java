@@ -8,6 +8,7 @@ import org.jabref.logic.util.strings.StringUtil;
 
 public class NoURLChecker implements ValueChecker {
 
+    @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
