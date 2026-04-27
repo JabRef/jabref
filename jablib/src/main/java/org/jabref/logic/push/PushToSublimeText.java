@@ -75,10 +75,10 @@ public class PushToSublimeText extends AbstractPushToApplication {
                 couldNotPush = true;
                 if (!error.isEmpty()) {
                     sendErrorNotification(Localization.lang("Error pushing entries"),
-                            Localization.lang("Could not push to a running %0 instance.", getDisplayName()) + " " + error);
+                            Localization.lang("Could not push to %0.", getDisplayName()) + " " + error);
                 } else {
                     sendErrorNotification(Localization.lang("Error pushing entries"),
-                            Localization.lang("Could not push to a running %0 instance.", getDisplayName()));
+                            Localization.lang("Could not push to %0.", getDisplayName()));
                 }
             }
         } catch (IOException | InterruptedException excep) {

@@ -74,10 +74,10 @@ public class PushToTexShop extends AbstractPushToApplication {
                 couldNotPush = true;
                 if (!error.isEmpty()) {
                     sendErrorNotification(Localization.lang("Error pushing entries"),
-                            Localization.lang("Could not push to a running TeXShop instance. Error %0", error));
+                            Localization.lang("Could not push to %0. Error %1", getDisplayName(), error));
                 } else {
                     sendErrorNotification(Localization.lang("Error pushing entries"),
-                            Localization.lang("Could not push to a running TeXShop instance."));
+                            Localization.lang("Could not push to %0.", getDisplayName()));
                 }
             }
         } catch (IOException | InterruptedException excep) {
