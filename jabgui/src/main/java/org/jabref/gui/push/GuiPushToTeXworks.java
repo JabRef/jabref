@@ -1,9 +1,9 @@
 package org.jabref.gui.push;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.push.PushToTeXworks;
 
