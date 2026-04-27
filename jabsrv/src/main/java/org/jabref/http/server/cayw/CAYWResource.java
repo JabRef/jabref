@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -53,6 +54,7 @@ public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
     private static final String CHOCOLATEBIB_PATH = "/Chocolate.bib";
     private static boolean initialized = false;
+    private static Pattern ALLOWED_COMMAND = Pattern.compile("[a-zA-Z*]+");
 
     @Inject
     private CliPreferences preferences;
@@ -72,7 +74,7 @@ public class CAYWResource {
     ) throws IOException, ExecutionException, InterruptedException {
         // Validation of command parameter
         String command = queryParams.getCommand().orElse("autocite");
-        if (!command.matches("[a-zA-Z*]+")) {
+        if (!ALLOWED_COMMAND.matcher(command).matches()) {
             LOGGER.warn("Blocked CAYW request with malicious command: {}", command);
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("The 'command' parameter contains invalid characters. Only alphanumeric characters and '*' are allowed.")
