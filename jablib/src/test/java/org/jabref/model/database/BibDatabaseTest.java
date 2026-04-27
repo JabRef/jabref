@@ -531,23 +531,32 @@ class BibDatabaseTest {
     }
 
     @Test
-    void childRelatedIndexUpdatesWhenCommaSeparatedFieldChanges() {
+    void childIsIndexedUnderEachKeyInCommaSeparatedField() {
         BibDatabase database = new BibDatabase();
         BibEntry child = new BibEntry(StandardEntryType.Article);
+        database.insertEntry(child);
 
+        // set multiple links in related field
+        child.setField(StandardField.RELATED, " ParentA ,   ParentB ");
+
+        // verify all keys have child
+        assertTrue(database.getEntriesForCitationKey("ParentA").contains(child), "Child should be indexed under ParentA");
+        assertTrue(database.getEntriesForCitationKey("ParentB").contains(child), "Child should be indexed under ParentB");
+    }
+
+    @Test
+    void changingOneKeyInCommaSeparatedFieldUpdatesIndex() {
+        BibDatabase database = new BibDatabase();
+        BibEntry child = new BibEntry(StandardEntryType.Article);
         database.insertEntry(child);
 
         // set multiple links in related field
         child.setField(StandardField.RELATED, "ParentA, ParentB");
 
-        // verify all keys have the child
-        assertTrue(database.getEntriesForCitationKey("ParentA").contains(child), "Child should be indexed under ParentA");
-        assertTrue(database.getEntriesForCitationKey("ParentB").contains(child), "Child should be indexed under ParentB");
-
-        // change a key in the multiple key entries field
+        // change a key in multiple key entries field
         child.setField(StandardField.RELATED, "ParentC, ParentB");
 
-        // verify if the change is done in the child related multiple entry field
+        // verify if the change is done in  the child related multiple entry field
         assertTrue(database.getEntriesForCitationKey("ParentC").contains(child), "Child should be in the new ParentC set");
         assertTrue(database.getEntriesForCitationKey("ParentB").contains(child), "Child should still be in the ParentB set");
         assertFalse(database.getEntriesForCitationKey("ParentA").contains(child), "Child should be removed from the old ParentA set");
