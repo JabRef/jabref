@@ -72,6 +72,6 @@ class CAYWResourceTest extends ServerTest {
                 .get();
 
         assertEquals(400, response.getStatus());
-        assertEquals("The 'command' parameter contains invalid characters. Only alphanumeric characters and '*' are allowed.", response.readEntity(String.class));
+        assertEquals("The 'command' parameter contains invalid characters. Only letters (A–Z, a–z) and '*' are allowed.", response.readEntity(String.class));
     }
 }
