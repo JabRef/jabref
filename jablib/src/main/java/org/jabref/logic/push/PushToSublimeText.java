@@ -2,9 +2,12 @@ package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
@@ -36,7 +39,8 @@ public class PushToSublimeText extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
+        String path = preferences.getCommandPaths().get(this.getDisplayName());
+        commandPath = path != null ? path : "";
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {
@@ -46,20 +50,56 @@ public class PushToSublimeText extends AbstractPushToApplication {
         try {
             String keyString = this.getKeyString(entries, getDelimiter());
             LOGGER.debug("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
-            ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
+
+            String[] command = getCommandLine(keyString);
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.inheritIO();
             Map<String, String> envs = processBuilder.environment();
-            envs.put("PATH", Path.of(commandPath).getParent().toString());
+            Path parent = Path.of(commandPath).getParent();
+            if (parent != null) {
+                envs.put("PATH", parent.toString());
+            }
 
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);
+            StringBuilder errorStringBuilder = new StringBuilder();
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), s -> {
+                LOGGER.warn("Push to Sublime Text error: {}", s);
+                errorStringBuilder.append(s).append("\n");
+            });
 
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
-        } catch (IOException excep) {
+
+            process.waitFor();
+            if (process.exitValue() != 0) {
+                couldNotPush = true;
+                String error = errorStringBuilder.toString().trim();
+                if (!error.isEmpty()) {
+                    sendErrorNotification(Localization.lang("Error pushing entries"),
+                            Localization.lang("Could not push to a running %0 server.", getDisplayName()) + " " + error);
+                }
+            }
+        } catch (IOException | InterruptedException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
+
+            if (excep instanceof IOException) {
+                sendErrorNotification(Localization.lang("Error pushing entries"),
+                        Localization.lang("Could not call executable '%0'.", commandPath) + "\n" +
+                                Localization.lang("Please check the path in the preferences.") + "\n" +
+                                (OS.OS_X ? Localization.lang("On macOS, you can use the command-line binary (e.g., /usr/local/bin/subl).") + "\n" +
+                                        Localization.lang("To create it, run: %0", "sudo ln -s /Applications/Sublime\\ Text.app/Contents/SharedSupport/bin/subl /usr/local/bin/subl") : ""));
+            }
+        }
+    }
+
+    @Override
+    public void onOperationCompleted() {
+        if (couldNotPush) {
+            // Detailed error notification might have been sent already in pushEntries
+        } else {
+            super.onOperationCompleted();
         }
     }
 
@@ -68,15 +108,10 @@ public class PushToSublimeText extends AbstractPushToApplication {
         String citeCommand = getCitePrefix();
         // we need to escape the extra slashses
         if (getCitePrefix().contains("\\")) {
-            citeCommand = "\"\\" + getCitePrefix();
+            citeCommand = "\\" + getCitePrefix();
         }
 
-        if (OS.WINDOWS) {
-            // TODO we might need to escape the inner double quotes with """ """
-            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCitePrefix() + keyString + getCiteSuffix() + "\"}\""};
-        } else {
-            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + keyString + getCiteSuffix() + "\"}'"};
-        }
+        return new String[] {commandPath, "--command", "insert {\"characters\": \"" + citeCommand + keyString + getCiteSuffix() + "\"}"};
     }
 
     @Override

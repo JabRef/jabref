@@ -1,6 +1,7 @@
 package org.jabref.gui.push;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.push.PushToApplicationPreferences;
@@ -22,6 +23,6 @@ public class GuiPushToTexmaker extends PushToTexmaker implements GuiPushToApplic
 
     @Override
     public void sendErrorNotification(String title, String message) {
-        dialogService.showErrorDialogAndWait(title, message);
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
     }
 }

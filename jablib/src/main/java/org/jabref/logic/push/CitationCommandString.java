@@ -9,6 +9,12 @@ public record CitationCommandString(@NonNull String prefix, @NonNull String deli
     public static final String CITE_KEY2 = "key2";
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommandString.class);
 
+    public CitationCommandString {
+        if (!prefix.matches("[a-zA-Z\\\\*]+\\{?")) {
+            LOGGER.warn("Invalid prefix: {}", prefix);
+        }
+    }
+
     @Override
     public @NonNull String toString() {
         return prefix + CITE_KEY1 + delimiter + CITE_KEY2 + suffix;

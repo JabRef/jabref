@@ -70,6 +70,15 @@ public class CAYWResource {
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
+        // Validation of command parameter
+        String command = queryParams.getCommand().orElse("autocite");
+        if (!command.matches("[a-zA-Z*]+")) {
+            LOGGER.warn("Blocked CAYW request with malicious command: {}", command);
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("The 'command' parameter contains invalid characters. Only alphanumeric characters and '*' are allowed.")
+                           .build();
+        }
+
         // Probe parameter handling
         if (queryParams.isProbe()) {
             return Response.ok("ready").build();
@@ -127,7 +136,7 @@ public class CAYWResource {
 
         // Push to Application parameter handling
         if (queryParams.getApplication().isPresent()) {
-            CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand().orElse("autocite")).concat("{"), ",", "}");
+            CitationCommandString citationCmd = new CitationCommandString("\\" + command + "{", ",", "}");
             PushToApplications.getApplication(queryParams.getApplication().get(), LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }

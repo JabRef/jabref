@@ -34,48 +34,73 @@ public class PushToTexShop extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
+        String path = preferences.getCommandPaths().get(this.getDisplayName());
+        commandPath = path != null ? path : "";
 
         try {
             String keyString = this.getKeyString(entries, getDelimiter());
-            LOGGER.debug("TexShop string: {}", String.join(" ", getCommandLine(keyString)));
-            ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
-            processBuilder.inheritIO();
+            String citeString = getCitePrefix() + keyString + getCiteSuffix();
+            LOGGER.debug("TexShop string: {}", citeString);
+
+            if (!OS.OS_X) {
+                sendErrorNotification(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
+                return;
+            }
+
+            // We use osascript to send the citation to TeXShop.
+            // Using separate arguments for ProcessBuilder avoids shell injection.
+            String script = "tell application \"TeXShop\"\n" +
+                    "activate\n" +
+                    "set TheString to item 1 of arguments\n" +
+                    "set content of selection of front document to TheString\n" +
+                    "end tell";
+
+            ProcessBuilder processBuilder = new ProcessBuilder("osascript", "-e", script, "--", citeString);
             Process process = processBuilder.start();
+
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);
+            StringBuilder errorStringBuilder = new StringBuilder();
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), s -> {
+                LOGGER.warn("Push to TeXShop error: {}", s);
+                errorStringBuilder.append(s).append("\n");
+            });
 
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
-        } catch (IOException excep) {
+
+            process.waitFor();
+            if (process.exitValue() != 0) {
+                couldNotPush = true;
+                String error = errorStringBuilder.toString().trim();
+                if (!error.isEmpty()) {
+                    sendErrorNotification(Localization.lang("Error pushing entries"),
+                            Localization.lang("Could not push to a running TeXShop server.") + " " + error);
+                }
+            }
+        } catch (IOException | InterruptedException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
+
+            if (excep instanceof IOException) {
+                sendErrorNotification(Localization.lang("Error pushing entries"),
+                        Localization.lang("Could not call executable '%0'.", "osascript") + "\n" +
+                                Localization.lang("Please check the path in the preferences.") + "\n" +
+                                (OS.OS_X ? Localization.lang("On macOS, you can use the command-line binary.") : ""));
+            }
+        }
+    }
+
+    @Override
+    public void onOperationCompleted() {
+        if (couldNotPush) {
+            // Detailed error notification might have been sent already in pushEntries
+        } else {
+            super.onOperationCompleted();
         }
     }
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        String citeCommand = getCitePrefix();
-        // we need to escape the extra slashses
-        int intSlashPosition = getCitePrefix().indexOf("\\");
-
-        if (intSlashPosition != -1) {
-            StringBuilder sb = new StringBuilder(getCitePrefix());
-            sb.insert(intSlashPosition, "\\");
-            citeCommand = sb.toString();
-        }
-
-        String osascriptTexShop = "osascript -e 'tell application \"TeXShop\"\n" +
-                "activate\n" +
-                "set TheString to \"" + citeCommand + keyString + getCiteSuffix() + "\"\n" +
-                "set content of selection of front document to TheString\n" +
-                "end tell'";
-
-        if (OS.OS_X) {
-            return new String[] {"sh", "-c", osascriptTexShop};
-        } else {
-            sendErrorNotification(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
-            return new String[] {};
-        }
+        return new String[] {};
     }
 }
