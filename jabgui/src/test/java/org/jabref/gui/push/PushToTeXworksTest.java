@@ -10,6 +10,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +63,7 @@ class PushToTeXworksTest {
     @Test
     void getCommandLine() {
         String keyString = "TestKey";
-        String[] expectedCommand = new String[] {null, "--insert-text", keyString}; // commandPath is only set in pushEntries
+        String[] expectedCommand = new String[] {"", "--insert-text", keyString}; // commandPath is only set in pushEntries
 
         String[] actualCommand = pushToTeXworks.getCommandLine(keyString);
 
@@ -75,7 +76,12 @@ class PushToTeXworksTest {
         ProcessBuilder processBuilder = mock(ProcessBuilder.class);
 
         String testKey = "TestKey";
-        String[] expectedCommand = new String[] {TEXWORKS_CLIENT_PATH, "--insert-text", testKey};
+        List<String> expectedCommand;
+        if (OS.OS_X) {
+            expectedCommand = List.of("open", "-a", TEXWORKS_CLIENT_PATH, "-n", "--args", "--insert-text", testKey);
+        } else {
+            expectedCommand = List.of(TEXWORKS_CLIENT_PATH, "--insert-text", testKey);
+        }
 
         pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
 
