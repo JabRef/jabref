@@ -69,12 +69,15 @@ public class PushToTexShop extends AbstractPushToApplication {
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
 
             process.waitFor();
+            String error = errorStringBuilder.toString().trim();
             if (process.exitValue() != 0) {
                 couldNotPush = true;
-                String error = errorStringBuilder.toString().trim();
                 if (!error.isEmpty()) {
                     sendErrorNotification(Localization.lang("Error pushing entries"),
                             Localization.lang("Could not push to a running TeXShop instance. Error %0", error));
+                } else {
+                    sendErrorNotification(Localization.lang("Error pushing entries"),
+                            Localization.lang("Could not push to a running TeXShop instance."));
                 }
             }
         } catch (IOException | InterruptedException excep) {

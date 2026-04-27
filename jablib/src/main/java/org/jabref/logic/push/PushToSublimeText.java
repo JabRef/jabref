@@ -2,8 +2,6 @@ package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -72,12 +70,15 @@ public class PushToSublimeText extends AbstractPushToApplication {
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
 
             process.waitFor();
+            String error = errorStringBuilder.toString().trim();
             if (process.exitValue() != 0) {
                 couldNotPush = true;
-                String error = errorStringBuilder.toString().trim();
                 if (!error.isEmpty()) {
                     sendErrorNotification(Localization.lang("Error pushing entries"),
-                            Localization.lang("Could not push to a running %0 server.", getDisplayName()) + " " + error);
+                            Localization.lang("Could not push to a running %0 instance.", getDisplayName()) + " " + error);
+                } else {
+                    sendErrorNotification(Localization.lang("Error pushing entries"),
+                            Localization.lang("Could not push to a running %0 instance.", getDisplayName()));
                 }
             }
         } catch (IOException | InterruptedException excep) {
