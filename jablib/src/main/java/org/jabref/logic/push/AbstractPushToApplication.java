@@ -106,7 +106,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         } else if (couldNotCall) {
             sendErrorNotification(
                     Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not call executable") + " '" + commandPath + "'.\n" +
+                    Localization.lang("Could not call executable '%0'.", commandPath) + "\n" +
                             Localization.lang("Please check the path in the preferences.") + "\n" +
                             (OS.OS_X ? Localization.lang("On macOS, you can use the command-line binary.") : ""));
         } else if (couldNotPush) {

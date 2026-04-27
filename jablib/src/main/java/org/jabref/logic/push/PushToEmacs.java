@@ -107,7 +107,7 @@ public class PushToEmacs extends AbstractPushToApplication {
                         couldNotPush = true;
                         if (error.contains("can't find socket") || error.contains("No socket or alternate editor")) {
                             sendErrorNotification(Localization.lang("Error pushing entries"),
-                                    Localization.lang("Could not connect to Emacs. Make sure the server is running. In Emacs, type %0 to start it.", "'M-x server-start'"));
+                                    Localization.lang("Could not connect to Emacs. Make sure the server is running. In Emacs, type %0 to start it.", "M-x server-start"));
                         } else {
                             sendErrorNotification(Localization.lang("Error pushing entries"),
                                     Localization.lang("Could not push to a running emacs daemon."));
