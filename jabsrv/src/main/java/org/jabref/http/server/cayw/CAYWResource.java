@@ -77,7 +77,7 @@ public class CAYWResource {
         if (!ALLOWED_COMMAND.matcher(command).matches()) {
             LOGGER.warn("Blocked CAYW request with malicious command: {}", command);
             return Response.status(Response.Status.BAD_REQUEST)
-                           .entity("The 'command' parameter contains invalid characters. Only alphanumeric characters and '*' are allowed.")
+                           .entity("The 'command' parameter contains invalid characters. Only letters (A–Z, a–z) and '*' are allowed.")
                            .build();
         }
 
