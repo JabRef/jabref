@@ -74,7 +74,7 @@ public class PushToTexShop extends AbstractPushToApplication {
                 String error = errorStringBuilder.toString().trim();
                 if (!error.isEmpty()) {
                     sendErrorNotification(Localization.lang("Error pushing entries"),
-                            Localization.lang("Could not push to a running TeXShop server.") + " " + error);
+                            Localization.lang("Could not push to a running TeXShop instance. Error %0", error));
                 }
             }
         } catch (IOException | InterruptedException excep) {
@@ -83,9 +83,7 @@ public class PushToTexShop extends AbstractPushToApplication {
 
             if (excep instanceof IOException) {
                 sendErrorNotification(Localization.lang("Error pushing entries"),
-                        Localization.lang("Could not call executable '%0'.", "osascript") + "\n" +
-                                Localization.lang("Please check the path in the preferences.") + "\n" +
-                                (OS.OS_X ? Localization.lang("On macOS, you can use the command-line binary.") : ""));
+                        Localization.lang("Could not call executable '%0' Please check the path in the preferences.", "osascript"));
             }
         }
     }
