@@ -63,6 +63,7 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final ListProperty<GroupTreeNode> selectedGroupsProperty;
     @Nullable private final IndexManager indexManager;
 
     private Optional<MatcherSet> groupsMatcher;
@@ -83,7 +84,7 @@ public class MainTableDataModel {
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new SearchIndexListener();
         this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
-
+        this.selectedGroupsProperty = selectedGroupsProperty;
         this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
         resetFieldFormatter();
 
@@ -280,6 +281,7 @@ public class MainTableDataModel {
                 } else {
                     clearSearchMatches();
                 }
+                updateGroupMatches(selectedGroupsProperty.get());
             }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
         }
     }
