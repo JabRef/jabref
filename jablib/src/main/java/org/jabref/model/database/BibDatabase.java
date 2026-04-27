@@ -556,10 +556,10 @@ public class BibDatabase {
             String newValue = event.getNewValue();
 
             // split the old multiple key string into individual keys and remove the entry from all old keys
-            if (oldValue != null && !oldValue.isBlank()) {
+            if (!StringUtil.isBlank(oldValue)) {
                 for (String rawKey : oldValue.split(",")) {
-                    String oldKey = rawKey.trim();
-                    if (!oldKey.isBlank()) {
+                    if (!StringUtil.isBlank(rawKey)) {
+                        String oldKey = rawKey.trim();
                         Set<BibEntry> referenceEntries = citationIndex.get(oldKey);
                         if (referenceEntries != null) {
                             // remove entry using unique id to prevent duplicate child entries
@@ -574,10 +574,10 @@ public class BibDatabase {
             }
 
             // split the new multiple key string into individual keys and add the entry to all new keys
-            if (newValue != null && !newValue.isBlank()) {
+            if (!StringUtil.isBlank(newValue)) {
                 for (String rawKey : newValue.split(",")) {
-                    String newKey = rawKey.trim();
-                    if (!newKey.isBlank()) {
+                    if (!StringUtil.isBlank(rawKey)) {
+                        String newKey = rawKey.trim();
                         citationIndex.computeIfAbsent(newKey, k -> ConcurrentHashMap.newKeySet()).add(entry);
                     }
                 }
