@@ -626,13 +626,13 @@ jobs:
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
 
-      - name: Install jbundle
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: jbundle
-          git: https://github.com/avelino/jbundle/
-          branch: main
+      - name: Install jbundle (Linux, macOS)
+        if: ${{ ((matrix.os == 'ubuntu-22.04') || (startsWith(matrix.os, 'macos'))) && (needs.conditions.outputs.should-jbundle == 'true') }}
+        run: curl -sSL https://raw.githubusercontent.com/avelino/jbundle/main/install.sh | sh
+      - name: Install jbundle (Windows)
+        if: (matrix.os == 'windows-latest') && (needs.conditions.outputs.should-jbundle == 'true')
+        run: irm https://raw.githubusercontent.com/avelino/jbundle/main/install.ps1 | iex
+
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
         uses: awalsh128/cache-apt-pkgs-action@latest

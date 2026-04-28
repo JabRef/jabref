@@ -160,7 +160,7 @@ runs:
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
 
     - name: jbundle ${{ inputs.component }}
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
+      if: ${{ (inputs.os != 'ubuntu-22.04-arm') && (inputs.shouldJbundle == 'true') }}
       shell: bash
       run: |
         jbundle build --no-appcds --input . --gradle-project ${{ inputs.component }} --output ./build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}
