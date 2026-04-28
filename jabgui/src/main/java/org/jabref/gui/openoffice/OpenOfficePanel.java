@@ -225,7 +225,8 @@ public class OpenOfficePanel {
                 ooBase.guiActionSelectDocument(false);
             } catch (WrappedTargetException
                      | NoSuchElementException ex) {
-                throw new RuntimeException(ex);
+                LOGGER.warn("Unable to select document to work on", ex);
+                OOError.fromMisc(ex).setTitle("Unable to select document to work on").showErrorDialog(dialogService);
             }
         });
 
@@ -348,22 +349,22 @@ public class OpenOfficePanel {
     }
 
     private List<BibDatabase> getBaseList() {
-        List<BibDatabase> databases = new ArrayList<>();
         if (openOfficePreferences.getUseAllDatabases()) {
-            for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
-                databases.add(database.getDatabase());
-            }
-        } else {
-            databases.add(stateManager.getActiveDatabase()
-                                      .map(BibDatabaseContext::getDatabase)
-                                      .orElse(new BibDatabase()));
+            return new ArrayList<>(stateManager.getOpenDatabases().stream()
+                                               .map(BibDatabaseContext::getDatabase)
+                                               .toList());
         }
-
-        return databases;
+        return new ArrayList<>(List.of(
+                stateManager.getActiveDatabase()
+                            .map(BibDatabaseContext::getDatabase)
+                            .orElseGet(BibDatabase::new)));
     }
 
     private void connectAutomatically() {
         DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
+
+        final String errorTitle = Localization.lang("Autodetection failed");
+        final String progressMessage = Localization.lang("Autodetecting paths...");
 
         if (officeInstallation.isExecutablePathDefined()) {
             connect();
@@ -386,9 +387,9 @@ public class OpenOfficePanel {
                 }
             });
 
-            taskConnectIfInstalled.setOnFailed(_ -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), taskConnectIfInstalled.getException()));
+            taskConnectIfInstalled.setOnFailed(_ -> dialogService.showErrorDialogAndWait(errorTitle, errorTitle, taskConnectIfInstalled.getException()));
 
-            dialogService.showProgressDialog(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), taskConnectIfInstalled);
+            dialogService.showProgressDialog(progressMessage, progressMessage, taskConnectIfInstalled);
             taskExecutor.execute(taskConnectIfInstalled);
         }
     }
@@ -396,6 +397,9 @@ public class OpenOfficePanel {
     private void connectManually() {
         DirectoryDialogConfiguration fileDialogConfiguration = new DirectoryDialogConfiguration.Builder().withInitialDirectory(System.getProperty("user.home")).build();
         Optional<Path> selectedPath = dialogService.showDirectorySelectionDialog(fileDialogConfiguration);
+
+        final String errorTitle = Localization.lang("Could not connect to running OpenOffice/LibreOffice.");
+        final String extendedErrorTitle = Localization.lang("If connecting manually, please verify program and library paths.");
 
         DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
 
@@ -406,12 +410,12 @@ public class OpenOfficePanel {
                               if (value) {
                                   connect();
                               } else {
-                                  dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."), Localization.lang("If connecting manually, please verify program and library paths."));
+                                  dialogService.showErrorDialogAndWait(errorTitle, extendedErrorTitle);
                               }
                           })
                           .executeWith(taskExecutor);
         } else {
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."), Localization.lang("If connecting manually, please verify program and library paths."));
+            dialogService.showErrorDialogAndWait(errorTitle, extendedErrorTitle);
         }
     }
 
@@ -440,6 +444,11 @@ public class OpenOfficePanel {
     }
 
     private void connect() {
+        final String connectionError = Localization.lang("Could not connect to running OpenOffice/LibreOffice.");
+        final String autodetectionFailedError = Localization.lang("Autodetection failed");
+        final String progressMessage = Localization.lang("Autodetecting paths...");
+        final String loggerMessage = "Could not connect to running OpenOffice/LibreOffice";
+
         Task<OOBibBase> connectTask = new Task<>() {
             @Override
             protected OOBibBase call() throws BootstrapException, CreationException, IOException, InterruptedException {
@@ -457,7 +466,9 @@ public class OpenOfficePanel {
                 ooBase.guiActionSelectDocument(true);
             } catch (WrappedTargetException
                      | NoSuchElementException e) {
-                throw new RuntimeException(e);
+                LOGGER.warn("Unable to connect to document", e);
+                OOError.fromMisc(e).showErrorDialog(dialogService);
+                return;
             }
 
             // Enable actions that depend on a connection
@@ -469,16 +480,16 @@ public class OpenOfficePanel {
             LOGGER.error("autodetect failed", ex);
             switch (ex) {
                 case UnsatisfiedLinkError unsatisfiedLinkError -> {
-                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", unsatisfiedLinkError);
+                    LOGGER.warn(loggerMessage, unsatisfiedLinkError);
 
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
                 }
                 case IOException ioException -> {
-                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ioException);
+                    LOGGER.warn(loggerMessage, ioException);
 
-                    dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
-                            Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
+                    dialogService.showErrorDialogAndWait(connectionError,
+                            connectionError
                                     + "\n"
                                     + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                                     + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
@@ -490,11 +501,11 @@ public class OpenOfficePanel {
                 }
                 case null,
                      default ->
-                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
+                        dialogService.showErrorDialogAndWait(autodetectionFailedError, autodetectionFailedError, ex);
             }
         });
 
-        dialogService.showProgressDialog(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), connectTask);
+        dialogService.showProgressDialog(progressMessage, progressMessage, connectTask);
         taskExecutor.execute(connectTask);
     }
 
@@ -588,15 +599,9 @@ public class OpenOfficePanel {
     /// @return true if all entries have citation keys, if it so may be after generating them
     private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
         // Check if there are empty keys
-        boolean emptyKeys = false;
-        for (BibEntry entry : entries) {
-            if (entry.getCitationKey().isEmpty()) {
-                // Found one, no need to look further for now
-                emptyKeys = true;
-                break;
-            }
-        }
-
+        // Found one, no need to look further for now
+        boolean emptyKeys = entries.stream()
+                                   .anyMatch(entry -> entry.getCitationKey().isEmpty());
         // If no empty keys, return true
         if (!emptyKeys) {
             return true;

@@ -12,7 +12,7 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafx = "26"
+val javafx = "26.0.1"
 
 val lucene = "10.4.0"
 
@@ -20,7 +20,7 @@ val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.13.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.13.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
@@ -61,13 +61,13 @@ dependencies.constraints {
     api("com.squareup.okhttp3:okhttp:5.3.2")
     api("com.squareup.okio:okio-jvm:3.17.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
-    api("com.tngtech.archunit:archunit:1.4.1")
-    api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
-    api("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    api("com.uber.nullaway:nullaway:0.13.3")
+    api("com.tngtech.archunit:archunit:1.4.2")
+    api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
+    api("com.tngtech.archunit:archunit-junit5-engine:1.4.2")
+    api("com.uber.nullaway:nullaway:0.13.4")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
-    api("commons-io:commons-io:2.21.0")
+    api("commons-io:commons-io:2.22.0")
     api("commons-logging:commons-logging:1.3.6")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
@@ -101,7 +101,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.2")
-    api("org.apache.httpcomponents.client5:httpclient5:5.6")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6.1")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.4")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
@@ -123,14 +123,14 @@ dependencies.constraints {
     api("org.glassfish.jaxb:jaxb-runtime:4.0.7")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
-    api("org.hisp.dhis:json-tree:1.8.1")
+    api("org.hisp.dhis:json-tree:1.9.1")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
-    api("org.jabref:mslinks:1.1.1")
+    api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.20")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
     api("org.jooq:jool:0.9.15")
-    api("org.jsoup:jsoup:1.22.1")
+    api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
