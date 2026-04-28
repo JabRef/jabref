@@ -76,16 +76,17 @@ class PushToTeXworksTest {
         ProcessBuilder processBuilder = mock(ProcessBuilder.class);
 
         String testKey = "TestKey";
-        List<String> expectedCommand;
         if (OS.OS_X) {
-            expectedCommand = List.of("open", "-a", TEXWORKS_CLIENT_PATH, "-n", "--args", "--insert-text", testKey);
+            List<String> expectedCommand = List.of("open", "-a", TEXWORKS_CLIENT_PATH, "-n", "--args", "--insert-text", testKey);
+
+            pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
+
+            verify(processBuilder).command(expectedCommand);
         } else {
-            expectedCommand = List.of(TEXWORKS_CLIENT_PATH, "--insert-text", testKey);
+            pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
+
+            verify(processBuilder).command(TEXWORKS_CLIENT_PATH, "--insert-text", testKey);
         }
-
-        pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
-
-        verify(processBuilder).command(expectedCommand);
     }
 
     /// To verify that the PushToTeXworks class correctly returns the tooltip for TeXworks.
