@@ -169,12 +169,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         Path baseDirectoryPath = getBaseDirectoryPath();
         List<Path> resolvedFiles = filesToOpen.stream()
                                               .map(FileUtil::resolveIfShortcut)
-                                              .map(path -> {
-                                                  if (!path.isAbsolute()) {
-                                                      return baseDirectoryPath.resolve(path).normalize();
-                                                  }
-                                                  return path.normalize();
-                                              })
                                               .filter(FileUtil::isBibFile)
                                               .collect(Collectors.toList());
 
