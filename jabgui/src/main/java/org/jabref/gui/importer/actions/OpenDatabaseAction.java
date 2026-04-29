@@ -221,7 +221,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 openTheFile(theFile);
                 Path file = theFile;
 
-                if (preferences.getInternalPreferences().isMemoryStickMode()) {
+                if (Files.exists(theFile) && preferences.getInternalPreferences().isMemoryStickMode()) {
                     try {
                         file = baseDirectoryPath.relativize(file).normalize();
                     } catch (IllegalArgumentException e) {
