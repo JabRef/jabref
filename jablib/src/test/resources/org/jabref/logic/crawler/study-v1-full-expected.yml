@@ -1,12 +1,12 @@
 version: 2.0
 authors:
-  - Jab Ref
+- Jab Ref
 title: TestStudyName
 research-questions:
-  - Question1
+- Question1
 queries:
-  - query: Quantum
+- query: Quantum
 catalogs:
-  - name: Springer
-    enabled: true
-    reason: ""
+- name: Springer
+  enabled: true
+  reason: ""
