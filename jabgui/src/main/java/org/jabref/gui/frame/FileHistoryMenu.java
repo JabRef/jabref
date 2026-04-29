@@ -101,7 +101,7 @@ public class FileHistoryMenu extends Menu {
         if (!Files.exists(resolvedFile)) {
             this.dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
-                    Localization.lang("File not found") + ": " + file);
+                    Localization.lang("File not found: %0", resolvedFile));
             return;
         }
 
