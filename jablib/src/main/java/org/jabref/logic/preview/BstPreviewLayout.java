@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bst.BstVM;
@@ -28,6 +29,7 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem[{].*[}]");
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
+    private static final Pattern MATH_EXPR_PATTERN = Pattern.compile("\\{\\{\\$\\\\([^$]+)\\$\\}\\}");
 
     private final String name;
     private String source;
@@ -66,20 +68,33 @@ public final class BstPreviewLayout implements PreviewLayout {
         // Ensure that the entry is of BibTeX format (and do not modify the original entry)
         BibEntry entry = new BibEntry(originalEntry);
         new ConvertToBibtexCleanup().cleanup(entry);
+
+        // Pre-process: convert {{$\Cmd$}} math expressions to Unicode wrapped in braces
+        // The braces protect the symbol from case conversion by BstCaseChanger
+        LatexToUnicodeFormatter preFormatter = new LatexToUnicodeFormatter();
+        for (org.jabref.model.entry.field.Field field : entry.getFields()) {
+            entry.getField(field).ifPresent(value -> {
+                Matcher matcher = MATH_EXPR_PATTERN.matcher(value);
+                StringBuffer sb = new StringBuffer();
+                while (matcher.find()) {
+                    String latexCmd = "\\" + matcher.group(1);
+                    String unicode = preFormatter.format(latexCmd);
+                    matcher.appendReplacement(sb, "{" + Matcher.quoteReplacement(unicode) + "}");
+                }
+                matcher.appendTail(sb);
+                entry.setField(field, sb.toString());
+            });
+        }
+
         String result = bstVM.render(List.of(entry));
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
         // Remove all LaTeX comments
-        // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
         result = result.replace("\\begin{thebibliography}{1}", "");
         result = result.replace("\\end{thebibliography}", "");
-        // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
         result = BIBITEM_PATTERN.matcher(result).replaceAll("");
-        // We want to replace \newblock by a space instead of completely removing it
         result = result.replace("\\newblock", " ");
-        // Remove all latex commands statements - assumption: command in a separate line
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
-        // Remove some IEEEtran.bst output (resulting from a multiline \providecommand)
         result = result.replace("#2}}", "");
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
@@ -113,7 +128,6 @@ public final class BstPreviewLayout implements PreviewLayout {
         return source;
     }
 
-    /// Checks if the given style file is a BST file by checking the extension
     public static boolean isBstStyleFile(String styleFile) {
         return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);
     }

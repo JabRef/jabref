@@ -62,4 +62,18 @@ class BstPreviewLayoutTest {
                 .withField(StandardField.EPRINTCLASS, "math-ph")
                 .withField(StandardField.KEYWORDS, "math-ph, math.DG, math.MP, math.SG, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42");
     }
+    @Test
+    void mathSymbolsInDoubleBracesAreCorrectlyRendered() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("IEEEtran.bst").toURI()));
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Mohammad Reza Sadeghifar and J. Jacob Wikner and Oscar Gustafsson")
+                .withField(StandardField.TITLE, "Linear programming design of semi-digital FIR filter and {{$\\Sigma$}}{{$\\Delta$}} modulator for VDSL2 transmitter")
+                .withField(StandardField.BOOKTITLE, "IEEE International Symposium on Circuits and Systems, ISCAS 2014")
+                .withField(StandardField.YEAR, "2014")
+                .withField(StandardField.PAGES, "2465--2468")
+                .withField(StandardField.PUBLISHER, "{IEEE}");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        org.junit.jupiter.api.Assertions.assertTrue(preview.contains("ΣΔ"),
+                "Preview should contain ΣΔ but was: " + preview);
+    }
 }
