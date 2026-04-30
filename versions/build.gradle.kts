@@ -23,7 +23,7 @@ dependencies {
     api(platform("dev.langchain4j:langchain4j-bom:1.13.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
     api(platform("org.junit:junit-bom:6.0.3"))
-    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.0"))
+    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.1"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
     api(platform("tools.jackson:jackson-bom:3.1.2"))
 }
