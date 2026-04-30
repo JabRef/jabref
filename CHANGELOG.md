@@ -46,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where LaTeX math symbols in the format `{{$\Cmd$}}` (e.g. `{{$\Sigma$}}`) were not rendered correctly in BST-based entry previews, showing `$$$$` instead of the actual symbol. [#11338](https://github.com/JabRef/jabref/issues/11338)
 - We improved the group filter to support full boolean search syntax. [#12721](https://github.com/JabRef/jabref/issues/12721)
 - We fixed the column chooser context menu appearing when right-clicking the empty library table body. [#15384](https://github.com/JabRef/jabref/issues/15384)
 - We fixed web search rejecting queries with non-standard syntax. [#12637](https://github.com/JabRef/jabref/issues/12637)
