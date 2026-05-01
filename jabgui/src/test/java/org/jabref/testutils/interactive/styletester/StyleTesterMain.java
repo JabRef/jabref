@@ -28,7 +28,7 @@ public class StyleTesterMain extends Application {
         );
 
         Scene scene = new Scene(view.getContent());
-        themeManager.installCss(scene);
+        themeManager.installCssOnScene(scene);
         stage.setScene(scene);
         stage.show();
     }
