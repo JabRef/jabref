@@ -1,0 +1,124 @@
+package org.jabref.logic.preview;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.jabref.logic.bst.BstVM;
+import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.layout.format.RemoveTilde;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public final class BstPreviewLayout implements PreviewLayout {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
+
+    private static final Pattern COMMENT_PATTERN = Pattern.compile("%.*");
+    private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem[{].*[}]");
+    private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
+    private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
+
+    private final String name;
+    private String source;
+    private BstVM bstVM;
+    private String error;
+    private final Path path;
+
+    public BstPreviewLayout(Path path) {
+        this.path = path;
+        try {
+            this.source = String.join("\n", Files.readAllLines(path));
+        } catch (IOException e) {
+            LOGGER.error("Error reading file", e);
+            this.source = "";
+        }
+
+        name = path.getFileName().toString();
+        if (!Files.exists(path)) {
+            LOGGER.error("File {} not found", path.toAbsolutePath());
+            error = Localization.lang("Error opening file '%0'", path.toString());
+            return;
+        }
+        try {
+            bstVM = new BstVM(path);
+        } catch (IOException e) {
+            LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
+            error = Localization.lang("Error opening file '%0'", path.toString());
+        }
+    }
+
+    @Override
+    public String generatePreview(BibEntry originalEntry, BibDatabaseContext databaseContext) {
+        if (error != null) {
+            return error;
+        }
+        // Ensure that the entry is of BibTeX format (and do not modify the original entry)
+        BibEntry entry = new BibEntry(originalEntry);
+        new ConvertToBibtexCleanup().cleanup(entry);
+        String result = bstVM.render(List.of(entry));
+        // Remove all comments
+        result = COMMENT_PATTERN.matcher(result).replaceAll("");
+        // Remove all LaTeX comments
+        // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
+        result = result.replace("\\begin{thebibliography}{1}", "");
+        result = result.replace("\\end{thebibliography}", "");
+        // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
+        result = BIBITEM_PATTERN.matcher(result).replaceAll("");
+        // We want to replace \newblock by a space instead of completely removing it
+        result = result.replace("\\newblock", " ");
+        // Remove all latex commands statements - assumption: command in a separate line
+        result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
+        // Remove some IEEEtran.bst output (resulting from a multiline \providecommand)
+        result = result.replace("#2}}", "");
+        // Have quotes right - and more
+        result = new LatexToUnicodeFormatter().format(result);
+        result = result.replace("``", "\"");
+        result = result.replace("''", "\"");
+        // Final cleanup
+        result = new RemoveNewlinesFormatter().format(result);
+        result = new RemoveLatexCommandsFormatter().format(result);
+        result = new RemoveTilde().format(result);
+        result = MULTIPLE_SPACES_PATTERN.matcher(result.trim()).replaceAll(" ");
+        return result;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getShortTitle() {
+        return name;
+    }
+
+    @Override
+    public String getText() {
+        return source;
+    }
+
+    /// Checks if the given style file is a BST file by checking the extension
+    public static boolean isBstStyleFile(String styleFile) {
+        return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);
+    }
+
+    public Path getFilePath() {
+        return path;
+    }
+}

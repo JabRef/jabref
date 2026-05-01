@@ -31,6 +31,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -88,7 +89,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public GroupTreeViewModel(@NonNull StateManager stateManager,
                               @NonNull BibEntryTypesManager entryTypesManager,
                               @NonNull GuiPreferences preferences,
-                              @NonNull FieldPreferences fieldPreferences,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
                               @NonNull AdaptVisibleTabs adaptVisibleTabs,
@@ -98,7 +98,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.fieldPreferences = fieldPreferences;
+        this.fieldPreferences = preferences.getFieldPreferences();
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.adaptVisibleTabs = adaptVisibleTabs;
@@ -110,7 +110,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
+        filterPredicate.bind(EasyBind.map(filterText, text ->
+                group -> GroupNameFilterVisitor.matches(group.getDisplayName(), text)
+        ));
     }
 
     private void refresh() {
@@ -187,7 +189,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Creates the "Imported entries" group if enabled and missing.
     /// Selection is disabled to prevent focus theft when switching tabs.
     private void addGroupImportEntries(GroupNodeViewModel parent) {
-        if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
+        if (!preferences.getLibraryPreferences().shouldAddImportedEntries()) {
             return;
         }
 
@@ -545,7 +547,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 Localization.lang("Remove subgroups"),
                 Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
         if (confirmation) {
-            /// TODO: Add undo
+            // TODO: Add undo
             // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
             // panel.getUndoManager().addEdit(undo);
             for (GroupNodeViewModel child : group.getChildren()) {

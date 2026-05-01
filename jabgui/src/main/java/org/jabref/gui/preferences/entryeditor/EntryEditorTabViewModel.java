@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -15,6 +17,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -36,6 +39,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
+    private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
@@ -70,6 +74,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
         enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
         showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
+        citationCountFetcherTypeProperty.setValue(entryEditorPreferences.getCitationCountFetcherType());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
     }
@@ -111,6 +116,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
         entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
         entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
+        entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
@@ -201,5 +207,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty showUserCommentsProperty() {
         return this.showUserCommentsProperty;
+    }
+
+    public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
+        return citationCountFetcherTypeProperty;
     }
 }

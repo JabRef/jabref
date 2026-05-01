@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -37,6 +38,7 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -53,9 +55,6 @@ public class OpenDatabaseAction extends SimpleCommand {
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
-            // Migrations:
-            // Warning for migrating the Review into the Comment field
-            new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
             // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
@@ -163,12 +162,19 @@ public class OpenDatabaseAction extends SimpleCommand {
     ///
     /// @param filesToOpen the filesToOpen, may be null or not existing
     public void openFiles(List<Path> filesToOpen) {
+        // Resolve any shortcuts to their targets and filter to only .bib files.
+        // The resulting list must remain modifiable for downstream processing (iterator.remove() calls below).
+        List<Path> resolvedFiles = filesToOpen.stream()
+                                              .map(FileUtil::resolveIfShortcut)
+                                              .filter(FileUtil::isBibFile)
+                                              .collect(Collectors.toList());
+
         LibraryTab toRaise = null;
-        int initialCount = filesToOpen.size();
+        int initialCount = resolvedFiles.size();
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Path> iterator = resolvedFiles.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
@@ -188,10 +194,10 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
-        if (!filesToOpen.isEmpty()) {
+        if (!resolvedFiles.isEmpty()) {
             assert fileUpdateMonitor != null;
             FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
-            filesToOpen.forEach(theFile -> {
+            resolvedFiles.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
                 fileHistory.newFile(theFile);

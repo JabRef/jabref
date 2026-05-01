@@ -14,12 +14,16 @@ import org.controlsfx.control.textfield.TextFields;
 public class SearchTextField {
 
     public static CustomTextField create(KeyBindingRepository keyBindingRepository) {
+        return create(keyBindingRepository, IconTheme.JabRefIcons.SEARCH);
+    }
+
+    public static CustomTextField create(KeyBindingRepository keyBindingRepository, IconTheme.JabRefIcons icon) {
         CustomTextField textField = (CustomTextField) TextFields.createClearableTextField();
         textField.setPromptText(Localization.lang("Search..."));
         textField.setId("searchField");
         textField.getStyleClass().add("search-field");
 
-        Node graphicNode = IconTheme.JabRefIcons.SEARCH.getGraphicNode();
+        Node graphicNode = icon.getGraphicNode();
         graphicNode.getStyleClass().add("search-field-icon");
         textField.setLeft(graphicNode);
 
@@ -29,8 +33,10 @@ public class SearchTextField {
             // Otherwise, we would have to add a new class for this and handle the case hitting that class in TextInputKeyBindings
 
             if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
-                textField.clear();
-                event.consume();
+                if (!textField.getText().isEmpty()) {
+                    textField.clear();
+                    event.consume();
+                }
             }
         });
 

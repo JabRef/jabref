@@ -17,7 +17,6 @@ import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
 import kong.unirest.core.json.JSONObject;
-import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,15 +104,17 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
         if (referencesResponse.getData() == null) {
             JSONObject responseObject = new JSONObject(response);
-            Optional.ofNullable(responseObject.optJSONObject("citingPaperInfo"))
-                    .flatMap(citingPaperInfo -> Optional.ofNullable(citingPaperInfo.optJSONObject("openAccessPdf")))
-                    .flatMap(openAccessPdf -> Optional.ofNullable(openAccessPdf.optString("disclaimer")))
-                    .ifPresent(Unchecked.consumer(disclaimer -> {
-                        LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
-                        if (disclaimer.contains("references")) {
-                            throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
-                        }
-                    }));
+            String disclaimer = Optional.ofNullable(responseObject.optJSONObject("citingPaperInfo"))
+                                        .flatMap(citingPaperInfo -> Optional.ofNullable(citingPaperInfo.optJSONObject("openAccessPdf")))
+                                        .flatMap(openAccessPdf -> Optional.ofNullable(openAccessPdf.optString("disclaimer")))
+                                        .orElse("");
+
+            if (!disclaimer.isBlank()) {
+                LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
+                if (disclaimer.contains("references")) {
+                    throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
+                }
+            }
             return List.of();
         }
 
@@ -144,14 +145,14 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         try {
             result = urlDownload.asString();
         } catch (FetcherException e) {
-            e.getHttpResponse().ifPresent(Unchecked.consumer(response -> {
-                Optional.ofNullable(response.responseBody())
-                        .map(JSONObject::new)
-                        .flatMap(json -> Optional.ofNullable(json.getString("error"))
-                                                 .map(Unchecked.function(error -> {
-                                                     throw new FetcherException(referencesUrl, error, e);
-                                                 })));
-            }));
+            Optional<String> error = e.getHttpResponse()
+                                      .flatMap(response -> Optional.ofNullable(response.responseBody()))
+                                      .map(JSONObject::new)
+                                      .flatMap(json -> Optional.ofNullable(json.optString("error")));
+
+            if (error.isPresent() && !error.get().isEmpty()) {
+                throw new FetcherException(referencesUrl, error.get(), e);
+            }
             throw e;
         }
         PaperDetails paperDetails = GSON.fromJson(result, PaperDetails.class);

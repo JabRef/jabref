@@ -162,6 +162,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 adaptVisibleTabs();
             } else {
                 this.allPossibleTabs.clear();
+                close();
             }
         });
 

@@ -13,7 +13,7 @@ public class LastPage implements LayoutFormatter {
         if (s == null) {
             return "";
         }
-        String[] pageParts = s.split("[\\-]+");
+        String[] pageParts = s.split("[ \\-\u2013\u2014]+");
         if (pageParts.length == 2) {
             return pageParts[1];
         } else if (pageParts.length >= 1) {

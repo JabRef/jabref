@@ -2,6 +2,7 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.importer.fetcher.TrustLevel;
@@ -27,4 +28,12 @@ public interface FulltextFetcher {
     ///
     /// @return The trust level of the fetcher, the higher the better
     TrustLevel getTrustLevel();
+
+    /// Returns HTTP headers required for downloading the PDF returned by {@link #findFullText}.
+    /// Fetchers that require authentication (for ex: API tokens) should override this method.
+    ///
+    /// @return A map of header name to header value, empty by default
+    default Map<String, String> getDownloadHeaders() {
+        return Map.of();
+    }
 }

@@ -1,8 +1,5 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
@@ -11,14 +8,13 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,21 +25,21 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
     @FXML
     private TabPane tabPane;
 
+    private final DialogService dialogService;
     private final UndoManager undoManager;
 
     private final BibDatabase database;
-    private final List<BibEntry> selectedEntries;
 
     private final StateManager stateManager;
 
     private AutomaticFieldEditorViewModel viewModel;
 
-    private List<NotificationPaneAdapter> notificationPanes = new ArrayList<>();
-
-    public AutomaticFieldEditorDialog(StateManager stateManager, UndoManager undoManager) {
-        this.selectedEntries = stateManager.getSelectedEntries();
+    public AutomaticFieldEditorDialog(StateManager stateManager,
+                                      DialogService dialogService,
+                                      UndoManager undoManager) {
         this.database = stateManager.getActiveDatabase().orElseThrow().getDatabase();
         this.stateManager = stateManager;
+        this.dialogService = dialogService;
         this.undoManager = undoManager;
 
         this.setTitle(Localization.lang("Automatic field editor"));
@@ -64,19 +60,11 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     @FXML
     public void initialize() {
-        viewModel = new AutomaticFieldEditorViewModel(database, undoManager, stateManager);
+        viewModel = new AutomaticFieldEditorViewModel(database, undoManager, dialogService, stateManager);
 
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
-            NotificationPaneAdapter notificationPane = new NotificationPaneAdapter(tabModel.getContent());
-            notificationPanes.add(notificationPane);
-            tabPane.getTabs().add(new Tab(tabModel.getTabName(), notificationPane));
+            tabPane.getTabs().add(new Tab(tabModel.getTabName(), tabModel.getContent()));
         }
-
-        EasyBind.listen(stateManager.lastAutomaticFieldEditorEditProperty(), (obs, old, lastEdit) -> {
-            viewModel.getDialogEdits().addEdit(lastEdit.getEdit());
-            notificationPanes.get(lastEdit.getTabIndex())
-                             .notify(lastEdit.getAffectedEntries(), selectedEntries.size());
-        });
     }
 
     private void saveChanges() {

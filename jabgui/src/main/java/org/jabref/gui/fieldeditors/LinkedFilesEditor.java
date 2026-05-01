@@ -33,7 +33,10 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.copyfiles.CopyLinkedFilesAction;
+import org.jabref.gui.fieldeditors.contextmenu.ContextAction;
 import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
@@ -267,12 +270,48 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
-                    case DELETE_ENTRY:
+                    case DELETE_ENTRY -> {
                         deleteAttachedFilesWithConfirmation();
                         event.consume();
-                        break;
-                    default:
+                    }
+                    case RENAME_FILE_TO_NAME -> {
+                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
+                        if (selectedFile != null) {
+                            new ContextAction(StandardActions.RENAME_FILE_TO_NAME, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
+                            event.consume();
+                        }
+                    }
+                    case OPEN_FILE -> {
+                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
+                        if (selectedFile != null) {
+                            new ContextAction(StandardActions.OPEN_FILE, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
+                            event.consume();
+                        }
+                    }
+                    case OPEN_FOLDER -> {
+                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
+                        if (selectedFile != null) {
+                            new ContextAction(StandardActions.OPEN_FOLDER, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
+                            event.consume();
+                        }
+                    }
+                    case OPEN_CLOSE_ENTRY_EDITOR -> {
+                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
+                        if (selectedFile != null) {
+                            new ContextAction(StandardActions.EDIT_FILE_LINK, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
+                            event.consume();
+                        }
+                    }
+                    case COPY -> {
+                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
+                        if (selectedFile != null) {
+                            new CopyLinkedFilesAction(selectedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences()).execute();
+                            event.consume();
+                        }
+                    }
+                    default -> {
                         // Pass other keys to children
+                    }
                 }
             }
         });
@@ -347,3 +386,4 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         return 3;
     }
 }
+

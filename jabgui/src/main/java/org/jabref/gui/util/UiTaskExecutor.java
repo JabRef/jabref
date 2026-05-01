@@ -87,7 +87,21 @@ public class UiTaskExecutor implements TaskExecutor {
         }
     }
 
+    /// Runs the runnable later. This will guarantee that it runs on the FX UI Thread.
+    ///
+    /// @param runnable runnable BackgroundTask to run
     public static void runInJavaFXThread(Runnable runnable) {
+        Platform.runLater(runnable);
+    }
+
+    /// Runs the runnable now, when we are already on the FX UI Thread, or later if we are not.
+    ///
+    /// @param runnable runnable BackgroundTask to run
+    public static void runNowOrInJavaFXThread(Runnable runnable) {
+        if (Platform.isFxApplicationThread()) {
+            runnable.run();
+            return;
+        }
         Platform.runLater(runnable);
     }
 
@@ -157,13 +171,13 @@ public class UiTaskExecutor implements TaskExecutor {
         Task<V> javaTask = new Task<>() {
             {
                 this.updateMessage(task.messageProperty().get());
-                this.updateTitle(task.titleProperty().get());
+                this.updateTitle(java.util.Objects.toString(task.titleProperty().get(), ""));
                 BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.workDone(), progress.max()));
                 BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
                 BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
                 BindingsHelper.subscribeFuture(task.isCancelledProperty(), cancelled -> {
                     if (cancelled) {
-                        cancel();
+                        cancel(task.mayInterruptIfRunningProperty().get());
                     }
                 });
                 setOnCancelled(_ -> task.cancel());

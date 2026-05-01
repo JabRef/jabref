@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Used to start a new study:
-/// <ol>
+///
 /// - Let the user input meta data for the study.
 /// - Let JabRef do the crawling afterwards.
-/// </ol>
+///
 ///
 /// Needs to inherit {@link ExistingStudySearchAction}, because that action implements the real crawling.
 ///

@@ -17,8 +17,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
@@ -179,6 +181,8 @@ public class PreviewPanel extends VBox implements PreviewControls {
 
         PreviewLayout layout = previewPreferences.getSelectedPreviewLayout();
         previewView.setLayout(layout);
-        dialogService.notify(Localization.lang("Preview style changed to: %0", layout.getDisplayName()));
+        dialogService.notify(
+                new Notifications.UiNotification(Localization.lang("Preview style changed"), layout.getDisplayName())
+                        .withAutoClose(Duration.seconds(5)));
     }
 }

@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.input.ClipboardContent;
 
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -69,7 +70,7 @@ public record ClipboardContentGenerator(
         }
     }
 
-    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link org.jabref.logic.bst.BstPreviewLayout})
+    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link org.jabref.logic.preview.BstPreviewLayout})
     /// and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
     @VisibleForTesting
     static ClipboardContent processPreview(List<String> citations) {
@@ -131,7 +132,15 @@ public record ClipboardContentGenerator(
     }
 
     private List<String> generateTextBasedPreviewLayoutCitations(List<BibEntry> selectedEntries, BibDatabaseContext bibDatabaseContext) throws IOException {
-        TextBasedPreviewLayout customPreviewLayout = previewPreferences.getCustomPreviewLayout();
+        Optional<TextBasedPreviewLayout> layoutOpt = previewPreferences.getLayoutCycle().stream()
+                                                                       .filter(TextBasedPreviewLayout.class::isInstance)
+                                                                       .map(TextBasedPreviewLayout.class::cast)
+                                                                       .findFirst();
+        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(
+                previewPreferences.getCustomPreviewLayout(),
+                layoutFormatterPreferences,
+                abbreviationRepository));
+
         Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
         List<String> citations = new ArrayList<>(selectedEntries.size());

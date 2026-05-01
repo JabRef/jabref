@@ -9,10 +9,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -25,6 +27,8 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView implements AutomaticFieldEditorTab {
+    private final NamedCompoundEdit compoundEdit;
+    private final DialogService dialogService;
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
     private final StateManager stateManager;
@@ -37,7 +41,12 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     private TextField newFieldNameTextField;
     private RenameFieldViewModel viewModel;
 
-    public RenameFieldTabView(BibDatabase database, StateManager stateManager) {
+    public RenameFieldTabView(BibDatabase database,
+                              NamedCompoundEdit compoundEdit,
+                              DialogService dialogService,
+                              StateManager stateManager) {
+        this.compoundEdit = compoundEdit;
+        this.dialogService = dialogService;
         this.selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
         this.database = database;
         this.stateManager = stateManager;
@@ -49,7 +58,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
 
     @FXML
     public void initialize() {
-        viewModel = new RenameFieldViewModel(selectedEntries, database, stateManager);
+        viewModel = new RenameFieldViewModel(selectedEntries, database, compoundEdit, dialogService, stateManager);
 
         fieldComboBox.getItems().setAll(FieldHelper.getSetFieldsOnly(selectedEntries, viewModel.getAllFields()));
 

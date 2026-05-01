@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ class FulltextFetchersTest {
         URL pdfUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
-        assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()));
+        assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
     }
 
     @Test
@@ -43,7 +44,7 @@ class FulltextFetchersTest {
         FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
-        assertEquals(Optional.empty(), fetcher.findFullTextPDF(new BibEntry()));
+        assertEquals(Optional.empty(), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
     }
 
     @Test
@@ -52,7 +53,7 @@ class FulltextFetchersTest {
         FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
-        assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()));
+        assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
     }
 
     @Test
@@ -72,6 +73,22 @@ class FulltextFetchersTest {
 
         FulltextFetchers fetchers = new FulltextFetchers(Set.of(finderLow, finderHigh));
 
-        assertEquals(Optional.of(highUrl), fetchers.findFullTextPDF(entry));
+        assertEquals(Optional.of(highUrl), fetchers.findFullTextPDF(entry).map(FetcherResult::source));
+    }
+
+    @Test
+    void downloadHeadersPropagateToResult() throws IOException, FetcherException {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1002/we.2952");
+        Map<String, String> expectedHeaders = Map.of("Wiley-TDM-Client-Token", "test-token");
+
+        FulltextFetcher finder = mock(FulltextFetcher.class);
+        when(finder.getTrustLevel()).thenReturn(TrustLevel.PUBLISHER);
+        final URL pdfUrl = URLUtil.create("https://api.wiley.com/onlinelibrary/tdm/v1/articles/10.1002/we.2952");
+        when(finder.findFullText(entry)).thenReturn(Optional.of(pdfUrl));
+        when(finder.getDownloadHeaders()).thenReturn(expectedHeaders);
+
+        FulltextFetchers fetchers = new FulltextFetchers(Set.of(finder));
+
+        assertEquals(Optional.of(expectedHeaders), fetchers.findFullTextPDF(entry).map(FetcherResult::headers));
     }
 }

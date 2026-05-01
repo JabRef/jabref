@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.external;
 
-import java.util.HashMap;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -63,16 +61,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     public ExternalTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.initialExternalApplicationPreferences = this.preferences.getExternalApplicationsPreferences();
-        this.initialPushToApplicationPreferences = this.preferences.getPushToApplicationPreferences();
-        this.workingPushToApplicationPreferences = new PushToApplicationPreferences(
-                initialPushToApplicationPreferences.getActiveApplicationName(),
-                new HashMap<>(initialPushToApplicationPreferences.getCommandPaths()),
-                initialPushToApplicationPreferences.getEmacsArguments(),
-                initialPushToApplicationPreferences.getVimServer(),
-                initialPushToApplicationPreferences.getCiteCommand(),
-                initialPushToApplicationPreferences.getDefaultCiteCommand()
-        );
+        this.initialExternalApplicationPreferences = preferences.getExternalApplicationsPreferences();
+        this.initialPushToApplicationPreferences = preferences.getPushToApplicationPreferences();
+        this.workingPushToApplicationPreferences = PushToApplicationPreferences.getDefault();
+        this.workingPushToApplicationPreferences.setAll(initialPushToApplicationPreferences);
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
@@ -102,6 +94,8 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        workingPushToApplicationPreferences.setAll(preferences.getPushToApplicationPreferences());
+
         eMailReferenceSubjectProperty.setValue(initialExternalApplicationPreferences.getEmailSubject());
         autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
@@ -176,7 +170,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public void pushToApplicationSettings() {
         GuiPushToApplication selectedApplication = selectedPushToApplicationProperty.getValue();
-        GuiPushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, dialogService, preferences.getFilePreferences(), workingPushToApplicationPreferences);
+        GuiPushToApplicationSettings settings = selectedApplication.getSettings(
+                selectedApplication,
+                dialogService,
+                preferences.getFilePreferences(),
+                workingPushToApplicationPreferences);
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(settings.getSettingsPane());
@@ -250,6 +248,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetCiteCommandToDefault() {
-        this.citeCommandProperty.setValue(preferences.getPushToApplicationPreferences().getDefaultCiteCommand().toString());
+        this.citeCommandProperty.setValue(PushToApplicationPreferences.getDefault().getCiteCommand().toString());
     }
 }

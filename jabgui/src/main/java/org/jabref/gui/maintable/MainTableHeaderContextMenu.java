@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.skin.TableColumnHeader;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -46,13 +47,20 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         // TODO: 20/10/2022 unknown bug where issue does not show unless parameter is passed through this method.
         mainTable.setOnContextMenuRequested(event -> {
             // Display the menu if header is clicked, otherwise, remove from display.
-            if (!(event.getTarget() instanceof StackPane) && show) {
+            if (show && isColumnHeaderTarget(event.getTarget())) {
                 this.show(mainTable, event.getScreenX(), event.getScreenY());
             } else if (this.isShowing()) {
                 this.hide();
             }
             event.consume();
         });
+    }
+
+    private static boolean isColumnHeaderTarget(Object eventTarget) {
+        if (!(eventTarget instanceof Node node)) {
+            return false;
+        }
+        return node instanceof TableColumnHeader || node.getParent() instanceof TableColumnHeader;
     }
 
     /// Constructs the items for the list and places them in the menu.

@@ -19,6 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -50,6 +51,13 @@ class SemanticScholarCitationFetcherTest {
         List<BibEntry> result = fetcher.getReferences(entry);
         // Paper has more than 400 cites, but server returns "null" as data
         assertNotEquals(null, result);
+    }
+
+    @Test
+    void getReferencesRestricted() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref");
+        assertThrows(FetcherException.class, () -> fetcher.getReferences(entry));
     }
 
     @Test

@@ -87,6 +87,7 @@
         <CheckBox fx:id="enableHttpServer" text="%Enable HTTP Server (e.g., for JabMap) on port" />
         <TextField fx:id="httpServerPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
     </HBox>
+    <CheckBox fx:id="directHttpImport" text="%Skip import dialog for entries received from browser extensions" />
 
     <Label styleClass="sectionHeader" text="%LSP Server" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">

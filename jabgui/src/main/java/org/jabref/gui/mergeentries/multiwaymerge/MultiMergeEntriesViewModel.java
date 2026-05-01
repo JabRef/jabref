@@ -15,6 +15,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.logic.bibtex.comparator.ComparisonResult;
+import org.jabref.logic.bibtex.comparator.plausibility.PlausibilityComparatorFactory;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -49,9 +51,21 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
             return;
         }
         for (Map.Entry<Field, String> fieldEntry : entry.getFieldMap().entrySet()) {
-            // make sure there is a row for the field
-            if (!mergedEntry.get().getFieldsObservable().containsKey(fieldEntry.getKey())) {
-                mergedEntry.get().setField(fieldEntry.getKey(), fieldEntry.getValue());
+            Field field = fieldEntry.getKey();
+            String newValue = fieldEntry.getValue();
+
+            if (!mergedEntry.get().getFieldsObservable().containsKey(field)) {
+                mergedEntry.get().setField(field, newValue);
+            } else {
+                String currentValue = mergedEntry.get().getField(field).orElse("");
+                PlausibilityComparatorFactory.INSTANCE
+                        .getPlausibilityComparator(field)
+                        .map(comparator -> comparator.compare(newValue, currentValue))
+                        .ifPresent(result -> {
+                            if (result == ComparisonResult.LEFT_BETTER) {
+                                mergedEntry.get().setField(field, newValue);
+                            }
+                        });
             }
         }
     }

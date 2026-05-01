@@ -20,12 +20,14 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.gui.theme.Theme;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -58,6 +60,7 @@ public class PreferencesMigrations {
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
+        upgradeBuiltinPreviewName(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
         // backward compatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
@@ -69,6 +72,7 @@ public class PreferencesMigrations {
         removeCommentsFromCustomEditorTabs(preferences);
         migrateGeneralTabDefaultFields(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
+        upgradeTheme(preferences);
     }
 
     /// Migrate all preferences from net/sf/jabref to org/jabref
@@ -310,7 +314,7 @@ public class PreferencesMigrations {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(
-                prefs.get(JabRefCliPreferences.DEFAULT_CITATION_KEY_PATTERN));
+                prefs.get(JabRefCliPreferences.CITATION_KEY_DEFAULT_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }
@@ -320,12 +324,12 @@ public class PreferencesMigrations {
 
     /// Customizable preview style migrations
     ///
-    /// -  Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
-    /// -  Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
-    /// -  Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
+    /// - Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
+    /// - Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
+    /// - Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
     ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
-        String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE);
+        String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, TextBasedPreviewLayout.DEFAULT);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
@@ -338,6 +342,12 @@ public class PreferencesMigrations {
                                                           \\begin{abstract}\
                                                           """);
         prefs.put(JabRefGuiPreferences.PREVIEW_STYLE, migratedStyle);
+    }
+
+    /// Since v6-alpha6 built in preview style will be stored by internal identifier instead by display name.
+    protected static void upgradeBuiltinPreviewName(JabRefGuiPreferences prefs) {
+        String previewCycle = prefs.get(JabRefGuiPreferences.PREVIEW_CYCLE, "");
+        prefs.put(JabRefGuiPreferences.PREVIEW_CYCLE, previewCycle.replace("Customized preview style", TextBasedPreviewLayout.NAME));
     }
 
     /// The former preferences default of columns was a simple list of strings ("author;title;year;..."). Since 5.0
@@ -493,14 +503,14 @@ public class PreferencesMigrations {
     /// <tr> <td colspan="2"> ... </td> </tr>
     /// <tr> <td> &nbsp; </td> </tr>
     /// <tr> <td colspan="2"> CLEANUP_JOBS - new format: </td> </tr>
-    /// <tr> <td> CleanUpJobs            </td> <td> CLEAN_UP_DOI;RENAME_PDF;MOVE_PDF </td> </tr>
+    /// <tr> <td> CleanUpJobs            </td> <td> `CLEAN_UP_DOI;RENAME_PDF;MOVE_PDF `</td> </tr>
     /// <tr> <td> &nbsp; </td> </tr>
     /// <tr> <td colspan="2"> CLEANUP_FORMATTERS - old format: </td> </tr>
-    /// <tr> <td> CleanUpFormatters     </td> <td> ENABLED\nfield[formatter,formatter...]\nfield[...]\nfield[...]... </td> </tr>
+    /// <tr> <td> CleanUpFormatters     </td> <td> `ENABLED\nfield[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
     /// <tr> <td> &nbsp; </td> </tr>
     /// <tr> <td colspan="2"> CLEANUP_FORMATTERS - new format: </td> </tr>
     /// <tr> <td> CleanUpFormattersEnabled </td> <td> TRUE </td> </tr>
-    /// <tr> <td> CleanUpFormatters        </td> <td> field[formatter,formatter...]\nfield[...]\nfield[...]... </td> </tr>
+    /// <tr> <td> CleanUpFormatters        </td> <td> `field[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
     /// </table>
     private static void upgradeCleanups(JabRefCliPreferences prefs) {
         final String V5_8_CLEANUP = "CleanUp";
@@ -607,5 +617,17 @@ public class PreferencesMigrations {
     /// Thus, the configuration ih the preferences is obsolete
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
+    }
+
+    /// upgrade the old theme css names of the theme to the new theme properties
+    /// Theme names were changed in [#15573](https://github.com/JabRef/jabref/pull/15573)
+    static void upgradeTheme(JabRefGuiPreferences preferences) {
+        if ("Dark.css".equals(preferences.get("fxTheme", ""))) {
+            preferences.getWorkspacePreferences().setTheme(Theme.dark());
+        }
+        // no value means light theme when sync with os theme switch is not on
+        if ("".equals(preferences.get("fxTheme", "")) && !preferences.getBoolean("themeSyncOs", false)) {
+            preferences.getWorkspacePreferences().setTheme(Theme.light());
+        }
     }
 }
