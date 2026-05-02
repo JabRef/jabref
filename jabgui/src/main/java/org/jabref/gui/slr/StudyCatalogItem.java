@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// View representation of {@link org.jabref.model.study.StudyCatalog}
 public class StudyCatalogItem {
@@ -19,7 +20,7 @@ public class StudyCatalogItem {
         this(name, enabled, "");
     }
 
-    public StudyCatalogItem(@NonNull String name, boolean enabled, String reason) {
+    public StudyCatalogItem(@NonNull String name, boolean enabled, @Nullable String reason) {
         this.name = new SimpleStringProperty(name);
         this.enabled = new SimpleBooleanProperty(enabled);
         this.reason = new SimpleStringProperty(reason != null ? reason : "");
@@ -53,7 +54,7 @@ public class StudyCatalogItem {
         return reason.getValue();
     }
 
-    public void setReason(String reason) {
+    public void setReason(@Nullable String reason) {
         this.reason.setValue(reason);
     }
 
