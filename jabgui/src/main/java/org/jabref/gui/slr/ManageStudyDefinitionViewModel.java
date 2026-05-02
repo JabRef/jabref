@@ -229,7 +229,6 @@ public class ManageStudyDefinitionViewModel {
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
                         .collect(Collectors.toList()));
-        study.setVersion("2.0");
         Path studyDirectory;
         final String studyDirectoryAsString = directory.getValueSafe();
         try {

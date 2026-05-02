@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.model.study.Study;
+
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.dataformat.yaml.YAMLFactory;
@@ -20,7 +22,7 @@ public class StudyYamlV1Migrator {
         });
 
         var v2Map = new LinkedHashMap<String, Object>();
-        v2Map.put("version", "2.0");
+        v2Map.put("version", Study.CURRENT_SCHEMA_VERSION);
         v2Map.putAll(v1Map);
 
         if (v2Map.containsKey("databases")) {

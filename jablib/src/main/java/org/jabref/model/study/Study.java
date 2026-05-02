@@ -16,6 +16,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
+    public static final String CURRENT_SCHEMA_VERSION = "2.0";
+
     @JsonProperty("version")
     private String version;
 
@@ -32,6 +34,7 @@ public class Study {
     private List<StudyCatalog> catalogs;
 
     public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs) {
+        this.version = CURRENT_SCHEMA_VERSION;
         this.authors = authors;
         this.title = title;
         this.researchQuestions = researchQuestions;
@@ -41,6 +44,7 @@ public class Study {
 
     /// Used for Jackson deserialization
     private Study() {
+        this.version = CURRENT_SCHEMA_VERSION;
     }
 
     public String getVersion() {
