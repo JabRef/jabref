@@ -10,6 +10,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -149,7 +150,7 @@ public class PushToVim extends AbstractPushToApplication {
 
         commandPath = preferences.getCommandPaths().getOrDefault(this.getDisplayName(), "");
 
-        if (commandPath.trim().isEmpty()) {
+        if (StringUtil.isBlank(commandPath)) {
             notDefined = true;
             return false;
         }
