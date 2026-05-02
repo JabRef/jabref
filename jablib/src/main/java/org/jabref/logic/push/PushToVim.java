@@ -147,8 +147,7 @@ public class PushToVim extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        String path = preferences.getCommandPaths().get(this.getDisplayName());
-        commandPath = path != null ? path : "";
+        commandPath = preferences.getCommandPaths().getOrDefault(this.getDisplayName(), "");
 
         if (commandPath.trim().isEmpty()) {
             notDefined = true;

@@ -38,7 +38,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
         notDefined = false;
         commandPath = preferences.getCommandPaths().getOrDefault(this.getDisplayName(), "");
         // Check if a path to the command has been specified
-        if (StringUtil.isNullOrEmpty(commandPath)) {
+        if (StringUtil.isBlank(commandPath)) {
             notDefined = true;
             return;
         }
