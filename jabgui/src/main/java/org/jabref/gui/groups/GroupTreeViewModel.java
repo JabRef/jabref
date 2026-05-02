@@ -182,7 +182,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         selectedGroups.setAll(
                 stateManager.getSelectedGroups(newDatabase.get()).stream()
                             .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     /// Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
