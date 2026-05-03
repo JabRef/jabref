@@ -133,6 +133,7 @@ dependencies.constraints {
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
+    api("org.kordamp.ikonli:ikonli-material-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:26.2.2")
     api("org.libreoffice:unoloader:26.2.2")
