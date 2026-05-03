@@ -64,9 +64,8 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         this.setResultConverter(button -> {
             if (button == primaryButtonType) {
                 return viewModel.getNewLinkedFile();
-            } else {
-                return null;
             }
+            return null;
         });
     }
 

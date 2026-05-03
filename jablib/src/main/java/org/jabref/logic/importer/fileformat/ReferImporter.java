@@ -290,8 +290,7 @@ public class ReferImporter extends Importer {
         if (index == (s.length() - 1)) {
             String mod = s.substring(0, s.length() - 1).replace(", ", " and ");
             return AuthorList.fixAuthorLastNameFirst(mod);
-        } else {
-            return AuthorList.fixAuthorLastNameFirst(s);
         }
+        return AuthorList.fixAuthorLastNameFirst(s);
     }
 }

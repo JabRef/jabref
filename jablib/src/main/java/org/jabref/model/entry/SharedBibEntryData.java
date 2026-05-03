@@ -48,8 +48,7 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
     public int compareTo(SharedBibEntryData o) {
         if (this.sharedID == o.sharedID) {
             return Integer.compare(this.version, o.version);
-        } else {
-            return Integer.compare(this.sharedID, o.sharedID);
         }
+        return Integer.compare(this.sharedID, o.sharedID);
     }
 }

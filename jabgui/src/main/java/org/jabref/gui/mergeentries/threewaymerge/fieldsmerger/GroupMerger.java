@@ -25,8 +25,7 @@ public class GroupMerger implements FieldMerger {
             return groupsB;
         } else if (StringUtil.isBlank(groupsB)) {
             return groupsA;
-        } else {
-            return KeywordList.merge(groupsA, groupsB, delimiter).getAsString(delimiter);
         }
+        return KeywordList.merge(groupsA, groupsB, delimiter).getAsString(delimiter);
     }
 }

@@ -389,9 +389,8 @@ public class AuthorListParser {
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input
             return Optional.of(new Author(lastPart, lastPart, vonPart, firstPart, jrPart));
-        } else {
-            return Optional.of(new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart));
         }
+        return Optional.of(new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart));
     }
 
     /// Concatenates list of tokens from 'tokens' Vector. Tokens are separated by spaces or dashes, depending on stored
@@ -520,9 +519,8 @@ public class AuthorListParser {
         }
         if ("and".equalsIgnoreCase(original.substring(tokenStart, tokenEnd))) {
             return Token.AND;
-        } else {
-            return Token.WORD;
         }
+        return Token.WORD;
     }
 
     // Token types (returned by getToken procedure)

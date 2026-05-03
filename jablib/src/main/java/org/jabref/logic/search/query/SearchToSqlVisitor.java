@@ -77,20 +77,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         if (children.size() == 1) {
             return children.getFirst();
-        } else {
-            String cte = """
-                    cte%d AS (
-                    %s
-                    )
-                    """.formatted(
-                    cteCounter,
-                    children.stream().map(node -> "    SELECT %s FROM %s".formatted(ENTRY_ID, node.cte())).collect(Collectors.joining("\n    INTERSECT\n")));
-
-            List<String> params = children.stream().flatMap(node -> node.params().stream()).toList();
-            SqlQueryNode node = new SqlQueryNode(cte, params);
-            nodes.add(node);
-            return new SqlQueryNode("cte" + cteCounter++);
         }
+        String cte = """
+                cte%d AS (
+                %s
+                )
+                """.formatted(
+                cteCounter,
+                children.stream().map(node -> "    SELECT %s FROM %s".formatted(ENTRY_ID, node.cte())).collect(Collectors.joining("\n    INTERSECT\n")));
+
+        List<String> params = children.stream().flatMap(node -> node.params().stream()).toList();
+        SqlQueryNode node = new SqlQueryNode(cte, params);
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
     }
 
     @Override
@@ -230,13 +229,13 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         // Pseudo-fields
         field = switch (field) {
             case "key" ->
-                    InternalField.KEY_FIELD.getName();
+                InternalField.KEY_FIELD.getName();
             case "anykeyword" ->
-                    StandardField.KEYWORDS.getName();
+                StandardField.KEYWORDS.getName();
             case "anyfield" ->
-                    "any";
+                "any";
             default ->
-                    field;
+                field;
         };
 
         if (ENTRY_ID.toString().equals(field)) {
@@ -244,24 +243,20 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         } else if ("any".equals(field)) {
             if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
-                       ? buildExactNegationAnyFieldQuery(sqlOperator, term)
-                       : buildExactAnyFieldQuery(sqlOperator, term);
-            } else {
-                return searchFlags.contains(NEGATION)
-                       ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
-                       : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
+                        ? buildExactNegationAnyFieldQuery(sqlOperator, term)
+                        : buildExactAnyFieldQuery(sqlOperator, term);
             }
-        } else {
-            if (searchFlags.contains(EXACT_MATCH)) {
-                return searchFlags.contains(NEGATION)
-                       ? buildExactNegationFieldQuery(field, sqlOperator, term)
-                       : buildExactFieldQuery(field, sqlOperator, term);
-            } else {
-                return searchFlags.contains(NEGATION)
-                       ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
-                       : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
-            }
+            return searchFlags.contains(NEGATION)
+                    ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
+                    : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
+        } else if (searchFlags.contains(EXACT_MATCH)) {
+            return searchFlags.contains(NEGATION)
+                    ? buildExactNegationFieldQuery(field, sqlOperator, term)
+                    : buildExactFieldQuery(field, sqlOperator, term);
         }
+        return searchFlags.contains(NEGATION)
+                ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
+                : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
     }
 
     private SqlQueryNode buildEntryIdQuery(String entryId) {

@@ -145,21 +145,19 @@ public class MainTableColumnModel {
     public String getName() {
         if (qualifierProperty.getValue().isBlank()) {
             return typeProperty.getValue().getName();
-        } else {
-            return typeProperty.getValue().getName() + COLUMNS_QUALIFIER_DELIMITER + qualifierProperty.getValue();
         }
+        return typeProperty.getValue().getName() + COLUMNS_QUALIFIER_DELIMITER + qualifierProperty.getValue();
     }
 
     public String getDisplayName() {
         if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank())
                 || (typeProperty.getValue() == Type.INDEX)) {
             return typeProperty.getValue().getDisplayName();
-        } else {
-            // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
-            // "author/editor(Custom)" instead of "author/editor" in the output
-
-            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()), preferences, undoManager);
         }
+        // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to
+        // "author/editor(Custom)" instead of "author/editor" in the output
+
+        return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()), preferences, undoManager);
     }
 
     public StringProperty nameProperty() {

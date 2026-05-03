@@ -42,19 +42,15 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
             } else if (entries.size() == 1) {
                 return Localization.lang("paste entry %0",
                         StringUtil.boldHTML(entries.getFirst().getCitationKey().orElse(Localization.lang("undefined"))));
-            } else {
-                return null;
             }
-        } else {
-            if (entries.size() > 1) {
-                return Localization.lang("insert entries");
-            } else if (entries.size() == 1) {
-                return Localization.lang("insert entry %0",
-                        StringUtil.boldHTML(entries.getFirst().getCitationKey().orElse(Localization.lang("undefined"))));
-            } else {
-                return null;
-            }
+            return null;
+        } else if (entries.size() > 1) {
+            return Localization.lang("insert entries");
+        } else if (entries.size() == 1) {
+            return Localization.lang("insert entry %0",
+                    StringUtil.boldHTML(entries.getFirst().getCitationKey().orElse(Localization.lang("undefined"))));
         }
+        return null;
     }
 
     @Override

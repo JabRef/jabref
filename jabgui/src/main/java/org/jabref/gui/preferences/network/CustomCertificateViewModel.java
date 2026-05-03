@@ -80,9 +80,8 @@ public class CustomCertificateViewModel extends AbstractViewModel {
     public Optional<String> getPath() {
         if (pathProperty.getValue() == null || pathProperty.getValue().isEmpty()) {
             return Optional.empty();
-        } else {
-            return Optional.of(pathProperty.getValue());
         }
+        return Optional.of(pathProperty.getValue());
     }
 
     public CustomCertificateViewModel setPath(String path) {

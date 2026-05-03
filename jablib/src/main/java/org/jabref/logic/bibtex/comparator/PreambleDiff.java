@@ -20,9 +20,8 @@ public class PreambleDiff {
         Optional<String> newPreamble = newDatabase.getDatabase().getPreamble();
         if (originalPreamble.equals(newPreamble)) {
             return Optional.empty();
-        } else {
-            return Optional.of(new PreambleDiff(originalPreamble.orElse(""), newPreamble.orElse("")));
         }
+        return Optional.of(new PreambleDiff(originalPreamble.orElse(""), newPreamble.orElse("")));
     }
 
     public String getNewPreamble() {

@@ -45,24 +45,21 @@ public class OptionalUtil {
     public static <T, S, R> Optional<R> combine(Optional<T> valueOne, Optional<S> valueTwo, BiFunction<T, S, R> combine) {
         if (valueOne.isPresent() && valueTwo.isPresent()) {
             return Optional.ofNullable(combine.apply(valueOne.get(), valueTwo.get()));
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     public static <T> Optional<T> orElse(Optional<? extends T> valueOne, Optional<? extends T> valueTwo) {
         if (valueOne.isPresent()) {
             return valueOne.map(f -> f);
-        } else {
-            return valueTwo.map(f -> f);
         }
+        return valueTwo.map(f -> f);
     }
 
     public static <T extends S, S> S orElse(Optional<T> optional, S otherwise) {
         if (optional.isPresent()) {
             return optional.get();
-        } else {
-            return otherwise;
         }
+        return otherwise;
     }
 }

@@ -72,10 +72,9 @@ public class PushToTexShop extends AbstractPushToApplication {
                 "end tell'";
 
         if (OS.OS_X) {
-            return new String[] {"sh", "-c", osascriptTexShop};
-        } else {
-            sendErrorNotification(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
-            return new String[] {};
+            return new String[]{"sh", "-c", osascriptTexShop};
         }
+        sendErrorNotification(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
+        return new String[]{};
     }
 }

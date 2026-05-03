@@ -107,9 +107,8 @@ public class CrossRefCitationFetcher implements CitationFetcher {
                                                  .withChanged(true);
                                      }
                                      return getBibEntryFromText(parser, unstructured.asText());
-                                 } else {
-                                     return getBibEntryFromDoi(doiNode.asText(), unstructured);
                                  }
+                                 return getBibEntryFromDoi(doiNode.asText(), unstructured);
                              }))
                              .toList();
         } catch (MalformedURLException e) {

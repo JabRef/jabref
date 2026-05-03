@@ -311,12 +311,11 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     private boolean isUpToDate() {
         if (styleFile == null) {
             return true;
-        } else {
-            try {
-                return Files.getLastModifiedTime(styleFile).toMillis() == this.styleFileModificationTime;
-            } catch (IOException e) {
-                return false;
-            }
+        }
+        try {
+            return Files.getLastModifiedTime(styleFile).toMillis() == this.styleFileModificationTime;
+        } catch (IOException e) {
+            return false;
         }
     }
 
@@ -342,7 +341,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
                 line = line.substring(0, line.length() - 1);
             }
             // Check for empty line or comment:
-            if (line.trim().isEmpty() || (line.charAt(0) == '#')) {
+            if (line.isBlank() || (line.charAt(0) == '#')) {
                 continue;
             }
             // Check if we should change mode:
@@ -368,7 +367,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
             switch (mode) {
                 case NAME:
-                    if (!line.trim().isEmpty()) {
+                    if (!line.isBlank()) {
                         name = line.trim();
                     }
                     break;
@@ -452,7 +451,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// Parse a line providing a journal name for which this style is valid.
     private void handleJournalsLine(String line) {
-        if (!line.trim().isEmpty()) {
+        if (!line.isBlank()) {
             journals.add(line.trim());
         }
     }
@@ -461,9 +460,8 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         Layout layout = bibLayout.get(type);
         if (layout == null) {
             return defaultBibLayout;
-        } else {
-            return layout;
         }
+        return layout;
     }
 
     /// Convenience method for checking the property for whether we use number citations or

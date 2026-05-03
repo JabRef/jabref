@@ -57,9 +57,8 @@ public class INSPIREBibtexFilterReader extends FilterReader {
         }
         if (PATTERN.matcher(preliminaryLine).find()) {
             return preliminaryLine.replace(' ', '_');
-        } else {
-            return preliminaryLine;
         }
+        return preliminaryLine;
     }
 
     @Override

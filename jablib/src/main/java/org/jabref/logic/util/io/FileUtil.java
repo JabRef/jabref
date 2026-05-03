@@ -449,9 +449,8 @@ public class FileUtil {
             Path path = Path.of(fileName);
             if (path.isAbsolute()) {
                 return Optional.of(path);
-            } else {
-                return Optional.empty();
             }
+            return Optional.empty();
         }
 
         return directories.stream()
@@ -490,9 +489,8 @@ public class FileUtil {
 
         if (Files.exists(resolvedFile)) {
             return Optional.of(resolvedFile);
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     /// Finds a file inside a list of directory structures. Will also look for the file inside nested directories.

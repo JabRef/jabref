@@ -57,9 +57,8 @@ public class EntryComparator implements Comparator<BibEntry> {
             // We just separate on set and unset fields:
             if (f1 == null) {
                 return f2 == null ? (next == null ? idCompare(e1, e2) : next.compare(e1, e2)) : 1;
-            } else {
-                return f2 == null ? -1 : (next == null ? idCompare(e1, e2) : next.compare(e1, e2));
             }
+            return f2 == null ? -1 : (next == null ? idCompare(e1, e2) : next.compare(e1, e2));
         }
 
         // If the field is author or editor, we rearrange names to achieve that they are
@@ -94,9 +93,8 @@ public class EntryComparator implements Comparator<BibEntry> {
         if (f2 == null) {
             if (f1 == null) {
                 return next == null ? idCompare(e1, e2) : next.compare(e1, e2);
-            } else {
-                return 1;
             }
+            return 1;
         }
 
         if (f1 == null) { // f2 != null here automatically
@@ -124,9 +122,8 @@ public class EntryComparator implements Comparator<BibEntry> {
         }
         if (next == null) {
             return idCompare(e1, e2); // If still equal, we use the unique IDs.
-        } else {
-            return next.compare(e1, e2); // Secondary sort if existent.
         }
+        return next.compare(e1, e2); // Secondary sort if existent.
     }
 
     private static int idCompare(BibEntry b1, BibEntry b2) {

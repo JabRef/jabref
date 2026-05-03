@@ -86,9 +86,8 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             return showErrorNotPdfs();
         } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
             return tryToGenerateCitationKeyThenBind(entry);
-        } else {
-            return tryToShowSummary();
         }
+        return tryToShowSummary();
     }
 
     private Node showErrorNoDatabasePath() {
@@ -118,9 +117,8 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                     Localization.lang("Unable to generate summary"),
                     Localization.lang("Please provide a non-empty and unique citation key for this entry.")
             );
-        } else {
-            return showPrivacyPolicyGuardedContent();
         }
+        return showPrivacyPolicyGuardedContent();
     }
 
     private Node tryToShowSummary() {

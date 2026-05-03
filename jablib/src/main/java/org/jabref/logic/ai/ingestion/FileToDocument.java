@@ -29,10 +29,9 @@ public class FileToDocument {
     public Optional<Document> fromFile(Path path) {
         if (FileUtil.isPDFFile(path)) {
             return fromPdfFile(path);
-        } else {
-            LOGGER.info("Unsupported file type of file: {}. Currently, only PDF files are supported", path);
-            return Optional.empty();
         }
+        LOGGER.info("Unsupported file type of file: {}. Currently, only PDF files are supported", path);
+        return Optional.empty();
     }
 
     private Optional<Document> fromPdfFile(Path path) {

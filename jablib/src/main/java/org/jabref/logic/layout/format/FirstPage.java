@@ -16,8 +16,7 @@ public class FirstPage implements LayoutFormatter {
         String[] pageParts = s.split("[ \\-\u2013\u2014]+");
         if (pageParts.length == 2) {
             return pageParts[0];
-        } else {
-            return s;
         }
+        return s;
     }
 }

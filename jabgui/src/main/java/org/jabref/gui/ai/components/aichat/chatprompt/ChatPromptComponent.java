@@ -137,14 +137,12 @@ public class ChatPromptComponent extends HBox {
                            .findFirst()
                            .ifPresent(message -> userPromptTextArea.setText(message));
                 }
-            } else {
-                // When currentUserMessageScroll is set to NEW_NON_EXISTENT_MESSAGE, then we should:
-                // 1) either clear the prompt, if user scrolls down the most recent history entry.
-                // 2) do nothing, if user starts to edit the history entry.
-                // We distinguish these two cases by checking showingHistoryMessage, which is true for -1 message, and false for others.
-                if (showingHistoryMessage.get()) {
-                    userPromptTextArea.setText("");
-                }
+            } else // When currentUserMessageScroll is set to NEW_NON_EXISTENT_MESSAGE, then we should:
+            // 1) either clear the prompt, if user scrolls down the most recent history entry.
+            // 2) do nothing, if user starts to edit the history entry.
+            // We distinguish these two cases by checking showingHistoryMessage, which is true for -1 message, and false for others.
+            if (showingHistoryMessage.get()) {
+                userPromptTextArea.setText("");
             }
         });
     }

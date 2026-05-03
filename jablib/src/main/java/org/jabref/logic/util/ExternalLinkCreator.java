@@ -119,10 +119,9 @@ public class ExternalLinkCreator {
             // Validate the final constructed URL
             if (URLUtil.isValidHttpUrl(finalUrl)) {
                 return Optional.of(finalUrl);
-            } else {
-                LOGGER.warn("Constructed URL for {} is invalid: {}. Using default URL.", serviceName, finalUrl);
-                return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName, addAuthorIndex);
             }
+            LOGGER.warn("Constructed URL for {} is invalid: {}. Using default URL.", serviceName, finalUrl);
+            return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName, addAuthorIndex);
         } catch (Exception ex) {
             LOGGER.error("Error constructing URL for {}: {}", serviceName, ex.getMessage(), ex);
             return buildUrlWithQueryParams(defaultUrl, filteredTitle, author, serviceName, addAuthorIndex);

@@ -51,7 +51,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
         commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+        if ((commandPath == null) || commandPath.isBlank()) {
             notDefined = true;
             return;
         }

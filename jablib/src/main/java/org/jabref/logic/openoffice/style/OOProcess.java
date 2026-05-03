@@ -42,9 +42,8 @@ public class OOProcess {
     public static Comparator<BibEntry> comparatorForMulticite(JStyle style) {
         if (style.getMultiCiteChronological()) {
             return OOProcess.YEAR_AUTHOR_TITLE_COMPARATOR;
-        } else {
-            return OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR;
         }
+        return OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR;
     }
 
     /// Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker

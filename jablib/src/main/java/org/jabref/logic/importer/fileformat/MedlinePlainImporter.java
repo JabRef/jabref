@@ -87,7 +87,7 @@ public class MedlinePlainImporter extends Importer {
                                         .split("\\n\\n");
 
         for (String entry1 : entries) {
-            if (entry1.trim().isEmpty() || !entry1.contains("-")) {
+            if (entry1.isBlank() || !entry1.contains("-")) {
                 continue;
             }
 
@@ -327,12 +327,10 @@ public class MedlinePlainImporter extends Importer {
             String oldVal = hm.get(StandardField.TITLE);
             if (oldVal == null) {
                 hm.put(StandardField.TITLE, val);
+            } else if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
+                hm.put(StandardField.TITLE, oldVal + " " + val);
             } else {
-                if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                    hm.put(StandardField.TITLE, oldVal + " " + val);
-                } else {
-                    hm.put(StandardField.TITLE, oldVal + ": " + val);
-                }
+                hm.put(StandardField.TITLE, oldVal + ": " + val);
             }
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
             hm.put(StandardField.BOOKTITLE, val);

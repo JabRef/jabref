@@ -18,8 +18,7 @@ public class LastPage implements LayoutFormatter {
             return pageParts[1];
         } else if (pageParts.length >= 1) {
             return pageParts[0];
-        } else {
-            return "";
         }
+        return "";
     }
 }

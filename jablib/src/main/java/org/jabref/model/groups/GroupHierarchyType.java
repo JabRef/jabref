@@ -23,9 +23,8 @@ public enum GroupHierarchyType {
         GroupHierarchyType[] types = values();
         if (type >= 0 && type < types.length) {
             return types[type];
-        } else {
-            return INDEPENDENT;
         }
+        return INDEPENDENT;
     }
 
     public String getDisplayName() {

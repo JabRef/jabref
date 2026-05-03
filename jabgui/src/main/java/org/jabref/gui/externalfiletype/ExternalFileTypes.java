@@ -95,9 +95,8 @@ public class ExternalFileTypes {
         }
         if ("text/html".equalsIgnoreCase(mimeType)) {
             return Optional.of(HTML_FALLBACK_TYPE);
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     public static Optional<ExternalFileType> getExternalFileTypeByFile(Path file, ExternalApplicationsPreferences externalApplicationsPreferences) {
@@ -126,16 +125,15 @@ public class ExternalFileTypes {
                 // URLs contain ":" which is illegal in Windows file paths (e.g., "http://")
                 // See https://github.com/JabRef/jabref/issues/14975
                 extensionOpt = FileUtil.getFileNameFromUrl(linkPath)
-                                       .flatMap(FileUtil::getFileExtension);
+                        .flatMap(FileUtil::getFileExtension);
             } else {
                 // For local files, get extension directly
                 extensionOpt = FileUtil.getFileExtension(linkPath);
             }
 
             return extensionOpt.flatMap(extension -> getExternalFileTypeByExt(extension, externalApplicationsPreferences));
-        } else {
-            return type;
         }
+        return type;
     }
 
     /// @return A StringList of customized and removed file types compared to the default list of external file types for storing

@@ -240,9 +240,8 @@ public class FrameDndHandler {
     private List<Path> getBibFiles(Dragboard dragboard) {
         if (!dragboard.hasFiles()) {
             return List.of();
-        } else {
-            return dragboard.getFiles().stream().map(File::toPath).filter(this::isAcceptedFile).collect(Collectors.toList());
         }
+        return dragboard.getFiles().stream().map(File::toPath).filter(this::isAcceptedFile).collect(Collectors.toList());
     }
 
     private boolean isAcceptedFile(Path path) {
@@ -256,8 +255,7 @@ public class FrameDndHandler {
     private List<String> getGroups(Dragboard dragboard) {
         if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
             return List.of();
-        } else {
-            return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
         }
+        return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
     }
 }

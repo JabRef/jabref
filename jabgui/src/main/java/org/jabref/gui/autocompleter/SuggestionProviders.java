@@ -38,8 +38,7 @@ public class SuggestionProviders {
             return new BibEntrySuggestionProvider(database);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME) || StandardField.PUBLISHER == field) {
             return new JournalsSuggestionProvider(field, database, abbreviationRepository);
-        } else {
-            return new WordSuggestionProvider(field, database);
         }
+        return new WordSuggestionProvider(field, database);
     }
 }

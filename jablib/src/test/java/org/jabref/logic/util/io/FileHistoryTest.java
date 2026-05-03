@@ -79,7 +79,7 @@ class FileHistoryTest {
         history.newFile(Path.of("file9"));
 
         assertEquals(8, history.size());
-        assertEquals(Path.of("file9"), history.get(0));
+        assertEquals(Path.of("file9"), history.getFirst());
         assertFalse(history.contains(Path.of("file1")));
     }
 }

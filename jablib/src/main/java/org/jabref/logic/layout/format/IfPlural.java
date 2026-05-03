@@ -36,8 +36,7 @@ public class IfPlural extends AbstractParamLayoutFormatter {
         }
         if (fieldText.matches(".*\\sand\\s.*")) {
             return pluralText;
-        } else {
-            return singularText;
         }
+        return singularText;
     }
 }

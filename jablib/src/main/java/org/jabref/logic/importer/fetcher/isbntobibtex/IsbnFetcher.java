@@ -93,9 +93,8 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         Optional<String> isbn = entry.getField(StandardField.ISBN);
         if (isbn.isPresent()) {
             return OptionalUtil.toList(performSearchById(isbn.get()));
-        } else {
-            return List.of();
         }
+        return List.of();
     }
 
     public IsbnFetcher addRetryFetcher(@NonNull AbstractIsbnFetcher retryFetcher) {

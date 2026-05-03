@@ -36,8 +36,7 @@ public class JabRefException extends Exception {
             String message = getMessage();
             LOGGER.debug("No localized exception message defined. Falling back to getMessage() ({}).", message);
             return message;
-        } else {
-            return localizedMessage;
         }
+        return localizedMessage;
     }
 }

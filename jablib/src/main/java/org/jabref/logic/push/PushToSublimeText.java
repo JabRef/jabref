@@ -73,10 +73,9 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
         if (OS.WINDOWS) {
             // TODO we might need to escape the inner double quotes with """ """
-            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCitePrefix() + keyString + getCiteSuffix() + "\"}\""};
-        } else {
-            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + keyString + getCiteSuffix() + "\"}'"};
+            return new String[]{"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCitePrefix() + keyString + getCiteSuffix() + "\"}\""};
         }
+        return new String[]{"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + keyString + getCiteSuffix() + "\"}'"};
     }
 
     @Override

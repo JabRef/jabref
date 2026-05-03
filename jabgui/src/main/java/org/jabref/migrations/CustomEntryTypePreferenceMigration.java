@@ -61,14 +61,13 @@ class CustomEntryTypePreferenceMigration {
             entryTypeBuilder = entryTypeBuilder
                     .withImportantFields(opt.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)));
             return Optional.of(entryTypeBuilder.build());
-        } else {
-            List<String> secondary = new ArrayList<>(opt);
-            secondary.removeAll(priOpt);
-
-            entryTypeBuilder = entryTypeBuilder
-                    .withImportantFields(priOpt.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)))
-                    .withDetailFields(secondary.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)));
-            return Optional.of(entryTypeBuilder.build());
         }
+        List<String> secondary = new ArrayList<>(opt);
+        secondary.removeAll(priOpt);
+
+        entryTypeBuilder = entryTypeBuilder
+                .withImportantFields(priOpt.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)))
+                .withDetailFields(secondary.stream().map(FieldFactory::parseField).collect(Collectors.toCollection(LinkedHashSet::new)));
+        return Optional.of(entryTypeBuilder.build());
     }
 }

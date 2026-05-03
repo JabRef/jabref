@@ -80,13 +80,12 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                 LOGGER.warn("No entry selected for fulltext download.");
                 dialogService.notify(Localization.lang("This operation requires one or more entries to be selected."));
                 return;
-            } else {
-                boolean confirm = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Write metadata to PDF file(s)"),
-                        Localization.lang("Write metadata for all PDFs in current library?"));
-                if (!confirm) {
-                    return;
-                }
+            }
+            boolean confirm = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Write metadata to PDF file(s)"),
+                    Localization.lang("Write metadata for all PDFs in current library?"));
+            if (!confirm) {
+                return;
             }
         }
 
