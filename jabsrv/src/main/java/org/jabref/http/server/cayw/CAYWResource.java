@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -53,6 +54,7 @@ public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
     private static final String CHOCOLATEBIB_PATH = "/Chocolate.bib";
     private static boolean initialized = false;
+    private static Pattern ALLOWED_COMMAND = Pattern.compile("[a-zA-Z*]+");
 
     @Inject
     private CliPreferences preferences;
@@ -70,6 +72,15 @@ public class CAYWResource {
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
+        // Validation of command parameter
+        String command = queryParams.getCommand().orElse("autocite");
+        if (!ALLOWED_COMMAND.matcher(command).matches()) {
+            LOGGER.warn("Blocked CAYW request with malicious command: {}", command);
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("The 'command' parameter contains invalid characters. Only letters (A–Z, a–z) and '*' are allowed.")
+                           .build();
+        }
+
         // Probe parameter handling
         if (queryParams.isProbe()) {
             return Response.ok("ready").build();
@@ -127,7 +138,7 @@ public class CAYWResource {
 
         // Push to Application parameter handling
         if (queryParams.getApplication().isPresent()) {
-            CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand().orElse("autocite")).concat("{"), ",", "}");
+            CitationCommandString citationCmd = new CitationCommandString("\\" + command + "{", ",", "}");
             PushToApplications.getApplication(queryParams.getApplication().get(), LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }

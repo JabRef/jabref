@@ -60,4 +60,18 @@ class CAYWResourceTest extends ServerTest {
         assertEquals("\\autocite{Author2023test}", response.readEntity(String.class));
         assertEquals("text/plain", response.getHeaderString("Content-Type"));
     }
+
+    @Test
+    void maliciousCommandReturnsBadRequest() {
+        Response response = target("/better-bibtex/cayw")
+                .queryParam("format", "biblatex")
+                .queryParam("selected", "1")
+                .queryParam("application", "Sublime Text")
+                .queryParam("command", "'; touch /tmp/pwned; #")
+                .request()
+                .get();
+
+        assertEquals(400, response.getStatus());
+        assertEquals("The 'command' parameter contains invalid characters. Only letters (A–Z, a–z) and '*' are allowed.", response.readEntity(String.class));
+    }
 }
