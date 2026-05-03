@@ -80,12 +80,12 @@ public class OOPreFormatter implements LayoutFormatter {
                         incommand = false;
                         escaped = false;
                     } else // Are we already at the end of the string?
-                    if ((i + 1) == finalResult.length()) {
-                        String command = currentCommand.toString();
-                        String result = OOPreFormatter.CHARS.get(command);
-                        // If found, then use translated version. If not, then keep the text of the parameter intact.
-                        sb.append(Objects.requireNonNullElse(result, command));
-                    }
+                        if ((i + 1) == finalResult.length()) {
+                            String command = currentCommand.toString();
+                            String result = OOPreFormatter.CHARS.get(command);
+                            // If found, then use translated version. If not, then keep the text of the parameter intact.
+                            sb.append(Objects.requireNonNullElse(result, command));
+                        }
                 }
             } else {
                 String argument;
@@ -146,18 +146,27 @@ public class OOPreFormatter implements LayoutFormatter {
             case "textit",
                  "it",
                  "emph",
-                 "em" -> "i";  // Italic
+                 "em" ->
+                    "i";  // Italic
             case "textbf",
-                 "bf" -> "b";                // Bold font
-            case "textsc" -> "smallcaps";              // Small caps
+                 "bf" ->
+                    "b";                // Bold font
+            case "textsc" ->
+                    "smallcaps";              // Small caps
             // Not a proper HTML tag, but used here for convenience
-            case "underline" -> "u";                   // Underline
-            case "sout" -> "s";                        // Strikeout
+            case "underline" ->
+                    "u";                   // Underline
+            case "sout" ->
+                    "s";                        // Strikeout
             // sout is the "standard" command, although it is actually based on the package ulem
-            case "texttt" -> "tt";                     // Monospace font
-            case "textsuperscript" -> "sup";           // Superscript
-            case "textsubscript" -> "sub";
-            default ->"";             // Subscript
+            case "texttt" ->
+                    "tt";                     // Monospace font
+            case "textsuperscript" ->
+                    "sup";           // Superscript
+            case "textsubscript" ->
+                    "sub";
+            default ->
+                    "";             // Subscript
         };
     }
 }
