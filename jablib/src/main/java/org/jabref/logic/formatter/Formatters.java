@@ -149,18 +149,16 @@ public class Formatters {
             modifier = modifier.replace("camel", "");
             if (modifier.isEmpty()) {
                 return Optional.of(new CamelFormatter());
-            } else {
-                int length = Integer.parseInt(modifier);
-                return Optional.of(new CamelNFormatter(length));
             }
+            int length = Integer.parseInt(modifier);
+            return Optional.of(new CamelNFormatter(length));
         } else if (modifier.startsWith(RegexFormatter.KEY)) {
             String regex = modifier.substring(RegexFormatter.KEY.length());
             return Optional.of(new RegexFormatter(regex));
         } else if (TRUNCATE_PATTERN.matcher(modifier).matches()) {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
-        } else {
-            return getFormatterForKey(modifier);
         }
+        return getFormatterForKey(modifier);
     }
 }

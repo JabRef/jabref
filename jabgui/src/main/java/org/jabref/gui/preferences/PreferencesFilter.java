@@ -64,9 +64,8 @@ public class PreferencesFilter {
                 return PreferenceType.BOOLEAN;
             } else if (value instanceof Integer) {
                 return PreferenceType.INTEGER;
-            } else {
-                return PreferenceType.STRING;
             }
+            return PreferenceType.STRING;
         }
 
         public boolean isUnchanged() {

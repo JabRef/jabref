@@ -103,12 +103,10 @@ public class JabKit implements Runnable {
                 System.err.println(Localization.lang("Problem downloading from %0: %1", address, e.getLocalizedMessage()));
                 return Optional.empty();
             }
+        } else if (OS.WINDOWS) {
+            file = Path.of(address);
         } else {
-            if (OS.WINDOWS) {
-                file = Path.of(address);
-            } else {
-                file = Path.of(address.replace("~", System.getProperty("user.home")));
-            }
+            file = Path.of(address.replace("~", System.getProperty("user.home")));
         }
 
         Optional<ParserResult> importResult = importFile(file, importFormat, cliPreferences, porcelain);
@@ -138,19 +136,18 @@ public class JabKit implements Runnable {
                 }
                 ParserResult result = importFormatReader.importFromFile(importFormat, file);
                 return Optional.of(result);
-            } else {
-                // * means "guess the format":
-                if (!porcelain) {
-                    System.out.println(Localization.lang("Importing file %0 as unknown format", file));
-                }
-
-                ImportFormatReader.ImportResult importResult = importFormatReader.importWithAutoDetection(file);
-
-                if (!porcelain) {
-                    System.out.println(Localization.lang("Format used: %0", importResult.format()));
-                }
-                return Optional.of(importResult.parserResult());
             }
+            // * means "guess the format":
+            if (!porcelain) {
+                System.out.println(Localization.lang("Importing file %0 as unknown format", file));
+            }
+
+            ImportFormatReader.ImportResult importResult = importFormatReader.importWithAutoDetection(file);
+
+            if (!porcelain) {
+                System.out.println(Localization.lang("Format used: %0", importResult.format()));
+            }
+            return Optional.of(importResult.parserResult());
         } catch (ImportException ex) {
             LOGGER.error("Error opening file '{}'", file, ex);
             return Optional.empty();

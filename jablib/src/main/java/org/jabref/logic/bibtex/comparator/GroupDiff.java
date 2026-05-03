@@ -22,9 +22,8 @@ public class GroupDiff {
 
         if (!originalGroups.equals(newGroups)) {
             return Optional.of(new GroupDiff(originalGroups.orElse(null), newGroups.orElse(null)));
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     public GroupTreeNode getOriginalGroupRoot() {

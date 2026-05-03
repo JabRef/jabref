@@ -53,8 +53,7 @@ public abstract class Formatter {
     public boolean equals(Object obj) {
         if (obj instanceof Formatter formatter) {
             return getKey().equals(formatter.getKey());
-        } else {
-            return false;
         }
+        return false;
     }
 }

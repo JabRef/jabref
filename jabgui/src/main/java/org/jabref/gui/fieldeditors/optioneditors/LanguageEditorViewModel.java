@@ -29,18 +29,16 @@ public class LanguageEditorViewModel extends OptionEditorViewModel<Langid> {
             public String toString(Langid object) {
                 if (object == null) {
                     return null;
-                } else {
-                    return object.getLangid();  // Langid used as both display and value
                 }
+                return object.getLangid();  // Langid used as both display and value
             }
 
             @Override
             public Langid fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
                     return Langid.parse(string).orElse(null);
-                } else {
-                    return null;
                 }
+                return null;
             }
         };
     }

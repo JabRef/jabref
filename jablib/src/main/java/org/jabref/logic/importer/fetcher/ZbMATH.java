@@ -67,7 +67,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         entry.getFieldOrAlias(StandardField.JOURNAL).ifPresent(journal -> uriBuilder.addParameter("j", journal));
         entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -> uriBuilder.addParameter("y", year));
         entry.getFieldOrAlias(StandardField.PAGINATION)
-             .ifPresent(pagination -> uriBuilder.addParameter("p", pagination));
+                .ifPresent(pagination -> uriBuilder.addParameter("p", pagination));
         entry.getFieldOrAlias(StandardField.VOLUME).ifPresent(volume -> uriBuilder.addParameter("v", volume));
         entry.getFieldOrAlias(StandardField.ISSUE).ifPresent(issue -> uriBuilder.addParameter("i", issue));
 
@@ -75,8 +75,8 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             // replace "and" by ";" as citation matching API uses ";" for separation
             AuthorList authors = AuthorList.parse(entry.getFieldOrAlias(StandardField.AUTHOR).get());
             String authorsWithSemicolon = authors.getAuthors().stream()
-                                                 .map(author -> author.getFamilyGiven(false))
-                                                 .collect(Collectors.joining(";"));
+                    .map(author -> author.getFamilyGiven(false))
+                    .collect(Collectors.joining(";"));
             uriBuilder.addParameter("a", authorsWithSemicolon);
         }
 
@@ -87,24 +87,23 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
          */
         String urlString = uriBuilder.build().toString();
         HttpResponse<JsonNode> response = Unirest.get(urlString)
-                                                 .asJson();
+                .asJson();
         String zblid = null;
         if (response.getStatus() == 200) {
             JSONArray result = response.getBody()
-                                       .getObject()
-                                       .getJSONArray("results");
+                    .getObject()
+                    .getJSONArray("results");
             if (!result.isEmpty()) {
                 zblid = result.getJSONObject(0)
-                              .get("zbl_id")
-                              .toString();
+                        .get("zbl_id")
+                        .toString();
             }
         }
         if (zblid == null) {
             // citation matching API found no matching entry
             return null;
-        } else {
-            return getUrlForIdentifier(zblid);
         }
+        return getUrlForIdentifier(zblid);
     }
 
     @Override

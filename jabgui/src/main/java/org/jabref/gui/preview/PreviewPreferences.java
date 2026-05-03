@@ -122,9 +122,8 @@ public class PreviewPreferences {
                     getCustomPreviewLayout(),
                     LayoutFormatterPreferences.getDefault(),
                     new JournalAbbreviationRepository());
-        } else {
-            return layoutCycle.get(layoutCyclePosition.getValue());
         }
+        return layoutCycle.get(layoutCyclePosition.getValue());
     }
 
     public String getCustomPreviewLayout() {

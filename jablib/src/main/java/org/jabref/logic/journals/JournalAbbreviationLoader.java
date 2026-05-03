@@ -77,15 +77,14 @@ public class JournalAbbreviationLoader {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no ltwa-list.mv. We cannot load the LTWA repository.");
                 throw new IOException("LTWA repository not found");
-            } else {
-                Path tempDir = Files.createTempDirectory("jabref-ltwa");
-                Path tempLtwaList = tempDir.resolve("ltwa-list.mv");
-                Files.copy(resourceAsStream, tempLtwaList);
-                LtwaRepository ltwaRepository = new LtwaRepository(tempLtwaList);
-                tempDir.toFile().deleteOnExit();
-                tempLtwaList.toFile().deleteOnExit();
-                return ltwaRepository;
             }
+            Path tempDir = Files.createTempDirectory("jabref-ltwa");
+            Path tempLtwaList = tempDir.resolve("ltwa-list.mv");
+            Files.copy(resourceAsStream, tempLtwaList);
+            LtwaRepository ltwaRepository = new LtwaRepository(tempLtwaList);
+            tempDir.toFile().deleteOnExit();
+            tempLtwaList.toFile().deleteOnExit();
+            return ltwaRepository;
         }
     }
 

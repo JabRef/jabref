@@ -31,9 +31,8 @@ public class CompareCitedKey implements Comparator<ComparableCitedKey> {
             return -mul;
         } else if (bBibEntry.isEmpty()) {
             return mul;
-        } else {
-            // Proper comparison of entries
-            return entryComparator.compare(aBibEntry.get(), bBibEntry.get());
         }
+        // Proper comparison of entries
+        return entryComparator.compare(aBibEntry.get(), bBibEntry.get());
     }
 }

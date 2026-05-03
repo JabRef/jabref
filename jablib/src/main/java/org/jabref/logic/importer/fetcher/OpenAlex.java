@@ -162,10 +162,9 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                     entries.add(jsonItemToBibEntry(item));
                 }
                 return entries;
-            } else {
-                // Single work object
-                return List.of(jsonItemToBibEntry(response));
             }
+            // Single work object
+            return List.of(jsonItemToBibEntry(response));
         };
     }
 

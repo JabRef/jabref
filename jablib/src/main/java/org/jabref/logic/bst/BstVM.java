@@ -90,9 +90,8 @@ public class BstVM {
     protected Deque<Object> getStack() {
         if (latestContext != null) {
             return latestContext.stack();
-        } else {
-            throw new BstVMException("BstVM must have rendered at least once to provide the latest stack");
         }
+        throw new BstVMException("BstVM must have rendered at least once to provide the latest stack");
     }
 
     private static class ThrowingErrorListener extends BaseErrorListener {

@@ -64,11 +64,10 @@ public final class SplitDiffHighlighter extends DiffHighlighter {
     public int getPositionInText(int positionInTokenList, List<String> tokenList) {
         if (positionInTokenList == 0) {
             return 0;
-        } else {
-            return tokenList.stream().limit(positionInTokenList).map(String::length)
-                            .reduce(Integer::sum)
-                            .map(value -> value + (getSeparator().length() * positionInTokenList))
-                            .orElse(0);
         }
+        return tokenList.stream().limit(positionInTokenList).map(String::length)
+                .reduce(Integer::sum)
+                .map(value -> value + (getSeparator().length() * positionInTokenList))
+                .orElse(0);
     }
 }

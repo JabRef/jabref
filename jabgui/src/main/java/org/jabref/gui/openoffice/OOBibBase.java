@@ -150,14 +150,13 @@ public class OOBibBase {
 
     OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
         String msg = results.stream()
-                            .filter(OOVoidResult::isError)
-                            .map(e -> e.getError().getLocalizedMessage())
-                            .collect(Collectors.joining("\n\n"));
+                .filter(OOVoidResult::isError)
+                .map(e -> e.getError().getLocalizedMessage())
+                .collect(Collectors.joining("\n\n"));
         if (msg.isEmpty()) {
             return OOVoidResult.ok();
-        } else {
-            return OOVoidResult.error(new OOError(errorTitle, msg));
         }
+        return OOVoidResult.error(new OOError(errorTitle, msg));
     }
 
     boolean testDialog(OOVoidResult<OOError> res) {
@@ -291,9 +290,8 @@ public class OOBibBase {
     OOVoidResult<OOError> styleIsRequired(OOStyle style) {
         if (style == null) {
             return OOVoidResult.error(OOError.noValidStyleSelected());
-        } else {
-            return OOVoidResult.ok();
         }
+        return OOVoidResult.ok();
     }
 
     OOResult<OOFrontend, OOError> getFrontend(XTextDocument doc) {
@@ -312,18 +310,16 @@ public class OOBibBase {
                                              Supplier<OOError> fun) {
         if (databases == null || databases.isEmpty()) {
             return OOVoidResult.error(fun.get());
-        } else {
-            return OOVoidResult.ok();
         }
+        return OOVoidResult.ok();
     }
 
     OOVoidResult<OOError> selectedBibEntryIsRequired(List<BibEntry> entries,
                                                      Supplier<OOError> fun) {
         if (entries == null || entries.isEmpty()) {
             return OOVoidResult.error(fun.get());
-        } else {
-            return OOVoidResult.ok();
         }
+        return OOVoidResult.ok();
     }
 
     /*
@@ -849,16 +845,15 @@ public class OOBibBase {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang(errorTitle),
                         Localization.lang("Your OpenOffice/LibreOffice document references"
-                                        + " at least %0 citation keys"
-                                        + " which could not be found in your current library."
-                                        + " Some of these are %1.",
+                                + " at least %0 citation keys"
+                                + " which could not be found in your current library."
+                                + " Some of these are %1.",
                                 String.valueOf(unresolvedKeys.size()),
                                 String.join(", ", unresolvedKeys)));
                 if (returnPartialResult) {
                     return Optional.of(result.newDatabase);
-                } else {
-                    return FAIL;
                 }
+                return FAIL;
             }
             return Optional.of(result.newDatabase);
         } catch (NoDocumentException ex) {

@@ -59,7 +59,7 @@ public class FileFieldParser {
     private List<LinkedFilePosition> parse() {
         List<LinkedFilePosition> files = new ArrayList<>();
 
-        if ((value == null) || value.trim().isEmpty()) {
+        if ((value == null) || value.isBlank()) {
             return files;
         }
 

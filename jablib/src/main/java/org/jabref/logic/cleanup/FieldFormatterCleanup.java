@@ -37,9 +37,8 @@ public class FieldFormatterCleanup implements CleanupJob {
             return cleanupAllFields(entry, mutationScheduler);
         } else if (InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD == field) {
             return cleanupAllTextFields(entry, mutationScheduler);
-        } else {
-            return cleanupSingleField(field, entry, mutationScheduler);
         }
+        return cleanupSingleField(field, entry, mutationScheduler);
     }
 
     /// Runs the formatter on the specified field in the given entry.

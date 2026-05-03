@@ -86,13 +86,11 @@ public class VersionWorker {
             if (manualExecution) {
                 dialogService.notify(Localization.lang("JabRef is up-to-date."));
             }
-        } else {
-            // notify the user about a newer version
-            if (dialogService.showCustomDialogAndWait(
-                                     new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
-                             .orElse(true)) {
-                internalPreferences.setIgnoredVersion(newerVersion.get());
-            }
+        } else // notify the user about a newer version
+        if (dialogService.showCustomDialogAndWait(
+                                 new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
+                         .orElse(true)) {
+            internalPreferences.setIgnoredVersion(newerVersion.get());
         }
     }
 }

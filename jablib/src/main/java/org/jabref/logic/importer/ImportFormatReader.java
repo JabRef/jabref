@@ -266,9 +266,8 @@ public class ImportFormatReader {
             ParserResult parserResult = importUsingBibtex.apply();
             if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                 return new ImportResult(ImportFormatReader.BIBTEX_FORMAT, parserResult);
-            } else {
-                throw new ImportException(parserResult.getErrorMessage());
             }
+            throw new ImportException(parserResult.getErrorMessage());
         } catch (IOException ignore) {
             throw new ImportException(Localization.lang("Could not find a suitable import format."));
         }

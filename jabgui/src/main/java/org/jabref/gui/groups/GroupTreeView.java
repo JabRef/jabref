@@ -91,10 +91,10 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
-    private static final double NUMBER_COL_WIDTH = 60d;
-    private static final double EXPANSION_COL_WIDTH = 20d;
-    private static final double ADD_SUBGROUP_COL_WIDTH = 28d;
-    private static final double SCROLLBAR_WIDTH = 15d;
+    private static final double NUMBER_COL_WIDTH = 60D;
+    private static final double EXPANSION_COL_WIDTH = 20D;
+    private static final double ADD_SUBGROUP_COL_WIDTH = 28D;
+    private static final double SCROLLBAR_WIDTH = 15D;
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -246,13 +246,12 @@ public class GroupTreeView extends BorderPane {
                         group -> {
                             if (group == null) {
                                 return null;
-                            } else {
-                                return new RecursiveTreeItem<>(
-                                        group,
-                                        GroupNodeViewModel::getChildren,
-                                        GroupNodeViewModel::expandedProperty,
-                                        viewModel.filterPredicateProperty());
                             }
+                            return new RecursiveTreeItem<>(
+                                    group,
+                                    GroupNodeViewModel::getChildren,
+                                    GroupNodeViewModel::expandedProperty,
+                                    viewModel.filterPredicateProperty());
                         }));
 
         // Icon and group name

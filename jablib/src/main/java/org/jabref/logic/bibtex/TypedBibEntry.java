@@ -39,9 +39,8 @@ public class TypedBibEntry {
         Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);
         if (type.isPresent()) {
             return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
-        } else {
-            return true;
         }
+        return true;
     }
 
     /// Gets the display name for the type of the entry.

@@ -277,9 +277,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     public List<String> getRestartWarnings() {
         if (sslCertificatesChanged.get()) {
             return List.of(Localization.lang("SSL configuration changed"));
-        } else {
-            return List.of();
         }
+        return List.of();
     }
 
     public BooleanProperty versionCheckProperty() {

@@ -137,9 +137,9 @@ public final class CSLStyleUtils {
                             usesHangingIndent = "true".equals(hangingIndent);
                         }
                         case "citation" ->
-                                hasCitation = true;
+                            hasCitation = true;
                         case "info" ->
-                                inInfo = true;
+                            inInfo = true;
                         case "title" -> {
                             if (inInfo) {
                                 title = reader.getElementText();
@@ -166,10 +166,9 @@ public final class CSLStyleUtils {
 
             if (hasCitation && title != null) {
                 return Optional.of(new StyleInfo(title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent));
-            } else {
-                LOGGER.debug("No valid title or citation found for file {}", filename);
-                return Optional.empty();
             }
+            LOGGER.debug("No valid title or citation found for file {}", filename);
+            return Optional.empty();
         } catch (XMLStreamException e) {
             LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage(), e);
             return Optional.empty();

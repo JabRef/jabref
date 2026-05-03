@@ -35,7 +35,7 @@ public class PushToApplicationDetector {
     }
 
     public static boolean isValidAbsolutePath(String path) {
-        if (path == null || path.trim().isEmpty()) {
+        if (path == null || path.isBlank()) {
             return false;
         }
         Path p = Path.of(path);
@@ -142,11 +142,10 @@ public class PushToApplicationDetector {
             return file.equals(name + ".exe") ||
                     file.equals(name + ".bat") ||
                     file.equals(name + ".cmd");
-        } else {
-            return file.equals(name) ||
-                    file.equals(name + ".sh") ||
-                    file.equals(name + ".app");
         }
+        return file.equals(name) ||
+                file.equals(name + ".sh") ||
+                file.equals(name + ".app");
     }
 
     private static String[] getPossibleExecutableNames(String name) {
@@ -185,7 +184,7 @@ public class PushToApplicationDetector {
         result = trySystemCommand("where", exe);
         if (result != null) {
             String[] lines = result.split("\n");
-            return lines.length > 0 && !lines[0].trim().isEmpty() ? lines[0].trim() : null;
+            return lines.length > 0 && !lines[0].isBlank() ? lines[0].trim() : null;
         }
 
         return null;

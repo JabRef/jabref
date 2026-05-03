@@ -87,17 +87,16 @@ public class OOFormatBibliography {
         if (citedKey.getLookupResult().isEmpty()) {
             // Unresolved entry
             return OOText.fromString("Unresolved(%s)".formatted(citedKey.citationKey));
-        } else {
-            // Resolved entry, use the layout engine
-            BibEntry bibentry = citedKey.getLookupResult().get().entry;
-            Layout layout = style.getReferenceFormat(bibentry.getType());
-            layout.setPostFormatter(POSTFORMATTER);
-
-            return formatFullReferenceOfBibEntry(layout,
-                    bibentry,
-                    citedKey.getLookupResult().get().database,
-                    citedKey.getUniqueLetter().orElse(null));
         }
+        // Resolved entry, use the layout engine
+        BibEntry bibentry = citedKey.getLookupResult().get().entry;
+        Layout layout = style.getReferenceFormat(bibentry.getType());
+        layout.setPostFormatter(POSTFORMATTER);
+
+        return formatFullReferenceOfBibEntry(layout,
+                bibentry,
+                citedKey.getLookupResult().get().database,
+                citedKey.getUniqueLetter().orElse(null));
     }
 
     /// Format the reference part of a bibliography entry using a Layout.

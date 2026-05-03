@@ -30,10 +30,9 @@ public class DateGroup extends AbstractGroup {
         if (isCore) {
             // use alias resolution so DATE <-> YEAR/MONTH/DAY works either way
             return entry.getFieldOrAlias(StandardField.DATE).flatMap(Date::parse);
-        } else {
-            // e.g. urldate or any custom date-like field
-            return entry.getField(field).flatMap(Date::parse);
         }
+        // e.g. urldate or any custom date-like field
+        return entry.getField(field).flatMap(Date::parse);
     }
 
     /// Returns a date group key from `d`.

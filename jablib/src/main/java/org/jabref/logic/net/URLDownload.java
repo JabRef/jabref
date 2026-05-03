@@ -382,9 +382,8 @@ public class URLDownload {
                 LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source.toString()), httpResponse);
                 if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
-                } else {
-                    throw new FetcherServerException(this.source, httpResponse);
                 }
+                throw new FetcherServerException(this.source, httpResponse);
             }
         }
         return connection;

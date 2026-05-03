@@ -98,9 +98,8 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
                         return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
                     } else if (optionalFields.contains(field)) {
                         return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-                    } else {
-                        return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
                     }
+                    return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
                 }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
         return results;
     }

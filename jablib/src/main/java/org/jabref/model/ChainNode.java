@@ -124,9 +124,8 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     public boolean isAncestorOf(@NonNull T anotherNode) {
         if (anotherNode == this) {
             return true;
-        } else {
-            return child.isAncestorOf(anotherNode);
         }
+        return child.isAncestorOf(anotherNode);
     }
 
     /// Adds the given node at the end of the chain.

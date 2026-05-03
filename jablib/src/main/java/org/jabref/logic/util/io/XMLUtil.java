@@ -64,9 +64,8 @@ public class XMLUtil {
         NodeList metadata = ((Element) item).getElementsByTagName(nodeName);
         if (metadata.getLength() == 1) {
             return Optional.ofNullable(metadata.item(0).getTextContent());
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     /// Gets the content of an attribute.

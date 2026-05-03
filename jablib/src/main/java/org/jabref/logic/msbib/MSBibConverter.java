@@ -90,16 +90,14 @@ public class MSBibConverter {
 
         if (entry.getFieldLatexFree(StandardField.TYPE).isPresent()) {
             result.thesisType = entry.getFieldLatexFree(StandardField.TYPE).get();
-        } else {
-            if (entry.getType().equals(StandardEntryType.TechReport)) {
-                result.thesisType = "Tech. rep.";
-            } else if (entry.getType().equals(StandardEntryType.MastersThesis)) {
-                result.thesisType = "Master's thesis";
-            } else if (entry.getType().equals(StandardEntryType.PhdThesis)) {
-                result.thesisType = "Ph.D. dissertation";
-            } else if (entry.getType().equals(StandardEntryType.Unpublished)) {
-                result.thesisType = "unpublished";
-            }
+        } else if (entry.getType().equals(StandardEntryType.TechReport)) {
+            result.thesisType = "Tech. rep.";
+        } else if (entry.getType().equals(StandardEntryType.MastersThesis)) {
+            result.thesisType = "Master's thesis";
+        } else if (entry.getType().equals(StandardEntryType.PhdThesis)) {
+            result.thesisType = "Ph.D. dissertation";
+        } else if (entry.getType().equals(StandardEntryType.Unpublished)) {
+            result.thesisType = "unpublished";
         }
 
         // TODO: currently this can never happen

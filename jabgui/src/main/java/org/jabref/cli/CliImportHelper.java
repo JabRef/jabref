@@ -44,12 +44,10 @@ public class CliImportHelper {
                 System.err.println(Localization.lang("Problem downloading from %0: %1", address, e.getLocalizedMessage()));
                 return Optional.empty();
             }
+        } else if (OS.WINDOWS) {
+            file = Path.of(address);
         } else {
-            if (OS.WINDOWS) {
-                file = Path.of(address);
-            } else {
-                file = Path.of(address.replace("~", System.getProperty("user.home")));
-            }
+            file = Path.of(address.replace("~", System.getProperty("user.home")));
         }
 
         Optional<ParserResult> importResult = importFile(file, cliPreferences, porcelain);
