@@ -114,7 +114,7 @@ One can add `--help` to see available options.
 In case you have [JBang installed], just run following command:
 
 ```terminal
-jbang jabsrv@jabref
+jbang --fresh jabsrv@jabref
 ```
 
 With `gg.cmd`:
