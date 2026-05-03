@@ -9,6 +9,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class EditionChecker implements ValueChecker {
 
@@ -34,7 +35,7 @@ public class EditionChecker implements ValueChecker {
     /// edition". Official BibTeX specification: The edition of a book-for example, "Second". This should be an ordinal,
     /// and should have the first letter capitalized.
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }
