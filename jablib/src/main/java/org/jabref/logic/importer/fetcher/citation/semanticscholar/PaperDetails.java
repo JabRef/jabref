@@ -95,29 +95,29 @@ public class PaperDetails {
         }
         return switch (publicationTypes.getFirst()) {
             case "Review" ->
-                "Misc";
+                    "Misc";
             case "CaseReport" ->
-                "Report";
+                    "Report";
             case "ClinicalTrial" ->
-                "Report";
+                    "Report";
             case "Dataset" ->
-                "Dataset";
+                    "Dataset";
             case "Editorial" ->
-                "Misc";
+                    "Misc";
             case "LettersAndComments" ->
-                "Misc";
+                    "Misc";
             case "MetaAnalysis" ->
-                "Article";
+                    "Article";
             case "News" ->
-                "Misc";
+                    "Misc";
             case "Study" ->
-                "Article";
+                    "Article";
             case "Book" ->
-                "Book";
+                    "Book";
             case "BookSection" ->
-                "InBook";
+                    "InBook";
             default ->
-                "Misc";
+                    "Misc";
         };
     }
 

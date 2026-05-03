@@ -154,8 +154,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         int delimiterIndex = input.lastIndexOf("//");
         if (delimiterIndex != -1) {
             lastParts.add(input.substring(afterAuthorsIndex, delimiterIndex)
-                    .replace(YEAR_TAG, "")
-                    .replace(PAGES_TAG, ""));
+                               .replace(YEAR_TAG, "")
+                               .replace(PAGES_TAG, ""));
             lastParts.addAll(Arrays.asList(input.substring(delimiterIndex + 2).split(",|\\.")));
         } else {
             lastParts.addAll(Arrays.asList(input.substring(afterAuthorsIndex).split(",|\\.")));

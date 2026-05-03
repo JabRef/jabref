@@ -137,9 +137,9 @@ public final class CSLStyleUtils {
                             usesHangingIndent = "true".equals(hangingIndent);
                         }
                         case "citation" ->
-                            hasCitation = true;
+                                hasCitation = true;
                         case "info" ->
-                            inInfo = true;
+                                inInfo = true;
                         case "title" -> {
                             if (inInfo) {
                                 title = reader.getElementText();

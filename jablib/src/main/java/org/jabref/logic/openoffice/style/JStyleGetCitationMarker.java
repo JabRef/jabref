@@ -158,19 +158,19 @@ class JStyleGetCitationMarker {
                 String name = getAuthorLastName(authorList, nAuthors - 1);
                 stringBuilder.append(markupAuthorName(style, name));
             } else // Emit last names up to nAuthorsToEmit.
-            //
-            // The (maxAuthorsBeforeEtAl > 1) test is intended to
-            // make sure the compiler eliminates this block as
-            // long as maxAuthorsBeforeEtAl is fixed to 1.
-            if (maxAuthorsBeforeEtAl > 1) {
-                int j = 1;
-                while (j < nAuthorsToEmit) {
-                    stringBuilder.append(authorSep);
-                    String name = getAuthorLastName(authorList, j);
-                    stringBuilder.append(markupAuthorName(style, name));
-                    j++;
+                //
+                // The (maxAuthorsBeforeEtAl > 1) test is intended to
+                // make sure the compiler eliminates this block as
+                // long as maxAuthorsBeforeEtAl is fixed to 1.
+                if (maxAuthorsBeforeEtAl > 1) {
+                    int j = 1;
+                    while (j < nAuthorsToEmit) {
+                        stringBuilder.append(authorSep);
+                        String name = getAuthorLastName(authorList, j);
+                        stringBuilder.append(markupAuthorName(style, name));
+                        j++;
+                    }
                 }
-            }
         }
 
         if (nAuthorsToEmit >= 1) {
@@ -275,8 +275,8 @@ class JStyleGetCitationMarker {
         }
 
         int maxAuthors = entry.getIsFirstAppearanceOfSource()
-                ? style.getMaxAuthorsFirst()
-                : style.getMaxAuthors();
+                         ? style.getMaxAuthorsFirst()
+                         : style.getMaxAuthors();
 
         AuthorList authorList = getAuthorList(style, entry.getLookupResult().get());
         int nAuthors = authorList.getNumberOfAuthors();

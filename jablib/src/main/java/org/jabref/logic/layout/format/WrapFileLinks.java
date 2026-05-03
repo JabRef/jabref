@@ -149,11 +149,11 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                     sb.append(c);
                 }
             } else // Check if we are at the start of an escape sequence:
-            if (c == '\\') {
-                escaped = true;
-            } else {
-                sb.append(c);
-            }
+                if (c == '\\') {
+                    escaped = true;
+                } else {
+                    sb.append(c);
+                }
         }
         // Finished scanning the string. If we collected text at the end, add an entry for it:
         if (!sb.isEmpty()) {

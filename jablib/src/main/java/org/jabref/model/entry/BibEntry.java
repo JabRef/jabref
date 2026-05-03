@@ -509,13 +509,13 @@ public class BibEntry {
             if (parsedDate.isPresent()) {
                 return switch (field) {
                     case StandardField.YEAR ->
-                        parsedDate.get().getYear().map(Object::toString);
+                            parsedDate.get().getYear().map(Object::toString);
                     case StandardField.MONTH ->
-                        parsedDate.get().getMonth().map(Month::getJabRefFormat);
+                            parsedDate.get().getMonth().map(Month::getJabRefFormat);
                     case StandardField.DAY ->
-                        parsedDate.get().getDay().map(Object::toString);
+                            parsedDate.get().getDay().map(Object::toString);
                     default ->
-                        throw new IllegalStateException("Unexpected value");
+                            throw new IllegalStateException("Unexpected value");
                 };
             }
             // Date field not in valid format

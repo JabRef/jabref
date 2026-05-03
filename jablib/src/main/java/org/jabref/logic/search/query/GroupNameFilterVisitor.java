@@ -37,7 +37,7 @@ public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
             return visit(ctx.expression().getFirst());
         }
         boolean allSimpleTerm = ctx.expression().stream()
-                .allMatch(e -> e instanceof SearchParser.ComparisonExpressionContext);
+                                   .allMatch(e -> e instanceof SearchParser.ComparisonExpressionContext);
         if (allSimpleTerm) {
             return ctx.expression().stream().anyMatch(this::visit);
         }

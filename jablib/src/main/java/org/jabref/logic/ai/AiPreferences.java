@@ -380,13 +380,13 @@ public class AiPreferences {
         }
         return switch (aiProvider.get()) {
             case OPEN_AI ->
-                AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
+                    AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
             case MISTRAL_AI ->
-                AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
+                    AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
             case HUGGING_FACE ->
-                AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
+                    AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
             case GEMINI ->
-                AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
+                    AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
         };
     }
 
@@ -514,13 +514,13 @@ public class AiPreferences {
         if (customizeExpertSettings.get()) {
             return switch (aiProvider.get()) {
                 case OPEN_AI ->
-                    openAiApiBaseUrl.get();
+                        openAiApiBaseUrl.get();
                 case MISTRAL_AI ->
-                    mistralAiApiBaseUrl.get();
+                        mistralAiApiBaseUrl.get();
                 case HUGGING_FACE ->
-                    huggingFaceApiBaseUrl.get();
+                        huggingFaceApiBaseUrl.get();
                 case GEMINI ->
-                    geminiApiBaseUrl.get();
+                        geminiApiBaseUrl.get();
             };
         }
         return aiProvider.get().getApiUrl();

@@ -90,15 +90,15 @@ public class HTMLChars implements ParamLayoutFormatter {
 
                         incommand = false;
                     } else // Are we already at the end of the string?
-                    if ((i + 1) == field.length()) {
-                        String command = currentCommand.toString();
-                        String result = HTML_CHARS.get(command);
-                        /* If found, then use translated version. If not,
+                        if ((i + 1) == field.length()) {
+                            String command = currentCommand.toString();
+                            String result = HTML_CHARS.get(command);
+                            /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
                              */
-                        sb.append(Objects.requireNonNullElse(result, command));
-                    }
+                            sb.append(Objects.requireNonNullElse(result, command));
+                        }
                 }
             } else {
                 if (!incommand) {

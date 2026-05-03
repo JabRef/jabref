@@ -229,13 +229,13 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         // Pseudo-fields
         field = switch (field) {
             case "key" ->
-                InternalField.KEY_FIELD.getName();
+                    InternalField.KEY_FIELD.getName();
             case "anykeyword" ->
-                StandardField.KEYWORDS.getName();
+                    StandardField.KEYWORDS.getName();
             case "anyfield" ->
-                "any";
+                    "any";
             default ->
-                field;
+                    field;
         };
 
         if (ENTRY_ID.toString().equals(field)) {
@@ -243,20 +243,20 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         } else if ("any".equals(field)) {
             if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
-                        ? buildExactNegationAnyFieldQuery(sqlOperator, term)
-                        : buildExactAnyFieldQuery(sqlOperator, term);
+                       ? buildExactNegationAnyFieldQuery(sqlOperator, term)
+                       : buildExactAnyFieldQuery(sqlOperator, term);
             }
             return searchFlags.contains(NEGATION)
-                    ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
-                    : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
+                   ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
+                   : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
         } else if (searchFlags.contains(EXACT_MATCH)) {
             return searchFlags.contains(NEGATION)
-                    ? buildExactNegationFieldQuery(field, sqlOperator, term)
-                    : buildExactFieldQuery(field, sqlOperator, term);
+                   ? buildExactNegationFieldQuery(field, sqlOperator, term)
+                   : buildExactFieldQuery(field, sqlOperator, term);
         }
         return searchFlags.contains(NEGATION)
-                ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
-                : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
+               ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
+               : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
     }
 
     private SqlQueryNode buildEntryIdQuery(String entryId) {

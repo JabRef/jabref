@@ -197,15 +197,15 @@ public class BibEntryTypesManager {
         /// or an empty optional if it does not exist.
         private Optional<BibEntryType> enrich(EntryType type) {
             Optional<BibEntryType> enrichedType = customOrModifiedType.stream()
-                    .filter(typeEquals(type))
-                    .findFirst();
+                                                                      .filter(typeEquals(type))
+                                                                      .findFirst();
             if (enrichedType.isPresent()) {
                 LOGGER.debug("Using customized entry type for {}", type.getName());
                 return enrichedType;
             }
             return standardTypes.stream()
-                    .filter(typeEquals(type))
-                    .findFirst();
+                                .filter(typeEquals(type))
+                                .findFirst();
         }
 
         static Predicate<BibEntryType> typeEquals(EntryType toCompare) {

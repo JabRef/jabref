@@ -1009,9 +1009,9 @@ public class BracketedPattern {
             // This gets the single char "+" only
             AuthorList allButOthers = AuthorList.of(
                     authorList.getAuthors()
-                            .stream()
-                            .limit(limit)
-                            .toList());
+                              .stream()
+                              .limit(limit)
+                              .toList());
             return authIniN(allButOthers, n - 1) + "+";
         }
 

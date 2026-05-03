@@ -50,14 +50,14 @@ public class UpdateField {
                 return Optional.empty();
             }
         } else // old field value not set
-        if (newValue == null) {
-            // Do nothing
-            return Optional.empty();
-        } else {
-            // Set new value
-            writtenValue = newValue;
-            be.setField(field, newValue);
-        }
+            if (newValue == null) {
+                // Do nothing
+                return Optional.empty();
+            } else {
+                // Set new value
+                writtenValue = newValue;
+                be.setField(field, newValue);
+            }
         return Optional.of(new FieldChange(be, field, oldValue, writtenValue));
     }
 
