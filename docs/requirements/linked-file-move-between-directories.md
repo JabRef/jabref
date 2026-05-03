@@ -14,7 +14,6 @@ JabRef supports up to four directory types for storing linked files (see [Direct
 
 Context menu design follows [ADR-0056](../decisions/0056-linked-file-move-context-menu-shows-all-configured-directories.md).
 Multi-file behaviour follows [ADR-0057](../decisions/0057-multi-file-move-uses-single-chosen-target-directory.md).
-X4 scope follows [ADR-0059](../decisions/0059-next-to-library-is-a-valid-move-target.md).
 
 Issue: [#12287](https://github.com/JabRef/jabref/issues/12287)
 
