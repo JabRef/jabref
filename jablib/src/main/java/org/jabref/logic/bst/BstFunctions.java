@@ -429,7 +429,7 @@ public class BstFunctions {
         stack.push(result ? BstVM.TRUE : BstVM.FALSE);
     }
 
-    /// The _built_in_ function {\.{format.name\$}} pops the
+    /// The _|built_in|_ function {\.{format.name\$}} pops the
     /// top three literals (ordered):
     ///
     ///  - String: format string, as described in the \BibTeX\ documentation.
@@ -437,7 +437,7 @@ public class BstFunctions {
     ///  - String: name list (each name corresponding to a person).
     ///
     /// Finally, this function pushes the formatted name. If any of the types is
-    /// incorrect, it complains and pushes the null string.
+    /// incorrect, it complains and pushes an empty string.
     private void bstFormatName(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 3) {
             throw new BstVMException("Not enough operands on stack for operation format.name$ (line %d)".formatted(ctx.start.getLine()));
@@ -465,11 +465,11 @@ public class BstFunctions {
             return;
         }
 
-        AuthorList a = AuthorList.parse(authors);
-        if (name < 1 || name > a.getNumberOfAuthors()) {
+        AuthorList parsedAuthors = AuthorList.parse(authors);
+        if (name < 1 || name > parsedAuthors.getNumberOfAuthors()) {
             throw new BstVMException("Author out of bounds. Number %d invalid for %s (line %d)".formatted(name, authors, ctx.start.getLine()));
         }
-        Author author = a.getAuthor(name - 1);
+        Author author = parsedAuthors.getAuthor(name - 1);
 
         stack.push(BstNameFormatter.formatName(author, format));
     }
