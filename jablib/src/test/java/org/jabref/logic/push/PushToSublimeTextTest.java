@@ -1,5 +1,6 @@
 package org.jabref.logic.push;
 
+import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.SimpleMapProperty;
@@ -35,7 +36,8 @@ class PushToSublimeTextTest {
         CitationCommandString maliciousCommand = new CitationCommandString("\\cite{'; touch /tmp/pwned; #", ",", "}");
         when(preferences.getCiteCommand()).thenReturn(maliciousCommand);
 
-        pushToSublimeText.pushEntries(java.util.List.of());
+        // this adds the /usr/bin/subl
+        pushToSublimeText.pushEntries(List.of());
 
         String[] commandLine = pushToSublimeText.getCommandLine("key");
 
