@@ -127,16 +127,24 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
+        Predicate<String> keyStoreRule = input -> !useSSL.getValue() || notEmptyAndfilesExist.test(input);
 
         databaseValidator = new FunctionBasedValidator<>(database, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
         hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
         portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
         userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
         folderValidator = new FunctionBasedValidator<>(folder, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-        keystoreValidator = new FunctionBasedValidator<>(keystore, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        keystoreValidator = new FunctionBasedValidator<>(keystore, keyStoreRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
         formValidator = new CompositeValidator();
-        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);
+        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, keystoreValidator);
+
+        EasyBind.subscribe(useSSL, selected -> {
+            // Force the keystoreValidator to re-evaluate by "touching" the text property
+            String current = keystore.getValue();
+            keystore.setValue(null);
+            keystore.setValue(current);
+        });
 
         applyPreferences();
     }
