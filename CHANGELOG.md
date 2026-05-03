@@ -101,7 +101,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the invisible delete button area was shown for internal CSL styles in the OpenOffice/LibreOffice style selection dialog. External CSL styles remain deletable. [#15397](https://github.com/JabRef/jabref/issues/15397)
 - We fixed an issue that prevented files without a file extension from being shown in various file select dialogs [#11786](https://github.com/JabRef/jabref/issues/11786)
 - We fixed the Hayagriva YAML exporter producing a multi-document YAML file, which broke Typst compilation. [#15617](https://github.com/JabRef/jabref/issues/15617)
-- We fixed the Shared Database Login Dialog by ensuring that fields were required or not required respective to connection information and preferences. [#15660](https://github.com/JabRef/jabref/issues/15660)
+- We fixed the Shared Database Login Dialog by ensuring that fields were required based on the database type and preferences. [#15660](https://github.com/JabRef/jabref/issues/15660)
 
 ### Removed
 
