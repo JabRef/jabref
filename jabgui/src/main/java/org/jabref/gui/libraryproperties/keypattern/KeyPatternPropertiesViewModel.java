@@ -48,7 +48,7 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
             }
         });
 
-        if (!defaultKeyPatternProperty.getValue().getPattern().trim().isEmpty()) {
+        if (!defaultKeyPatternProperty.getValue().getPattern().isBlank()) {
             // we do not trim the value at the assignment to enable users to have spaces at the beginning and
             // at the end of the pattern
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());

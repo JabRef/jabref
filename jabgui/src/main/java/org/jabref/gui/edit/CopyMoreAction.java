@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
@@ -27,6 +28,8 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 public class CopyMoreAction extends SimpleCommand {
 
@@ -255,7 +258,7 @@ public class CopyMoreAction extends SimpleCommand {
         List<String> fieldValues = selectedBibEntries.stream()
                                                      .filter(bibEntry -> bibEntry.getFieldOrAlias(field).isPresent())
                                                      .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getFieldOrAlias(field).orElse("")))
-                                                     .filter(value -> !value.isEmpty())
+                                                     .filter(not(String::isEmpty))
                                                      .toList();
 
         if (fieldValues.isEmpty()) {

@@ -39,7 +39,7 @@ public class PushToEmacs extends AbstractPushToApplication {
 
         commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+        if ((commandPath == null) || commandPath.isBlank()) {
             notDefined = true;
             return;
         }
@@ -101,7 +101,7 @@ public class PushToEmacs extends AbstractPushToApplication {
                         LOGGER.warn("Could not read from stderr.", e);
                     }
                     // Error stream has been closed. See if there were any errors:
-                    if (!sb.toString().trim().isEmpty()) {
+                    if (!sb.toString().isBlank()) {
                         LOGGER.warn("Push to Emacs error: {}", sb);
                         couldNotPush = true;
                     }
