@@ -82,7 +82,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
         run: |
-          gradle --no-configuration-cache :rewriteRun
+          gradle --no-configuration-cache :rewriteDryRun
       - name: Output diff
         if: failure()
         run: |
