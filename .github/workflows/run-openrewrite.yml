@@ -40,6 +40,9 @@ jobs:
       - name: Run rewrite
         run: gradle --no-configuration-cache :rewriteRun
 
+      # Reformat code (because OpenRewrite does different indents)
+      - uses: ./.github/actions/format-java
+
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
