@@ -85,8 +85,8 @@ class GenerateBibFromAux implements Runnable {
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()
-                    .map(BibEntry::toString)
-                    .collect(Collectors.joining("\n\n")));
+                                          .map(BibEntry::toString)
+                                          .collect(Collectors.joining("\n\n")));
             return;
         }
         JabKit.saveDatabase(
