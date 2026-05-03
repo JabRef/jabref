@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -23,6 +24,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -65,6 +67,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableView<StudyCatalogItem> catalogTable;
     @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogReasonColumn;
 
     @FXML private Label directoryWarning;
 
@@ -247,6 +250,39 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         catalogColumn.setEditable(false);
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
+
+        catalogReasonColumn.setReorderable(false);
+        catalogReasonColumn.setCellValueFactory(param -> param.getValue().reasonProperty());
+        catalogReasonColumn.setCellFactory(column -> {
+            TextField textField = new TextField();
+            TableCell<StudyCatalogItem, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        textField.setText(item == null ? "" : item);
+                        setGraphic(textField);
+                    }
+                }
+            };
+            textField.focusedProperty().addListener((_obs, _wasFocused, isNowFocused) -> {
+                if (!isNowFocused) {
+                    TableView<StudyCatalogItem> tableView = cell.getTableView();
+                    int index = cell.getIndex();
+                    if (tableView != null && index >= 0 && index < tableView.getItems().size()) {
+                        tableView.getItems().get(index).setReason(textField.getText());
+                    }
+                }
+            });
+            textField.addEventFilter(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
+            return cell;
+        });
+        Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
+        catalogReasonHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the reason")));
+        catalogReasonColumn.setGraphic(catalogReasonHeader);
+        catalogReasonColumn.setText("");
 
         catalogTable.setItems(viewModel.getCatalogs());
     }
