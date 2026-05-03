@@ -66,8 +66,8 @@ public final class SplitDiffHighlighter extends DiffHighlighter {
             return 0;
         }
         return tokenList.stream().limit(positionInTokenList).map(String::length)
-                .reduce(Integer::sum)
-                .map(value -> value + (getSeparator().length() * positionInTokenList))
-                .orElse(0);
+                        .reduce(Integer::sum)
+                        .map(value -> value + (getSeparator().length() * positionInTokenList))
+                        .orElse(0);
     }
 }

@@ -55,7 +55,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                .orElse(BibDatabaseMode.BIBLATEX);
+                                           .orElse(BibDatabaseMode.BIBLATEX);
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             if (isImportantOptionalFields) {

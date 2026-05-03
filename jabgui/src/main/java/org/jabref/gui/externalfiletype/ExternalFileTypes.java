@@ -125,7 +125,7 @@ public class ExternalFileTypes {
                 // URLs contain ":" which is illegal in Windows file paths (e.g., "http://")
                 // See https://github.com/JabRef/jabref/issues/14975
                 extensionOpt = FileUtil.getFileNameFromUrl(linkPath)
-                        .flatMap(FileUtil::getFileExtension);
+                                       .flatMap(FileUtil::getFileExtension);
             } else {
                 // For local files, get extension directly
                 extensionOpt = FileUtil.getFileExtension(linkPath);

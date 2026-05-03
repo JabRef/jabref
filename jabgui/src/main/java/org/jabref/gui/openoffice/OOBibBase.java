@@ -150,9 +150,9 @@ public class OOBibBase {
 
     OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
         String msg = results.stream()
-                .filter(OOVoidResult::isError)
-                .map(e -> e.getError().getLocalizedMessage())
-                .collect(Collectors.joining("\n\n"));
+                            .filter(OOVoidResult::isError)
+                            .map(e -> e.getError().getLocalizedMessage())
+                            .collect(Collectors.joining("\n\n"));
         if (msg.isEmpty()) {
             return OOVoidResult.ok();
         }
@@ -845,9 +845,9 @@ public class OOBibBase {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang(errorTitle),
                         Localization.lang("Your OpenOffice/LibreOffice document references"
-                                + " at least %0 citation keys"
-                                + " which could not be found in your current library."
-                                + " Some of these are %1.",
+                                        + " at least %0 citation keys"
+                                        + " which could not be found in your current library."
+                                        + " Some of these are %1.",
                                 String.valueOf(unresolvedKeys.size()),
                                 String.join(", ", unresolvedKeys)));
                 if (returnPartialResult) {

@@ -65,7 +65,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                .orElse(BibDatabaseMode.BIBLATEX);
+                                           .orElse(BibDatabaseMode.BIBLATEX);
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             return entryType.get().getDeprecatedFields(mode).stream().filter(field -> entry.getField(field).isPresent()).collect(Collectors.toCollection(LinkedHashSet::new));

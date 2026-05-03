@@ -103,10 +103,10 @@ public class SaveDatabaseAction {
                                  return new SelfContainedSaveOrder(
                                          SaveOrder.OrderType.SPECIFIED,
                                          sortOrder.stream()
-                                                 .filter(col -> col instanceof MainTableColumn<?>)
-                                                 .map(column -> ((MainTableColumn<?>) column).getModel())
-                                                 .flatMap(model -> model.getSortCriteria().stream())
-                                                 .toList());
+                                                  .filter(col -> col instanceof MainTableColumn<?>)
+                                                  .map(column -> ((MainTableColumn<?>) column).getModel())
+                                                  .flatMap(model -> model.getSortCriteria().stream())
+                                                  .toList());
                              }
                              return SelfContainedSaveOrder.of(so);
                          })
