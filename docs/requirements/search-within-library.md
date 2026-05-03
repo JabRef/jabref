@@ -39,7 +39,8 @@ When searching for "author" "Demo" should match `art_1` only.
 
 It is possible by regular expressions, but the user asked for "quickly".
 
-Needs: impl
+> Currently, no implementation is linked
+{: .prompt-note}
 
 ## Search for citation key
 `req~jabgui.search.syntax.citation-key~1`
@@ -47,8 +48,6 @@ Needs: impl
 Issue: [#10490](https://github.com/JabRef/jabref/issues/10490)
 
 Enable to quickly search for a citation key.
-
-Needs: impl
 
 > Currently, no implementation is linked
 {: .prompt-note}
