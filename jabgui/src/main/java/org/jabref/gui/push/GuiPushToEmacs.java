@@ -3,7 +3,6 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
@@ -30,6 +29,6 @@ public class GuiPushToEmacs extends PushToEmacs implements GuiPushToApplication 
 
     @Override
     public void sendErrorNotification(String title, String message) {
-        UiTaskExecutor.runNowOrInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
+        dialogService.showErrorDialogAndWait(title, message);
     }
 }

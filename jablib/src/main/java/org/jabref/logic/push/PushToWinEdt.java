@@ -19,11 +19,8 @@ public class PushToWinEdt extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        String citeString = getCitePrefix() + keyString + getCiteSuffix();
-        // WinEdt macro escaping: ' is escaped by ''
-        String escapedCiteString = citeString.replace("'", "''");
         return new String[] {commandPath,
-                "\"[InsText('" + escapedCiteString + "');]\""};
+                "\"[InsText('" + getCitePrefix() + keyString.replace("'", "''") + getCiteSuffix() + "');]\""};
     }
 
     @Override

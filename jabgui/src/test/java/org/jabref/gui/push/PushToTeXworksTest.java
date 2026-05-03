@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -63,7 +62,7 @@ class PushToTeXworksTest {
     @Test
     void getCommandLine() {
         String keyString = "TestKey";
-        String[] expectedCommand = new String[] {"", "--insert-text", keyString}; // commandPath is only set in pushEntries
+        String[] expectedCommand = new String[] {null, "--insert-text", keyString}; // commandPath is only set in pushEntries
 
         String[] actualCommand = pushToTeXworks.getCommandLine(keyString);
 
@@ -76,17 +75,11 @@ class PushToTeXworksTest {
         ProcessBuilder processBuilder = mock(ProcessBuilder.class);
 
         String testKey = "TestKey";
-        if (OS.OS_X) {
-            List<String> expectedCommand = List.of("open", "-a", TEXWORKS_CLIENT_PATH, "-n", "--args", "--insert-text", testKey);
+        String[] expectedCommand = new String[] {TEXWORKS_CLIENT_PATH, "--insert-text", testKey};
 
-            pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
+        pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
 
-            verify(processBuilder).command(expectedCommand);
-        } else {
-            pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
-
-            verify(processBuilder).command(TEXWORKS_CLIENT_PATH, "--insert-text", testKey);
-        }
+        verify(processBuilder).command(expectedCommand);
     }
 
     /// To verify that the PushToTeXworks class correctly returns the tooltip for TeXworks.

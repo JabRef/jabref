@@ -2,9 +2,6 @@ package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -31,7 +28,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected boolean couldNotPush; // Set to true in case the tunnel to the program (if one is used) does not operate
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
 
-    protected String commandPath = "";
+    protected String commandPath;
 
     protected final NotificationService notificationService;
     protected final PushToApplicationPreferences preferences;
@@ -60,7 +57,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getCommandPaths().getOrDefault(this.getDisplayName(), "");
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {
@@ -72,25 +69,24 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
         // Execute command
         try {
-            String[] commands = getCommandLine(keyString);
             if (OS.OS_X) {
-                if (commands.length == 0) {
-                    LOGGER.error("Commandline does not contain any parameters to \"push to application\"");
+                String[] commands = getCommandLine(keyString);
+                if (commands.length < 3) {
+                    LOGGER.error("Commandline does not contain enough parameters to \"push to application\"");
                     return;
                 }
-                List<String> openCommand = new ArrayList<>();
-                openCommand.add("open");
-                openCommand.add("-a");
-                openCommand.add(commands[0]);
-                if (commands.length > 1) {
-                    openCommand.add("-n");
-                    openCommand.add("--args");
-                    Collections.addAll(openCommand, Arrays.copyOfRange(commands, 1, commands.length));
-                }
-                processBuilder.command(openCommand);
+                processBuilder.command(
+                        "open",
+                        "-a",
+                        commands[0],
+                        "-n",
+                        "--args",
+                        commands[1],
+                        commands[2]
+                );
                 processBuilder.start();
             } else {
-                processBuilder.command(commands);
+                processBuilder.command(getCommandLine(keyString));
                 processBuilder.start();
             }
         } catch (IOException excep) {
@@ -108,9 +104,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         } else if (couldNotCall) {
             sendErrorNotification(
                     Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not call executable '%0'.", commandPath) + "\n" +
-                            Localization.lang("Please check the path in the preferences.") + "\n" +
-                            (OS.OS_X ? Localization.lang("On macOS, you can use the command-line binary.") : ""));
+                    Localization.lang("Could not call executable") + " '" + commandPath + "'.");
         } else if (couldNotPush) {
             sendErrorNotification(
                     Localization.lang("Error pushing entries"),
@@ -154,7 +148,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     ///
     /// @return String with the command name
     public String getCommandName() {
-        return "";
+        return null;
     }
 
     protected String getCitePrefix() {
@@ -170,8 +164,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     public void jumpToLine(Path fileName, int line, int column) {
-        String path = preferences.getCommandPaths().get(this.getDisplayName());
-        commandPath = path != null ? path : "";
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;
