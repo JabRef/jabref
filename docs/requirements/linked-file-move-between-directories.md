@@ -5,14 +5,13 @@ parent: Requirements
 
 JabRef supports up to four directory types for storing linked files (see [Directories for Files](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files)):
 
-| ID | Name | Scope |
-|----|------|-------|
-| X1 | Main file directory | Global preference; current user only |
-| X2 | Library-specific file directory | Per library; all users of that library |
-| X3 | User-specific file directory | Per user per library; current user only |
-| X4 | Next to library | Global preference "store files next to library"; files live alongside the `.bib` file |
+| ID | Name                            | Scope                                                                                 |
+|----|---------------------------------|---------------------------------------------------------------------------------------|
+| X1 | Main file directory             | Global preference; current user only                                                  |
+| X2 | Library-specific file directory | Per library; all users of that library                                                |
+| X3 | User-specific file directory    | Per user per library; current user only                                               |
+| X4 | Next to library                 | Global preference "store files next to library"; files live alongside the `.bib` file |
 
-Terminology follows [ADR-0060](../decisions/0060-rename-general-file-directory-to-library-specific-file-directory.md).
 Context menu design follows [ADR-0056](../decisions/0056-linked-file-move-context-menu-shows-all-configured-directories.md).
 Multi-file behaviour follows [ADR-0057](../decisions/0057-multi-file-move-uses-single-chosen-target-directory.md).
 X4 scope follows [ADR-0059](../decisions/0059-next-to-library-is-a-valid-move-target.md).
@@ -25,12 +24,12 @@ Issue: [#12287](https://github.com/JabRef/jabref/issues/12287)
 The right-click context menu for a linked file must display one menu item per configured directory type (X1–X4).
 Each item is labelled as follows:
 
-| Directory | Menu label |
-|-----------|-----------|
-| X1 | Move file to main file directory |
-| X2 | Move file to library-specific file directory |
-| X3 | Move file to user-specific file directory |
-| X4 | Move file next to library |
+| Directory | Menu label                                   |
+|-----------|----------------------------------------------|
+| X1        | Move file to main file directory             |
+| X2        | Move file to library-specific file directory |
+| X3        | Move file to user-specific file directory    |
+| X4        | Move file next to library                    |
 
 Only directories that are actually configured appear in the menu.
 
