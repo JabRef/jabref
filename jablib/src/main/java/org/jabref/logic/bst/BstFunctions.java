@@ -12,6 +12,7 @@ import org.jabref.logic.bst.util.BstNameFormatter;
 import org.jabref.logic.bst.util.BstPurifier;
 import org.jabref.logic.bst.util.BstTextPrefixer;
 import org.jabref.logic.bst.util.BstWidthCalculator;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -19,7 +20,6 @@ import org.jabref.model.entry.AuthorList;
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -453,13 +453,13 @@ public class BstFunctions {
             return;
         }
 
-        if (StringUtils.isBlank(format)) {
+        if (StringUtil.isBlank(format)) {
             LOGGER.warn("Format string is empty");
             stack.push("");
             return;
         }
 
-        if (StringUtils.isBlank(authors)) {
+        if (StringUtil.isBlank(authors)) {
             LOGGER.warn("Author list is empty");
             stack.push("");
             return;
