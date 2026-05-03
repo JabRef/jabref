@@ -2,7 +2,6 @@ package org.jabref.http.server.cayw;
 
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.function.Predicate;
 
 import org.jspecify.annotations.Nullable;
 
