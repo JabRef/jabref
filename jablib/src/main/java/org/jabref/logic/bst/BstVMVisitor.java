@@ -95,7 +95,6 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         return BstVM.TRUE;
     }
 
-    /// Trims braces and resolve months
     private static String normalizeFieldValue(String content, FieldWriter fieldWriter, Field field) {
         String result = fieldWriter.write(field, content);
         if (result.startsWith("{")
