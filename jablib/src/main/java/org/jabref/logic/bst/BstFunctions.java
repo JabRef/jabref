@@ -19,9 +19,13 @@ import org.jabref.model.entry.AuthorList;
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class BstFunctions {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstFunctions.class);
     private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^.?!}\\s])(}|\\s)*$");
@@ -37,11 +41,11 @@ public class BstFunctions {
     private int bstWarning = 0;
 
     @FunctionalInterface
-    public interface BstFunction {
+    interface BstFunction {
 
         void execute(BstVMVisitor visitor, ParserRuleContext ctx);
 
-        default void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
+        default void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntryContext) {
             this.execute(visitor, ctx);
         }
     }
@@ -57,7 +61,7 @@ public class BstFunctions {
         this.bbl = bbl;
     }
 
-    protected Map<String, BstFunction> getBuiltInFunctions() {
+    Map<String, BstFunction> getBuiltInFunctions() {
         Map<String, BstFunction> builtInFunctions = new HashMap<>();
 
         builtInFunctions.put(">", this::bstIsGreaterThan);
@@ -216,7 +220,7 @@ public class BstFunctions {
 
     /// Pops the top two literals and assigns to the first (which must be
     /// a global or entry variable) the value of the second.
-    public class BstAssignFunction implements BstFunction {
+    class BstAssignFunction implements BstFunction {
 
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
@@ -224,7 +228,7 @@ public class BstFunctions {
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntry) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntry) {
             if (stack.size() < 2) {
                 throw new BstVMException("Not enough operands on stack for operation := (line %d)".formatted(ctx.start.getLine()));
             }
@@ -298,14 +302,14 @@ public class BstFunctions {
     /// default.type. Thus, you should define (before the READ command)
     /// one function for each standard entry type as well as a
     /// `default.type` function.
-    public class BstCallTypeFunction implements BstFunction {
+    class BstCallTypeFunction implements BstFunction {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
             throw new BstVMException("Call.type$ can only be called from within a context (ITERATE or REVERSE). (line %d)".formatted(ctx.start.getLine()));
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntry) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntry) {
             if (bstEntry == null) {
                 this.execute(visitor, ctx); // Throw error
             } else {
@@ -373,20 +377,20 @@ public class BstFunctions {
 
     /// Pushes the string that was the \cite-command argument for this
     /// entry.
-    public class BstCiteFunction implements BstFunction {
+    class BstCiteFunction implements BstFunction {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
             throw new BstVMException("Must have an entry to cite$ (line %d)".formatted(ctx.start.getLine()));
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
-            if (bstEntryContext == null) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntry) {
+            if (bstEntry == null) {
                 execute(visitor, ctx);
                 return;
             }
 
-            stack.push(bstEntryContext.entry.getCitationKey().orElse(null));
+            bstEntry.entry.getCitationKey().ifPresent(stack::push);
         }
     }
 
@@ -425,15 +429,15 @@ public class BstFunctions {
         stack.push(result ? BstVM.TRUE : BstVM.FALSE);
     }
 
-    /// The |built_in| function {\.{format.name\$}} pops the
-    /// top three literals (they are a string, an integer, and a string
-    /// literal, in that order). The last string literal represents a
-    /// name list (each name corresponding to a person), the integer
-    /// literal specifies which name to pick from this list, and the
-    /// first string literal specifies how to format this name, as
-    /// described in the \BibTeX\ documentation. Finally, this function
-    /// pushes the formatted name. If any of the types is incorrect, it
-    /// complains and pushes the null string.
+    /// The _built_in_ function {\.{format.name\$}} pops the
+    /// top three literals (ordered):
+    ///
+    ///  - String: format string, as described in the \BibTeX\ documentation.
+    ///  - Integer: number of the name to format, starting with 1
+    ///  - String: name list (each name corresponding to a person).
+    ///
+    /// Finally, this function pushes the formatted name. If any of the types is
+    /// incorrect, it complains and pushes the null string.
     private void bstFormatName(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 3) {
             throw new BstVMException("Not enough operands on stack for operation format.name$ (line %d)".formatted(ctx.start.getLine()));
@@ -442,27 +446,32 @@ public class BstFunctions {
         Object o2 = stack.pop();
         Object o3 = stack.pop();
 
-        if (!(o1 instanceof String) && !(o2 instanceof Integer) && !(o3 instanceof String)) {
-            // warning("A string is needed for change.case$");
+        if (!(o1 instanceof String format)
+                || !(o2 instanceof Integer name)
+                || !(o3 instanceof String authors)) {
             stack.push("");
             return;
         }
 
-        String format = (String) o1;
-        Integer name = (Integer) o2;
-        String names = (String) o3;
-
-        if (names == null) {
+        if (StringUtils.isBlank(format)) {
+            LOGGER.warn("Format string is empty");
             stack.push("");
-        } else {
-            AuthorList a = AuthorList.parse(names);
-            if (name > a.getNumberOfAuthors()) {
-                throw new BstVMException("Author Out of Bounds. Number %d invalid for %s (line %d)".formatted(name, names, ctx.start.getLine()));
-            }
-            Author author = a.getAuthor(name - 1);
-
-            stack.push(BstNameFormatter.formatName(author, format));
+            return;
         }
+
+        if (StringUtils.isBlank(authors)) {
+            LOGGER.warn("Author list is empty");
+            stack.push("");
+            return;
+        }
+
+        AuthorList a = AuthorList.parse(authors);
+        if (name < 1 || name > a.getNumberOfAuthors()) {
+            throw new BstVMException("Author out of bounds. Number %d invalid for %s (line %d)".formatted(name, authors, ctx.start.getLine()));
+        }
+        Author author = a.getAuthor(name - 1);
+
+        stack.push(BstNameFormatter.formatName(author, format));
     }
 
     /// Pops the top three literals (they are two function literals and
@@ -790,14 +799,14 @@ public class BstFunctions {
 
     /// Pushes the current entry's type (book, article, etc.), but pushes
     /// the null string if the type is either unknown or undefined.
-    public class BstTypeFunction implements BstFunction {
+    class BstTypeFunction implements BstFunction {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
             throw new BstVMException("type$ need a context (line %d)".formatted(ctx.start.getLine()));
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntryContext) {
             if (bstEntryContext == null) {
                 this.execute(visitor, ctx);
                 return;
