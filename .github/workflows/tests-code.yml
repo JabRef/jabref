@@ -81,12 +81,18 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run OpenRewrite
+        continue-on-error: true
+        run: |
+          gradle --no-configuration-cache :rewriteRun
+      - name: Output diff
+        run: |
+          if [ -f /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch ]; then
+            cat /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch
+            exit 1
+          fi
+      - name: Run OpenRewrite (fallback)
         run: |
           gradle --no-configuration-cache :rewriteDryRun
-      - name: Output diff
-        if: failure()
-        run: |
-          cat /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch
 
   format:
     # ubuntu-slim doesn't offer docker
