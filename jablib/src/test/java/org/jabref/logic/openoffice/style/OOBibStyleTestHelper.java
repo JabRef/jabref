@@ -97,11 +97,11 @@ class OOBibStyleTestHelper {
         }
         List<CitationMarkerNumericEntry> input =
                 num.stream()
-                        .map(n ->
-                                new CitationMarkerNumericEntryImpl("key" + n,
-                                        n,
-                                        Optional.empty()))
-                        .collect(Collectors.toList());
+                   .map(n ->
+                           new CitationMarkerNumericEntryImpl("key" + n,
+                                   n,
+                                   Optional.empty()))
+                   .collect(Collectors.toList());
         return style.getNumCitationMarker2(input, minGroupingCount).toString();
     }
 
