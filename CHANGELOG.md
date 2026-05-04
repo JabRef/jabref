@@ -53,6 +53,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the active group filter was reset after deleting an entry. [#15587](https://github.com/JabRef/jabref/issues/15587)
 - We fixed an issue where removed CSL files were not immediately cleared from the UI upon style removal. [#15438](https://github.com/JabRef/jabref/issues/15438)
 - We improved the group filter to support full boolean search syntax. [#12721](https://github.com/JabRef/jabref/issues/12721)
 - We fixed the column chooser context menu appearing when right-clicking the empty library table body. [#15384](https://github.com/JabRef/jabref/issues/15384)
