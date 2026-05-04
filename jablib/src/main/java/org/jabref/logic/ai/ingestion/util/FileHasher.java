@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.ingestion.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -30,7 +31,7 @@ public final class FileHasher {
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
 
-            try (var inputStream = Files.newInputStream(path)) {
+            try (InputStream inputStream = Files.newInputStream(path)) {
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     digest.update(buffer, 0, bytesRead);
                 }

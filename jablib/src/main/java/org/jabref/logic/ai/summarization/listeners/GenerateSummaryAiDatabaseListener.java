@@ -74,8 +74,8 @@ public class GenerateSummaryAiDatabaseListener implements AiDatabaseListener {
         }
 
         @Subscribe
-        public void listen(EntriesAddedEvent e) {
-            e.getBibEntries().forEach(entry -> {
+        public void listen(EntriesAddedEvent event) {
+            event.getBibEntries().forEach(entry -> {
                 // [pp->req~ai.summarization.entries.auto~1]
                 if (!aiPreferences.getEnableAi() || !aiPreferences.getAutoGenerateSummaries()) {
                     return;
@@ -92,9 +92,9 @@ public class GenerateSummaryAiDatabaseListener implements AiDatabaseListener {
         }
 
         @Subscribe
-        public void listen(FieldChangedEvent e) {
+        public void listen(FieldChangedEvent event) {
             // [pp->req~ai.summarization.entries.auto~1]
-            if (!aiPreferences.getEnableAi() || !aiPreferences.getAutoGenerateSummaries() || e.getField() != StandardField.FILE) {
+            if (!aiPreferences.getEnableAi() || !aiPreferences.getAutoGenerateSummaries() || event.getField() != StandardField.FILE) {
                 return;
             }
 
@@ -102,7 +102,7 @@ public class GenerateSummaryAiDatabaseListener implements AiDatabaseListener {
                     filePreferences,
                     chatModel.get(),
                     summarizator.get(),
-                    new FullBibEntry(context, e.getBibEntry()),
+                    new FullBibEntry(context, event.getBibEntry()),
                     false
             ));
         }
