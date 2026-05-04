@@ -18,8 +18,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SearchRxivExporterTest {
 
@@ -51,18 +49,19 @@ class SearchRxivExporterTest {
         try (var files = Files.list(tempDir)) {
             file = files.findFirst().orElseThrow();
         }
-        String content = Files.readString(file);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(content);
+        JsonNode expected = mapper.readTree("""
+                {
+                  "search_string": "artificial intelligence AND health",
+                  "platform": "ieee",
+                  "authors": [{"name": "John Doe"}],
+                  "record_info": {},
+                  "date": {},
+                  "database": []
+                }
+                """);
 
-        assertEquals("artificial intelligence AND health", root.get("search_string").asText());
-        assertEquals("ieee", root.get("platform").asText());
-        assertEquals("John Doe", root.get("authors").get(0).get("name").asText());
-        assertTrue(root.has("record_info"));
-        assertTrue(root.has("date"));
-        assertFalse(root.has("title"));
-        assertTrue(root.has("database"));
-        assertEquals(0, root.get("database").size());
+        assertEquals(expected, mapper.readTree(Files.readString(file)));
     }
 
     @Test
