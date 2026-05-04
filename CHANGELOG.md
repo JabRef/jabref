@@ -321,7 +321,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We merged the 'New Entry', 'Import by ID', and 'New Entry from Plain Text' tools into a single 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
-- We moved all sorting options into a dedicated “Sort” sub-menu in the Groups menu. ([#14017](https://github.com/JabRef/jabref/issues/14017))
+- We moved all sorting options into a dedicated “Sort” sub-menu in the Groups menu. [#14017](https://github.com/JabRef/jabref/issues/14017)
 - We merged `Citation information` and `Citation relations` into a singular tab. [#13618](https://github.com/JabRef/jabref/issues/13618)
 - We changed `ISSNCleanup` into `NormalizeIssn` a `ISSN` formatter. [#13748](https://github.com/JabRef/jabref/issues/13748)
 - We changed Citation Relations tab and gave tab panes more descriptive titles and tooltips. [#13619](https://github.com/JabRef/jabref/issues/13619)
@@ -437,8 +437,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to choose whether to open the file explorer in the files directory or in the last opened directory when attaching files. [#12554](https://github.com/JabRef/jabref/issues/12554)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
-- We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832/)
-- We added a "LTWA" abbreviation feature in the "Quality > Abbreviate journal names > LTWA" menu [#12273](https://github.com/JabRef/jabref/issues/12273/)
+- We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832)
+- We added a "LTWA" abbreviation feature in the "Quality > Abbreviate journal names > LTWA" menu [#12273](https://github.com/JabRef/jabref/issues/12273)
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 - We now support usage of custom CSL styles in the Open/LibreOffice integration. [#12337](https://github.com/JabRef/jabref/issues/12337)
 - We added support for citation-only CSL styles which don't specify bibliography formatting. [#12996](https://github.com/JabRef/jabref/pull/12996)
@@ -509,7 +509,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where duplicate items cannot be removed correctly when merging groups or keywords. [#12585](https://github.com/JabRef/jabref/issues/12585)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion [#12645](https://github.com/JabRef/jabref/issues/12645)
 - We fixed an issue where JabRef displayed an incorrect deletion notification when canceling entry deletion. [#12645](https://github.com/JabRef/jabref/issues/12645)
-- We fixed an issue where JabRref wrote wrong field names into the PDF. [#12833](https://github.com/JabRef/jabref/pulls/12833)
+- We fixed an issue where JabRref wrote wrong field names into the PDF. [#12833](https://github.com/JabRef/jabref/pull/12833)
 - We fixed an issue where an exception would occur when running abbreviate journals for multiple entries. [#12634](https://github.com/JabRef/jabref/issues/12634)
 - We fixed an issue Where JabRef displayed an inconsistent search results for date-related queries[#12296](https://github.com/JabRef/jabref/issues/12296)
 - We fixed an issue where JabRef displayed dropdown triangle in wrong place in "Search for unlinked local files" dialog [#12713](https://github.com/JabRef/jabref/issues/12713)
@@ -968,7 +968,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We reorganized the order of tabs and settings in the library properties. [#9836](https://github.com/JabRef/jabref/pull/9836)
 - We changed the handling of an "overflow" of authors at `[authIniN]`: JabRef uses `+` to indicate an overflow. Example: `[authIni2]` produces `A+` (instead of `AB`) for `Aachen and Berlin and Chemnitz`. [#9703](https://github.com/JabRef/jabref/pull/9703)
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
-- We improved the recognition of DOIs when pasting a link containing a DOI on the maintable. [#9864](https://github.com/JabRef/jabref/issues/9864s)
+- We improved the recognition of DOIs when pasting a link containing a DOI on the maintable. [#9864](https://github.com/JabRef/jabref/issues/9864)
 - We reordered the preferences dialog. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We split the 'Import and Export' tab into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
@@ -1365,7 +1365,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We present options to manually enter an article or return to the New Entry menu when the fetcher DOI fails to find an entry for an ID [#7870](https://github.com/JabRef/jabref/issues/7870)
 - We trim white space and non-ASCII characters from DOI [#8127](https://github.com/JabRef/jabref/issues/8127)
 - The duplicate checker now inspects other fields in case no difference in the required and optional fields are found.
-- We reworked the library properties dialog and integrated the `Library > Preamble`, `Library > Citation key pattern` and `Library > String constants dialogs` [#8264](https://github.com/JabRef/jabref/pulls/8264)
+- We reworked the library properties dialog and integrated the `Library > Preamble`, `Library > Citation key pattern` and `Library > String constants dialogs` [#8264](https://github.com/JabRef/jabref/pull/8264)
 - We improved the startup time of JabRef by switching from the logging library `log4j2` to `tinylog` [#8007](https://github.com/JabRef/jabref/issues/8007)
 
 ### Fixed
@@ -1377,7 +1377,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue when checking for a new version when JabRef is used behind a corporate proxy. [#7884](https://github.com/JabRef/jabref/issues/7884)
 - We fixed some icons that were drawn in the wrong color when JabRef used a custom theme. [#7853](https://github.com/JabRef/jabref/issues/7853)
 - We fixed an issue where the `Aux file` on `Edit group` doesn't support relative sub-directories path to import. [#7719](https://github.com/JabRef/jabref/issues/7719).
-- We fixed an issue where it was impossible to add or modify groups. [#7912](https://github.com/JabRef/jabref/pull/793://github.com/JabRef/jabref/pull/7921)
+- We fixed an issue where it was impossible to add or modify groups. [#7912](https://github.com/JabRef/jabref/issues/7912)
 - We fixed an issue about the visible side pane components being out of sync with the view menu. [#8115](https://github.com/JabRef/jabref/issues/8115)
 - We fixed an issue where the side pane would not close when all its components were closed. [#8082](https://github.com/JabRef/jabref/issues/8082)
 - We fixed an issue where exported entries from a Citavi bib containing URLs could not be imported [#7882](https://github.com/JabRef/jabref/issues/7882)
@@ -1575,10 +1575,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog. [#6934](https://github.com/JabRef/jabref/issues/6934)
 - We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog. [#6906](https://github.com/JabRef/jabref/issues/6906)
 - We fixed an issue where it was impossible to connect to OpenOffice/LibreOffice on Mac OSX. [#6970](https://github.com/JabRef/jabref/pull/6970)
-- We fixed an issue with the python script used by browser plugins that failed to locate JabRef if not installed in its default location. [#6963](https://github.com/JabRef/jabref/pull/6963/files)
+- We fixed an issue with the python script used by browser plugins that failed to locate JabRef if not installed in its default location. [#6963](https://github.com/JabRef/jabref/pull/6963)
 - We fixed an issue where spaces and newlines in an isbn would generate an exception. [#6456](https://github.com/JabRef/jabref/issues/6456)
 - We fixed an issue where identity column header had incorrect foreground color in the Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796)
-- We fixed an issue where the RIS exporter added extra blank lines.[#7007](https://github.com/JabRef/jabref/pull/7007/files)
+- We fixed an issue where the RIS exporter added extra blank lines.[#7007](https://github.com/JabRef/jabref/pull/7007)
 - We fixed an issue where clicking on Collapse All button in the Search for Unlinked Local Files expanded the directory structure erroneously [#6848](https://github.com/JabRef/jabref/issues/6848)
 - We fixed an issue, when pulling changes from shared database via shortcut caused creation of a new tech report [#6867](https://github.com/JabRef/jabref/issues/6867)
 - We fixed an issue where the JabRef GUI does not highlight the "All entries" group on start-up [#6691](https://github.com/JabRef/jabref/issues/6691)
