@@ -315,18 +315,30 @@ class LayoutEntry {
                             continue;
                         }
                     }
-
-                    if (eol < fieldText.length()) {
-                        sb.append(fieldText.substring(eol));
-                    }
                 } else {
-                    sb.append(fieldText);
+                    // if previous was skipped --> remove leading line
+                    // breaks
+                    if (previousSkipped) {
+                        int eol = 0;
+
+                        while ((eol < fieldText.length())
+                                && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
+                            eol++;
+                        }
+
+                        if (eol < fieldText.length()) {
+                            sb.append(fieldText.substring(eol));
+                        }
+                    } else {
+                        sb.append(fieldText);
+                    }
                 }
 
-            previousSkipped = false;
-        }
+                previousSkipped = false;
+            }
 
-        return sb.toString();
+            return sb.toString();
+        }
     }
 
     /// Do layout for general formatters (no bibtex-entry fields).
