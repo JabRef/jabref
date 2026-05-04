@@ -65,4 +65,3 @@ However, users have reported problems with the PyTorch engine integration and un
 * Good, because it has a built-in model zoo for downloading models
 * Neutral, because its API is a bit complex
 * Bad, because of reported stability issues with certain engines
-

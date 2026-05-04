@@ -22,7 +22,7 @@ The [ADR-0032](../decisions/0032-store-chats-in-local-user-folder.md) and [ADR-0
 
 ## Requirements
 
-See [the requirements page of AI features](../requirements/ai.md). 
+See [the requirements page of AI features](../requirements/ai.md).
 
 ## Features
 
@@ -75,7 +75,7 @@ Because JabRef is not build around one global database, but rather it is a `.bib
 - In order to uniquely identify a library, an "AI library ID" was introduced (as a metadata field), which is just a UUID. An alternative would be to use the library path, but if the library moves, the path changes, but AI library ID is not.
 - In order to uniquely identify an entry, the citation key is used, but only if it is non-empty and unique.
 - In some cases (that arise potentially often), the conditions above are not met (for example, a library is not saved - it does not have a path, or an entry does not have a citation key), however user is actively working on an entry. In this case the AI features have an *in-memory cache layer*. So whenever a chat or a summary is created for an entry, it is firstly interacted with the in-memory storage layer. The cache is flushed to the on-disk storage at the close of the JabRef.
-- In order to uniquely identify a file, we use the file hash. An alternative would be to use the file path, but the file could be moved, or defined by a relative path. This is also useful when several libraries cite the same paper, and instead of ingesting 
+- In order to uniquely identify a file, we use the file hash. An alternative would be to use the file path, but the file could be moved, or defined by a relative path. This is also useful when several libraries cite the same paper, and instead of ingesting
 
 ## [OLD] Internal model (v1)
 
@@ -98,7 +98,7 @@ This section describes the standard pattern used for AI features. If should foll
 
 The next points are targeted to the GUI of the feature:
 
-1. Design a component using the MVVM pattern. You need to write the interface in the FXML, then write a controller `Ai<Feature>View` and a view-model `Ai<Feature>ViewModel`. 
+1. Design a component using the MVVM pattern. You need to write the interface in the FXML, then write a controller `Ai<Feature>View` and a view-model `Ai<Feature>ViewModel`.
 2. A typical AI component will be a state machine: first and foremost, check if the AI features are enabled in JabRef (which equals to accepting a privacy policy of AI features). If not, then you must ensure that you component does nothing. To show the privacy policy banner, there is a dedicated component [org.jabref.gui.ai.AiPrivacyNoticeView]. The next states typically envolve checking some preconditions (for example, you can not summarize an entry, if it does not have linked files), and the final is the working state. You might find the [org.jabref.gui.util.BindingsHelper#bindEnum] useful.
 3. The entry editor tabs are designed to be switchable (rebound to some other `BibEntry`), so you can have an `entryProperty` and whenver it is changed, the state machine of the component is rerun.
 4. When you read an artifact for an entry (or a group, or other entity that is linked to your AI feature), the look-up should be made in 3 steps: look into the repository, look in to the in-memory cache, and only then contact the `TaskAggregator` to start a new generation task.

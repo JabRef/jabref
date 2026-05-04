@@ -46,7 +46,6 @@ Needs: impl
 
 Covers: `feat~ai.expert-settings~1`
 
-
 ## Allow modification of global summarization parameters in AI expert settings
 `req~ai.expert-settings.summarization-global~1`
 
