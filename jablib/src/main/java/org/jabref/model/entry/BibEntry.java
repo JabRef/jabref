@@ -62,6 +62,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 /// Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
 ///
 /// Example:
@@ -680,7 +682,7 @@ public class BibEntry {
             FieldPreferences fieldPreferences) {
         try (StringWriter writer = new StringWriter()) {
             BibWriter bibWriter = new BibWriter(writer, "\n");
-            FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+            FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
             BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
             bibEntryWriter.write(entry, bibWriter, type, true);
             return writer.toString();
@@ -1077,7 +1079,7 @@ public class BibEntry {
                    .stream()
                    .flatMap(content -> Arrays.stream(content.split(",")))
                    .map(String::trim)
-                   .filter(key -> !key.isEmpty())
+                   .filter(not(String::isEmpty))
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

@@ -20,6 +20,7 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.gui.theme.Theme;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
@@ -71,6 +72,7 @@ public class PreferencesMigrations {
         removeCommentsFromCustomEditorTabs(preferences);
         migrateGeneralTabDefaultFields(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
+        upgradeTheme(preferences);
     }
 
     /// Migrate all preferences from net/sf/jabref to org/jabref
@@ -615,5 +617,17 @@ public class PreferencesMigrations {
     /// Thus, the configuration ih the preferences is obsolete
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
+    }
+
+    /// upgrade the old theme css names of the theme to the new theme properties
+    /// Theme names were changed in [#15573](https://github.com/JabRef/jabref/pull/15573)
+    static void upgradeTheme(JabRefGuiPreferences preferences) {
+        if ("Dark.css".equals(preferences.get("fxTheme", ""))) {
+            preferences.getWorkspacePreferences().setTheme(Theme.dark());
+        }
+        // no value means light theme when sync with os theme switch is not on
+        if ("".equals(preferences.get("fxTheme", "")) && !preferences.getBoolean("themeSyncOs", false)) {
+            preferences.getWorkspacePreferences().setTheme(Theme.light());
+        }
     }
 }
