@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.undo.UndoManager;
 
