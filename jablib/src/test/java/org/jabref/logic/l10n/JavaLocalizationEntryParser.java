@@ -41,7 +41,7 @@ class JavaLocalizationEntryParser {
                 throw new RuntimeException("\"" + languageKey + "\" ends with a space. As this is a localization key, this is illegal!");
             }
 
-            if (!languagePropertyKey.trim().isEmpty()) {
+            if (!languagePropertyKey.isBlank()) {
                 result.add(languagePropertyKey);
             }
         }

@@ -25,9 +25,9 @@ runs:
       with:
         gradle-version: current
       env:
-        GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+        GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: false
     - name: Setup TestLens
-      uses: testlens-app/setup-testlens@v1.7.0
+      uses: testlens-app/setup-testlens@v1.8.0
     - name: Generate JBang cache key
       id: cache-key
       shell: bash
